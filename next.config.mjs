@@ -49,10 +49,13 @@ const nextConfig = {
 
   // Configure rewrites for Clerk proxy (satellite domain support)
   async rewrites() {
+    // Read Clerk Frontend API URL from environment variable
+    const clerkFrontendApi = process.env.NEXT_PUBLIC_CLERK_FRONTEND_API_URL || 'https://clerk.event-site-manager.com';
+
     return [
       {
         source: '/__clerk/:path*',
-        destination: 'https://clerk.event-site-manager.com/:path*',
+        destination: `${clerkFrontendApi}/:path*`,
       },
     ];
   },

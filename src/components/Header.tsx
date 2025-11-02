@@ -113,6 +113,30 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
 
+  // CRITICAL: Check for sign-out flag IMMEDIATELY on mount, before Clerk loads
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const clerkSignedOut = urlParams.get('clerk_signout');
+
+    if (clerkSignedOut === 'true') {
+      console.log('[Header] Detected clerk_signout=true flag');
+
+      // Clear all Clerk-related items from localStorage
+      Object.keys(localStorage).forEach(key => {
+        if (key.includes('clerk') || key.includes('__clerk')) {
+          localStorage.removeItem(key);
+        }
+      });
+
+      // Remove flag from URL and reload
+      urlParams.delete('clerk_signout');
+      const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+      window.location.replace(newUrl);
+    }
+  }, []);
+
   // Debug: Log auth state changes
   useEffect(() => {
     console.log('[Header] Auth state:', {
@@ -152,10 +176,34 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
   };
 
   const handleSignOut = async () => {
+    console.log('[Header] Sign out button clicked');
+    setIsSigningOut(true);
+
+    // Broadcast sign-out to other tabs
+    localStorage.setItem('clerk_signout_broadcast', Date.now().toString());
+
+    // For satellite domains, redirect to primary domain's sign-out URL
+    const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+    const satelliteDomain = process.env.NEXT_PUBLIC_CLERK_DOMAIN || 'mosc-temp.com';
+    const isSatellite = hostname.includes('mosc-temp.com') || hostname.includes(satelliteDomain.replace('www.', ''));
+
+    if (isSatellite) {
+      console.log('[Header] Satellite domain detected, redirecting to primary domain sign-out...');
+
+      // Get primary domain from environment variable
+      const primaryDomain = process.env.NEXT_PUBLIC_PRIMARY_DOMAIN || 'www.event-site-manager.com';
+
+      // Redirect to primary domain's dedicated sign-out page
+      const primarySignOutUrl = `https://${primaryDomain}/auth/signout-redirect`;
+      const returnUrl = encodeURIComponent(window.location.origin);
+
+      window.location.href = `${primarySignOutUrl}?redirect_url=${returnUrl}`;
+      return;
+    }
+
+    // Primary domain: normal sign out
     try {
-      setIsSigningOut(true);
       await signOut();
-      // Redirect to home page after sign out
       window.location.href = '/';
     } catch (error) {
       console.error('[Header] Error signing out:', error);

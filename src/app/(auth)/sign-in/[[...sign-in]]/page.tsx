@@ -32,14 +32,18 @@ export default function SignInPage() {
       }
 
       // If on satellite domain, redirect to primary domain with return URL
-      if (hostname.includes('md-strikers.com')) {
+      const satelliteDomain = process.env.NEXT_PUBLIC_CLERK_DOMAIN || 'mosc-temp.com';
+      if (hostname.includes('mosc-temp.com') || hostname.includes(satelliteDomain.replace('www.', ''))) {
         setShouldRedirect(true);
         // Get the current URL to return to after authentication
         const currentUrl = window.location.origin;
 
+        // Get primary domain from environment variable
+        const primaryDomain = process.env.NEXT_PUBLIC_PRIMARY_DOMAIN || 'www.event-site-manager.com';
+
         // Redirect to primary domain with redirect_url parameter
         // Clerk will redirect back to this URL after successful authentication
-        const redirectUrl = `https://www.event-site-manager.com/sign-in?redirect_url=${encodeURIComponent(currentUrl)}`;
+        const redirectUrl = `https://${primaryDomain}/sign-in?redirect_url=${encodeURIComponent(currentUrl)}`;
         window.location.href = redirectUrl;
       }
     }

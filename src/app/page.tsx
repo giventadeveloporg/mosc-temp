@@ -109,7 +109,7 @@ function HomePageContent() {
         {/* Temporary site banner */}
         <div className="w-full bg-green-700 text-white py-6 md:py-8">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <span className="text-2xl md:text-4xl font-bold tracking-wider">MD-STRIKERS</span>
+            <span className="text-2xl md:text-4xl font-bold tracking-wider">MOSC-TEMP</span>
           </div>
         </div>
         <div className="py-16 bg-gray-50">
@@ -127,7 +127,7 @@ function HomePageContent() {
       {/* Temporary site banner */}
       <div className="w-full bg-green-700 text-white py-6 md:py-8">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <span className="text-2xl md:text-4xl font-bold tracking-wider">MD-STRIKERS</span>
+          <span className="text-2xl md:text-4xl font-bold tracking-wider">MOSC-TEMP</span>
         </div>
       </div>
       <div className="mt-[100px]">

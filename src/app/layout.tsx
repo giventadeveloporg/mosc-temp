@@ -21,27 +21,35 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   // Satellite domain configuration for multi-domain support
-  // Primary domain: www.event-site-manager.com
-  // Satellite domains: www.md-strikers.com (and future tenant domains)
+  // Primary domain: Read from NEXT_PUBLIC_PRIMARY_DOMAIN env variable
+  // Satellite domains: Read from NEXT_PUBLIC_CLERK_DOMAIN and NEXT_PUBLIC_APP_URL env variables
   // IMPORTANT: Only apply satellite config in production, not in development (localhost)
 
   const headersList = await headers();
   const hostname = headersList.get('host') || '';
 
-  // Detect if this is a satellite domain
-  const isSatellite = hostname.includes('md-strikers.com');
+  // Get primary domain from environment variable
+  const primaryDomain = process.env.NEXT_PUBLIC_PRIMARY_DOMAIN || 'www.event-site-manager.com';
+
+  // Get satellite domain from environment variable
+  const satelliteDomain = process.env.NEXT_PUBLIC_CLERK_DOMAIN || 'www.mosc-temp.com';
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || '';
+
+  // Detect if this is a satellite domain (check if hostname matches satellite domain or APP_URL)
+  const isSatellite = hostname.includes('mosc-temp.com') ||
+                      (satelliteDomain && hostname.includes(satelliteDomain.replace('www.', '')));
 
   // Satellite domains must redirect to primary domain for authentication
   const clerkProps = isSatellite
     ? {
       isSatellite: true,
-      domain: process.env.NEXT_PUBLIC_CLERK_DOMAIN || 'www.md-strikers.com', // Use env var to match DNS record
-      signInUrl: 'https://www.event-site-manager.com/sign-in',
-      signUpUrl: 'https://www.event-site-manager.com/sign-up',
+      domain: satelliteDomain, // Use env var to match DNS record
+      signInUrl: `https://${primaryDomain}/sign-in`,
+      signUpUrl: `https://${primaryDomain}/sign-up`,
     }
     : {
       // Primary domain allows redirects from satellites
-      allowedRedirectOrigins: ['https://www.md-strikers.com'],
+      allowedRedirectOrigins: appUrl ? [appUrl] : [],
     };
 
   // Determine tenant-scoped admin flag on the server

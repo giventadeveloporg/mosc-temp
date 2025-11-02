@@ -1,10 +1,85 @@
 # Satellite Domain Setup Guide - www.mosc-temp.com
 
 **Date**: 2025-01-23
-**Updated**: 2025-11-01 (Added sign-out flow, redirect URL fixes, DNS configuration fixes)
+**Updated**: 2025-11-01 (Added sign-out flow, redirect URL fixes, DNS configuration fixes, Amplify platform type requirement)
 
 **Primary Domain**: www.adwiise.com (Amplify App #1 - ALREADY EXISTS)
 **New Satellite Domain**: www.mosc-temp.com (Amplify App #2 - Separate deployment)
+
+---
+
+## ⚠️ CRITICAL PRE-FLIGHT CHECKLIST
+
+**Before starting setup, verify these MUST-DO items:**
+
+### 1. ✅ Amplify Platform Type (MOST COMMON FAILURE POINT!)
+
+When creating the Amplify app, you MUST select **"Web Compute"** platform:
+
+```
+❌ Platform: WEB (Static site - will cause 404 errors!)
+✅ Platform: Web Compute (Next.js SSR with Lambda - REQUIRED!)
+```
+
+**How to verify:**
+- AWS Amplify Console → Your App → App settings → General settings
+- Check "Platform" field - MUST say **"Web Compute"**
+- If it says "WEB", you MUST delete and recreate the app
+
+**Why this matters:**
+- `WEB` = Static site deployment (no Lambda functions, no SSR)
+- `Web Compute` = Next.js SSR deployment (with Lambda@Edge functions)
+- Wrong platform = 404 errors even with successful builds
+- Wrong platform = No "Hosting compute logs" in Monitoring section
+- **Cannot be changed after creation** - must recreate app!
+
+**Signs you have wrong platform:**
+- ❌ Missing "Hosting compute logs" menu item under Monitoring
+- ❌ 404 errors on all pages despite successful deployment
+- ❌ Build logs show SSR functions created but site doesn't work
+- ❌ Direct Amplify URL returns 404
+
+---
+
+### 2. ✅ Update ALL Hardcoded Domain References in Source Code
+
+When setting up a new satellite domain, you MUST update hardcoded domain names in **BOTH** primary and satellite project source code. **Environment variables alone are NOT enough!**
+
+**Files requiring hardcoded domain updates** (see detailed section below):
+
+**Satellite Project** (e.g., md-strikers):
+- [ ] `src/app/layout.tsx` - Domain detection and Clerk config (3-4 locations)
+- [ ] `src/middleware.ts` - Satellite detection (2 locations)
+- [ ] `src/app/(auth)/sign-in/[[...sign-in]]/page.tsx` - Redirect URL
+- [ ] `src/app/(auth)/sign-up/[[...sign-up]]/page.tsx` - Redirect URL
+- [ ] `src/app/__clerk/[...path]/route.ts` - Clerk Frontend API URL
+- [ ] `src/components/Header.tsx` - Sign-out redirect URL
+- [ ] `next.config.mjs` - Clerk proxy rewrite destination
+
+**Primary Project** (e.g., event-site-manager):
+- [ ] `src/app/layout.tsx` - allowedRedirectOrigins array
+- [ ] `src/middleware.ts` - CORS headers (2 locations)
+
+**Common mistake:** Copying a project like mcefee-temp and only updating .env files. The code still has old domain hardcoded!
+
+---
+
+### 3. ✅ DNS Configuration Format Consistency
+
+Ensure your Clerk domain configuration matches your DNS records:
+
+```
+If DNS is:     clerk.www.md-strikers.com
+Then use:      NEXT_PUBLIC_CLERK_DOMAIN=www.md-strikers.com
+
+If DNS is:     clerk.md-strikers.com
+Then use:      NEXT_PUBLIC_CLERK_DOMAIN=md-strikers.com
+```
+
+**Always use environment variable as source of truth:**
+```typescript
+domain: process.env.NEXT_PUBLIC_CLERK_DOMAIN || 'www.md-strikers.com'
+```
 
 ---
 
@@ -1268,68 +1343,147 @@ const handleSignOut = async () => {
 
 ---
 
-#### 6. `src/app/__clerk/[...path]/route.ts` - Proxy Frontend API (Optional)
+#### 6. `src/app/__clerk/[...path]/route.ts` - Proxy Frontend API (CRITICAL)
 
-**Purpose**: If using Clerk proxy configuration, this route proxies requests to the primary domain's Clerk Frontend API.
+**Purpose**: Proxies Clerk Frontend API requests to the primary domain. **This file MUST be updated when cloning from another satellite project!**
 
-**Current Code** (example from adwiise.com setup):
+**Current Code** (example from old project like mosc-temp):
 ```typescript
-const CLERK_FRONTEND_API = 'https://clerk.adwiise.com';
+/**
+ * Primary Clerk domain for Frontend API
+ */
+const CLERK_FRONTEND_API = 'https://clerk.adwiise.com';  // ← OLD DOMAIN!
 ```
 
-**Required Change** for event-site-manager.com + mcefee-temp.com:
+**Required Change** for event-site-manager.com + md-strikers.com:
 ```typescript
-const CLERK_FRONTEND_API = 'https://clerk.event-site-manager.com';
+/**
+ * Primary Clerk domain for Frontend API
+ */
+const CLERK_FRONTEND_API = 'https://clerk.event-site-manager.com';  // ← NEW PRIMARY DOMAIN!
 ```
 
 **File Path**: `src/app/__clerk/[...path]/route.ts`
 **Line**: ~18
 
-**Note**: This file may not exist if you're using DNS verification (not proxy). Only update if you use proxy configuration.
+**⚠️ CRITICAL**:
+- This file is often overlooked when copying from another satellite project
+- If left unchanged, Clerk SDK will try to load from wrong domain
+- Results in `net::ERR_NAME_NOT_RESOLVED` errors
+- Authentication will not work at all
+
+---
+
+#### 7. `next.config.mjs` - Clerk Proxy Rewrite Destination (CRITICAL)
+
+**Purpose**: Configures Next.js rewrites to proxy `/__clerk` requests to the primary domain's Clerk Frontend API.
+
+**Current Code** (example from old project like mcefee-temp):
+```typescript
+// Configure rewrites for Clerk proxy (satellite domain support)
+async rewrites() {
+  return [
+    {
+      source: '/__clerk/:path*',
+      destination: 'https://clerk.adwiise.com/:path*',  // ← OLD PRIMARY DOMAIN!
+    },
+  ];
+},
+```
+
+**Required Change** for event-site-manager.com + md-strikers.com:
+```typescript
+// Configure rewrites for Clerk proxy (satellite domain support)
+async rewrites() {
+  return [
+    {
+      source: '/__clerk/:path*',
+      destination: 'https://clerk.event-site-manager.com/:path*',  // ← NEW PRIMARY DOMAIN!
+    },
+  ];
+},
+```
+
+**File Path**: `next.config.mjs`
+**Lines**: ~50-58
+
+**⚠️ CRITICAL**:
+- This is one of the MOST COMMONLY MISSED updates when cloning projects
+- If left unchanged, Clerk API requests will fail
+- Results in authentication errors even after DNS is correct
+- Can cause 404 errors if primary domain doesn't exist
 
 ---
 
 ### Summary Checklist: Code Changes for New Domain Pair
 
+⚠️ **CRITICAL**: All these changes MUST be made. Missing even ONE will cause authentication failures!
+
 **For Primary Domain Project (event-site-manager):**
 
-- [ ] **`src/app/layout.tsx`**: Update `allowedRedirectOrigins` to include `'https://www.mcefee-temp.com'`
+- [ ] **`src/app/layout.tsx`**: Update `allowedRedirectOrigins` to include `'https://www.md-strikers.com'`
 - [ ] **`src/middleware.ts`**:
-  - [ ] Update CORS `Access-Control-Allow-Origin` headers to `'https://www.mcefee-temp.com'` (2 locations)
+  - [ ] Update CORS `Access-Control-Allow-Origin` headers to `'https://www.md-strikers.com'` (2 locations)
   - [ ] Add `/auth/signout-redirect` to `publicRoutes` array
 - [ ] **`src/app/(auth)/sign-in/[[...sign-in]]/page.tsx`**: Add `redirect_url` parameter handling (read from query string and pass to SignIn component)
 - [ ] **`src/app/(auth)/sign-up/[[...sign-up]]/page.tsx`**: Add `redirect_url` parameter handling (read from query string and pass to SignUp component)
 - [ ] **`src/app/auth/signout-redirect/page.tsx`**: Create new file to handle satellite sign-out (calls Clerk signOut and redirects back with flag)
 
-**For Satellite Domain Project (mcefee-temp):**
+**For Satellite Domain Project (md-strikers):**
 
-- [ ] **`src/app/layout.tsx`**:
+- [ ] **`src/app/layout.tsx`** (4-5 changes):
   - [ ] Update comment: Primary domain to `www.event-site-manager.com`
-  - [ ] Update `isSatellite` detection: change `hostname.includes('mosc-temp.com')` to `hostname.includes('mcefee-temp.com')`
-  - [ ] Update `domain`: Use `process.env.NEXT_PUBLIC_CLERK_DOMAIN || 'www.mcefee-temp.com'` (read from env var)
-  - [ ] Update `signInUrl`: change to `'https://www.event-site-manager.com/sign-in'`
-  - [ ] Update `signUpUrl`: change to `'https://www.event-site-manager.com/sign-up'`
-  - [ ] Update `allowedRedirectOrigins`: change to `['https://www.mcefee-temp.com']`
+  - [ ] Update satellite domain comment: `www.md-strikers.com`
+  - [ ] Update `isSatellite` detection: `hostname.includes('md-strikers.com')`
+  - [ ] Update `domain`: `process.env.NEXT_PUBLIC_CLERK_DOMAIN || 'www.md-strikers.com'`
+  - [ ] Update `signInUrl`: `'https://www.event-site-manager.com/sign-in'`
+  - [ ] Update `signUpUrl`: `'https://www.event-site-manager.com/sign-up'`
+  - [ ] Update `allowedRedirectOrigins`: `['https://www.md-strikers.com']`
 
-- [ ] **`src/middleware.ts`**:
-  - [ ] Update `isSatEnv` detection: change `includes('mosc-temp.com')` to `includes('mcefee-temp.com')`
-  - [ ] Update `satDomain` fallback: change `'mosc-temp.com'` to `'www.mcefee-temp.com'` (with www to match DNS)
-  - [ ] Update `signInUrl`: change to `'https://www.event-site-manager.com/sign-in'`
+- [ ] **`src/middleware.ts`** (3 changes):
+  - [ ] Update `isSatEnv` detection: `includes('md-strikers.com')`
+  - [ ] Update `satDomain` fallback: `'www.md-strikers.com'` (match DNS format)
+  - [ ] Update `signInUrl`: `'https://www.event-site-manager.com/sign-in'`
 
-- [ ] **`src/app/(auth)/sign-in/[[...sign-in]]/page.tsx`**:
-  - [ ] Update redirect check: change `includes('mosc-temp.com')` to `includes('mcefee-temp.com')`
-  - [ ] Update redirect URL: change to `'https://www.event-site-manager.com/sign-in'`
+- [ ] **`src/app/(auth)/sign-in/[[...sign-in]]/page.tsx`** (2 changes):
+  - [ ] Update redirect check: `hostname.includes('md-strikers.com')`
+  - [ ] Update redirect URL: `'https://www.event-site-manager.com/sign-in'`
 
-- [ ] **`src/app/(auth)/sign-up/[[...sign-up]]/page.tsx`**:
-  - [ ] Update redirect check: change `includes('mosc-temp.com')` to `includes('mcefee-temp.com')`
-  - [ ] Update redirect URL: change to `'https://www.event-site-manager.com/sign-up'`
+- [ ] **`src/app/(auth)/sign-up/[[...sign-up]]/page.tsx`** (2 changes):
+  - [ ] Update redirect check: `hostname.includes('md-strikers.com')`
+  - [ ] Update redirect URL: `'https://www.event-site-manager.com/sign-up'`
 
-- [ ] **`src/components/Header.tsx`**:
+- [ ] **`src/components/Header.tsx`** (2 changes):
   - [ ] Add flag detection useEffect (checks for `clerk_signout=true` and clears localStorage)
-  - [ ] Update `handleSignOut` to redirect to primary domain: `https://www.event-site-manager.com/auth/signout-redirect?redirect_url=...`
+  - [ ] Update `isSatellite` check: `hostname.includes('md-strikers.com')`
+  - [ ] Update sign-out redirect URL: `'https://www.event-site-manager.com/auth/signout-redirect'`
 
-- [ ] **`src/app/__clerk/[...path]/route.ts`** (if exists):
-  - [ ] Update `CLERK_FRONTEND_API` to `'https://clerk.event-site-manager.com'`
+- [ ] **⚠️ `src/app/__clerk/[...path]/route.ts`** (CRITICAL - Often Missed!):
+  - [ ] Update `CLERK_FRONTEND_API` constant to `'https://clerk.event-site-manager.com'`
+
+- [ ] **⚠️ `next.config.mjs`** (CRITICAL - Often Missed!):
+  - [ ] Update `rewrites()` destination to `'https://clerk.event-site-manager.com/:path*'`
+
+---
+
+### Quick Search & Replace Reference
+
+When cloning from an old satellite project (like mcefee-temp) to create a new one (like md-strikers), use these find/replace operations:
+
+**Find:**
+- `mcefee-temp.com` or `mosc-temp.com` (old satellite domain)
+- `adwiise.com` (old primary domain)
+- `clerk.adwiise.com` (old Clerk frontend API)
+
+**Replace with:**
+- `md-strikers.com` (new satellite domain)
+- `event-site-manager.com` (new primary domain)
+- `clerk.event-site-manager.com` (new Clerk frontend API)
+
+**⚠️ IMPORTANT**:
+- Search in source code files only (exclude `node_modules`, `documentation`, `.next`)
+- Manually review each match before replacing
+- Some occurrences may be in comments or examples - use judgment
 
 ---
 
