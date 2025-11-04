@@ -1,11 +1,17 @@
 # Task ID: 4
-# Title: Update middleware for public Focus Group routes
+# Title: Implement Sponsor CRUD Operations UI
 # Status: pending
-# Dependencies: None
-# Priority: medium
-# Description: Add Focus Group routes to the public routes in middleware
+# Dependencies: 1 ⏱️, 2 ⏱️, 3 ⏱️
+# Priority: high
+# Description: Complete the user interface for sponsor CRUD operations.
 # Details:
-Add `/focus-groups(.*)` pattern to the `publicRoutes` array in the middleware configuration to ensure public access to focus group pages.
+- Create modal or page for adding new sponsors
+- Implement edit sponsor functionality
+- Implement view sponsor details
+- Implement delete sponsor confirmation dialog
+- Add loading states for all operations
+- Add toast notifications for success/error feedback
+- Implement form validation with error messages
 
 # Test Strategy:
-Verify that focus group pages are accessible without authentication.
+Test the complete CRUD flow from the UI, including form validation, loading states, and error handling.

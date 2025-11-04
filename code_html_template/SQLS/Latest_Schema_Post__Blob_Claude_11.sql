@@ -178,6 +178,11 @@ DROP TABLE IF EXISTS public.executive_committee_team_members CASCADE;
 DROP TABLE IF EXISTS public.event_focus_groups CASCADE;
 DROP TABLE IF EXISTS public.focus_group_members CASCADE;
 DROP TABLE IF EXISTS public.focus_group CASCADE;
+DROP TABLE IF EXISTS public.clerk_user_tenant CASCADE;
+DROP TABLE IF EXISTS public.clerk_organization_role CASCADE;
+
+
+
 
 CREATE FUNCTION public.generate_attendee_qr_code() RETURNS trigger
     LANGUAGE plpgsql
@@ -797,49 +802,49 @@ COMMENT ON COLUMN public.event_details.is_live IS 'Whether this event is current
 -- ===================================================
 
 CREATE TABLE public.focus_group (
-    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
-    tenant_id character varying(255) NOT NULL,
-    name character varying(120) NOT NULL,
-    slug character varying(80) NOT NULL,
-    description text,
-    cover_image_url character varying(1024),
-    is_active boolean DEFAULT true,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL,
-    CONSTRAINT focus_group_pkey PRIMARY KEY (id),
-    CONSTRAINT ux_focus_group__tenant_slug UNIQUE (tenant_id, slug),
-    CONSTRAINT ux_focus_group__tenant_name UNIQUE (tenant_id, name)
+                                    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                    tenant_id character varying(255) NOT NULL,
+                                    name character varying(120) NOT NULL,
+                                    slug character varying(80) NOT NULL,
+                                    description text,
+                                    cover_image_url character varying(1024),
+                                    is_active boolean DEFAULT true,
+                                    created_at timestamp without time zone DEFAULT now() NOT NULL,
+                                    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+                                    CONSTRAINT focus_group_pkey PRIMARY KEY (id),
+                                    CONSTRAINT ux_focus_group__tenant_slug UNIQUE (tenant_id, slug),
+                                    CONSTRAINT ux_focus_group__tenant_name UNIQUE (tenant_id, name)
 );
 
 COMMENT ON TABLE public.focus_group IS 'Tenant-scoped focus groups (Career, Cultural, IT, NextGen, etc.)';
 
 
 CREATE TABLE public.focus_group_members (
-    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
-    tenant_id character varying(255) NOT NULL,
-    focus_group_id bigint NOT NULL,
-    user_profile_id bigint NOT NULL,
+                                            id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                            tenant_id character varying(255) NOT NULL,
+                                            focus_group_id bigint NOT NULL,
+                                            user_profile_id bigint NOT NULL,
     -- Use VARCHAR for compatibility with existing Java domain models; enums retained for future hardening
-    role character varying(50) NOT NULL DEFAULT 'MEMBER',
-    status character varying(50) NOT NULL DEFAULT 'PENDING',
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL,
-    CONSTRAINT focus_group_members_pkey PRIMARY KEY (id),
-    CONSTRAINT ux_focus_group_members__tenant_group_user UNIQUE (tenant_id, focus_group_id, user_profile_id)
+                                            role character varying(50) NOT NULL DEFAULT 'MEMBER',
+                                            status character varying(50) NOT NULL DEFAULT 'PENDING',
+                                            created_at timestamp without time zone DEFAULT now() NOT NULL,
+                                            updated_at timestamp without time zone DEFAULT now() NOT NULL,
+                                            CONSTRAINT focus_group_members_pkey PRIMARY KEY (id),
+                                            CONSTRAINT ux_focus_group_members__tenant_group_user UNIQUE (tenant_id, focus_group_id, user_profile_id)
 );
 
 COMMENT ON TABLE public.focus_group_members IS 'Membership of focus groups by user_profile with roles/status';
 
 
 CREATE TABLE public.event_focus_groups (
-    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
-    tenant_id character varying(255) NOT NULL,
-    event_id bigint NOT NULL,
-    focus_group_id bigint NOT NULL,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL,
-    CONSTRAINT event_focus_groups_pkey PRIMARY KEY (id),
-    CONSTRAINT ux_event_focus_groups__tenant_event_group UNIQUE (tenant_id, event_id, focus_group_id)
+                                           id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                           tenant_id character varying(255) NOT NULL,
+                                           event_id bigint NOT NULL,
+                                           focus_group_id bigint NOT NULL,
+                                           created_at timestamp without time zone DEFAULT now() NOT NULL,
+                                           updated_at timestamp without time zone DEFAULT now() NOT NULL,
+                                           CONSTRAINT event_focus_groups_pkey PRIMARY KEY (id),
+                                           CONSTRAINT ux_event_focus_groups__tenant_event_group UNIQUE (tenant_id, event_id, focus_group_id)
 );
 
 COMMENT ON TABLE public.event_focus_groups IS 'Join table mapping events to one or more focus groups';
@@ -847,11 +852,11 @@ COMMENT ON TABLE public.event_focus_groups IS 'Join table mapping events to one 
 
 -- Foreign keys (after tables exist)
 ALTER TABLE public.focus_group_members
-  ADD CONSTRAINT fk_focus_group_members__group FOREIGN KEY (focus_group_id) REFERENCES public.focus_group(id) ON DELETE CASCADE,
+    ADD CONSTRAINT fk_focus_group_members__group FOREIGN KEY (focus_group_id) REFERENCES public.focus_group(id) ON DELETE CASCADE,
   ADD CONSTRAINT fk_focus_group_members__user_profile FOREIGN KEY (user_profile_id) REFERENCES public.user_profile(id) ON DELETE CASCADE;
 
 ALTER TABLE public.event_focus_groups
-  ADD CONSTRAINT fk_event_focus_groups__group FOREIGN KEY (focus_group_id) REFERENCES public.focus_group(id) ON DELETE CASCADE,
+    ADD CONSTRAINT fk_event_focus_groups__group FOREIGN KEY (focus_group_id) REFERENCES public.focus_group(id) ON DELETE CASCADE,
   ADD CONSTRAINT fk_event_focus_groups__event FOREIGN KEY (event_id) REFERENCES public.event_details(id) ON DELETE CASCADE;
 
 --
@@ -3190,6 +3195,7 @@ CREATE TABLE public.event_contacts (
 CREATE TABLE public.event_sponsors (
                                        id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
                                        tenant_id character varying(255),
+                                       event_id int8 NULL,
                                        name varchar(255) NOT NULL,
                                        type varchar(100) NOT NULL,
     -- Company information
@@ -3278,6 +3284,10 @@ ALTER TABLE ONLY public.event_featured_performers
 -- Foreign key constraints for event_contacts
 ALTER TABLE ONLY public.event_contacts
     ADD CONSTRAINT fk_event_contacts_event_id FOREIGN KEY (event_id) REFERENCES public.event_details(id) ON DELETE CASCADE;
+
+-- Foreign key constraints for event_sponsors
+ALTER TABLE ONLY public.event_sponsors
+    ADD CONSTRAINT fk_event_sponsors_event_id FOREIGN KEY (event_id) REFERENCES public.event_details(id) ON DELETE CASCADE;
 
 -- Foreign key constraints for event_sponsors_join
 ALTER TABLE ONLY public.event_sponsors_join

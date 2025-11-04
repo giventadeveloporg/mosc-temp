@@ -1,17 +1,15 @@
 # Task ID: 9
-# Title: Implement Focus Group events management page
+# Title: Implement Multi-Tenant Support
 # Status: pending
-# Dependencies: 3 ⏱️, 5 ⏱️, 8 ⏱️
+# Dependencies: 3 ⏱️
 # Priority: high
-# Description: Create the admin page for linking events to focus groups
+# Description: Ensure all operations respect tenant isolation.
 # Details:
-Build the `/admin/focus-groups/[id]/events` page with:
-- List of currently linked events
-- Search/filter functionality to find events
-- UI for linking new events to the focus group
-- Ability to unlink events
-
-Ensure the page handles pagination for large numbers of events.
+- Verify all API calls include `tenantId` in request body
+- Ensure backend automatically filters by tenant
+- Confirm tenant ID is sourced from `NEXT_PUBLIC_TENANT_ID` environment variable
+- Verify `withTenantId` utility is used for payload injection
+- Test tenant isolation at all levels
 
 # Test Strategy:
-Test linking and unlinking events, verify the changes are reflected in both the admin UI and public pages.
+Test API calls with different tenant IDs, verify data isolation between tenants, and confirm tenant ID is correctly applied to all requests.

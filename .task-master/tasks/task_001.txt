@@ -1,16 +1,17 @@
 # Task ID: 1
-# Title: Update database schema for Focus Groups
+# Title: Update Main Sponsors Page Form Fields
 # Status: pending
 # Dependencies: None
 # Priority: high
-# Description: Add new tables to the database schema for focus groups functionality
+# Description: Align form field names with DTO schema and add missing fields.
 # Details:
-Add the following tables to the schema:
-- `focus_group` (tenant_id, name, slug, description, cover_image_url, is_active, created_at, updated_at)
-- `focus_group_members` (tenant_id, focus_group_id, user_profile_id, role, status, created_at, updated_at)
-- `event_focus_groups` (tenant_id, event_id, focus_group_id)
-
-Ensure composite unique constraints are added per tenant for name/slug and joins. Set up VARCHAR(50) for role/status columns and create (but don't apply) the enums `focus_group_member_role_type` and `focus_group_member_status_type`.
+- Replace `sponsorName` with `name`
+- Replace `sponsorshipLevel` with `type`
+- Replace `displayOrder` with `priorityRanking`
+- Remove `sponsorshipAmount` and `benefits` fields (not in DTO)
+- Add missing fields: `companyName`, `tagline`, `facebookUrl`, `twitterUrl`, `linkedinUrl`, `instagramUrl`
+- Update form validation rules
+- Update form submission handler to match DTO structure
 
 # Test Strategy:
-Verify schema changes are correctly applied and constraints are working as expected.
+Verify that the form fields match the DTO schema and that form submission sends the correct data structure to the API.

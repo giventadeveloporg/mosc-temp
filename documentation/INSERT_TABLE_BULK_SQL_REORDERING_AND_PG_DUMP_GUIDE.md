@@ -2,6 +2,71 @@
 
 This guide covers how to reorder SQL INSERT statements and how to export/import PostgreSQL databases using `pg_dump`.
 
+---
+
+## ⚡ Priority: Quick Start Workflow
+
+### Step-by-Step Instructions
+
+**1. Navigate to the SQLS folder:**
+
+```bash
+cd E:\project_workspace\mosc-temp\code_html_template\SQLS
+```
+
+**2. Find the PostgreSQL container ID:**
+
+```bash
+docker ps | findstr postgres
+```
+
+This will output something like:
+```
+0c2a38241eca   postgres:15   "docker-entrypoint.s…"   2 weeks ago   Up 2 weeks   0.0.0.0:5432->5432/tcp   postgres_container
+```
+
+Copy the container ID (e.g., `0c2a38241eca`).
+
+**3. Export database data with INSERT statements:**
+
+```bash
+docker exec -it 0c2a38241eca pg_dump -U event_site_app -d event_site_manager_db --data-only --column-inserts > corrected_event_media_inserts.sql
+```
+
+**Important**: Replace `0c2a38241eca` with your actual container ID from step 2.
+
+**4. Reorder the INSERT statements:**
+
+Still in the `code_html_template/SQLS` folder, run:
+
+```bash
+node reorder_sql_inserts_final.cjs
+```
+
+This will generate: `corrected_event_media_inserts.ordered.sql`
+
+**5. Import the reordered data:**
+
+Run the generated SQL file to insert data records into the database tables:
+
+```bash
+# Using docker exec with psql
+docker exec -i 0c2a38241eca psql -U event_site_app -d event_site_manager_db < corrected_event_media_inserts.ordered.sql
+
+# Or using docker-compose (if applicable)
+docker-compose exec -T postgresql psql -U event_site_app -d event_site_manager_db < corrected_event_media_inserts.ordered.sql
+```
+
+### Summary
+
+1. ✅ Navigate to `code_html_template/SQLS`
+2. ✅ Get PostgreSQL container ID: `docker ps | findstr postgres`
+3. ✅ Export data: `docker exec -it <container_id> pg_dump -U event_site_app -d event_site_manager_db --data-only --column-inserts > corrected_event_media_inserts.sql`
+4. ✅ Reorder INSERTs: `node reorder_sql_inserts_final.cjs`
+5. ✅ Import data: Run `corrected_event_media_inserts.ordered.sql` into the database
+
+---
+
 ## Table of Contents
 
 1. [SQL Insert Reordering Script](#sql-insert-reordering-script)
@@ -95,18 +160,20 @@ The script is pre-configured to use:
 
 #### Step 1: Run the Script
 
-You can run the script from anywhere in your project:
+**Option A: From the project root directory:**
 
 ```bash
 node code_html_template/SQLS/reorder_sql_inserts_final.cjs
 ```
 
-Or from the `code_html_template/SQLS` directory:
+**Option B: From the `code_html_template/SQLS` directory:**
 
 ```bash
 cd code_html_template/SQLS
 node reorder_sql_inserts_final.cjs
 ```
+
+**Important**: If you're already in the `code_html_template/SQLS` directory, use just the filename (`reorder_sql_inserts_final.cjs`), not the full path. Using the full path when already in that directory will cause a path resolution error.
 
 #### Step 2: Using a Different Input File
 

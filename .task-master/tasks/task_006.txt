@@ -1,17 +1,16 @@
 # Task ID: 6
-# Title: Implement Focus Groups landing page
+# Title: Implement Event-Sponsor Association Management
 # Status: pending
-# Dependencies: 3 ⏱️, 4 ⏱️
-# Priority: medium
-# Description: Create the public landing page for all focus groups
+# Dependencies: 4 ⏱️
+# Priority: high
+# Description: Create UI for managing event-sponsor associations.
 # Details:
-Build the `/focus-groups` page with:
-- Hero section
-- Grid layout of active focus group cards
-- Each card should display name, image, and brief description
-- Linking to individual focus group pages
-
-Ensure the page only shows active groups and sorts them by name.
+- Create interface to assign existing sponsors to events
+- Implement removing sponsors from events
+- Add view to see all sponsors for a specific event
+- Add view to see all events for a specific sponsor
+- Prevent duplicate associations
+- Handle cascade delete when event or sponsor is deleted
 
 # Test Strategy:
-Verify the page displays correctly, shows only active groups, and links work properly.
+Test creating and removing associations, verify duplicate prevention, and test cascade delete behavior.

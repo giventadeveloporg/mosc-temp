@@ -417,3 +417,4 @@ const showSponsorsSection = settings?.showSponsorsSectionInHomePage ?? true;
 - Loading state only affects Events and Team sections; Sponsors section waits for loading to complete
 - "What We Do" and "About Foundation" sections are always shown immediately (outside loading condition)
 
+

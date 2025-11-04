@@ -1,17 +1,16 @@
 # Task ID: 5
-# Title: Create server actions for Focus Group management
+# Title: Implement Search and Filter Functionality
 # Status: pending
-# Dependencies: 2 ⏱️, 3 ⏱️
-# Priority: high
-# Description: Implement server actions for authenticated admin mutations
+# Dependencies: 4 ⏱️
+# Priority: medium
+# Description: Add search and filter capabilities to the sponsors list.
 # Details:
-Create server actions for:
-- Creating focus groups
-- Updating focus groups
-- Managing focus group members
-- Linking/unlinking events to focus groups
-
-Use `fetchWithJwtRetry` for all authenticated requests and ensure all server actions handle errors appropriately.
+- Implement search by sponsor name
+- Add filter by sponsor type
+- Add filter by active/inactive status
+- Implement sorting by priority ranking and name
+- Add pagination controls
+- Connect filters to API query parameters
 
 # Test Strategy:
-Test each server action to verify authentication, proper data handling, and error management.
+Test search and filter functionality with different combinations of criteria, verify pagination works correctly.

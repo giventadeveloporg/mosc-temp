@@ -8,3 +8,4 @@ export const config = {
 
 export default createProxyHandler({ backendPath: '/api/event-featured-performers' });
 
+

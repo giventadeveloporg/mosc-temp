@@ -1,17 +1,15 @@
 # Task ID: 8
-# Title: Implement Focus Group admin listing page
+# Title: Verify DTO Type Definitions
 # Status: pending
-# Dependencies: 3 ⏱️, 5 ⏱️
-# Priority: high
-# Description: Create the admin page for managing focus groups
+# Dependencies: None
+# Priority: medium
+# Description: Ensure EventSponsorsDTO matches the backend schema.
 # Details:
-Build the `/admin/focus-groups` page with:
-- List of all focus groups with filtering options
-- Create new focus group functionality
-- Edit and delete capabilities
-- Links to manage events and members for each group
-
-Ensure proper validation for all form inputs and confirmation for destructive actions.
+- Verify `EventSponsorsDTO` in `src/types/index.ts` matches backend schema
+- Check if `event_id` field in database should be included in DTO
+- Ensure all required fields are marked as such
+- Verify field types match database schema
+- Update DTO if necessary
 
 # Test Strategy:
-Test CRUD operations for focus groups and verify validation works correctly.
+Compare DTO with database schema and backend API documentation, verify all fields are correctly typed.

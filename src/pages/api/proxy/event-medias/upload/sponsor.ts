@@ -48,7 +48,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const { eventId, entityId, imageType, title, description, isPublic, tenantId } = req.query;
 
-    if (!eventId || !entityId || !imageType || !title) {
+    // eventId can be 0 or "0" for main sponsors page (sponsors not yet associated with events)
+    // Check if eventId is missing (undefined or null), but allow 0
+    const eventIdValue = Array.isArray(eventId) ? eventId[0] : eventId;
+    if (eventIdValue === undefined || eventIdValue === null || eventIdValue === '' || !entityId || !imageType || !title) {
       return res.status(400).json({ error: 'Missing required parameters: eventId, entityId, imageType, title' });
     }
 
@@ -59,8 +62,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: 'Invalid entityId: must be a valid integer' });
     }
 
-    // Get values from query parameters
-    const eventIdValue = Array.isArray(eventId) ? eventId[0] : eventId;
+    // Get values from query parameters (eventIdValue already extracted above)
     const imageTypeValue = Array.isArray(imageType) ? imageType[0] : imageType;
     const titleValue = Array.isArray(title) ? title[0] : title;
     const descriptionValue = Array.isArray(description) ? description[0] || 'Uploaded image' : description || 'Uploaded image';

@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FaPlus, FaSearch, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaPlus, FaSearch, FaEdit, FaTrash, FaFilter } from 'react-icons/fa';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import DataTable, { Column } from '@/components/ui/DataTable';
 import Modal from '@/components/ui/Modal';
 import ConfirmModal from '@/components/ui/Modal';
+import ImageUpload from '@/components/ui/ImageUpload';
 import AdminNavigation from '@/components/AdminNavigation';
 import type { EventSponsorsDTO } from '@/types';
 import {
@@ -30,26 +31,31 @@ export default function EventSponsorsPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedSponsor, setSelectedSponsor] = useState<EventSponsorsDTO | null>(null);
 
-  // Form state
+  // Form state - aligned with DTO schema
   const [formData, setFormData] = useState<Partial<EventSponsorsDTO>>({
-    sponsorName: '',
-    contactPerson: '',
+    name: '',
+    type: '',
+    companyName: '',
+    tagline: '',
+    description: '',
+    websiteUrl: '',
     contactEmail: '',
     contactPhone: '',
-    website: '',
-    description: '',
     logoUrl: '',
     heroImageUrl: '',
     bannerImageUrl: '',
-    sponsorshipLevel: '',
-    sponsorshipAmount: 0,
-    benefits: '',
     isActive: true,
-    displayOrder: 0,
+    priorityRanking: 1,
+    facebookUrl: '',
+    twitterUrl: '',
+    linkedinUrl: '',
+    instagramUrl: '',
   });
 
   // Search and filter state
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterType, setFilterType] = useState<string>('');
+  const [filterActive, setFilterActive] = useState<string>('all');
   const [sortKey, setSortKey] = useState<string>('');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
@@ -73,7 +79,7 @@ export default function EventSponsorsPage() {
       setLoading(true);
       setError(null);
       const data = await fetchEventSponsorsServer();
-      setSponsors(data);
+      setSponsors(data || []);
     } catch (err: any) {
       setError(err.message || 'Failed to load sponsors');
       setToastMessage({ type: 'error', message: err.message || 'Failed to load sponsors' });
@@ -84,12 +90,44 @@ export default function EventSponsorsPage() {
 
   const handleCreate = async () => {
     try {
+      // Validate required fields
+      if (!formData.name?.trim()) {
+        setToastMessage({ type: 'error', message: 'Sponsor name is required' });
+        return;
+      }
+      if (!formData.type?.trim()) {
+        setToastMessage({ type: 'error', message: 'Sponsor type is required' });
+        return;
+      }
+
       setLoading(true);
-      const newSponsor = await createEventSponsorServer(formData as any);
+      const sponsorData: Omit<EventSponsorsDTO, 'id' | 'createdAt' | 'updatedAt'> = {
+        name: formData.name!.trim(),
+        type: formData.type!.trim(),
+        companyName: formData.companyName?.trim() || undefined,
+        tagline: formData.tagline?.trim() || undefined,
+        description: formData.description?.trim() || undefined,
+        websiteUrl: formData.websiteUrl?.trim() || undefined,
+        contactEmail: formData.contactEmail?.trim() || undefined,
+        contactPhone: formData.contactPhone?.trim() || undefined,
+        logoUrl: formData.logoUrl?.trim() || undefined,
+        heroImageUrl: formData.heroImageUrl?.trim() || undefined,
+        bannerImageUrl: formData.bannerImageUrl?.trim() || undefined,
+        isActive: formData.isActive !== undefined ? formData.isActive : true,
+        priorityRanking: formData.priorityRanking || 1,
+        facebookUrl: formData.facebookUrl?.trim() || undefined,
+        twitterUrl: formData.twitterUrl?.trim() || undefined,
+        linkedinUrl: formData.linkedinUrl?.trim() || undefined,
+        instagramUrl: formData.instagramUrl?.trim() || undefined,
+      };
+
+      const newSponsor = await createEventSponsorServer(sponsorData);
       setSponsors(prev => [...prev, newSponsor]);
       setIsCreateModalOpen(false);
       resetForm();
-      setToastMessage({ type: 'success', message: 'Sponsor created successfully' });
+      setToastMessage({ type: 'success', message: 'Sponsor created successfully. You can now upload images when editing the sponsor.' });
+      // Reload sponsors to ensure fresh data
+      await loadSponsors();
     } catch (err: any) {
       setToastMessage({ type: 'error', message: err.message || 'Failed to create sponsor' });
     } finally {
@@ -134,20 +172,23 @@ export default function EventSponsorsPage() {
 
   const resetForm = () => {
     setFormData({
-      sponsorName: '',
-      contactPerson: '',
+      name: '',
+      type: '',
+      companyName: '',
+      tagline: '',
+      description: '',
+      websiteUrl: '',
       contactEmail: '',
       contactPhone: '',
-      website: '',
-      description: '',
       logoUrl: '',
       heroImageUrl: '',
       bannerImageUrl: '',
-      sponsorshipLevel: '',
-      sponsorshipAmount: 0,
-      benefits: '',
       isActive: true,
-      displayOrder: 0,
+      priorityRanking: 1,
+      facebookUrl: '',
+      twitterUrl: '',
+      linkedinUrl: '',
+      instagramUrl: '',
     });
   };
 
@@ -165,51 +206,62 @@ export default function EventSponsorsPage() {
   const handleSort = (key: string, direction: 'asc' | 'desc') => {
     setSortKey(key);
     setSortDirection(direction);
-
-    const sorted = [...sponsors].sort((a, b) => {
-      const aVal = a[key as keyof EventSponsorsDTO];
-      const bVal = b[key as keyof EventSponsorsDTO];
-
-      if (direction === 'asc') {
-        return aVal > bVal ? 1 : -1;
-      } else {
-        return aVal < bVal ? 1 : -1;
-      }
-    });
-
-    setSponsors(sorted);
   };
 
-  const filteredSponsors = sponsors.filter(sponsor =>
-    sponsor.sponsorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    sponsor.contactPerson?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    sponsor.sponsorshipLevel?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    sponsor.description?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter sponsors based on search and filters
+  const filteredSponsors = sponsors.filter(sponsor => {
+    const matchesSearch = !searchTerm ||
+      sponsor.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      sponsor.companyName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      sponsor.type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      sponsor.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      sponsor.contactEmail?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesType = !filterType || sponsor.type === filterType;
+    const matchesActive = filterActive === 'all' ||
+      (filterActive === 'active' && sponsor.isActive) ||
+      (filterActive === 'inactive' && !sponsor.isActive);
+
+    return matchesSearch && matchesType && matchesActive;
+  });
+
+  // Sort filtered sponsors
+  const sortedSponsors = [...filteredSponsors].sort((a, b) => {
+    if (!sortKey) return 0;
+
+    const aVal = a[sortKey as keyof EventSponsorsDTO];
+    const bVal = b[sortKey as keyof EventSponsorsDTO];
+
+    if (aVal === undefined || aVal === null) return 1;
+    if (bVal === undefined || bVal === null) return -1;
+
+    if (sortDirection === 'asc') {
+      return aVal > bVal ? 1 : -1;
+    } else {
+      return aVal < bVal ? 1 : -1;
+    }
+  });
+
+  // Get unique sponsor types for filter
+  const sponsorTypes = Array.from(new Set(sponsors.map(s => s.type).filter(Boolean))).sort();
 
   const columns: Column<EventSponsorsDTO>[] = [
     {
-      key: 'sponsorName',
+      key: 'name',
       label: 'Sponsor Name',
       sortable: true
     },
     {
-      key: 'contactPerson',
-      label: 'Contact Person',
+      key: 'type',
+      label: 'Type',
       sortable: true,
       render: (value) => value || '-'
     },
     {
-      key: 'sponsorshipLevel',
-      label: 'Level',
+      key: 'companyName',
+      label: 'Company',
       sortable: true,
       render: (value) => value || '-'
-    },
-    {
-      key: 'sponsorshipAmount',
-      label: 'Amount',
-      sortable: true,
-      render: (value) => value ? `$${value.toLocaleString()}` : '-'
     },
     {
       key: 'contactEmail',
@@ -217,60 +269,92 @@ export default function EventSponsorsPage() {
       render: (value) => value || '-'
     },
     {
-      key: 'isActive',
-      label: 'Active',
-      sortable: true,
-      render: (value) => value ? 'Yes' : 'No'
-    },
-    {
-      key: 'displayOrder',
-      label: 'Order',
+      key: 'priorityRanking',
+      label: 'Priority',
       sortable: true,
       render: (value) => value || 0
+    },
+    {
+      key: 'isActive',
+      label: 'Status',
+      sortable: true,
+      render: (value) => (
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+          value ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+        }`}>
+          {value ? 'Active' : 'Inactive'}
+        </span>
+      )
     },
   ];
 
   if (!userId) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <p>Loading...</p>
+        <p className="font-body text-lg text-foreground">Loading...</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-8 py-8" style={{ paddingTop: '180px' }}>
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Event Sponsors</h1>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ paddingTop: '180px' }}>
+      <h1 className="font-heading font-semibold text-3xl text-foreground mb-8">Event Sponsors</h1>
       <AdminNavigation />
 
       {/* Toast Message */}
       {toastMessage && (
-        <div className={`mb-4 p-4 rounded-lg ${toastMessage.type === 'success'
-            ? 'bg-green-50 border border-green-200 text-green-700'
-            : 'bg-red-50 border border-red-200 text-red-700'
-          }`}>
+        <div className={`mb-4 p-4 rounded-lg sacred-shadow ${
+          toastMessage.type === 'success'
+            ? 'bg-success/10 border border-success/20 text-success'
+            : 'bg-destructive/10 border border-destructive/20 text-destructive'
+        }`}>
           {toastMessage.message}
         </div>
       )}
 
       {/* Search and Filter Bar */}
-      <div className="mb-6 bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+      <div className="mb-6 bg-card rounded-lg sacred-shadow border border-border p-6">
         <div className="flex flex-wrap gap-4 items-center">
           <div className="flex-1 min-w-64">
             <div className="relative">
-              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
               <input
                 type="text"
                 placeholder="Search sponsors..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="pl-10 pr-4 py-2 w-full border border-border rounded-lg bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
               />
             </div>
           </div>
+
+          <div className="flex gap-2 items-center">
+            <FaFilter className="text-muted-foreground" />
+            <select
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+              className="border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
+            >
+              <option value="">All Types</option>
+              {sponsorTypes.map(type => (
+                <option key={type} value={type}>{type}</option>
+              ))}
+            </select>
+
+            <select
+              value={filterActive}
+              onChange={(e) => setFilterActive(e.target.value)}
+              className="border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
+            >
+              <option value="all">All Status</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow font-bold flex items-center gap-2 hover:bg-blue-700 transition"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg sacred-shadow font-medium flex items-center gap-2 reverent-transition"
           >
             <FaPlus />
             Add Sponsor
@@ -279,13 +363,13 @@ export default function EventSponsorsPage() {
       </div>
 
       {error && (
-        <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+        <div className="mb-4 bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg">
           {error}
         </div>
       )}
 
       <DataTable
-        data={filteredSponsors}
+        data={sortedSponsors}
         columns={columns}
         loading={loading}
         onSort={handleSort}
@@ -344,7 +428,7 @@ export default function EventSponsorsPage() {
         }}
         onConfirm={handleDelete}
         title="Delete Sponsor"
-        message={`Are you sure you want to delete "${selectedSponsor?.sponsorName}"? This action cannot be undone.`}
+        message={`Are you sure you want to delete "${selectedSponsor?.name}"? This action cannot be undone.`}
         confirmText="Delete"
         variant="danger"
       />
@@ -380,48 +464,95 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText }: S
     onSubmit();
   };
 
-  const sponsorshipLevels = [
+  const sponsorTypes = [
     'Platinum',
     'Gold',
     'Silver',
     'Bronze',
     'Community Partner',
-    'In-Kind',
+    'Media Partner',
+    'Food & Beverage',
+    'Entertainment',
     'Other'
   ];
 
+  // Note: ImageUpload requires eventId. For main sponsors page, we'll use a default eventId of 0
+  // or only show image uploads after sponsor is created (when formData.id exists)
+  // For now, we'll show image uploads only when editing (formData.id exists)
+  const canUploadImages = !!formData.id;
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Basic Information */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-foreground mb-1">
             Sponsor Name *
           </label>
           <input
             type="text"
-            name="sponsorName"
-            value={formData.sponsorName || ''}
+            name="name"
+            value={formData.name || ''}
             onChange={handleChange}
             required
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
+            placeholder="Enter sponsor name"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Contact Person
+          <label className="block text-sm font-medium text-foreground mb-1">
+            Type *
+          </label>
+          <select
+            name="type"
+            value={formData.type || ''}
+            onChange={handleChange}
+            required
+            className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
+          >
+            <option value="">Select sponsor type</option>
+            {sponsorTypes.map(type => (
+              <option key={type} value={type}>{type}</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-foreground mb-1">
+            Company Name
           </label>
           <input
             type="text"
-            name="contactPerson"
-            value={formData.contactPerson || ''}
+            name="companyName"
+            value={formData.companyName || ''}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
+            placeholder="Enter company name"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-foreground mb-1">
+            Priority Ranking *
+          </label>
+          <input
+            type="number"
+            name="priorityRanking"
+            value={formData.priorityRanking || 1}
+            onChange={handleChange}
+            min="1"
+            required
+            className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
+            placeholder="Enter priority ranking (1 = highest priority)"
+          />
+          <p className="mt-1 text-xs text-muted-foreground">
+            Lower numbers indicate higher priority (1 = highest priority)
+          </p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-foreground mb-1">
             Contact Email
           </label>
           <input
@@ -429,12 +560,13 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText }: S
             name="contactEmail"
             value={formData.contactEmail || ''}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
+            placeholder="Enter contact email"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-foreground mb-1">
             Contact Phone
           </label>
           <input
@@ -442,163 +574,203 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText }: S
             name="contactPhone"
             value={formData.contactPhone || ''}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
+            placeholder="Enter contact phone"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Website
+          <label className="block text-sm font-medium text-foreground mb-1">
+            Website URL
           </label>
           <input
             type="url"
-            name="website"
-            value={formData.website || ''}
+            name="websiteUrl"
+            value={formData.websiteUrl || ''}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
+            placeholder="https://example.com"
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Sponsorship Level
-          </label>
-          <select
-            name="sponsorshipLevel"
-            value={formData.sponsorshipLevel || ''}
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="">Select sponsorship level</option>
-            {sponsorshipLevels.map(level => (
-              <option key={level} value={level}>{level}</option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Sponsorship Amount
-          </label>
+        <div className="flex items-center">
           <input
-            type="number"
-            name="sponsorshipAmount"
-            value={formData.sponsorshipAmount || 0}
+            type="checkbox"
+            name="isActive"
+            checked={formData.isActive || false}
             onChange={handleChange}
-            min="0"
-            step="0.01"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="h-4 w-4 text-primary focus:ring-ring border-border rounded"
           />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Display Order
+          <label className="ml-2 block text-sm text-foreground">
+            Active Sponsor
           </label>
-          <input
-            type="number"
-            name="displayOrder"
-            value={formData.displayOrder || 0}
-            onChange={handleChange}
-            min="0"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          />
         </div>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-foreground mb-1">
+          Tagline
+        </label>
+        <input
+          type="text"
+          name="tagline"
+          value={formData.tagline || ''}
+          onChange={handleChange}
+          maxLength={500}
+          className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
+          placeholder="Enter sponsor tagline (max 500 characters)"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-foreground mb-1">
           Description
         </label>
         <textarea
           name="description"
           value={formData.description || ''}
           onChange={handleChange}
-          rows={3}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          rows={4}
+          className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
+          placeholder="Enter detailed description about the sponsor"
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Benefits
-        </label>
-        <textarea
-          name="benefits"
-          value={formData.benefits || ''}
-          onChange={handleChange}
-          rows={3}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          placeholder="List the benefits provided to the sponsor"
-        />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Social Media Links */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Logo URL
+          <label className="block text-sm font-medium text-foreground mb-1">
+            Facebook URL
           </label>
           <input
             type="url"
-            name="logoUrl"
-            value={formData.logoUrl || ''}
+            name="facebookUrl"
+            value={formData.facebookUrl || ''}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
+            placeholder="https://facebook.com/sponsor"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Hero Image URL
+          <label className="block text-sm font-medium text-foreground mb-1">
+            Twitter URL
           </label>
           <input
             type="url"
-            name="heroImageUrl"
-            value={formData.heroImageUrl || ''}
+            name="twitterUrl"
+            value={formData.twitterUrl || ''}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
+            placeholder="https://twitter.com/sponsor"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Banner Image URL
+          <label className="block text-sm font-medium text-foreground mb-1">
+            LinkedIn URL
           </label>
           <input
             type="url"
-            name="bannerImageUrl"
-            value={formData.bannerImageUrl || ''}
+            name="linkedinUrl"
+            value={formData.linkedinUrl || ''}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
+            placeholder="https://linkedin.com/company/sponsor"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-foreground mb-1">
+            Instagram URL
+          </label>
+          <input
+            type="url"
+            name="instagramUrl"
+            value={formData.instagramUrl || ''}
+            onChange={handleChange}
+            className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
+            placeholder="https://instagram.com/sponsor"
           />
         </div>
       </div>
 
-      <div className="flex items-center">
-        <input
-          type="checkbox"
-          name="isActive"
-          checked={formData.isActive || false}
-          onChange={handleChange}
-          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-        />
-        <label className="ml-2 block text-sm text-gray-900">
-          Active Sponsor
-        </label>
-      </div>
+      {/* Image Upload Section - Only show when editing (sponsor ID exists) */}
+      {canUploadImages && (
+        <div className="border-t border-border pt-6">
+          <h3 className="text-lg font-heading font-medium text-foreground mb-4">Images</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-2">
+                Logo Image
+              </label>
+              <ImageUpload
+                entityId={formData.id!}
+                entityType="sponsor"
+                imageType="logo"
+                eventId={0} // Using 0 as default since this is main sponsors page
+                currentImageUrl={formData.logoUrl}
+                onImageUploaded={(url) => setFormData(prev => ({ ...prev, logoUrl: url }))}
+                onError={(error) => console.error('Logo upload error:', error)}
+                disabled={loading}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-2">
+                Hero Image
+              </label>
+              <ImageUpload
+                entityId={formData.id!}
+                entityType="sponsor"
+                imageType="hero"
+                eventId={0} // Using 0 as default since this is main sponsors page
+                currentImageUrl={formData.heroImageUrl}
+                onImageUploaded={(url) => setFormData(prev => ({ ...prev, heroImageUrl: url }))}
+                onError={(error) => console.error('Hero image upload error:', error)}
+                disabled={loading}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-2">
+                Banner Image
+              </label>
+              <ImageUpload
+                entityId={formData.id!}
+                entityType="sponsor"
+                imageType="banner"
+                eventId={0} // Using 0 as default since this is main sponsors page
+                currentImageUrl={formData.bannerImageUrl}
+                onImageUploaded={(url) => setFormData(prev => ({ ...prev, bannerImageUrl: url }))}
+                onError={(error) => console.error('Banner upload error:', error)}
+                disabled={loading}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {!canUploadImages && (
+        <div className="bg-muted/50 border border-border rounded-lg p-4">
+          <p className="text-sm text-muted-foreground">
+            <strong>Note:</strong> Image uploads will be available after the sponsor is created. Save the sponsor first, then edit it to upload images.
+          </p>
+        </div>
+      )}
 
       <div className="flex justify-end space-x-3 pt-4">
         <button
           type="button"
           onClick={() => window.history.back()}
-          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          className="px-4 py-2 text-sm font-medium text-foreground bg-card border border-border rounded-md hover:bg-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring reverent-transition"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={loading}
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+          className="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary border border-transparent rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring reverent-transition disabled:opacity-50"
         >
           {loading ? 'Saving...' : submitText}
         </button>

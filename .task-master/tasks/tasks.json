@@ -4,208 +4,137 @@
     "version": "1.5.0",
     "source": ".task-master/PRD.md",
     "description": "Tasks generated from PRD",
-    "totalTasksGenerated": 15,
-    "tasksIncluded": 15
+    "totalTasksGenerated": 10,
+    "tasksIncluded": 10
   },
   "tasks": [
     {
       "id": 1,
-      "title": "Update database schema for Focus Groups",
-      "description": "Add new tables to the database schema for focus groups functionality",
+      "title": "Update Main Sponsors Page Form Fields",
+      "description": "Align form field names with DTO schema and add missing fields.",
       "status": "pending",
       "dependencies": [],
       "priority": "high",
-      "details": "Add the following tables to the schema:\n- `focus_group` (tenant_id, name, slug, description, cover_image_url, is_active, created_at, updated_at)\n- `focus_group_members` (tenant_id, focus_group_id, user_profile_id, role, status, created_at, updated_at)\n- `event_focus_groups` (tenant_id, event_id, focus_group_id)\n\nEnsure composite unique constraints are added per tenant for name/slug and joins. Set up VARCHAR(50) for role/status columns and create (but don't apply) the enums `focus_group_member_role_type` and `focus_group_member_status_type`.",
-      "testStrategy": "Verify schema changes are correctly applied and constraints are working as expected."
+      "details": "- Replace `sponsorName` with `name`\n- Replace `sponsorshipLevel` with `type`\n- Replace `displayOrder` with `priorityRanking`\n- Remove `sponsorshipAmount` and `benefits` fields (not in DTO)\n- Add missing fields: `companyName`, `tagline`, `facebookUrl`, `twitterUrl`, `linkedinUrl`, `instagramUrl`\n- Update form validation rules\n- Update form submission handler to match DTO structure",
+      "testStrategy": "Verify that the form fields match the DTO schema and that form submission sends the correct data structure to the API."
     },
     {
       "id": 2,
-      "title": "Create DTOs for Focus Group entities",
-      "description": "Define TypeScript DTOs for the Focus Group related entities",
+      "title": "Implement ImageUpload Component Integration",
+      "description": "Replace URL input fields with ImageUpload component for logo, hero, and banner images.",
       "status": "pending",
       "dependencies": [
         1
       ],
       "priority": "high",
-      "details": "Add the following DTOs to `src/types/index.ts`:\n- `FocusGroupDTO`\n- `FocusGroupMemberDTO`\n- `EventFocusGroupDTO`\n\nEnsure all DTOs are flat, serializable, and use uppercase enums for consistency.",
-      "testStrategy": "Verify the DTOs match the backend entities and include all required fields."
+      "details": "- Replace URL input fields with `ImageUpload` component for logo, hero, and banner images\n- Determine how to handle `eventId` requirement for the main sponsors page\n- Configure ImageUpload component with appropriate entityType ('sponsor') and imageType ('logo', 'hero', 'banner')\n- Implement image preview functionality\n- Handle image upload state and errors\n- Update form data when images are uploaded successfully",
+      "testStrategy": "Test image upload for all three types (logo, hero, banner), verify preview functionality, and confirm that image URLs are correctly saved to the sponsor record."
     },
     {
       "id": 3,
-      "title": "Implement Focus Group proxy handlers",
-      "description": "Create API proxy handlers for focus group related endpoints",
+      "title": "Verify and Update API Server Actions",
+      "description": "Ensure API server actions match DTO structure and use correct HTTP methods.",
       "status": "pending",
       "dependencies": [
-        2
+        1
       ],
       "priority": "high",
-      "details": "Implement the following proxy handlers using `createProxyHandler`:\n- `GET /api/proxy/focus-groups`\n- `GET /api/proxy/focus-groups/by-slug/{slug}`\n- `GET /api/proxy/focus-group-members`\n- `POST /api/proxy/focus-groups`\n- `PATCH /api/proxy/focus-groups/{id}`\n- `POST /api/proxy/event-focus-groups`\n- `DELETE /api/proxy/event-focus-groups/{id}`\n\nEnsure all handlers properly inject tenantId, handle JWT, and forward queries to the backend.",
-      "testStrategy": "Test each endpoint to verify proper proxy functionality, authentication, and data flow."
+      "details": "- Verify `createEventSponsorServer` matches DTO structure\n- Verify `updateEventSponsorServer` uses PATCH correctly for partial updates\n- Ensure `withTenantId` is applied to all mutations\n- Add error handling improvements\n- Verify that all CRUD operations respect tenant isolation",
+      "testStrategy": "Test all CRUD operations through the API server actions, verify correct HTTP methods, and confirm tenant isolation is enforced."
     },
     {
       "id": 4,
-      "title": "Update middleware for public Focus Group routes",
-      "description": "Add Focus Group routes to the public routes in middleware",
-      "status": "pending",
-      "dependencies": [],
-      "priority": "medium",
-      "details": "Add `/focus-groups(.*)` pattern to the `publicRoutes` array in the middleware configuration to ensure public access to focus group pages.",
-      "testStrategy": "Verify that focus group pages are accessible without authentication."
-    },
-    {
-      "id": 5,
-      "title": "Create server actions for Focus Group management",
-      "description": "Implement server actions for authenticated admin mutations",
+      "title": "Implement Sponsor CRUD Operations UI",
+      "description": "Complete the user interface for sponsor CRUD operations.",
       "status": "pending",
       "dependencies": [
+        1,
         2,
         3
       ],
       "priority": "high",
-      "details": "Create server actions for:\n- Creating focus groups\n- Updating focus groups\n- Managing focus group members\n- Linking/unlinking events to focus groups\n\nUse `fetchWithJwtRetry` for all authenticated requests and ensure all server actions handle errors appropriately.",
-      "testStrategy": "Test each server action to verify authentication, proper data handling, and error management."
+      "details": "- Create modal or page for adding new sponsors\n- Implement edit sponsor functionality\n- Implement view sponsor details\n- Implement delete sponsor confirmation dialog\n- Add loading states for all operations\n- Add toast notifications for success/error feedback\n- Implement form validation with error messages",
+      "testStrategy": "Test the complete CRUD flow from the UI, including form validation, loading states, and error handling."
     },
     {
-      "id": 6,
-      "title": "Implement Focus Groups landing page",
-      "description": "Create the public landing page for all focus groups",
+      "id": 5,
+      "title": "Implement Search and Filter Functionality",
+      "description": "Add search and filter capabilities to the sponsors list.",
       "status": "pending",
       "dependencies": [
-        3,
         4
       ],
       "priority": "medium",
-      "details": "Build the `/focus-groups` page with:\n- Hero section\n- Grid layout of active focus group cards\n- Each card should display name, image, and brief description\n- Linking to individual focus group pages\n\nEnsure the page only shows active groups and sorts them by name.",
-      "testStrategy": "Verify the page displays correctly, shows only active groups, and links work properly."
+      "details": "- Implement search by sponsor name\n- Add filter by sponsor type\n- Add filter by active/inactive status\n- Implement sorting by priority ranking and name\n- Add pagination controls\n- Connect filters to API query parameters",
+      "testStrategy": "Test search and filter functionality with different combinations of criteria, verify pagination works correctly."
+    },
+    {
+      "id": 6,
+      "title": "Implement Event-Sponsor Association Management",
+      "description": "Create UI for managing event-sponsor associations.",
+      "status": "pending",
+      "dependencies": [
+        4
+      ],
+      "priority": "high",
+      "details": "- Create interface to assign existing sponsors to events\n- Implement removing sponsors from events\n- Add view to see all sponsors for a specific event\n- Add view to see all events for a specific sponsor\n- Prevent duplicate associations\n- Handle cascade delete when event or sponsor is deleted",
+      "testStrategy": "Test creating and removing associations, verify duplicate prevention, and test cascade delete behavior."
     },
     {
       "id": 7,
-      "title": "Implement individual Focus Group page",
-      "description": "Create the public page for individual focus groups with tabbed interface",
+      "title": "Apply UI/UX Style Guide",
+      "description": "Ensure the sponsors management UI follows established style guidelines.",
       "status": "pending",
       "dependencies": [
-        3,
         4,
+        5,
         6
       ],
       "priority": "medium",
-      "details": "Build the `/focus-groups/[slug]` page with:\n- Hero section with group details\n- Tabbed interface for About, Events, and Members sections\n- About tab: Display full description and group leads\n- Events tab: List and calendar views filtered by the focus group\n- Members tab: Configurable public roster of members\n\nEnsure the page handles invalid slugs gracefully.",
-      "testStrategy": "Test with various focus groups to verify correct display of information across all tabs."
+      "details": "- Apply sacred design system colors and typography\n- Match admin page styling patterns\n- Ensure consistent form layouts and spacing\n- Implement responsive design for mobile, tablet, and desktop\n- Add appropriate loading states\n- Ensure error handling follows UI patterns\n- Match styling with event-specific sponsors page",
+      "testStrategy": "Verify UI matches style guide standards, test responsiveness on different devices, and confirm consistent styling across the application."
     },
     {
       "id": 8,
-      "title": "Implement Focus Group admin listing page",
-      "description": "Create the admin page for managing focus groups",
+      "title": "Verify DTO Type Definitions",
+      "description": "Ensure EventSponsorsDTO matches the backend schema.",
       "status": "pending",
-      "dependencies": [
-        3,
-        5
-      ],
-      "priority": "high",
-      "details": "Build the `/admin/focus-groups` page with:\n- List of all focus groups with filtering options\n- Create new focus group functionality\n- Edit and delete capabilities\n- Links to manage events and members for each group\n\nEnsure proper validation for all form inputs and confirmation for destructive actions.",
-      "testStrategy": "Test CRUD operations for focus groups and verify validation works correctly."
+      "dependencies": [],
+      "priority": "medium",
+      "details": "- Verify `EventSponsorsDTO` in `src/types/index.ts` matches backend schema\n- Check if `event_id` field in database should be included in DTO\n- Ensure all required fields are marked as such\n- Verify field types match database schema\n- Update DTO if necessary",
+      "testStrategy": "Compare DTO with database schema and backend API documentation, verify all fields are correctly typed."
     },
     {
       "id": 9,
-      "title": "Implement Focus Group events management page",
-      "description": "Create the admin page for linking events to focus groups",
+      "title": "Implement Multi-Tenant Support",
+      "description": "Ensure all operations respect tenant isolation.",
       "status": "pending",
       "dependencies": [
-        3,
-        5,
-        8
+        3
       ],
       "priority": "high",
-      "details": "Build the `/admin/focus-groups/[id]/events` page with:\n- List of currently linked events\n- Search/filter functionality to find events\n- UI for linking new events to the focus group\n- Ability to unlink events\n\nEnsure the page handles pagination for large numbers of events.",
-      "testStrategy": "Test linking and unlinking events, verify the changes are reflected in both the admin UI and public pages."
+      "details": "- Verify all API calls include `tenantId` in request body\n- Ensure backend automatically filters by tenant\n- Confirm tenant ID is sourced from `NEXT_PUBLIC_TENANT_ID` environment variable\n- Verify `withTenantId` utility is used for payload injection\n- Test tenant isolation at all levels",
+      "testStrategy": "Test API calls with different tenant IDs, verify data isolation between tenants, and confirm tenant ID is correctly applied to all requests."
     },
     {
       "id": 10,
-      "title": "Implement Focus Group members management page",
-      "description": "Create the admin page for managing focus group membership",
+      "title": "Comprehensive Testing",
+      "description": "Perform thorough testing of the entire sponsors management system.",
       "status": "pending",
       "dependencies": [
+        1,
+        2,
         3,
+        4,
         5,
-        8
-      ],
-      "priority": "high",
-      "details": "Build the `/admin/focus-groups/[id]/members` page with:\n- List of current members with their roles and statuses\n- Add new members functionality\n- Change role and status capabilities\n- Remove members functionality\n\nEnsure proper validation for role and status values (uppercase normalization).",
-      "testStrategy": "Test adding, updating, and removing members with different roles and statuses."
-    },
-    {
-      "id": 11,
-      "title": "Update event calendar to support Focus Group filtering",
-      "description": "Enhance the event calendar to filter events by focus group",
-      "status": "pending",
-      "dependencies": [
-        3,
-        7
-      ],
-      "priority": "medium",
-      "details": "Modify the existing event calendar to:\n- Accept `?focusGroup=slug` query parameter\n- Filter events based on focus group association\n- Update UI to indicate when a filter is active\n\nEnsure backward compatibility with existing calendar functionality.",
-      "testStrategy": "Test filtering by various focus groups and verify correct events are displayed."
-    },
-    {
-      "id": 12,
-      "title": "Update event listing to show Focus Group associations",
-      "description": "Enhance event listings to display associated focus groups",
-      "status": "pending",
-      "dependencies": [
-        3,
-        7
-      ],
-      "priority": "medium",
-      "details": "Modify event listing components to:\n- Display focus group tags/badges on event cards\n- Link these tags to respective focus group pages\n- Update event detail pages to show associated focus groups\n\nEnsure consistent styling with the rest of the application.",
-      "testStrategy": "Verify focus group associations are correctly displayed on event listings and detail pages."
-    },
-    {
-      "id": 13,
-      "title": "Implement Focus Group membership controls",
-      "description": "Add UI elements for users to join/leave focus groups",
-      "status": "pending",
-      "dependencies": [
-        3,
-        5,
-        7
-      ],
-      "priority": "medium",
-      "details": "Add functionality for:\n- Authenticated users to request to join a focus group\n- Members to leave a focus group\n- Display membership status to the user\n\nEnsure proper handling of different membership statuses (ACTIVE/INACTIVE/PENDING).",
-      "testStrategy": "Test the join/leave functionality with different user accounts and verify status changes are correctly reflected."
-    },
-    {
-      "id": 14,
-      "title": "Add Focus Group filtering to event search",
-      "description": "Enhance event search functionality to filter by focus group",
-      "status": "pending",
-      "dependencies": [
-        3,
-        11,
-        12
-      ],
-      "priority": "low",
-      "details": "Update the event search component to:\n- Add focus group filter option\n- Allow multiple focus group selection\n- Maintain filter state in URL parameters\n\nEnsure the UI clearly indicates when filters are active.",
-      "testStrategy": "Test various filter combinations to verify correct results are returned."
-    },
-    {
-      "id": 15,
-      "title": "Implement comprehensive testing",
-      "description": "Create end-to-end and integration tests for Focus Group functionality",
-      "status": "pending",
-      "dependencies": [
         6,
         7,
         8,
-        9,
-        10,
-        11,
-        12,
-        13,
-        14
+        9
       ],
-      "priority": "medium",
-      "details": "Develop tests covering:\n- Public page rendering\n- Admin functionality\n- API integrations\n- Authentication and authorization\n- Edge cases and error handling\n\nEnsure all acceptance criteria are validated through automated tests.",
-      "testStrategy": "Run the test suite against a staging environment to verify full functionality."
+      "priority": "high",
+      "details": "- Test all CRUD operations\n- Test image uploads for all three types\n- Test event-sponsor associations\n- Test multi-tenant isolation\n- Test form validation and error handling\n- Test search, filter, and pagination\n- Test responsive design\n- Test loading states and error scenarios\n- Verify authentication requirements",
+      "testStrategy": "Create a comprehensive test plan covering all functional and non-functional requirements, test edge cases, and verify all success criteria are met."
     }
   ]
 }
