@@ -127,6 +127,79 @@ This guide sets up `www.mosc-temp.com` as a **Clerk satellite domain** that uses
 
 ---
 
+## 📚 Additional Documentation: Satellite Branding During Authentication
+
+**For detailed information about showing satellite-specific headers and footers during authentication redirects, refer to the comprehensive guide in the Primary Domain project:**
+
+**📍 Documentation Location:**
+```
+E:\project_workspace\event-site-manager\documentation\clerk_authentication\DOMAIN_REGN_AND_CLERK_SATELLITE_SET_UP_GUIDE.md
+```
+
+**What's Covered in That Document:**
+
+### 🎨 Satellite Branding Implementation
+- **ConditionalAuthLayout Pattern** - How primary domain hides its header/footer on auth routes
+- **Configuration-Based Rendering** - How satellite branding is stored and rendered
+- **SatelliteHeader & SatelliteFooter Components** - Complete implementation details
+
+### 📋 Key Topics:
+1. **Architecture Overview** - Multi-domain authentication flow with branding
+2. **Problem & Solution** - Why mixed branding occurred and how it was fixed
+3. **Configuration Management** - Complete `satellites.json` branding structure
+4. **Code Structure** - All file locations and component relationships
+5. **Implementation Details** - Line-by-line code walkthrough
+6. **Setup Instructions** - Step-by-step guide for adding new satellites with branding
+7. **Testing Checklist** - Comprehensive testing procedures
+8. **Troubleshooting Guide** - Common issues and solutions
+
+### 🔑 Key Implementation:
+The primary domain uses a **ConditionalAuthLayout** component that:
+- Detects when a user is on an authentication route (`/sign-in`, `/sign-up`, `/auth/signout-redirect`)
+- **Hides** the primary domain's header and footer completely
+- **Shows** satellite-specific header and footer based on the `redirect_url` parameter
+- Renders satellite branding from configuration (no iframes, no external fetching)
+
+### 📖 Example Flow:
+```
+User on satellite (www.mosc-temp.com) → Clicks "Sign In"
+    ↓
+Redirects to primary with redirect_url:
+    https://www.event-site-manager.com/sign-in?redirect_url=https://www.mosc-temp.com
+    ↓
+Primary domain:
+    ✅ Hides MCEFEE header/footer (ConditionalAuthLayout)
+    ✅ Extracts satellite config from redirect_url
+    ✅ Shows "Unite India" header/footer (satellite branding)
+    ↓
+User completes authentication
+    ↓
+Redirects back to www.mosc-temp.com with session
+```
+
+### 💡 Why This Matters:
+Without this implementation, users would see **mixed branding** during authentication:
+- ❌ Primary domain header (MCEFEE) at top
+- ❌ Satellite footer (Unite India) at bottom
+- ❌ Confusing user experience
+
+With this implementation:
+- ✅ Only satellite branding visible during entire auth flow
+- ✅ Seamless branded experience
+- ✅ No user confusion about which site they're on
+
+### 🚀 For Developers:
+If you need to:
+- Understand how satellite branding works during authentication
+- Add a new satellite domain with custom branding
+- Troubleshoot branding issues (double headers/footers)
+- Modify satellite header/footer components
+- Update branding configuration
+
+**→ Refer to the Primary Domain documentation linked above for complete details.**
+
+---
+
 ## Prerequisites
 
 ### Required

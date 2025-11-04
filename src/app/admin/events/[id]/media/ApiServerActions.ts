@@ -29,7 +29,15 @@ export async function fetchMediaFilteredServer(
   page: number = 0,
   size: number = 10,
   searchTerm: string = '',
-  eventFlyerOnly: boolean = false
+  eventFlyerOnly: boolean = false,
+  filters: {
+    isFeaturedVideo?: boolean;
+    isHeroImage?: boolean;
+    isActiveHeroImage?: boolean;
+    isHomePageHeroImage?: boolean;
+    isFeaturedEventImage?: boolean;
+    isLiveEventImage?: boolean;
+  } = {}
 ) {
   const params = new URLSearchParams({
     'eventId.equals': eventId,
@@ -46,6 +54,26 @@ export async function fetchMediaFilteredServer(
 
   if (eventFlyerOnly) {
     params.append('eventFlyer.equals', 'true');
+  }
+
+  // Add boolean field filters
+  if (filters.isFeaturedVideo !== undefined) {
+    params.append('isFeaturedVideo.equals', String(filters.isFeaturedVideo));
+  }
+  if (filters.isHeroImage !== undefined) {
+    params.append('isHeroImage.equals', String(filters.isHeroImage));
+  }
+  if (filters.isActiveHeroImage !== undefined) {
+    params.append('isActiveHeroImage.equals', String(filters.isActiveHeroImage));
+  }
+  if (filters.isHomePageHeroImage !== undefined) {
+    params.append('isHomePageHeroImage.equals', String(filters.isHomePageHeroImage));
+  }
+  if (filters.isFeaturedEventImage !== undefined) {
+    params.append('isFeaturedEventImage.equals', String(filters.isFeaturedEventImage));
+  }
+  if (filters.isLiveEventImage !== undefined) {
+    params.append('isLiveEventImage.equals', String(filters.isLiveEventImage));
   }
 
   const url = `${API_BASE_URL}/api/event-medias?${params.toString()}`;

@@ -16,6 +16,21 @@ const LiveEventsSection: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
   const { filteredEvents, isLoading, error } = useFilteredEvents('live');
 
+  // Helper to generate Google Calendar URL
+  function toGoogleCalendarDate(date: string, time: string) {
+    if (!date || !time) return '';
+    const [year, month, day] = date.split('-');
+    let [hour, minute] = time.split(':');
+    let ampm = '';
+    if (minute && minute.includes(' ')) {
+      [minute, ampm] = minute.split(' ');
+    }
+    let h = parseInt(hour, 10);
+    if (ampm && ampm.toUpperCase() === 'PM' && h !== 12) h += 12;
+    if (ampm && ampm.toUpperCase() === 'AM' && h === 12) h = 0;
+    return `${year}${month}${day}T${String(h).padStart(2, '0')}${minute || '00'}00`;
+  }
+
   // Show section after hero section is loaded (2 second delay)
   useEffect(() => {
     if (!isLoading && filteredEvents.length > 0) {
@@ -118,17 +133,50 @@ const LiveEventsSection: React.FC = () => {
                       )}
                     </div>
 
-                    {/* See More Details Button - Only show if content might be cut off */}
-                    <div className="pt-2">
+                    {/* Action Buttons */}
+                    <div className="pt-2 space-y-2">
+                      {/* See More Details Button */}
                       <button
                         onClick={() => window.location.href = `/events/${liveEvent.event.id}`}
-                        className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-red-600 bg-white border border-red-200 rounded-full hover:bg-red-50 hover:border-red-300 transition-colors duration-200"
+                        className="w-full inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium text-red-600 bg-white border border-red-200 rounded-full hover:bg-red-50 hover:border-red-300 transition-colors duration-200"
                       >
                         <span>See More Details</span>
                         <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
                       </button>
+
+                      {/* Add to Calendar Button - Only for upcoming events */}
+                      {(() => {
+                        const currentDate = new Date();
+                        currentDate.setHours(0, 0, 0, 0);
+                        const eventDate = liveEvent.event.startDate ? new Date(liveEvent.event.startDate) : null;
+                        if (eventDate) {
+                          eventDate.setHours(0, 0, 0, 0);
+                        }
+                        const isUpcoming = eventDate && eventDate >= currentDate;
+
+                        if (!isUpcoming || !liveEvent.event.startDate || !liveEvent.event.startTime) return null;
+
+                        const start = toGoogleCalendarDate(liveEvent.event.startDate, liveEvent.event.startTime);
+                        const end = toGoogleCalendarDate(liveEvent.event.endDate || liveEvent.event.startDate, liveEvent.event.endTime || liveEvent.event.startTime);
+                        const text = encodeURIComponent(liveEvent.event.title);
+                        const details = encodeURIComponent(liveEvent.event.description || '');
+                        const location = encodeURIComponent(liveEvent.event.location || '');
+                        const calendarLink = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${start}/${end}&details=${details}&location=${location}`;
+
+                        return (
+                          <a
+                            href={calendarLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-xl border border-gray-200 transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2 text-xs"
+                          >
+                            <span className="text-lg">📅</span>
+                            <span>Add to Calendar</span>
+                          </a>
+                        );
+                      })()}
                     </div>
                   </div>
                 </div>

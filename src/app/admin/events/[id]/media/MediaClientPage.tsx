@@ -151,7 +151,31 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFiles(e.target.files);
+    if (e.target.files && e.target.files.length > 0) {
+      setFiles(e.target.files);
+      // Also update the main file input if it's a folder input
+      if (fileInputRef.current && e.target !== fileInputRef.current) {
+        const dataTransfer = new DataTransfer();
+        Array.from(e.target.files).forEach(file => {
+          dataTransfer.items.add(file);
+        });
+        fileInputRef.current.files = dataTransfer.files;
+      }
+    }
+  };
+
+  const handleFolderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFiles(e.target.files);
+      // Also update the main file input
+      if (fileInputRef.current) {
+        const dataTransfer = new DataTransfer();
+        Array.from(e.target.files).forEach(file => {
+          dataTransfer.items.add(file);
+        });
+        fileInputRef.current.files = dataTransfer.files;
+      }
+    }
   };
 
   // Drag and drop handlers
@@ -643,7 +667,7 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
         >
           <FaPhotoVideo className="w-5 h-5 mr-1" />
           <span className="text-left">
-            Go to / View<br />Uploaded Media Files
+            Go to / View<br />Uploaded Media Files<br />Full Files List
           </span>
         </button>
       </div>
@@ -696,6 +720,35 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
       {/* Upload form */}
       <div ref={uploadFormDivRef} className="mt-8 mb-8 p-6 bg-gray-50 border border-gray-200 rounded-lg shadow-sm">
         <div className="text-xl font-bold mb-4">Media File Upload Form</div>
+
+        {/* Image Resizing Guidelines */}
+        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="flex items-start space-x-3">
+            <div className="flex-shrink-0">
+              <svg className="w-5 h-5 text-yellow-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm font-semibold text-yellow-800 mb-2">📏 Image Resizing Guidelines</h3>
+              <div className="text-sm text-yellow-700 space-y-2">
+                <p><strong>Need to resize your image before uploading?</strong> You can use the online image resizer tool:</p>
+                <p className="font-medium text-yellow-800">Steps to resize images:</p>
+                <ol className="list-decimal list-inside space-y-1 text-xs ml-2">
+                  <li>Visit <a href="https://imageresizer.com/resize/editor" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800">https://imageresizer.com/resize/editor</a></li>
+                  <li>Upload your image to the tool</li>
+                  <li><strong>Uncheck</strong> the checkbox labeled <strong>'Lock Aspect Ratio'</strong></li>
+                  <li><strong>Uncheck</strong> the checkbox labeled <strong>'Background Fill'</strong></li>
+                  <li>Enter the desired width and height in the text fields</li>
+                  <li>Click <strong>Export</strong> to download the resized image</li>
+                </ol>
+                <p className="text-xs text-yellow-600 mt-2 italic">
+                  <strong>Important:</strong> If you want your image to be displayed as a hero image in the home page Hero section, please make sure to check the <strong>'Home Page Hero Image'</strong> checkbox in the form below after uploading.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Hero Image Specifications Tip */}
         <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
@@ -843,8 +896,8 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
               />
             </div>
 
-            {/* Choose Files Button */}
-            <div className="flex justify-center">
+            {/* Choose Files Buttons */}
+            <div className="flex justify-center gap-3 flex-wrap">
               <label className="relative cursor-pointer">
                 <span className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded shadow-sm border border-blue-700 transition-colors inline-block text-center min-w-[160px] flex items-center justify-center gap-2">
                   <FaFolderOpen className="w-5 h-5" />
@@ -858,7 +911,30 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
                   accept="image/*,video/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.svg"
                 />
               </label>
+
+              <label className="relative cursor-pointer">
+                <span className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded shadow-sm border border-green-700 transition-colors inline-block text-center min-w-[160px] flex items-center justify-center gap-2">
+                  <FaFolderOpen className="w-5 h-5" />
+                  Upload Folder
+                </span>
+                <input
+                  type="file"
+                  {...({ webkitdirectory: '' } as any)}
+                  onChange={handleFolderChange}
+                  className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                  accept="image/*,video/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.svg"
+                />
+              </label>
             </div>
+
+            {/* Info message about folder upload */}
+            {files && files.length > 0 && (
+              <div className="text-center mt-2">
+                <p className="text-sm text-gray-600">
+                  <span className="font-semibold text-blue-600">{files.length} file{files.length !== 1 ? 's' : ''}</span> selected for upload
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Start Displaying From Date Field */}
@@ -1149,7 +1225,20 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
           Mouse over the first 2 columns (Title, Type) to see full details about the item. Use the × button to close the tooltip.
         </div>
         <div className="mb-4 flex justify-between items-center">
-          <h2 className="text-2xl font-bold text-gray-900">Uploaded Media Files</h2>
+          <div className="flex items-center gap-4">
+            <h2 className="text-2xl font-bold text-gray-900">Uploaded Media Files</h2>
+            <Link href={`/admin/events/${eventId}/media/list`}>
+              <button
+                type="button"
+                className="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold px-4 py-2 rounded shadow-sm border border-yellow-700 transition-colors flex items-center gap-2"
+              >
+                <FaPhotoVideo className="w-5 h-5 mr-1" />
+                <span className="text-left">
+                  Go to / View<br />Uploaded Media Files<br />Full Files List
+                </span>
+              </button>
+            </Link>
+          </div>
           <div className="flex items-center gap-4">
             <label className="flex items-center gap-2">
               <input

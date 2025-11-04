@@ -643,7 +643,7 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
         >
           <FaPhotoVideo className="w-5 h-5 mr-1" />
           <span className="text-left">
-            Go to / View<br />Uploaded Media Files
+            Go to / View<br />Uploaded Media Files<br />Full Files List
           </span>
         </button>
       </div>

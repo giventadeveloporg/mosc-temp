@@ -1,0 +1,51 @@
+/* Gallery Thumbnails Grid with Perfect Centering - Matching TeamSection logic */
+.galleryThumbnailsGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  width: 100%;
+  justify-content: center;
+  align-items: flex-start;
+  margin: 0 auto;
+}
+
+.galleryThumbnail {
+  width: 150px;
+  height: 150px;
+  max-width: 150px;
+  max-height: 150px;
+  flex-shrink: 0;
+}
+
+/* Desktop (lg): 6 columns with centered alignment - matches original lg:grid-cols-6 */
+@media (min-width: 1024px) {
+  .galleryThumbnailsGrid {
+    max-width: calc(6 * 150px + 5 * 0.5rem);
+  }
+}
+
+/* Tablet (sm): 4 columns with centered alignment - matches original sm:grid-cols-4 */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .galleryThumbnailsGrid {
+    max-width: calc(4 * 150px + 3 * 0.5rem);
+  }
+}
+
+/* Mobile: 3 columns with centered alignment - matches original grid-cols-3 */
+@media (max-width: 639px) {
+  .galleryThumbnailsGrid {
+    max-width: calc(3 * 150px + 2 * 0.5rem);
+  }
+}
+
+/* Very small mobile: 2 columns with centered alignment */
+@media (max-width: 479px) {
+  .galleryThumbnailsGrid {
+    max-width: calc(2 * 150px + 1 * 0.5rem);
+  }
+  .galleryThumbnail {
+    width: calc(50% - 0.25rem);
+    max-width: calc(50% - 0.25rem);
+  }
+}
+

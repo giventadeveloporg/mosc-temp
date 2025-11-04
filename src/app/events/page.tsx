@@ -6,6 +6,7 @@ import Link from "next/link";
 import type { EventWithMedia, EventDetailsDTO } from "@/types";
 import { formatInTimeZone } from 'date-fns-tz';
 import LocationDisplay from '@/components/LocationDisplay';
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 // import { formatInTimeZone } from 'date-fns-tz';
 
 const EVENTS_PAGE_SIZE = 10;
@@ -37,7 +38,21 @@ function DescriptionDisplay({ description }: { description: string }) {
         }}
         className="mt-3 inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-full border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 font-medium text-sm"
       >
-        {isExpanded ? 'Show less' : 'See Event Details →'}
+        {isExpanded ? (
+          <>
+            <span>Show Less</span>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+            </svg>
+          </>
+        ) : (
+          <>
+            <span>Read More</span>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </>
+        )}
       </button>
     </div>
   );
@@ -49,6 +64,7 @@ export default function EventsPage() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const [heroImageUrl, setHeroImageUrl] = useState<string>("/images/default_placeholder_hero_image.jpeg");
   const [fetchError, setFetchError] = useState(false);
   const [showPastEvents, setShowPastEvents] = useState(false);
@@ -117,6 +133,16 @@ export default function EventsPage() {
         // Fetch paginated events with date filtering
         const eventsRes = await fetch(`/api/proxy/event-details?${queryParams.toString()}`);
         if (!eventsRes.ok) throw new Error('Failed to fetch events');
+
+        // Get total count from response header (as per UI style guide)
+        const totalCountHeader = eventsRes.headers.get('x-total-count');
+        const totalCountValue = totalCountHeader ? parseInt(totalCountHeader, 10) : 0;
+        setTotalCount(totalCountValue);
+
+        // Calculate total pages
+        const calculatedTotalPages = Math.max(1, Math.ceil(totalCountValue / EVENTS_PAGE_SIZE));
+        setTotalPages(calculatedTotalPages);
+
         const events: EventDetailsDTO[] = await eventsRes.json();
         let eventList = Array.isArray(events) ? events : [events];
         // For each event, fetch its hero image (homepage hero or regular hero)
@@ -143,8 +169,6 @@ export default function EventsPage() {
           })
         );
         setEvents(eventsWithMedia);
-        // Remove totalPages logic, since not present in array response
-        setTotalPages(1);
 
         // Hero image logic: earliest upcoming event within 3 months
         const currentDate = new Date();
@@ -183,9 +207,11 @@ export default function EventsPage() {
       [minute, ampm] = minute.split(' ');
     }
     let h = parseInt(hour, 10);
+    if (isNaN(h)) h = 0;
     if (ampm && ampm.toUpperCase() === 'PM' && h !== 12) h += 12;
     if (ampm && ampm.toUpperCase() === 'AM' && h === 12) h = 0;
-    return `${year}${month}${day}T${String(h).padStart(2, '0')}${minute}00`;
+    const min = minute && !isNaN(parseInt(minute, 10)) ? minute : '00';
+    return `${year}${month}${day}T${String(h).padStart(2, '0')}${min.padStart(2, '0')}00`;
   }
 
   // Helper to format time with AM/PM
@@ -841,9 +867,19 @@ export default function EventsPage() {
                         {(() => {
                           if (showPastEvents) return null;
 
-                          const currentDate = new Date();
-                          const eventDate = event.startDate ? new Date(event.startDate) : null;
-                          const isUpcoming = eventDate && eventDate >= currentDate;
+                          // Get today's date in YYYY-MM-DD format using local timezone
+                          const today = new Date();
+                          const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+                          // Compare dates as strings to avoid timezone parsing issues
+                          const eventDateStr = event.startDate ? event.startDate.split('T')[0] : null; // Get just the date part (YYYY-MM-DD)
+
+                          if (!eventDateStr) return null;
+
+                          // Check if event date is today or in the future
+                          const isToday = eventDateStr === todayStr;
+                          const isFuture = eventDateStr > todayStr;
+                          const isUpcoming = isToday || isFuture;
 
                           if (!isUpcoming) return null;
 
@@ -869,17 +905,61 @@ export default function EventsPage() {
                         {(() => {
                           if (showPastEvents) return null;
 
-                          const currentDate = new Date();
-                          const eventDate = event.startDate ? new Date(event.startDate) : null;
-                          const isUpcoming = eventDate && eventDate >= currentDate;
-                          if (!isUpcoming) return null;
+                          // Check that startDate and startTime exist for calendar link generation
+                          if (!event.startDate || !event.startTime) {
+                            console.log(`Event ${event.id} missing startDate or startTime:`, {
+                              startDate: event.startDate,
+                              startTime: event.startTime
+                            });
+                            return null;
+                          }
+
+                          // Get today's date in YYYY-MM-DD format using local timezone
+                          const today = new Date();
+                          const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+                          // Compare dates as strings to avoid timezone parsing issues
+                          const eventDateStr = event.startDate.split('T')[0]; // Get just the date part (YYYY-MM-DD)
+
+                          // Check if event date is today or in the future
+                          const isToday = eventDateStr === todayStr;
+                          const isFuture = eventDateStr > todayStr;
+                          const isUpcoming = isToday || isFuture;
+
+                          if (!isUpcoming) {
+                            console.log(`Event ${event.id} is not upcoming (past event):`, {
+                              eventDateStr,
+                              todayStr,
+                              isToday,
+                              isFuture
+                            });
+                            return null;
+                          }
+
+                          // If event is today OR in the future, show the button
+                          // This includes events happening later today
 
                           const start = toGoogleCalendarDate(event.startDate, event.startTime);
-                          const end = toGoogleCalendarDate(event.endDate, event.endTime);
+                          const end = toGoogleCalendarDate(event.endDate || event.startDate, event.endTime || event.startTime);
+
+                          if (!start || !end) {
+                            console.log(`Event ${event.id} failed to generate calendar dates:`, {
+                              start,
+                              end,
+                              startDate: event.startDate,
+                              startTime: event.startTime,
+                              endDate: event.endDate,
+                              endTime: event.endTime
+                            });
+                            return null;
+                          }
+
                           const text = encodeURIComponent(event.title);
                           const details = encodeURIComponent(event.description || '');
                           const location = encodeURIComponent(event.location || '');
                           const calendarLink = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${start}/${end}&details=${details}&location=${location}`;
+
+                          console.log(`Event ${event.id} calendar link generated:`, calendarLink);
 
                           return (
                             <a
@@ -893,34 +973,53 @@ export default function EventsPage() {
                             </a>
                           );
                         })()}
+
+                        {/* See Event Details Button - Links to event details page */}
+                        <Link
+                          href={`/events/${event.id}`}
+                          className="bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 px-6 rounded-xl border border-gray-200 transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2"
+                        >
+                          <span>See Event Details</span>
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </Link>
                       </div>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
-            {/* Pagination controls */}
-            <div className="flex justify-center items-center mt-12 gap-4">
-              <button
-                onClick={() => setPage((p) => Math.max(0, p - 1))}
-                disabled={page === 0}
-                className="px-6 py-3 rounded-xl bg-white hover:bg-gray-50 text-gray-700 font-semibold disabled:opacity-50 disabled:cursor-not-allowed border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 flex items-center gap-2"
-              >
-                <span>←</span>
-                <span>Previous</span>
-              </button>
-              <span className="px-4 py-2 bg-gray-100 text-gray-700 font-semibold rounded-lg">
-                Page {page + 1} of {totalPages}
-              </span>
-              <button
-                onClick={() => setPage((p) => (p + 1 < totalPages ? p + 1 : p))}
-                disabled={page + 1 >= totalPages}
-                className="px-6 py-3 rounded-xl bg-white hover:bg-gray-50 text-gray-700 font-semibold disabled:opacity-50 disabled:cursor-not-allowed border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 flex items-center gap-2"
-              >
-                <span>Next</span>
-                <span>→</span>
-              </button>
-            </div>
+            {/* Pagination controls - Matching admin page style */}
+            {!loading && totalCount > 0 && (
+              <div className="mt-8">
+                <div className="flex justify-between items-center">
+                  <button
+                    onClick={() => setPage((p) => Math.max(0, p - 1))}
+                    disabled={page === 0}
+                    className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+                  >
+                    <FaChevronLeft />
+                    Previous
+                  </button>
+                  <div className="text-sm font-semibold text-gray-700">
+                    Page {page + 1} of {totalPages}
+                  </div>
+                  <button
+                    onClick={() => setPage((p) => (p + 1 < totalPages ? p + 1 : p))}
+                    disabled={page >= totalPages - 1}
+                    className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+                  >
+                    Next
+                    <FaChevronRight />
+                  </button>
+                </div>
+                <div className="text-center text-sm text-gray-600 mt-2">
+                  Showing <span className="font-medium">{totalCount > 0 ? page * EVENTS_PAGE_SIZE + 1 : 0}</span> to <span className="font-medium">{totalCount > 0 ? Math.min((page + 1) * EVENTS_PAGE_SIZE, totalCount) : 0}</span> of{' '}
+                  <span className="font-medium">{totalCount}</span> results
+                </div>
+              </div>
+            )}
           </>
         )}
       </div>

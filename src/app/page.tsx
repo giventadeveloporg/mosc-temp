@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
+import Image from 'next/image';
 import HeroSection from '../components/HeroSection';
 import LiveEventsSection from '../components/LiveEventsSection';
 import FeaturedEventsSection from '../components/FeaturedEventsSection';
@@ -101,31 +102,11 @@ function HomePageContent() {
     };
   }, []);
 
-  // Show loading state while tenant settings are being fetched
-  if (loading) {
-    return (
-      <main>
-        <HeroSection />
-        {/* Temporary site banner */}
-        <div className="w-full bg-green-700 text-white py-6 md:py-8">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <span className="text-2xl md:text-4xl font-bold tracking-wider">MOSC-TEMP</span>
-          </div>
-        </div>
-        <div className="py-16 bg-gray-50">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div className="animate-pulse">Loading...</div>
-          </div>
-        </div>
-      </main>
-    );
-  }
-
   return (
     <main>
       <HeroSection />
       {/* Temporary site banner */}
-      <div className="w-full bg-green-700 text-white py-6 md:py-8">
+      <div className="w-full bg-green-700 text-white py-6 md:py-8 mt-[10px]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <span className="text-2xl md:text-4xl font-bold tracking-wider">MOSC-TEMP</span>
         </div>
@@ -138,19 +119,46 @@ function HomePageContent() {
           <FeaturedEventsSection />
         </ErrorBoundary>
       </div>
+      {/* What We Do and About Foundation sections - Always shown immediately */}
       <ServicesSection />
       <AboutSection />
-      {showEventsSection && (
-        <ErrorBoundary fallback={<EventsFallback />}>
-          <UpcomingEventsSection />
-        </ErrorBoundary>
+      {/* Loading state for Upcoming Events and Team sections only */}
+      {loading ? (
+        <div className="py-16 bg-gray-50">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-center items-center min-h-[400px]">
+              <div className="relative">
+                <Image
+                  src="/images/loading_events.jpg"
+                  alt="Loading events and team information..."
+                  width={300}
+                  height={300}
+                  className="rounded-lg shadow-2xl animate-pulse"
+                  priority
+                />
+                <div className="absolute inset-0 rounded-lg overflow-hidden">
+                  <div className="wavy-animation"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <>
+          {showEventsSection && (
+            <ErrorBoundary fallback={<EventsFallback />}>
+              <UpcomingEventsSection />
+            </ErrorBoundary>
+          )}
+          {showTeamSection && (
+            <ErrorBoundary fallback={<TeamFallback />}>
+              <TeamSection />
+            </ErrorBoundary>
+          )}
+        </>
       )}
+      {/* Causes section - Always shown (outside loading condition) */}
       <CausesSection />
-      {showTeamSection && (
-        <ErrorBoundary fallback={<TeamFallback />}>
-          <TeamSection />
-        </ErrorBoundary>
-      )}
       {showSponsorsSection && (
         <ErrorBoundary fallback={<div>Sponsors temporarily unavailable</div>}>
           <OurSponsorsSection />

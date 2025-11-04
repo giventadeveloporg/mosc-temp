@@ -1,8 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 
-const INPUT_FILE = 'dump-giventa_event_management-202506240024_pre_tenant_id_with_insert_data.sql';
-const OUTPUT_FILE = 'dump-giventa_event_management-202506240024_pre_tenant_id_with_insert_data.ordered.sql';
+// Use path.join to ensure correct path resolution regardless of where script is run from
+const SCRIPT_DIR = __dirname;
+const INPUT_FILE = path.join(SCRIPT_DIR, 'corrected_event_media_inserts.sql');
+const OUTPUT_FILE = path.join(SCRIPT_DIR, 'corrected_event_media_inserts.ordered.sql');
 
 const TABLE_ORDER = [
   'event_type_details',
@@ -46,6 +48,15 @@ const TABLE_ORDER = [
 ];
 
 function main() {
+  // Check if input file exists
+  if (!fs.existsSync(INPUT_FILE)) {
+    console.error(`❌ Error: Input file not found: ${INPUT_FILE}`);
+    console.error(`   Please ensure the file exists in the same directory as this script.`);
+    process.exit(1);
+  }
+
+  console.log(`📁 Reading input file: ${INPUT_FILE}`);
+
   // Read the input file
   const sql = fs.readFileSync(INPUT_FILE, 'utf8');
   const lines = sql.split(/\r?\n/);
@@ -145,6 +156,12 @@ function main() {
   // Write the reordered SQL to output file
   const outputContent = output.join('\n\n') + '\n';
   fs.writeFileSync(OUTPUT_FILE, outputContent, 'utf8');
+
+  console.log(`✅ Success! Output written to: ${OUTPUT_FILE}`);
+  console.log(`📊 Summary:`);
+  console.log(`   • Total INSERT statements: ${insertStatements.length}`);
+  console.log(`   • Tables found: ${allTables.join(', ')}`);
+  console.log(`   • Extra tables (not in order): ${extraTables.length > 0 ? extraTables.join(', ') : 'none'}`);
 }
 
 // Run the script

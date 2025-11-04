@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { EventDetailsDTO, EventTypeDetailsDTO } from '@/types';
 import timezones from '@/lib/timezones'; // (We'll create this file for the IANA timezone list)
+import { FaCalendarAlt } from 'react-icons/fa';
 
 interface EventFormProps {
   event?: EventDetailsDTO;
@@ -74,9 +75,38 @@ export function EventForm({ event, eventTypes, onSubmit, loading }: EventFormPro
     if (form.description && form.description.length > 900) errs.description = 'Description must not exceed 900 characters';
     if (form.directionsToVenue && form.directionsToVenue.length > 580) errs.directionsToVenue = 'Directions to Venue must not exceed 580 characters';
     if (!form.eventType || !form.eventType.id) errs.eventType = 'Event type is required';
-    if (!form.startDate) errs.startDate = 'Start date is required';
-    if (!form.endDate) errs.endDate = 'End date is required';
-    if (!form.promotionStartDate) errs.promotionStartDate = 'Promotion start date is required';
+
+    // Date validations - convert display format to storage format if needed
+    let startDateStr = form.startDate;
+    let endDateStr = form.endDate;
+    let promotionStartDateStr = form.promotionStartDate;
+
+    // Validate date format (MM/DD/YYYY) and convert to YYYY-MM-DD for comparison
+    if (startDateStr) {
+      if (!isValidDateFormat(formatDateForDisplay(startDateStr))) {
+        errs.startDate = 'Start date must be in MM/DD/YYYY format (e.g., 09/14/2025)';
+      } else {
+        startDateStr = formatDateForStorage(startDateStr);
+      }
+    }
+    if (endDateStr) {
+      if (!isValidDateFormat(formatDateForDisplay(endDateStr))) {
+        errs.endDate = 'End date must be in MM/DD/YYYY format (e.g., 09/14/2025)';
+      } else {
+        endDateStr = formatDateForStorage(endDateStr);
+      }
+    }
+    if (promotionStartDateStr) {
+      if (!isValidDateFormat(formatDateForDisplay(promotionStartDateStr))) {
+        errs.promotionStartDate = 'Promotion start date must be in MM/DD/YYYY format (e.g., 09/14/2025)';
+      } else {
+        promotionStartDateStr = formatDateForStorage(promotionStartDateStr);
+      }
+    }
+
+    if (!startDateStr) errs.startDate = 'Start date is required';
+    if (!endDateStr) errs.endDate = 'End date is required';
+    if (!promotionStartDateStr) errs.promotionStartDate = 'Promotion start date is required';
     if (!form.startTime) errs.startTime = 'Start time is required';
     if (!form.endTime) errs.endTime = 'End time is required';
     if (!form.admissionType) errs.admissionType = 'Admission type is required';
@@ -88,10 +118,6 @@ export function EventForm({ event, eventTypes, onSubmit, loading }: EventFormPro
     const todayStr = today.getFullYear() + '-' +
       String(today.getMonth() + 1).padStart(2, '0') + '-' +
       String(today.getDate()).padStart(2, '0');
-
-    const startDateStr = form.startDate;
-    const endDateStr = form.endDate;
-    const promotionStartDateStr = form.promotionStartDate;
 
     // For date validation, compare strings directly to avoid timezone issues
     // YYYY-MM-DD format can be compared lexicographically
@@ -183,6 +209,105 @@ export function EventForm({ event, eventTypes, onSubmit, loading }: EventFormPro
     return `${String(h).padStart(2, '0')}:${minute}`;
   }
 
+  // Helper to convert YYYY-MM-DD to MM/DD/YYYY for display
+  function formatDateForDisplay(dateStr: string): string {
+    if (!dateStr) return '';
+    // If already in MM/DD/YYYY format, return as is
+    if (dateStr.match(/^\d{2}\/\d{2}\/\d{4}$/)) return dateStr;
+    // Convert from YYYY-MM-DD to MM/DD/YYYY
+    const [year, month, day] = dateStr.split('-');
+    if (year && month && day) {
+      return `${month}/${day}/${year}`;
+    }
+    return dateStr;
+  }
+
+  // Helper to convert MM/DD/YYYY to YYYY-MM-DD for storage
+  function formatDateForStorage(dateStr: string): string {
+    if (!dateStr) return '';
+    // If already in YYYY-MM-DD format, return as is
+    if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) return dateStr;
+    // Convert from MM/DD/YYYY to YYYY-MM-DD
+    const [month, day, year] = dateStr.split('/');
+    if (year && month && day && year.length === 4 && month.length === 2 && day.length === 2) {
+      return `${year}-${month}-${day}`;
+    }
+    return dateStr;
+  }
+
+  // Helper to validate MM/DD/YYYY format (exactly 2 digits for month and day)
+  function isValidDateFormat(dateStr: string): boolean {
+    if (!dateStr) return false;
+    const mmddyyyyPattern = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+    const match = dateStr.match(mmddyyyyPattern);
+    if (!match) return false;
+
+    const [, month, day, year] = match;
+    const monthNum = parseInt(month, 10);
+    const dayNum = parseInt(day, 10);
+    const yearNum = parseInt(year, 10);
+
+    // Basic validation: month 1-12, day 1-31, year reasonable
+    if (monthNum < 1 || monthNum > 12) return false;
+    if (dayNum < 1 || dayNum > 31) return false;
+    if (yearNum < 1900 || yearNum > 2100) return false;
+
+    // Check if date is actually valid (e.g., not Feb 30)
+    const date = new Date(yearNum, monthNum - 1, dayNum);
+    return date.getFullYear() === yearNum &&
+           date.getMonth() === monthNum - 1 &&
+           date.getDate() === dayNum;
+  }
+
+  // Helper to check if date format is exactly MM/DD/YYYY (with 2 digits for month and day)
+  function isMMDDYYYYFormat(dateStr: string): boolean {
+    if (!dateStr) return false;
+    // Must match exactly MM/DD/YYYY pattern (2 digits, slash, 2 digits, slash, 4 digits)
+    const exactPattern = /^\d{2}\/\d{2}\/\d{4}$/;
+    return exactPattern.test(dateStr);
+  }
+
+  // Validate date field format and set error if needed
+  function validateDateField(name: string, value: string) {
+    const displayValue = formatDateForDisplay(value) || value;
+
+    // If empty, no error (required validation happens elsewhere)
+    if (!displayValue || displayValue.trim() === '') {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+      return true;
+    }
+
+    // Check if format is exactly MM/DD/YYYY
+    if (!isMMDDYYYYFormat(displayValue)) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: 'Please enter date in the MM/DD/YYYY format'
+      }));
+      return false;
+    }
+
+    // Check if it's a valid date
+    if (!isValidDateFormat(displayValue)) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: 'Please enter a valid date in MM/DD/YYYY format'
+      }));
+      return false;
+    }
+
+    // Clear error if valid
+    setErrors(prev => {
+      const newErrors = { ...prev };
+      delete newErrors[name];
+      return newErrors;
+    });
+    return true;
+  }
+
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     const { name, value, type } = e.target;
 
@@ -202,8 +327,194 @@ export function EventForm({ event, eventTypes, onSubmit, loading }: EventFormPro
     } else if (name === 'startTime' || name === 'endTime') {
       // Convert 24-hour value from <input type="time"> to 12-hour AM/PM string
       setForm((f: EventDetailsDTO) => ({ ...f, [name]: to12HourFormat(value) }));
+    } else if (name === 'startDate' || name === 'endDate' || name === 'promotionStartDate') {
+      // Handle date fields - allow typing in MM/DD/YYYY format
+      // Store in YYYY-MM-DD format internally, but display as MM/DD/YYYY
+      const formattedValue = formatDateForStorage(value);
+      setForm((f: EventDetailsDTO) => ({ ...f, [name]: formattedValue }));
     } else {
       setForm((f: EventDetailsDTO) => ({ ...f, [name]: value }));
+    }
+  }
+
+  // Handler for date input with formatting - allows digits and forward slashes
+  function handleDateChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+    const input = e.target;
+    const cursorPos = input.selectionStart || 0;
+
+    // Allow only digits and forward slashes, preserve user's input structure
+    let cleaned = value.replace(/[^\d\/]/g, '');
+
+    // Auto-format: ensure slashes are in the right places as user types
+    // But allow user to type slashes manually too
+    const digits = cleaned.replace(/\D/g, '');
+    const slashes = cleaned.match(/\//g) || [];
+
+    // Build formatted string: MM/DD/YYYY
+    // If user has typed slashes, respect their position; otherwise auto-format
+    let formatted = '';
+    if (cleaned.includes('/')) {
+      // User has typed slashes - preserve their structure but ensure proper format
+      // Split by slashes and reconstruct
+      const parts = cleaned.split('/').filter(p => p.length > 0);
+      if (parts.length >= 1) {
+        formatted = parts[0].slice(0, 2); // Month (max 2 digits)
+      }
+      if (parts.length >= 2) {
+        formatted += '/' + parts[1].slice(0, 2); // Day (max 2 digits)
+      }
+      if (parts.length >= 3) {
+        formatted += '/' + parts[2].slice(0, 4); // Year (max 4 digits)
+      }
+    } else {
+      // Auto-format based on digit count
+      if (digits.length > 0) {
+        formatted = digits.slice(0, 2);
+      }
+      if (digits.length > 2) {
+        formatted += '/' + digits.slice(2, 4);
+      }
+      if (digits.length > 4) {
+        formatted += '/' + digits.slice(4, 8);
+      }
+    }
+
+    // Store the formatted display value
+    // If complete and valid, convert to YYYY-MM-DD for storage
+    if (formatted.match(/^\d{2}\/\d{2}\/\d{4}$/) && isValidDateFormat(formatted)) {
+      const storageValue = formatDateForStorage(formatted);
+      setForm((f: EventDetailsDTO) => ({ ...f, [name]: storageValue }));
+      // Clear error if format is correct
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    } else {
+      // Store the display value as-is (allows partial dates like "12/0/2025")
+      setForm((f: EventDetailsDTO) => ({ ...f, [name]: formatted }));
+
+      // Validate format - show error if format is incorrect
+      // Only validate if user has finished typing (has slashes and some digits)
+      if (formatted.includes('/') && formatted.length >= 6) {
+        validateDateField(name, formatted);
+      } else {
+        // Clear error while user is still typing
+        setErrors(prev => {
+          const newErrors = { ...prev };
+          delete newErrors[name];
+          return newErrors;
+        });
+      }
+    }
+
+    // Restore cursor position
+    setTimeout(() => {
+      // Calculate cursor position - maintain relative position
+      let newCursorPos = cursorPos;
+      const displayValue = formatDateForDisplay(form[name as keyof EventDetailsDTO] as string) || formatted;
+
+      // Ensure cursor doesn't go past the end
+      newCursorPos = Math.min(newCursorPos, displayValue.length);
+
+      // If cursor would land on a slash after typing a digit, move past it
+      if (value.length > (formatDateForDisplay(form[name as keyof EventDetailsDTO] as string) || '').length) {
+        // User was typing
+        if (newCursorPos < displayValue.length && displayValue[newCursorPos] === '/' && /^\d$/.test(value[cursorPos - 1])) {
+          newCursorPos = Math.min(newCursorPos + 1, displayValue.length);
+        }
+      }
+
+      input.setSelectionRange(newCursorPos, newCursorPos);
+    }, 0);
+  }
+
+  // Handler for date field blur - validate format when user leaves the field
+  function handleDateBlur(e: React.FocusEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+    const displayValue = formatDateForDisplay(form[name as keyof EventDetailsDTO] as string) || value;
+    validateDateField(name, displayValue);
+  }
+
+  // Handler for key down events to handle deletion without shifting
+  function handleDateKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    const input = e.currentTarget;
+    const { name, selectionStart, selectionEnd } = input;
+    const cursorPos = selectionStart || 0;
+    const hasSelection = selectionStart !== selectionEnd;
+
+    // Always allow forward slash to be typed
+    if (e.key === '/' && !e.shiftKey) {
+      return; // Let it through
+    }
+
+    // Handle backspace/delete to delete character at position without shifting others
+    if ((e.key === 'Backspace' || e.key === 'Delete') && !hasSelection) {
+      e.preventDefault();
+
+      const currentValue = input.value || '';
+
+      // Determine which character to remove
+      let deleteIndex = cursorPos;
+
+      if (e.key === 'Backspace' && cursorPos > 0) {
+        deleteIndex = cursorPos - 1;
+        // If we're trying to delete a slash, skip it and delete the digit before it
+        if (currentValue[deleteIndex] === '/') {
+          deleteIndex = Math.max(0, deleteIndex - 1);
+        }
+      } else if (e.key === 'Delete' && cursorPos < currentValue.length) {
+        deleteIndex = cursorPos;
+        // If current position is a slash, delete the digit after it
+        if (currentValue[deleteIndex] === '/') {
+          deleteIndex = Math.min(currentValue.length - 1, deleteIndex + 1);
+        }
+      } else {
+        return; // No valid position
+      }
+
+      // Don't delete slashes - maintain structure
+      if (currentValue[deleteIndex] === '/') {
+        // Just move cursor, don't delete the slash
+        setTimeout(() => {
+          const newPos = e.key === 'Backspace' ? Math.max(0, cursorPos - 1) : cursorPos;
+          input.setSelectionRange(newPos, newPos);
+        }, 0);
+        return;
+      }
+
+      // Remove the character at deleteIndex - this will naturally maintain structure
+      // because we're removing from a specific position
+      const newValue = currentValue.substring(0, deleteIndex) + currentValue.substring(deleteIndex + 1);
+
+      // Store the new value (allows partial dates like "12/0/2025")
+      setForm((f: EventDetailsDTO) => ({ ...f, [name]: newValue }));
+
+      // Update input directly for immediate feedback
+      input.value = newValue;
+
+      // Restore cursor position
+      setTimeout(() => {
+        let newCursorPos = e.key === 'Backspace' ? Math.max(0, cursorPos - 1) : cursorPos;
+        // Don't land on a slash
+        if (newCursorPos < newValue.length && newValue[newCursorPos] === '/') {
+          newCursorPos = e.key === 'Backspace' ? Math.max(0, newCursorPos - 1) : Math.min(newValue.length, newCursorPos + 1);
+        }
+        input.setSelectionRange(newCursorPos, newCursorPos);
+      }, 0);
+
+      return;
+    }
+  }
+
+  // Handler for calendar date picker
+  function handleCalendarDateChange(name: string, dateValue: string) {
+    // Convert from YYYY-MM-DD (date input format) to MM/DD/YYYY for display
+    if (dateValue && dateValue.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      const [year, month, day] = dateValue.split('-');
+      const formatted = `${month}/${day}/${year}`;
+      setForm((f: EventDetailsDTO) => ({ ...f, [name]: dateValue })); // Store in YYYY-MM-DD format
     }
   }
 
@@ -221,9 +532,13 @@ export function EventForm({ event, eventTypes, onSubmit, loading }: EventFormPro
     setErrors({});
     setShowErrors(false);
 
+    // Ensure dates are in YYYY-MM-DD format before submitting
     // Ensure all booleans are true/false
     const sanitizedForm = {
       ...form,
+      startDate: formatDateForStorage(formatDateForDisplay(form.startDate)),
+      endDate: formatDateForStorage(formatDateForDisplay(form.endDate)),
+      promotionStartDate: formatDateForStorage(formatDateForDisplay(form.promotionStartDate)),
       isActive: !!form.isActive,
       allowGuests: !!form.allowGuests,
       requireGuestApproval: !!form.requireGuestApproval,
@@ -299,41 +614,214 @@ export function EventForm({ event, eventTypes, onSubmit, loading }: EventFormPro
       <div className="flex gap-2">
         <div className="flex-1">
           <label className="block font-medium">Start Date *</label>
-          <input
-            ref={(el) => { if (el) fieldRefs.current.startDate = el; }}
-            type="date"
-            name="startDate"
-            value={form.startDate}
-            onChange={handleChange}
-            className={`w-full border rounded p-2 ${errors.startDate ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'}`}
-          />
+          <div className="relative">
+            <input
+              ref={(el) => { if (el) fieldRefs.current.startDate = el; }}
+              type="text"
+              name="startDate"
+              value={formatDateForDisplay(form.startDate)}
+              onChange={handleDateChange}
+              onKeyDown={handleDateKeyDown}
+              onBlur={handleDateBlur}
+              placeholder="MM/DD/YYYY"
+              pattern="\d{2}/\d{2}/\d{4}"
+              className={`w-full border rounded p-2 pr-10 ${errors.startDate ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'}`}
+            />
+            <button
+              type="button"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded cursor-pointer z-10"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const buttonRect = e.currentTarget.getBoundingClientRect();
+                const dateInput = document.createElement('input');
+                dateInput.type = 'date';
+                dateInput.value = formatDateForStorage(formatDateForDisplay(form.startDate)) || '';
+                // Position it near the button using fixed positioning
+                dateInput.style.position = 'fixed';
+                dateInput.style.left = `${buttonRect.left}px`;
+                dateInput.style.top = `${buttonRect.bottom + 4}px`;
+                dateInput.style.width = '1px';
+                dateInput.style.height = '1px';
+                dateInput.style.opacity = '0.01';
+                dateInput.style.pointerEvents = 'none';
+                dateInput.style.zIndex = '9999';
+                document.body.appendChild(dateInput);
+
+                // Use requestAnimationFrame to ensure element is in DOM before showing picker
+                requestAnimationFrame(() => {
+                  try {
+                    dateInput.showPicker?.();
+                  } catch (err) {
+                    // Fallback: focus the input to trigger picker
+                    dateInput.focus();
+                    dateInput.click();
+                  }
+                });
+
+                dateInput.onchange = (ev: any) => {
+                  if (ev.target.value) {
+                    handleCalendarDateChange('startDate', ev.target.value);
+                  }
+                  if (dateInput.parentNode) {
+                    document.body.removeChild(dateInput);
+                  }
+                };
+                dateInput.onblur = () => {
+                  setTimeout(() => {
+                    if (dateInput.parentNode) {
+                      document.body.removeChild(dateInput);
+                    }
+                  }, 100);
+                };
+              }}
+            >
+              <FaCalendarAlt className="text-gray-400" size={16} />
+            </button>
+          </div>
           {errors.startDate && <div className="text-red-500 text-sm mt-1">{errors.startDate}</div>}
+          <p className="text-xs text-gray-500 mt-1">Format: MM/DD/YYYY (e.g., 09/14/2025) or click calendar icon</p>
         </div>
         <div className="flex-1">
           <label className="block font-medium">End Date *</label>
-          <input
-            ref={(el) => { if (el) fieldRefs.current.endDate = el; }}
-            type="date"
-            name="endDate"
-            value={form.endDate}
-            onChange={handleChange}
-            className={`w-full border rounded p-2 ${errors.endDate ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'}`}
-          />
+          <div className="relative">
+            <input
+              ref={(el) => { if (el) fieldRefs.current.endDate = el; }}
+              type="text"
+              name="endDate"
+              value={formatDateForDisplay(form.endDate)}
+              onChange={handleDateChange}
+              onKeyDown={handleDateKeyDown}
+              onBlur={handleDateBlur}
+              placeholder="MM/DD/YYYY"
+              pattern="\d{2}/\d{2}/\d{4}"
+              className={`w-full border rounded p-2 pr-10 ${errors.endDate ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'}`}
+            />
+            <button
+              type="button"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded cursor-pointer z-10"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const buttonRect = e.currentTarget.getBoundingClientRect();
+                const dateInput = document.createElement('input');
+                dateInput.type = 'date';
+                dateInput.value = formatDateForStorage(formatDateForDisplay(form.endDate)) || '';
+                // Position it near the button using fixed positioning
+                dateInput.style.position = 'fixed';
+                dateInput.style.left = `${buttonRect.left}px`;
+                dateInput.style.top = `${buttonRect.bottom + 4}px`;
+                dateInput.style.width = '1px';
+                dateInput.style.height = '1px';
+                dateInput.style.opacity = '0.01';
+                dateInput.style.pointerEvents = 'none';
+                dateInput.style.zIndex = '9999';
+                document.body.appendChild(dateInput);
+
+                // Use requestAnimationFrame to ensure element is in DOM before showing picker
+                requestAnimationFrame(() => {
+                  try {
+                    dateInput.showPicker?.();
+                  } catch (err) {
+                    // Fallback: focus the input to trigger picker
+                    dateInput.focus();
+                    dateInput.click();
+                  }
+                });
+
+                dateInput.onchange = (ev: any) => {
+                  if (ev.target.value) {
+                    handleCalendarDateChange('endDate', ev.target.value);
+                  }
+                  if (dateInput.parentNode) {
+                    document.body.removeChild(dateInput);
+                  }
+                };
+                dateInput.onblur = () => {
+                  setTimeout(() => {
+                    if (dateInput.parentNode) {
+                      document.body.removeChild(dateInput);
+                    }
+                  }, 100);
+                };
+              }}
+            >
+              <FaCalendarAlt className="text-gray-400" size={16} />
+            </button>
+          </div>
           {errors.endDate && <div className="text-red-500 text-sm mt-1">{errors.endDate}</div>}
+          <p className="text-xs text-gray-500 mt-1">Format: MM/DD/YYYY (e.g., 09/14/2025) or click calendar icon</p>
         </div>
       </div>
       <div>
         <label className="block font-medium">Promotion Start Date *</label>
-        <input
-          ref={(el) => { if (el) fieldRefs.current.promotionStartDate = el; }}
-          type="date"
-          name="promotionStartDate"
-          value={form.promotionStartDate}
-          onChange={handleChange}
-          className={`w-full border rounded p-2 ${errors.promotionStartDate ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'}`}
-        />
+        <div className="relative">
+          <input
+            ref={(el) => { if (el) fieldRefs.current.promotionStartDate = el; }}
+            type="text"
+            name="promotionStartDate"
+            value={formatDateForDisplay(form.promotionStartDate)}
+            onChange={handleDateChange}
+            onKeyDown={handleDateKeyDown}
+            onBlur={handleDateBlur}
+            placeholder="MM/DD/YYYY"
+            pattern="\d{2}/\d{2}/\d{4}"
+            className={`w-full border rounded p-2 pr-10 ${errors.promotionStartDate ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'}`}
+          />
+          <button
+            type="button"
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded cursor-pointer z-10"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              const buttonRect = e.currentTarget.getBoundingClientRect();
+              const dateInput = document.createElement('input');
+              dateInput.type = 'date';
+              dateInput.value = formatDateForStorage(formatDateForDisplay(form.promotionStartDate)) || '';
+              // Position it near the button using fixed positioning
+              dateInput.style.position = 'fixed';
+              dateInput.style.left = `${buttonRect.left}px`;
+              dateInput.style.top = `${buttonRect.bottom + 4}px`;
+              dateInput.style.width = '1px';
+              dateInput.style.height = '1px';
+              dateInput.style.opacity = '0.01';
+              dateInput.style.pointerEvents = 'none';
+              dateInput.style.zIndex = '9999';
+              document.body.appendChild(dateInput);
+
+              // Use requestAnimationFrame to ensure element is in DOM before showing picker
+              requestAnimationFrame(() => {
+                try {
+                  dateInput.showPicker?.();
+                } catch (err) {
+                  // Fallback: focus the input to trigger picker
+                  dateInput.focus();
+                  dateInput.click();
+                }
+              });
+
+              dateInput.onchange = (ev: any) => {
+                if (ev.target.value) {
+                  handleCalendarDateChange('promotionStartDate', ev.target.value);
+                }
+                if (dateInput.parentNode) {
+                  document.body.removeChild(dateInput);
+                }
+              };
+              dateInput.onblur = () => {
+                setTimeout(() => {
+                  if (dateInput.parentNode) {
+                    document.body.removeChild(dateInput);
+                  }
+                }, 100);
+              };
+            }}
+          >
+            <FaCalendarAlt className="text-gray-400" size={16} />
+          </button>
+        </div>
         {errors.promotionStartDate && <div className="text-red-500 text-sm mt-1">{errors.promotionStartDate}</div>}
-        <p className="text-sm text-gray-500 mt-1">When should promotion for this event begin?</p>
+        <p className="text-sm text-gray-500 mt-1">When should promotion for this event begin? Format: MM/DD/YYYY (e.g., 09/14/2025) or click calendar icon</p>
       </div>
       <div className="flex gap-2">
         <div className="flex-1">

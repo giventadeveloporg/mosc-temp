@@ -453,6 +453,12 @@ export default function EventMediaListPage() {
   const [totalCount, setTotalCount] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [eventFlyerOnly, setEventFlyerOnly] = useState(false);
+  const [isFeaturedVideo, setIsFeaturedVideo] = useState<boolean | undefined>(undefined);
+  const [isHeroImage, setIsHeroImage] = useState<boolean | undefined>(undefined);
+  const [isActiveHeroImage, setIsActiveHeroImage] = useState<boolean | undefined>(undefined);
+  const [isHomePageHeroImage, setIsHomePageHeroImage] = useState<boolean | undefined>(undefined);
+  const [isFeaturedEventImage, setIsFeaturedEventImage] = useState<boolean | undefined>(undefined);
+  const [isLiveEventImage, setIsLiveEventImage] = useState<boolean | undefined>(undefined);
   const [serialNumberInput, setSerialNumberInput] = useState('');
   const totalPages = Math.ceil(totalCount / pageSize);
 
@@ -474,7 +480,14 @@ export default function EventMediaListPage() {
           const details = await fetchEventDetailsServer(parseInt(eventId, 10));
           setEventDetails(details);
 
-          const mediaResponse = await fetchMediaFilteredServer(eventId, page, pageSize, searchTerm, eventFlyerOnly);
+          const mediaResponse = await fetchMediaFilteredServer(eventId, page, pageSize, searchTerm, eventFlyerOnly, {
+            isFeaturedVideo,
+            isHeroImage,
+            isActiveHeroImage,
+            isHomePageHeroImage,
+            isFeaturedEventImage,
+            isLiveEventImage,
+          });
           setMedia(mediaResponse.data);
           setTotalCount(mediaResponse.totalCount);
 
@@ -488,7 +501,7 @@ export default function EventMediaListPage() {
       fetchData();
     }, 500); // Debounce search
     return () => clearTimeout(timer);
-  }, [eventId, page, pageSize, searchTerm, eventFlyerOnly]);
+  }, [eventId, page, pageSize, searchTerm, eventFlyerOnly, isFeaturedVideo, isHeroImage, isActiveHeroImage, isHomePageHeroImage, isFeaturedEventImage, isLiveEventImage]);
 
   function handleCellMouseEnter(media: EventMediaDTO, e: React.MouseEvent<HTMLTableCellElement>, type: 'officialDocs' | 'uploadedMedia', serialNumber: number) {
     // Don't show tooltip if it was recently closed
@@ -736,8 +749,8 @@ export default function EventMediaListPage() {
             </button>
           </div>
 
-          {/* Event flyers filter */}
-          <div className="flex items-center gap-2">
+          {/* Boolean field filters */}
+          <div className="flex flex-wrap items-center gap-4 mt-4">
             <label className="flex items-center gap-2 cursor-pointer">
               <span className="relative flex items-center justify-center">
                 <input
@@ -755,7 +768,127 @@ export default function EventMediaListPage() {
                   )}
                 </span>
               </span>
-              <span className="text-sm font-medium text-gray-700 select-none">Event Flyers Only</span>
+              <span className="text-sm font-medium text-gray-700 select-none">Event Flyers</span>
+            </label>
+
+            <label className="flex items-center gap-2 cursor-pointer">
+              <span className="relative flex items-center justify-center">
+                <input
+                  type="checkbox"
+                  className="custom-checkbox"
+                  checked={isFeaturedVideo === true}
+                  onChange={(e) => setIsFeaturedVideo(e.target.checked ? true : undefined)}
+                  onClick={(e) => e.stopPropagation()}
+                />
+                <span className="custom-checkbox-tick">
+                  {isFeaturedVideo === true && (
+                    <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l5 5L19 7" />
+                    </svg>
+                  )}
+                </span>
+              </span>
+              <span className="text-sm font-medium text-gray-700 select-none">Featured Video</span>
+            </label>
+
+            <label className="flex items-center gap-2 cursor-pointer">
+              <span className="relative flex items-center justify-center">
+                <input
+                  type="checkbox"
+                  className="custom-checkbox"
+                  checked={isHeroImage === true}
+                  onChange={(e) => setIsHeroImage(e.target.checked ? true : undefined)}
+                  onClick={(e) => e.stopPropagation()}
+                />
+                <span className="custom-checkbox-tick">
+                  {isHeroImage === true && (
+                    <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l5 5L19 7" />
+                    </svg>
+                  )}
+                </span>
+              </span>
+              <span className="text-sm font-medium text-gray-700 select-none">Hero Image</span>
+            </label>
+
+            <label className="flex items-center gap-2 cursor-pointer">
+              <span className="relative flex items-center justify-center">
+                <input
+                  type="checkbox"
+                  className="custom-checkbox"
+                  checked={isActiveHeroImage === true}
+                  onChange={(e) => setIsActiveHeroImage(e.target.checked ? true : undefined)}
+                  onClick={(e) => e.stopPropagation()}
+                />
+                <span className="custom-checkbox-tick">
+                  {isActiveHeroImage === true && (
+                    <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l5 5L19 7" />
+                    </svg>
+                  )}
+                </span>
+              </span>
+              <span className="text-sm font-medium text-gray-700 select-none">Active Hero Image</span>
+            </label>
+
+            <label className="flex items-center gap-2 cursor-pointer">
+              <span className="relative flex items-center justify-center">
+                <input
+                  type="checkbox"
+                  className="custom-checkbox"
+                  checked={isHomePageHeroImage === true}
+                  onChange={(e) => setIsHomePageHeroImage(e.target.checked ? true : undefined)}
+                  onClick={(e) => e.stopPropagation()}
+                />
+                <span className="custom-checkbox-tick">
+                  {isHomePageHeroImage === true && (
+                    <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l5 5L19 7" />
+                    </svg>
+                  )}
+                </span>
+              </span>
+              <span className="text-sm font-medium text-gray-700 select-none">Home Page Hero Image</span>
+            </label>
+
+            <label className="flex items-center gap-2 cursor-pointer">
+              <span className="relative flex items-center justify-center">
+                <input
+                  type="checkbox"
+                  className="custom-checkbox"
+                  checked={isFeaturedEventImage === true}
+                  onChange={(e) => setIsFeaturedEventImage(e.target.checked ? true : undefined)}
+                  onClick={(e) => e.stopPropagation()}
+                />
+                <span className="custom-checkbox-tick">
+                  {isFeaturedEventImage === true && (
+                    <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l5 5L19 7" />
+                    </svg>
+                  )}
+                </span>
+              </span>
+              <span className="text-sm font-medium text-gray-700 select-none">Featured Event Image</span>
+            </label>
+
+            <label className="flex items-center gap-2 cursor-pointer">
+              <span className="relative flex items-center justify-center">
+                <input
+                  type="checkbox"
+                  className="custom-checkbox"
+                  checked={isLiveEventImage === true}
+                  onChange={(e) => setIsLiveEventImage(e.target.checked ? true : undefined)}
+                  onClick={(e) => e.stopPropagation()}
+                />
+                <span className="custom-checkbox-tick">
+                  {isLiveEventImage === true && (
+                    <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l5 5L19 7" />
+                    </svg>
+                  )}
+                </span>
+              </span>
+              <span className="text-sm font-medium text-gray-700 select-none">Live Event Image</span>
             </label>
           </div>
         </div>
