@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { FaPlus, FaSearch, FaArrowLeft } from 'react-icons/fa';
+import React, { useState, useEffect, useRef } from 'react';
+import { FaPlus, FaSearch, FaArrowLeft, FaChevronLeft, FaChevronRight, FaEdit, FaTrashAlt } from 'react-icons/fa';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
+import ReactDOM from 'react-dom';
 import DataTable, { Column } from '@/components/ui/DataTable';
 import Modal, { ConfirmModal } from '@/components/ui/Modal';
 import ImageUpload from '@/components/ui/ImageUpload';
@@ -14,6 +15,9 @@ import {
   createEventFeaturedPerformerServer,
   updateEventFeaturedPerformerServer,
   deleteEventFeaturedPerformerServer,
+  fetchAvailablePerformersServer,
+  associatePerformerWithEventServer,
+  disassociatePerformerFromEventServer,
 } from './ApiServerActions';
 
 export default function EventPerformersPage() {
@@ -66,11 +70,27 @@ export default function EventPerformersPage() {
   const [sortKey, setSortKey] = useState<string>('');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
+  // Available performers state (tenant-level performers not mapped to this event)
+  const [availablePerformers, setAvailablePerformers] = useState<EventFeaturedPerformersDTO[]>([]);
+  const [availablePerformersPage, setAvailablePerformersPage] = useState(0);
+  const [availablePerformersTotalPages, setAvailablePerformersTotalPages] = useState(0);
+  const [availablePerformersTotalElements, setAvailablePerformersTotalElements] = useState(0);
+  const [availablePerformersSearchTerm, setAvailablePerformersSearchTerm] = useState('');
+
+  // Modal states
+  const [isDisassociateModalOpen, setIsDisassociateModalOpen] = useState(false);
+
+  // Tooltip state
+  const [tooltipPerformer, setTooltipPerformer] = useState<EventFeaturedPerformersDTO | null>(null);
+  const [tooltipAnchorRect, setTooltipAnchorRect] = useState<DOMRect | null>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const [toastMessage, setToastMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   useEffect(() => {
     if (userId && eventId) {
       loadEventAndPerformers();
+      loadAvailablePerformers(0, '');
     }
   }, [userId, eventId]);
 
@@ -107,14 +127,44 @@ export default function EventPerformersPage() {
   const handleCreate = async () => {
     try {
       setLoading(true);
+
+      // Check for duplicates before creating
+      const isDuplicate = performers.some(
+        (p) =>
+          (formData.email && p.email && p.email.toLowerCase() === formData.email.toLowerCase()) ||
+          (formData.name && p.name && formData.name.toLowerCase() === p.name.toLowerCase() &&
+           formData.stageName && p.stageName && formData.stageName.toLowerCase() === p.stageName.toLowerCase())
+      );
+
+      if (isDuplicate) {
+        setToastMessage({
+          type: 'error',
+          message: 'A performer with this email or name/stage name combination is already associated with this event. Duplicate entries are not allowed.'
+        });
+        return;
+      }
+
       const performerData = { ...formData, event: { id: parseInt(eventId) } as EventDetailsDTO };
       const newPerformer = await createEventFeaturedPerformerServer(performerData as any);
       setPerformers(prev => [...prev, newPerformer]);
       setIsCreateModalOpen(false);
       resetForm();
+      // Reload available performers in case this was a duplicate
+      await loadAvailablePerformers(availablePerformersPage, availablePerformersSearchTerm);
+      // Reload event performers to get fresh data
+      await loadEventAndPerformers();
       setToastMessage({ type: 'success', message: 'Performer created successfully' });
     } catch (err: any) {
-      setToastMessage({ type: 'error', message: err.message || 'Failed to create performer' });
+      const errorMessage = err.message || 'Failed to create performer';
+      // Check if error is due to duplicate constraint
+      if (errorMessage.toLowerCase().includes('duplicate') || errorMessage.toLowerCase().includes('already exists')) {
+        setToastMessage({
+          type: 'error',
+          message: 'A performer with this email or name/stage name combination is already associated with this event. Duplicate entries are not allowed.'
+        });
+      } else {
+        setToastMessage({ type: 'error', message: errorMessage });
+      }
     } finally {
       setLoading(false);
     }
@@ -138,13 +188,41 @@ export default function EventPerformersPage() {
     }
   };
 
+  const handleDisassociate = async () => {
+    if (!selectedPerformer) {
+      console.log('❌ No selected performer for disassociation');
+      return;
+    }
+
+    console.log('🔗 Disassociating performer from event:', selectedPerformer);
+
+    try {
+      setLoading(true);
+      // Use the dedicated disassociate endpoint
+      await disassociatePerformerFromEventServer(selectedPerformer.id!);
+
+      console.log('✅ Performer disassociated successfully, updating UI');
+      setPerformers(prev => prev.filter(p => p.id !== selectedPerformer.id));
+      setIsDisassociateModalOpen(false);
+      setSelectedPerformer(null);
+      // Reload available performers so this performer appears in the available list
+      await loadAvailablePerformers(availablePerformersPage, availablePerformersSearchTerm);
+      setToastMessage({ type: 'success', message: 'Performer disassociated from event successfully' });
+    } catch (err: any) {
+      console.error('❌ Disassociate error:', err);
+      setToastMessage({ type: 'error', message: err.message || 'Failed to disassociate performer' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleDelete = async () => {
     if (!selectedPerformer) {
       console.log('❌ No selected performer for deletion');
       return;
     }
 
-    console.log('🗑️ Deleting performer:', selectedPerformer);
+    console.log('🗑️ Hard deleting performer:', selectedPerformer);
 
     try {
       setLoading(true);
@@ -155,10 +233,108 @@ export default function EventPerformersPage() {
       setPerformers(prev => prev.filter(p => p.id !== selectedPerformer.id));
       setIsDeleteModalOpen(false);
       setSelectedPerformer(null);
-      setToastMessage({ type: 'success', message: 'Performer deleted successfully' });
+      // Reload available performers in case this performer should now appear
+      await loadAvailablePerformers(availablePerformersPage, availablePerformersSearchTerm);
+      setToastMessage({ type: 'success', message: 'Performer permanently deleted' });
     } catch (err: any) {
       console.error('❌ Delete error:', err);
       setToastMessage({ type: 'error', message: err.message || 'Failed to delete performer' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load available performers with pagination and search
+  const loadAvailablePerformers = async (page = 0, searchTerm = '') => {
+    try {
+      setLoading(true);
+      console.log('🔄 Loading available performers for event:', eventId, 'page:', page, 'search:', searchTerm);
+      const availablePerformersData = await fetchAvailablePerformersServer(
+        parseInt(eventId),
+        page,
+        20, // Page size 20 as per UI style guide
+        searchTerm
+      );
+      console.log('📊 Available performers data received:', availablePerformersData);
+      setAvailablePerformers(availablePerformersData.content);
+      setAvailablePerformersTotalPages(availablePerformersData.totalPages);
+      setAvailablePerformersTotalElements(availablePerformersData.totalElements);
+    } catch (err: any) {
+      console.error('Failed to load available performers:', err);
+      setAvailablePerformers([]);
+      setAvailablePerformersTotalPages(0);
+      setAvailablePerformersTotalElements(0);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle search for available performers
+  const handleAvailablePerformersSearch = (searchTerm: string) => {
+    setAvailablePerformersSearchTerm(searchTerm);
+    setAvailablePerformersPage(0);
+    loadAvailablePerformers(0, searchTerm);
+  };
+
+  // Handle pagination for available performers
+  const handleAvailablePerformersPageChange = (page: number) => {
+    setAvailablePerformersPage(page);
+    loadAvailablePerformers(page, availablePerformersSearchTerm);
+  };
+
+  // Handle adding an available performer to this event
+  const handleAddPerformerToEvent = async (performer: EventFeaturedPerformersDTO) => {
+    try {
+      setLoading(true);
+      console.log('➕ Adding performer to event:', performer);
+
+      // Check if performer is already associated with this event
+      const isAlreadyAssociated = performers.some(
+        (p) => p.id === performer.id ||
+        (p.email && performer.email && p.email.toLowerCase() === performer.email.toLowerCase()) ||
+        (p.name && performer.name && p.name.toLowerCase() === performer.name.toLowerCase() &&
+         p.stageName && performer.stageName && p.stageName.toLowerCase() === performer.stageName.toLowerCase())
+      );
+
+      if (isAlreadyAssociated) {
+        setToastMessage({
+          type: 'error',
+          message: `Performer "${performer.name || performer.stageName}" is already associated with this event. Duplicate entries are not allowed.`
+        });
+        return;
+      }
+
+      // Update the existing performer to associate with this event (don't create duplicate)
+      if (!performer.id) {
+        setToastMessage({
+          type: 'error',
+          message: `Cannot add performer "${performer.name || performer.stageName}" - performer ID is missing.`
+        });
+        return;
+      }
+
+      // Use the dedicated associate endpoint to properly associate the performer with the event
+      console.log('🔄 Associating performer', performer.id, 'with event', eventId);
+      await associatePerformerWithEventServer(performer.id, parseInt(eventId));
+
+      // Reload available performers to remove the added one
+      await loadAvailablePerformers(availablePerformersPage, availablePerformersSearchTerm);
+      // Reload event performers to get fresh data
+      await loadEventAndPerformers();
+
+      setToastMessage({ type: 'success', message: `Performer "${performer.name || performer.stageName}" added to event successfully` });
+    } catch (err: any) {
+      console.error('❌ Failed to add performer to event:', err);
+      const errorMessage = err.message || 'Failed to add performer to event';
+      // Check if error is due to duplicate constraint
+      if (errorMessage.toLowerCase().includes('duplicate') || errorMessage.toLowerCase().includes('already exists')) {
+        setToastMessage({
+          type: 'error',
+          message: `Performer "${performer.name || performer.stageName}" is already associated with this event. Duplicate entries are not allowed.`
+        });
+      } else {
+        setToastMessage({ type: 'error', message: errorMessage });
+      }
     } finally {
       setLoading(false);
     }
@@ -195,6 +371,12 @@ export default function EventPerformersPage() {
     setIsDeleteModalOpen(true);
   };
 
+  const openDisassociateModal = (performer: EventFeaturedPerformersDTO) => {
+    console.log('🔗 Opening disassociate modal for performer:', performer);
+    setSelectedPerformer(performer);
+    setIsDisassociateModalOpen(true);
+  };
+
   const handleSort = (key: string, direction: 'asc' | 'desc') => {
     setSortKey(key);
     setSortDirection(direction);
@@ -220,13 +402,202 @@ export default function EventPerformersPage() {
     performer.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Tooltip handlers
+  const handleNameCellMouseEnter = (performer: EventFeaturedPerformersDTO, event: React.MouseEvent<HTMLDivElement>) => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+    const targetElement = event.currentTarget;
+    hoverTimeoutRef.current = setTimeout(() => {
+      // Check if element still exists and is mounted
+      if (!targetElement || !document.body.contains(targetElement)) {
+        return;
+      }
+      try {
+        const rect = targetElement.getBoundingClientRect();
+        setTooltipAnchorRect(rect);
+        setTooltipPerformer(performer);
+      } catch (error) {
+        console.error('Error getting bounding rect:', error);
+      }
+    }, 300); // 300ms delay to prevent flickering
+  };
+
+  const handleNameCellMouseLeave = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+  };
+
+  const closeTooltip = () => {
+    setTooltipPerformer(null);
+    setTooltipAnchorRect(null);
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+  };
+
+  // Tooltip component
+  function PerformerDetailsTooltip({ performer, anchorRect, onClose }: {
+    performer: EventFeaturedPerformersDTO | null,
+    anchorRect: DOMRect | null,
+    onClose: () => void
+  }) {
+    if (!anchorRect || !performer) return null;
+
+    const tooltipWidth = 450;
+    const spacing = 12;
+
+    // Always show tooltip to the right of the anchor cell, never above the columns
+    let top = anchorRect.top;
+    let left = anchorRect.right + spacing;
+
+    // Clamp position to stay within the viewport
+    const estimatedHeight = 400;
+    if (top + estimatedHeight > window.innerHeight) {
+      top = window.innerHeight - estimatedHeight - spacing;
+    }
+    if (top < spacing) {
+      top = spacing;
+    }
+    if (left + tooltipWidth > window.innerWidth - spacing) {
+      left = window.innerWidth - tooltipWidth - spacing;
+    }
+
+    const style: React.CSSProperties = {
+      position: 'fixed',
+      top: `${top}px`,
+      left: `${left}px`,
+      zIndex: 9999,
+      background: 'white',
+      border: '1px solid #cbd5e1',
+      borderRadius: 8,
+      boxShadow: '0 4px 24px rgba(0,0,0,0.15)',
+      padding: '16px',
+      width: `${tooltipWidth}px`,
+      fontSize: '14px',
+      maxHeight: '500px',
+      overflowY: 'auto',
+      transition: 'opacity 0.1s ease-in-out',
+    };
+
+    const formatFieldName = (key: string): string => {
+      return key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()).trim();
+    };
+
+    const formatValue = (key: string, value: any): string => {
+      if (value === null || value === undefined || value === '') return '';
+      if (typeof value === 'boolean') return value ? 'Yes' : 'No';
+      if (key.toLowerCase().includes('date') && value) {
+        try {
+          return new Date(value).toLocaleDateString();
+        } catch {
+          return String(value);
+        }
+      }
+      return String(value);
+    };
+
+    const details = [
+      { label: 'Name', value: performer.name },
+      { label: 'Stage Name', value: performer.stageName },
+      { label: 'Role', value: performer.role },
+      { label: 'Email', value: performer.email },
+      { label: 'Phone', value: performer.phone },
+      { label: 'Nationality', value: performer.nationality },
+      { label: 'Date of Birth', value: performer.dateOfBirth },
+      { label: 'Bio', value: performer.bio },
+      { label: 'Website URL', value: performer.websiteUrl },
+      { label: 'Headliner', value: performer.isHeadliner },
+      { label: 'Performance Order', value: performer.performanceOrder },
+      { label: 'Performance Duration (min)', value: performer.performanceDurationMinutes },
+      { label: 'Priority Ranking', value: performer.priorityRanking },
+      { label: 'Active', value: performer.isActive },
+      { label: 'Facebook URL', value: performer.facebookUrl },
+      { label: 'Twitter URL', value: performer.twitterUrl },
+      { label: 'Instagram URL', value: performer.instagramUrl },
+      { label: 'YouTube URL', value: performer.youtubeUrl },
+      { label: 'LinkedIn URL', value: performer.linkedinUrl },
+      { label: 'TikTok URL', value: performer.tiktokUrl },
+      { label: 'Portrait Image URL', value: performer.portraitImageUrl },
+      { label: 'Performance Image URL', value: performer.performanceImageUrl },
+      { label: 'Gallery Image URLs', value: performer.galleryImageUrls },
+    ].filter(detail => detail.value !== null && detail.value !== undefined && detail.value !== '');
+
+    return ReactDOM.createPortal(
+      <div style={style} tabIndex={-1} className="admin-tooltip">
+        <div className="sticky top-0 right-0 z-10 bg-white flex justify-end" style={{ minHeight: 0 }}>
+          <button
+            onClick={onClose}
+            className="w-10 h-10 text-2xl bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all"
+            aria-label="Close tooltip"
+          >
+            &times;
+          </button>
+        </div>
+        <div className="font-semibold text-lg mb-4 pb-2 border-b border-gray-200">
+          {performer.name || performer.stageName || 'Performer Details'}
+        </div>
+        <table className="admin-tooltip-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <tbody>
+            {details.map((detail, index) => (
+              <tr key={index} className="border-b border-gray-100">
+                <th style={{
+                  textAlign: 'left',
+                  width: '40%',
+                  minWidth: '150px',
+                  fontWeight: 600,
+                  wordBreak: 'break-word',
+                  whiteSpace: 'normal',
+                  boxSizing: 'border-box',
+                  padding: '12px 16px 12px 0',
+                  fontSize: '14px',
+                  color: '#374151'
+                }}>
+                  {detail.label}
+                </th>
+                <td style={{
+                  textAlign: 'left',
+                  width: '60%',
+                  padding: '12px 0',
+                  fontSize: '14px',
+                  color: '#6b7280',
+                  wordBreak: 'break-word'
+                }}>
+                  {typeof detail.value === 'boolean' ? (
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${detail.value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                      {detail.value ? 'Yes' : 'No'}
+                    </span>
+                  ) : detail.value === null || detail.value === undefined || detail.value === '' ? (
+                    <span className="text-gray-400 italic">(empty)</span>
+                  ) : (
+                    String(detail.value)
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>,
+      document.body
+    );
+  }
+
   const columns: Column<EventFeaturedPerformersDTO>[] = [
-    { key: 'name', label: 'Name', sortable: true },
     {
-      key: 'stageName',
-      label: 'Stage Name',
+      key: 'name',
+      label: 'Name',
       sortable: true,
-      render: (value) => value || '-'
+      render: (value, performer) => (
+        <div
+          onMouseEnter={(e) => handleNameCellMouseEnter(performer, e)}
+          onMouseLeave={handleNameCellMouseLeave}
+          className="cursor-pointer hover:text-blue-600 transition-colors"
+          title="Hover to view full details"
+        >
+          {value || performer.stageName || '-'}
+        </div>
+      )
     },
     {
       key: 'role',
@@ -235,27 +606,42 @@ export default function EventPerformersPage() {
       render: (value) => value || '-'
     },
     {
-      key: 'isHeadliner',
-      label: 'Headliner',
-      sortable: true,
-      render: (value) => value ? 'Yes' : 'No'
-    },
-    {
-      key: 'performanceOrder',
-      label: 'Order',
-      sortable: true,
-      render: (value) => value || 0
-    },
-    {
-      key: 'email',
-      label: 'Email',
-      render: (value) => value || '-'
-    },
-    {
-      key: 'isActive',
-      label: 'Active',
-      sortable: true,
-      render: (value) => value ? 'Yes' : 'No'
+      key: 'actions',
+      label: 'Actions',
+      render: (value, performer) => (
+        <div className="flex space-x-2">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              openEditModal(performer);
+            }}
+            className="icon-btn icon-btn-edit"
+            title="Edit"
+          >
+            <FaEdit />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              openDisassociateModal(performer);
+            }}
+            className="icon-btn icon-btn-delete bg-yellow-500 hover:bg-yellow-600"
+            title="Disassociate from Event"
+          >
+            <FaTrashAlt />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              openDeleteModal(performer);
+            }}
+            className="icon-btn icon-btn-delete"
+            title="Permanently Delete"
+          >
+            <FaTrashAlt />
+          </button>
+        </div>
+      )
     },
   ];
 
@@ -276,7 +662,7 @@ export default function EventPerformersPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-8 py-8" style={{ paddingTop: '180px' }}>
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ paddingTop: '180px' }}>
       {/* Header with back button */}
       <div className="flex items-center mb-6">
         <Link
@@ -322,7 +708,7 @@ export default function EventPerformersPage() {
           </div>
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow font-bold flex items-center gap-2 hover:bg-blue-700 transition"
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow font-bold flex items-center gap-2 hover:bg-blue-700 transition whitespace-nowrap"
           >
             <FaPlus />
             Add Performer
@@ -336,17 +722,154 @@ export default function EventPerformersPage() {
         </div>
       )}
 
-      <DataTable
-        data={filteredPerformers}
-        columns={columns}
-        loading={loading}
-        onSort={handleSort}
-        onEdit={openEditModal}
-        onDelete={openDeleteModal}
-        sortKey={sortKey}
-        sortDirection={sortDirection}
-        emptyMessage="No performers found for this event"
-      />
+      {/* Performers Table */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div className="mb-4">
+          <h2 className="text-xl font-semibold mb-2">
+            Event Performers ({filteredPerformers.length})
+          </h2>
+          <p className="text-sm text-gray-600">
+            💡 <strong>Tip:</strong> Hover over a performer's name to view detailed information in a tooltip.
+          </p>
+        </div>
+        <div className="overflow-x-auto">
+          <DataTable
+            data={filteredPerformers}
+            columns={columns}
+            loading={loading}
+            onSort={handleSort}
+            sortKey={sortKey}
+            sortDirection={sortDirection}
+            emptyMessage="No performers found for this event"
+          />
+        </div>
+      </div>
+
+      {/* Available Performers Section */}
+      <div className="mb-8">
+        <div className="mb-4">
+          <h2 className="text-xl font-semibold">Available Performers to Add</h2>
+          <p className="text-gray-600 text-sm mt-1">
+            Tenant-level performers that are not yet mapped to this event. Click "Add" to associate them with this event.
+            Showing {availablePerformers.length > 0 ? (availablePerformersPage * 20) + 1 : 0} to {availablePerformers.length > 0 ? (availablePerformersPage * 20) + availablePerformers.length : 0} of {availablePerformersTotalElements} available performers
+          </p>
+        </div>
+
+        {/* Search Bar for Available Performers */}
+        <div className="mb-6 bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+          <div className="flex flex-wrap gap-4 items-center">
+            <div className="flex-1 min-w-64">
+              <div className="relative">
+                <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search available performers..."
+                  value={availablePerformersSearchTerm}
+                  onChange={(e) => handleAvailablePerformersSearch(e.target.value)}
+                  className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Available Performers Table */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          {loading && availablePerformers.length === 0 ? (
+            <div className="flex justify-center items-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            </div>
+          ) : availablePerformers.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              No available performers found. All tenant performers may already be mapped to this event.
+            </div>
+          ) : (
+            <>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Name
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Role
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {availablePerformers.map((performer) => (
+                      <tr key={performer.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          <div
+                            onMouseEnter={(e) => handleNameCellMouseEnter(performer, e)}
+                            onMouseLeave={handleNameCellMouseLeave}
+                            className="cursor-pointer hover:text-blue-600 transition-colors"
+                            title="Hover to view full details"
+                          >
+                            {performer.name || performer.stageName || '-'}
+                          </div>
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {performer.role || '-'}
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
+                          <button
+                            onClick={() => handleAddPerformerToEvent(performer)}
+                            className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition whitespace-nowrap"
+                          >
+                            Add
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination for Available Performers - Always show */}
+              <div className="mt-8">
+                <div className="flex justify-between items-center">
+                  <button
+                    onClick={() => handleAvailablePerformersPageChange(availablePerformersPage - 1)}
+                    disabled={availablePerformersPage === 0 || loading}
+                    className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+                  >
+                    <FaChevronLeft />
+                    Previous
+                  </button>
+                  <div className="text-sm font-semibold text-gray-700">
+                    Page {availablePerformersTotalPages === 0 ? 0 : availablePerformersPage + 1} of {availablePerformersTotalPages}
+                  </div>
+                  <button
+                    onClick={() => handleAvailablePerformersPageChange(availablePerformersPage + 1)}
+                    disabled={availablePerformersPage >= availablePerformersTotalPages - 1 || loading}
+                    className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+                  >
+                    Next
+                    <FaChevronRight />
+                  </button>
+                </div>
+                <div className="text-center text-sm text-gray-600 mt-2">
+                  {availablePerformersTotalElements > 0 ? (
+                    <>Showing <span className="font-medium">{(availablePerformersPage * 20) + 1}</span> to <span className="font-medium">{Math.min((availablePerformersPage * 20) + availablePerformers.length, availablePerformersTotalElements)}</span> of <span className="font-medium">{availablePerformersTotalElements}</span> available performers</>
+                  ) : (
+                    <div className="flex items-center justify-center gap-2">
+                      <span>No available performers found</span>
+                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-sm font-medium">
+                        [All tenant performers are mapped to this event]
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
 
       {/* Create Modal */}
       <Modal
@@ -389,6 +912,20 @@ export default function EventPerformersPage() {
         />
       </Modal>
 
+      {/* Disassociate Confirmation Modal */}
+      <ConfirmModal
+        isOpen={isDisassociateModalOpen}
+        onClose={() => {
+          setIsDisassociateModalOpen(false);
+          setSelectedPerformer(null);
+        }}
+        onConfirm={handleDisassociate}
+        title="Disassociate Performer from Event"
+        message={`Are you sure you want to remove "${selectedPerformer?.name || selectedPerformer?.stageName || 'this performer'}" from this event? The performer will remain in the system and can be added to other events.`}
+        confirmText="Disassociate"
+        variant="warning"
+      />
+
       {/* Delete Confirmation Modal */}
       <ConfirmModal
         isOpen={isDeleteModalOpen}
@@ -397,10 +934,17 @@ export default function EventPerformersPage() {
           setSelectedPerformer(null);
         }}
         onConfirm={handleDelete}
-        title="Delete Performer"
-        message={`Are you sure you want to delete "${selectedPerformer?.name || 'this performer'}"? This action cannot be undone.`}
-        confirmText="Delete"
+        title="Permanently Delete Performer"
+        message={`Are you sure you want to permanently delete "${selectedPerformer?.name || selectedPerformer?.stageName || 'this performer'}"? This action cannot be undone and will remove the performer from all events.`}
+        confirmText="Delete Permanently"
         variant="danger"
+      />
+
+      {/* Tooltip */}
+      <PerformerDetailsTooltip
+        performer={tooltipPerformer}
+        anchorRect={tooltipAnchorRect}
+        onClose={closeTooltip}
       />
     </div>
   );

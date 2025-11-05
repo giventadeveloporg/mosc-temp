@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { FaPlus, FaSearch, FaArrowLeft, FaUserPlus, FaHandshake, FaBan, FaFolderOpen } from 'react-icons/fa';
+import React, { useState, useEffect, useRef } from 'react';
+import { FaPlus, FaSearch, FaArrowLeft, FaUserPlus, FaHandshake, FaBan, FaFolderOpen, FaChevronLeft, FaChevronRight, FaEdit, FaTrashAlt } from 'react-icons/fa';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
+import ReactDOM from 'react-dom';
 import DataTable, { Column } from '@/components/ui/DataTable';
 import Modal, { ConfirmModal } from '@/components/ui/Modal';
 import ImageUpload from '@/components/ui/ImageUpload';
@@ -18,6 +19,7 @@ import {
   updateEventSponsorJoinServer,
   updateEventSponsorServer,
   deleteEventSponsorJoinServer,
+  deleteEventSponsorServer,
 } from './ApiServerActions';
 
 export default function EventSponsorsPage() {
@@ -44,10 +46,16 @@ export default function EventSponsorsPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDisassociateModalOpen, setIsDisassociateModalOpen] = useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [selectedSponsor, setSelectedSponsor] = useState<EventSponsorsJoinDTO | null>(null);
   const [selectedAvailableSponsor, setSelectedAvailableSponsor] = useState<EventSponsorsDTO | null>(null);
   const [selectedSponsorForEdit, setSelectedSponsorForEdit] = useState<EventSponsorsDTO | null>(null);
+
+  // Tooltip state
+  const [tooltipSponsor, setTooltipSponsor] = useState<EventSponsorsJoinDTO | null>(null);
+  const [tooltipAnchorRect, setTooltipAnchorRect] = useState<DOMRect | null>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Form state for creating new sponsor join
   const [formData, setFormData] = useState<Partial<EventSponsorsJoinDTO>>({
@@ -188,6 +196,19 @@ export default function EventSponsorsPage() {
         sponsor: newSponsor
       };
 
+      // Check if sponsor with same name is already assigned to this event
+      const isDuplicate = eventSponsors.some(
+        (es) => es.sponsor?.name?.toLowerCase() === sponsorData.name.toLowerCase()
+      );
+
+      if (isDuplicate) {
+        setToastMessage({
+          type: 'error',
+          message: `A sponsor with the name "${sponsorData.name}" is already assigned to this event. Duplicate assignments are not allowed.`
+        });
+        return;
+      }
+
       console.log('🔍 Auto-assigning new sponsor to event:', {
         eventId: parseInt(eventId),
         sponsorId: newSponsor.id,
@@ -199,10 +220,23 @@ export default function EventSponsorsPage() {
 
       setIsCreateSponsorModalOpen(false);
       resetSponsorForm();
+      // Reload event sponsors to get fresh data
+      const eventSponsorsData = await fetchEventSponsorsJoinServer(parseInt(eventId));
+      setEventSponsors(eventSponsorsData);
+      await loadAvailableSponsors(availableSponsorsPage, availableSponsorsSearchTerm);
       setToastMessage({ type: 'success', message: 'Sponsor created and assigned to event successfully' });
     } catch (err: any) {
       console.error('❌ Failed to create sponsor:', err);
-      setToastMessage({ type: 'error', message: err.message || 'Failed to create sponsor' });
+      const errorMessage = err.message || 'Failed to create sponsor';
+      // Check if error is due to duplicate constraint
+      if (errorMessage.toLowerCase().includes('duplicate') || errorMessage.toLowerCase().includes('already exists')) {
+        setToastMessage({
+          type: 'error',
+          message: `A sponsor with the name "${sponsorData.name}" is already assigned to this event. Duplicate assignments are not allowed.`
+        });
+      } else {
+        setToastMessage({ type: 'error', message: errorMessage });
+      }
     } finally {
       setLoading(false);
     }
@@ -213,6 +247,21 @@ export default function EventSponsorsPage() {
 
     try {
       setLoading(true);
+
+      // Check if sponsor is already assigned to this event
+      const isAlreadyAssigned = eventSponsors.some(
+        (es) => es.sponsor?.id === selectedAvailableSponsor.id
+      );
+
+      if (isAlreadyAssigned) {
+        setToastMessage({
+          type: 'error',
+          message: `Sponsor "${selectedAvailableSponsor.name}" is already assigned to this event. Duplicate assignments are not allowed.`
+        });
+        setIsAssignModalOpen(false);
+        setSelectedAvailableSponsor(null);
+        return;
+      }
 
       // Create sponsor join record
       const sponsorJoinData = {
@@ -242,7 +291,16 @@ export default function EventSponsorsPage() {
       setToastMessage({ type: 'success', message: 'Sponsor assigned to event successfully' });
     } catch (err: any) {
       console.error('❌ Failed to assign sponsor:', err);
-      setToastMessage({ type: 'error', message: err.message || 'Failed to assign sponsor' });
+      const errorMessage = err.message || 'Failed to assign sponsor';
+      // Check if error is due to duplicate constraint
+      if (errorMessage.toLowerCase().includes('duplicate') || errorMessage.toLowerCase().includes('already exists')) {
+        setToastMessage({
+          type: 'error',
+          message: `Sponsor "${selectedAvailableSponsor.name}" is already assigned to this event. Duplicate assignments are not allowed.`
+        });
+      } else {
+        setToastMessage({ type: 'error', message: errorMessage });
+      }
     } finally {
       setLoading(false);
     }
@@ -275,7 +333,7 @@ export default function EventSponsorsPage() {
     }
   };
 
-  const handleDelete = async () => {
+  const handleDisassociate = async () => {
     if (!selectedSponsor) return;
 
     try {
@@ -283,19 +341,43 @@ export default function EventSponsorsPage() {
       await deleteEventSponsorJoinServer(selectedSponsor.id!);
 
       // Reload the event sponsors data to ensure we have the latest data
-      console.log('🔄 Reloading event sponsors after deletion...');
+      console.log('🔄 Reloading event sponsors after disassociation...');
       const eventSponsorsData = await fetchEventSponsorsJoinServer(parseInt(eventId));
       setEventSponsors(eventSponsorsData);
 
       // Also reload available sponsors to reflect the removed assignment
       await loadAvailableSponsors(availableSponsorsPage, availableSponsorsSearchTerm);
 
+      setIsDisassociateModalOpen(false);
+      setSelectedSponsor(null);
+      setToastMessage({ type: 'success', message: 'Sponsor disassociated from event successfully' });
+    } catch (err: any) {
+      console.error('❌ Failed to disassociate sponsor from event:', err);
+      setToastMessage({ type: 'error', message: err.message || 'Failed to disassociate sponsor from event' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!selectedSponsor || !selectedSponsor.sponsor || !selectedSponsor.sponsor.id) return;
+
+    try {
+      setLoading(true);
+      // Hard delete: Delete the sponsor entity itself (this will cascade delete all join records)
+      await deleteEventSponsorServer(selectedSponsor.sponsor.id);
+
+      // Reload the event sponsors data
+      const eventSponsorsData = await fetchEventSponsorsJoinServer(parseInt(eventId));
+      setEventSponsors(eventSponsorsData);
+      await loadAvailableSponsors(availableSponsorsPage, availableSponsorsSearchTerm);
+
       setIsDeleteModalOpen(false);
       setSelectedSponsor(null);
-      setToastMessage({ type: 'success', message: 'Sponsor removed from event successfully' });
+      setToastMessage({ type: 'success', message: 'Sponsor permanently deleted from all events' });
     } catch (err: any) {
-      console.error('❌ Failed to remove sponsor from event:', err);
-      setToastMessage({ type: 'error', message: err.message || 'Failed to remove sponsor from event' });
+      console.error('❌ Failed to delete sponsor:', err);
+      setToastMessage({ type: 'error', message: err.message || 'Failed to delete sponsor' });
     } finally {
       setLoading(false);
     }
@@ -431,9 +513,9 @@ export default function EventSponsorsPage() {
     setIsEditModalOpen(true);
   };
 
-  const openDeleteModal = (sponsor: EventSponsorsJoinDTO) => {
+  const openDisassociateModal = (sponsor: EventSponsorsJoinDTO) => {
     setSelectedSponsor(sponsor);
-    setIsDeleteModalOpen(true);
+    setIsDisassociateModalOpen(true);
   };
 
   const openAssignModal = (sponsor: EventSponsorsDTO) => {
@@ -542,12 +624,181 @@ export default function EventSponsorsPage() {
       sponsor.sponsor?.companyName?.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
+  // Tooltip handlers
+  const handleSponsorNameCellMouseEnter = (sponsor: EventSponsorsJoinDTO, event: React.MouseEvent<HTMLDivElement>) => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+    const targetElement = event.currentTarget;
+    hoverTimeoutRef.current = setTimeout(() => {
+      // Check if element still exists and is mounted
+      if (!targetElement || !document.body.contains(targetElement)) {
+        return;
+      }
+      try {
+        const rect = targetElement.getBoundingClientRect();
+        setTooltipAnchorRect(rect);
+        setTooltipSponsor(sponsor);
+      } catch (error) {
+        console.error('Error getting bounding rect:', error);
+      }
+    }, 300); // 300ms delay to prevent flickering
+  };
+
+  const handleSponsorNameCellMouseLeave = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+  };
+
+  const closeTooltip = () => {
+    setTooltipSponsor(null);
+    setTooltipAnchorRect(null);
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+  };
+
+  // Tooltip component
+  function SponsorDetailsTooltip({ sponsorJoin, anchorRect, onClose }: {
+    sponsorJoin: EventSponsorsJoinDTO | null,
+    anchorRect: DOMRect | null,
+    onClose: () => void
+  }) {
+    if (!anchorRect || !sponsorJoin || !sponsorJoin.sponsor) return null;
+
+    const sponsor = sponsorJoin.sponsor;
+    const tooltipWidth = 450;
+    const spacing = 12;
+
+    // Always show tooltip to the right of the anchor cell, never above the columns
+    let top = anchorRect.top;
+    let left = anchorRect.right + spacing;
+
+    // Clamp position to stay within the viewport
+    const estimatedHeight = 400;
+    if (top + estimatedHeight > window.innerHeight) {
+      top = window.innerHeight - estimatedHeight - spacing;
+    }
+    if (top < spacing) {
+      top = spacing;
+    }
+    if (left + tooltipWidth > window.innerWidth - spacing) {
+      left = window.innerWidth - tooltipWidth - spacing;
+    }
+
+    const style: React.CSSProperties = {
+      position: 'fixed',
+      top: `${top}px`,
+      left: `${left}px`,
+      zIndex: 9999,
+      background: 'white',
+      border: '1px solid #cbd5e1',
+      borderRadius: 8,
+      boxShadow: '0 4px 24px rgba(0,0,0,0.15)',
+      padding: '16px',
+      width: `${tooltipWidth}px`,
+      fontSize: '14px',
+      maxHeight: '500px',
+      overflowY: 'auto',
+      transition: 'opacity 0.1s ease-in-out',
+    };
+
+    const details = [
+      { label: 'Name', value: sponsor.name },
+      { label: 'Type', value: sponsor.type },
+      { label: 'Company Name', value: sponsor.companyName },
+      { label: 'Tagline', value: sponsor.tagline },
+      { label: 'Description', value: sponsor.description },
+      { label: 'Website URL', value: sponsor.websiteUrl },
+      { label: 'Contact Email', value: sponsor.contactEmail },
+      { label: 'Contact Phone', value: sponsor.contactPhone },
+      { label: 'Logo URL', value: sponsor.logoUrl },
+      { label: 'Hero Image URL', value: sponsor.heroImageUrl },
+      { label: 'Banner Image URL', value: sponsor.bannerImageUrl },
+      { label: 'Priority Ranking', value: sponsor.priorityRanking },
+      { label: 'Active', value: sponsor.isActive },
+      { label: 'Facebook URL', value: sponsor.facebookUrl },
+      { label: 'Twitter URL', value: sponsor.twitterUrl },
+      { label: 'LinkedIn URL', value: sponsor.linkedinUrl },
+      { label: 'Instagram URL', value: sponsor.instagramUrl },
+      { label: 'Assigned Date', value: sponsorJoin.createdAt ? new Date(sponsorJoin.createdAt).toLocaleDateString() : null },
+    ].filter(detail => detail.value !== null && detail.value !== undefined && detail.value !== '');
+
+    return ReactDOM.createPortal(
+      <div style={style} tabIndex={-1} className="admin-tooltip">
+        <div className="sticky top-0 right-0 z-10 bg-white flex justify-end" style={{ minHeight: 0 }}>
+          <button
+            onClick={onClose}
+            className="w-10 h-10 text-2xl bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all"
+            aria-label="Close tooltip"
+          >
+            &times;
+          </button>
+        </div>
+        <div className="font-semibold text-lg mb-4 pb-2 border-b border-gray-200">
+          {sponsor.name || 'Sponsor Details'}
+        </div>
+        <table className="admin-tooltip-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <tbody>
+            {details.map((detail, index) => (
+              <tr key={index} className="border-b border-gray-100">
+                <th style={{
+                  textAlign: 'left',
+                  width: '40%',
+                  minWidth: '150px',
+                  fontWeight: 600,
+                  wordBreak: 'break-word',
+                  whiteSpace: 'normal',
+                  boxSizing: 'border-box',
+                  padding: '12px 16px 12px 0',
+                  fontSize: '14px',
+                  color: '#374151'
+                }}>
+                  {detail.label}
+                </th>
+                <td style={{
+                  textAlign: 'left',
+                  width: '60%',
+                  padding: '12px 0',
+                  fontSize: '14px',
+                  color: '#6b7280',
+                  wordBreak: 'break-word'
+                }}>
+                  {typeof detail.value === 'boolean' ? (
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${detail.value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                      {detail.value ? 'Yes' : 'No'}
+                    </span>
+                  ) : detail.value === null || detail.value === undefined || detail.value === '' ? (
+                    <span className="text-gray-400 italic">(empty)</span>
+                  ) : (
+                    String(detail.value)
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>,
+      document.body
+    );
+  }
+
   const columns: Column<EventSponsorsJoinDTO>[] = [
     {
       key: 'sponsorName',
       label: 'Sponsor Name',
       sortable: true,
-      render: (value, row) => row?.sponsor?.name || '-'
+      render: (value, row) => (
+        <div
+          onMouseEnter={(e) => handleSponsorNameCellMouseEnter(row, e)}
+          onMouseLeave={handleSponsorNameCellMouseLeave}
+          className="cursor-pointer hover:text-blue-600 transition-colors"
+          title="Hover to view full details"
+        >
+          {row?.sponsor?.name || '-'}
+        </div>
+      )
     },
     {
       key: 'sponsorType',
@@ -556,28 +807,42 @@ export default function EventSponsorsPage() {
       render: (value, row) => row?.sponsor?.type || '-'
     },
     {
-      key: 'sponsorCompany',
-      label: 'Company',
-      sortable: true,
-      render: (value, row) => row?.sponsor?.companyName || '-'
-    },
-    {
-      key: 'sponsorEmail',
-      label: 'Contact Email',
-      sortable: true,
-      render: (value, row) => row?.sponsor?.contactEmail || '-'
-    },
-    {
-      key: 'sponsorActive',
-      label: 'Active',
-      sortable: true,
-      render: (value, row) => row?.sponsor?.isActive ? 'Yes' : 'No'
-    },
-    {
-      key: 'createdAt',
-      label: 'Assigned Date',
-      sortable: true,
-      render: (value, row) => row?.createdAt ? new Date(row.createdAt).toLocaleDateString() : '-'
+      key: 'actions',
+      label: 'Actions',
+      render: (value, row) => (
+        <div className="flex space-x-2">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              openEditModal(row);
+            }}
+            className="icon-btn icon-btn-edit"
+            title="Edit"
+          >
+            <FaEdit />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              openDisassociateModal(row);
+            }}
+            className="icon-btn icon-btn-delete bg-yellow-500 hover:bg-yellow-600"
+            title="Disassociate from Event"
+          >
+            <FaTrashAlt />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              openDeleteModal(row);
+            }}
+            className="icon-btn icon-btn-delete"
+            title="Permanently Delete"
+          >
+            <FaTrashAlt />
+          </button>
+        </div>
+      )
     },
   ];
 
@@ -598,38 +863,22 @@ export default function EventSponsorsPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-8 py-8" style={{ paddingTop: '180px' }}>
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ paddingTop: '180px' }}>
       {/* Header with back button */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center">
-          <Link
-            href={`/admin/events/${eventId}/edit`}
-            className="flex items-center text-blue-600 hover:text-blue-800 mr-4"
-          >
-            <FaArrowLeft className="mr-2" />
-            Back to Event
-          </Link>
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              Event Sponsors
-              {event && <span className="text-lg font-normal text-gray-600 ml-2">- {event.title}</span>}
-            </h1>
-            <p className="text-gray-600">Manage sponsor assignments for this specific event only</p>
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <button
-            onClick={testApiCall}
-            className="bg-purple-600 text-white px-4 py-2 rounded-lg shadow font-medium flex items-center gap-2 hover:bg-purple-700 transition"
-          >
-            🧪 Test API
-          </button>
-          <button
-            onClick={testDirectBackendCall}
-            className="bg-orange-600 text-white px-4 py-2 rounded-lg shadow font-medium flex items-center gap-2 hover:bg-orange-700 transition"
-          >
-            🔍 Test Backend
-          </button>
+      <div className="flex items-center mb-6">
+        <Link
+          href={`/admin/events/${eventId}/edit`}
+          className="flex items-center text-blue-600 hover:text-blue-800 mr-4"
+        >
+          <FaArrowLeft className="mr-2" />
+          Back to Event
+        </Link>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Event Sponsors
+            {event && <span className="text-lg font-normal text-gray-600 ml-2">- {event.title}</span>}
+          </h1>
+          <p className="text-gray-600">Manage sponsor assignments for this specific event only</p>
         </div>
       </div>
 
@@ -659,6 +908,13 @@ export default function EventSponsorsPage() {
               />
             </div>
           </div>
+          <button
+            onClick={() => setIsCreateSponsorModalOpen(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow font-bold flex items-center gap-2 hover:bg-blue-700 transition whitespace-nowrap"
+          >
+            <FaPlus />
+            Add Sponsor
+          </button>
         </div>
       </div>
 
@@ -669,21 +925,26 @@ export default function EventSponsorsPage() {
       )}
 
       {/* Event Sponsors Section - Moved to top */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">
-          Event Sponsors for this Event Event ID {eventId} ({filteredEventSponsors.length})
-        </h2>
-        <DataTable
-          data={filteredEventSponsors || []}
-          columns={columns}
-          loading={loading}
-          onSort={handleSort}
-          onEdit={openEditModal}
-          onDelete={openDeleteModal}
-          sortKey={sortKey}
-          sortDirection={sortDirection}
-          emptyMessage="No sponsors assigned to this event yet. Assign sponsors from the available sponsors below."
-        />
+      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div className="mb-4">
+          <h2 className="text-xl font-semibold mb-2">
+            Event Sponsors ({filteredEventSponsors.length})
+          </h2>
+          <p className="text-sm text-gray-600">
+            💡 <strong>Tip:</strong> Hover over a sponsor's name to view detailed information in a tooltip.
+          </p>
+        </div>
+        <div className="overflow-x-auto">
+          <DataTable
+            data={filteredEventSponsors || []}
+            columns={columns}
+            loading={loading}
+            onSort={handleSort}
+            sortKey={sortKey}
+            sortDirection={sortDirection}
+            emptyMessage="No sponsors assigned to this event yet. Assign sponsors from the available sponsors below."
+          />
+        </div>
       </div>
 
       {/* Available Sponsors Section */}
@@ -724,81 +985,115 @@ export default function EventSponsorsPage() {
         </div>
 
         <div className="bg-white rounded-lg shadow-md p-6">
-          {loading ? (
+          {loading && availableSponsors.length === 0 ? (
             <div className="flex justify-center items-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
             </div>
+          ) : availableSponsors.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              No available sponsors found. All tenant sponsors may already be mapped to this event.
+            </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {availableSponsors.map((sponsor) => (
-                  <div key={sponsor.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-medium text-gray-900">{sponsor.name}</h3>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => openEditSponsorModal(sponsor)}
-                          className="bg-gray-600 text-white px-3 py-1 rounded text-sm hover:bg-gray-700 transition"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => openAssignModal(sponsor)}
-                          className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition"
-                        >
-                          Assign
-                        </button>
-                      </div>
-                    </div>
-                    <p className="text-sm text-gray-600">{sponsor.type || 'No type set'}</p>
-                    <p className="text-sm text-gray-500">{sponsor.companyName || 'No company name'}</p>
-                    <p className="text-sm text-gray-500">{sponsor.contactEmail || 'No contact email'}</p>
-                  </div>
-                ))}
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Name
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Type
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {availableSponsors.map((sponsor) => (
+                      <tr key={sponsor.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          <div
+                            onMouseEnter={(e) => {
+                              // Create a temporary join object for tooltip
+                              const tempJoin: EventSponsorsJoinDTO = {
+                                id: null,
+                                sponsor: sponsor,
+                                event: { id: parseInt(eventId) } as EventDetailsDTO,
+                                createdAt: null,
+                                updatedAt: null,
+                              };
+                              handleSponsorNameCellMouseEnter(tempJoin, e);
+                            }}
+                            onMouseLeave={handleSponsorNameCellMouseLeave}
+                            className="cursor-pointer hover:text-blue-600 transition-colors"
+                            title="Hover to view full details"
+                          >
+                            {sponsor.name || '-'}
+                          </div>
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {sponsor.type || '-'}
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => openEditSponsorModal(sponsor)}
+                              className="bg-gray-600 text-white px-3 py-1 rounded text-sm hover:bg-gray-700 transition whitespace-nowrap"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => openAssignModal(sponsor)}
+                              className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition whitespace-nowrap"
+                            >
+                              Assign
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
 
-              {/* Pagination for Available Sponsors */}
-              {availableSponsorsTotalPages > 1 && (
-                <div className="mt-6 flex justify-center">
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => handleAvailableSponsorsPageChange(availableSponsorsPage - 1)}
-                      disabled={availableSponsorsPage === 0}
-                      className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Previous
-                    </button>
-
-                    <div className="flex items-center space-x-1">
-                      {Array.from({ length: Math.min(5, availableSponsorsTotalPages) }, (_, i) => {
-                        const pageNum = availableSponsorsPage < 3 ? i : availableSponsorsPage - 2 + i;
-                        if (pageNum >= availableSponsorsTotalPages) return null;
-
-                        return (
-                          <button
-                            key={pageNum}
-                            onClick={() => handleAvailableSponsorsPageChange(pageNum)}
-                            className={`px-3 py-2 text-sm font-medium rounded-md ${pageNum === availableSponsorsPage
-                              ? 'bg-blue-600 text-white'
-                              : 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-50'
-                              }`}
-                          >
-                            {pageNum + 1}
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    <button
-                      onClick={() => handleAvailableSponsorsPageChange(availableSponsorsPage + 1)}
-                      disabled={availableSponsorsPage >= availableSponsorsTotalPages - 1}
-                      className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Next
-                    </button>
+              {/* Pagination for Available Sponsors - Always show */}
+              <div className="mt-8">
+                <div className="flex justify-between items-center">
+                  <button
+                    onClick={() => handleAvailableSponsorsPageChange(availableSponsorsPage - 1)}
+                    disabled={availableSponsorsPage === 0 || loading}
+                    className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+                  >
+                    <FaChevronLeft />
+                    Previous
+                  </button>
+                  <div className="text-sm font-semibold text-gray-700">
+                    Page {availableSponsorsTotalPages === 0 ? 0 : availableSponsorsPage + 1} of {availableSponsorsTotalPages}
                   </div>
+                  <button
+                    onClick={() => handleAvailableSponsorsPageChange(availableSponsorsPage + 1)}
+                    disabled={availableSponsorsPage >= availableSponsorsTotalPages - 1 || loading}
+                    className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+                  >
+                    Next
+                    <FaChevronRight />
+                  </button>
                 </div>
-              )}
+                <div className="text-center text-sm text-gray-600 mt-2">
+                  {availableSponsorsTotalElements > 0 ? (
+                    <>Showing <span className="font-medium">{(availableSponsorsPage * 20) + 1}</span> to <span className="font-medium">{Math.min((availableSponsorsPage * 20) + availableSponsors.length, availableSponsorsTotalElements)}</span> of <span className="font-medium">{availableSponsorsTotalElements}</span> available sponsors</>
+                  ) : (
+                    <div className="flex items-center justify-center gap-2">
+                      <span>No available sponsors found</span>
+                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-sm font-medium">
+                        [All tenant sponsors are mapped to this event]
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
 
               {availableSponsors.length === 0 && !loading && (
                 <div className="text-center py-8">
@@ -886,10 +1181,24 @@ export default function EventSponsorsPage() {
           setSelectedSponsor(null);
         }}
         onConfirm={handleDelete}
-        title="Remove Sponsor"
-        message={`Are you sure you want to remove "${selectedSponsor?.sponsor?.name || 'this sponsor'}" from this event? This action cannot be undone.`}
-        confirmText="Remove"
+        title="Permanently Delete Sponsor"
+        message={`Are you sure you want to permanently delete "${selectedSponsor?.sponsor?.name || 'this sponsor'}"? This action cannot be undone and will remove the sponsor from all events.`}
+        confirmText="Delete Permanently"
         variant="danger"
+      />
+
+      {/* Disassociate Confirmation Modal */}
+      <ConfirmModal
+        isOpen={isDisassociateModalOpen}
+        onClose={() => {
+          setIsDisassociateModalOpen(false);
+          setSelectedSponsor(null);
+        }}
+        onConfirm={handleDisassociate}
+        title="Disassociate Sponsor from Event"
+        message={`Are you sure you want to remove "${selectedSponsor?.sponsor?.name || 'this sponsor'}" from this event? The sponsor will remain in the system and can be added to other events.`}
+        confirmText="Disassociate"
+        variant="warning"
       />
 
       {/* Create New Sponsor Modal */}
@@ -941,6 +1250,13 @@ export default function EventSponsorsPage() {
           eventId={eventId}
         />
       </Modal>
+
+      {/* Tooltip */}
+      <SponsorDetailsTooltip
+        sponsorJoin={tooltipSponsor}
+        anchorRect={tooltipAnchorRect}
+        onClose={closeTooltip}
+      />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FaPlus, FaSearch, FaArrowLeft } from 'react-icons/fa';
+import { FaPlus, FaSearch, FaArrowLeft, FaChevronLeft, FaChevronRight, FaEdit, FaTrashAlt } from 'react-icons/fa';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -14,6 +14,9 @@ import {
   createEventProgramDirectorServer,
   updateEventProgramDirectorServer,
   deleteEventProgramDirectorServer,
+  associateDirectorWithEventServer,
+  disassociateDirectorFromEventServer,
+  fetchAvailableProgramDirectorsServer,
 } from './ApiServerActions';
 
 export default function EventProgramDirectorsPage() {
@@ -31,6 +34,7 @@ export default function EventProgramDirectorsPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDisassociateModalOpen, setIsDisassociateModalOpen] = useState(false);
   const [selectedDirector, setSelectedDirector] = useState<EventProgramDirectorsDTO | null>(null);
 
   // Form state
@@ -46,11 +50,19 @@ export default function EventProgramDirectorsPage() {
   const [sortKey, setSortKey] = useState<string>('');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
+  // Available program directors state (tenant-level directors not mapped to this event)
+  const [availableDirectors, setAvailableDirectors] = useState<EventProgramDirectorsDTO[]>([]);
+  const [availableDirectorsPage, setAvailableDirectorsPage] = useState(0);
+  const [availableDirectorsTotalPages, setAvailableDirectorsTotalPages] = useState(0);
+  const [availableDirectorsTotalElements, setAvailableDirectorsTotalElements] = useState(0);
+  const [availableDirectorsSearchTerm, setAvailableDirectorsSearchTerm] = useState('');
+
   const [toastMessage, setToastMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   useEffect(() => {
     if (userId && eventId) {
       loadEventAndProgramDirectors();
+      loadAvailableDirectors(0, '');
     }
   }, [userId, eventId]);
 
@@ -87,14 +99,42 @@ export default function EventProgramDirectorsPage() {
   const handleCreate = async () => {
     try {
       setLoading(true);
+
+      // Check for duplicates before creating
+      const isDuplicate = programDirectors.some(
+        (d) =>
+          formData.name && d.name && d.name.toLowerCase() === formData.name.toLowerCase()
+      );
+
+      if (isDuplicate) {
+        setToastMessage({
+          type: 'error',
+          message: 'A program director with this name is already associated with this event. Duplicate entries are not allowed.'
+        });
+        return;
+      }
+
       const directorData = { ...formData, event: { id: parseInt(eventId) } as EventDetailsDTO };
       const newDirector = await createEventProgramDirectorServer(directorData as any);
       setProgramDirectors(prev => [...prev, newDirector]);
       setIsCreateModalOpen(false);
       resetForm();
+      // Reload event program directors to get fresh data
+      await loadEventAndProgramDirectors();
+      // Reload available directors in case it should be removed from available list
+      await loadAvailableDirectors(availableDirectorsPage, availableDirectorsSearchTerm);
       setToastMessage({ type: 'success', message: 'Program director created successfully' });
     } catch (err: any) {
-      setToastMessage({ type: 'error', message: err.message || 'Failed to create program director' });
+      const errorMessage = err.message || 'Failed to create program director';
+      // Check if error is due to duplicate constraint
+      if (errorMessage.toLowerCase().includes('duplicate') || errorMessage.toLowerCase().includes('already exists')) {
+        setToastMessage({
+          type: 'error',
+          message: 'A program director with this name is already associated with this event. Duplicate entries are not allowed.'
+        });
+      } else {
+        setToastMessage({ type: 'error', message: errorMessage });
+      }
     } finally {
       setLoading(false);
     }
@@ -118,6 +158,28 @@ export default function EventProgramDirectorsPage() {
     }
   };
 
+  const handleDisassociate = async () => {
+    if (!selectedDirector) return;
+
+    try {
+      setLoading(true);
+      // Use the dedicated disassociate endpoint
+      await disassociateDirectorFromEventServer(selectedDirector.id!);
+      setProgramDirectors(prev => prev.filter(d => d.id !== selectedDirector.id));
+      setIsDisassociateModalOpen(false);
+      setSelectedDirector(null);
+      // Reload event program directors to get fresh data
+      await loadEventAndProgramDirectors();
+      // Reload available directors in case this director should now appear
+      await loadAvailableDirectors(availableDirectorsPage, availableDirectorsSearchTerm);
+      setToastMessage({ type: 'success', message: 'Program director disassociated from event successfully' });
+    } catch (err: any) {
+      setToastMessage({ type: 'error', message: err.message || 'Failed to disassociate program director' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleDelete = async () => {
     if (!selectedDirector) return;
 
@@ -127,9 +189,107 @@ export default function EventProgramDirectorsPage() {
       setProgramDirectors(prev => prev.filter(d => d.id !== selectedDirector.id));
       setIsDeleteModalOpen(false);
       setSelectedDirector(null);
-      setToastMessage({ type: 'success', message: 'Program director deleted successfully' });
+      // Reload event program directors to get fresh data
+      await loadEventAndProgramDirectors();
+      // Reload available directors in case this director should now appear
+      await loadAvailableDirectors(availableDirectorsPage, availableDirectorsSearchTerm);
+      setToastMessage({ type: 'success', message: 'Program director permanently deleted' });
     } catch (err: any) {
       setToastMessage({ type: 'error', message: err.message || 'Failed to delete program director' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load available program directors with pagination and search
+  const loadAvailableDirectors = async (page = 0, searchTerm = '') => {
+    try {
+      setLoading(true);
+      console.log('🔄 Loading available program directors for event:', eventId, 'page:', page, 'search:', searchTerm);
+      const availableDirectorsData = await fetchAvailableProgramDirectorsServer(
+        parseInt(eventId),
+        page,
+        20, // Page size 20 as per UI style guide
+        searchTerm
+      );
+      console.log('📊 Available program directors data received:', availableDirectorsData);
+      setAvailableDirectors(availableDirectorsData.content);
+      setAvailableDirectorsTotalPages(availableDirectorsData.totalPages);
+      setAvailableDirectorsTotalElements(availableDirectorsData.totalElements);
+    } catch (err: any) {
+      console.error('Failed to load available program directors:', err);
+      setAvailableDirectors([]);
+      setAvailableDirectorsTotalPages(0);
+      setAvailableDirectorsTotalElements(0);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle search for available program directors
+  const handleAvailableDirectorsSearch = (searchTerm: string) => {
+    setAvailableDirectorsSearchTerm(searchTerm);
+    setAvailableDirectorsPage(0);
+    loadAvailableDirectors(0, searchTerm);
+  };
+
+  // Handle pagination for available program directors
+  const handleAvailableDirectorsPageChange = (page: number) => {
+    setAvailableDirectorsPage(page);
+    loadAvailableDirectors(page, availableDirectorsSearchTerm);
+  };
+
+  // Handle adding an available program director to this event
+  const handleAddDirectorToEvent = async (director: EventProgramDirectorsDTO) => {
+    try {
+      setLoading(true);
+      console.log('➕ Adding program director to event:', director);
+
+      // Check if director is already associated with this event
+      const isAlreadyAssociated = programDirectors.some(
+        (d) => d.id === director.id ||
+        (d.name && director.name && d.name.toLowerCase() === director.name.toLowerCase())
+      );
+
+      if (isAlreadyAssociated) {
+        setToastMessage({
+          type: 'error',
+          message: `Program director "${director.name}" is already associated with this event. Duplicate entries are not allowed.`
+        });
+        return;
+      }
+
+      // Update the existing director to associate with this event (don't create duplicate)
+      if (!director.id) {
+        setToastMessage({
+          type: 'error',
+          message: `Cannot add program director "${director.name}" - director ID is missing.`
+        });
+        return;
+      }
+
+      // Use the dedicated associate endpoint to properly associate the director with the event
+      console.log('🔄 Associating program director', director.id, 'with event', eventId);
+      await associateDirectorWithEventServer(director.id, parseInt(eventId));
+
+      // Reload event program directors to get fresh data from database
+      await loadEventAndProgramDirectors();
+      // Reload available directors to remove the added one
+      await loadAvailableDirectors(availableDirectorsPage, availableDirectorsSearchTerm);
+
+      setToastMessage({ type: 'success', message: `Program director "${director.name}" added to event successfully` });
+    } catch (err: any) {
+      console.error('❌ Failed to add program director to event:', err);
+      // Check if error is due to duplicate constraint
+      const errorMessage = err.message || 'Failed to add program director to event';
+      if (errorMessage.toLowerCase().includes('duplicate') || errorMessage.toLowerCase().includes('already exists')) {
+        setToastMessage({
+          type: 'error',
+          message: `Program director "${director.name}" is already associated with this event. Duplicate entries are not allowed.`
+        });
+      } else {
+        setToastMessage({ type: 'error', message: errorMessage });
+      }
     } finally {
       setLoading(false);
     }
@@ -153,6 +313,11 @@ export default function EventProgramDirectorsPage() {
   const openDeleteModal = (director: EventProgramDirectorsDTO) => {
     setSelectedDirector(director);
     setIsDeleteModalOpen(true);
+  };
+
+  const openDisassociateModal = (director: EventProgramDirectorsDTO) => {
+    setSelectedDirector(director);
+    setIsDisassociateModalOpen(true);
   };
 
   const handleSort = (key: string, direction: 'asc' | 'desc') => {
@@ -185,6 +350,44 @@ export default function EventProgramDirectorsPage() {
       label: 'Bio',
       render: (value) => value ? (value.length > 50 ? value.substring(0, 50) + '...' : value) : '-'
     },
+    {
+      key: 'actions',
+      label: 'Actions',
+      render: (value, director) => (
+        <div className="flex space-x-2">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              openEditModal(director);
+            }}
+            className="icon-btn icon-btn-edit"
+            title="Edit"
+          >
+            <FaEdit />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              openDisassociateModal(director);
+            }}
+            className="icon-btn icon-btn-delete bg-yellow-500 hover:bg-yellow-600"
+            title="Disassociate from Event"
+          >
+            <FaTrashAlt />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              openDeleteModal(director);
+            }}
+            className="icon-btn icon-btn-delete"
+            title="Permanently Delete"
+          >
+            <FaTrashAlt />
+          </button>
+        </div>
+      )
+    },
   ];
 
   if (!userId) {
@@ -204,19 +407,19 @@ export default function EventProgramDirectorsPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-8 py-8" style={{ paddingTop: '180px' }}>
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ paddingTop: '180px' }}>
       {/* Header with back button */}
       <div className="flex items-center mb-6">
         <Link
           href={`/admin/events/${eventId}/edit`}
-          className="flex items-center text-blue-600 hover:text-blue-800 mr-4"
+          className="flex items-center text-blue-600 hover:text-blue-800 mr-4 transition-colors"
         >
           <FaArrowLeft className="mr-2" />
           Back to Event
         </Link>
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            Event Program Directors
+            🎭 Event Program Directors
             {event && <span className="text-lg font-normal text-gray-600 ml-2">- {event.title}</span>}
           </h1>
           <p className="text-gray-600">Manage program directors for this event</p>
@@ -234,23 +437,23 @@ export default function EventProgramDirectorsPage() {
       )}
 
       {/* Search and Filter Bar */}
-      <div className="mb-6 bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+      <div className="mb-6 bg-white rounded-lg shadow-md p-6">
         <div className="flex flex-wrap gap-4 items-center">
           <div className="flex-1 min-w-64">
             <div className="relative">
               <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search program directors..."
+                placeholder="🔍 Search program directors..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="pl-10 pr-4 py-3 w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 text-base"
               />
             </div>
           </div>
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow font-bold flex items-center gap-2 hover:bg-blue-700 transition"
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 transition-colors font-semibold whitespace-nowrap"
           >
             <FaPlus />
             Add Program Director
@@ -264,17 +467,142 @@ export default function EventProgramDirectorsPage() {
         </div>
       )}
 
-      <DataTable
-        data={filteredDirectors}
-        columns={columns}
-        loading={loading}
-        onSort={handleSort}
-        onEdit={openEditModal}
-        onDelete={openDeleteModal}
-        sortKey={sortKey}
-        sortDirection={sortDirection}
-        emptyMessage="No program directors found for this event"
-      />
+      {/* Program Directors Table */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 className="text-xl font-semibold mb-4">
+          Event Program Directors ({filteredDirectors.length})
+        </h2>
+        <div className="overflow-x-auto">
+          <DataTable
+            data={filteredDirectors}
+            columns={columns}
+            loading={loading}
+            onSort={handleSort}
+            sortKey={sortKey}
+            sortDirection={sortDirection}
+            emptyMessage="No program directors found for this event"
+          />
+        </div>
+      </div>
+
+      {/* Available Program Directors Section */}
+      <div className="mb-8">
+        <div className="mb-4">
+          <h2 className="text-xl font-semibold">Available Program Directors to Add</h2>
+          <p className="text-gray-600 text-sm mt-1">
+            Tenant-level program directors that are not yet mapped to this event. Click "Add" to associate them with this event.
+            Showing {availableDirectors.length > 0 ? (availableDirectorsPage * 20) + 1 : 0} to {availableDirectors.length > 0 ? (availableDirectorsPage * 20) + availableDirectors.length : 0} of {availableDirectorsTotalElements} available program directors
+          </p>
+        </div>
+
+        {/* Search Bar for Available Program Directors */}
+        <div className="mb-6 bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+          <div className="flex flex-wrap gap-4 items-center">
+            <div className="flex-1 min-w-64">
+              <div className="relative">
+                <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search available program directors..."
+                  value={availableDirectorsSearchTerm}
+                  onChange={(e) => handleAvailableDirectorsSearch(e.target.value)}
+                  className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Available Program Directors Table */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          {loading && availableDirectors.length === 0 ? (
+            <div className="flex justify-center items-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            </div>
+          ) : availableDirectors.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              No available program directors found. All tenant program directors may already be mapped to this event.
+            </div>
+          ) : (
+            <>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Name
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Bio
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {availableDirectors.map((director) => (
+                      <tr key={director.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {director.name || '-'}
+                        </td>
+                        <td className="px-4 py-4 text-sm text-gray-500">
+                          {director.bio ? (director.bio.length > 50 ? director.bio.substring(0, 50) + '...' : director.bio) : '-'}
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
+                          <button
+                            onClick={() => handleAddDirectorToEvent(director)}
+                            className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition whitespace-nowrap"
+                          >
+                            Add
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination for Available Program Directors - Always show */}
+              <div className="mt-8">
+                <div className="flex justify-between items-center">
+                  <button
+                    onClick={() => handleAvailableDirectorsPageChange(availableDirectorsPage - 1)}
+                    disabled={availableDirectorsPage === 0 || loading}
+                    className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+                  >
+                    <FaChevronLeft />
+                    Previous
+                  </button>
+                  <div className="text-sm font-semibold text-gray-700">
+                    Page {availableDirectorsTotalPages === 0 ? 0 : availableDirectorsPage + 1} of {availableDirectorsTotalPages}
+                  </div>
+                  <button
+                    onClick={() => handleAvailableDirectorsPageChange(availableDirectorsPage + 1)}
+                    disabled={availableDirectorsPage >= availableDirectorsTotalPages - 1 || loading}
+                    className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+                  >
+                    Next
+                    <FaChevronRight />
+                  </button>
+                </div>
+                <div className="text-center text-sm text-gray-600 mt-2">
+                  {availableDirectorsTotalElements > 0 ? (
+                    <>Showing <span className="font-medium">{(availableDirectorsPage * 20) + 1}</span> to <span className="font-medium">{Math.min((availableDirectorsPage * 20) + availableDirectors.length, availableDirectorsTotalElements)}</span> of <span className="font-medium">{availableDirectorsTotalElements}</span> available program directors</>
+                  ) : (
+                    <div className="flex items-center justify-center gap-2">
+                      <span>No available program directors found</span>
+                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-sm font-medium">
+                        [All tenant program directors are mapped to this event]
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
 
       {/* Create Modal */}
       <Modal
@@ -317,6 +645,20 @@ export default function EventProgramDirectorsPage() {
         />
       </Modal>
 
+      {/* Disassociate Confirmation Modal */}
+      <ConfirmModal
+        isOpen={isDisassociateModalOpen}
+        onClose={() => {
+          setIsDisassociateModalOpen(false);
+          setSelectedDirector(null);
+        }}
+        onConfirm={handleDisassociate}
+        title="Disassociate Program Director from Event"
+        message={`Are you sure you want to remove "${selectedDirector?.name || 'this program director'}" from this event? The program director will remain in the system and can be added to other events.`}
+        confirmText="Disassociate"
+        variant="warning"
+      />
+
       {/* Delete Confirmation Modal */}
       <ConfirmModal
         isOpen={isDeleteModalOpen}
@@ -325,9 +667,9 @@ export default function EventProgramDirectorsPage() {
           setSelectedDirector(null);
         }}
         onConfirm={handleDelete}
-        title="Delete Program Director"
-        message={`Are you sure you want to delete "${selectedDirector?.name || 'this program director'}"? This action cannot be undone.`}
-        confirmText="Delete"
+        title="Permanently Delete Program Director"
+        message={`Are you sure you want to permanently delete "${selectedDirector?.name || 'this program director'}"? This action cannot be undone and will remove the program director from all events.`}
+        confirmText="Delete Permanently"
         variant="danger"
       />
     </div>

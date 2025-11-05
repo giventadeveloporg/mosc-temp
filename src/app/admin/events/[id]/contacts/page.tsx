@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FaPlus, FaSearch, FaArrowLeft } from 'react-icons/fa';
+import { FaPlus, FaSearch, FaArrowLeft, FaChevronLeft, FaChevronRight, FaEdit, FaTrashAlt } from 'react-icons/fa';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -13,6 +13,9 @@ import {
   createEventContactServer,
   updateEventContactServer,
   deleteEventContactServer,
+  fetchAvailableContactsServer,
+  associateContactWithEventServer,
+  disassociateContactFromEventServer,
 } from './ApiServerActions';
 
 export default function EventContactsPage() {
@@ -30,6 +33,7 @@ export default function EventContactsPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDisassociateModalOpen, setIsDisassociateModalOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState<EventContactsDTO | null>(null);
 
   // Form state
@@ -45,11 +49,19 @@ export default function EventContactsPage() {
   const [sortKey, setSortKey] = useState<string>('');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
+  // Available contacts state (tenant-level contacts not mapped to this event)
+  const [availableContacts, setAvailableContacts] = useState<EventContactsDTO[]>([]);
+  const [availableContactsPage, setAvailableContactsPage] = useState(0);
+  const [availableContactsTotalPages, setAvailableContactsTotalPages] = useState(0);
+  const [availableContactsTotalElements, setAvailableContactsTotalElements] = useState(0);
+  const [availableContactsSearchTerm, setAvailableContactsSearchTerm] = useState('');
+
   const [toastMessage, setToastMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   useEffect(() => {
     if (userId && eventId) {
       loadEventAndContacts();
+      loadAvailableContacts(0, '');
     }
   }, [userId, eventId]);
 
@@ -114,6 +126,21 @@ export default function EventContactsPage() {
         return;
       }
 
+      // Check for duplicates before creating
+      const isDuplicate = contacts.some(
+        (c) =>
+          (formData.email && c.email && c.email.toLowerCase() === formData.email.toLowerCase()) ||
+          (formData.phone && c.phone && c.phone === formData.phone)
+      );
+
+      if (isDuplicate) {
+        setToastMessage({
+          type: 'error',
+          message: 'A contact with this email or phone number is already associated with this event. Duplicate entries are not allowed.'
+        });
+        return;
+      }
+
       const contactData = {
         name: formData.name.trim(),
         phone: formData.phone.trim(),
@@ -131,9 +158,22 @@ export default function EventContactsPage() {
       setContacts(prev => [...prev, newContact]);
       setIsCreateModalOpen(false);
       resetForm();
+      // Reload available contacts in case this was a duplicate
+      await loadAvailableContacts(availableContactsPage, availableContactsSearchTerm);
+      // Reload event contacts to get fresh data
+      await loadEventAndContacts();
       setToastMessage({ type: 'success', message: 'Contact created successfully' });
     } catch (err: any) {
-      setToastMessage({ type: 'error', message: err.message || 'Failed to create contact' });
+      const errorMessage = err.message || 'Failed to create contact';
+      // Check if error is due to duplicate constraint
+      if (errorMessage.toLowerCase().includes('duplicate') || errorMessage.toLowerCase().includes('already exists')) {
+        setToastMessage({
+          type: 'error',
+          message: 'A contact with this email or phone number is already associated with this event. Duplicate entries are not allowed.'
+        });
+      } else {
+        setToastMessage({ type: 'error', message: errorMessage });
+      }
     } finally {
       setLoading(false);
     }
@@ -157,13 +197,41 @@ export default function EventContactsPage() {
     }
   };
 
+  const handleDisassociate = async () => {
+    if (!selectedContact) {
+      console.log('❌ No selected contact for disassociation');
+      return;
+    }
+
+    console.log('🔗 Disassociating contact from event:', selectedContact);
+
+    try {
+      setLoading(true);
+      // Use the dedicated disassociate endpoint
+      await disassociateContactFromEventServer(selectedContact.id!);
+
+      console.log('✅ Contact disassociated successfully, updating UI');
+      setContacts(prev => prev.filter(c => c.id !== selectedContact.id));
+      setIsDisassociateModalOpen(false);
+      setSelectedContact(null);
+      // Reload available contacts so this contact appears in the available list
+      await loadAvailableContacts(availableContactsPage, availableContactsSearchTerm);
+      setToastMessage({ type: 'success', message: 'Contact disassociated from event successfully' });
+    } catch (err: any) {
+      console.error('❌ Disassociate error:', err);
+      setToastMessage({ type: 'error', message: err.message || 'Failed to disassociate contact' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleDelete = async () => {
     if (!selectedContact) {
       console.log('❌ No selected contact for deletion');
       return;
     }
 
-    console.log('🗑️ Deleting contact:', selectedContact);
+    console.log('🗑️ Hard deleting contact:', selectedContact);
 
     try {
       setLoading(true);
@@ -174,10 +242,107 @@ export default function EventContactsPage() {
       setContacts(prev => prev.filter(c => c.id !== selectedContact.id));
       setIsDeleteModalOpen(false);
       setSelectedContact(null);
-      setToastMessage({ type: 'success', message: 'Contact deleted successfully' });
+      // Reload available contacts in case this contact should now appear
+      await loadAvailableContacts(availableContactsPage, availableContactsSearchTerm);
+      setToastMessage({ type: 'success', message: 'Contact permanently deleted' });
     } catch (err: any) {
       console.error('❌ Delete error:', err);
       setToastMessage({ type: 'error', message: err.message || 'Failed to delete contact' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load available contacts with pagination and search
+  const loadAvailableContacts = async (page = 0, searchTerm = '') => {
+    try {
+      setLoading(true);
+      console.log('🔄 Loading available contacts for event:', eventId, 'page:', page, 'search:', searchTerm);
+      const availableContactsData = await fetchAvailableContactsServer(
+        parseInt(eventId),
+        page,
+        20, // Page size 20 as per UI style guide
+        searchTerm
+      );
+      console.log('📊 Available contacts data received:', availableContactsData);
+      setAvailableContacts(availableContactsData.content);
+      setAvailableContactsTotalPages(availableContactsData.totalPages);
+      setAvailableContactsTotalElements(availableContactsData.totalElements);
+    } catch (err: any) {
+      console.error('Failed to load available contacts:', err);
+      setAvailableContacts([]);
+      setAvailableContactsTotalPages(0);
+      setAvailableContactsTotalElements(0);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle search for available contacts
+  const handleAvailableContactsSearch = (searchTerm: string) => {
+    setAvailableContactsSearchTerm(searchTerm);
+    setAvailableContactsPage(0);
+    loadAvailableContacts(0, searchTerm);
+  };
+
+  // Handle pagination for available contacts
+  const handleAvailableContactsPageChange = (page: number) => {
+    setAvailableContactsPage(page);
+    loadAvailableContacts(page, availableContactsSearchTerm);
+  };
+
+  // Handle adding an available contact to this event
+  const handleAddContactToEvent = async (contact: EventContactsDTO) => {
+    try {
+      setLoading(true);
+      console.log('➕ Adding contact to event:', contact);
+
+      // Check if contact is already associated with this event
+      const isAlreadyAssociated = contacts.some(
+        (c) => c.id === contact.id ||
+        (c.email && contact.email && c.email.toLowerCase() === contact.email.toLowerCase()) ||
+        (c.phone && contact.phone && c.phone === contact.phone)
+      );
+
+      if (isAlreadyAssociated) {
+        setToastMessage({
+          type: 'error',
+          message: `Contact "${contact.name}" is already associated with this event. Duplicate entries are not allowed.`
+        });
+        return;
+      }
+
+      // Update the existing contact to associate with this event (don't create duplicate)
+      if (!contact.id) {
+        setToastMessage({
+          type: 'error',
+          message: `Cannot add contact "${contact.name}" - contact ID is missing.`
+        });
+        return;
+      }
+
+      // Use the dedicated associate endpoint to properly associate the contact with the event
+      console.log('🔄 Associating contact', contact.id, 'with event', eventId);
+      await associateContactWithEventServer(contact.id, parseInt(eventId));
+
+      // Reload event contacts to get fresh data from database
+      await loadEventAndContacts();
+      // Reload available contacts to remove the added one
+      await loadAvailableContacts(availableContactsPage, availableContactsSearchTerm);
+
+      setToastMessage({ type: 'success', message: `Contact "${contact.name}" added to event successfully` });
+    } catch (err: any) {
+      console.error('❌ Failed to add contact to event:', err);
+      // Check if error is due to duplicate constraint
+      const errorMessage = err.message || 'Failed to add contact to event';
+      if (errorMessage.toLowerCase().includes('duplicate') || errorMessage.toLowerCase().includes('already exists')) {
+        setToastMessage({
+          type: 'error',
+          message: `Contact "${contact.name}" is already associated with this event. Duplicate entries are not allowed.`
+        });
+      } else {
+        setToastMessage({ type: 'error', message: errorMessage });
+      }
     } finally {
       setLoading(false);
     }
@@ -200,10 +365,14 @@ export default function EventContactsPage() {
 
   const openDeleteModal = (contact: EventContactsDTO) => {
     console.log('🗑️ Opening delete modal for contact:', contact);
-    console.log('🗑️ Setting selectedContact to:', contact);
-    console.log('🗑️ Setting isDeleteModalOpen to true');
     setSelectedContact(contact);
     setIsDeleteModalOpen(true);
+  };
+
+  const openDisassociateModal = (contact: EventContactsDTO) => {
+    console.log('🔗 Opening disassociate modal for contact:', contact);
+    setSelectedContact(contact);
+    setIsDisassociateModalOpen(true);
   };
 
   const handleSort = (key: string, direction: 'asc' | 'desc') => {
@@ -241,6 +410,44 @@ export default function EventContactsPage() {
       key: 'email',
       label: 'Email',
       render: (value) => value || '-'
+    },
+    {
+      key: 'actions',
+      label: 'Actions',
+      render: (value, contact) => (
+        <div className="flex space-x-2">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              openEditModal(contact);
+            }}
+            className="icon-btn icon-btn-edit"
+            title="Edit"
+          >
+            <FaEdit />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              openDisassociateModal(contact);
+            }}
+            className="icon-btn icon-btn-delete bg-yellow-500 hover:bg-yellow-600"
+            title="Disassociate from Event"
+          >
+            <FaTrashAlt />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              openDeleteModal(contact);
+            }}
+            className="icon-btn icon-btn-delete"
+            title="Permanently Delete"
+          >
+            <FaTrashAlt />
+          </button>
+        </div>
+      )
     },
   ];
 
@@ -322,18 +529,144 @@ export default function EventContactsPage() {
       )}
 
       {/* Contacts Table */}
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 className="text-xl font-semibold mb-4">
+          Event Contacts ({filteredContacts.length})
+        </h2>
         <DataTable
           data={filteredContacts}
           columns={columns}
           loading={loading}
           onSort={handleSort}
-          onEdit={openEditModal}
-          onDelete={openDeleteModal}
           sortKey={sortKey}
           sortDirection={sortDirection}
           emptyMessage="No contacts found for this event"
         />
+      </div>
+
+      {/* Available Contacts Section */}
+      <div className="mb-8">
+        <div className="mb-4">
+          <h2 className="text-xl font-semibold">Available Contacts to Add</h2>
+          <p className="text-gray-600 text-sm mt-1">
+            Tenant-level contacts that are not yet mapped to this event. Click "Add" to associate them with this event.
+            Showing {availableContacts.length > 0 ? (availableContactsPage * 20) + 1 : 0} to {availableContacts.length > 0 ? (availableContactsPage * 20) + availableContacts.length : 0} of {availableContactsTotalElements} available contacts
+          </p>
+        </div>
+
+        {/* Search Bar for Available Contacts */}
+        <div className="mb-6 bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+          <div className="flex flex-wrap gap-4 items-center">
+            <div className="flex-1 min-w-64">
+              <div className="relative">
+                <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search available contacts..."
+                  value={availableContactsSearchTerm}
+                  onChange={(e) => handleAvailableContactsSearch(e.target.value)}
+                  className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Available Contacts Table */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          {loading && availableContacts.length === 0 ? (
+            <div className="flex justify-center items-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            </div>
+          ) : availableContacts.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              No available contacts found. All tenant contacts may already be mapped to this event.
+            </div>
+          ) : (
+            <>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Name
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Phone
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Email
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {availableContacts.map((contact) => (
+                      <tr key={contact.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {contact.name || '-'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {contact.phone || '-'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {contact.email || '-'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <button
+                            onClick={() => handleAddContactToEvent(contact)}
+                            className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition"
+                          >
+                            Add
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination for Available Contacts - Always show */}
+              <div className="mt-8">
+                <div className="flex justify-between items-center">
+                  <button
+                    onClick={() => handleAvailableContactsPageChange(availableContactsPage - 1)}
+                    disabled={availableContactsPage === 0 || loading}
+                    className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+                  >
+                    <FaChevronLeft />
+                    Previous
+                  </button>
+                  <div className="text-sm font-semibold text-gray-700">
+                    Page {availableContactsTotalPages === 0 ? 0 : availableContactsPage + 1} of {availableContactsTotalPages}
+                  </div>
+                  <button
+                    onClick={() => handleAvailableContactsPageChange(availableContactsPage + 1)}
+                    disabled={availableContactsPage >= availableContactsTotalPages - 1 || loading}
+                    className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+                  >
+                    Next
+                    <FaChevronRight />
+                  </button>
+                </div>
+                <div className="text-center text-sm text-gray-600 mt-2">
+                  {availableContactsTotalElements > 0 ? (
+                    <>Showing <span className="font-medium">{(availableContactsPage * 20) + 1}</span> to <span className="font-medium">{Math.min((availableContactsPage * 20) + availableContacts.length, availableContactsTotalElements)}</span> of <span className="font-medium">{availableContactsTotalElements}</span> available contacts</>
+                  ) : (
+                    <div className="flex items-center justify-center gap-2">
+                      <span>No available contacts found</span>
+                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-sm font-medium">
+                        [All tenant contacts are mapped to this event]
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Create Modal */}
@@ -375,18 +708,31 @@ export default function EventContactsPage() {
         />
       </Modal>
 
+      {/* Disassociate Confirmation Modal */}
+      <ConfirmModal
+        isOpen={isDisassociateModalOpen}
+        onClose={() => {
+          setIsDisassociateModalOpen(false);
+          setSelectedContact(null);
+        }}
+        onConfirm={handleDisassociate}
+        title="Disassociate Contact from Event"
+        message={`Are you sure you want to remove "${selectedContact?.name || 'this contact'}" from this event? The contact will remain in the system and can be added to other events.`}
+        confirmText="Disassociate"
+        variant="warning"
+      />
+
       {/* Delete Confirmation Modal */}
       <ConfirmModal
         isOpen={isDeleteModalOpen}
         onClose={() => {
-          console.log('🔍 ConfirmModal onClose called');
           setIsDeleteModalOpen(false);
           setSelectedContact(null);
         }}
         onConfirm={handleDelete}
-        title="Delete Contact"
-        message={`Are you sure you want to delete "${selectedContact?.name || 'this contact'}"? This action cannot be undone.`}
-        confirmText="Delete"
+        title="Permanently Delete Contact"
+        message={`Are you sure you want to permanently delete "${selectedContact?.name || 'this contact'}"? This action cannot be undone and will remove the contact from all events.`}
+        confirmText="Delete Permanently"
         variant="danger"
       />
     </div>

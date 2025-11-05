@@ -299,7 +299,7 @@ export default function EventSponsorsPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ paddingTop: '180px' }}>
       <h1 className="font-heading font-semibold text-3xl text-foreground mb-8">Event Sponsors</h1>
-      <AdminNavigation />
+      <AdminNavigation currentPage="event-sponsors" />
 
       {/* Toast Message */}
       {toastMessage && (

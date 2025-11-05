@@ -31,6 +31,83 @@ This guide provides standards for creating consistent and maintainable UI compon
   </div>
   ```
 
+### Centered Card Grid Layout
+
+- **Rule:** Use CSS modules with flexbox for centered card grids (Featured Guests, Contact Information, Program Directors, Gallery thumbnails, Team members).
+- **Purpose:** Ensures cards are perfectly centered regardless of the number of items, preventing left-aligned layouts when items don't fill the full width.
+- **Pattern:** Create a CSS module file (e.g., `CenteredCardGrid.module.css`) with:
+  - Flexbox container with `justify-content: center`
+  - Responsive `max-width` calculations based on number of columns
+  - Fixed or calculated widths for card items
+- **Example:**
+  ```css
+  /* Centered Card Grid */
+  .centeredCardGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    width: 100%;
+    justify-content: center;
+    align-items: flex-start;
+    margin: 0 auto;
+  }
+
+  /* Desktop: 3 columns */
+  @media (min-width: 1024px) {
+    .centeredCardGrid {
+      max-width: calc(3 * 350px + 2 * 1rem);
+    }
+    .cardItem {
+      width: 350px;
+      max-width: 350px;
+    }
+  }
+
+  /* Tablet: 2 columns */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .centeredCardGrid {
+      max-width: calc(2 * 350px + 1 * 1rem);
+    }
+    .cardItem {
+      width: calc((100% - 1rem) / 2);
+      max-width: calc((100% - 1rem) / 2);
+    }
+  }
+
+  /* Mobile: 1 column */
+  @media (max-width: 767px) {
+    .centeredCardGrid {
+      max-width: 100%;
+    }
+    .cardItem {
+      width: 100%;
+      max-width: 100%;
+    }
+  }
+  ```
+- **Usage:**
+  ```tsx
+  // ✅ DO: Use CSS module for centered card grids
+  import cardGridStyles from './CenteredCardGrid.module.css';
+
+  <div className={cardGridStyles.centeredCardGrid}>
+    {items.map((item) => (
+      <div key={item.id} className={cardGridStyles.cardItem}>
+        {/* Card content */}
+      </div>
+    ))}
+  </div>
+
+  // ❌ DON'T: Use standard grid without centering
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    {/* Cards will be left-aligned when not filling full width */}
+  </div>
+  ```
+- **References:**
+  - See `src/app/events/[id]/CenteredCardGrid.module.css` for implementation
+  - See `src/app/events/[id]/GalleryThumbnails.module.css` for gallery pattern
+  - See `src/components/TeamSection.module.css` for team member pattern
+
 ---
 
 ## 2. Forms
@@ -266,8 +343,8 @@ const endItem = totalCount > 0 ? currentPage * pageSize + Math.min(pageSize, tot
 // Always render pagination - show in ALL states (loading, empty, with data)
 <div className="mt-8">
   <div className="flex justify-between items-center">
-    <button 
-      disabled={isPrevDisabled} 
+    <button
+      disabled={isPrevDisabled}
       onClick={handlePrevPage}
       className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
     >
@@ -277,8 +354,8 @@ const endItem = totalCount > 0 ? currentPage * pageSize + Math.min(pageSize, tot
     <div className="text-sm font-semibold text-gray-700">
       Page {currentPage + 1} of {totalPages}
     </div>
-    <button 
-      disabled={isNextDisabled} 
+    <button
+      disabled={isNextDisabled}
       onClick={handleNextPage}
       className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
     >

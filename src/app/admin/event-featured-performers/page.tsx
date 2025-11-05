@@ -16,6 +16,7 @@ import {
   updateEventFeaturedPerformerServer,
   deleteEventFeaturedPerformerServer,
 } from './ApiServerActions';
+import { fetchEventsFilteredServer } from '../ApiServerActions';
 
 export default function EventFeaturedPerformersPage() {
   const { userId } = useAuth();
@@ -23,8 +24,10 @@ export default function EventFeaturedPerformersPage() {
   const { toasts, showSuccess, showError, removeToast } = useToast();
 
   const [performers, setPerformers] = useState<EventFeaturedPerformersDTO[]>([]);
+  const [events, setEvents] = useState<EventDetailsDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [eventFilter, setEventFilter] = useState<string>('');
 
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -57,8 +60,21 @@ export default function EventFeaturedPerformersPage() {
   useEffect(() => {
     if (userId) {
       loadPerformers();
+      loadEvents();
     }
   }, [userId]);
+
+  const loadEvents = async () => {
+    try {
+      const result = await fetchEventsFilteredServer({
+        pageSize: 1000, // Load all events for dropdown
+        sort: 'startDate,desc'
+      });
+      setEvents(result.events);
+    } catch (err: any) {
+      console.error('Failed to load events:', err);
+    }
+  };
 
   const loadPerformers = async () => {
     try {
@@ -77,7 +93,12 @@ export default function EventFeaturedPerformersPage() {
   const handleCreate = async () => {
     try {
       setLoading(true);
-      const newPerformer = await createEventFeaturedPerformerServer(formData as any);
+      // Include event association if selected
+      const performerData = {
+        ...formData,
+        event: formData.event?.id ? { id: formData.event.id } as EventDetailsDTO : undefined
+      };
+      const newPerformer = await createEventFeaturedPerformerServer(performerData as any);
       setPerformers(prev => [...prev, newPerformer]);
       setIsCreateModalOpen(false);
       resetForm();
@@ -94,7 +115,12 @@ export default function EventFeaturedPerformersPage() {
 
     try {
       setLoading(true);
-      const updatedPerformer = await updateEventFeaturedPerformerServer(selectedPerformer.id!, formData);
+      // Include event association if selected
+      const performerData = {
+        ...formData,
+        event: formData.event?.id ? { id: formData.event.id } as EventDetailsDTO : undefined
+      };
+      const updatedPerformer = await updateEventFeaturedPerformerServer(selectedPerformer.id!, performerData);
       setPerformers(prev => prev.map(p => p.id === selectedPerformer.id ? updatedPerformer : p));
       setIsEditModalOpen(false);
       setSelectedPerformer(null);
@@ -139,12 +165,16 @@ export default function EventFeaturedPerformersPage() {
       isHeadliner: false,
       performanceDuration: 0,
       specialRequirements: '',
+      event: undefined,
     });
   };
 
   const openEditModal = (performer: EventFeaturedPerformersDTO) => {
     setSelectedPerformer(performer);
-    setFormData(performer);
+    setFormData({
+      ...performer,
+      event: performer.event || undefined
+    });
     setIsEditModalOpen(true);
   };
 
@@ -171,11 +201,15 @@ export default function EventFeaturedPerformersPage() {
     setPerformers(sorted);
   };
 
-  const filteredPerformers = performers.filter(performer =>
-    performer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    performer.stageName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    performer.role?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredPerformers = performers.filter(performer => {
+    const matchesSearch = performer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      performer.stageName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      performer.role?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesEventFilter = !eventFilter || performer.event?.id?.toString() === eventFilter;
+
+    return matchesSearch && matchesEventFilter;
+  });
 
   const columns: Column<EventFeaturedPerformersDTO>[] = [
     { key: 'name', label: 'Name', sortable: true },
@@ -190,6 +224,27 @@ export default function EventFeaturedPerformersPage() {
       label: 'Role',
       sortable: true,
       render: (value) => value || '-'
+    },
+    {
+      key: 'event',
+      label: 'Event',
+      sortable: false,
+      render: (value, row) => {
+        if (row.event?.id && row.event?.title) {
+          return (
+            <a
+              href={`/admin/events/${row.event.id}`}
+              className="text-blue-600 hover:text-blue-800 underline"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              {row.event.title}
+            </a>
+          );
+        }
+        return <span className="text-gray-400">-</span>;
+      }
     },
     {
       key: 'isHeadliner',
@@ -238,6 +293,23 @@ export default function EventFeaturedPerformersPage() {
               />
             </div>
           </div>
+          <div className="min-w-48">
+            <div className="relative">
+              <FaFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <select
+                value={eventFilter}
+                onChange={(e) => setEventFilter(e.target.value)}
+                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white"
+              >
+                <option value="">All Events</option>
+                {events.map(event => (
+                  <option key={event.id} value={event.id?.toString()}>
+                    {event.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
           <button
             onClick={() => setIsCreateModalOpen(true)}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow font-bold flex items-center gap-2 hover:bg-blue-700 transition"
@@ -282,6 +354,7 @@ export default function EventFeaturedPerformersPage() {
           onSubmit={handleCreate}
           loading={loading}
           submitText="Create Performer"
+          events={events}
         />
       </Modal>
 
@@ -302,6 +375,7 @@ export default function EventFeaturedPerformersPage() {
           onSubmit={handleEdit}
           loading={loading}
           submitText="Update Performer"
+          events={events}
         />
       </Modal>
 
@@ -351,9 +425,10 @@ interface PerformerFormProps {
   onSubmit: () => void;
   loading: boolean;
   submitText: string;
+  events: EventDetailsDTO[];
 }
 
-function PerformerForm({ formData, setFormData, onSubmit, loading, submitText }: PerformerFormProps) {
+function PerformerForm({ formData, setFormData, onSubmit, loading, submitText, events }: PerformerFormProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
 
@@ -375,6 +450,31 @@ function PerformerForm({ formData, setFormData, onSubmit, loading, submitText }:
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Event (Optional)
+          </label>
+          <select
+            name="event"
+            value={formData.event?.id?.toString() || ''}
+            onChange={(e) => {
+              const eventId = e.target.value ? parseInt(e.target.value) : undefined;
+              setFormData(prev => ({
+                ...prev,
+                event: eventId ? { id: eventId } as EventDetailsDTO : undefined
+              }));
+            }}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">No Event (Global)</option>
+            {events.map(event => (
+              <option key={event.id} value={event.id?.toString()}>
+                {event.title} {event.startDate ? `(${event.startDate})` : ''}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Name *

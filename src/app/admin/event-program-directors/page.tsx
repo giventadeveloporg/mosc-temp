@@ -1,28 +1,31 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FaPlus, FaSearch } from 'react-icons/fa';
+import { FaPlus, FaSearch, FaFilter } from 'react-icons/fa';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import DataTable, { Column } from '@/components/ui/DataTable';
 import Modal from '@/components/ui/Modal';
 import ConfirmModal from '@/components/ui/Modal';
 import AdminNavigation from '@/components/AdminNavigation';
-import type { EventProgramDirectorsDTO } from '@/types';
+import type { EventProgramDirectorsDTO, EventDetailsDTO } from '@/types';
 import {
   fetchEventProgramDirectorsServer,
   createEventProgramDirectorServer,
   updateEventProgramDirectorServer,
   deleteEventProgramDirectorServer,
 } from './ApiServerActions';
+import { fetchEventsFilteredServer } from '../ApiServerActions';
 
 export default function GlobalEventProgramDirectorsPage() {
   const { userId } = useAuth();
   const router = useRouter();
 
   const [directors, setDirectors] = useState<EventProgramDirectorsDTO[]>([]);
+  const [events, setEvents] = useState<EventDetailsDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [eventFilter, setEventFilter] = useState<string>('');
 
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -35,6 +38,7 @@ export default function GlobalEventProgramDirectorsPage() {
     name: '',
     photoUrl: '',
     bio: '',
+    event: undefined,
   });
 
   // Search and filter state
@@ -47,8 +51,21 @@ export default function GlobalEventProgramDirectorsPage() {
   useEffect(() => {
     if (userId) {
       loadDirectors();
+      loadEvents();
     }
   }, [userId]);
+
+  const loadEvents = async () => {
+    try {
+      const result = await fetchEventsFilteredServer({
+        pageSize: 1000, // Load all events for dropdown
+        sort: 'startDate,desc'
+      });
+      setEvents(result.events);
+    } catch (err: any) {
+      console.error('Failed to load events:', err);
+    }
+  };
 
   const loadDirectors = async () => {
     try {
@@ -77,6 +94,7 @@ export default function GlobalEventProgramDirectorsPage() {
         name: formData.name.trim(),
         photoUrl: formData.photoUrl?.trim() || undefined,
         bio: formData.bio?.trim() || undefined,
+        event: formData.event?.id ? { id: formData.event.id } as EventDetailsDTO : undefined
       };
 
       // Debug logging
@@ -101,7 +119,12 @@ export default function GlobalEventProgramDirectorsPage() {
 
     try {
       setLoading(true);
-      const updatedDirector = await updateEventProgramDirectorServer(selectedDirector.id!, formData);
+      // Include event association if selected
+      const directorData = {
+        ...formData,
+        event: formData.event?.id ? { id: formData.event.id } as EventDetailsDTO : undefined
+      };
+      const updatedDirector = await updateEventProgramDirectorServer(selectedDirector.id!, directorData);
       setDirectors(prev => prev.map(d => d.id === selectedDirector.id ? updatedDirector : d));
       setIsEditModalOpen(false);
       setSelectedDirector(null);
@@ -136,6 +159,7 @@ export default function GlobalEventProgramDirectorsPage() {
       name: '',
       photoUrl: '',
       bio: '',
+      event: undefined,
     });
   };
 
@@ -145,6 +169,7 @@ export default function GlobalEventProgramDirectorsPage() {
       name: director.name || '',
       photoUrl: director.photoUrl || '',
       bio: director.bio || '',
+      event: director.event || undefined
     });
     setIsEditModalOpen(true);
   };
@@ -174,6 +199,27 @@ export default function GlobalEventProgramDirectorsPage() {
   const columns: Column<EventProgramDirectorsDTO>[] = [
     { key: 'name', label: 'Name', sortable: true },
     { key: 'bio', label: 'Bio', sortable: true },
+    {
+      key: 'event',
+      label: 'Event',
+      sortable: false,
+      render: (value, row) => {
+        if (row.event?.id && row.event?.title) {
+          return (
+            <a
+              href={`/admin/events/${row.event.id}`}
+              className="text-blue-600 hover:text-blue-800 underline"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              {row.event.title}
+            </a>
+          );
+        }
+        return <span className="text-gray-400">-</span>;
+      }
+    },
   ];
 
   if (loading && directors.length === 0) {
@@ -215,17 +261,36 @@ export default function GlobalEventProgramDirectorsPage() {
           </div>
 
           <div className="p-6">
-            {/* Search */}
-            <div className="mb-6">
-              <div className="relative">
-                <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search directors..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
+            {/* Search and Filter */}
+            <div className="mb-6 flex flex-wrap gap-4">
+              <div className="flex-1 min-w-64">
+                <div className="relative">
+                  <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search directors..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+              <div className="min-w-48">
+                <div className="relative">
+                  <FaFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <select
+                    value={eventFilter}
+                    onChange={(e) => setEventFilter(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white"
+                  >
+                    <option value="">All Events</option>
+                    {events.map(event => (
+                      <option key={event.id} value={event.id?.toString()}>
+                        {event.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
 
@@ -276,6 +341,7 @@ export default function GlobalEventProgramDirectorsPage() {
           onSubmit={handleCreate}
           loading={loading}
           submitText="Create Director"
+          events={events}
         />
       </Modal>
 
@@ -296,6 +362,7 @@ export default function GlobalEventProgramDirectorsPage() {
           onSubmit={handleEdit}
           loading={loading}
           submitText="Update Director"
+          events={events}
         />
       </Modal>
 
@@ -323,10 +390,11 @@ interface DirectorFormProps {
   onSubmit: () => void;
   loading: boolean;
   submitText: string;
+  events: EventDetailsDTO[];
 }
 
-function DirectorForm({ formData, setFormData, onSubmit, loading, submitText }: DirectorFormProps) {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+function DirectorForm({ formData, setFormData, onSubmit, loading, submitText, events }: DirectorFormProps) {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -339,6 +407,31 @@ function DirectorForm({ formData, setFormData, onSubmit, loading, submitText }: 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Event (Optional)
+          </label>
+          <select
+            name="event"
+            value={formData.event?.id?.toString() || ''}
+            onChange={(e) => {
+              const eventId = e.target.value ? parseInt(e.target.value) : undefined;
+              setFormData(prev => ({
+                ...prev,
+                event: eventId ? { id: eventId } as EventDetailsDTO : undefined
+              }));
+            }}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">No Event (Global)</option>
+            {events.map(event => (
+              <option key={event.id} value={event.id?.toString()}>
+                {event.title} {event.startDate ? `(${event.startDate})` : ''}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Name *

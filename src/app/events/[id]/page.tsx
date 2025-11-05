@@ -3,12 +3,96 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import type { EventWithMedia, EventMediaDTO, EventDetailsDTO, EventFeaturedPerformersDTO, EventContactsDTO, EventProgramDirectorsDTO } from "@/types";
+import type { EventWithMedia, EventMediaDTO, EventDetailsDTO, EventFeaturedPerformersDTO, EventContactsDTO, EventProgramDirectorsDTO, EventSponsorsJoinDTO } from "@/types";
 import { formatInTimeZone } from 'date-fns-tz';
 import LocationDisplay from '@/components/LocationDisplay';
 import { EventMediaSlideshow } from '@/app/gallery/components/EventMediaSlideshow';
 import { Camera, Video, Eye } from 'lucide-react';
 import styles from './GalleryThumbnails.module.css';
+import cardGridStyles from './CenteredCardGrid.module.css';
+
+// Helper function to get initials from a name
+function getInitials(name: string): string {
+  if (!name) return '?';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  return name.substring(0, 2).toUpperCase();
+}
+
+// Color palette for cards and placeholders (light versions of design system colors)
+const cardColors = [
+  { bg: 'bg-blue-50', border: 'border-blue-200', hover: 'hover:bg-blue-100' },
+  { bg: 'bg-emerald-50', border: 'border-emerald-200', hover: 'hover:bg-emerald-100' },
+  { bg: 'bg-purple-50', border: 'border-purple-200', hover: 'hover:bg-purple-100' },
+  { bg: 'bg-amber-50', border: 'border-amber-200', hover: 'hover:bg-amber-100' },
+  { bg: 'bg-pink-50', border: 'border-pink-200', hover: 'hover:bg-pink-100' },
+  { bg: 'bg-teal-50', border: 'border-teal-200', hover: 'hover:bg-teal-100' },
+  { bg: 'bg-indigo-50', border: 'border-indigo-200', hover: 'hover:bg-indigo-100' },
+  { bg: 'bg-rose-50', border: 'border-rose-200', hover: 'hover:bg-rose-100' },
+];
+
+// Avatar gradient colors (matching design system with variations)
+const avatarGradients = [
+  { from: 'from-blue-500', to: 'to-blue-600' },
+  { from: 'from-emerald-500', to: 'to-emerald-600' },
+  { from: 'from-purple-500', to: 'to-purple-600' },
+  { from: 'from-amber-500', to: 'to-amber-600' },
+  { from: 'from-pink-500', to: 'to-pink-600' },
+  { from: 'from-teal-500', to: 'to-teal-600' },
+  { from: 'from-indigo-500', to: 'to-indigo-600' },
+  { from: 'from-rose-500', to: 'to-rose-600' },
+  { from: 'from-primary', to: 'to-secondary' },
+  { from: 'from-accent', to: 'to-primary' },
+];
+
+// Button color variants
+const buttonColors = [
+  { bg: 'bg-blue-500', hover: 'hover:bg-blue-600', text: 'text-white', border: 'border-blue-400' },
+  { bg: 'bg-emerald-500', hover: 'hover:bg-emerald-600', text: 'text-white', border: 'border-emerald-400' },
+  { bg: 'bg-purple-500', hover: 'hover:bg-purple-600', text: 'text-white', border: 'border-purple-400' },
+  { bg: 'bg-amber-500', hover: 'hover:bg-amber-600', text: 'text-white', border: 'border-amber-400' },
+  { bg: 'bg-pink-500', hover: 'hover:bg-pink-600', text: 'text-white', border: 'border-pink-400' },
+  { bg: 'bg-teal-500', hover: 'hover:bg-teal-600', text: 'text-white', border: 'border-teal-400' },
+];
+
+// Helper to get consistent color based on index or name hash
+function getColorIndex(str: string | number, max: number): number {
+  if (typeof str === 'number') return str % max;
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash) % max;
+}
+
+// Helper function to create a data URL for placeholder avatar with initials
+function createPlaceholderAvatar(name: string, size: number = 64): string {
+  const initials = getInitials(name);
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return '';
+
+  // Background gradient
+  const gradient = ctx.createLinearGradient(0, 0, size, size);
+  gradient.addColorStop(0, '#8B7D6B');
+  gradient.addColorStop(1, '#A0926B');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, size, size);
+
+  // Text
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = `bold ${size * 0.4}px Arial`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(initials, size / 2, size / 2);
+
+  return canvas.toDataURL();
+}
 
 export default function EventDetailsPage() {
   const params = useParams();
@@ -18,9 +102,12 @@ export default function EventDetailsPage() {
   const [featuredPerformers, setFeaturedPerformers] = useState<EventFeaturedPerformersDTO[]>([]);
   const [contacts, setContacts] = useState<EventContactsDTO[]>([]);
   const [programDirectors, setProgramDirectors] = useState<EventProgramDirectorsDTO[]>([]);
+  const [sponsors, setSponsors] = useState<EventSponsorsJoinDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [showSlideshow, setShowSlideshow] = useState(false);
   const [slideshowInitialIndex, setSlideshowInitialIndex] = useState(0);
+  // Track failed images for placeholder fallback
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     async function fetchEventDetails() {
@@ -113,12 +200,81 @@ export default function EventDetailsPage() {
           console.error('Error fetching program directors:', err);
           setProgramDirectors([]);
         }
+
+        // Fetch sponsors from event-sponsors-join table
+        try {
+          const sponsorsRes = await fetch(`/api/proxy/event-sponsors-join/event/${eventId}`);
+
+          if (!sponsorsRes.ok) {
+            console.warn('Sponsors fetch failed:', sponsorsRes.status, sponsorsRes.statusText);
+            setSponsors([]);
+          } else {
+            const contentType = sponsorsRes.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+              const sponsorsData = await sponsorsRes.json();
+              let sponsorsArray = Array.isArray(sponsorsData) ? sponsorsData : [sponsorsData];
+
+              // Populate sponsor details if they're missing (sponsor object might only have ID)
+              console.log('🔄 Checking and populating sponsor details...');
+              const populatedSponsors = await Promise.all(
+                sponsorsArray.map(async (joinRecord: EventSponsorsJoinDTO) => {
+                  // Skip if no sponsor reference
+                  if (!joinRecord.sponsor) {
+                    console.warn('⚠️ Join record missing sponsor reference:', joinRecord.id);
+                    return joinRecord;
+                  }
+
+                  // Check if sponsor has ID but missing details (like name)
+                  if (joinRecord.sponsor.id && !joinRecord.sponsor.name) {
+                    console.log('🔍 Fetching sponsor details for ID:', joinRecord.sponsor.id);
+                    try {
+                      const sponsorDetailsRes = await fetch(`/api/proxy/event-sponsors/${joinRecord.sponsor.id}`, {
+                        cache: 'no-store',
+                      });
+
+                      if (sponsorDetailsRes.ok) {
+                        const sponsorDetails = await sponsorDetailsRes.json();
+                        console.log('✅ Fetched sponsor details:', sponsorDetails);
+                        return {
+                          ...joinRecord,
+                          sponsor: sponsorDetails
+                        };
+                      } else {
+                        console.warn('⚠️ Failed to fetch sponsor details for ID:', joinRecord.sponsor.id, sponsorDetailsRes.status);
+                        // Return original record even if fetch failed
+                        return joinRecord;
+                      }
+                    } catch (error) {
+                      console.warn('⚠️ Error fetching sponsor details:', error);
+                      // Return original record even if fetch failed
+                      return joinRecord;
+                    }
+                  } else if (joinRecord.sponsor.name) {
+                    // Sponsor details already populated
+                    console.log('✅ Sponsor details already populated for:', joinRecord.sponsor.name);
+                  }
+                  return joinRecord;
+                })
+              );
+
+              console.log('✅ Populated sponsors:', populatedSponsors);
+              setSponsors(populatedSponsors);
+            } else {
+              console.warn('Sponsors response is not JSON:', contentType);
+              setSponsors([]);
+            }
+          }
+        } catch (err) {
+          console.error('Error fetching sponsors:', err);
+          setSponsors([]);
+        }
       } catch (err) {
         setEvent(null);
         setMedia([]);
         setFeaturedPerformers([]);
         setContacts([]);
         setProgramDirectors([]);
+        setSponsors([]);
       } finally {
         setLoading(false);
       }
@@ -347,8 +503,17 @@ export default function EventDetailsPage() {
 
               {/* Description */}
               {event.description && (
-                <div className="mb-6 text-lg text-gray-700 whitespace-pre-wrap">
-                  {event.description}
+                <div className="mb-6 p-6 rounded-xl bg-gradient-to-br from-muted/50 via-background to-muted/30 border-2 border-primary/30 shadow-lg relative overflow-hidden">
+                  {/* Beveled border effect - Inner highlight */}
+                  <div className="absolute inset-0 rounded-xl pointer-events-none" style={{
+                    background: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,0.05) 100%)',
+                    border: '1px solid rgba(255,255,255,0.4)',
+                    boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.5), inset 0 -1px 2px rgba(0,0,0,0.1)',
+                  }}></div>
+                  {/* Content */}
+                  <div className="relative text-lg text-foreground whitespace-pre-wrap leading-relaxed z-10">
+                    {event.description}
+                  </div>
                 </div>
               )}
 
@@ -356,26 +521,37 @@ export default function EventDetailsPage() {
               {featuredPerformers.length > 0 && (
                 <div className="mb-6">
                   <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <span className="text-2xl">🎭</span>
-                    Featured Artists
+                    <span className="text-2xl">⭐</span>
+                    Featured Guests
                   </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {featuredPerformers.map((performer) => (
+                  <div className={cardGridStyles.centeredCardGrid}>
+                    {featuredPerformers.map((performer, index) => {
+                      const cardColor = cardColors[getColorIndex(performer.id || performer.name || index, cardColors.length)];
+                      const avatarGradient = avatarGradients[getColorIndex(performer.id || performer.name || index, avatarGradients.length)];
+                      return (
                       <div
                         key={performer.id}
-                        className="bg-white rounded-lg shadow-md border border-gray-200 p-4 hover:shadow-lg transition-shadow"
+                        className={`${cardGridStyles.cardItem} ${cardColor.bg} ${cardColor.border} rounded-lg shadow-md border-2 p-4 ${cardColor.hover} transition-all duration-200`}
                       >
                         <div className="flex items-start gap-4">
-                          {performer.portraitImageUrl && (
-                            <div className="relative w-16 h-16 flex-shrink-0 rounded-full overflow-hidden border-2 border-gray-200">
+                          <div className={`relative w-16 h-16 flex-shrink-0 rounded-full overflow-hidden border-2 ${cardColor.border} bg-gradient-to-br ${avatarGradient.from} ${avatarGradient.to}`}>
+                            {performer.portraitImageUrl && !failedImages.has(`performer-${performer.id}`) ? (
                               <Image
                                 src={performer.portraitImageUrl}
                                 alt={performer.name}
                                 fill
                                 className="object-cover"
+                                onError={() => {
+                                  // Mark this image as failed
+                                  setFailedImages(prev => new Set(prev).add(`performer-${performer.id}`));
+                                }}
                               />
-                            </div>
-                          )}
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-white font-bold text-lg">
+                                {getInitials(performer.name || 'Guest')}
+                              </div>
+                            )}
+                          </div>
                           <div className="flex-1 min-w-0">
                             <h3 className="font-semibold text-gray-800 text-lg mb-1">
                               {performer.name}
@@ -449,7 +625,8 @@ export default function EventDetailsPage() {
                           </div>
                         </div>
                       </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -461,11 +638,13 @@ export default function EventDetailsPage() {
                     <span className="text-2xl">📞</span>
                     Contact Information
                   </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {contacts.map((contact) => (
+                  <div className={cardGridStyles.centeredCardGrid}>
+                    {contacts.map((contact, index) => {
+                      const cardColor = cardColors[getColorIndex(contact.id || contact.name || index, cardColors.length)];
+                      return (
                       <div
                         key={contact.id}
-                        className="bg-white rounded-lg shadow-md border border-gray-200 p-4 hover:shadow-lg transition-shadow"
+                        className={`${cardGridStyles.cardItem} ${cardColor.bg} ${cardColor.border} rounded-lg shadow-md border-2 p-4 ${cardColor.hover} transition-all duration-200`}
                       >
                         <h3 className="font-semibold text-gray-800 text-lg mb-2">{contact.name}</h3>
                         <div className="space-y-2">
@@ -493,7 +672,8 @@ export default function EventDetailsPage() {
                           )}
                         </div>
                       </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -505,23 +685,34 @@ export default function EventDetailsPage() {
                     <span className="text-2xl">🎬</span>
                     Program Directors
                   </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {programDirectors.map((director) => (
+                  <div className={cardGridStyles.centeredCardGrid}>
+                    {programDirectors.map((director, index) => {
+                      const cardColor = cardColors[getColorIndex(director.id || director.name || index, cardColors.length)];
+                      const avatarGradient = avatarGradients[getColorIndex(director.id || director.name || index, avatarGradients.length)];
+                      return (
                       <div
                         key={director.id}
-                        className="bg-white rounded-lg shadow-md border border-gray-200 p-4 hover:shadow-lg transition-shadow"
+                        className={`${cardGridStyles.cardItem} ${cardColor.bg} ${cardColor.border} rounded-lg shadow-md border-2 p-4 ${cardColor.hover} transition-all duration-200`}
                       >
                         <div className="flex items-start gap-4">
-                          {director.photoUrl && (
-                            <div className="relative w-16 h-16 flex-shrink-0 rounded-full overflow-hidden border-2 border-gray-200">
+                          <div className={`relative w-16 h-16 flex-shrink-0 rounded-full overflow-hidden border-2 ${cardColor.border} bg-gradient-to-br ${avatarGradient.from} ${avatarGradient.to}`}>
+                            {director.photoUrl && !failedImages.has(`director-${director.id}`) ? (
                               <Image
                                 src={director.photoUrl}
                                 alt={director.name}
                                 fill
                                 className="object-cover"
+                                onError={() => {
+                                  // Mark this image as failed
+                                  setFailedImages(prev => new Set(prev).add(`director-${director.id}`));
+                                }}
                               />
-                            </div>
-                          )}
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-white font-bold text-lg">
+                                {getInitials(director.name || 'Director')}
+                              </div>
+                            )}
+                          </div>
                           <div className="flex-1 min-w-0">
                             <h3 className="font-semibold text-gray-800 text-lg mb-1">
                               {director.name}
@@ -537,7 +728,8 @@ export default function EventDetailsPage() {
                           </div>
                         </div>
                       </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -583,21 +775,168 @@ export default function EventDetailsPage() {
                 })()}
 
                 {/* Calendar Link - Only for upcoming events */}
-                {isUpcoming && calendarLink && (
+                {isUpcoming && calendarLink && (() => {
+                  const buttonColor = buttonColors[getColorIndex('calendar', buttonColors.length)];
+                  return (
                   <a
                     href={calendarLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 px-6 rounded-xl border border-gray-200 transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-3"
+                    className={`${buttonColor.bg} ${buttonColor.hover} ${buttonColor.text} font-medium py-3 px-6 rounded-xl border-2 ${buttonColor.border} transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-3`}
                   >
                     <span className="text-2xl">📅</span>
                     <span className="text-lg">Add to Calendar</span>
                   </a>
-                )}
+                  );
+                })()}
               </div>
             </div>
           </div>
         </div>
+
+        {/* Sponsors Section - Stacked one on top of another */}
+        {sponsors.length > 0 && (
+          <div className="mb-8 mt-8">
+            <div className={`${getRandomBackground(event.id!)} rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 overflow-hidden`}>
+              <div className="p-6">
+                <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                  <span className="text-2xl">🏢</span>
+                  Our Sponsors
+                </h2>
+                <div className="space-y-4">
+                  {sponsors.map((sponsorJoin, index) => {
+                    const sponsor = sponsorJoin.sponsor;
+                    if (!sponsor) return null;
+                    const cardColor = cardColors[getColorIndex(sponsor.id || sponsor.name || index, cardColors.length)];
+                    return (
+                      <div
+                        key={sponsorJoin.id || index}
+                        className={`${cardColor.bg} ${cardColor.border} rounded-lg shadow-md border-2 p-4 ${cardColor.hover} transition-all duration-200`}
+                      >
+                        <div className="flex items-center gap-4">
+                          {/* Sponsor Logo */}
+                          {sponsor.logoUrl && !failedImages.has(`sponsor-${sponsor.id}`) ? (
+                            <div className="relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden border-2 border-gray-300 bg-white">
+                              <Image
+                                src={sponsor.logoUrl}
+                                alt={sponsor.name}
+                                fill
+                                className="object-contain p-2"
+                                onError={() => {
+                                  setFailedImages(prev => new Set(prev).add(`sponsor-${sponsor.id}`));
+                                }}
+                              />
+                            </div>
+                          ) : (
+                            <div className="w-20 h-20 flex-shrink-0 rounded-lg bg-gray-200 flex items-center justify-center border-2 border-gray-300">
+                              <span className="text-gray-400 text-2xl">🏢</span>
+                            </div>
+                          )}
+
+                          {/* Sponsor Details */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex-1">
+                                <h3 className="font-semibold text-gray-800 text-lg mb-1">
+                                  {sponsor.name || 'Sponsor'}
+                                </h3>
+                                {sponsor.companyName && (
+                                  <p className="text-sm text-gray-600 mb-1">{sponsor.companyName}</p>
+                                )}
+                                {sponsor.tagline && (
+                                  <p className="text-sm text-gray-700 mb-2 italic">{sponsor.tagline}</p>
+                                )}
+                                {sponsor.description && (
+                                  <p className="text-sm text-gray-700 mb-2" style={{
+                                    display: '-webkit-box',
+                                    WebkitLineClamp: 2,
+                                    WebkitBoxOrient: 'vertical',
+                                    overflow: 'hidden'
+                                  }}>{sponsor.description}</p>
+                                )}
+                                {/* Sponsor Type Badge */}
+                                {sponsor.type && (
+                                  <span className="inline-block px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded-full mb-2">
+                                    {sponsor.type}
+                                  </span>
+                                )}
+                                {/* Contact and Social Links */}
+                                <div className="flex flex-wrap gap-3 mt-2">
+                                  {sponsor.websiteUrl && (
+                                    <a
+                                      href={sponsor.websiteUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-blue-600 hover:text-blue-800 text-sm"
+                                      title="Website"
+                                    >
+                                      🌐 Website
+                                    </a>
+                                  )}
+                                  {sponsor.contactEmail && (
+                                    <a
+                                      href={`mailto:${sponsor.contactEmail}`}
+                                      className="text-blue-600 hover:text-blue-800 text-sm"
+                                      title="Email"
+                                    >
+                                      ✉️ {sponsor.contactEmail}
+                                    </a>
+                                  )}
+                                  {sponsor.contactPhone && (
+                                    <a
+                                      href={`tel:${sponsor.contactPhone}`}
+                                      className="text-blue-600 hover:text-blue-800 text-sm"
+                                      title="Phone"
+                                    >
+                                      📱 {sponsor.contactPhone}
+                                    </a>
+                                  )}
+                                  {sponsor.facebookUrl && (
+                                    <a
+                                      href={sponsor.facebookUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-blue-600 hover:text-blue-800 text-sm"
+                                      title="Facebook"
+                                    >
+                                      📘 Facebook
+                                    </a>
+                                  )}
+                                  {sponsor.instagramUrl && (
+                                    <a
+                                      href={sponsor.instagramUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-pink-600 hover:text-pink-800 text-sm"
+                                      title="Instagram"
+                                    >
+                                      📷 Instagram
+                                    </a>
+                                  )}
+                                  {sponsor.linkedinUrl && (
+                                    <a
+                                      href={sponsor.linkedinUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-blue-700 hover:text-blue-900 text-sm"
+                                      title="LinkedIn"
+                                    >
+                                      💼 LinkedIn
+                                    </a>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         {/* Gallery Section - Styled like gallery page */}
         {gallery.length > 0 && (
           <div className="mb-8 mt-8">
@@ -608,17 +947,22 @@ export default function EventDetailsPage() {
                   {gallery.length} {gallery.length === 1 ? 'photo or video' : 'photos and videos'}
                 </p>
               </div>
-              <button
-                onClick={() => {
-                  console.log('View Gallery clicked for event:', event.title, 'Media count:', gallery.length);
-                  setSlideshowInitialIndex(0);
-                  setShowSlideshow(true);
-                }}
-                className="flex items-center justify-center px-6 py-3 h-12 bg-gradient-to-b from-blue-500 to-blue-700 text-white text-sm font-medium rounded-lg shadow-lg hover:shadow-xl hover:shadow-blue-500/25 border border-blue-400/20 transform hover:-translate-y-0.5 transition-all duration-200"
-              >
-                <Eye className="w-4 h-4 mr-2" />
-                View Full Gallery
-              </button>
+              {(() => {
+                const buttonColor = buttonColors[getColorIndex('gallery', buttonColors.length)];
+                return (
+                <button
+                  onClick={() => {
+                    console.log('View Gallery clicked for event:', event.title, 'Media count:', gallery.length);
+                    setSlideshowInitialIndex(0);
+                    setShowSlideshow(true);
+                  }}
+                  className={`flex items-center justify-center px-6 py-3 h-12 ${buttonColor.bg} ${buttonColor.hover} ${buttonColor.text} text-sm font-medium rounded-lg shadow-lg hover:shadow-xl border-2 ${buttonColor.border} transform hover:-translate-y-0.5 transition-all duration-200`}
+                >
+                  <Eye className="w-4 h-4 mr-2" />
+                  View Full Gallery
+                </button>
+                );
+              })()}
             </div>
 
             {/* Preview thumbnails grid - Centered like TeamSection */}

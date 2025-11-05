@@ -3124,7 +3124,7 @@ CREATE TABLE public.whatsapp_log (
 CREATE TABLE public.event_featured_performers (
                                                   id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
                                                   tenant_id character varying(255),
-                                                  event_id bigint NOT NULL,
+                                                  event_id bigint NULL,
     -- Basic performer information
                                                   name varchar(255) NOT NULL,
                                                   stage_name varchar(255) NULL,
@@ -3181,7 +3181,7 @@ CREATE TABLE public.event_featured_performers (
 CREATE TABLE public.event_contacts (
                                        id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
                                        tenant_id character varying(255),
-                                       event_id bigint NOT NULL,
+                                       event_id bigint NULL,
                                        name varchar(255) NOT NULL,
                                        phone varchar(50) NOT NULL,
                                        email varchar(255) NULL,
@@ -3252,7 +3252,7 @@ CREATE TABLE public.event_sponsors_join (
 CREATE TABLE public.event_emails (
                                      id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
                                      tenant_id character varying(255),
-                                     event_id bigint NOT NULL,
+                                     event_id bigint NULL,
                                      email varchar(255) NOT NULL,
                                      created_at timestamp DEFAULT now() NOT NULL,
                                      updated_at timestamp DEFAULT now() NOT NULL,
@@ -3264,7 +3264,7 @@ CREATE TABLE public.event_emails (
 CREATE TABLE public.event_program_directors (
                                                 id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
                                                 tenant_id character varying(255),
-                                                event_id bigint NOT NULL,
+                                                event_id bigint NULL,
                                                 name varchar(255) NOT NULL,
                                                 photo_url varchar(1024) NULL,
                                                 bio text NULL,
@@ -3303,6 +3303,81 @@ ALTER TABLE ONLY public.event_emails
 -- Foreign key constraints for event_program_directors
 ALTER TABLE ONLY public.event_program_directors
     ADD CONSTRAINT fk_event_program_directors_event_id FOREIGN KEY (event_id) REFERENCES public.event_details(id) ON DELETE CASCADE;
+
+-- =============================================
+-- UNIQUE CONSTRAINTS FOR MULTI-EVENT ASSOCIATION
+-- =============================================
+-- These constraints prevent duplicate associations of the same entity with the same event
+-- Using partial unique indexes to handle NULL event_id values correctly
+
+-- event_contacts: Unique per tenant+event+name+phone
+CREATE UNIQUE INDEX IF NOT EXISTS unique_event_contact_tenant_event_name_phone
+ON public.event_contacts (tenant_id, event_id, name, phone)
+WHERE event_id IS NOT NULL;
+
+-- event_contacts: Unique per tenant+event+email (if email provided)
+CREATE UNIQUE INDEX IF NOT EXISTS unique_event_contact_tenant_event_email
+ON public.event_contacts (tenant_id, event_id, email)
+WHERE event_id IS NOT NULL AND email IS NOT NULL;
+
+-- event_featured_performers: Unique per tenant+event+name+stage_name
+CREATE UNIQUE INDEX IF NOT EXISTS unique_event_performer_tenant_event_name_stage
+ON public.event_featured_performers (tenant_id, event_id, name, stage_name)
+WHERE event_id IS NOT NULL AND stage_name IS NOT NULL;
+
+-- event_featured_performers: Unique per tenant+event+email (if email provided)
+CREATE UNIQUE INDEX IF NOT EXISTS unique_event_performer_tenant_event_email
+ON public.event_featured_performers (tenant_id, event_id, email)
+WHERE event_id IS NOT NULL AND email IS NOT NULL;
+
+-- event_emails: Unique per tenant+event+email
+CREATE UNIQUE INDEX IF NOT EXISTS unique_event_email_tenant_event_email
+ON public.event_emails (tenant_id, event_id, email)
+WHERE event_id IS NOT NULL;
+
+-- event_program_directors: Unique per tenant+event+name
+CREATE UNIQUE INDEX IF NOT EXISTS unique_event_director_tenant_event_name
+ON public.event_program_directors (tenant_id, event_id, name)
+WHERE event_id IS NOT NULL;
+
+-- =============================================
+-- PERFORMANCE INDEXES FOR MULTI-EVENT ASSOCIATION
+-- =============================================
+-- Indexes to optimize queries filtering by event_id and finding tenant-level entities
+
+-- Performance indexes for queries filtering by event_id (tenant_id, event_id)
+CREATE INDEX IF NOT EXISTS idx_event_featured_performers_tenant_event
+ON public.event_featured_performers (tenant_id, event_id)
+WHERE event_id IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_event_contacts_tenant_event
+ON public.event_contacts (tenant_id, event_id)
+WHERE event_id IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_event_emails_tenant_event
+ON public.event_emails (tenant_id, event_id)
+WHERE event_id IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_event_program_directors_tenant_event
+ON public.event_program_directors (tenant_id, event_id)
+WHERE event_id IS NOT NULL;
+
+-- Indexes for finding tenant-level entities (where event_id IS NULL)
+CREATE INDEX IF NOT EXISTS idx_event_featured_performers_tenant_null_event
+ON public.event_featured_performers (tenant_id)
+WHERE event_id IS NULL;
+
+CREATE INDEX IF NOT EXISTS idx_event_contacts_tenant_null_event
+ON public.event_contacts (tenant_id)
+WHERE event_id IS NULL;
+
+CREATE INDEX IF NOT EXISTS idx_event_emails_tenant_null_event
+ON public.event_emails (tenant_id)
+WHERE event_id IS NULL;
+
+CREATE INDEX IF NOT EXISTS idx_event_program_directors_tenant_null_event
+ON public.event_program_directors (tenant_id)
+WHERE event_id IS NULL;
 
 -- =============================================
 -- POSTGRESQL CACHING FEATURES

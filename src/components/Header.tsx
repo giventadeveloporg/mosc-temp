@@ -66,7 +66,8 @@ const adminSubmenuItems = [
   { name: 'Promotion Emails', href: '/admin/promotion-emails' },
   { name: 'Test Stripe', href: '/admin/test-stripe' },
   { name: 'Media Management', href: '/admin/media' },
-  { name: 'Executive Committee', href: '/admin/executive-committee' }
+  { name: 'Executive Committee', href: '/admin/executive-committee' },
+  { name: 'Event Sponsors', href: '/admin/event-sponsors' }
 ];
 
 const ORG_NAME = "Adwiise";
