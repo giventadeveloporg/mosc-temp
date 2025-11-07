@@ -1317,11 +1317,17 @@ CREATE TABLE public.event_media (
                                     updated_at timestamp DEFAULT now() NOT NULL,
                                     event_id int8 NULL,
                                     uploaded_by_id int8 NULL,
+                                    sponsor_id bigint NULL,
+                                    event_sponsors_join_id bigint NULL,
+                                    performer_id bigint NULL,
+                                    director_id bigint NULL,
+                                    priority_ranking INT4 NOT NULL DEFAULT 0,
                                     is_home_page_hero_image bool DEFAULT false NOT NULL,
                                     is_featured_event_image bool DEFAULT false NOT NULL,
                                     is_live_event_image bool DEFAULT false NOT NULL,
                                     CONSTRAINT check_download_count_non_negative CHECK ((download_count >= 0)),
-                                    CONSTRAINT check_file_size_positive CHECK (((file_size IS NULL) OR (file_size >= 0)))
+                                    CONSTRAINT check_file_size_positive CHECK (((file_size IS NULL) OR (file_size >= 0))),
+                                    CONSTRAINT check_priority_ranking_non_negative CHECK (priority_ranking >= 0)
 );
 
 -- ALTER TABLE public.event_media OWNER TO giventa_event_management;
@@ -1333,6 +1339,12 @@ CREATE TABLE public.event_media (
 --
 
 COMMENT ON COLUMN public.event_media.pre_signed_url IS 'Pre-signed URL for temporary access (max length 2048 chars)';
+
+COMMENT ON COLUMN public.event_media.sponsor_id IS 'Reference to sponsor for sponsor-specific media files. When set, this media file belongs to a specific sponsor.';
+
+COMMENT ON COLUMN public.event_media.event_sponsors_join_id IS 'Reference to event-sponsor join record for custom posters. When set, this media file is a custom poster for a specific event-sponsor combination.';
+
+COMMENT ON COLUMN public.event_media.priority_ranking IS 'Priority ranking for media files (sponsor or event-sponsor). Lower values indicate higher priority (0 = highest priority). Used to determine which image to display when multiple files are available.';
 
 
 --
@@ -3242,9 +3254,11 @@ CREATE TABLE public.event_sponsors_join (
                                             tenant_id character varying(255),
                                             event_id bigint NOT NULL,
                                             sponsor_id bigint NOT NULL,
+                                            custom_poster_url varchar(1024) NULL,
                                             created_at timestamp DEFAULT now() NOT NULL,
                                             CONSTRAINT event_sponsors_join_pkey PRIMARY KEY (id),
-                                            CONSTRAINT unique_event_sponsor UNIQUE (event_id, sponsor_id)
+                                            CONSTRAINT unique_event_sponsor UNIQUE (event_id, sponsor_id),
+                                            CONSTRAINT check_custom_poster_url_format CHECK (custom_poster_url IS NULL OR custom_poster_url ~* '^https?://.*')
 );
 
 -- Table: event_emails
@@ -3295,6 +3309,25 @@ ALTER TABLE ONLY public.event_sponsors_join
 
 ALTER TABLE ONLY public.event_sponsors_join
     ADD CONSTRAINT fk_event_sponsors_join_sponsor_id FOREIGN KEY (sponsor_id) REFERENCES public.event_sponsors(id) ON DELETE CASCADE;
+
+-- Foreign key constraints for event_media sponsor references
+ALTER TABLE ONLY public.event_media
+    ADD CONSTRAINT fk_event_media_sponsor_id FOREIGN KEY (sponsor_id) REFERENCES public.event_sponsors(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.event_media
+    ADD CONSTRAINT fk_event_media_event_sponsors_join_id FOREIGN KEY (event_sponsors_join_id) REFERENCES public.event_sponsors_join(id) ON DELETE CASCADE;
+
+-- Indexes for event_media sponsor references
+CREATE INDEX IF NOT EXISTS idx_event_media_sponsor_id ON public.event_media(sponsor_id) WHERE sponsor_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_event_media_event_sponsors_join_id ON public.event_media(event_sponsors_join_id) WHERE event_sponsors_join_id IS NOT NULL;
+
+-- Indexes for event_media priority ranking (for sponsor and event-sponsor media)
+CREATE INDEX IF NOT EXISTS idx_event_media_priority_ranking ON public.event_media(priority_ranking) WHERE sponsor_id IS NOT NULL OR event_sponsors_join_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_event_media_sponsor_priority ON public.event_media(sponsor_id, priority_ranking) WHERE sponsor_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_event_media_event_sponsor_join_priority ON public.event_media(event_sponsors_join_id, priority_ranking) WHERE event_sponsors_join_id IS NOT NULL;
+
+-- Index for event_sponsors_join custom_poster_url
+CREATE INDEX IF NOT EXISTS idx_event_sponsors_join_custom_poster ON public.event_sponsors_join(custom_poster_url) WHERE custom_poster_url IS NOT NULL;
 
 -- Foreign key constraints for event_emails
 ALTER TABLE ONLY public.event_emails
@@ -3611,6 +3644,7 @@ COMMENT ON COLUMN public.event_sponsors.instagram_url IS 'Instagram profile URL'
 -- event_sponsors_join column comments
 COMMENT ON COLUMN public.event_sponsors_join.event_id IS 'Foreign key reference to event_details.id';
 COMMENT ON COLUMN public.event_sponsors_join.sponsor_id IS 'Foreign key reference to event_sponsors.id';
+COMMENT ON COLUMN public.event_sponsors_join.custom_poster_url IS 'Custom poster image URL for this specific event-sponsor combination. Stored in S3 with path: dev/events/tenantId/{tenantId}/event-id/{eventId}/sponsor/sponsor_id/{sponsorId}/{filename}';
 
 -- event_emails column comments
 COMMENT ON COLUMN public.event_emails.event_id IS 'Foreign key reference to event_details.id';

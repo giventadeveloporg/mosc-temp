@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { FaPlus, FaSearch, FaArrowLeft, FaUserPlus, FaHandshake, FaBan, FaFolderOpen, FaChevronLeft, FaChevronRight, FaEdit, FaTrashAlt } from 'react-icons/fa';
+import { FaPlus, FaSearch, FaArrowLeft, FaUserPlus, FaHandshake, FaBan, FaFolderOpen, FaChevronLeft, FaChevronRight, FaEdit, FaTrashAlt, FaImage, FaImages } from 'react-icons/fa';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -9,6 +9,8 @@ import ReactDOM from 'react-dom';
 import DataTable, { Column } from '@/components/ui/DataTable';
 import Modal, { ConfirmModal } from '@/components/ui/Modal';
 import ImageUpload from '@/components/ui/ImageUpload';
+import EventSponsorPosterUploadDialog from '@/components/sponsors/EventSponsorPosterUploadDialog';
+import EventSponsorMediaGallery from '@/components/sponsors/EventSponsorMediaGallery';
 import type { EventSponsorsDTO, EventSponsorsJoinDTO, EventDetailsDTO } from '@/types';
 import {
   fetchEventSponsorsServer,
@@ -56,6 +58,11 @@ export default function EventSponsorsPage() {
   const [tooltipSponsor, setTooltipSponsor] = useState<EventSponsorsJoinDTO | null>(null);
   const [tooltipAnchorRect, setTooltipAnchorRect] = useState<DOMRect | null>(null);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Upload dialog and media gallery states
+  const [posterUploadOpen, setPosterUploadOpen] = useState(false);
+  const [selectedSponsorForPoster, setSelectedSponsorForPoster] = useState<{ eventId: number; sponsorId: number; currentPosterUrl?: string } | null>(null);
+  const [selectedSponsorForMedia, setSelectedSponsorForMedia] = useState<{ eventId: number; sponsorId: number } | null>(null);
 
   // Form state for creating new sponsor join
   const [formData, setFormData] = useState<Partial<EventSponsorsJoinDTO>>({
@@ -809,40 +816,78 @@ export default function EventSponsorsPage() {
     {
       key: 'actions',
       label: 'Actions',
-      render: (value, row) => (
-        <div className="flex space-x-2">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              openEditModal(row);
-            }}
-            className="icon-btn icon-btn-edit"
-            title="Edit"
-          >
-            <FaEdit />
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              openDisassociateModal(row);
-            }}
-            className="icon-btn icon-btn-delete bg-yellow-500 hover:bg-yellow-600"
-            title="Disassociate from Event"
-          >
-            <FaTrashAlt />
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              openDeleteModal(row);
-            }}
-            className="icon-btn icon-btn-delete"
-            title="Permanently Delete"
-          >
-            <FaTrashAlt />
-          </button>
-        </div>
-      )
+      render: (value, row) => {
+        const sponsorId = row?.sponsor?.id;
+        const eventIdNum = parseInt(eventId);
+        const currentPosterUrl = row?.customPosterUrl;
+
+        return (
+          <div className="flex space-x-2">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                openEditModal(row);
+              }}
+              className="icon-btn icon-btn-edit"
+              title="Edit"
+            >
+              <FaEdit />
+            </button>
+            {sponsorId && (
+              <>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedSponsorForPoster({
+                      eventId: eventIdNum,
+                      sponsorId,
+                      currentPosterUrl,
+                    });
+                    setPosterUploadOpen(true);
+                  }}
+                  className="icon-btn bg-blue-500 hover:bg-blue-600 text-white"
+                  title="Upload Custom Poster"
+                >
+                  <FaImage />
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedSponsorForMedia({
+                      eventId: eventIdNum,
+                      sponsorId,
+                    });
+                  }}
+                  className="icon-btn bg-purple-500 hover:bg-purple-600 text-white"
+                  title="View Media Gallery"
+                >
+                  <FaImages />
+                </button>
+              </>
+            )}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                openDisassociateModal(row);
+              }}
+              className="icon-btn icon-btn-delete bg-yellow-500 hover:bg-yellow-600"
+              title="Disassociate from Event"
+            >
+              <FaTrashAlt />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                openDeleteModal(row);
+              }}
+              className="icon-btn icon-btn-delete"
+              title="Permanently Delete"
+            >
+              <FaTrashAlt />
+            </button>
+          </div>
+        );
+      }
     },
   ];
 
@@ -1257,6 +1302,49 @@ export default function EventSponsorsPage() {
         anchorRect={tooltipAnchorRect}
         onClose={closeTooltip}
       />
+
+      {/* Custom Poster Upload Dialog */}
+      {selectedSponsorForPoster && (
+        <EventSponsorPosterUploadDialog
+          eventId={selectedSponsorForPoster.eventId}
+          sponsorId={selectedSponsorForPoster.sponsorId}
+          currentPosterUrl={selectedSponsorForPoster.currentPosterUrl}
+          isOpen={posterUploadOpen}
+          onClose={() => {
+            setPosterUploadOpen(false);
+            setSelectedSponsorForPoster(null);
+          }}
+          onUploadSuccess={async (imageUrl) => {
+            // Refresh event sponsors to show updated poster
+            await loadEventAndSponsors();
+            setPosterUploadOpen(false);
+            setSelectedSponsorForPoster(null);
+          }}
+        />
+      )}
+
+      {/* Media Gallery Modal */}
+      {selectedSponsorForMedia && (
+        <Modal
+          isOpen={!!selectedSponsorForMedia}
+          onClose={() => setSelectedSponsorForMedia(null)}
+          title={`Media Gallery - ${eventSponsors.find(s => s.sponsor?.id === selectedSponsorForMedia.sponsorId)?.sponsor?.name || 'Sponsor'}`}
+          size="xl"
+        >
+          <EventSponsorMediaGallery
+            eventId={selectedSponsorForMedia.eventId}
+            sponsorId={selectedSponsorForMedia.sponsorId}
+            showPriorityControls={true}
+            allowUpload={true}
+            onUploadClick={() => {
+              // Could open bulk upload dialog here
+            }}
+            onPriorityChange={async (mediaId, priorityRanking) => {
+              // Refresh gallery
+            }}
+          />
+        </Modal>
+      )}
     </div>
   );
 }

@@ -1,15 +1,11 @@
 # Task ID: 3
-# Title: Verify and Update API Server Actions
+# Title: Create Upload Sponsor Image Server Action
 # Status: pending
 # Dependencies: 1 ⏱️
 # Priority: high
-# Description: Ensure API server actions match DTO structure and use correct HTTP methods.
+# Description: Create server action to upload sponsor logo, hero, or banner image.
 # Details:
-- Verify `createEventSponsorServer` matches DTO structure
-- Verify `updateEventSponsorServer` uses PATCH correctly for partial updates
-- Ensure `withTenantId` is applied to all mutations
-- Add error handling improvements
-- Verify that all CRUD operations respect tenant isolation
+Implement the uploadSponsorImageServer function in src/app/admin/event-sponsors/ApiServerActions.ts that handles uploading sponsor images (logo, hero, banner). Use FormData to send multipart/form-data to the /api/proxy/event-medias/upload/sponsor-image endpoint with appropriate query parameters.
 
 # Test Strategy:
-Test all CRUD operations through the API server actions, verify correct HTTP methods, and confirm tenant isolation is enforced.
+Test the function by uploading different image types and verifying the correct response structure and error handling.

@@ -159,13 +159,13 @@ function HomePageContent() {
       )}
       {/* Causes section - Always shown (outside loading condition) */}
       <CausesSection />
+      <ProjectsSection />
+      <TestimonialsSection />
       {showSponsorsSection && (
         <ErrorBoundary fallback={<div>Sponsors temporarily unavailable</div>}>
           <OurSponsorsSection />
         </ErrorBoundary>
       )}
-      <ProjectsSection />
-      <TestimonialsSection />
       {/* Contact Section - Updated to match "What We Do" styling */}
       <div id="contact" className="py-24 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -267,7 +267,11 @@ const UpcomingEventsSection: React.FC = () => {
                             borderRadius: '1rem 1rem 0 0'
                           }}
                         >
-                          <span className="text-gray-400 text-4xl">📅</span>
+                          <div className="w-16 h-16 rounded-xl bg-gray-100 flex items-center justify-center">
+                            <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                          </div>
                         </div>
                       )}
                       {/* Past Event Badge */}
@@ -281,24 +285,24 @@ const UpcomingEventsSection: React.FC = () => {
                     </div>
 
                     {/* Content Section - Bottom on all screen sizes, exactly like events page */}
-                    <div className="p-6 border-t border-white/20">
+                    <div className="p-5 border-t border-white/20">
                       {/* Title */}
-                      <h2 className="text-2xl font-bold text-gray-800 mb-3">
+                      <h2 className="text-xl font-bold text-gray-800 mb-2">
                         {event.title}
                       </h2>
 
                       {/* Caption */}
                       {event.caption && (
-                        <p className="text-gray-600 text-lg mb-4">
+                        <p className="text-gray-600 text-base mb-3">
                           {event.caption}
                         </p>
                       )}
 
-                      {/* Event Details - 3-column layout with smart centering for last item */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-2">
-                        <div className="flex items-center gap-3 text-gray-700">
-                          <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                            <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      {/* Event Details - Centered flexbox layout */}
+                      <div className="flex flex-wrap justify-center gap-3 mb-2 lg:max-w-4xl lg:mx-auto">
+                        <div className="flex items-center gap-3 text-gray-700 w-full sm:w-auto sm:min-w-[280px]">
+                          <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                            <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                           </div>
@@ -306,9 +310,9 @@ const UpcomingEventsSection: React.FC = () => {
                             {formatDate(event.startDate, event.timezone)}
                           </span>
                         </div>
-                        <div className="flex items-center gap-3 text-gray-700">
-                          <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                            <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="flex items-center gap-3 text-gray-700 w-full sm:w-auto sm:min-w-[280px]">
+                          <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                            <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                           </div>
@@ -317,9 +321,9 @@ const UpcomingEventsSection: React.FC = () => {
                           </span>
                         </div>
                         {event.location && (
-                          <div className="flex items-center gap-3 text-gray-700 lg:justify-self-center lg:col-start-2">
-                            <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                              <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <div className="flex items-center gap-3 text-gray-700 w-full sm:w-auto sm:min-w-[280px]">
+                            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                              <svg className="w-10 h-10 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                               </svg>
@@ -331,10 +335,22 @@ const UpcomingEventsSection: React.FC = () => {
                         )}
                       </div>
 
-                      {/* Action Buttons - Only for upcoming events with minimal spacing */}
-                      {isUpcomingEvents && (
-                        <div className="flex flex-col sm:flex-row gap-2 mt-1">
-                          {/* Buy Tickets Button */}
+                      {/* Action Buttons */}
+                      <div className="flex flex-col sm:flex-row gap-2 mt-4">
+                        {/* See Event Details Button */}
+                        <Link
+                          href={`/events/${event.id}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 px-6 rounded-xl border border-gray-200 transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2"
+                        >
+                          <span>See Event Details</span>
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </Link>
+
+                        {/* Buy Tickets Button - Only for upcoming events */}
+                        {isUpcomingEvents && (
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -352,8 +368,8 @@ const UpcomingEventsSection: React.FC = () => {
                               }}
                             />
                           </button>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>

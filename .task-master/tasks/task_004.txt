@@ -1,17 +1,11 @@
 # Task ID: 4
-# Title: Implement Sponsor CRUD Operations UI
+# Title: Create Upload Event-Sponsor Poster Server Action
 # Status: pending
-# Dependencies: 1 ⏱️, 2 ⏱️, 3 ⏱️
+# Dependencies: 2 ⏱️
 # Priority: high
-# Description: Complete the user interface for sponsor CRUD operations.
+# Description: Create server action to upload custom poster for event-sponsor combination.
 # Details:
-- Create modal or page for adding new sponsors
-- Implement edit sponsor functionality
-- Implement view sponsor details
-- Implement delete sponsor confirmation dialog
-- Add loading states for all operations
-- Add toast notifications for success/error feedback
-- Implement form validation with error messages
+Implement the uploadEventSponsorPosterServer function in src/app/admin/event-sponsors/ApiServerActions.ts that handles uploading custom posters for event-sponsor combinations. Use FormData to send multipart/form-data to the /api/proxy/event-medias/upload/event-sponsor-poster endpoint with appropriate query parameters.
 
 # Test Strategy:
-Test the complete CRUD flow from the UI, including form validation, loading states, and error handling.
+Test the function by uploading posters for different event-sponsor combinations and verifying the correct response structure and error handling.

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FaPlus, FaSearch, FaFilter } from 'react-icons/fa';
+import { FaPlus, FaSearch, FaFilter, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import DataTable, { Column } from '@/components/ui/DataTable';
@@ -28,6 +28,11 @@ export default function EventFeaturedPerformersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [eventFilter, setEventFilter] = useState<string>('');
+
+  // Pagination state
+  const [page, setPage] = useState(0);
+  const [pageSize] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
 
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -62,7 +67,7 @@ export default function EventFeaturedPerformersPage() {
       loadPerformers();
       loadEvents();
     }
-  }, [userId]);
+  }, [userId, page]);
 
   const loadEvents = async () => {
     try {
@@ -80,8 +85,9 @@ export default function EventFeaturedPerformersPage() {
     try {
       setLoading(true);
       setError(null);
-      const data = await fetchEventFeaturedPerformersServer();
-      setPerformers(data);
+      const result = await fetchEventFeaturedPerformersServer(undefined, page, pageSize);
+      setPerformers(result.data);
+      setTotalCount(result.totalCount);
     } catch (err: any) {
       setError(err.message || 'Failed to load performers');
       showError('Error', err.message || 'Failed to load performers');
@@ -99,10 +105,11 @@ export default function EventFeaturedPerformersPage() {
         event: formData.event?.id ? { id: formData.event.id } as EventDetailsDTO : undefined
       };
       const newPerformer = await createEventFeaturedPerformerServer(performerData as any);
-      setPerformers(prev => [...prev, newPerformer]);
       setIsCreateModalOpen(false);
       resetForm();
       showSuccess('Success', 'Performer created successfully');
+      // Reload current page to refresh the list
+      await loadPerformers();
     } catch (err: any) {
       showError('Error', err.message || 'Failed to create performer');
     } finally {
@@ -139,10 +146,11 @@ export default function EventFeaturedPerformersPage() {
     try {
       setLoading(true);
       await deleteEventFeaturedPerformerServer(selectedPerformer.id!);
-      setPerformers(prev => prev.filter(p => p.id !== selectedPerformer.id));
       setIsDeleteModalOpen(false);
       setSelectedPerformer(null);
       showSuccess('Success', 'Performer deleted successfully');
+      // Reload current page to refresh the list
+      await loadPerformers();
     } catch (err: any) {
       showError('Error', err.message || 'Failed to delete performer');
     } finally {
@@ -170,12 +178,8 @@ export default function EventFeaturedPerformersPage() {
   };
 
   const openEditModal = (performer: EventFeaturedPerformersDTO) => {
-    setSelectedPerformer(performer);
-    setFormData({
-      ...performer,
-      event: performer.event || undefined
-    });
-    setIsEditModalOpen(true);
+    // Navigate to detail/edit page instead of opening modal
+    router.push(`/admin/event-featured-performers/${performer.id}`);
   };
 
   const openDeleteModal = (performer: EventFeaturedPerformersDTO) => {
@@ -275,7 +279,8 @@ export default function EventFeaturedPerformersPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-8 py-8" style={{ paddingTop: '180px' }}>
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Event Featured Performers</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-2">Global Performers</h1>
+      <p className="text-gray-600 mb-8">(You can add or disassociate these items with any events. Please go to the corresponding event page to manage these associated entities.)</p>
       <AdminNavigation />
 
       {/* Search and Filter Bar */}
@@ -337,6 +342,36 @@ export default function EventFeaturedPerformersPage() {
         sortDirection={sortDirection}
         emptyMessage="No performers found"
       />
+
+      {/* Pagination Controls - Matching admin home page style */}
+      {!loading && totalCount > 0 && (
+        <div className="mt-4">
+          <div className="flex justify-between items-center">
+            <button
+              onClick={() => setPage(prev => Math.max(0, prev - 1))}
+              disabled={page === 0}
+              className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+            >
+              <FaChevronLeft />
+              Previous
+            </button>
+            <div className="text-sm font-semibold">
+              Page {page + 1} of {Math.max(1, Math.ceil(totalCount / pageSize))}
+            </div>
+            <button
+              onClick={() => setPage(prev => prev + 1)}
+              disabled={page >= Math.ceil(totalCount / pageSize) - 1}
+              className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+            >
+              Next
+              <FaChevronRight />
+            </button>
+          </div>
+          <div className="text-center text-sm text-gray-600 mt-2">
+            Showing {totalCount > 0 ? page * pageSize + 1 : 0} to {Math.min((page + 1) * pageSize, totalCount)} of {totalCount} performers
+          </div>
+        </div>
+      )}
 
       {/* Create Modal */}
       <Modal

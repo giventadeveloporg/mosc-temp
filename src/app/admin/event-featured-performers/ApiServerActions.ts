@@ -1,18 +1,20 @@
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
-import { getAppUrl } from '@/lib/env';
+import { getAppUrl, getTenantId } from '@/lib/env';
 import { withTenantId } from '@/lib/withTenantId';
-import type { EventFeaturedPerformersDTO } from '@/types';
+import type { EventFeaturedPerformersDTO, EventMediaDTO } from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 const baseUrl = getAppUrl();
 
-export async function fetchEventFeaturedPerformersServer(eventId?: number) {
+export async function fetchEventFeaturedPerformersServer(eventId?: number, page: number = 0, size: number = 10) {
   const params = new URLSearchParams();
   if (eventId) {
     params.append('eventId.equals', eventId.toString());
   }
+  params.append('page', page.toString());
+  params.append('size', size.toString());
 
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-featured-performers${params.toString() ? `?${params.toString()}` : ''}`, {
+  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-featured-performers?${params.toString()}`, {
     cache: 'no-store',
   });
 
@@ -20,7 +22,22 @@ export async function fetchEventFeaturedPerformersServer(eventId?: number) {
     throw new Error(`Failed to fetch event featured performers: ${response.statusText}`);
   }
 
-  return await response.json();
+  const data = await response.json();
+  const totalCount = parseInt(response.headers.get('x-total-count') || '0', 10);
+
+  // Handle Spring Data REST paginated response format
+  if (data._embedded && data._embedded.eventFeaturedPerformers) {
+    return {
+      data: data._embedded.eventFeaturedPerformers,
+      totalCount,
+    };
+  }
+
+  // Handle direct array response
+  return {
+    data: Array.isArray(data) ? data : [data],
+    totalCount: Array.isArray(data) ? data.length : 1,
+  };
 }
 
 export async function fetchEventFeaturedPerformerServer(id: number) {
@@ -80,4 +97,162 @@ export async function deleteEventFeaturedPerformerServer(id: number) {
   }
 
   return true;
+}
+
+/**
+ * Fetch all media files for a performer, sorted by priority ranking
+ * Uses the criteria-based query endpoint: /api/event-medias?performerId.equals={performerId}
+ */
+export async function fetchPerformerMediaServer(
+  performerId: number,
+  tenantId?: string
+): Promise<EventMediaDTO[]> {
+  const baseUrl = getAppUrl();
+  const params = new URLSearchParams();
+  params.append('performerId.equals', performerId.toString());
+
+  // Add tenantId filter (always include tenantId for multi-tenant filtering)
+  const tenantIdToUse = tenantId || getTenantId();
+  params.append('tenantId.equals', tenantIdToUse);
+
+  // Sort by priority ranking (ascending)
+  params.append('sort', 'priorityRanking,asc');
+
+  const url = `${baseUrl}/api/proxy/event-medias?${params.toString()}`;
+
+  const response = await fetch(url, {
+    method: 'GET',
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    console.warn(`Failed to fetch performer media: ${response.statusText}`);
+    return [];
+  }
+
+  const data = await response.json();
+
+  // Handle Spring Data REST paginated response format
+  if (data._embedded && data._embedded.eventMedias) {
+    return data._embedded.eventMedias;
+  }
+
+  // Handle direct array response
+  return Array.isArray(data) ? data : [data];
+}
+
+/**
+ * Upload performer image (portrait or performance)
+ */
+export async function uploadPerformerImageServer(
+  performerId: number,
+  file: File,
+  imageType: 'portrait' | 'performance',
+  title?: string,
+  description?: string,
+  tenantId?: string
+): Promise<EventMediaDTO> {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const params = new URLSearchParams();
+    params.append('eventId', '0'); // No event association
+    params.append('entityId', performerId.toString());
+    params.append('entityType', 'PERFORMER');
+    params.append('imageType', imageType);
+
+    // Set flags based on image type
+    if (imageType === 'portrait') {
+      params.append('isFeaturedPerformerPortrait', 'true');
+    } else if (imageType === 'performance') {
+      params.append('isFeaturedPerformerPerformance', 'true');
+    }
+
+    params.append('title', title || `${imageType} - ${performerId}`);
+    params.append('description', description || `Performer ${imageType} image`);
+    params.append('isPublic', 'true');
+    params.append('tenantId', tenantId || getTenantId());
+
+    // Set startDisplayingFromDate to today's date (YYYY-MM-DD format) to satisfy NOT NULL constraint
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    params.append('startDisplayingFromDate', today);
+
+    const baseUrl = getAppUrl();
+    // Use the generic upload endpoint (same as sponsors)
+    const url = `${baseUrl}/api/proxy/event-medias/upload?${params.toString()}`;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      body: formData,
+    });
+
+    // 🎯 CRITICAL: Only rely on HTTP status codes for success/failure determination
+    if (response.status >= 200 && response.status < 300) {
+      console.log('✅ Upload successful - HTTP status:', response.status);
+
+      try {
+        const result = await response.json();
+        return result;
+      } catch (parseError) {
+        console.error('❌ Failed to parse successful upload response:', parseError);
+        throw new Error('Upload succeeded but response parsing failed');
+      }
+    } else {
+      console.error('❌ Upload failed - HTTP status:', response.status);
+      const errorText = await response.text();
+      throw new Error(`Upload failed with HTTP status ${response.status}: ${errorText}`);
+    }
+  } catch (error) {
+    console.error('Error uploading performer image:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update event media attributes
+ */
+export async function updateEventMediaServer(
+  mediaId: number,
+  updates: Partial<EventMediaDTO>,
+  tenantId?: string
+): Promise<EventMediaDTO> {
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  if (!API_BASE_URL) {
+    throw new Error('API base URL not configured');
+  }
+
+  const payload = {
+    ...updates,
+    id: mediaId,
+    tenantId: tenantId || getTenantId(),
+  };
+
+  const baseUrl = getAppUrl();
+  const url = `${baseUrl}/api/proxy/event-medias/${mediaId}`; // Proxy to backend's PATCH endpoint
+
+  const response = await fetch(url, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/merge-patch+json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to update media: ${errorText}`);
+  }
+
+  return await response.json();
+}
+
+/**
+ * Update media priority ranking
+ */
+export async function updateMediaPriorityRankingServer(
+  mediaId: number,
+  priorityRanking: number
+): Promise<EventMediaDTO> {
+  return updateEventMediaServer(mediaId, { priorityRanking });
 }

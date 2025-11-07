@@ -1,15 +1,11 @@
 # Task ID: 9
-# Title: Implement Multi-Tenant Support
+# Title: Create Update Media Priority Ranking Server Action
 # Status: pending
-# Dependencies: 3 ⏱️
-# Priority: high
-# Description: Ensure all operations respect tenant isolation.
+# Dependencies: 1 ⏱️
+# Priority: medium
+# Description: Create server action to update the priority ranking of a media file.
 # Details:
-- Verify all API calls include `tenantId` in request body
-- Ensure backend automatically filters by tenant
-- Confirm tenant ID is sourced from `NEXT_PUBLIC_TENANT_ID` environment variable
-- Verify `withTenantId` utility is used for payload injection
-- Test tenant isolation at all levels
+Implement the updateMediaPriorityRankingServer function in src/app/admin/event-sponsors/ApiServerActions.ts that updates the priority ranking of a specific media file. Use the PATCH method with Content-Type: application/merge-patch+json to call the /api/proxy/event-medias/{id}/priority-ranking endpoint.
 
 # Test Strategy:
-Test API calls with different tenant IDs, verify data isolation between tenants, and confirm tenant ID is correctly applied to all requests.
+Test the function by updating priority rankings for different media files and verifying the correct response structure and error handling.

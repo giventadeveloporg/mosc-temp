@@ -1,15 +1,11 @@
 # Task ID: 8
-# Title: Verify DTO Type Definitions
+# Title: Create Fetch Event-Sponsor Media Server Action
 # Status: pending
-# Dependencies: None
-# Priority: medium
-# Description: Ensure EventSponsorsDTO matches the backend schema.
+# Dependencies: 1 ⏱️, 2 ⏱️
+# Priority: high
+# Description: Create server action to fetch all media files for an event-sponsor combination, sorted by priority ranking.
 # Details:
-- Verify `EventSponsorsDTO` in `src/types/index.ts` matches backend schema
-- Check if `event_id` field in database should be included in DTO
-- Ensure all required fields are marked as such
-- Verify field types match database schema
-- Update DTO if necessary
+Implement the fetchEventSponsorMediaServer function in src/app/admin/event-sponsors/ApiServerActions.ts that retrieves all media files for a specific event-sponsor combination. Call the /api/proxy/event-medias/event-sponsor/{eventId}/{sponsorId} endpoint and handle the response as an array of EventMediaDTO objects.
 
 # Test Strategy:
-Compare DTO with database schema and backend API documentation, verify all fields are correctly typed.
+Test the function by fetching media for different event-sponsor combinations and verifying the correct array structure, sorting, and error handling.

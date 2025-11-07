@@ -33,6 +33,25 @@ const cardColors = [
   { bg: 'bg-rose-50', border: 'border-rose-200', hover: 'hover:bg-rose-100' },
 ];
 
+// Array of modern background colors for sponsor cards (matching homepage)
+const cardBackgrounds = [
+  'bg-gradient-to-br from-blue-50 to-blue-100',
+  'bg-gradient-to-br from-green-50 to-green-100',
+  'bg-gradient-to-br from-purple-50 to-purple-100',
+  'bg-gradient-to-br from-pink-50 to-pink-100',
+  'bg-gradient-to-br from-yellow-50 to-yellow-100',
+  'bg-gradient-to-br from-indigo-50 to-indigo-100',
+  'bg-gradient-to-br from-teal-50 to-teal-100',
+  'bg-gradient-to-br from-orange-50 to-orange-100',
+  'bg-gradient-to-br from-cyan-50 to-cyan-100',
+  'bg-gradient-to-br from-rose-50 to-rose-100'
+];
+
+// Function to get random background color for each sponsor
+const getSponsorBackground = (index: number) => {
+  return cardBackgrounds[index % cardBackgrounds.length];
+};
+
 // Avatar gradient colors (matching design system with variations)
 const avatarGradients = [
   { from: 'from-blue-500', to: 'to-blue-600' },
@@ -440,38 +459,86 @@ export default function EventDetailsPage() {
         >
           <div className="flex flex-col h-full">
             {/* Content Section - Styled like events page */}
-            <div className="p-6 border-t border-white/20">
+            <div className="p-6 border-t border-white/20 relative">
+              {/* Buy Tickets Image - Top Right Corner */}
+              {(() => {
+                if (!event.startDate) return null;
+
+                // Get today's date in YYYY-MM-DD format using local timezone
+                const today = new Date();
+                const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+                // Compare dates as strings to avoid timezone parsing issues
+                const eventDateStr = event.startDate ? event.startDate.split('T')[0] : null;
+
+                if (!eventDateStr) return null;
+
+                // Check if event date is today or in the future
+                const isToday = eventDateStr === todayStr;
+                const isFuture = eventDateStr > todayStr;
+                const isUpcomingLocal = isToday || isFuture;
+                const isPast = !isUpcomingLocal;
+
+                return (
+                  <div className="absolute top-4 right-4 lg:top-6 lg:right-6 z-10">
+                    <Link
+                      href={`/events/${event.id}/tickets`}
+                      className={`transition-transform hover:scale-105 ${isPast ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
+                    >
+                      <img
+                        src="/images/buy_tickets_click_here_red.webp"
+                        alt="Buy Tickets"
+                        className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
+                      />
+                    </Link>
+                  </div>
+                );
+              })()}
+
               {/* Title */}
-              <h1 className="text-2xl font-bold text-gray-800 mb-3">
+              <h1 className="text-2xl font-bold text-gray-800 mb-3 sm:pr-48 lg:pr-56">
                 {event.title}
               </h1>
 
               {/* Caption */}
               {event.caption && (
-                <p className="text-gray-600 text-lg mb-4">
+                <p className="text-gray-600 text-lg mb-4 sm:pr-48 lg:pr-56">
                   {event.caption}
                 </p>
               )}
 
-              {/* Event Details - Matching events page format */}
-              <div className="space-y-3 mb-6">
-                <div className="flex items-center gap-3 text-gray-700">
-                  <span className="text-2xl">📅</span>
+              {/* Event Details - Centered flexbox layout */}
+              <div className="flex flex-wrap justify-center gap-3 mb-6 lg:max-w-4xl lg:mx-auto">
+                <div className="flex items-center gap-3 text-gray-700 w-full sm:w-auto sm:min-w-[280px]">
+                  <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
                   <span className="text-lg font-semibold">
                     {formatDate(event.startDate || '', event.timezone || 'America/New_York')}
                   </span>
                 </div>
                 {event.startTime && event.endTime && (
-                  <div className="flex items-center gap-3 text-gray-700">
-                    <span className="text-2xl">🕐</span>
+                  <div className="flex items-center gap-3 text-gray-700 w-full sm:w-auto sm:min-w-[280px]">
+                    <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
                     <span className="text-lg font-semibold">
                       {formatTime(event.startTime)} - {formatTime(event.endTime)} (EDT)
                     </span>
                   </div>
                 )}
                 {event.location && (
-                  <div className="flex items-center gap-3 text-gray-700">
-                    <span className="text-2xl">📍</span>
+                  <div className="flex items-center gap-3 text-gray-700 w-full sm:w-auto sm:min-w-[280px]">
+                    <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <svg className="w-10 h-10 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                    </div>
                     <span className="text-lg font-semibold">
                       {event.location}
                     </span>
@@ -482,19 +549,23 @@ export default function EventDetailsPage() {
                           navigator.clipboard.writeText(event.location || '');
                           alert('Address copied to clipboard!');
                         }}
-                        className="p-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors"
+                        className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-colors group-hover:scale-110 transition-transform duration-300"
                         title="Copy Address"
                       >
-                        <span className="text-sm">📋</span>
+                        <svg className="w-6 h-6 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
                       </button>
                       <a
                         href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location || '')}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-1.5 bg-green-100 hover:bg-green-200 text-green-700 rounded-lg transition-colors"
+                        className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 hover:bg-green-200 flex items-center justify-center transition-colors group-hover:scale-110 transition-transform duration-300"
                         title="Open in Google Maps"
                       >
-                        <span className="text-sm">🗺️</span>
+                        <svg className="w-6 h-6 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                        </svg>
                       </a>
                     </div>
                   </div>
@@ -503,7 +574,7 @@ export default function EventDetailsPage() {
 
               {/* Description */}
               {event.description && (
-                <div className="mb-6 p-6 rounded-xl bg-gradient-to-br from-muted/50 via-background to-muted/30 border-2 border-primary/30 shadow-lg relative overflow-hidden">
+                <div className="mb-6 p-6 rounded-xl bg-gradient-to-br from-muted/50 via-background to-muted/30 border-2 border-primary/30 shadow-lg relative overflow-hidden lg:max-w-4xl lg:mx-auto">
                   {/* Beveled border effect - Inner highlight */}
                   <div className="absolute inset-0 rounded-xl pointer-events-none" style={{
                     background: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,0.05) 100%)',
@@ -511,7 +582,11 @@ export default function EventDetailsPage() {
                     boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.5), inset 0 -1px 2px rgba(0,0,0,0.1)',
                   }}></div>
                   {/* Content */}
-                  <div className="relative text-lg text-foreground whitespace-pre-wrap leading-relaxed z-10">
+                  <div className="relative text-lg font-medium text-gray-800 whitespace-pre-wrap leading-relaxed z-10" style={{
+                    fontFamily: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif',
+                    letterSpacing: '0.01em',
+                    lineHeight: '1.75'
+                  }}>
                     {event.description}
                   </div>
                 </div>
@@ -520,8 +595,12 @@ export default function EventDetailsPage() {
               {/* Featured Performers Section */}
               {featuredPerformers.length > 0 && (
                 <div className="mb-6">
-                  <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <span className="text-2xl">⭐</span>
+                  <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-3 justify-center lg:justify-start">
+                    <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-yellow-100 flex items-center justify-center">
+                      <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                      </svg>
+                    </div>
                     Featured Guests
                   </h2>
                   <div className={cardGridStyles.centeredCardGrid}>
@@ -581,10 +660,12 @@ export default function EventDetailsPage() {
                                     href={performer.websiteUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-blue-600 hover:text-blue-800 text-sm"
+                                    className="flex-shrink-0 w-8 h-8 rounded-lg bg-teal-100 hover:bg-teal-200 flex items-center justify-center transition-colors group-hover:scale-110 transition-transform duration-300"
                                     title="Website"
                                   >
-                                    🌐
+                                    <svg className="w-5 h-5 text-teal-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9-9a9 9 0 00-9-9m0 18a9 9 0 009-9M12 3a9 9 0 00-9 9" />
+                                    </svg>
                                   </a>
                                 )}
                                 {performer.facebookUrl && (
@@ -592,10 +673,12 @@ export default function EventDetailsPage() {
                                     href={performer.facebookUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-blue-600 hover:text-blue-800 text-sm"
+                                    className="flex-shrink-0 w-8 h-8 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-colors group-hover:scale-110 transition-transform duration-300"
                                     title="Facebook"
                                   >
-                                    📘
+                                    <svg className="w-5 h-5 text-blue-700" fill="currentColor" viewBox="0 0 24 24">
+                                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                                    </svg>
                                   </a>
                                 )}
                                 {performer.instagramUrl && (
@@ -603,10 +686,12 @@ export default function EventDetailsPage() {
                                     href={performer.instagramUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-pink-600 hover:text-pink-800 text-sm"
+                                    className="flex-shrink-0 w-8 h-8 rounded-lg bg-pink-100 hover:bg-pink-200 flex items-center justify-center transition-colors group-hover:scale-110 transition-transform duration-300"
                                     title="Instagram"
                                   >
-                                    📷
+                                    <svg className="w-5 h-5 text-pink-700" fill="currentColor" viewBox="0 0 24 24">
+                                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                                    </svg>
                                   </a>
                                 )}
                                 {performer.youtubeUrl && (
@@ -614,10 +699,12 @@ export default function EventDetailsPage() {
                                     href={performer.youtubeUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-red-600 hover:text-red-800 text-sm"
+                                    className="flex-shrink-0 w-8 h-8 rounded-lg bg-red-100 hover:bg-red-200 flex items-center justify-center transition-colors group-hover:scale-110 transition-transform duration-300"
                                     title="YouTube"
                                   >
-                                    ▶️
+                                    <svg className="w-5 h-5 text-red-700" fill="currentColor" viewBox="0 0 24 24">
+                                      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                                    </svg>
                                   </a>
                                 )}
                               </div>
@@ -634,8 +721,12 @@ export default function EventDetailsPage() {
               {/* Contact Information Section */}
               {contacts.length > 0 && (
                 <div className="mb-6">
-                  <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <span className="text-2xl">📞</span>
+                  <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-3">
+                    <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
+                      <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                      </svg>
+                    </div>
                     Contact Information
                   </h2>
                   <div className={cardGridStyles.centeredCardGrid}>
@@ -646,25 +737,33 @@ export default function EventDetailsPage() {
                         key={contact.id}
                         className={`${cardGridStyles.cardItem} ${cardColor.bg} ${cardColor.border} rounded-lg shadow-md border-2 p-4 ${cardColor.hover} transition-all duration-200`}
                       >
-                        <h3 className="font-semibold text-gray-800 text-lg mb-2">{contact.name}</h3>
-                        <div className="space-y-2">
+                        <h3 className="font-semibold text-gray-800 text-lg mb-3">{contact.name}</h3>
+                        <div className="flex flex-wrap justify-center gap-3">
                           {contact.phone && (
-                            <div className="flex items-center gap-2 text-gray-700">
-                              <span className="text-lg">📱</span>
+                            <div className="flex items-center gap-3 text-gray-700">
+                              <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                <svg className="w-8 h-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                </svg>
+                              </div>
                               <a
                                 href={`tel:${contact.phone}`}
-                                className="text-blue-600 hover:text-blue-800 hover:underline"
+                                className="text-lg font-semibold text-blue-600 hover:text-blue-800 hover:underline"
                               >
                                 {contact.phone}
                               </a>
                             </div>
                           )}
                           {contact.email && (
-                            <div className="flex items-center gap-2 text-gray-700">
-                              <span className="text-lg">✉️</span>
+                            <div className="flex items-center gap-3 text-gray-700">
+                              <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                <svg className="w-8 h-8 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                              </div>
                               <a
                                 href={`mailto:${contact.email}`}
-                                className="text-blue-600 hover:text-blue-800 hover:underline"
+                                className="text-lg font-semibold text-blue-600 hover:text-blue-800 hover:underline"
                               >
                                 {contact.email}
                               </a>
@@ -681,8 +780,12 @@ export default function EventDetailsPage() {
               {/* Program Directors Section */}
               {programDirectors.length > 0 && (
                 <div className="mb-6">
-                  <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <span className="text-2xl">🎬</span>
+                  <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-3">
+                    <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-indigo-100 flex items-center justify-center">
+                      <svg className="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                    </div>
                     Program Directors
                   </h2>
                   <div className={cardGridStyles.centeredCardGrid}>
@@ -736,207 +839,223 @@ export default function EventDetailsPage() {
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                {/* Buy Tickets Image - Only for upcoming events */}
-                {(() => {
-                  if (!event.startDate) return null;
-
-                  // Get today's date in YYYY-MM-DD format using local timezone
-                  const today = new Date();
-                  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-
-                  // Compare dates as strings to avoid timezone parsing issues
-                  const eventDateStr = event.startDate ? event.startDate.split('T')[0] : null; // Get just the date part (YYYY-MM-DD)
-
-                  if (!eventDateStr) return null;
-
-                  // Check if event date is today or in the future
-                  const isToday = eventDateStr === todayStr;
-                  const isFuture = eventDateStr > todayStr;
-                  const isUpcomingLocal = isToday || isFuture;
-
-                  if (!isUpcomingLocal) return null;
-
-                  return (
-                    <Link
-                      href={`/events/${event.id}/tickets`}
-                      className="transition-transform hover:scale-105"
-                    >
-                      <img
-                        src="/images/buy_tickets_click_here_red.webp"
-                        alt="Buy Tickets"
-                        className="object-contain"
-                        style={{
-                          width: '200px',
-                          height: '70px'
-                        }}
-                      />
-                    </Link>
-                  );
-                })()}
-
                 {/* Calendar Link - Only for upcoming events */}
-                {isUpcoming && calendarLink && (() => {
-                  const buttonColor = buttonColors[getColorIndex('calendar', buttonColors.length)];
-                  return (
+                {isUpcoming && calendarLink && (
                   <a
                     href={calendarLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`${buttonColor.bg} ${buttonColor.hover} ${buttonColor.text} font-medium py-3 px-6 rounded-xl border-2 ${buttonColor.border} transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-3`}
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-xl border-2 border-blue-400 transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-3"
                   >
-                    <span className="text-2xl">📅</span>
+                    <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-orange-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <svg className="w-10 h-10 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
                     <span className="text-lg">Add to Calendar</span>
                   </a>
-                  );
-                })()}
+                )}
+
+                {/* See Event Details Button - Links back to this page (for consistency) */}
+                <Link
+                  href={`/events/${event.id}`}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-3 px-6 rounded-xl border-2 border-emerald-400 transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-3"
+                >
+                  <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  </div>
+                  <span className="text-lg">See Event Details</span>
+                </Link>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Sponsors Section - Stacked one on top of another */}
-        {sponsors.length > 0 && (
-          <div className="mb-8 mt-8">
-            <div className={`${getRandomBackground(event.id!)} rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 overflow-hidden`}>
-              <div className="p-6">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-                  <span className="text-2xl">🏢</span>
-                  Our Sponsors
-                </h2>
-                <div className="space-y-4">
-                  {sponsors.map((sponsorJoin, index) => {
-                    const sponsor = sponsorJoin.sponsor;
-                    if (!sponsor) return null;
-                    const cardColor = cardColors[getColorIndex(sponsor.id || sponsor.name || index, cardColors.length)];
-                    return (
-                      <div
-                        key={sponsorJoin.id || index}
-                        className={`${cardColor.bg} ${cardColor.border} rounded-lg shadow-md border-2 p-4 ${cardColor.hover} transition-all duration-200`}
-                      >
-                        <div className="flex items-center gap-4">
-                          {/* Sponsor Logo */}
-                          {sponsor.logoUrl && !failedImages.has(`sponsor-${sponsor.id}`) ? (
-                            <div className="relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden border-2 border-gray-300 bg-white">
-                              <Image
-                                src={sponsor.logoUrl}
-                                alt={sponsor.name}
-                                fill
-                                className="object-contain p-2"
-                                onError={() => {
-                                  setFailedImages(prev => new Set(prev).add(`sponsor-${sponsor.id}`));
-                                }}
-                              />
-                            </div>
-                          ) : (
-                            <div className="w-20 h-20 flex-shrink-0 rounded-lg bg-gray-200 flex items-center justify-center border-2 border-gray-300">
-                              <span className="text-gray-400 text-2xl">🏢</span>
-                            </div>
-                          )}
+        {/* Sponsors Section - Matching homepage style */}
+        {sponsors.length > 0 && (() => {
+          // Limit to maximum 12 sponsors
+          const displayedSponsors = sponsors.slice(0, 12);
+          const hasMoreSponsors = sponsors.length > 12;
 
-                          {/* Sponsor Details */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between gap-4">
-                              <div className="flex-1">
-                                <h3 className="font-semibold text-gray-800 text-lg mb-1">
-                                  {sponsor.name || 'Sponsor'}
-                                </h3>
-                                {sponsor.companyName && (
-                                  <p className="text-sm text-gray-600 mb-1">{sponsor.companyName}</p>
-                                )}
-                                {sponsor.tagline && (
-                                  <p className="text-sm text-gray-700 mb-2 italic">{sponsor.tagline}</p>
-                                )}
-                                {sponsor.description && (
-                                  <p className="text-sm text-gray-700 mb-2" style={{
-                                    display: '-webkit-box',
-                                    WebkitLineClamp: 2,
-                                    WebkitBoxOrient: 'vertical',
-                                    overflow: 'hidden'
-                                  }}>{sponsor.description}</p>
-                                )}
-                                {/* Sponsor Type Badge */}
-                                {sponsor.type && (
-                                  <span className="inline-block px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded-full mb-2">
+          return (
+            <div className="mb-8 mt-8">
+              <div className={`${getRandomBackground(event.id!)} rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 overflow-hidden`}>
+                <div className="p-6">
+                  <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                    <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
+                      <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                      </svg>
+                    </div>
+                    Our Sponsors
+                  </h2>
+
+                  {/* Sponsors List - Single column layout matching homepage */}
+                  <div className="space-y-8 mb-8">
+                    {displayedSponsors.map((sponsorJoin, index) => {
+                      const sponsor = sponsorJoin.sponsor;
+                      if (!sponsor) return null;
+                      return (
+                        <div
+                          key={sponsorJoin.id || index}
+                          className={`${getSponsorBackground(index)} rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 overflow-hidden group cursor-pointer`}
+                          style={{
+                            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05)',
+                            height: '680px'
+                          }}
+                          onClick={() => sponsor.websiteUrl && window.open(sponsor.websiteUrl, '_blank')}
+                        >
+                          <div className="flex flex-col h-full">
+                            {/* Image Section - Using bannerImageUrl */}
+                            <div className="relative w-full h-[448px] rounded-t-2xl overflow-hidden">
+                              {sponsor.bannerImageUrl ? (
+                                <Image
+                                  src={sponsor.bannerImageUrl}
+                                  alt={sponsor.name}
+                                  width={800}
+                                  height={600}
+                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                  style={{
+                                    borderRadius: '1rem 1rem 0 0'
+                                  }}
+                                />
+                              ) : (
+                                <div
+                                  className="w-full h-full flex items-center justify-center bg-gray-100"
+                                  style={{
+                                    borderRadius: '1rem 1rem 0 0'
+                                  }}
+                                >
+                                  <span className="text-gray-400 text-5xl">🏢</span>
+                                </div>
+                              )}
+                              {/* Sponsor Type Badge */}
+                              {sponsor.type && (
+                                <div className="absolute top-3 right-3">
+                                  <span className="px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded-full">
                                     {sponsor.type}
                                   </span>
-                                )}
-                                {/* Contact and Social Links */}
-                                <div className="flex flex-wrap gap-3 mt-2">
-                                  {sponsor.websiteUrl && (
-                                    <a
-                                      href={sponsor.websiteUrl}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="text-blue-600 hover:text-blue-800 text-sm"
-                                      title="Website"
-                                    >
-                                      🌐 Website
-                                    </a>
-                                  )}
-                                  {sponsor.contactEmail && (
-                                    <a
-                                      href={`mailto:${sponsor.contactEmail}`}
-                                      className="text-blue-600 hover:text-blue-800 text-sm"
-                                      title="Email"
-                                    >
-                                      ✉️ {sponsor.contactEmail}
-                                    </a>
-                                  )}
-                                  {sponsor.contactPhone && (
-                                    <a
-                                      href={`tel:${sponsor.contactPhone}`}
-                                      className="text-blue-600 hover:text-blue-800 text-sm"
-                                      title="Phone"
-                                    >
-                                      📱 {sponsor.contactPhone}
-                                    </a>
-                                  )}
-                                  {sponsor.facebookUrl && (
-                                    <a
-                                      href={sponsor.facebookUrl}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="text-blue-600 hover:text-blue-800 text-sm"
-                                      title="Facebook"
-                                    >
-                                      📘 Facebook
-                                    </a>
-                                  )}
-                                  {sponsor.instagramUrl && (
-                                    <a
-                                      href={sponsor.instagramUrl}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="text-pink-600 hover:text-pink-800 text-sm"
-                                      title="Instagram"
-                                    >
-                                      📷 Instagram
-                                    </a>
-                                  )}
-                                  {sponsor.linkedinUrl && (
-                                    <a
-                                      href={sponsor.linkedinUrl}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="text-blue-700 hover:text-blue-900 text-sm"
-                                      title="LinkedIn"
-                                    >
-                                      💼 LinkedIn
-                                    </a>
-                                  )}
                                 </div>
+                              )}
+                            </div>
+
+                            {/* Content Section - Compact with 3-column layout */}
+                            <div className="p-4 border-t border-white/20">
+                              {/* Sponsor Name */}
+                              <h2 className="text-xl font-bold text-gray-800 mb-2">
+                                {sponsor.name}
+                              </h2>
+
+                              {/* Sponsor Details - 3-column layout with smart centering */}
+                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-2">
+                                {/* Company Name */}
+                                {sponsor.companyName && (
+                                  <div className="flex items-center gap-3 text-gray-700">
+                                    <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                      <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                      </svg>
+                                    </div>
+                                    <span className="text-lg font-semibold">
+                                      {sponsor.companyName}
+                                    </span>
+                                  </div>
+                                )}
+
+                                {/* Sponsor Type */}
+                                {sponsor.type && (
+                                  <div className="flex items-center gap-3 text-gray-700">
+                                    <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                      <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                                      </svg>
+                                    </div>
+                                    <span className="text-lg font-semibold">
+                                      {sponsor.type}
+                                    </span>
+                                  </div>
+                                )}
+
+                                {/* Contact Email */}
+                                {sponsor.contactEmail && (
+                                  <div className="flex items-center gap-3 text-gray-700">
+                                    <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                      <svg className="w-8 h-8 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                      </svg>
+                                    </div>
+                                    <span className="text-lg font-semibold">
+                                      {sponsor.contactEmail}
+                                    </span>
+                                  </div>
+                                )}
+
+                                {/* Contact Phone */}
+                                {sponsor.contactPhone && (
+                                  <div className="flex items-center gap-3 text-gray-700">
+                                    <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                      <svg className="w-8 h-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                      </svg>
+                                    </div>
+                                    <span className="text-lg font-semibold">
+                                      {sponsor.contactPhone}
+                                    </span>
+                                  </div>
+                                )}
+
+                                {/* Website - Centers if it's the only item in the last row */}
+                                {sponsor.websiteUrl && (
+                                  <div className="flex items-center gap-3 text-gray-700 lg:justify-self-center lg:col-start-2">
+                                    <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-teal-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                      <svg className="w-8 h-8 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9-9a9 9 0 00-9-9m0 18a9 9 0 009-9M12 3a9 9 0 00-9 9" />
+                                      </svg>
+                                    </div>
+                                    <span className="text-lg font-semibold">
+                                      {sponsor.websiteUrl.replace(/^https?:\/\//, '')}
+                                    </span>
+                                  </div>
+                                )}
                               </div>
+
+                              {/* Tagline/Description - Minimal bottom spacing */}
+                              {sponsor.tagline && (
+                                <div className="mb-1">
+                                  <p className="text-gray-600 text-sm line-clamp-2">
+                                    {sponsor.tagline}
+                                  </p>
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
+
+                  {/* See All Sponsors Button - Only show if there are more than 12 */}
+                  {hasMoreSponsors && (
+                    <div className="text-center">
+                      <Link
+                        href={`/events/${event.id}#sponsors`}
+                        className="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                      >
+                        <span>See All Sponsors</span>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                      </Link>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
         {/* Gallery Section - Styled like gallery page */}
         {gallery.length > 0 && (
           <div className="mb-8 mt-8">

@@ -100,12 +100,15 @@ const LiveEventsSection: React.FC = () => {
                       </h3>
                     </div>
 
-                    <div className="space-y-2">
-                      <div className="flex items-center text-sm text-gray-700">
-                        <svg className="w-4 h-4 mr-2 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        <span>
+                    {/* Event Details - Centered flexbox layout */}
+                    <div className="flex flex-wrap justify-center gap-3 mb-2 lg:max-w-4xl lg:mx-auto">
+                      <div className="flex items-center gap-3 text-gray-700 w-full sm:w-auto sm:min-w-[200px]">
+                        <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                          <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                        <span className="text-lg font-semibold">
                           {liveEvent.event.timezone
                             ? formatInTimeZone(liveEvent.event.startDate, liveEvent.event.timezone, 'EEEE, MMMM d, yyyy (zzz)')
                             : new Date(liveEvent.event.startDate).toLocaleDateString()
@@ -114,37 +117,41 @@ const LiveEventsSection: React.FC = () => {
                       </div>
 
                       {liveEvent.event.startTime && (
-                        <div className="flex items-center text-sm text-gray-700">
-                          <svg className="w-4 h-4 mr-2 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          <span>{liveEvent.event.startTime}</span>
+                        <div className="flex items-center gap-3 text-gray-700 w-full sm:w-auto sm:min-w-[200px]">
+                          <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                            <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                          <span className="text-lg font-semibold">{liveEvent.event.startTime}</span>
                         </div>
                       )}
 
                       {liveEvent.event.location && (
-                        <div className="flex items-center text-sm text-gray-700">
-                          <svg className="w-4 h-4 mr-2 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                          </svg>
-                          <span className="truncate">{liveEvent.event.location}</span>
+                        <div className="flex items-center gap-3 text-gray-700 w-full sm:w-auto sm:min-w-[200px]">
+                          <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                            <svg className="w-10 h-10 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                          </div>
+                          <span className="text-lg font-semibold truncate">{liveEvent.event.location}</span>
                         </div>
                       )}
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="pt-2 space-y-2">
-                      {/* See More Details Button */}
-                      <button
-                        onClick={() => window.location.href = `/events/${liveEvent.event.id}`}
-                        className="w-full inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium text-red-600 bg-white border border-red-200 rounded-full hover:bg-red-50 hover:border-red-300 transition-colors duration-200"
+                    <div className="pt-2 flex flex-col sm:flex-row gap-2">
+                      {/* See Event Details Button */}
+                      <Link
+                        href={`/events/${liveEvent.event.id}`}
+                        className="bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 px-6 rounded-xl border border-gray-200 transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2"
                       >
-                        <span>See More Details</span>
-                        <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <span>See Event Details</span>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
-                      </button>
+                      </Link>
 
                       {/* Add to Calendar Button - Only for upcoming events */}
                       {(() => {
@@ -170,9 +177,13 @@ const LiveEventsSection: React.FC = () => {
                             href={calendarLink}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-full bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-xl border border-gray-200 transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2 text-xs"
+                            className="bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 px-6 rounded-xl border border-gray-200 transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2"
                           >
-                            <span className="text-lg">📅</span>
+                            <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
+                              <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                            </div>
                             <span>Add to Calendar</span>
                           </a>
                         );

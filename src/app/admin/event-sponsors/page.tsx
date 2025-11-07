@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FaPlus, FaSearch, FaEdit, FaTrash, FaFilter } from 'react-icons/fa';
+import { FaPlus, FaSearch, FaEdit, FaTrash, FaFilter, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import DataTable, { Column } from '@/components/ui/DataTable';
@@ -9,6 +9,8 @@ import Modal from '@/components/ui/Modal';
 import ConfirmModal from '@/components/ui/Modal';
 import ImageUpload from '@/components/ui/ImageUpload';
 import AdminNavigation from '@/components/AdminNavigation';
+import SponsorImageUploadDialog from '@/components/sponsors/SponsorImageUploadDialog';
+import SponsorMediaGallery from '@/components/sponsors/SponsorMediaGallery';
 import type { EventSponsorsDTO } from '@/types';
 import {
   fetchEventSponsorsServer,
@@ -16,6 +18,7 @@ import {
   updateEventSponsorServer,
   deleteEventSponsorServer,
 } from './ApiServerActions';
+import { fetchAdminProfileServer } from '../manage-usage/ApiServerActions';
 
 export default function EventSponsorsPage() {
   const { userId } = useAuth();
@@ -24,6 +27,14 @@ export default function EventSponsorsPage() {
   const [sponsors, setSponsors] = useState<EventSponsorsDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Pagination state
+  const [page, setPage] = useState(0);
+  const [pageSize] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
+
+  // User role state
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -52,6 +63,11 @@ export default function EventSponsorsPage() {
     instagramUrl: '',
   });
 
+  // Upload dialog states
+  const [logoUploadOpen, setLogoUploadOpen] = useState(false);
+  const [heroUploadOpen, setHeroUploadOpen] = useState(false);
+  const [bannerUploadOpen, setBannerUploadOpen] = useState(false);
+
   // Search and filter state
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<string>('');
@@ -63,9 +79,21 @@ export default function EventSponsorsPage() {
 
   useEffect(() => {
     if (userId) {
+      checkUserRole();
       loadSponsors();
     }
-  }, [userId]);
+  }, [userId, page]);
+
+  const checkUserRole = async () => {
+    if (!userId) return;
+    try {
+      const profile = await fetchAdminProfileServer(userId);
+      setIsAdmin(profile?.userRole === 'ADMIN');
+    } catch (err) {
+      console.error('Failed to fetch user profile:', err);
+      setIsAdmin(false);
+    }
+  };
 
   useEffect(() => {
     if (toastMessage) {
@@ -78,8 +106,9 @@ export default function EventSponsorsPage() {
     try {
       setLoading(true);
       setError(null);
-      const data = await fetchEventSponsorsServer();
-      setSponsors(data || []);
+      const result = await fetchEventSponsorsServer(page, pageSize);
+      setSponsors(result.data || []);
+      setTotalCount(result.totalCount || 0);
     } catch (err: any) {
       setError(err.message || 'Failed to load sponsors');
       setToastMessage({ type: 'error', message: err.message || 'Failed to load sponsors' });
@@ -122,7 +151,6 @@ export default function EventSponsorsPage() {
       };
 
       const newSponsor = await createEventSponsorServer(sponsorData);
-      setSponsors(prev => [...prev, newSponsor]);
       setIsCreateModalOpen(false);
       resetForm();
       setToastMessage({ type: 'success', message: 'Sponsor created successfully. You can now upload images when editing the sponsor.' });
@@ -193,9 +221,8 @@ export default function EventSponsorsPage() {
   };
 
   const openEditModal = (sponsor: EventSponsorsDTO) => {
-    setSelectedSponsor(sponsor);
-    setFormData(sponsor);
-    setIsEditModalOpen(true);
+    // Navigate to detail/edit page instead of opening modal
+    router.push(`/admin/event-sponsors/${sponsor.id}`);
   };
 
   const openDeleteModal = (sponsor: EventSponsorsDTO) => {
@@ -298,7 +325,8 @@ export default function EventSponsorsPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ paddingTop: '180px' }}>
-      <h1 className="font-heading font-semibold text-3xl text-foreground mb-8">Event Sponsors</h1>
+      <h1 className="font-heading font-semibold text-3xl text-foreground mb-2">Global Sponsors</h1>
+      <p className="font-body text-muted-foreground mb-8">(You can add or disassociate these items with any events. Please go to the corresponding event page to manage these associated entities.)</p>
       <AdminNavigation currentPage="event-sponsors" />
 
       {/* Toast Message */}
@@ -375,10 +403,41 @@ export default function EventSponsorsPage() {
         onSort={handleSort}
         onEdit={openEditModal}
         onDelete={openDeleteModal}
+        onView={openEditModal} // Use onView for row clicks to navigate
         sortKey={sortKey}
         sortDirection={sortDirection}
         emptyMessage="No sponsors found"
       />
+
+      {/* Pagination Controls - Matching admin home page style */}
+      {!loading && totalCount > 0 && (
+        <div className="mt-4">
+          <div className="flex justify-between items-center">
+            <button
+              onClick={() => setPage(prev => Math.max(0, prev - 1))}
+              disabled={page === 0}
+              className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+            >
+              <FaChevronLeft />
+              Previous
+            </button>
+            <div className="text-sm font-semibold">
+              Page {page + 1} of {Math.max(1, Math.ceil(totalCount / pageSize))}
+            </div>
+            <button
+              onClick={() => setPage(prev => prev + 1)}
+              disabled={page >= Math.ceil(totalCount / pageSize) - 1}
+              className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+            >
+              Next
+              <FaChevronRight />
+            </button>
+          </div>
+          <div className="text-center text-sm text-gray-600 mt-2">
+            Showing {totalCount > 0 ? page * pageSize + 1 : 0} to {Math.min((page + 1) * pageSize, totalCount)} of {totalCount} sponsors
+          </div>
+        </div>
+      )}
 
       {/* Create Modal */}
       <Modal
@@ -386,6 +445,9 @@ export default function EventSponsorsPage() {
         onClose={() => {
           setIsCreateModalOpen(false);
           resetForm();
+          setLogoUploadOpen(false);
+          setHeroUploadOpen(false);
+          setBannerUploadOpen(false);
         }}
         title="Add Event Sponsor"
         size="xl"
@@ -396,6 +458,9 @@ export default function EventSponsorsPage() {
           onSubmit={handleCreate}
           loading={loading}
           submitText="Create Sponsor"
+          onLogoUploadClick={() => setLogoUploadOpen(true)}
+          onHeroUploadClick={() => setHeroUploadOpen(true)}
+          onBannerUploadClick={() => setBannerUploadOpen(true)}
         />
       </Modal>
 
@@ -406,6 +471,9 @@ export default function EventSponsorsPage() {
           setIsEditModalOpen(false);
           setSelectedSponsor(null);
           resetForm();
+          setLogoUploadOpen(false);
+          setHeroUploadOpen(false);
+          setBannerUploadOpen(false);
         }}
         title="Edit Event Sponsor"
         size="xl"
@@ -416,6 +484,9 @@ export default function EventSponsorsPage() {
           onSubmit={handleEdit}
           loading={loading}
           submitText="Update Sponsor"
+          onLogoUploadClick={() => setLogoUploadOpen(true)}
+          onHeroUploadClick={() => setHeroUploadOpen(true)}
+          onBannerUploadClick={() => setBannerUploadOpen(true)}
         />
       </Modal>
 
@@ -432,6 +503,45 @@ export default function EventSponsorsPage() {
         confirmText="Delete"
         variant="danger"
       />
+
+      {/* Upload Dialogs */}
+      {formData.id && (
+        <>
+          <SponsorImageUploadDialog
+            sponsor={formData as EventSponsorsDTO}
+            imageType="logo"
+            isOpen={logoUploadOpen}
+            onClose={() => setLogoUploadOpen(false)}
+            onUploadSuccess={async (imageUrl) => {
+              setFormData(prev => ({ ...prev, logoUrl: imageUrl }));
+              await loadSponsors(); // Refresh to get updated data
+            }}
+            eventId={0}
+          />
+          <SponsorImageUploadDialog
+            sponsor={formData as EventSponsorsDTO}
+            imageType="hero"
+            isOpen={heroUploadOpen}
+            onClose={() => setHeroUploadOpen(false)}
+            onUploadSuccess={async (imageUrl) => {
+              setFormData(prev => ({ ...prev, heroImageUrl: imageUrl }));
+              await loadSponsors(); // Refresh to get updated data
+            }}
+            eventId={0}
+          />
+          <SponsorImageUploadDialog
+            sponsor={formData as EventSponsorsDTO}
+            imageType="banner"
+            isOpen={bannerUploadOpen}
+            onClose={() => setBannerUploadOpen(false)}
+            onUploadSuccess={async (imageUrl) => {
+              setFormData(prev => ({ ...prev, bannerImageUrl: imageUrl }));
+              await loadSponsors(); // Refresh to get updated data
+            }}
+            eventId={0}
+          />
+        </>
+      )}
     </div>
   );
 }
@@ -443,9 +553,12 @@ interface SponsorFormProps {
   onSubmit: () => void;
   loading: boolean;
   submitText: string;
+  onLogoUploadClick?: () => void;
+  onHeroUploadClick?: () => void;
+  onBannerUploadClick?: () => void;
 }
 
-function SponsorForm({ formData, setFormData, onSubmit, loading, submitText }: SponsorFormProps) {
+function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onLogoUploadClick, onHeroUploadClick, onBannerUploadClick }: SponsorFormProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
 
@@ -704,48 +817,69 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText }: S
               <label className="block text-sm font-medium text-foreground mb-2">
                 Logo Image
               </label>
-              <ImageUpload
-                entityId={formData.id!}
-                entityType="sponsor"
-                imageType="logo"
-                eventId={0} // Using 0 as default since this is main sponsors page
-                currentImageUrl={formData.logoUrl}
-                onImageUploaded={(url) => setFormData(prev => ({ ...prev, logoUrl: url }))}
-                onError={(error) => console.error('Logo upload error:', error)}
-                disabled={loading}
-              />
+              {formData.logoUrl && (
+                <div className="mb-2">
+                  <img
+                    src={formData.logoUrl}
+                    alt="Logo"
+                    className="h-20 w-auto rounded border border-border"
+                  />
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={onLogoUploadClick}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-md reverent-transition text-sm"
+                disabled={loading || !formData.id}
+              >
+                {formData.logoUrl ? 'Change Logo' : 'Upload Logo'}
+              </button>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
                 Hero Image
               </label>
-              <ImageUpload
-                entityId={formData.id!}
-                entityType="sponsor"
-                imageType="hero"
-                eventId={0} // Using 0 as default since this is main sponsors page
-                currentImageUrl={formData.heroImageUrl}
-                onImageUploaded={(url) => setFormData(prev => ({ ...prev, heroImageUrl: url }))}
-                onError={(error) => console.error('Hero image upload error:', error)}
-                disabled={loading}
-              />
+              {formData.heroImageUrl && (
+                <div className="mb-2">
+                  <img
+                    src={formData.heroImageUrl}
+                    alt="Hero"
+                    className="h-20 w-auto rounded border border-border"
+                  />
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={onHeroUploadClick}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-md reverent-transition text-sm"
+                disabled={loading || !formData.id}
+              >
+                {formData.heroImageUrl ? 'Change Hero Image' : 'Upload Hero Image'}
+              </button>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
                 Banner Image
               </label>
-              <ImageUpload
-                entityId={formData.id!}
-                entityType="sponsor"
-                imageType="banner"
-                eventId={0} // Using 0 as default since this is main sponsors page
-                currentImageUrl={formData.bannerImageUrl}
-                onImageUploaded={(url) => setFormData(prev => ({ ...prev, bannerImageUrl: url }))}
-                onError={(error) => console.error('Banner upload error:', error)}
-                disabled={loading}
-              />
+              {formData.bannerImageUrl && (
+                <div className="mb-2">
+                  <img
+                    src={formData.bannerImageUrl}
+                    alt="Banner"
+                    className="h-20 w-auto rounded border border-border"
+                  />
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={onBannerUploadClick}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-md reverent-transition text-sm"
+                disabled={loading || !formData.id}
+              >
+                {formData.bannerImageUrl ? 'Change Banner' : 'Upload Banner'}
+              </button>
             </div>
           </div>
         </div>
@@ -756,6 +890,24 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText }: S
           <p className="text-sm text-muted-foreground">
             <strong>Note:</strong> Image uploads will be available after the sponsor is created. Save the sponsor first, then edit it to upload images.
           </p>
+        </div>
+      )}
+
+      {/* Media Gallery Section */}
+      {canUploadImages && formData.id && (
+        <div className="border-t border-border pt-6 mt-6">
+          <h3 className="text-lg font-heading font-medium text-foreground mb-4">Media Gallery</h3>
+          <p className="text-sm font-body text-muted-foreground mb-4">
+            Upload and manage multiple media files for this sponsor. Files are sorted by priority ranking (lower = higher priority).
+          </p>
+          <SponsorMediaGallery
+            sponsorId={formData.id}
+            showPriorityControls={true}
+            allowUpload={false}
+            onPriorityChange={async (mediaId, priorityRanking) => {
+              // Priority change handled by component
+            }}
+          />
         </div>
       )}
 

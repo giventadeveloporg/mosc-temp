@@ -1,17 +1,16 @@
 # Task ID: 1
-# Title: Update Main Sponsors Page Form Fields
+# Title: Update EventMediaDTO Type
 # Status: pending
 # Dependencies: None
 # Priority: high
-# Description: Align form field names with DTO schema and add missing fields.
+# Description: Add new fields to EventMediaDTO interface to support sponsor and event-sponsor media files.
 # Details:
-- Replace `sponsorName` with `name`
-- Replace `sponsorshipLevel` with `type`
-- Replace `displayOrder` with `priorityRanking`
-- Remove `sponsorshipAmount` and `benefits` fields (not in DTO)
-- Add missing fields: `companyName`, `tagline`, `facebookUrl`, `twitterUrl`, `linkedinUrl`, `instagramUrl`
-- Update form validation rules
-- Update form submission handler to match DTO structure
+Add the following fields to the EventMediaDTO interface in src/types/index.ts:
+- sponsorId?: number; // Reference to sponsor for sponsor-specific media
+- eventSponsorsJoinId?: number; // Reference to event-sponsor join for custom posters
+- priorityRanking?: number; // Priority ranking (0 = highest priority, default: 0)
+
+Ensure all fields are optional (nullable) to maintain backward compatibility and add JSDoc comments explaining each field's purpose.
 
 # Test Strategy:
-Verify that the form fields match the DTO schema and that form submission sends the correct data structure to the API.
+Verify that the EventMediaDTO includes all required fields with proper typing (number | undefined) and JSDoc comments.

@@ -176,6 +176,28 @@ export interface EventMediaDTO {
   updatedAt: string;
   /** Start displaying from date (YYYY-MM-DD) */
   startDisplayingFromDate?: string;
+  /**
+   * Reference to sponsor for sponsor-specific media files
+   */
+  sponsorId?: number;
+  /**
+   * Reference to event-sponsor join record for custom posters
+   */
+  eventSponsorsJoinId?: number;
+  /**
+   * Reference to performer for performer-specific media files
+   */
+  performerId?: number;
+  /**
+   * Reference to director for director-specific media files
+   */
+  directorId?: number;
+  /**
+   * Priority ranking for media files (sponsor or event-sponsor).
+   * Lower values indicate higher priority (0 = highest priority).
+   * Default: 0
+   */
+  priorityRanking?: number;
 }
 
 export interface EventCalendarEntryDTO {
@@ -774,6 +796,10 @@ export interface EventSponsorsJoinDTO {
   id?: number;
   tenantId?: string;
   createdAt: string;
+  /**
+   * Custom poster image URL for this specific event-sponsor combination
+   */
+  customPosterUrl?: string;
   event?: EventDetailsDTO;
   sponsor?: EventSponsorsDTO;
 }

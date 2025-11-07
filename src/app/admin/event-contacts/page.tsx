@@ -249,7 +249,8 @@ export default function EventContactsPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-8 py-8" style={{ paddingTop: '180px' }}>
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Event Contacts</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-2">Global Contacts</h1>
+      <p className="text-gray-600 mb-8">(You can add or disassociate these items with any events. Please go to the corresponding event page to manage these associated entities.)</p>
       <AdminNavigation />
 
       {/* Toast Message */}

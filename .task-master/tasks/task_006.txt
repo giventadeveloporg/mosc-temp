@@ -1,16 +1,11 @@
 # Task ID: 6
-# Title: Implement Event-Sponsor Association Management
+# Title: Create Upload Event-Sponsor Media Server Action
 # Status: pending
-# Dependencies: 4 ⏱️
+# Dependencies: 1 ⏱️, 2 ⏱️
 # Priority: high
-# Description: Create UI for managing event-sponsor associations.
+# Description: Create server action to upload multiple media files for an event-sponsor combination.
 # Details:
-- Create interface to assign existing sponsors to events
-- Implement removing sponsors from events
-- Add view to see all sponsors for a specific event
-- Add view to see all events for a specific sponsor
-- Prevent duplicate associations
-- Handle cascade delete when event or sponsor is deleted
+Implement the uploadEventSponsorMediaServer function in src/app/admin/event-sponsors/ApiServerActions.ts that handles uploading media files for event-sponsor combinations. Use FormData to send multipart/form-data to the /api/proxy/event-medias/upload/event-sponsor-media endpoint with appropriate query parameters.
 
 # Test Strategy:
-Test creating and removing associations, verify duplicate prevention, and test cascade delete behavior.
+Test the function by uploading media files for different event-sponsor combinations and verifying the correct response structure and error handling.

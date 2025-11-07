@@ -191,8 +191,8 @@ export default function GlobalEventEmailsPage() {
           <div className="px-6 py-4 border-b border-gray-200">
             <div className="flex justify-between items-center">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Global Event Emails</h1>
-                <p className="text-gray-600 mt-1">Manage email addresses across all events</p>
+                <h1 className="text-2xl font-bold text-gray-900">Global Emails</h1>
+                <p className="text-gray-600 mt-1">(You can add or disassociate these items with any events. Please go to the corresponding event page to manage these associated entities.)</p>
               </div>
               <button
                 onClick={() => setIsCreateModalOpen(true)}

@@ -18,7 +18,7 @@ function DescriptionDisplay({ description }: { description: string }) {
 
   if (description.length <= maxLength) {
     return (
-      <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+      <div className="text-lg font-semibold text-gray-700 leading-relaxed whitespace-pre-wrap">
         {description}
       </div>
     );
@@ -27,7 +27,7 @@ function DescriptionDisplay({ description }: { description: string }) {
   const truncatedText = description.substring(0, maxLength).trim();
 
   return (
-    <div className="text-sm text-gray-700 leading-relaxed">
+    <div className="text-lg font-semibold text-gray-700 leading-relaxed">
       <div className="whitespace-pre-wrap">
         {isExpanded ? description : `${truncatedText}...`}
       </div>
@@ -688,7 +688,11 @@ export default function EventsPage() {
                     </>
                   ) : (
                     <>
-                      <span>🔍</span>
+                      <div className="flex-shrink-0 w-5 h-5 flex items-center justify-center">
+                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                      </div>
                       Search Events
                     </>
                   )}
@@ -697,7 +701,11 @@ export default function EventsPage() {
                   onClick={clearSearch}
                   className="px-2 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-sm font-semibold rounded-lg transition-all duration-200 shadow-md hover:shadow-lg flex items-center gap-1.5 w-fit"
                 >
-                  <span>🗑️</span>
+                  <div className="flex-shrink-0 w-5 h-5 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </div>
                   Clear Search
                 </button>
               </div>
@@ -781,125 +789,154 @@ export default function EventsPage() {
                             borderRadius: '1rem 1rem 0 0'
                           }}
                         >
-                          <span className="text-gray-400 text-4xl">📅</span>
+                          <div className="w-16 h-16 rounded-xl bg-gray-100 flex items-center justify-center">
+                            <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                          </div>
                         </div>
                       )}
                       {/* Past Event Badge */}
                       {showPastEvents && (
-                        <div className="absolute top-3 right-3">
+                        <div className="absolute top-3 left-3">
                           <span className="px-3 py-1 bg-gray-500 text-white text-xs font-medium rounded-full">
                             Past Event
                           </span>
                         </div>
                       )}
+                      {/* Buy Tickets Button - Top Right Corner */}
+                      {(() => {
+                        if (!event.startDate) return null;
+
+                        // Get today's date in YYYY-MM-DD format using local timezone
+                        const today = new Date();
+                        const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+                        // Compare dates as strings to avoid timezone parsing issues
+                        const eventDateStr = event.startDate ? event.startDate.split('T')[0] : null;
+
+                        if (!eventDateStr) return null;
+
+                        // Check if event date is today or in the future
+                        const isToday = eventDateStr === todayStr;
+                        const isFuture = eventDateStr > todayStr;
+                        const isUpcomingLocal = isToday || isFuture;
+                        const isPast = !isUpcomingLocal;
+
+                        return (
+                          <div className="absolute top-4 right-4 lg:top-6 lg:right-6 z-10">
+                            <Link
+                              href={`/events/${event.id}/tickets`}
+                              className={`transition-transform hover:scale-105 ${isPast ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
+                            >
+                              <img
+                                src="/images/buy_tickets_click_here_red.webp"
+                                alt="Buy Tickets"
+                                className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
+                              />
+                            </Link>
+                          </div>
+                        );
+                      })()}
                     </div>
 
                     {/* Content Section - Bottom on all screen sizes */}
-                    <div className="p-6 border-t border-white/20">
+                    <div className="p-5 border-t border-white/20 relative">
                       {/* Title */}
-                      <h2 className="text-2xl font-bold text-gray-800 mb-3">
+                      <h2 className="text-xl font-bold text-gray-800 mb-2 sm:pr-48 lg:pr-56">
                         {event.title}
                       </h2>
 
                       {/* Caption */}
                       {event.caption && (
-                        <p className="text-gray-600 text-lg mb-4">
+                        <p className="text-gray-600 text-base mb-3 sm:pr-48 lg:pr-56">
                           {event.caption}
                         </p>
                       )}
 
-                      {/* Event Details */}
-                      <div className="space-y-3 mb-6">
-                        <div className="flex items-center gap-3 text-gray-700">
-                          <span className="text-2xl">📅</span>
-                          <span className="text-lg font-semibold">
-                            {formatDate(event.startDate, event.timezone)}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-3 text-gray-700">
-                          <span className="text-2xl">🕐</span>
-                          <span className="text-lg font-semibold">
-                            {formatTime(event.startTime)} - {formatTime(event.endTime)} (EDT)
-                          </span>
-                        </div>
-                        {event.location && (
-                          <div className="flex items-center gap-3 text-gray-700">
-                            <span className="text-2xl">📍</span>
-                            <span className="text-lg font-semibold">
-                              {event.location}
-                            </span>
-                            {/* Copy and Navigate Icons - moved closer to location text */}
-                            <div className="flex gap-1 ml-2">
-                              <button
-                                onClick={() => {
-                                  navigator.clipboard.writeText(event.location || '');
-                                  alert('Address copied to clipboard!');
-                                }}
-                                className="p-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors"
-                                title="Copy Address"
-                              >
-                                <span className="text-sm">📋</span>
-                              </button>
-                              <a
-                                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location || '')}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="p-1.5 bg-green-100 hover:bg-green-200 text-green-700 rounded-lg transition-colors"
-                                title="Open in Google Maps"
-                              >
-                                <span className="text-sm">🗺️</span>
-                              </a>
+                      {/* Event Details - Matching sponsors page style with centered flexbox */}
+                      <div className="px-4 pb-4 border-t border-white/20">
+                        <div className="flex flex-wrap justify-center gap-3 mb-2 pt-3 lg:max-w-4xl lg:mx-auto">
+                          {/* Date */}
+                          <div className="flex items-center gap-3 text-gray-700 w-full sm:w-auto sm:min-w-[280px]">
+                            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                              <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
                             </div>
+                            <span className="text-lg font-semibold">
+                              {formatDate(event.startDate, event.timezone)}
+                            </span>
                           </div>
-                        )}
+
+                          {/* Time */}
+                          {event.startTime && (
+                            <div className="flex items-center gap-3 text-gray-700 w-full sm:w-auto sm:min-w-[280px]">
+                              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                              </div>
+                              <span className="text-lg font-semibold">
+                                {formatTime(event.startTime)} - {formatTime(event.endTime)} (EDT)
+                              </span>
+                            </div>
+                          )}
+
+                          {/* Location */}
+                          {event.location && (
+                            <div className="flex items-center gap-3 text-gray-700 w-full sm:w-auto sm:min-w-[280px]">
+                              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                <svg className="w-10 h-10 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-lg font-semibold truncate">
+                                  {event.location}
+                                </span>
+                                {/* Copy and Navigate Icons */}
+                                <div className="flex gap-1">
+                                  <button
+                                    onClick={() => {
+                                      navigator.clipboard.writeText(event.location || '');
+                                      alert('Address copied to clipboard!');
+                                    }}
+                                    className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-colors group-hover:scale-110 transition-transform duration-300"
+                                    title="Copy Address"
+                                  >
+                                    <svg className="w-6 h-6 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                    </svg>
+                                  </button>
+                                  <a
+                                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location || '')}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 hover:bg-green-200 flex items-center justify-center transition-colors group-hover:scale-110 transition-transform duration-300"
+                                    title="Open in Google Maps"
+                                  >
+                                    <svg className="w-6 h-6 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                                    </svg>
+                                  </a>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
 
                       {/* Description with modern button */}
                       {event.description && (
-                        <div className="mb-6">
+                        <div className="mb-4 px-4 lg:max-w-4xl lg:mx-auto">
                           <DescriptionDisplay description={event.description} />
                         </div>
                       )}
 
                       {/* Action Buttons */}
-                      <div className="flex flex-col sm:flex-row gap-4">
-                        {/* Buy Tickets Image - Only for future events */}
-                        {(() => {
-                          if (showPastEvents) return null;
-
-                          // Get today's date in YYYY-MM-DD format using local timezone
-                          const today = new Date();
-                          const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-
-                          // Compare dates as strings to avoid timezone parsing issues
-                          const eventDateStr = event.startDate ? event.startDate.split('T')[0] : null; // Get just the date part (YYYY-MM-DD)
-
-                          if (!eventDateStr) return null;
-
-                          // Check if event date is today or in the future
-                          const isToday = eventDateStr === todayStr;
-                          const isFuture = eventDateStr > todayStr;
-                          const isUpcoming = isToday || isFuture;
-
-                          if (!isUpcoming) return null;
-
-                          return (
-                            <Link
-                              href={`/events/${event.id}/tickets`}
-                              className="transition-transform hover:scale-105"
-                            >
-                              <img
-                                src="/images/buy_tickets_click_here_red.webp"
-                                alt="Buy Tickets"
-                                className="object-contain"
-                                style={{
-                                  width: '200px',
-                                  height: '70px'
-                                }}
-                              />
-                            </Link>
-                          );
-                        })()}
+                      <div className="flex flex-col sm:flex-row gap-4 px-4">
 
                         {/* Calendar Link - Only for future events */}
                         {(() => {
@@ -966,9 +1003,13 @@ export default function EventsPage() {
                               href={calendarLink}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 px-6 rounded-xl border border-gray-200 transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-3"
+                              className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-xl border-2 border-blue-400 transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-3"
                             >
-                              <span className="text-2xl">📅</span>
+                              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-orange-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                <svg className="w-10 h-10 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                              </div>
                               <span className="text-lg">Add to Calendar</span>
                             </a>
                           );
@@ -977,12 +1018,15 @@ export default function EventsPage() {
                         {/* See Event Details Button - Links to event details page */}
                         <Link
                           href={`/events/${event.id}`}
-                          className="bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 px-6 rounded-xl border border-gray-200 transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2"
+                          className="bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-3 px-6 rounded-xl border-2 border-emerald-400 transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-3"
                         >
-                          <span>See Event Details</span>
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
+                          <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                            <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                          </div>
+                          <span className="text-lg">See Event Details</span>
                         </Link>
                       </div>
                     </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FaPlus, FaSearch, FaFilter } from 'react-icons/fa';
+import { FaPlus, FaSearch, FaFilter, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import DataTable, { Column } from '@/components/ui/DataTable';
@@ -26,6 +26,11 @@ export default function GlobalEventProgramDirectorsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [eventFilter, setEventFilter] = useState<string>('');
+
+  // Pagination state
+  const [page, setPage] = useState(0);
+  const [pageSize] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
 
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -53,7 +58,7 @@ export default function GlobalEventProgramDirectorsPage() {
       loadDirectors();
       loadEvents();
     }
-  }, [userId]);
+  }, [userId, page]);
 
   const loadEvents = async () => {
     try {
@@ -70,8 +75,9 @@ export default function GlobalEventProgramDirectorsPage() {
   const loadDirectors = async () => {
     try {
       setLoading(true);
-      const directorsData = await fetchEventProgramDirectorsServer();
-      setDirectors(directorsData);
+      const result = await fetchEventProgramDirectorsServer(undefined, page, pageSize);
+      setDirectors(result.data);
+      setTotalCount(result.totalCount);
     } catch (err: any) {
       setError(err.message || 'Failed to load program directors');
     } finally {
@@ -102,11 +108,12 @@ export default function GlobalEventProgramDirectorsPage() {
       console.log('📝 Form data:', formData);
       console.log('📤 Director data being sent:', directorData);
 
-      const newDirector = await createEventProgramDirectorServer(directorData);
-      setDirectors(prev => [...prev, newDirector]);
+      await createEventProgramDirectorServer(directorData);
       setIsCreateModalOpen(false);
       resetForm();
       setToastMessage({ type: 'success', message: 'Program director created successfully' });
+      // Reload current page to refresh the list
+      await loadDirectors();
     } catch (err: any) {
       setToastMessage({ type: 'error', message: err.message || 'Failed to create program director' });
     } finally {
@@ -124,12 +131,13 @@ export default function GlobalEventProgramDirectorsPage() {
         ...formData,
         event: formData.event?.id ? { id: formData.event.id } as EventDetailsDTO : undefined
       };
-      const updatedDirector = await updateEventProgramDirectorServer(selectedDirector.id!, directorData);
-      setDirectors(prev => prev.map(d => d.id === selectedDirector.id ? updatedDirector : d));
+      await updateEventProgramDirectorServer(selectedDirector.id!, directorData);
       setIsEditModalOpen(false);
       setSelectedDirector(null);
       resetForm();
       setToastMessage({ type: 'success', message: 'Program director updated successfully' });
+      // Reload current page to refresh the list
+      await loadDirectors();
     } catch (err: any) {
       setToastMessage({ type: 'error', message: err.message || 'Failed to update program director' });
     } finally {
@@ -143,10 +151,11 @@ export default function GlobalEventProgramDirectorsPage() {
     try {
       setLoading(true);
       await deleteEventProgramDirectorServer(selectedDirector.id!);
-      setDirectors(prev => prev.filter(d => d.id !== selectedDirector.id));
       setIsDeleteModalOpen(false);
       setSelectedDirector(null);
       setToastMessage({ type: 'success', message: 'Program director deleted successfully' });
+      // Reload current page to refresh the list
+      await loadDirectors();
     } catch (err: any) {
       setToastMessage({ type: 'error', message: err.message || 'Failed to delete program director' });
     } finally {
@@ -164,14 +173,8 @@ export default function GlobalEventProgramDirectorsPage() {
   };
 
   const openEditModal = (director: EventProgramDirectorsDTO) => {
-    setSelectedDirector(director);
-    setFormData({
-      name: director.name || '',
-      photoUrl: director.photoUrl || '',
-      bio: director.bio || '',
-      event: director.event || undefined
-    });
-    setIsEditModalOpen(true);
+    // Navigate to detail/edit page instead of opening modal
+    router.push(`/admin/event-program-directors/${director.id}`);
   };
 
   const openDeleteModal = (director: EventProgramDirectorsDTO) => {
@@ -198,7 +201,26 @@ export default function GlobalEventProgramDirectorsPage() {
 
   const columns: Column<EventProgramDirectorsDTO>[] = [
     { key: 'name', label: 'Name', sortable: true },
-    { key: 'bio', label: 'Bio', sortable: true },
+    {
+      key: 'bio',
+      label: 'Bio',
+      sortable: true,
+      width: '200px',
+      className: 'max-w-xs whitespace-normal',
+      render: (value) => {
+        if (!value) return <span className="text-gray-400">-</span>;
+        const bioText = String(value);
+        return (
+          <div
+            className="line-clamp-2 text-sm text-gray-900"
+            title={bioText}
+            style={{ maxWidth: '200px' }}
+          >
+            {bioText}
+          </div>
+        );
+      }
+    },
     {
       key: 'event',
       label: 'Event',
@@ -247,8 +269,8 @@ export default function GlobalEventProgramDirectorsPage() {
           <div className="px-6 py-4 border-b border-gray-200">
             <div className="flex justify-between items-center">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Global Event Program Directors</h1>
-                <p className="text-gray-600 mt-1">Manage program directors across all events</p>
+                <h1 className="text-2xl font-bold text-gray-900">Global Program Directors</h1>
+                <p className="text-gray-600 mt-1">(You can add or disassociate these items with any events. Please go to the corresponding event page to manage these associated entities.)</p>
               </div>
               <button
                 onClick={() => setIsCreateModalOpen(true)}
@@ -307,6 +329,36 @@ export default function GlobalEventProgramDirectorsPage() {
                 setSortDirection(direction);
               }}
             />
+
+            {/* Pagination Controls - Matching admin home page style */}
+            {!loading && totalCount > 0 && (
+              <div className="mt-4">
+                <div className="flex justify-between items-center">
+                  <button
+                    onClick={() => setPage(prev => Math.max(0, prev - 1))}
+                    disabled={page === 0}
+                    className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+                  >
+                    <FaChevronLeft />
+                    Previous
+                  </button>
+                  <div className="text-sm font-semibold">
+                    Page {page + 1} of {Math.max(1, Math.ceil(totalCount / pageSize))}
+                  </div>
+                  <button
+                    onClick={() => setPage(prev => prev + 1)}
+                    disabled={page >= Math.ceil(totalCount / pageSize) - 1}
+                    className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+                  >
+                    Next
+                    <FaChevronRight />
+                  </button>
+                </div>
+                <div className="text-center text-sm text-gray-600 mt-2">
+                  Showing {totalCount > 0 ? page * pageSize + 1 : 0} to {Math.min((page + 1) * pageSize, totalCount)} of {totalCount} directors
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

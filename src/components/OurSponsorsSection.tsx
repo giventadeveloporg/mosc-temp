@@ -59,7 +59,7 @@ const OurSponsorsSection: React.FC = () => {
         const params = new URLSearchParams({
           sort: 'priorityRanking,asc',
           page: '0',
-          size: '4', // Maximum 4 sponsors
+          size: '15', // Maximum 15 sponsors
           'isActive.equals': 'true' // Only active sponsors
         });
 
@@ -73,19 +73,22 @@ const OurSponsorsSection: React.FC = () => {
         if (response.ok) {
           const data = await response.json();
           const sponsorsList = Array.isArray(data) ? data : [];
-          console.log('✅ Fetched sponsors for homepage:', sponsorsList.length);
+
+          // Limit to maximum 15 sponsors (top priority ranking)
+          const limitedSponsors = sponsorsList.slice(0, 15);
+          console.log('✅ Fetched sponsors for homepage:', limitedSponsors.length, 'out of', sponsorsList.length);
 
           // Cache the data
           try {
             sessionStorage.setItem(CACHE_KEY, JSON.stringify({
-              data: sponsorsList,
+              data: limitedSponsors,
               timestamp: Date.now()
             }));
           } catch (error) {
             console.warn('Failed to cache sponsors data:', error);
           }
 
-          setSponsors(sponsorsList);
+          setSponsors(limitedSponsors);
         } else {
           console.warn('Failed to fetch sponsors:', response.status);
           setFetchError(true);
@@ -196,9 +199,9 @@ const OurSponsorsSection: React.FC = () => {
               <div className="flex flex-col h-full">
                 {/* Image Section - Increased by another 10% (h-112 = 448px) for maximum image display */}
                 <div className="relative w-full h-112 rounded-t-2xl overflow-hidden">
-                  {sponsor.heroImageUrl ? (
+                  {sponsor.bannerImageUrl ? (
                     <Image
-                      src={sponsor.heroImageUrl}
+                      src={sponsor.bannerImageUrl}
                       alt={sponsor.name}
                       width={800}
                       height={600}

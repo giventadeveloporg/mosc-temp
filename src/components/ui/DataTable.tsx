@@ -107,7 +107,11 @@ export default function DataTable<T extends Record<string, any>>({
               </tr>
             ) : (
               data.map((item, index) => (
-                <tr key={index} className="hover:bg-gray-50">
+                <tr
+                  key={index}
+                  className={`hover:bg-gray-50 ${onView ? 'cursor-pointer' : ''}`}
+                  onClick={() => onView && onView(item)}
+                >
                   {columns.map((column) => (
                     <td
                       key={String(column.key)}
@@ -120,7 +124,7 @@ export default function DataTable<T extends Record<string, any>>({
                   ))}
                   {(onEdit || onDelete || onView) && (
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex space-x-2">
+                      <div className="flex space-x-2" onClick={(e) => e.stopPropagation()}>
                         {onView && (
                           <button
                             onClick={() => onView(item)}

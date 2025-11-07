@@ -1,16 +1,11 @@
 # Task ID: 5
-# Title: Implement Search and Filter Functionality
+# Title: Create Upload Sponsor Media Server Action
 # Status: pending
-# Dependencies: 4 ⏱️
-# Priority: medium
-# Description: Add search and filter capabilities to the sponsors list.
+# Dependencies: 1 ⏱️
+# Priority: high
+# Description: Create server action to upload multiple media files for a sponsor.
 # Details:
-- Implement search by sponsor name
-- Add filter by sponsor type
-- Add filter by active/inactive status
-- Implement sorting by priority ranking and name
-- Add pagination controls
-- Connect filters to API query parameters
+Implement the uploadSponsorMediaServer function in src/app/admin/event-sponsors/ApiServerActions.ts that handles uploading media files for sponsors. Use FormData to send multipart/form-data to the /api/proxy/event-medias/upload/sponsor-media endpoint with appropriate query parameters, including optional title, description, and priorityRanking.
 
 # Test Strategy:
-Test search and filter functionality with different combinations of criteria, verify pagination works correctly.
+Test the function by uploading media files with different parameters and verifying the correct response structure and error handling.

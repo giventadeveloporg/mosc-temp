@@ -1,17 +1,11 @@
 # Task ID: 7
-# Title: Apply UI/UX Style Guide
+# Title: Create Fetch Sponsor Media Server Action
 # Status: pending
-# Dependencies: 4 ⏱️, 5 ⏱️, 6 ⏱️
-# Priority: medium
-# Description: Ensure the sponsors management UI follows established style guidelines.
+# Dependencies: 1 ⏱️
+# Priority: high
+# Description: Create server action to fetch all media files for a sponsor, sorted by priority ranking.
 # Details:
-- Apply sacred design system colors and typography
-- Match admin page styling patterns
-- Ensure consistent form layouts and spacing
-- Implement responsive design for mobile, tablet, and desktop
-- Add appropriate loading states
-- Ensure error handling follows UI patterns
-- Match styling with event-specific sponsors page
+Implement the fetchSponsorMediaServer function in src/app/admin/event-sponsors/ApiServerActions.ts that retrieves all media files for a specific sponsor. Call the /api/proxy/event-medias/sponsor/{sponsorId} endpoint and handle the response as an array of EventMediaDTO objects sorted by priorityRanking.
 
 # Test Strategy:
-Verify UI matches style guide standards, test responsiveness on different devices, and confirm consistent styling across the application.
+Test the function by fetching media for different sponsors and verifying the correct array structure, sorting, and error handling.

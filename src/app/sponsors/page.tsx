@@ -216,23 +216,22 @@ export default function SponsorsPage() {
               </p>
             </div>
 
-            {/* Sponsors List - Single column stacked layout exactly like events page */}
+            {/* Sponsors List - Single column stacked layout */}
             <div className="space-y-8">
               {filteredSponsors.map((sponsor, index) => (
                 <div
                   key={sponsor.id}
-                  className={`${getRandomBackground(index)} rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 overflow-hidden group cursor-pointer`}
-                  onClick={() => sponsor.websiteUrl && window.open(sponsor.websiteUrl, '_blank')}
+                  className={`${getRandomBackground(index)} rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group`}
                   style={{
-                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05)'
+                    boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05)'
                   }}
                 >
                   <div className="flex flex-col h-full">
-                    {/* Image Section - Top on all screen sizes, exactly like events page */}
+                    {/* Image Section - Matching events page style */}
                     <div className="relative w-full h-auto rounded-t-2xl overflow-hidden">
-                      {sponsor.heroImageUrl ? (
+                      {sponsor.bannerImageUrl ? (
                         <Image
-                          src={sponsor.heroImageUrl}
+                          src={sponsor.bannerImageUrl}
                           alt={sponsor.name}
                           width={800}
                           height={600}
@@ -261,26 +260,69 @@ export default function SponsorsPage() {
                       </div>
                     </div>
 
-                    {/* Content Section - Bottom on all screen sizes, exactly like events page */}
-                    <div className="p-6 border-t border-white/20">
+                    {/* Content Section - Compact header */}
+                    <div className="p-5 border-t border-white/20">
                       {/* Sponsor Name */}
-                      <h2 className="text-2xl font-bold text-gray-800 mb-3">
+                      <h2 className="text-xl font-bold text-gray-800 mb-2">
                         {sponsor.name}
                       </h2>
 
                       {/* Company Name */}
                       {sponsor.companyName && (
-                        <p className="text-gray-600 text-lg mb-4">
+                        <p className="text-gray-600 text-base mb-2">
                           {sponsor.companyName}
                         </p>
                       )}
 
-                      {/* Sponsor Details */}
-                      <div className="space-y-3 mb-6">
+                      {/* Tagline/Description - Compact */}
+                      {sponsor.tagline && (
+                        <div className="mb-3">
+                          <p className="text-gray-600 text-sm line-clamp-2">
+                            {sponsor.tagline}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Details Section - Matching home page style */}
+                    <div className="px-4 pb-4 border-t border-white/20">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-2 pt-3">
+                        {/* Company Name */}
+                        {sponsor.companyName && (
+                          <div className="flex items-center gap-3 text-gray-700">
+                            <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                              <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                              </svg>
+                            </div>
+                            <span className="text-lg font-semibold">
+                              {sponsor.companyName}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Sponsor Type */}
+                        {sponsor.type && (
+                          <div className="flex items-center gap-3 text-gray-700">
+                            <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                              <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                              </svg>
+                            </div>
+                            <span className="text-lg font-semibold">
+                              {sponsor.type}
+                            </span>
+                          </div>
+                        )}
+
                         {/* Contact Email */}
                         {sponsor.contactEmail && (
                           <div className="flex items-center gap-3 text-gray-700">
-                            <span className="text-2xl">📧</span>
+                            <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                              <svg className="w-8 h-8 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                              </svg>
+                            </div>
                             <span className="text-lg font-semibold">
                               {sponsor.contactEmail}
                             </span>
@@ -290,17 +332,25 @@ export default function SponsorsPage() {
                         {/* Contact Phone */}
                         {sponsor.contactPhone && (
                           <div className="flex items-center gap-3 text-gray-700">
-                            <span className="text-2xl">📞</span>
+                            <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                              <svg className="w-8 h-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                              </svg>
+                            </div>
                             <span className="text-lg font-semibold">
                               {sponsor.contactPhone}
                             </span>
                           </div>
                         )}
 
-                        {/* Website */}
+                        {/* Website - Centers if it's the only item in the last row */}
                         {sponsor.websiteUrl && (
-                          <div className="flex items-center gap-3 text-gray-700">
-                            <span className="text-2xl">🌐</span>
+                          <div className="flex items-center gap-3 text-gray-700 lg:justify-self-center lg:col-start-2">
+                            <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-teal-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                              <svg className="w-8 h-8 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9-9a9 9 0 00-9-9m0 18a9 9 0 009-9M12 3a9 9 0 00-9 9" />
+                              </svg>
+                            </div>
                             <span className="text-lg font-semibold">
                               {sponsor.websiteUrl.replace(/^https?:\/\//, '')}
                             </span>
@@ -308,35 +358,12 @@ export default function SponsorsPage() {
                         )}
                       </div>
 
-                      {/* Tagline/Description */}
+                      {/* Tagline/Description - Minimal bottom spacing */}
                       {sponsor.tagline && (
-                        <div className="mb-6">
-                          <p className="text-gray-600 text-lg">
+                        <div className="mb-1">
+                          <p className="text-gray-600 text-sm line-clamp-2">
                             {sponsor.tagline}
                           </p>
-                        </div>
-                      )}
-
-                      {/* Action Button - Only for sponsors with website */}
-                      {sponsor.websiteUrl && (
-                        <div className="flex flex-col sm:flex-row gap-4">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              window.open(sponsor.websiteUrl, '_blank');
-                            }}
-                            className="transition-transform hover:scale-105"
-                          >
-                            <img
-                              src="/images/buy_tickets_click_here_red.webp"
-                              alt="Visit Website"
-                              className="object-contain"
-                              style={{
-                                width: '200px',
-                                height: '70px'
-                              }}
-                            />
-                          </button>
                         </div>
                       )}
                     </div>
@@ -345,38 +372,29 @@ export default function SponsorsPage() {
               ))}
             </div>
 
-            {/* Pagination Controls - Always show, following UI Style Guide */}
-            <div className="mt-8">
+            {/* Pagination Controls - Matching admin home page style */}
+            <div className="mt-4">
               <div className="flex justify-between items-center">
                 <button
-                  disabled={!hasPrevPage}
                   onClick={handlePrevPage}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium transition-all ${hasPrevPage
-                    ? 'bg-blue-500 hover:bg-blue-600 text-white'
-                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                    }`}
+                  disabled={!hasPrevPage}
+                  className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
                 >
                   <FaChevronLeft />
                   Previous
                 </button>
-
-                <div className="text-sm font-semibold text-gray-700">
+                <div className="text-sm font-semibold">
                   Page {currentPage} of {Math.max(totalPages, 1)}
                 </div>
-
                 <button
-                  disabled={!hasNextPage}
                   onClick={handleNextPage}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium transition-all ${hasNextPage
-                    ? 'bg-blue-500 hover:bg-blue-600 text-white'
-                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                    }`}
+                  disabled={!hasNextPage}
+                  className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
                 >
                   Next
                   <FaChevronRight />
                 </button>
               </div>
-
               <div className="text-center text-sm text-gray-600 mt-2">
                 Showing {filteredSponsors.length > 0 ? startItem : 0} to {filteredSponsors.length > 0 ? endItem : 0} of {totalCount} sponsors
               </div>
