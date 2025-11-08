@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { FaEdit, FaTrash, FaSpinner, FaImage, FaPlus } from 'react-icons/fa';
 import Image from 'next/image';
 import type { EventMediaDTO } from '@/types';
-import { fetchEventSponsorMediaServer, updateMediaPriorityRankingServer } from '@/app/admin/event-sponsors/ApiServerActions';
+import { fetchEventSponsorMediaServer, updateMediaPriorityRankingServer, deleteEventMediaServer } from '@/app/admin/event-sponsors/ApiServerActions';
 import PriorityRankingEditor from './PriorityRankingEditor';
 import ErrorDialog from '@/components/ErrorDialog';
 
@@ -88,12 +88,17 @@ export default function EventSponsorMediaGallery({
     }
 
     try {
+      // Call server action to delete media
+      await deleteEventMediaServer(mediaId);
+
+      // Call optional callback if provided
       if (onMediaDelete) {
-        await onMediaDelete(mediaId);
-        // Refresh media list
-        const media = await fetchEventSponsorMediaServer(eventId, sponsorId);
-        setMediaList(media);
+        onMediaDelete(mediaId);
       }
+
+      // Refresh media list
+      const media = await fetchEventSponsorMediaServer(eventId, sponsorId);
+      setMediaList(media);
     } catch (error) {
       console.error('Failed to delete media:', error);
       setErrorMessage(`Failed to delete media: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -172,6 +177,18 @@ export default function EventSponsorMediaGallery({
                   </div>
                 )}
 
+                {/* Delete Button - Always Visible */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (media.id) handleDelete(media.id);
+                  }}
+                  className="absolute top-2 right-2 bg-destructive hover:bg-destructive/90 text-destructive-foreground p-2 rounded-full reverent-transition shadow-lg z-10"
+                  title="Delete Media"
+                >
+                  <FaTrash className="w-3 h-3" />
+                </button>
+
                 {/* Action Buttons Overlay */}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 reverent-transition flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
                   {showPriorityControls && (
@@ -184,18 +201,6 @@ export default function EventSponsorMediaGallery({
                       title="Edit Priority"
                     >
                       <FaEdit className="w-4 h-4" />
-                    </button>
-                  )}
-                  {onMediaDelete && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (media.id) handleDelete(media.id);
-                      }}
-                      className="bg-destructive hover:bg-destructive/90 text-destructive-foreground p-2 rounded reverent-transition"
-                      title="Delete"
-                    >
-                      <FaTrash className="w-4 h-4" />
                     </button>
                   )}
                 </div>

@@ -9,6 +9,7 @@ import ErrorDialog from '@/components/ErrorDialog';
 interface EventSponsorPosterUploadDialogProps {
   eventId: number;
   sponsorId: number;
+  eventSponsorsJoinId: number;
   currentPosterUrl?: string;
   isOpen: boolean;
   onClose: () => void;
@@ -18,6 +19,7 @@ interface EventSponsorPosterUploadDialogProps {
 export default function EventSponsorPosterUploadDialog({
   eventId,
   sponsorId,
+  eventSponsorsJoinId,
   currentPosterUrl,
   isOpen,
   onClose,
@@ -101,6 +103,7 @@ export default function EventSponsorPosterUploadDialog({
       const media = await uploadEventSponsorPosterServer(
         eventId,
         sponsorId,
+        eventSponsorsJoinId,
         selectedFile,
         title || undefined,
         description || undefined

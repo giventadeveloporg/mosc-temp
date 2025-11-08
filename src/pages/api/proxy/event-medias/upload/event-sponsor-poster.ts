@@ -9,6 +9,30 @@ export const config = {
   },
 };
 
+async function fetchWithJwtRetry(apiUrl: string, options: any = {}, debugLabel = '') {
+  let token = await getCachedApiJwt();
+  let response = await fetch(apiUrl, {
+    ...options,
+    headers: {
+      ...options.headers,
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (response.status === 401) {
+    token = await generateApiJwt();
+    response = await fetch(apiUrl, {
+      ...options,
+      headers: {
+        ...options.headers,
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
+
+  return response;
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     if (!API_BASE_URL) {
@@ -30,25 +54,51 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
 
+    // Extract values from query parameters
+    const eventIdValue = Array.isArray(eventId) ? eventId[0] : String(eventId);
+    const sponsorIdValue = Array.isArray(sponsorId) ? sponsorId[0] : String(sponsorId);
+    const tenantIdValue = Array.isArray(tenantId) ? tenantId[0] : String(tenantId);
+    const isPublicValue = Array.isArray(isPublic) ? isPublic[0] : isPublic;
+    const isPublicBoolean = String(isPublicValue) === 'true';
+    const titleValue = Array.isArray(title) ? title[0] : title;
+    const descriptionValue = Array.isArray(description) ? description[0] : description;
+    const startDisplayingFromDateValue = Array.isArray(startDisplayingFromDate) ? startDisplayingFromDate[0] : startDisplayingFromDate;
+
     // Build query string
     const params = new URLSearchParams();
-    params.append('eventId', Array.isArray(eventId) ? eventId[0] : String(eventId));
-    params.append('sponsorId', Array.isArray(sponsorId) ? sponsorId[0] : String(sponsorId));
-    params.append('tenantId', Array.isArray(tenantId) ? tenantId[0] : String(tenantId));
-    if (isPublic) {
-      params.append('isPublic', Array.isArray(isPublic) ? isPublic[0] : String(isPublic));
+    params.append('eventId', eventIdValue);
+    params.append('sponsorId', sponsorIdValue);
+    params.append('tenantId', tenantIdValue);
+    params.append('isPublic', isPublicBoolean.toString());
+    if (titleValue) {
+      params.append('title', titleValue);
     }
-    if (title) {
-      params.append('title', Array.isArray(title) ? title[0] : String(title));
+    if (descriptionValue) {
+      params.append('description', descriptionValue);
     }
-    if (description) {
-      params.append('description', Array.isArray(description) ? description[0] : String(description));
-    }
-    if (startDisplayingFromDate) {
-      params.append('startDisplayingFromDate', Array.isArray(startDisplayingFromDate) ? startDisplayingFromDate[0] : String(startDisplayingFromDate));
+    if (startDisplayingFromDateValue) {
+      params.append('startDisplayingFromDate', startDisplayingFromDateValue);
     }
 
+    // Backend endpoint: /api/event-medias/upload/event-sponsor-poster
+    // NOTE: This endpoint must be implemented on the backend with the following requirements:
+    // 1. Accept multipart/form-data with file upload
+    // 2. Create EventMedia record with eventId, sponsorId, and eventSponsorsJoinId
+    // 3. Update event_sponsors_join.custom_poster_url field
+    // 4. Use S3 path format: dev/events/tenantId/{tenantId}/event-id/{eventId}/sponsors/sponsor_id/{sponsorId}/{filename}
     const apiUrl = `${API_BASE_URL}/api/event-medias/upload/event-sponsor-poster?${params.toString()}`;
+
+    console.log('🔍 Event-Sponsor Poster Upload Proxy Debug:');
+    console.log('📋 Values:', {
+      eventId: eventIdValue,
+      sponsorId: sponsorIdValue,
+      tenantId: tenantIdValue,
+      isPublic: isPublicBoolean,
+      title: titleValue,
+      description: descriptionValue,
+      startDisplayingFromDate: startDisplayingFromDateValue
+    });
+    console.log('🔗 Backend URL:', apiUrl);
 
     // Use node-fetch for proper multipart form handling
     const fetch = (await import('node-fetch')).default;
@@ -66,10 +116,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (req.headers['content-type']) {
       headers['content-type'] = req.headers['content-type'];
+      console.log('🔧 Content-Type from request:', req.headers['content-type']);
     }
     if (req.headers['content-length']) {
       headers['content-length'] = req.headers['content-length'];
+      console.log('🔧 Content-Length from request:', req.headers['content-length']);
     }
+
+    console.log('🔧 Final headers being sent to backend:', headers);
 
     // Forward the request to the backend
     const apiRes = await fetch(apiUrl, {
@@ -79,9 +133,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       duplex: 'half', // Required for streaming body in Node.js fetch
     });
 
+    console.log('🔧 Backend response status:', apiRes.status);
+    console.log('🔧 Backend response headers:', Object.fromEntries(apiRes.headers.entries()));
+
     // Check response status and handle accordingly
     if (apiRes.status >= 200 && apiRes.status < 300) {
       // Success - pipe the response
+      console.log('✅ Event-Sponsor Poster Upload Proxy: Backend upload successful - HTTP status:', apiRes.status);
       res.status(apiRes.status);
 
       // Copy response headers
@@ -94,6 +152,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       apiRes.body.pipe(res);
     } else {
       // Error - return structured error response
+      console.error('❌ Event-Sponsor Poster Upload Proxy: Backend upload failed - HTTP status:', apiRes.status);
+
+      // Try to read error response body for better error messages
+      let errorBody = '';
+      try {
+        const errorText = await apiRes.text();
+        errorBody = errorText;
+        console.error('❌ Backend error response:', errorBody);
+      } catch (readError) {
+        console.warn('Warning: Could not read error response body:', readError);
+      }
+
       // Drain the error response to prevent processing
       try {
         if (apiRes.body && typeof apiRes.body.destroy === 'function') {
@@ -110,8 +180,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.json({
         error: 'Event-sponsor poster upload failed',
         status: apiRes.status,
-        message: `Upload operation failed with HTTP status ${apiRes.status}`,
-        success: false
+        message: `Upload operation failed with HTTP status ${apiRes.status}${errorBody ? `: ${errorBody}` : ''}`,
+        success: false,
+        backendError: errorBody || undefined
       });
     }
   } catch (err) {

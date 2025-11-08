@@ -184,6 +184,9 @@ export async function uploadSponsorImageServer(
     const formData = new FormData();
     formData.append('file', file);
 
+    // Convert frontend imageType to backend format: logo -> LOGO_IMAGE, hero -> HERO_IMAGE, banner -> BANNER_IMAGE
+    const backendImageType = imageType.toUpperCase() + '_IMAGE';
+
     const params = new URLSearchParams();
     // Use eventId = 0 for sponsor images without event association (same pattern as executive team members)
     params.append('eventId', String(eventId || 0));
@@ -191,10 +194,13 @@ export async function uploadSponsorImageServer(
     // Use entityId to identify the sponsor (same pattern as executiveTeamMemberID)
     params.append('entityId', String(sponsorId));
 
+    // Send imageType in backend format (LOGO_IMAGE, HERO_IMAGE, BANNER_IMAGE) to match uploadSponsorImage() switch statement
+    params.append('imageType', backendImageType);
+
     // Set entityType to indicate this is a sponsor entity
     params.append('entityType', 'SPONSOR');
 
-    // Set the appropriate sponsor image flag based on imageType
+    // Set the appropriate sponsor image flag based on imageType (for backward compatibility)
     if (imageType === 'logo') {
       params.append('isSponsorLogo', 'true');
     } else if (imageType === 'hero') {
@@ -226,8 +232,8 @@ export async function uploadSponsorImageServer(
     params.append('startDisplayingFromDate', today);
 
     const baseUrl = getAppUrl();
-    // Use the generic upload endpoint (same as executive team members)
-    const url = `${baseUrl}/api/proxy/event-medias/upload?${params.toString()}`;
+    // Use the dedicated sponsor-image upload endpoint
+    const url = `${baseUrl}/api/proxy/event-medias/upload/sponsor?${params.toString()}`;
 
     const response = await fetch(url, {
       method: 'POST',
@@ -260,10 +266,12 @@ export async function uploadSponsorImageServer(
 
 /**
  * Upload custom poster for event-sponsor combination
+ * Uses the generic /api/event-medias/upload endpoint with eventSponsorsJoinId
  */
 export async function uploadEventSponsorPosterServer(
   eventId: number,
   sponsorId: number,
+  eventSponsorsJoinId: number,
   file: File,
   title?: string,
   description?: string,
@@ -275,29 +283,65 @@ export async function uploadEventSponsorPosterServer(
   const params = new URLSearchParams();
   params.append('eventId', String(eventId));
   params.append('sponsorId', String(sponsorId));
+  params.append('eventSponsorsJoinId', String(eventSponsorsJoinId));
   params.append('tenantId', tenantId || getTenantId());
   params.append('isPublic', 'true');
-  if (title) params.append('title', title);
-  if (description) params.append('description', description);
+
+  // Set eventMediaType to indicate this is a custom poster
+  params.append('eventMediaType', 'EVENT_SPONSOR_POSTER');
+
+  // Set storage type
+  params.append('storageType', 'S3');
+
+  // Set required flags
+  params.append('eventFlyer', 'false');
+  params.append('isEventManagementOfficialDocument', 'false');
+  params.append('isHeroImage', 'false');
+  params.append('isActiveHeroImage', 'false');
+  params.append('isFeaturedImage', 'false');
+
+  // Title and description
+  if (title) {
+    params.append('title', title);
+  } else {
+    params.append('title', `Custom Poster - Event ${eventId} - Sponsor ${sponsorId}`);
+  }
+
+  if (description) {
+    params.append('description', description);
+  } else {
+    params.append('description', 'Custom poster for event-sponsor combination');
+  }
 
   // Set startDisplayingFromDate to today's date (YYYY-MM-DD format) to satisfy NOT NULL constraint
   const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
   params.append('startDisplayingFromDate', today);
 
   const baseUrl = getAppUrl();
-  const url = `${baseUrl}/api/proxy/event-medias/upload/event-sponsor-poster?${params.toString()}`;
+  // Use the generic upload endpoint (same pattern as sponsor images)
+  const url = `${baseUrl}/api/proxy/event-medias/upload?${params.toString()}`;
 
   const response = await fetch(url, {
     method: 'POST',
     body: formData,
   });
 
-  if (!response.ok) {
+  // 🎯 CRITICAL: Only rely on HTTP status codes for success/failure determination
+  if (response.status >= 200 && response.status < 300) {
+    console.log('✅ Upload successful - HTTP status:', response.status);
+    try {
+      const result = await response.json();
+      return result;
+    } catch (parseError) {
+      console.error('❌ Failed to parse successful upload response:', parseError);
+      throw new Error('Upload succeeded but response parsing failed');
+    }
+  } else {
+    // 🚫 Any non-2xx status code indicates failure
+    console.error('❌ Upload failed - HTTP status:', response.status);
     const errorText = await response.text();
     throw new Error(`Failed to upload event-sponsor poster: ${errorText}`);
   }
-
-  return await response.json();
 }
 
 /**
@@ -432,6 +476,7 @@ export async function fetchSponsorMediaServer(
 
 /**
  * Fetch all media files for an event-sponsor combination, sorted by priority ranking
+ * Uses the endpoint: /api/event-medias/event-sponsor/{eventId}/{sponsorId}
  */
 export async function fetchEventSponsorMediaServer(
   eventId: number,
@@ -440,8 +485,15 @@ export async function fetchEventSponsorMediaServer(
 ): Promise<EventMediaDTO[]> {
   const baseUrl = getAppUrl();
   const params = new URLSearchParams();
-  if (tenantId) params.append('tenantId', tenantId);
-  const url = `${baseUrl}/api/proxy/event-medias/event-sponsor/${eventId}/${sponsorId}${params.toString() ? `?${params.toString()}` : ''}`;
+
+  // Always include tenantId for multi-tenant filtering (same pattern as fetchSponsorMediaServer)
+  const tenantIdToUse = tenantId || getTenantId();
+  params.append('tenantId.equals', tenantIdToUse);
+
+  // Sort by priority ranking (ascending - lower = higher priority)
+  params.append('sort', 'priorityRanking,asc');
+
+  const url = `${baseUrl}/api/proxy/event-medias/event-sponsor/${eventId}/${sponsorId}?${params.toString()}`;
 
   const response = await fetch(url, {
     method: 'GET',
@@ -449,11 +501,18 @@ export async function fetchEventSponsorMediaServer(
   });
 
   if (!response.ok) {
-    console.warn(`Failed to fetch event-sponsor media: ${response.statusText}`);
+    console.warn(`Failed to fetch event-sponsor media: ${response.status} ${response.statusText}`);
     return [];
   }
 
   const data = await response.json();
+
+  // Handle paginated response (Spring Data REST format)
+  if (data && typeof data === 'object' && '_embedded' in data && 'eventMedias' in data._embedded) {
+    return Array.isArray(data._embedded.eventMedias) ? data._embedded.eventMedias : [];
+  }
+
+  // Handle direct array response
   return Array.isArray(data) ? data : [data];
 }
 
@@ -508,13 +567,31 @@ export async function updateMediaPriorityRankingServer(
     throw new Error('Priority ranking must be >= 0');
   }
 
+  // Fetch existing media first to get ALL required fields
+  const existingMedia = await fetchEventMediaServer(mediaId, tenantId);
+
   // Use fetchWithJwtRetry for authenticated backend call
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-  const payload = {
+  if (!API_BASE_URL) {
+    throw new Error('API base URL not configured');
+  }
+
+  // Include ALL required fields from existing media + updated priority ranking
+  // This ensures backend validation passes for all NotNull fields
+  const payload = withTenantId({
     id: mediaId,
     priorityRanking,
-    ...(tenantId && { tenantId }),
-  };
+    // Required string fields
+    storageType: existingMedia.storageType || 'S3',
+    eventMediaType: existingMedia.eventMediaType || 'gallery',
+    title: existingMedia.title || '',
+    createdAt: existingMedia.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    // Required boolean fields (must not be null)
+    isHomePageHeroImage: existingMedia.isHomePageHeroImage ?? false,
+    isFeaturedEventImage: existingMedia.isFeaturedEventImage ?? false,
+    isLiveEventImage: existingMedia.isLiveEventImage ?? false,
+  });
 
   const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-medias/${mediaId}`, {
     method: 'PATCH',
@@ -530,4 +607,54 @@ export async function updateMediaPriorityRankingServer(
   }
 
   return await response.json();
+}
+
+/**
+ * Fetch a single media file by ID
+ */
+export async function fetchEventMediaServer(
+  mediaId: number,
+  tenantId?: string
+): Promise<EventMediaDTO> {
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  if (!API_BASE_URL) {
+    throw new Error('API base URL not configured');
+  }
+
+  const url = `${API_BASE_URL}/api/event-medias/${mediaId}`;
+  const response = await fetchWithJwtRetry(url, {
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to fetch media: ${errorText}`);
+  }
+
+  return await response.json();
+}
+
+/**
+ * Delete a media file
+ */
+export async function deleteEventMediaServer(
+  mediaId: number,
+  tenantId?: string
+): Promise<boolean> {
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  if (!API_BASE_URL) {
+    throw new Error('API base URL not configured');
+  }
+
+  const url = `${API_BASE_URL}/api/event-medias/${mediaId}`;
+  const response = await fetchWithJwtRetry(url, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to delete media: ${errorText}`);
+  }
+
+  return true;
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { FaPlus, FaSearch, FaArrowLeft, FaUserPlus, FaHandshake, FaBan, FaFolderOpen, FaChevronLeft, FaChevronRight, FaEdit, FaTrashAlt, FaImage, FaImages } from 'react-icons/fa';
+import { FaPlus, FaSearch, FaArrowLeft, FaUserPlus, FaHandshake, FaBan, FaFolderOpen, FaChevronLeft, FaChevronRight, FaEdit, FaTrashAlt, FaImage, FaImages, FaUpload, FaUnlink } from 'react-icons/fa';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -61,7 +61,7 @@ export default function EventSponsorsPage() {
 
   // Upload dialog and media gallery states
   const [posterUploadOpen, setPosterUploadOpen] = useState(false);
-  const [selectedSponsorForPoster, setSelectedSponsorForPoster] = useState<{ eventId: number; sponsorId: number; currentPosterUrl?: string } | null>(null);
+  const [selectedSponsorForPoster, setSelectedSponsorForPoster] = useState<{ eventId: number; sponsorId: number; eventSponsorsJoinId: number; currentPosterUrl?: string } | null>(null);
   const [selectedSponsorForMedia, setSelectedSponsorForMedia] = useState<{ eventId: number; sponsorId: number } | null>(null);
 
   // Form state for creating new sponsor join
@@ -822,7 +822,7 @@ export default function EventSponsorsPage() {
         const currentPosterUrl = row?.customPosterUrl;
 
         return (
-          <div className="flex space-x-2">
+          <div className="flex flex-wrap gap-2">
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -841,14 +841,15 @@ export default function EventSponsorsPage() {
                     setSelectedSponsorForPoster({
                       eventId: eventIdNum,
                       sponsorId,
+                      eventSponsorsJoinId: row?.id || 0,
                       currentPosterUrl,
                     });
                     setPosterUploadOpen(true);
                   }}
-                  className="icon-btn bg-blue-500 hover:bg-blue-600 text-white"
-                  title="Upload Custom Poster"
+                  className="icon-btn bg-blue-500 hover:bg-blue-600 text-white p-4"
+                  title="Upload banners in this particular event for this sponsor"
                 >
-                  <FaImage />
+                  <FaUpload className="text-xl" />
                 </button>
                 <button
                   onClick={(e) => {
@@ -858,10 +859,10 @@ export default function EventSponsorsPage() {
                       sponsorId,
                     });
                   }}
-                  className="icon-btn bg-purple-500 hover:bg-purple-600 text-white"
-                  title="View Media Gallery"
+                  className="icon-btn bg-purple-500 hover:bg-purple-600 text-white p-4"
+                  title="View all the media files associated with this sponsor"
                 >
-                  <FaImages />
+                  <FaImages className="text-xl" />
                 </button>
               </>
             )}
@@ -870,10 +871,10 @@ export default function EventSponsorsPage() {
                 e.stopPropagation();
                 openDisassociateModal(row);
               }}
-              className="icon-btn icon-btn-delete bg-yellow-500 hover:bg-yellow-600"
-              title="Disassociate from Event"
+              className="icon-btn icon-btn-delete bg-yellow-500 hover:bg-yellow-600 text-white p-4"
+              title="Disassociate this sponsor with this event"
             >
-              <FaTrashAlt />
+              <FaUnlink className="text-xl" />
             </button>
             <button
               onClick={(e) => {
@@ -975,9 +976,34 @@ export default function EventSponsorsPage() {
           <h2 className="text-xl font-semibold mb-2">
             Event Sponsors ({filteredEventSponsors.length})
           </h2>
-          <p className="text-sm text-gray-600">
-            💡 <strong>Tip:</strong> Hover over a sponsor's name to view detailed information in a tooltip.
-          </p>
+          <div className="space-y-2">
+            <p className="text-sm text-gray-600">
+              💡 <strong>Tip:</strong> Hover over a sponsor's name to view detailed information in a tooltip.
+            </p>
+            <div className="text-sm text-gray-600">
+              <p className="mb-2"><strong>Action Icons:</strong></p>
+              <div className="flex flex-wrap gap-4 items-center">
+                <div className="flex items-center gap-2">
+                  <button className="icon-btn bg-blue-500 hover:bg-blue-600 text-white p-3 pointer-events-none" disabled>
+                    <FaUpload className="text-lg" />
+                  </button>
+                  <span>Upload banners in this particular event for this sponsor</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button className="icon-btn bg-purple-500 hover:bg-purple-600 text-white p-3 pointer-events-none" disabled>
+                    <FaImages className="text-lg" />
+                  </button>
+                  <span>View all the media files associated with this sponsor</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button className="icon-btn bg-yellow-500 hover:bg-yellow-600 text-white p-3 pointer-events-none" disabled>
+                    <FaUnlink className="text-lg" />
+                  </button>
+                  <span>Disassociate this sponsor with this event</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <div className="overflow-x-auto">
           <DataTable
@@ -1308,6 +1334,7 @@ export default function EventSponsorsPage() {
         <EventSponsorPosterUploadDialog
           eventId={selectedSponsorForPoster.eventId}
           sponsorId={selectedSponsorForPoster.sponsorId}
+          eventSponsorsJoinId={selectedSponsorForPoster.eventSponsorsJoinId}
           currentPosterUrl={selectedSponsorForPoster.currentPosterUrl}
           isOpen={posterUploadOpen}
           onClose={() => {
@@ -1332,15 +1359,27 @@ export default function EventSponsorsPage() {
           size="xl"
         >
           <EventSponsorMediaGallery
+            key={`${selectedSponsorForMedia.eventId}-${selectedSponsorForMedia.sponsorId}`}
             eventId={selectedSponsorForMedia.eventId}
             sponsorId={selectedSponsorForMedia.sponsorId}
             showPriorityControls={true}
             allowUpload={true}
             onUploadClick={() => {
-              // Could open bulk upload dialog here
+              // Refresh gallery after upload by remounting component
+              // The component will reload when key changes
+              setSelectedSponsorForMedia({
+                ...selectedSponsorForMedia,
+                eventId: selectedSponsorForMedia.eventId, // Trigger re-render
+              });
             }}
             onPriorityChange={async (mediaId, priorityRanking) => {
-              // Refresh gallery
+              // Component handles its own refresh via useEffect
+              // This callback is for external notifications if needed
+              console.log(`Priority updated for media ${mediaId}: ${priorityRanking}`);
+            }}
+            onMediaDelete={async (mediaId) => {
+              // Component handles its own refresh after delete
+              console.log(`Media deleted: ${mediaId}`);
             }}
           />
         </Modal>

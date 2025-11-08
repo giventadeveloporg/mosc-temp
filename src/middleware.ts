@@ -36,6 +36,7 @@ export default authMiddleware({
     '/api/proxy(.*)',  // Public API proxy routes for public data (events, etc.)
     '/mosc(.*)',
     '/events(.*)',
+    '/sponsors(.*)',  // Public sponsor pages
     '/gallery(.*)',
     '/about(.*)',
     '/contact(.*)',

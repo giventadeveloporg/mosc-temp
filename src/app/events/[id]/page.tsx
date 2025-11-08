@@ -122,6 +122,7 @@ export default function EventDetailsPage() {
   const [contacts, setContacts] = useState<EventContactsDTO[]>([]);
   const [programDirectors, setProgramDirectors] = useState<EventProgramDirectorsDTO[]>([]);
   const [sponsors, setSponsors] = useState<EventSponsorsJoinDTO[]>([]);
+  const [sponsorBannerImages, setSponsorBannerImages] = useState<Map<number, string>>(new Map());
   const [loading, setLoading] = useState(true);
   const [showSlideshow, setShowSlideshow] = useState(false);
   const [slideshowInitialIndex, setSlideshowInitialIndex] = useState(0);
@@ -278,6 +279,56 @@ export default function EventDetailsPage() {
 
               console.log('✅ Populated sponsors:', populatedSponsors);
               setSponsors(populatedSponsors);
+
+              // Fetch banner images for each sponsor from event_media table
+              const bannerImageMap = new Map<number, string>();
+              await Promise.all(
+                populatedSponsors.map(async (joinRecord: EventSponsorsJoinDTO) => {
+                  if (!joinRecord.sponsor?.id) return;
+
+                  try {
+                    // Build query parameters for banner image lookup
+                    const params = new URLSearchParams();
+                    params.append('eventId.equals', eventId.toString());
+                    params.append('sponsorId.equals', joinRecord.sponsor.id.toString());
+                    params.append('eventMediaType.equals', 'SPONSOR_BANNER');
+
+                    // Add eventSponsorsJoinId if available
+                    if (joinRecord.id) {
+                      params.append('eventSponsorsJoinId.equals', joinRecord.id.toString());
+                    }
+
+                    // Sort by priority ranking (ascending - lower = higher priority)
+                    params.append('sort', 'priorityRanking,asc');
+
+                    const bannerRes = await fetch(`/api/proxy/event-medias?${params.toString()}`);
+                    if (bannerRes.ok) {
+                      const bannerData = await bannerRes.json();
+
+                      // Handle paginated response (Spring Data REST format)
+                      let bannerMedia: EventMediaDTO[] = [];
+                      if (bannerData && typeof bannerData === 'object' && '_embedded' in bannerData && 'eventMedias' in bannerData._embedded) {
+                        bannerMedia = Array.isArray(bannerData._embedded.eventMedias) ? bannerData._embedded.eventMedias : [];
+                      } else {
+                        bannerMedia = Array.isArray(bannerData) ? bannerData : [bannerData];
+                      }
+
+                      // Get the first (highest priority) banner image
+                      const bannerImage = bannerMedia.find((m: EventMediaDTO) => m.fileUrl);
+                      if (bannerImage?.fileUrl) {
+                        bannerImageMap.set(joinRecord.sponsor.id, bannerImage.fileUrl);
+                        console.log(`✅ Found banner image for sponsor ${joinRecord.sponsor.id}:`, bannerImage.fileUrl);
+                      } else {
+                        console.log(`⚠️ No banner image found for sponsor ${joinRecord.sponsor.id}`);
+                      }
+                    }
+                  } catch (error) {
+                    console.warn(`⚠️ Error fetching banner image for sponsor ${joinRecord.sponsor.id}:`, error);
+                  }
+                })
+              );
+
+              setSponsorBannerImages(bannerImageMap);
             } else {
               console.warn('Sponsors response is not JSON:', contentType);
               setSponsors([]);
@@ -909,29 +960,37 @@ export default function EventDetailsPage() {
                           onClick={() => sponsor.websiteUrl && window.open(sponsor.websiteUrl, '_blank')}
                         >
                           <div className="flex flex-col h-full">
-                            {/* Image Section - Using bannerImageUrl */}
-                            <div className="relative w-full h-[448px] rounded-t-2xl overflow-hidden">
-                              {sponsor.bannerImageUrl ? (
-                                <Image
-                                  src={sponsor.bannerImageUrl}
-                                  alt={sponsor.name}
-                                  width={800}
-                                  height={600}
-                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                  style={{
-                                    borderRadius: '1rem 1rem 0 0'
-                                  }}
-                                />
-                              ) : (
-                                <div
-                                  className="w-full h-full flex items-center justify-center bg-gray-100"
-                                  style={{
-                                    borderRadius: '1rem 1rem 0 0'
-                                  }}
-                                >
-                                  <span className="text-gray-400 text-5xl">🏢</span>
-                                </div>
-                              )}
+                            {/* Image Section - Using banner image from event_media table */}
+                            <div className="relative w-full h-auto rounded-t-2xl overflow-hidden">
+                              {(() => {
+                                // Get banner image from event_media table (priority) or fallback to sponsor.bannerImageUrl
+                                const bannerImageUrl = sponsor.id ? sponsorBannerImages.get(sponsor.id) : null;
+                                const displayImageUrl = bannerImageUrl || sponsor.bannerImageUrl;
+
+                                return displayImageUrl ? (
+                                  <Image
+                                    src={displayImageUrl}
+                                    alt={sponsor.name}
+                                    width={800}
+                                    height={600}
+                                    className="w-full h-auto object-contain group-hover:scale-105 transition-transform duration-300"
+                                    style={{
+                                      backgroundColor: 'transparent',
+                                      borderRadius: '1rem 1rem 0 0'
+                                    }}
+                                  />
+                                ) : (
+                                  <div
+                                    className="w-full h-80 flex items-center justify-center"
+                                    style={{
+                                      backgroundColor: 'transparent',
+                                      borderRadius: '1rem 1rem 0 0'
+                                    }}
+                                  >
+                                    <span className="text-gray-400 text-5xl">🏢</span>
+                                  </div>
+                                );
+                              })()}
                               {/* Sponsor Type Badge */}
                               {sponsor.type && (
                                 <div className="absolute top-3 right-3">
@@ -950,10 +1009,10 @@ export default function EventDetailsPage() {
                               </h2>
 
                               {/* Sponsor Details - 3-column layout with smart centering */}
-                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-2">
+                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-2 lg:justify-items-center">
                                 {/* Company Name */}
                                 {sponsor.companyName && (
-                                  <div className="flex items-center gap-3 text-gray-700">
+                                  <div className="flex items-center gap-3 text-gray-700 justify-center lg:justify-start">
                                     <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                                       <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -967,7 +1026,7 @@ export default function EventDetailsPage() {
 
                                 {/* Sponsor Type */}
                                 {sponsor.type && (
-                                  <div className="flex items-center gap-3 text-gray-700">
+                                  <div className="flex items-center gap-3 text-gray-700 justify-center lg:justify-start">
                                     <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                                       <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
@@ -981,7 +1040,7 @@ export default function EventDetailsPage() {
 
                                 {/* Contact Email */}
                                 {sponsor.contactEmail && (
-                                  <div className="flex items-center gap-3 text-gray-700">
+                                  <div className="flex items-center gap-3 text-gray-700 justify-center lg:justify-start">
                                     <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                                       <svg className="w-8 h-8 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -995,7 +1054,7 @@ export default function EventDetailsPage() {
 
                                 {/* Contact Phone */}
                                 {sponsor.contactPhone && (
-                                  <div className="flex items-center gap-3 text-gray-700">
+                                  <div className="flex items-center gap-3 text-gray-700 justify-center lg:justify-start">
                                     <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                                       <svg className="w-8 h-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -1007,9 +1066,9 @@ export default function EventDetailsPage() {
                                   </div>
                                 )}
 
-                                {/* Website - Centers if it's the only item in the last row */}
+                                {/* Website */}
                                 {sponsor.websiteUrl && (
-                                  <div className="flex items-center gap-3 text-gray-700 lg:justify-self-center lg:col-start-2">
+                                  <div className="flex items-center gap-3 text-gray-700 justify-center lg:justify-start">
                                     <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-teal-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                                       <svg className="w-8 h-8 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9-9a9 9 0 00-9-9m0 18a9 9 0 009-9M12 3a9 9 0 00-9 9" />
@@ -1024,10 +1083,27 @@ export default function EventDetailsPage() {
 
                               {/* Tagline/Description - Minimal bottom spacing */}
                               {sponsor.tagline && (
-                                <div className="mb-1">
+                                <div className="mb-3">
                                   <p className="text-gray-600 text-sm line-clamp-2">
                                     {sponsor.tagline}
                                   </p>
+                                </div>
+                              )}
+
+                              {/* View Sponsor Details Button */}
+                              {sponsor.id && (
+                                <div className="mt-4 pt-3 border-t border-gray-200">
+                                  <Link
+                                    href={`/sponsors/${sponsor.id}`}
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="inline-flex items-center justify-center w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                  >
+                                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                    View Sponsor Details
+                                  </Link>
                                 </div>
                               )}
                             </div>

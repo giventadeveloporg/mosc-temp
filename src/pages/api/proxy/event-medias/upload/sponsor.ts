@@ -70,14 +70,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const isPublicValue = Array.isArray(isPublic) ? isPublic[0] : isPublic;
     const isPublicBoolean = String(isPublicValue) === 'true';
 
-    // Use the Swagger API specification endpoint
-    const apiUrl = `${API_BASE_URL}/api/event-medias/upload/sponsor`;
+    // Use the Swagger API specification endpoint (backend expects /upload/sponsor-image)
+    const apiUrl = `${API_BASE_URL}/api/event-medias/upload/sponsor-image`;
 
     // Build query string according to Swagger specification
     const queryParams = new URLSearchParams({
       eventId: eventIdValue,
       entityId: String(entityIdInt),
-      imageType: imageTypeValue,
+      imageType: imageTypeValue, // Now sends LOGO_IMAGE, HERO_IMAGE, BANNER_IMAGE
       title: titleValue,
       description: descriptionValue,
       tenantId: tenantIdValue,

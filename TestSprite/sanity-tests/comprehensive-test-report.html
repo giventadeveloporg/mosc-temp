@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Sanity Test Report - Malayalees US Site</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+        }
+        .summary {
+            padding: 30px;
+            border-bottom: 2px solid #eee;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .summary-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .summary-card h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .summary-card .number {
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+        .passed { color: #28a745; }
+        .failed { color: #dc3545; }
+        .total { color: #007bff; }
+        .success-rate { color: #17a2b8; }
+        .skipped { color: #ffc107; }
+        .category-section {
+            padding: 30px;
+            border-bottom: 1px solid #eee;
+        }
+        .category-section:last-child {
+            border-bottom: none;
+        }
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        .category-header h2 {
+            color: #333;
+            font-size: 1.5em;
+        }
+        .category-stats {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9em;
+        }
+        .category-stats span {
+            padding: 5px 10px;
+            border-radius: 4px;
+            background: #f8f9fa;
+        }
+        .test-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+            border-left: 4px solid;
+            transition: background-color 0.2s;
+        }
+        .test-item:hover {
+            background-color: #f8f9fa;
+        }
+        .test-item.passed {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+        .test-item.failed {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+        .test-item.skipped {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+        }
+        .test-status {
+            font-size: 1.5em;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        .test-info {
+            flex: 1;
+        }
+        .test-info h4 {
+            margin: 0 0 5px 0;
+            color: #333;
+            font-size: 1.1em;
+        }
+        .test-info .test-id {
+            font-family: monospace;
+            font-size: 0.85em;
+            color: #666;
+            margin-right: 10px;
+        }
+        .test-info .test-priority {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .priority-critical { background: #dc3545; color: white; }
+        .priority-high { background: #fd7e14; color: white; }
+        .priority-medium { background: #ffc107; color: #333; }
+        .priority-low { background: #6c757d; color: white; }
+        .test-info p {
+            margin: 5px 0 0 0;
+            color: #666;
+            font-size: 0.9em;
+        }
+        .test-details {
+            margin-left: auto;
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .test-details .url {
+            font-family: monospace;
+            background: #f1f1f1;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+            display: inline-block;
+        }
+        .test-details .duration {
+            font-size: 0.8em;
+            color: #666;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #eee;
+        }
+        .timestamp {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+        .expandable {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0,0,0,0.02);
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
+        .expandable h5 {
+            margin: 0 0 5px 0;
+            color: #333;
+        }
+        .expandable ul {
+            margin: 5px 0 0 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Comprehensive Sanity Test Report</h1>
+            <p>Malayalees US Site Event Registration Platform</p>
+        </div>
+
+        <div class="summary">
+            <h2>📊 Test Summary</h2>
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <h3>Total Tests</h3>
+                    <div class="number total">34</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Passed</h3>
+                    <div class="number passed">29</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Failed</h3>
+                    <div class="number failed">0</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Skipped</h3>
+                    <div class="number skipped">5</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Success Rate</h3>
+                    <div class="number success-rate">100.0%</div>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="category-section">
+            <div class="category-header">
+                <h2>Public Pages</h2>
+                <div class="category-stats">
+                    <span>Total: 11</span>
+                    <span style="color: #28a745;">Passed: 9</span>
+                    <span style="color: #dc3545;">Failed: 0</span>
+                    <span style="color: #17a2b8;">Rate: 81.8%</span>
+                </div>
+            </div>
+            
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-001</span>
+                            Homepage Load Test
+                            <span class="test-priority priority-critical">critical</span>
+                        </h4>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="expandable">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>nav</code></li><li><code>main</code></li><li><code>h1, h2</code></li><li><code>a[href="/events"]</code></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/</div>
+                        <div class="duration">765ms</div>
+                    </div>
+                </div>
+            
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-002</span>
+                            Events Listing Page Test
+                            <span class="test-priority priority-critical">critical</span>
+                        </h4>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="expandable">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>h1</code></li><li><code>.grid, [class*="grid"]</code></li><li><code>[class*="event"], [class*="card"]</code></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/events</div>
+                        <div class="duration">766ms</div>
+                    </div>
+                </div>
+            
+                <div class="test-item skipped">
+                    <div class="test-status">⏭️</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-003</span>
+                            Event Details Page Test
+                            <span class="test-priority priority-critical">critical</span>
+                        </h4>
+                        <p>Skipped: No events available</p>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/events/1</div>
+                        <div class="duration">0ms</div>
+                    </div>
+                </div>
+            
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-004</span>
+                            Sponsors Listing Page Test
+                            <span class="test-priority priority-high">high</span>
+                        </h4>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="expandable">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>h1</code></li><li><code>[class*="sponsor"], [class*="card"]</code></li><li><code>input[type="text"], input[type="search"]</code></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/sponsors</div>
+                        <div class="duration">921ms</div>
+                    </div>
+                </div>
+            
+                <div class="test-item skipped">
+                    <div class="test-status">⏭️</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-005</span>
+                            Sponsor Details Page Test
+                            <span class="test-priority priority-medium">medium</span>
+                        </h4>
+                        <p>Skipped: No sponsors available</p>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/sponsors/1</div>
+                        <div class="duration">0ms</div>
+                    </div>
+                </div>
+            
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-006</span>
+                            Gallery Page Test
+                            <span class="test-priority priority-high">high</span>
+                        </h4>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="expandable">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>h1</code></li><li><code>[class*="gallery"]</code></li><li><code>img, [class*="image"]</code></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/gallery</div>
+                        <div class="duration">372ms</div>
+                    </div>
+                </div>
+            
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-007</span>
+                            Polls Listing Page Test
+                            <span class="test-priority priority-medium">medium</span>
+                        </h4>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="expandable">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>h1</code></li><li><code>[class*="poll"], [class*="card"]</code></li><li><code>button, a[href*="/polls/"]</code></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/polls</div>
+                        <div class="duration">1033ms</div>
+                    </div>
+                </div>
+            
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-008</span>
+                            Calendar Page Test
+                            <span class="test-priority priority-medium">medium</span>
+                        </h4>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="expandable">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>h1</code></li><li><code>[class*="calendar"]</code></li><li><code>button, [class*="month"], [class*="day"]</code></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/calendar</div>
+                        <div class="duration">933ms</div>
+                    </div>
+                </div>
+            
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-009</span>
+                            MOSC Homepage Test
+                            <span class="test-priority priority-medium">medium</span>
+                        </h4>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="expandable">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>h1, h2</code></li><li><code>nav</code></li><li><code>main</code></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/mosc</div>
+                        <div class="duration">1079ms</div>
+                    </div>
+                </div>
+            
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-010</span>
+                            Charity Theme Page Test
+                            <span class="test-priority priority-low">low</span>
+                        </h4>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="expandable">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>h1</code></li><li><code>main</code></li><li><code>[class*="charity"]</code></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/charity-theme</div>
+                        <div class="duration">704ms</div>
+                    </div>
+                </div>
+            
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-034</span>
+                            Pricing Page Test
+                            <span class="test-priority priority-medium">medium</span>
+                        </h4>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="expandable">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>h1</code></li><li><code>[class*="pricing"], [class*="plan"]</code></li><li><code>button, a[href*="/sign-up"]</code></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/pricing</div>
+                        <div class="duration">864ms</div>
+                    </div>
+                </div>
+            
+        </div>
+        
+        <div class="category-section">
+            <div class="category-header">
+                <h2>Admin Pages</h2>
+                <div class="category-stats">
+                    <span>Total: 16</span>
+                    <span style="color: #28a745;">Passed: 13</span>
+                    <span style="color: #dc3545;">Failed: 0</span>
+                    <span style="color: #17a2b8;">Rate: 81.3%</span>
+                </div>
+            </div>
+            
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-011</span>
+                            Admin Dashboard Access Test
+                            <span class="test-priority priority-critical">critical</span>
+                        </h4>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="expandable">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>h1, h2</code></li><li><code>[class*="admin"]</code></li><li><code>nav, [class*="nav"]</code></li><li><code>a[href*="/admin/events"]</code></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/admin</div>
+                        <div class="duration">841ms</div>
+                    </div>
+                </div>
+            
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-012</span>
+                            Admin Events Management Hub Test
+                            <span class="test-priority priority-critical">critical</span>
+                        </h4>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="expandable">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>h1</code></li><li><code>[class*="grid"], [class*="card"]</code></li><li><code>a[href*="/admin/events/new"], button</code></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/admin/events</div>
+                        <div class="duration">469ms</div>
+                    </div>
+                </div>
+            
+                <div class="test-item skipped">
+                    <div class="test-status">⏭️</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-013</span>
+                            Admin Event Overview Test
+                            <span class="test-priority priority-critical">critical</span>
+                        </h4>
+                        <p>Skipped: No events available</p>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/admin/events/1</div>
+                        <div class="duration">0ms</div>
+                    </div>
+                </div>
+            
+                <div class="test-item skipped">
+                    <div class="test-status">⏭️</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-014</span>
+                            Admin Event Media Management Test
+                            <span class="test-priority priority-high">high</span>
+                        </h4>
+                        <p>Skipped: No events available</p>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/admin/events/1/media</div>
+                        <div class="duration">0ms</div>
+                    </div>
+                </div>
+            
+                <div class="test-item skipped">
+                    <div class="test-status">⏭️</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-015</span>
+                            Admin Event Sponsors Management Test
+                            <span class="test-priority priority-high">high</span>
+                        </h4>
+                        <p>Skipped: No events available</p>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/admin/events/1/sponsors</div>
+                        <div class="duration">0ms</div>
+                    </div>
+                </div>
+            
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-016</span>
+                            Admin Event Contacts Management Test
+                            <span class="test-priority priority-high">high</span>
+                        </h4>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="expandable">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>h1</code></li><li><code>table, [class*="table"]</code></li><li><code>button, form</code></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/admin/event-contacts</div>
+                        <div class="duration">335ms</div>
+                    </div>
+                </div>
+            
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-017</span>
+                            Admin Event Emails Management Test
+                            <span class="test-priority priority-high">high</span>
+                        </h4>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="expandable">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>h1</code></li><li><code>table, [class*="table"]</code></li><li><code>button, form</code></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/admin/event-emails</div>
+                        <div class="duration">481ms</div>
+                    </div>
+                </div>
+            
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-018</span>
+                            Admin Event Performers Management Test
+                            <span class="test-priority priority-high">high</span>
+                        </h4>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="expandable">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>h1</code></li><li><code>table, [class*="table"], [class*="grid"]</code></li><li><code>button, a[href*="/new"]</code></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/admin/event-featured-performers</div>
+                        <div class="duration">457ms</div>
+                    </div>
+                </div>
+            
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-019</span>
+                            Admin Event Program Directors Test
+                            <span class="test-priority priority-high">high</span>
+                        </h4>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="expandable">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>h1</code></li><li><code>table, [class*="table"], [class*="grid"]</code></li><li><code>button, a[href*="/new"]</code></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/admin/event-program-directors</div>
+                        <div class="duration">608ms</div>
+                    </div>
+                </div>
+            
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-020</span>
+                            Admin Event Registrations Management Test
+                            <span class="test-priority priority-critical">critical</span>
+                        </h4>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="expandable">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>h1</code></li><li><code>table, [class*="table"]</code></li><li><code>select, input[type="text"]</code></li><li><code>button</code></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/admin/events/registrations</div>
+                        <div class="duration">591ms</div>
+                    </div>
+                </div>
+            
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-021</span>
+                            Admin Executive Committee Management Test
+                            <span class="test-priority priority-medium">medium</span>
+                        </h4>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="expandable">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>h1</code></li><li><code>table, [class*="table"], [class*="grid"]</code></li><li><code>button, form</code></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/admin/executive-committee</div>
+                        <div class="duration">538ms</div>
+                    </div>
+                </div>
+            
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-022</span>
+                            Admin Focus Groups Management Test
+                            <span class="test-priority priority-medium">medium</span>
+                        </h4>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="expandable">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>h1</code></li><li><code>table, [class*="table"], [class*="grid"]</code></li><li><code>a[href*="/new"], button</code></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/admin/focus-groups</div>
+                        <div class="duration">525ms</div>
+                    </div>
+                </div>
+            
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-023</span>
+                            Admin Polls Management Test
+                            <span class="test-priority priority-medium">medium</span>
+                        </h4>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="expandable">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>h1</code></li><li><code>table, [class*="table"], [class*="grid"]</code></li><li><code>button, a[href*="/new"]</code></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/admin/polls</div>
+                        <div class="duration">472ms</div>
+                    </div>
+                </div>
+            
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-024</span>
+                            Admin Tenant Management Test
+                            <span class="test-priority priority-medium">medium</span>
+                        </h4>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="expandable">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>h1</code></li><li><code>nav, [class*="tab"]</code></li><li><code>button, form</code></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/admin/tenant-management</div>
+                        <div class="duration">1041ms</div>
+                    </div>
+                </div>
+            
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-025</span>
+                            Admin WhatsApp Settings Test
+                            <span class="test-priority priority-low">low</span>
+                        </h4>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="expandable">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>h1</code></li><li><code>form</code></li><li><code>input, select</code></li><li><code>button[type="submit"]</code></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/admin/whatsapp-settings</div>
+                        <div class="duration">692ms</div>
+                    </div>
+                </div>
+            
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-026</span>
+                            Admin QR Code Scanner Test
+                            <span class="test-priority priority-medium">medium</span>
+                        </h4>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="expandable">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>h1</code></li><li><code>video, canvas, [class*="camera"]</code></li><li><code>button</code></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/admin/qrcode-scan/tickets</div>
+                        <div class="duration">712ms</div>
+                    </div>
+                </div>
+            
+        </div>
+        
+        <div class="category-section">
+            <div class="category-header">
+                <h2>User Pages</h2>
+                <div class="category-stats">
+                    <span>Total: 3</span>
+                    <span style="color: #28a745;">Passed: 3</span>
+                    <span style="color: #dc3545;">Failed: 0</span>
+                    <span style="color: #17a2b8;">Rate: 100.0%</span>
+                </div>
+            </div>
+            
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-027</span>
+                            User Profile Page Test
+                            <span class="test-priority priority-high">high</span>
+                        </h4>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="expandable">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>h1</code></li><li><code>form</code></li><li><code>input[name="firstName"], input[name="lastName"]</code></li><li><code>input[name="email"]</code></li><li><code>button[type="submit"]</code></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/profile</div>
+                        <div class="duration">805ms</div>
+                    </div>
+                </div>
+            
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-028</span>
+                            User Dashboard Test
+                            <span class="test-priority priority-high">high</span>
+                        </h4>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="expandable">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>h1, h2</code></li><li><code>[class*="card"], [class*="grid"]</code></li><li><code>a, button</code></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/dashboard</div>
+                        <div class="duration">323ms</div>
+                    </div>
+                </div>
+            
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-029</span>
+                            User Settings Page Test
+                            <span class="test-priority priority-medium">medium</span>
+                        </h4>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="expandable">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>h1</code></li><li><code>form</code></li><li><code>input, select</code></li><li><code>button[type="submit"]</code></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/settings</div>
+                        <div class="duration">415ms</div>
+                    </div>
+                </div>
+            
+        </div>
+        
+        <div class="category-section">
+            <div class="category-header">
+                <h2>Authentication</h2>
+                <div class="category-stats">
+                    <span>Total: 2</span>
+                    <span style="color: #28a745;">Passed: 2</span>
+                    <span style="color: #dc3545;">Failed: 0</span>
+                    <span style="color: #17a2b8;">Rate: 100.0%</span>
+                </div>
+            </div>
+            
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-030</span>
+                            Sign In Page Test
+                            <span class="test-priority priority-critical">critical</span>
+                        </h4>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="expandable">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>h1, h2</code></li><li><code>form</code></li><li><code>input[type="email"], input[type="text"]</code></li><li><code>button[type="submit"]</code></li><li><code>a[href*="/sign-up"]</code></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/sign-in</div>
+                        <div class="duration">560ms</div>
+                    </div>
+                </div>
+            
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-031</span>
+                            Sign Up Page Test
+                            <span class="test-priority priority-critical">critical</span>
+                        </h4>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="expandable">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>h1, h2</code></li><li><code>form</code></li><li><code>input[type="email"]</code></li><li><code>button[type="submit"]</code></li><li><code>a[href*="/sign-in"]</code></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/sign-up</div>
+                        <div class="duration">417ms</div>
+                    </div>
+                </div>
+            
+        </div>
+        
+        <div class="category-section">
+            <div class="category-header">
+                <h2>Legal Pages</h2>
+                <div class="category-stats">
+                    <span>Total: 2</span>
+                    <span style="color: #28a745;">Passed: 2</span>
+                    <span style="color: #dc3545;">Failed: 0</span>
+                    <span style="color: #17a2b8;">Rate: 100.0%</span>
+                </div>
+            </div>
+            
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-032</span>
+                            Privacy Policy Page Test
+                            <span class="test-priority priority-low">low</span>
+                        </h4>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="expandable">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>h1</code></li><li><code>main, article</code></li><li><code>p, [class*="content"]</code></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/privacy</div>
+                        <div class="duration">740ms</div>
+                    </div>
+                </div>
+            
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">sanity-033</span>
+                            Terms of Service Page Test
+                            <span class="test-priority priority-low">low</span>
+                        </h4>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="expandable">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>h1</code></li><li><code>main, article</code></li><li><code>p, [class*="content"]</code></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/terms</div>
+                        <div class="duration">623ms</div>
+                    </div>
+                </div>
+            
+        </div>
+        
+
+        <div class="footer">
+            <p>Generated by Comprehensive TestSprite Sanity Test Suite</p>
+            <p class="timestamp">Report generated on: 11/8/2025, 12:25:38 AM</p>
+            <p class="timestamp">Base URL: http://localhost:3000</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -198,22 +198,24 @@ const OurSponsorsSection: React.FC = () => {
             >
               <div className="flex flex-col h-full">
                 {/* Image Section - Increased by another 10% (h-112 = 448px) for maximum image display */}
-                <div className="relative w-full h-112 rounded-t-2xl overflow-hidden">
+                <div className="relative w-full h-auto rounded-t-2xl overflow-hidden">
                   {sponsor.bannerImageUrl ? (
                     <Image
                       src={sponsor.bannerImageUrl}
                       alt={sponsor.name}
                       width={800}
                       height={600}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-auto object-contain group-hover:scale-105 transition-transform duration-300"
                       style={{
+                        backgroundColor: 'transparent',
                         borderRadius: '1rem 1rem 0 0'
                       }}
                     />
                   ) : (
                     <div
-                      className="w-full h-full flex items-center justify-center bg-gray-100"
+                      className="w-full h-80 flex items-center justify-center"
                       style={{
+                        backgroundColor: 'transparent',
                         borderRadius: '1rem 1rem 0 0'
                       }}
                     >
@@ -236,10 +238,10 @@ const OurSponsorsSection: React.FC = () => {
                   </h2>
 
                   {/* Sponsor Details - 3-column layout with smart centering for last item */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-2 lg:justify-items-center">
                     {/* Company Name */}
                     {sponsor.companyName && (
-                      <div className="flex items-center gap-3 text-gray-700">
+                      <div className="flex items-center gap-3 text-gray-700 justify-center lg:justify-start">
                         <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                           <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -252,7 +254,7 @@ const OurSponsorsSection: React.FC = () => {
                     )}
 
                     {/* Sponsor Type */}
-                    <div className="flex items-center gap-3 text-gray-700">
+                    <div className="flex items-center gap-3 text-gray-700 justify-center lg:justify-start">
                       <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                         <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
@@ -265,7 +267,7 @@ const OurSponsorsSection: React.FC = () => {
 
                     {/* Contact Email */}
                     {sponsor.contactEmail && (
-                      <div className="flex items-center gap-3 text-gray-700">
+                      <div className="flex items-center gap-3 text-gray-700 justify-center lg:justify-start">
                         <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                           <svg className="w-8 h-8 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -279,7 +281,7 @@ const OurSponsorsSection: React.FC = () => {
 
                     {/* Contact Phone */}
                     {sponsor.contactPhone && (
-                      <div className="flex items-center gap-3 text-gray-700">
+                      <div className="flex items-center gap-3 text-gray-700 justify-center lg:justify-start">
                         <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                           <svg className="w-8 h-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -291,9 +293,9 @@ const OurSponsorsSection: React.FC = () => {
                       </div>
                     )}
 
-                    {/* Website - Centers if it's the only item in the last row */}
+                    {/* Website */}
                     {sponsor.websiteUrl && (
-                      <div className="flex items-center gap-3 text-gray-700 lg:justify-self-center lg:col-start-2">
+                      <div className="flex items-center gap-3 text-gray-700 justify-center lg:justify-start">
                         <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-teal-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                           <svg className="w-8 h-8 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9-9a9 9 0 00-9-9m0 18a9 9 0 009-9M12 3a9 9 0 00-9 9" />

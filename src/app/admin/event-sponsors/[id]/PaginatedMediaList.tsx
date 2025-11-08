@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { FaChevronLeft, FaChevronRight, FaSpinner, FaImage, FaEdit, FaSave, FaBan } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaSpinner, FaImage, FaEdit, FaSave, FaBan, FaTrash } from 'react-icons/fa';
 import Image from 'next/image';
 import type { EventMediaDTO } from '@/types';
-import { fetchSponsorMediaServer, updateMediaPriorityRankingServer, updateEventMediaServer } from '../ApiServerActions';
+import { fetchSponsorMediaServer, updateMediaPriorityRankingServer, updateEventMediaServer, deleteEventMediaServer } from '../ApiServerActions';
 import PriorityRankingEditor from '@/components/sponsors/PriorityRankingEditor';
 import Modal from '@/components/ui/Modal';
 
@@ -133,26 +133,23 @@ export default function PaginatedMediaList({
     });
   };
 
-  const handleSaveEdit = async () => {
-    if (!editingMedia?.id) return;
+  const handleDelete = async (mediaId: number) => {
+    if (!confirm('Are you sure you want to delete this media file? This action cannot be undone.')) {
+      return;
+    }
 
-    setSaving(true);
+    setLoading(true);
     try {
-      const payload = {
-        ...editForm,
-        updatedAt: new Date().toISOString(),
-      };
-      await updateEventMediaServer(editingMedia.id, payload);
-
+      await deleteEventMediaServer(mediaId);
       // Refresh the media list
       await loadMedia();
-      setEditingMedia(null);
-      setEditForm({});
+      // Refresh the page to update pagination
+      router.refresh();
     } catch (error) {
-      console.error('Failed to update media:', error);
-      alert(`Failed to update media: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error('Failed to delete media:', error);
+      alert(`Failed to delete media: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
-      setSaving(false);
+      setLoading(false);
     }
   };
 
@@ -204,13 +201,26 @@ export default function PaginatedMediaList({
                   <h4 className="font-medium text-sm text-foreground truncate flex-1" title={media.title || 'Untitled'}>
                     {media.title || 'Untitled'}
                   </h4>
-                  <button
-                    onClick={(e) => handleEditClick(media, e)}
-                    className="ml-2 text-primary hover:text-primary/80 reverent-transition flex-shrink-0"
-                    title="Edit media details"
-                  >
-                    <FaEdit className="w-4 h-4" />
-                  </button>
+                  <div className="flex items-center gap-2 ml-2 flex-shrink-0">
+                    <button
+                      onClick={(e) => handleEditClick(media, e)}
+                      className="text-primary hover:text-primary/80 reverent-transition"
+                      title="Edit media details"
+                    >
+                      <FaEdit className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (media.id) handleDelete(media.id);
+                      }}
+                      className="text-destructive hover:text-destructive/80 reverent-transition"
+                      title="Delete media"
+                      disabled={loading}
+                    >
+                      <FaTrash className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
                 <div className="text-xs text-muted-foreground mb-1">
                   Type: {media.eventMediaType || 'N/A'}
