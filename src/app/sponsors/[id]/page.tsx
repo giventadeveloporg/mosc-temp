@@ -250,22 +250,37 @@ export default function SponsorDetailsPage() {
                 )}
               </div>
 
-              {/* Tagline/Description */}
+              {/* Tagline */}
               {sponsor.tagline && (
-                <div className="mb-6 p-6 rounded-xl bg-gradient-to-br from-muted/50 via-background to-muted/30 border-2 border-primary/30 shadow-lg relative overflow-hidden lg:max-w-4xl lg:mx-auto">
-                  {/* Beveled border effect */}
-                  <div className="absolute inset-0 rounded-xl pointer-events-none" style={{
-                    background: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,0.05) 100%)',
-                    border: '1px solid rgba(255,255,255,0.4)',
-                    boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.5), inset 0 -1px 2px rgba(0,0,0,0.1)',
-                  }}></div>
-                  {/* Content */}
-                  <div className="relative text-lg font-medium text-gray-800 whitespace-pre-wrap leading-relaxed z-10" style={{
-                    fontFamily: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif',
-                    letterSpacing: '0.01em',
-                    lineHeight: '1.75'
-                  }}>
-                    {sponsor.tagline}
+                <div className="mb-8 lg:max-w-3xl lg:mx-auto px-3">
+                  <div className="relative overflow-hidden rounded-3xl border border-amber-200 bg-gradient-to-br from-amber-50 via-white to-amber-100 shadow-[0_18px_38px_-20px_rgba(146,118,65,0.45)] px-6 sm:px-10 py-8 text-center">
+                    <div className="absolute inset-0 rounded-3xl pointer-events-none" style={{
+                      background: 'linear-gradient(130deg, rgba(255,255,255,0.75) 0%, rgba(255,248,235,0.35) 50%, rgba(214,173,96,0.2) 100%)'
+                    }}/>
+                    <p className="relative z-10 font-heading text-xl sm:text-2xl text-amber-800 italic leading-relaxed tracking-wide">
+                      {sponsor.tagline}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Description */}
+              {sponsor.description && sponsor.description.trim().length > 0 && (
+                <div className="mb-10 lg:max-w-4xl lg:mx-auto px-3">
+                  <div className="relative rounded-3xl border border-white/70 bg-gradient-to-br from-sky-100 via-white to-sky-50 shadow-[0_22px_45px_-25px_rgba(15,23,42,0.35)] px-8 sm:px-12 py-10 text-center">
+                    <div className="absolute inset-0 rounded-3xl pointer-events-none" style={{
+                      background: 'linear-gradient(135deg, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0.1) 40%, rgba(135,206,250,0.15) 100%)'
+                    }}/>
+                    <div className="relative z-10 text-left">
+                      {sponsor.description.split(/\n{2,}|\r\n\r\n/).map((paragraph, idx) => (
+                        <p
+                          key={idx}
+                          className="font-heading text-[1.1rem] sm:text-[1.2rem] text-slate-700 leading-relaxed tracking-[0.01em] mb-4 last:mb-0"
+                        >
+                          {paragraph.trim()}
+                        </p>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}

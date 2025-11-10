@@ -137,10 +137,10 @@ export default function DataTable<T extends Record<string, any>>({
                         {onEdit && (
                           <button
                             onClick={() => onEdit(item)}
-                            className="icon-btn icon-btn-edit mr-2"
+                            className="icon-btn icon-btn-edit bg-blue-700 hover:bg-blue-800 text-white p-4 shadow-lg"
                             title="Edit"
                           >
-                            <FaEdit />
+                            <FaEdit className="text-xl text-white" />
                           </button>
                         )}
                         {onDelete && (
@@ -149,10 +149,10 @@ export default function DataTable<T extends Record<string, any>>({
                               console.log('🗑️ Delete button clicked for item:', item);
                               onDelete(item);
                             }}
-                            className="icon-btn icon-btn-delete"
+                            className="icon-btn icon-btn-delete bg-red-700 hover:bg-red-800 text-white p-4 shadow-lg"
                             title="Delete"
                           >
-                            <FaTrashAlt />
+                            <FaTrashAlt className="text-xl text-white" />
                           </button>
                         )}
                       </div>

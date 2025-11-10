@@ -2,10 +2,10 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import type { EventSponsorsDTO } from "@/types";
 import { getAppUrl } from '@/lib/env';
+import { SponsorCard } from '@/components/sponsors/SponsorCard';
 
 export default function SponsorsPage() {
   const [sponsors, setSponsors] = useState<EventSponsorsDTO[]>([]);
@@ -219,156 +219,11 @@ export default function SponsorsPage() {
             {/* Sponsors List - Single column stacked layout */}
             <div className="space-y-8">
               {filteredSponsors.map((sponsor, index) => (
-                <div
-                  key={sponsor.id}
-                  className={`${getRandomBackground(index)} rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group`}
-                  style={{
-                    boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05)'
-                  }}
-                >
-                  <div className="flex flex-col h-full">
-                    {/* Image Section - Matching events page style */}
-                    <div className="relative w-full h-auto rounded-t-2xl overflow-hidden">
-                      {sponsor.bannerImageUrl ? (
-                        <Image
-                          src={sponsor.bannerImageUrl}
-                          alt={sponsor.name}
-                          width={800}
-                          height={600}
-                          className="w-full h-auto object-contain group-hover:scale-105 transition-transform duration-300"
-                          style={{
-                            backgroundColor: 'transparent',
-                            borderRadius: '1rem 1rem 0 0'
-                          }}
-                        />
-                      ) : (
-                        <div
-                          className="w-full h-80 flex items-center justify-center"
-                          style={{
-                            backgroundColor: 'transparent',
-                            borderRadius: '1rem 1rem 0 0'
-                          }}
-                        >
-                          <span className="text-gray-400 text-4xl">🏢</span>
-                        </div>
-                      )}
-                      {/* Sponsor Type Badge */}
-                      <div className="absolute top-3 right-3">
-                        <span className="px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full">
-                          {sponsor.type}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Content Section - Compact header */}
-                    <div className="p-5 border-t border-white/20">
-                      {/* Sponsor Name */}
-                      <h2 className="text-xl font-bold text-gray-800 mb-2">
-                        {sponsor.name}
-                      </h2>
-
-                      {/* Company Name */}
-                      {sponsor.companyName && (
-                        <p className="text-gray-600 text-base mb-2">
-                          {sponsor.companyName}
-                        </p>
-                      )}
-
-                      {/* Tagline/Description - Compact */}
-                      {sponsor.tagline && (
-                        <div className="mb-3">
-                          <p className="text-gray-600 text-sm line-clamp-2">
-                            {sponsor.tagline}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Details Section - Matching home page style */}
-                    <div className="px-4 pb-4 border-t border-white/20">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-2 pt-3 lg:justify-items-center">
-                        {/* Company Name */}
-                        {sponsor.companyName && (
-                          <div className="flex items-center gap-3 text-gray-700 justify-center lg:justify-start">
-                            <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                              <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                              </svg>
-                            </div>
-                            <span className="text-lg font-semibold">
-                              {sponsor.companyName}
-                            </span>
-                          </div>
-                        )}
-
-                        {/* Sponsor Type */}
-                        {sponsor.type && (
-                          <div className="flex items-center gap-3 text-gray-700 justify-center lg:justify-start">
-                            <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                              <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                              </svg>
-                            </div>
-                            <span className="text-lg font-semibold">
-                              {sponsor.type}
-                            </span>
-                          </div>
-                        )}
-
-                        {/* Contact Email */}
-                        {sponsor.contactEmail && (
-                          <div className="flex items-center gap-3 text-gray-700 justify-center lg:justify-start">
-                            <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                              <svg className="w-8 h-8 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                              </svg>
-                            </div>
-                            <span className="text-lg font-semibold">
-                              {sponsor.contactEmail}
-                            </span>
-                          </div>
-                        )}
-
-                        {/* Contact Phone */}
-                        {sponsor.contactPhone && (
-                          <div className="flex items-center gap-3 text-gray-700 justify-center lg:justify-start">
-                            <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                              <svg className="w-8 h-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                              </svg>
-                            </div>
-                            <span className="text-lg font-semibold">
-                              {sponsor.contactPhone}
-                            </span>
-                          </div>
-                        )}
-
-                        {/* Website */}
-                        {sponsor.websiteUrl && (
-                          <div className="flex items-center gap-3 text-gray-700 justify-center lg:justify-start">
-                            <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-teal-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                              <svg className="w-8 h-8 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9-9a9 9 0 00-9-9m0 18a9 9 0 009-9M12 3a9 9 0 00-9 9" />
-                              </svg>
-                            </div>
-                            <span className="text-lg font-semibold">
-                              {sponsor.websiteUrl.replace(/^https?:\/\//, '')}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Tagline/Description - Minimal bottom spacing */}
-                      {sponsor.tagline && (
-                        <div className="mb-1">
-                          <p className="text-gray-600 text-sm line-clamp-2">
-                            {sponsor.tagline}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                <SponsorCard
+                  key={sponsor.id ?? `${sponsor.name}-${index}`}
+                  sponsor={sponsor}
+                  backgroundClass={getRandomBackground(index)}
+                />
               ))}
             </div>
 

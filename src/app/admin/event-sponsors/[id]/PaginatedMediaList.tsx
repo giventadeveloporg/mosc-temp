@@ -2,12 +2,12 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { FaChevronLeft, FaChevronRight, FaSpinner, FaImage, FaEdit, FaSave, FaBan, FaTrash } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaSpinner, FaImage, FaEdit, FaSave, FaBan, FaTrashAlt } from 'react-icons/fa';
 import Image from 'next/image';
 import type { EventMediaDTO } from '@/types';
 import { fetchSponsorMediaServer, updateMediaPriorityRankingServer, updateEventMediaServer, deleteEventMediaServer } from '../ApiServerActions';
 import PriorityRankingEditor from '@/components/sponsors/PriorityRankingEditor';
-import Modal from '@/components/ui/Modal';
+import Modal, { ConfirmModal } from '@/components/ui/Modal';
 
 interface PaginatedMediaListProps {
   sponsorId: number;
@@ -38,6 +38,8 @@ export default function PaginatedMediaList({
   const [editingMedia, setEditingMedia] = useState<EventMediaDTO | null>(null);
   const [editForm, setEditForm] = useState<Partial<EventMediaDTO>>({});
   const [saving, setSaving] = useState(false);
+  const [deletingMediaId, setDeletingMediaId] = useState<number | null>(null);
+  const [mediaToDelete, setMediaToDelete] = useState<EventMediaDTO | null>(null);
 
   // Load media when page changes or refreshKey changes
   const loadMedia = useCallback(async () => {
@@ -106,6 +108,7 @@ export default function PaginatedMediaList({
 
   const handleEditClick = (media: EventMediaDTO, e: React.MouseEvent) => {
     e.stopPropagation();
+    (e.currentTarget as HTMLButtonElement).blur();
     setEditingMedia(media);
     setEditForm({
       id: media.id,
@@ -133,23 +136,88 @@ export default function PaginatedMediaList({
     });
   };
 
-  const handleDelete = async (mediaId: number) => {
-    if (!confirm('Are you sure you want to delete this media file? This action cannot be undone.')) {
-      return;
+  const handleDelete = async (mediaId: number, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+      (e.currentTarget as HTMLButtonElement).blur();
     }
+    const media = mediaList.find(m => m.id === mediaId);
+    if (media) {
+      setMediaToDelete(media);
+    }
+  };
 
+  const handleConfirmDelete = async () => {
+    if (!mediaToDelete?.id) return;
+
+    setDeletingMediaId(mediaToDelete.id);
     setLoading(true);
     try {
-      await deleteEventMediaServer(mediaId);
+      await deleteEventMediaServer(mediaToDelete.id);
       // Refresh the media list
       await loadMedia();
       // Refresh the page to update pagination
       router.refresh();
+      setMediaToDelete(null);
     } catch (error) {
       console.error('Failed to delete media:', error);
       alert(`Failed to delete media: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
+      setDeletingMediaId(null);
+    }
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingMedia?.id) return;
+
+    setSaving(true);
+    try {
+      const merged: Partial<EventMediaDTO> = {
+        ...editingMedia,
+        ...editForm,
+        updatedAt: new Date().toISOString(),
+      };
+
+      merged.createdAt = merged.createdAt || editingMedia.createdAt || new Date().toISOString();
+      merged.storageType = merged.storageType || editingMedia.storageType || 'S3';
+      merged.eventMediaType = merged.eventMediaType || editingMedia.eventMediaType || 'gallery';
+      merged.title = (merged.title ?? editingMedia.title ?? 'Untitled Media').trim() || 'Untitled Media';
+      merged.priorityRanking =
+        typeof merged.priorityRanking === 'number'
+          ? merged.priorityRanking
+          : editingMedia.priorityRanking ?? 0;
+      merged.tenantId = merged.tenantId || editingMedia.tenantId;
+
+      const booleanFields: (keyof EventMediaDTO)[] = [
+        'isHomePageHeroImage',
+        'isFeaturedEventImage',
+        'isLiveEventImage',
+        'isPublic',
+        'eventFlyer',
+        'isEventManagementOfficialDocument',
+        'isHeroImage',
+        'isActiveHeroImage',
+        'isFeaturedVideo',
+      ];
+
+      booleanFields.forEach((field) => {
+        (merged as any)[field] = (merged as any)[field] ?? (editingMedia as any)?.[field] ?? false;
+      });
+
+      if (merged.startDisplayingFromDate === '') {
+        delete merged.startDisplayingFromDate;
+      }
+
+      await updateEventMediaServer(editingMedia.id, merged);
+      await loadMedia();
+      setEditingMedia(null);
+      setEditForm({});
+    } catch (error) {
+      console.error('Failed to update media:', error);
+      alert(`Failed to update media: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -204,21 +272,24 @@ export default function PaginatedMediaList({
                   <div className="flex items-center gap-2 ml-2 flex-shrink-0">
                     <button
                       onClick={(e) => handleEditClick(media, e)}
-                      className="text-primary hover:text-primary/80 reverent-transition"
+                      className="icon-btn icon-btn-edit bg-blue-700 hover:bg-blue-800 text-white p-3 shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                       title="Edit media details"
                     >
-                      <FaEdit className="w-4 h-4" />
+                      <FaEdit className="text-lg text-white" />
                     </button>
                     <button
                       onClick={(e) => {
-                        e.stopPropagation();
-                        if (media.id) handleDelete(media.id);
+                        if (media.id) handleDelete(media.id, e);
                       }}
-                      className="text-destructive hover:text-destructive/80 reverent-transition"
-                      title="Delete media"
-                      disabled={loading}
+                      disabled={deletingMediaId === media.id || loading}
+                      className="icon-btn icon-btn-delete bg-red-700 hover:bg-red-800 text-white p-3 shadow-lg disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                      title="Delete media file"
                     >
-                      <FaTrash className="w-4 h-4" />
+                      {deletingMediaId === media.id ? (
+                        <FaSpinner className="text-lg text-white animate-spin" />
+                      ) : (
+                        <FaTrashAlt className="text-lg text-white" />
+                      )}
                     </button>
                   </div>
                 </div>
@@ -478,6 +549,17 @@ export default function PaginatedMediaList({
           </div>
         </Modal>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={!!mediaToDelete}
+        onClose={() => setMediaToDelete(null)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Media File"
+        message={`Are you sure you want to delete "${mediaToDelete?.title || 'this media file'}"? This action cannot be undone.`}
+        confirmText="Delete"
+        variant="danger"
+      />
     </div>
   );
 }

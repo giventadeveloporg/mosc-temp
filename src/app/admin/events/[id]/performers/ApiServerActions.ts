@@ -1,7 +1,7 @@
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
-import { getAppUrl } from '@/lib/env';
+import { getAppUrl, getTenantId } from '@/lib/env';
 import { withTenantId } from '@/lib/withTenantId';
-import type { EventFeaturedPerformersDTO } from '@/types';
+import type { EventFeaturedPerformersDTO, EventMediaDTO } from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 const baseUrl = getAppUrl();
@@ -231,5 +231,148 @@ export async function fetchAvailablePerformersServer(eventId: number, page = 0, 
   } catch (error) {
     console.warn('❌ Error fetching available performers:', error);
     return { content: [], totalElements: 0, totalPages: 0, assignedCount: 0, totalPerformers: 0 };
+  }
+}
+
+/**
+ * Upload event-specific performer poster
+ * Uses the generic /api/proxy/event-medias/upload endpoint with eventId, performerId, and eventMediaType
+ */
+export async function uploadEventPerformerPosterServer(
+  eventId: number,
+  performerId: number,
+  file: File,
+  title?: string,
+  description?: string,
+  tenantId?: string
+): Promise<EventMediaDTO> {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const params = new URLSearchParams();
+  params.append('eventId', String(eventId));
+  params.append('performerId', String(performerId));
+  params.append('tenantId', tenantId || getTenantId());
+  params.append('isPublic', 'true');
+
+  // Set eventMediaType to indicate this is a custom poster
+  params.append('eventMediaType', 'EVENT_PERFORMER_POSTER');
+
+  // Set storage type
+  params.append('storageType', 'S3');
+
+  // Set required flags
+  params.append('eventFlyer', 'false');
+  params.append('isEventManagementOfficialDocument', 'false');
+  params.append('isHeroImage', 'false');
+  params.append('isActiveHeroImage', 'false');
+  params.append('isFeaturedImage', 'false');
+
+  // Title and description
+  if (title) {
+    params.append('title', title);
+  } else {
+    params.append('title', `Custom Poster - Event ${eventId} - Performer ${performerId}`);
+  }
+
+  if (description) {
+    params.append('description', description);
+  } else {
+    params.append('description', `Custom poster for event-performer combination`);
+  }
+
+  // Set startDisplayingFromDate to today's date (YYYY-MM-DD format) to satisfy NOT NULL constraint
+  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+  params.append('startDisplayingFromDate', today);
+
+  const baseUrl = getAppUrl();
+  const url = `${baseUrl}/api/proxy/event-medias/upload?${params.toString()}`;
+
+  const response = await fetch(url, {
+    method: 'POST',
+    body: formData,
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to upload performer poster: ${errorText}`);
+  }
+
+  return await response.json();
+}
+
+/**
+ * Fetch media for a specific event-performer combination
+ */
+export async function fetchEventPerformerMediaServer(
+  eventId: number,
+  performerId: number,
+  tenantId?: string
+): Promise<EventMediaDTO[]> {
+  const baseUrl = getAppUrl();
+  const params = new URLSearchParams();
+
+  // Use eventId.equals and performerId.equals query parameters (JHipster criteria syntax)
+  params.append('eventId.equals', String(eventId));
+  params.append('performerId.equals', String(performerId));
+
+  // Add tenantId filter (always include tenantId for multi-tenant filtering)
+  const tenantIdToUse = tenantId || getTenantId();
+  params.append('tenantId.equals', tenantIdToUse);
+
+  // Sort by priority ranking (ascending - lower = higher priority)
+  params.append('sort', 'priorityRanking,asc');
+
+  const url = `${baseUrl}/api/proxy/event-medias?${params.toString()}`;
+
+  const response = await fetch(url, {
+    method: 'GET',
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    console.warn(`Failed to fetch event-performer media: ${response.status} ${response.statusText}`);
+    return [];
+  }
+
+  const data = await response.json();
+  return Array.isArray(data) ? data : [];
+}
+
+/**
+ * Update media priority ranking
+ */
+export async function updateMediaPriorityRankingServer(
+  mediaId: number,
+  priorityRanking: number
+): Promise<EventMediaDTO> {
+  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-medias/${mediaId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/merge-patch+json' },
+    body: JSON.stringify({ priorityRanking }),
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to update media priority: ${errorText}`);
+  }
+
+  return await response.json();
+}
+
+/**
+ * Delete event media
+ */
+export async function deleteEventMediaServer(mediaId: number): Promise<void> {
+  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-medias/${mediaId}`, {
+    method: 'DELETE',
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to delete media: ${errorText}`);
   }
 }

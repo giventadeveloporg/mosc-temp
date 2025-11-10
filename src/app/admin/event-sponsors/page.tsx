@@ -291,11 +291,6 @@ export default function EventSponsorsPage() {
       render: (value) => value || '-'
     },
     {
-      key: 'contactEmail',
-      label: 'Email',
-      render: (value) => value || '-'
-    },
-    {
       key: 'priorityRanking',
       label: 'Priority',
       sortable: true,

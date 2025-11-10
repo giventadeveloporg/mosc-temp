@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FaPlus, FaSearch, FaArrowLeft, FaChevronLeft, FaChevronRight, FaEdit, FaTrashAlt } from 'react-icons/fa';
+import { FaPlus, FaSearch, FaArrowLeft, FaChevronLeft, FaChevronRight, FaEdit, FaTrashAlt, FaUpload, FaImages, FaUnlink } from 'react-icons/fa';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -18,6 +18,8 @@ import {
   disassociateDirectorFromEventServer,
   fetchAvailableProgramDirectorsServer,
 } from './ApiServerActions';
+import EventDirectorPosterUploadDialog from '@/components/directors/EventDirectorPosterUploadDialog';
+import EventDirectorMediaGallery from '@/components/directors/EventDirectorMediaGallery';
 
 export default function EventProgramDirectorsPage() {
   const { userId } = useAuth();
@@ -36,6 +38,9 @@ export default function EventProgramDirectorsPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDisassociateModalOpen, setIsDisassociateModalOpen] = useState(false);
   const [selectedDirector, setSelectedDirector] = useState<EventProgramDirectorsDTO | null>(null);
+  const [selectedDirectorForPoster, setSelectedDirectorForPoster] = useState<{ eventId: number; directorId: number; currentPosterUrl?: string } | null>(null);
+  const [posterUploadOpen, setPosterUploadOpen] = useState(false);
+  const [selectedDirectorForMedia, setSelectedDirectorForMedia] = useState<{ eventId: number; directorId: number } | null>(null);
 
   // Form state
   const [formData, setFormData] = useState<Partial<EventProgramDirectorsDTO>>({
@@ -353,40 +358,78 @@ export default function EventProgramDirectorsPage() {
     {
       key: 'actions',
       label: 'Actions',
-      render: (value, director) => (
-        <div className="flex space-x-2">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              openEditModal(director);
-            }}
-            className="icon-btn icon-btn-edit"
-            title="Edit"
-          >
-            <FaEdit />
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              openDisassociateModal(director);
-            }}
-            className="icon-btn icon-btn-delete bg-yellow-500 hover:bg-yellow-600"
-            title="Disassociate from Event"
-          >
-            <FaTrashAlt />
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              openDeleteModal(director);
-            }}
-            className="icon-btn icon-btn-delete"
-            title="Permanently Delete"
-          >
-            <FaTrashAlt />
-          </button>
-        </div>
-      )
+      render: (value, director) => {
+        const directorId = director?.id;
+        const eventIdNum = parseInt(eventId);
+        const currentPosterUrl = director?.photoUrl; // Use photoUrl as current poster URL
+
+        return (
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                openEditModal(director);
+              }}
+              className="icon-btn icon-btn-edit bg-blue-700 hover:bg-blue-800 text-white p-4 shadow-lg"
+              title="Edit director details"
+            >
+              <FaEdit className="text-xl text-white" />
+            </button>
+            {directorId && (
+              <>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedDirectorForPoster({
+                      eventId: eventIdNum,
+                      directorId,
+                      currentPosterUrl,
+                    });
+                    setPosterUploadOpen(true);
+                  }}
+                  className="icon-btn bg-blue-500 hover:bg-blue-600 text-white p-4"
+                  title="Upload banners in this particular event for this director"
+                >
+                  <FaUpload className="text-xl" />
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedDirectorForMedia({
+                      eventId: eventIdNum,
+                      directorId,
+                    });
+                  }}
+                  className="icon-btn bg-purple-500 hover:bg-purple-600 text-white p-4"
+                  title="View all the media files associated with this director"
+                >
+                  <FaImages className="text-xl" />
+                </button>
+              </>
+            )}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                openDisassociateModal(director);
+              }}
+              className="icon-btn icon-btn-delete bg-yellow-500 hover:bg-yellow-600 text-white p-4"
+              title="Disassociate this director with this event"
+            >
+              <FaUnlink className="text-xl" />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                openDeleteModal(director);
+              }}
+              className="icon-btn icon-btn-delete bg-red-700 hover:bg-red-800 text-white p-4 shadow-lg"
+              title="Permanently delete this director"
+            >
+              <FaTrashAlt className="text-xl text-white" />
+            </button>
+          </div>
+        );
+      }
     },
   ];
 
@@ -469,9 +512,51 @@ export default function EventProgramDirectorsPage() {
 
       {/* Program Directors Table */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-        <h2 className="text-xl font-semibold mb-4">
-          Event Program Directors ({filteredDirectors.length})
-        </h2>
+        <div className="mb-4">
+          <h2 className="text-xl font-semibold mb-2">
+            Event Program Directors ({filteredDirectors.length})
+          </h2>
+          <div className="space-y-2">
+            <p className="text-sm text-gray-600">
+              💡 <strong>Tip:</strong> Hover over a director's name to view detailed information in a tooltip.
+            </p>
+            <div className="text-sm text-gray-600">
+              <p className="mb-2"><strong>Action Icons:</strong></p>
+              <div className="flex flex-wrap gap-4 items-center">
+                <div className="flex items-center gap-2">
+                  <button className="icon-btn bg-blue-700 hover:bg-blue-800 text-white p-3 pointer-events-none shadow-lg" disabled>
+                    <FaEdit className="text-lg text-white" />
+                  </button>
+                  <span>Edit director details</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button className="icon-btn bg-blue-500 hover:bg-blue-600 text-white p-3 pointer-events-none" disabled>
+                    <FaUpload className="text-lg" />
+                  </button>
+                  <span>Upload banners in this particular event for this director</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button className="icon-btn bg-purple-500 hover:bg-purple-600 text-white p-3 pointer-events-none" disabled>
+                    <FaImages className="text-lg" />
+                  </button>
+                  <span>View all the media files associated with this director</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button className="icon-btn bg-yellow-500 hover:bg-yellow-600 text-white p-3 pointer-events-none" disabled>
+                    <FaUnlink className="text-lg" />
+                  </button>
+                  <span>Disassociate this director with this event</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button className="icon-btn bg-red-700 hover:bg-red-800 text-white p-3 pointer-events-none shadow-lg" disabled>
+                    <FaTrashAlt className="text-lg text-white" />
+                  </button>
+                  <span>Permanently delete this director</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         <div className="overflow-x-auto">
           <DataTable
             data={filteredDirectors}
@@ -672,6 +757,61 @@ export default function EventProgramDirectorsPage() {
         confirmText="Delete Permanently"
         variant="danger"
       />
+
+      {/* Poster Upload Dialog */}
+      {selectedDirectorForPoster && (
+        <EventDirectorPosterUploadDialog
+          eventId={selectedDirectorForPoster.eventId}
+          directorId={selectedDirectorForPoster.directorId}
+          currentPosterUrl={selectedDirectorForPoster.currentPosterUrl}
+          isOpen={posterUploadOpen}
+          onClose={() => {
+            setPosterUploadOpen(false);
+            setSelectedDirectorForPoster(null);
+          }}
+          onUploadSuccess={async (imageUrl) => {
+            // Refresh program directors to show updated poster
+            await loadEventAndProgramDirectors();
+            setPosterUploadOpen(false);
+            setSelectedDirectorForPoster(null);
+          }}
+        />
+      )}
+
+      {/* Media Gallery Modal */}
+      {selectedDirectorForMedia && (
+        <Modal
+          isOpen={!!selectedDirectorForMedia}
+          onClose={() => setSelectedDirectorForMedia(null)}
+          title={`Media Gallery - ${programDirectors.find(d => d.id === selectedDirectorForMedia.directorId)?.name || 'Director'}`}
+          size="xl"
+        >
+          <EventDirectorMediaGallery
+            key={`${selectedDirectorForMedia.eventId}-${selectedDirectorForMedia.directorId}`}
+            eventId={selectedDirectorForMedia.eventId}
+            directorId={selectedDirectorForMedia.directorId}
+            showPriorityControls={true}
+            allowUpload={true}
+            onUploadClick={() => {
+              // Refresh gallery after upload by remounting component
+              // The component will reload when key changes
+              setSelectedDirectorForMedia({
+                ...selectedDirectorForMedia,
+                eventId: selectedDirectorForMedia.eventId, // Trigger re-render
+              });
+            }}
+            onPriorityChange={async (mediaId, priorityRanking) => {
+              // Component handles its own refresh via useEffect
+              // This callback is for external notifications if needed
+              console.log(`Priority updated for media ${mediaId}: ${priorityRanking}`);
+            }}
+            onMediaDelete={async (mediaId) => {
+              // Component handles its own refresh after delete
+              console.log(`Media deleted: ${mediaId}`);
+            }}
+          />
+        </Modal>
+      )}
     </div>
   );
 }
@@ -722,7 +862,7 @@ function ProgramDirectorForm({ formData, setFormData, onSubmit, loading, submitT
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Photo URL
+            Photo URL (Optional)
           </label>
           <input
             type="url"
@@ -730,7 +870,7 @@ function ProgramDirectorForm({ formData, setFormData, onSubmit, loading, submitT
             value={formData.photoUrl || ''}
             onChange={handleChange}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="https://example.com/photo.jpg"
+            placeholder="https://example.com/photo.jpg (optional)"
           />
         </div>
 

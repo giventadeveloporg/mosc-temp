@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { FaPlus, FaSearch, FaArrowLeft, FaChevronLeft, FaChevronRight, FaEdit, FaTrashAlt } from 'react-icons/fa';
+import { FaPlus, FaSearch, FaArrowLeft, FaChevronLeft, FaChevronRight, FaEdit, FaTrashAlt, FaUpload, FaImages, FaUnlink } from 'react-icons/fa';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -9,6 +9,8 @@ import ReactDOM from 'react-dom';
 import DataTable, { Column } from '@/components/ui/DataTable';
 import Modal, { ConfirmModal } from '@/components/ui/Modal';
 import ImageUpload from '@/components/ui/ImageUpload';
+import EventPerformerPosterUploadDialog from '@/components/performers/EventPerformerPosterUploadDialog';
+import EventPerformerMediaGallery from '@/components/performers/EventPerformerMediaGallery';
 import type { EventFeaturedPerformersDTO, EventDetailsDTO } from '@/types';
 import {
   fetchEventFeaturedPerformersServer,
@@ -79,6 +81,11 @@ export default function EventPerformersPage() {
 
   // Modal states
   const [isDisassociateModalOpen, setIsDisassociateModalOpen] = useState(false);
+
+  // Upload dialog and media gallery states
+  const [posterUploadOpen, setPosterUploadOpen] = useState(false);
+  const [selectedPerformerForPoster, setSelectedPerformerForPoster] = useState<{ eventId: number; performerId: number; currentPosterUrl?: string } | null>(null);
+  const [selectedPerformerForMedia, setSelectedPerformerForMedia] = useState<{ eventId: number; performerId: number } | null>(null);
 
   // Tooltip state
   const [tooltipPerformer, setTooltipPerformer] = useState<EventFeaturedPerformersDTO | null>(null);
@@ -608,40 +615,78 @@ export default function EventPerformersPage() {
     {
       key: 'actions',
       label: 'Actions',
-      render: (value, performer) => (
-        <div className="flex space-x-2">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              openEditModal(performer);
-            }}
-            className="icon-btn icon-btn-edit"
-            title="Edit"
-          >
-            <FaEdit />
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              openDisassociateModal(performer);
-            }}
-            className="icon-btn icon-btn-delete bg-yellow-500 hover:bg-yellow-600"
-            title="Disassociate from Event"
-          >
-            <FaTrashAlt />
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              openDeleteModal(performer);
-            }}
-            className="icon-btn icon-btn-delete"
-            title="Permanently Delete"
-          >
-            <FaTrashAlt />
-          </button>
-        </div>
-      )
+      render: (value, performer) => {
+        const performerId = performer?.id;
+        const eventIdNum = parseInt(eventId);
+        const currentPosterUrl = performer?.portraitImageUrl || performer?.performanceImageUrl;
+
+        return (
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                openEditModal(performer);
+              }}
+              className="icon-btn icon-btn-edit bg-blue-700 hover:bg-blue-800 text-white p-4 shadow-lg"
+              title="Edit performer details"
+            >
+              <FaEdit className="text-xl text-white" />
+            </button>
+            {performerId && (
+              <>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedPerformerForPoster({
+                      eventId: eventIdNum,
+                      performerId,
+                      currentPosterUrl,
+                    });
+                    setPosterUploadOpen(true);
+                  }}
+                  className="icon-btn bg-blue-500 hover:bg-blue-600 text-white p-4"
+                  title="Upload banners in this particular event for this performer"
+                >
+                  <FaUpload className="text-xl" />
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedPerformerForMedia({
+                      eventId: eventIdNum,
+                      performerId,
+                    });
+                  }}
+                  className="icon-btn bg-purple-500 hover:bg-purple-600 text-white p-4"
+                  title="View all the media files associated with this performer"
+                >
+                  <FaImages className="text-xl" />
+                </button>
+              </>
+            )}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                openDisassociateModal(performer);
+              }}
+              className="icon-btn icon-btn-delete bg-yellow-500 hover:bg-yellow-600 text-white p-4"
+              title="Disassociate this performer with this event"
+            >
+              <FaUnlink className="text-xl" />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                openDeleteModal(performer);
+              }}
+              className="icon-btn icon-btn-delete bg-red-700 hover:bg-red-800 text-white p-4 shadow-lg"
+              title="Permanently delete this performer"
+            >
+              <FaTrashAlt className="text-xl text-white" />
+            </button>
+          </div>
+        );
+      }
     },
   ];
 
@@ -728,9 +773,46 @@ export default function EventPerformersPage() {
           <h2 className="text-xl font-semibold mb-2">
             Event Performers ({filteredPerformers.length})
           </h2>
-          <p className="text-sm text-gray-600">
-            💡 <strong>Tip:</strong> Hover over a performer's name to view detailed information in a tooltip.
-          </p>
+          <div className="space-y-2">
+            <p className="text-sm text-gray-600">
+              💡 <strong>Tip:</strong> Hover over a performer's name to view detailed information in a tooltip.
+            </p>
+            <div className="text-sm text-gray-600">
+              <p className="mb-2"><strong>Action Icons:</strong></p>
+              <div className="flex flex-wrap gap-4 items-center">
+                <div className="flex items-center gap-2">
+                  <button className="icon-btn bg-blue-700 hover:bg-blue-800 text-white p-3 pointer-events-none shadow-lg" disabled>
+                    <FaEdit className="text-lg text-white" />
+                  </button>
+                  <span>Edit performer details</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button className="icon-btn bg-blue-500 hover:bg-blue-600 text-white p-3 pointer-events-none" disabled>
+                    <FaUpload className="text-lg" />
+                  </button>
+                  <span>Upload banners in this particular event for this performer</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button className="icon-btn bg-purple-500 hover:bg-purple-600 text-white p-3 pointer-events-none" disabled>
+                    <FaImages className="text-lg" />
+                  </button>
+                  <span>View all the media files associated with this performer</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button className="icon-btn bg-yellow-500 hover:bg-yellow-600 text-white p-3 pointer-events-none" disabled>
+                    <FaUnlink className="text-lg" />
+                  </button>
+                  <span>Disassociate this performer with this event</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button className="icon-btn bg-red-700 hover:bg-red-800 text-white p-3 pointer-events-none shadow-lg" disabled>
+                    <FaTrashAlt className="text-lg text-white" />
+                  </button>
+                  <span>Permanently delete this performer</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <div className="overflow-x-auto">
           <DataTable
@@ -939,6 +1021,61 @@ export default function EventPerformersPage() {
         confirmText="Delete Permanently"
         variant="danger"
       />
+
+      {/* Poster Upload Dialog */}
+      {selectedPerformerForPoster && (
+        <EventPerformerPosterUploadDialog
+          eventId={selectedPerformerForPoster.eventId}
+          performerId={selectedPerformerForPoster.performerId}
+          currentPosterUrl={selectedPerformerForPoster.currentPosterUrl}
+          isOpen={posterUploadOpen}
+          onClose={() => {
+            setPosterUploadOpen(false);
+            setSelectedPerformerForPoster(null);
+          }}
+          onUploadSuccess={async (imageUrl) => {
+            // Refresh performers to show updated poster
+            await loadEventAndPerformers();
+            setPosterUploadOpen(false);
+            setSelectedPerformerForPoster(null);
+          }}
+        />
+      )}
+
+      {/* Media Gallery Modal */}
+      {selectedPerformerForMedia && (
+        <Modal
+          isOpen={!!selectedPerformerForMedia}
+          onClose={() => setSelectedPerformerForMedia(null)}
+          title={`Media Gallery - ${performers.find(p => p.id === selectedPerformerForMedia.performerId)?.name || performers.find(p => p.id === selectedPerformerForMedia.performerId)?.stageName || 'Performer'}`}
+          size="xl"
+        >
+          <EventPerformerMediaGallery
+            key={`${selectedPerformerForMedia.eventId}-${selectedPerformerForMedia.performerId}`}
+            eventId={selectedPerformerForMedia.eventId}
+            performerId={selectedPerformerForMedia.performerId}
+            showPriorityControls={true}
+            allowUpload={true}
+            onUploadClick={() => {
+              // Refresh gallery after upload by remounting component
+              // The component will reload when key changes
+              setSelectedPerformerForMedia({
+                ...selectedPerformerForMedia,
+                eventId: selectedPerformerForMedia.eventId, // Trigger re-render
+              });
+            }}
+            onPriorityChange={async (mediaId, priorityRanking) => {
+              // Component handles its own refresh via useEffect
+              // This callback is for external notifications if needed
+              console.log(`Priority updated for media ${mediaId}: ${priorityRanking}`);
+            }}
+            onMediaDelete={async (mediaId) => {
+              // Component handles its own refresh after delete
+              console.log(`Media deleted: ${mediaId}`);
+            }}
+          />
+        </Modal>
+      )}
 
       {/* Tooltip */}
       <PerformerDetailsTooltip

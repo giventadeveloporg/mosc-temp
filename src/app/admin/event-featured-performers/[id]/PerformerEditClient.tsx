@@ -8,6 +8,7 @@ import PerformerImageUploadArea from '@/components/performers/PerformerImageUplo
 import type { EventFeaturedPerformersDTO, EventMediaDTO } from '@/types';
 import { updateEventFeaturedPerformerServer } from '../ApiServerActions';
 import PaginatedMediaList from './PaginatedMediaList';
+import Modal from '@/components/ui/Modal';
 
 interface PerformerEditClientProps {
   performer: EventFeaturedPerformersDTO;
@@ -32,6 +33,7 @@ export default function PerformerEditClient({
   const [loading, setLoading] = useState(false);
   const [toastMessage, setToastMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [mediaRefreshKey, setMediaRefreshKey] = useState(0);
+  const [saveSuccessModalOpen, setSaveSuccessModalOpen] = useState(false);
 
   React.useEffect(() => {
     if (toastMessage) {
@@ -50,6 +52,7 @@ export default function PerformerEditClient({
       setPerformer(updatedPerformer);
       setToastMessage({ type: 'success', message: 'Performer updated successfully' });
       setMediaRefreshKey(prev => prev + 1);
+      setSaveSuccessModalOpen(true);
     } catch (err: any) {
       setToastMessage({ type: 'error', message: err.message || 'Failed to update performer' });
     } finally {
@@ -401,6 +404,27 @@ export default function PerformerEditClient({
           refreshKey={mediaRefreshKey}
         />
       </div>
+
+      <Modal
+        isOpen={saveSuccessModalOpen}
+        onClose={() => setSaveSuccessModalOpen(false)}
+        title="Changes Saved"
+        size="sm"
+      >
+        <div className="space-y-6">
+          <p className="text-gray-700">
+            Performer information has been updated successfully.
+          </p>
+          <div className="flex justify-end">
+            <button
+              onClick={() => setSaveSuccessModalOpen(false)}
+              className="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors"
+            >
+              Got it
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

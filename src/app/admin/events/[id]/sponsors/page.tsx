@@ -828,10 +828,10 @@ export default function EventSponsorsPage() {
                 e.stopPropagation();
                 openEditModal(row);
               }}
-              className="icon-btn icon-btn-edit"
-              title="Edit"
+              className="icon-btn icon-btn-edit bg-blue-700 hover:bg-blue-800 text-white p-4 shadow-lg"
+              title="Edit sponsor details"
             >
-              <FaEdit />
+              <FaEdit className="text-xl text-white" />
             </button>
             {sponsorId && (
               <>
@@ -881,10 +881,10 @@ export default function EventSponsorsPage() {
                 e.stopPropagation();
                 openDeleteModal(row);
               }}
-              className="icon-btn icon-btn-delete"
-              title="Permanently Delete"
+              className="icon-btn icon-btn-delete bg-red-700 hover:bg-red-800 text-white p-4 shadow-lg"
+              title="Permanently delete this sponsor"
             >
-              <FaTrashAlt />
+              <FaTrashAlt className="text-xl text-white" />
             </button>
           </div>
         );

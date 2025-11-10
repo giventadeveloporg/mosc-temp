@@ -6,7 +6,7 @@
   gap: 1rem;
   width: 100%;
   justify-content: center;
-  align-items: flex-start;
+  align-items: stretch;
   margin: 0 auto;
 }
 
@@ -19,18 +19,18 @@
 /* Desktop (lg): 3 columns - Calculate max-width based on 3 cards + 2 gaps */
 @media (min-width: 1024px) {
   .centeredCardGrid {
-    max-width: calc(3 * 350px + 2 * 1rem); /* Adjust 350px based on your card width */
+    max-width: calc(3 * 400px + 2 * 1rem); /* Increased from 350px to 400px */
   }
   .cardItem {
-    width: 350px; /* Fixed width for consistent centering */
-    max-width: 350px;
+    width: 400px; /* Increased from 350px to 400px */
+    max-width: 400px;
   }
 }
 
 /* Tablet (md): 2 columns - Calculate max-width based on 2 cards + 1 gap */
 @media (min-width: 768px) and (max-width: 1023px) {
   .centeredCardGrid {
-    max-width: calc(2 * 350px + 1 * 1rem);
+    max-width: calc(2 * 400px + 1 * 1rem); /* Increased from 350px to 400px */
   }
   .cardItem {
     width: calc((100% - 1rem) / 2);

@@ -99,3 +99,5 @@ AND column_name IN ('sponsor_id', 'event_sponsors_join_id');
 
 
 
+
+

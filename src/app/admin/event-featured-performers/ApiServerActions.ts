@@ -248,11 +248,70 @@ export async function updateEventMediaServer(
 }
 
 /**
+ * Fetch a single media file by ID
+ */
+export async function fetchEventMediaServer(
+  mediaId: number,
+  tenantId?: string
+): Promise<EventMediaDTO> {
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  if (!API_BASE_URL) {
+    throw new Error('API base URL not configured');
+  }
+
+  const url = `${API_BASE_URL}/api/event-medias/${mediaId}`;
+  const response = await fetchWithJwtRetry(url, {
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to fetch media: ${errorText}`);
+  }
+
+  return await response.json();
+}
+
+/**
  * Update media priority ranking
  */
 export async function updateMediaPriorityRankingServer(
   mediaId: number,
   priorityRanking: number
 ): Promise<EventMediaDTO> {
-  return updateEventMediaServer(mediaId, { priorityRanking });
+  if (priorityRanking < 0) {
+    throw new Error('Priority ranking must be >= 0');
+  }
+
+  const existingMedia = await fetchEventMediaServer(mediaId);
+
+  const merged: Partial<EventMediaDTO> = withTenantId({
+    ...existingMedia,
+    priorityRanking,
+    updatedAt: new Date().toISOString(),
+  });
+
+  merged.createdAt = merged.createdAt || existingMedia.createdAt || new Date().toISOString();
+  merged.storageType = merged.storageType || existingMedia.storageType || 'S3';
+  merged.eventMediaType = merged.eventMediaType || existingMedia.eventMediaType || 'gallery';
+  merged.title = (merged.title ?? existingMedia.title ?? 'Untitled Media').trim() || 'Untitled Media';
+  merged.tenantId = merged.tenantId || existingMedia.tenantId;
+
+  const booleanFields: (keyof EventMediaDTO)[] = [
+    'isHomePageHeroImage',
+    'isFeaturedEventImage',
+    'isLiveEventImage',
+    'isPublic',
+    'eventFlyer',
+    'isEventManagementOfficialDocument',
+    'isHeroImage',
+    'isActiveHeroImage',
+    'isFeaturedVideo',
+  ];
+
+  booleanFields.forEach((field) => {
+    (merged as any)[field] = (merged as any)[field] ?? (existingMedia as any)?.[field] ?? false;
+  });
+
+  return updateEventMediaServer(mediaId, merged, existingMedia.tenantId);
 }

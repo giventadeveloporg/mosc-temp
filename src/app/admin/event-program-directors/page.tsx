@@ -261,11 +261,11 @@ export default function GlobalEventProgramDirectorsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 py-8" style={{ paddingTop: '180px' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <AdminNavigation currentPage="event-program-directors" />
 
-        <div className="bg-white rounded-lg shadow">
+        <div className="bg-white rounded-lg shadow mt-8">
           <div className="px-6 py-4 border-b border-gray-200">
             <div className="flex justify-between items-center">
               <div>
@@ -500,7 +500,7 @@ function DirectorForm({ formData, setFormData, onSubmit, loading, submitText, ev
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Photo URL
+            Photo URL (Optional)
           </label>
           <input
             type="url"
@@ -508,7 +508,7 @@ function DirectorForm({ formData, setFormData, onSubmit, loading, submitText, ev
             value={formData.photoUrl || ''}
             onChange={handleChange}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Enter photo URL"
+            placeholder="Enter photo URL (optional)"
           />
         </div>
         <div className="md:col-span-2">

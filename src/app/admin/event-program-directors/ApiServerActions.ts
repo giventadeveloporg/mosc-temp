@@ -53,7 +53,19 @@ export async function fetchEventProgramDirectorServer(id: number) {
 }
 
 export async function createEventProgramDirectorServer(director: Omit<EventProgramDirectorsDTO, 'id' | 'createdAt' | 'updatedAt'>) {
-  const payload = withTenantId(director);
+  // Helper function to convert empty strings to null for URL fields
+  const cleanUrlField = (value: string | undefined | null): string | null => {
+    return (value && value.trim() !== '') ? value : null;
+  };
+
+  const currentTime = new Date().toISOString();
+  const payload = withTenantId({
+    ...director,
+    createdAt: currentTime,
+    updatedAt: currentTime,
+    // Convert empty URL fields to null to satisfy database constraints
+    photoUrl: cleanUrlField(director.photoUrl),
+  });
 
   const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-program-directors`, {
     method: 'POST',

@@ -115,6 +115,13 @@ export default function EditEventPage() {
           </div>
         </div>
       </div>
+      <div className="max-w-4xl mx-auto mb-8">
+        <div className="rounded-lg border border-blue-100 bg-blue-50/70 px-4 py-3 text-sm text-blue-800 shadow-sm">
+          <strong className="block font-semibold mb-1 text-blue-900">Tip:</strong>
+          Use the management shortcuts above to add or associate performers, sponsors, contacts, emails,
+          and program directors with this event.
+        </div>
+      </div>
 
       <h1 className="text-2xl font-bold mb-4">Edit Event - ID: {eventId}</h1>
       {error && <div className="bg-red-50 text-red-500 p-3 rounded mb-4">{error}</div>}

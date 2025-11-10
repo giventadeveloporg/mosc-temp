@@ -1,7 +1,7 @@
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
-import { getAppUrl } from '@/lib/env';
+import { getAppUrl, getTenantId } from '@/lib/env';
 import { withTenantId } from '@/lib/withTenantId';
-import type { EventProgramDirectorsDTO } from '@/types';
+import type { EventProgramDirectorsDTO, EventMediaDTO } from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 const baseUrl = getAppUrl();
@@ -209,4 +209,237 @@ export async function fetchAvailableProgramDirectorsServer(eventId: number, page
     console.warn('❌ Error fetching available program directors:', error);
     return { content: [], totalElements: 0, totalPages: 0, assignedCount: 0, totalDirectors: 0 };
   }
+}
+
+// ============================================
+// Event Media Upload Functions for Directors
+// ============================================
+
+/**
+ * Upload custom poster for event-director combination
+ * Uses the generic /api/event-medias/upload endpoint with eventId and directorId
+ */
+export async function uploadEventDirectorPosterServer(
+  eventId: number,
+  directorId: number,
+  file: File,
+  title?: string,
+  description?: string,
+  tenantId?: string
+): Promise<EventMediaDTO> {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const params = new URLSearchParams();
+  params.append('eventId', String(eventId));
+  params.append('directorId', String(directorId));
+  params.append('tenantId', tenantId || getTenantId());
+  params.append('isPublic', 'true');
+
+  // Set eventMediaType to indicate this is a custom poster
+  params.append('eventMediaType', 'EVENT_DIRECTOR_POSTER');
+
+  // Set storage type
+  params.append('storageType', 'S3');
+
+  // Set required flags
+  params.append('eventFlyer', 'false');
+  params.append('isEventManagementOfficialDocument', 'false');
+  params.append('isHeroImage', 'false');
+  params.append('isActiveHeroImage', 'false');
+  params.append('isFeaturedImage', 'false');
+
+  // Title and description
+  if (title) {
+    params.append('title', title);
+  } else {
+    params.append('title', `Custom Poster - Event ${eventId} - Director ${directorId}`);
+  }
+
+  if (description) {
+    params.append('description', description);
+  } else {
+    params.append('description', 'Custom poster for event-director combination');
+  }
+
+  // Set startDisplayingFromDate to today's date (YYYY-MM-DD format) to satisfy NOT NULL constraint
+  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+  params.append('startDisplayingFromDate', today);
+
+  const baseUrl = getAppUrl();
+  // Use the generic upload endpoint (same pattern as sponsors)
+  const url = `${baseUrl}/api/proxy/event-medias/upload?${params.toString()}`;
+
+  const response = await fetch(url, {
+    method: 'POST',
+    body: formData,
+  });
+
+  // 🎯 CRITICAL: Only rely on HTTP status codes for success/failure determination
+  if (response.status >= 200 && response.status < 300) {
+    console.log('✅ Upload successful - HTTP status:', response.status);
+    try {
+      const result = await response.json();
+      return result;
+    } catch (parseError) {
+      console.error('❌ Failed to parse successful upload response:', parseError);
+      throw new Error('Upload succeeded but response parsing failed');
+    }
+  } else {
+    // 🚫 Any non-2xx status code indicates failure
+    console.error('❌ Upload failed - HTTP status:', response.status);
+    const errorText = await response.text();
+    throw new Error(`Failed to upload event-director poster: ${errorText}`);
+  }
+}
+
+/**
+ * Fetch all media files for an event-director combination, sorted by priority ranking
+ * Uses the criteria-based query endpoint: /api/event-medias?eventId.equals={eventId}&directorId.equals={directorId}
+ */
+export async function fetchEventDirectorMediaServer(
+  eventId: number,
+  directorId: number,
+  tenantId?: string
+): Promise<EventMediaDTO[]> {
+  const baseUrl = getAppUrl();
+  const params = new URLSearchParams();
+
+  // Use eventId.equals and directorId.equals query parameters (JHipster criteria syntax)
+  params.append('eventId.equals', String(eventId));
+  params.append('directorId.equals', String(directorId));
+
+  // Add tenantId filter (always include tenantId for multi-tenant filtering)
+  const tenantIdToUse = tenantId || getTenantId();
+  params.append('tenantId.equals', tenantIdToUse);
+
+  // Sort by priority ranking (ascending - lower = higher priority)
+  params.append('sort', 'priorityRanking,asc');
+
+  const url = `${baseUrl}/api/proxy/event-medias?${params.toString()}`;
+
+  const response = await fetch(url, {
+    method: 'GET',
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    console.warn(`Failed to fetch event-director media: ${response.status} ${response.statusText}`);
+    return [];
+  }
+
+  const data = await response.json();
+
+  // Handle paginated response (Spring Data REST format)
+  if (data && typeof data === 'object' && '_embedded' in data && 'eventMedias' in data._embedded) {
+    return Array.isArray(data._embedded.eventMedias) ? data._embedded.eventMedias : [];
+  }
+
+  // Handle direct array response
+  return Array.isArray(data) ? data : [data];
+}
+
+/**
+ * Update media priority ranking
+ */
+export async function updateMediaPriorityRankingServer(
+  mediaId: number,
+  priorityRanking: number,
+  tenantId?: string
+): Promise<EventMediaDTO> {
+  // Validate priority ranking
+  if (priorityRanking < 0) {
+    throw new Error('Priority ranking must be >= 0');
+  }
+
+  // Fetch existing media first to get ALL required fields
+  const existingMedia = await fetchEventMediaServer(mediaId, tenantId);
+
+  // Use fetchWithJwtRetry for authenticated backend call
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  if (!API_BASE_URL) {
+    throw new Error('API base URL not configured');
+  }
+
+  // Include ALL required fields from existing media + updated priority ranking
+  // This ensures backend validation passes for all NotNull fields
+  const payload = withTenantId({
+    id: mediaId,
+    priorityRanking,
+    // Required string fields
+    storageType: existingMedia.storageType || 'S3',
+    eventMediaType: existingMedia.eventMediaType || 'gallery',
+    title: existingMedia.title || '',
+    createdAt: existingMedia.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    // Required boolean fields (must not be null)
+    isHomePageHeroImage: existingMedia.isHomePageHeroImage ?? false,
+    isFeaturedEventImage: existingMedia.isFeaturedEventImage ?? false,
+    isLiveEventImage: existingMedia.isLiveEventImage ?? false,
+  });
+
+  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-medias/${mediaId}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/merge-patch+json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to update priority ranking: ${errorText}`);
+  }
+
+  return await response.json();
+}
+
+/**
+ * Fetch a single media file by ID
+ */
+export async function fetchEventMediaServer(
+  mediaId: number,
+  tenantId?: string
+): Promise<EventMediaDTO> {
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  if (!API_BASE_URL) {
+    throw new Error('API base URL not configured');
+  }
+
+  const url = `${API_BASE_URL}/api/event-medias/${mediaId}`;
+  const response = await fetchWithJwtRetry(url, {
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to fetch media: ${errorText}`);
+  }
+
+  return await response.json();
+}
+
+/**
+ * Delete a media file
+ */
+export async function deleteEventMediaServer(
+  mediaId: number,
+  tenantId?: string
+): Promise<boolean> {
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  if (!API_BASE_URL) {
+    throw new Error('API base URL not configured');
+  }
+
+  const url = `${API_BASE_URL}/api/event-medias/${mediaId}`;
+  const response = await fetchWithJwtRetry(url, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to delete media: ${errorText}`);
+  }
+
+  return true;
 }

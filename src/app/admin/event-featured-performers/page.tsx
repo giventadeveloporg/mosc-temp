@@ -262,11 +262,6 @@ export default function EventFeaturedPerformersPage() {
       sortable: true,
       render: (value) => value || 0
     },
-    {
-      key: 'contactEmail',
-      label: 'Email',
-      render: (value) => value || '-'
-    },
   ];
 
   if (!userId) {

@@ -583,6 +583,12 @@ export function EventForm({ event, eventTypes, onSubmit, loading }: EventFormPro
         {errors.caption && <div className="text-red-500 text-sm mt-1">{errors.caption}</div>}
       </div>
       <div>
+        <div className="mb-2 rounded-lg border border-blue-100 bg-blue-50/60 px-3 py-2 text-sm text-blue-700">
+          <strong className="block font-semibold text-blue-800">Tip for rich paragraphs:</strong>
+          The display page renders a new paragraph whenever you leave a completely blank line in this
+          field (press Enter twice between paragraphs). Feel free to add as many paragraphs as needed—the
+          layout expands automatically to fit your content.
+        </div>
         <label className="block font-medium">Description <span className="text-sm text-gray-500">({(form.description || '').length}/900)</span></label>
         <textarea
           ref={(el) => { if (el) fieldRefs.current.description = el; }}
