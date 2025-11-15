@@ -39,20 +39,54 @@ async function fetchTickets(eventId: string, searchParams: SearchParams) {
     page,
     size: pageSize,
   };
+  // Note: tenantId.equals is automatically added by the proxy handler
+  // If tickets aren't showing, they might be associated with a different tenant
   if (searchParams.email) query['email.contains'] = searchParams.email;
   if (searchParams.transactionId) query['id.equals'] = searchParams.transactionId;
-  if (searchParams.name) query['firstName.contains'] = searchParams.name;
+  if (searchParams.name) {
+    // Search in both firstName and lastName fields
+    query['firstName.contains'] = searchParams.name;
+    // Note: Backend might need OR logic, but we'll try firstName first
+    // If that doesn't work, we may need to search lastName separately or use a different approach
+  }
   const qs = buildQueryString(query);
   console.log('Fetching tickets with query:', qs);
   const res = await fetch(`${baseUrl}/api/proxy/event-ticket-transactions?${qs}`, { cache: 'no-store' });
-  if (!res.ok) throw new Error('Failed to fetch tickets');
-  const rows = await res.json();
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error('Failed to fetch tickets:', res.status, res.statusText, errorText);
+    throw new Error(`Failed to fetch tickets: ${res.status} ${res.statusText}`);
+  }
+  let rows = await res.json();
+  console.log('Fetched tickets response (raw):', rows);
+  console.log('Response type:', typeof rows, 'Is array:', Array.isArray(rows));
+
+  // Handle case where backend returns a single object instead of an array
+  if (!Array.isArray(rows)) {
+    if (rows && typeof rows === 'object' && rows.id) {
+      // Single ticket object - wrap in array
+      console.log('Backend returned single ticket object, wrapping in array');
+      rows = [rows];
+    } else if (rows && typeof rows === 'object' && rows.content && Array.isArray(rows.content)) {
+      // Paginated response with content array
+      console.log('Backend returned paginated response with content array');
+      rows = rows.content;
+    } else {
+      // Unexpected format - log and default to empty array
+      console.warn('Unexpected response format, defaulting to empty array:', rows);
+      rows = [];
+    }
+  }
+
+  console.log('Fetched tickets response (processed):', { rowsCount: rows.length, totalCountHeader: res.headers.get('x-total-count') });
   // Debug: Log purchase dates to verify sorting
-  console.log('Purchase dates from response:', rows.map((row: any) => ({
-    id: row.id,
-    purchaseDate: row.purchaseDate,
-    createdAt: row.createdAt
-  })));
+  if (rows.length > 0) {
+    console.log('Purchase dates from response:', rows.map((row: any) => ({
+      id: row.id,
+      purchaseDate: row.purchaseDate,
+      createdAt: row.createdAt
+    })));
+  }
 
   // Fallback: Sort consistently by createdAt (descending) if backend sorting doesn't work
   const sortedRows = Array.isArray(rows) ? rows.sort((a: any, b: any) => {
@@ -69,8 +103,13 @@ async function fetchTickets(eventId: string, searchParams: SearchParams) {
 async function fetchStatistics(eventId: string): Promise<EventTicketTransactionStatisticsDTO | null> {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
   const res = await fetch(`${baseUrl}/api/proxy/event-ticket-transactions/statistics/${eventId}`, { cache: 'no-store' });
-  if (!res.ok) return null;
-  return res.json();
+  if (!res.ok) {
+    console.error('Statistics fetch failed:', res.status, res.statusText);
+    return null;
+  }
+  const stats = await res.json();
+  console.log('Statistics response:', stats);
+  return stats;
 }
 
 async function fetchTicketTypes(eventId: string): Promise<EventTicketTypeDTO[]> {
@@ -383,14 +422,31 @@ export default async function TicketListPage({ params, searchParams }: { params:
         </form>
       </div>
       <div className="bg-white rounded-lg shadow p-4 overflow-x-auto">
-        {error && (
-          <div className="text-red-500 font-semibold mb-4">
-            {error}
-            {!hasTickets && (
-              <span className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-sm font-medium ml-2">[No tickets sold yet]</span>
-            )}
+      {error && (
+        <div className="text-red-500 font-semibold mb-4">
+          {error}
+          {!hasTickets && (
+            <span className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-sm font-medium ml-2">[No tickets sold yet]</span>
+          )}
+        </div>
+      )}
+      {!error && statistics && statistics.totalTicketsSold > 0 && rows.length === 0 && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+          <div className="flex items-start gap-2">
+            <svg className="w-5 h-5 text-yellow-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <div>
+              <p className="text-yellow-800 font-semibold mb-1">Data Mismatch Detected</p>
+              <p className="text-yellow-700 text-sm">
+                Statistics show <strong>{statistics.totalTicketsSold} ticket(s)</strong> sold, but the list query returned no results.
+                This may indicate a tenantId mismatch or the tickets may be associated with a different event/tenant.
+                Check the browser console for detailed query logs.
+              </p>
+            </div>
           </div>
-        )}
+        </div>
+      )}
         <div className="text-xs text-gray-500 mb-2">Hover over the <b>ID</b> or <b>Name</b> columns to see full ticket details.</div>
         <table className="min-w-full divide-y divide-gray-300 border border-gray-300">
           <thead className="bg-gray-50">

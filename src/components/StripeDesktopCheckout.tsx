@@ -22,13 +22,19 @@ type Props = {
   discountCodeId?: number | null;
   enabled: boolean;
   amountCents: number;
+  publishableKey?: string; // Backend-provided publishable key (domain-agnostic)
+  clientSecret?: string; // Backend-provided client secret (skip PaymentIntent creation)
+  transactionId?: string; // Backend transaction ID for success page lookup
   onInvalidClick?: () => void;
   onLoadingChange?: (loading: boolean) => void;
 };
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string);
+// Default Stripe promise (fallback for backward compatibility)
+const defaultStripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+  ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
+  : null;
 
-function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecret, onLoadingChange }: Props & { clientSecret: string }) {
+function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecret, transactionId, onLoadingChange }: Props & { clientSecret: string }) {
   const stripe = useStripe();
   const elements = useElements();
   const [confirming, setConfirming] = useState(false);
@@ -54,6 +60,13 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
 
   const handleConfirm = async () => {
     if (!stripe || !elements || !clientSecret) return;
+
+    // Prevent double submission
+    if (confirming) {
+      console.log('[DESKTOP ECE] Payment confirmation already in progress, ignoring duplicate click');
+      return;
+    }
+
     setConfirming(true);
 
     try {
@@ -122,7 +135,27 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
         } else if (paymentError?.type === 'api_error') {
           errorMessage = "Payment service error. Please try again later.";
         } else if (paymentError?.code === 'payment_intent_unexpected_state') {
+          // Payment already processed - try to redirect to success page
           errorMessage = "Payment already processed. Please check your email for confirmation.";
+
+          // Build success URL with transactionId if available (preferred), otherwise use Payment Intent ID
+          const params = new URLSearchParams();
+          if (transactionId) {
+            params.set('transactionId', transactionId);
+            console.log("[DESKTOP ECE] Payment already processed, redirecting with transactionId:", transactionId);
+          } else {
+            // Extract Payment Intent ID from clientSecret if available
+            const paymentIntentId = clientSecret?.split('_secret_')[0] || null;
+            if (paymentIntentId) {
+              params.set('pi', paymentIntentId);
+              console.log("[DESKTOP ECE] Payment already processed, redirecting with Payment Intent ID:", paymentIntentId);
+            }
+          }
+          if (eventId) params.set('eventId', String(eventId));
+          if (params.toString()) {
+            window.location.href = `/event/success?${params.toString()}`;
+            return; // Don't show alert, just redirect
+          }
         }
 
         alert(errorMessage);
@@ -132,11 +165,43 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
         // Extract Payment Intent ID from result and redirect to success page
         const paymentIntent = (result as any)?.paymentIntent;
         if (paymentIntent?.id) {
-          console.log("[DESKTOP ECE] Redirecting to success page with Payment Intent ID:", paymentIntent.id);
-          window.location.href = `/event/success?pi=${encodeURIComponent(paymentIntent.id)}`;
+          console.log("[DESKTOP ECE] Payment confirmed successfully, redirecting to success page with Payment Intent ID:", paymentIntent.id);
+          // Build success URL with transactionId if available (preferred), otherwise use Payment Intent ID
+          const params = new URLSearchParams();
+          if (transactionId) {
+            params.set('transactionId', transactionId);
+            console.log("[DESKTOP ECE] Using transactionId for success page:", transactionId);
+          } else {
+            params.set('pi', paymentIntent.id);
+            console.log("[DESKTOP ECE] Using Payment Intent ID for success page lookup:", paymentIntent.id);
+          }
+          if (eventId) params.set('eventId', String(eventId));
+          window.location.href = `/event/success?${params.toString()}`;
         } else {
-          console.warn("[DESKTOP ECE] No Payment Intent ID found in result, redirecting without parameters");
-          window.location.href = '/event/success';
+          // Fallback: try to extract from clientSecret
+          const paymentIntentIdFromSecret = clientSecret?.split('_secret_')[0] || null;
+          if (paymentIntentIdFromSecret) {
+            console.log("[DESKTOP ECE] No Payment Intent in result, using clientSecret to extract ID:", paymentIntentIdFromSecret);
+            const params = new URLSearchParams();
+            if (transactionId) {
+              params.set('transactionId', transactionId);
+            } else {
+              params.set('pi', paymentIntentIdFromSecret);
+            }
+            if (eventId) params.set('eventId', String(eventId));
+            window.location.href = `/event/success?${params.toString()}`;
+          } else {
+            console.warn("[DESKTOP ECE] No Payment Intent ID found in result or clientSecret");
+            if (transactionId) {
+              // If we have transactionId, use it directly
+              const params = new URLSearchParams({ transactionId });
+              if (eventId) params.set('eventId', String(eventId));
+              window.location.href = `/event/success?${params.toString()}`;
+            } else {
+              console.warn("[DESKTOP ECE] No transactionId or Payment Intent ID, redirecting without parameters");
+              window.location.href = '/event/success';
+            }
+          }
         }
       }
     } catch (e: any) {
@@ -482,9 +547,10 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
             alert("Please select a payment method first. You can choose from the Link, Cash App, or credit card options below.");
           }}
           className="mt-3 w-full inline-flex items-center justify-center bg-gradient-to-r from-teal-500 to-green-500 text-white font-bold py-3 px-4 rounded-md hover:from-teal-600 hover:to-green-600 disabled:opacity-60 disabled:cursor-not-allowed"
-          disabled={confirming || !paymentMethodSelected}
+          disabled={confirming || !paymentMethodSelected || !expressCheckoutReady}
         >
           {confirming ? 'Processing…' :
+            !expressCheckoutReady ? 'Loading payment options...' :
             !paymentMethodSelected ? 'Select a payment method first' : 'Pay Now'}
         </button>
       </div>
@@ -493,10 +559,27 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
 }
 
 export default function StripeDesktopCheckout(props: Props) {
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [clientSecret, setClientSecret] = useState<string | null>(props.clientSecret || null);
   const [creating, setCreating] = useState(false);
 
+  // Use backend-provided publishable key or fallback to env var
+  const publishableKey = props.publishableKey || process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+  const stripePromise = useMemo(() => {
+    if (!publishableKey) {
+      console.warn('[StripeDesktopCheckout] No publishable key provided');
+      return defaultStripePromise;
+    }
+    return loadStripe(publishableKey);
+  }, [publishableKey]);
+
+  // Only create PaymentIntent if clientSecret is not provided (backward compatibility)
   useEffect(() => {
+    if (props.clientSecret) {
+      // Backend-provided client secret, skip PaymentIntent creation
+      setClientSecret(props.clientSecret);
+      return;
+    }
+
     let cancelled = false;
     async function createPi() {
       if (!props.enabled) { setClientSecret(null); return; }
@@ -524,7 +607,7 @@ export default function StripeDesktopCheckout(props: Props) {
     }
     createPi();
     return () => { cancelled = true; };
-  }, [props.enabled, props.amountCents, JSON.stringify(props.cart), props.eventId, props.email, props.discountCodeId]);
+  }, [props.enabled, props.amountCents, JSON.stringify(props.cart), props.eventId, props.email, props.discountCodeId, props.clientSecret]);
 
   const options = useMemo(() => ({ appearance: { theme: "stripe" }, clientSecret: clientSecret || undefined }), [clientSecret]);
 
@@ -546,10 +629,18 @@ export default function StripeDesktopCheckout(props: Props) {
     );
   }
 
+  if (!stripePromise) {
+    return (
+      <div className="w-full border rounded-lg p-3 text-sm text-gray-600 bg-white">
+        Stripe is not configured. Please provide a publishable key.
+      </div>
+    );
+  }
+
   return (
     <Elements stripe={stripePromise} options={options as any}>
       {/* @ts-ignore */}
-      <InnerDesktopCheckout {...props} clientSecret={clientSecret} />
+      <InnerDesktopCheckout {...props} clientSecret={clientSecret || undefined} />
     </Elements>
   );
 }

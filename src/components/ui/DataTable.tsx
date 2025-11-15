@@ -128,10 +128,10 @@ export default function DataTable<T extends Record<string, any>>({
                         {onView && (
                           <button
                             onClick={() => onView(item)}
-                            className="icon-btn icon-btn-view mr-2"
+                            className="icon-btn icon-btn-view bg-green-700 hover:bg-green-800 text-white p-4 shadow-lg"
                             title="View"
                           >
-                            <FaEye />
+                            <FaEye className="text-xl text-white" />
                           </button>
                         )}
                         {onEdit && (

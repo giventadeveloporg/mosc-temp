@@ -17,10 +17,14 @@ type Props = {
   enabled: boolean; // whether fields are valid; when false, we show disabled overlay/placeholder
   showPlaceholder?: boolean; // show a disabled-looking placeholder if not eligible yet
   amountCents?: number; // optional current total for display
+  publishableKey?: string; // Backend-provided publishable key (domain-agnostic)
   onInvalidClick?: () => void; // called when user clicks placeholder/disabled state to surface validation
 };
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string);
+// Default Stripe promise (fallback for backward compatibility)
+const defaultStripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+  ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
+  : null;
 
 function InnerPRB({ cart, eventId, email, discountCodeId, enabled, showPlaceholder, amountCents, onInvalidClick }: Props) {
   const stripe = useStripe();
@@ -318,7 +322,26 @@ function InnerPRB({ cart, eventId, email, discountCodeId, enabled, showPlacehold
 }
 
 export function StripePaymentRequestButton(props: Props) {
+  // Use backend-provided publishable key or fallback to env var
+  const publishableKey = props.publishableKey || process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+  const stripePromise = useMemo(() => {
+    if (!publishableKey) {
+      console.warn('[StripePaymentRequestButton] No publishable key provided');
+      return defaultStripePromise;
+    }
+    return loadStripe(publishableKey);
+  }, [publishableKey]);
+
   const elementsOptions = useMemo<StripeElementsOptions>(() => ({ appearance: { theme: 'stripe' } }), []);
+
+  if (!stripePromise) {
+    return (
+      <div className="w-full border rounded-lg p-3 text-sm text-gray-600 bg-white opacity-60">
+        Stripe wallet buttons are not available. Please provide a publishable key.
+      </div>
+    );
+  }
+
   return (
     <Elements stripe={stripePromise} options={elementsOptions}>
       {/* @ts-ignore - stripe types at runtime */}
@@ -326,5 +349,8 @@ export function StripePaymentRequestButton(props: Props) {
     </Elements>
   );
 }
+
+// Default export for backward compatibility
+export default StripePaymentRequestButton;
 
 

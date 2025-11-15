@@ -825,6 +825,19 @@ export default function EventsPage() {
 
                         return (
                           <div className="absolute top-4 right-4 lg:top-6 lg:right-6 z-10">
+                            {/* New backend payment flow */}
+                            <Link
+                              href={`/events/${event.id}/checkout`}
+                              className={`transition-transform hover:scale-105 ${isPast ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
+                              title="Buy Tickets (New Payment Flow)"
+                            >
+                              <img
+                                src="/images/buy_tickets_click_here_red.webp"
+                                alt="Buy Tickets"
+                                className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
+                              />
+                            </Link>
+                            {/* Legacy Stripe flow (commented out):
                             <Link
                               href={`/events/${event.id}/tickets`}
                               className={`transition-transform hover:scale-105 ${isPast ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
@@ -835,6 +848,7 @@ export default function EventsPage() {
                                 className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
                               />
                             </Link>
+                            */}
                           </div>
                         );
                       })()}

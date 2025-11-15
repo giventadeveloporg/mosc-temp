@@ -4,6 +4,8 @@ import {
   EventTicketTransactionDTO,
   EventTicketTypeDTO,
   UserProfileDTO,
+  EventAttendeeDTO,
+  EventAttendeeGuestDTO,
 } from '@/types';
 import { getTenantId, getAppUrl, getEmailHostUrlPrefix } from '@/lib/env';
 import { withTenantId } from '@/lib/withTenantId';
@@ -568,5 +570,56 @@ export async function fetchTransactionQrCode(eventId: number, transactionId: num
       fullApiUrl
     });
     throw error;
+  }
+}
+
+/**
+ * Get event attendee by ID
+ */
+export async function getEventAttendee(attendeeId: number): Promise<EventAttendeeDTO | null> {
+  try {
+    const baseUrl = getAppUrl();
+    const response = await fetchWithJwtRetry(`${baseUrl}/api/proxy/event-attendees/${attendeeId}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      cache: 'no-store',
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        return null;
+      }
+      throw new Error(`Failed to fetch event attendee: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching event attendee:', error);
+    return null;
+  }
+}
+
+/**
+ * Get event attendee guests by attendee ID
+ */
+export async function getEventAttendeeGuests(attendeeId: number): Promise<EventAttendeeGuestDTO[]> {
+  try {
+    const baseUrl = getAppUrl();
+    const params = new URLSearchParams({ 'eventAttendeeId.equals': attendeeId.toString() });
+    const response = await fetchWithJwtRetry(`${baseUrl}/api/proxy/event-attendee-guests?${params.toString()}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      cache: 'no-store',
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch event attendee guests: ${response.status}`);
+    }
+
+    const guests = await response.json();
+    return Array.isArray(guests) ? guests : [];
+  } catch (error) {
+    console.error('Error fetching event attendee guests:', error);
+    return [];
   }
 }

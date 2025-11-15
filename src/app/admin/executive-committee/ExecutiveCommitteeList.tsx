@@ -250,10 +250,10 @@ export default function ExecutiveCommitteeList({
                   <div className="flex items-center justify-end gap-1">
                     <button
                       onClick={() => onView(member)}
-                      className="text-blue-600 hover:text-blue-900 p-1.5 rounded hover:bg-blue-50"
+                      className="icon-btn icon-btn-view bg-green-700 hover:bg-green-800 text-white p-4 shadow-lg"
                       title="View details"
                     >
-                      <FaEye className="w-4 h-4" />
+                      <FaEye className="text-xl text-white" />
                     </button>
                     <button
                       onClick={() => onEdit(member)}

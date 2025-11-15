@@ -126,7 +126,7 @@ export function createProxyHandler({ injectTenantId = true, allowedMethods = ['G
           if (injectTenantId && payload && typeof payload === 'object') {
             if (Array.isArray(payload)) {
               // For arrays, inject tenantId into each array item if they are objects
-              payload = payload.map(item => 
+              payload = payload.map(item =>
                 typeof item === 'object' && item !== null ? withTenantId(item) : item
               );
             } else {
@@ -134,7 +134,7 @@ export function createProxyHandler({ injectTenantId = true, allowedMethods = ['G
               payload = withTenantId(payload);
             }
           }
-          
+
           // Special debugging for promotion emails
           if (path.includes('send-promotion-emails')) {
             console.log('[PROXY DEBUG] Promotion email request - payload after tenantId injection:', payload);
@@ -175,7 +175,7 @@ export function createProxyHandler({ injectTenantId = true, allowedMethods = ['G
           }
         }
         console.log('[ProxyHandler] About to call fetchWithJwtRetry');
-        
+
         // Special logging for promotion emails - log exactly what we're sending to backend
         if (path.includes('send-promotion-emails') && bodyToSend) {
           console.log('[PROXY FINAL] About to send to backend API:', {
@@ -192,7 +192,7 @@ export function createProxyHandler({ injectTenantId = true, allowedMethods = ['G
             console.log('[PROXY FINAL] Could not parse body:', e);
           }
         }
-        
+
         const apiRes = await fetchWithJwtRetry(apiUrl, {
           method,
           headers: { 'Content-Type': contentType, ...extraHeaders },
@@ -206,8 +206,30 @@ export function createProxyHandler({ injectTenantId = true, allowedMethods = ['G
           if (totalCount) {
             res.setHeader('x-total-count', totalCount);
           }
-          const data = await apiRes.json();
-          res.status(apiRes.status).json(data);
+
+          // Handle empty responses (e.g., 404 with no body)
+          const responseContentType = apiRes.headers.get('content-type') || '';
+          const text = await apiRes.text();
+
+          // If response is empty or not JSON, return appropriate error
+          if (!text || text.trim() === '') {
+            if (apiRes.status === 404) {
+              res.status(404).json({ error: 'Resource not found' });
+            } else {
+              res.status(apiRes.status).json({ error: 'Empty response from backend' });
+            }
+            return;
+          }
+
+          // Try to parse as JSON, fallback to text if not JSON
+          try {
+            const data = JSON.parse(text);
+            res.status(apiRes.status).json(data);
+          } catch (parseError) {
+            // If not JSON, return as text with appropriate content type
+            res.status(apiRes.status).setHeader('Content-Type', responseContentType || 'text/plain');
+            res.send(text);
+          }
           return;
         }
         const data = await apiRes.text();

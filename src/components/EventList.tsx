@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import type { EventDetailsDTO, EventTypeDetailsDTO, EventCalendarEntryDTO } from '@/types';
-import { FaEdit, FaTrashAlt, FaUpload, FaCalendarDay, FaChevronLeft, FaChevronRight, FaPhotoVideo, FaTicketAlt } from 'react-icons/fa';
+import { FaEdit, FaTrashAlt, FaUpload, FaCalendarDay, FaChevronLeft, FaChevronRight, FaPhotoVideo, FaTicketAlt, FaCopy } from 'react-icons/fa';
 import { Modal } from './Modal';
 import { getTenantId } from '@/lib/env';
 import { formatDateLocal } from '@/lib/date';
@@ -300,6 +300,16 @@ export function EventList({
                     {boldEventIdLabel ? <b>Event ID:</b> : 'Event ID:'} {event.id}
                   </div>
                   <div><span className="font-bold">Title:</span> {event.title}</div>
+                  <div className="mt-2">
+                    <Link
+                      href={`/admin/events/new?copyFrom=${event.id}`}
+                      className="inline-flex items-center gap-1 text-xs bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded shadow-sm transition-colors"
+                      title="Copy this event to create a new one"
+                    >
+                      <FaCopy className="w-3 h-3" />
+                      Copy event
+                    </Link>
+                  </div>
                 </td>
                 <td
                   className="p-2 border align-middle"

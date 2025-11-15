@@ -1,6 +1,63 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { EventSponsorsDTO } from "@/types";
+import { useState } from "react";
+
+// Component to handle image loading errors and hide container when image fails
+function ImageWithErrorHandling({
+  src,
+  alt,
+  sponsorType,
+}: {
+  src: string;
+  alt: string;
+  sponsorType?: string;
+}) {
+  const [imageError, setImageError] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  // Don't render if image fails to load
+  if (imageError || !src) {
+    return sponsorType ? (
+      <div className="relative w-full pt-3 pr-3">
+        <div className="flex justify-end">
+          <span className="px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full">
+            {sponsorType}
+          </span>
+        </div>
+      </div>
+    ) : null;
+  }
+
+  return (
+    <div className="relative w-full h-auto rounded-t-2xl overflow-hidden">
+      <Image
+        src={src}
+        alt={alt}
+        width={800}
+        height={600}
+        className="w-full h-auto object-contain group-hover:scale-105 transition-transform duration-300"
+        style={{
+          backgroundColor: "transparent",
+          borderRadius: "1rem 1rem 0 0",
+        }}
+        onError={() => {
+          setImageError(true);
+        }}
+        onLoad={() => {
+          setImageLoaded(true);
+        }}
+      />
+      {sponsorType && imageLoaded && !imageError && (
+        <div className="absolute top-3 right-3">
+          <span className="px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full">
+            {sponsorType}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
 
 interface SponsorCardProps {
   sponsor: EventSponsorsDTO;
@@ -51,40 +108,24 @@ export function SponsorCard({
         }
       >
         <div className="flex flex-col h-full">
-          <div className="relative w-full h-auto rounded-t-2xl overflow-hidden">
-            {sponsor.bannerImageUrl ? (
-              <Image
-                src={sponsor.bannerImageUrl}
-                alt={sponsor.name}
-                width={800}
-                height={600}
-                className="w-full h-auto object-contain group-hover:scale-105 transition-transform duration-300"
-                style={{
-                  backgroundColor: "transparent",
-                  borderRadius: "1rem 1rem 0 0",
-                }}
-              />
-            ) : (
-              <div
-                className="w-full h-80 flex items-center justify-center"
-                style={{
-                  backgroundColor: "transparent",
-                  borderRadius: "1rem 1rem 0 0",
-                }}
-              >
-                <span className="text-gray-400 text-4xl">🏢</span>
-              </div>
-            )}
-            {sponsor.type && (
-              <div className="absolute top-3 right-3">
+          {sponsor.bannerImageUrl && (
+            <ImageWithErrorHandling
+              src={sponsor.bannerImageUrl}
+              alt={sponsor.name}
+              sponsorType={sponsor.type}
+            />
+          )}
+          {!sponsor.bannerImageUrl && sponsor.type && (
+            <div className="relative w-full pt-3 pr-3">
+              <div className="flex justify-end">
                 <span className="px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full">
                   {sponsor.type}
                 </span>
               </div>
-            )}
-          </div>
+            </div>
+          )}
 
-          <div className="flex-1 flex flex-col border-t border-white/20">
+          <div className={`flex-1 flex flex-col ${sponsor.bannerImageUrl ? 'border-t border-white/20' : ''}`}>
             <div className="p-5">
               <h2 className="text-xl font-bold text-gray-800 mb-2">
                 {sponsor.name}

@@ -1,4 +1,4 @@
-{
+﻿{
   "openapi": "3.0.1",
   "info": {
     "title": "Nextjs Template Boot API",
@@ -5977,8 +5977,8 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "Status updated successfully",
+          "403": {
+            "description": "Access denied - admin privileges required",
             "content": {
               "application/json": {
                 "schema": {
@@ -5987,8 +5987,8 @@
               }
             }
           },
-          "403": {
-            "description": "Access denied - admin privileges required",
+          "200": {
+            "description": "Status updated successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -18960,6 +18960,299 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/QrCodeUsageDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments/{transactionId}/refund": {
+      "post": {
+        "tags": [
+          "payment-resource"
+        ],
+        "operationId": "refundPayment",
+        "parameters": [
+          {
+            "name": "transactionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefundRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefundResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments/{transactionId}/confirm": {
+      "post": {
+        "tags": [
+          "payment-resource"
+        ],
+        "operationId": "confirmPayment",
+        "parameters": [
+          {
+            "name": "transactionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentSessionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments/{transactionId}/cancel": {
+      "post": {
+        "tags": [
+          "payment-resource"
+        ],
+        "operationId": "cancelPayment",
+        "parameters": [
+          {
+            "name": "transactionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/payments/zelle/manual": {
+      "post": {
+        "tags": [
+          "payment-resource"
+        ],
+        "operationId": "createZelleManual",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentSessionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentSessionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments/zeffy/initialize": {
+      "post": {
+        "tags": [
+          "payment-resource"
+        ],
+        "operationId": "initializeZeffy",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentSessionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentSessionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments/webhooks/{provider}": {
+      "post": {
+        "tags": [
+          "payment-resource"
+        ],
+        "operationId": "handleWebhook_1",
+        "parameters": [
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Webhook-Signature",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tenantId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments/providers/stripe/instant-checkout": {
+      "post": {
+        "tags": [
+          "payment-resource"
+        ],
+        "operationId": "createStripeInstantCheckout",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentSessionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentSessionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments/initialize": {
+      "post": {
+        "tags": [
+          "payment-resource"
+        ],
+        "operationId": "initializePayment",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentSessionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentSessionResponse"
                 }
               }
             }
@@ -37648,6 +37941,24 @@
             }
           },
           {
+            "name": "directorId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "performerId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
             "name": "eventMediaType",
             "in": "query",
             "required": false,
@@ -55779,16 +56090,6 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "Webhook processed successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/WebhookResponse"
-                }
-              }
-            }
-          },
           "401": {
             "description": "Invalid signature",
             "content": {
@@ -55801,6 +56102,16 @@
           },
           "400": {
             "description": "Invalid payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Webhook processed successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -56748,8 +57059,8 @@
               }
             }
           },
-          "201": {
-            "description": "User registered successfully",
+          "500": {
+            "description": "Internal server error",
             "content": {
               "application/json": {
                 "schema": {
@@ -56758,8 +57069,8 @@
               }
             }
           },
-          "500": {
-            "description": "Internal server error",
+          "201": {
+            "description": "User registered successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -69393,6 +69704,36 @@
                 "schema": {
                   "type": "integer",
                   "format": "int64"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments/{transactionId}": {
+      "get": {
+        "tags": [
+          "payment-resource"
+        ],
+        "operationId": "getPaymentStatus",
+        "parameters": [
+          {
+            "name": "transactionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
                 }
               }
             }
@@ -111284,6 +111625,206 @@
             "type": "string"
           },
           "testEmail": {
+            "type": "boolean"
+          }
+        }
+      },
+      "RefundRequest": {
+        "required": [
+          "transactionId"
+        ],
+        "type": "object",
+        "properties": {
+          "transactionId": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "tenantId": {
+            "type": "string"
+          }
+        }
+      },
+      "RefundResponse": {
+        "type": "object",
+        "properties": {
+          "refundId": {
+            "type": "string"
+          },
+          "transactionId": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "processedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "providerMetadata": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "PaymentSessionResponse": {
+        "type": "object",
+        "properties": {
+          "transactionId": {
+            "type": "string"
+          },
+          "provider": {
+            "type": "string",
+            "enum": [
+              "STRIPE",
+              "PAYPAL",
+              "ZEFFY",
+              "ZELLE_MANUAL",
+              "REVOLUT",
+              "CEFI_CHARITY"
+            ]
+          },
+          "status": {
+            "type": "string"
+          },
+          "clientSecret": {
+            "type": "string"
+          },
+          "sessionUrl": {
+            "type": "string"
+          },
+          "publishableKey": {
+            "type": "string"
+          },
+          "supportedMethods": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "CARD",
+                "BANK_TRANSFER",
+                "WALLET",
+                "MANUAL",
+                "LINK",
+                "APPLE_PAY",
+                "GOOGLE_PAY"
+              ]
+            }
+          },
+          "amount": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "providerMetadata": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object"
+            }
+          },
+          "requiresAction": {
+            "type": "boolean"
+          },
+          "actionType": {
+            "type": "string"
+          },
+          "actionData": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object"
+            }
+          },
+          "failureReason": {
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "PaymentSessionRequest": {
+        "required": [
+          "amount",
+          "currency",
+          "paymentUseCase",
+          "tenantId"
+        ],
+        "type": "object",
+        "properties": {
+          "tenantId": {
+            "type": "string"
+          },
+          "paymentUseCase": {
+            "type": "string",
+            "enum": [
+              "TICKET_SALE",
+              "DONATION",
+              "DONATION_CEFI",
+              "DONATION_ZERO_FEE",
+              "OFFERING",
+              "MEMBERSHIP_SUBSCRIPTION"
+            ]
+          },
+          "amount": {
+            "type": "number"
+          },
+          "currency": {
+            "maxLength": 3,
+            "minLength": 3,
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "customerEmail": {
+            "type": "string"
+          },
+          "customerName": {
+            "type": "string"
+          },
+          "eventId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "membershipPlanId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object"
+            }
+          },
+          "returnUrl": {
+            "type": "string"
+          },
+          "cancelUrl": {
+            "type": "string"
+          },
+          "requiresConfirmation": {
             "type": "boolean"
           }
         }

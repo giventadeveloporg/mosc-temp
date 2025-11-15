@@ -16,10 +16,11 @@ export default function TenantSettingsList({
   initialTotalCount = 0,
   onRefresh
 }: TenantSettingsListProps) {
-  const [settings, setSettings] = useState<TenantSettingsDTO[]>(initialData);
-  const [loading, setLoading] = useState(false);
+  // Don't use initialData in state to prevent flash - we'll fetch filtered data immediately
+  const [settings, setSettings] = useState<TenantSettingsDTO[]>([]);
+  const [loading, setLoading] = useState(true); // Start with loading true to prevent flash
   const [error, setError] = useState<string | null>(null);
-  const [totalCount, setTotalCount] = useState(initialTotalCount);
+  const [totalCount, setTotalCount] = useState(0);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(0);
@@ -35,6 +36,9 @@ export default function TenantSettingsList({
 
   // Selection state for bulk operations
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+
+  // Track if initial load has completed
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
 
   // Load data function
   const loadData = async () => {
@@ -59,6 +63,7 @@ export default function TenantSettingsList({
 
       setSettings(Array.isArray(data) ? data : []);
       setTotalCount(total);
+      setInitialLoadComplete(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -276,24 +281,27 @@ export default function TenantSettingsList({
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <div className="flex gap-2">
+                  <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
                     <Link
                       href={`/admin/tenant-management/settings/${setting.id}`}
-                      className="text-blue-600 hover:text-blue-900"
+                      className="icon-btn icon-btn-view bg-green-700 hover:bg-green-800 text-white p-4 shadow-lg"
+                      title="View"
                     >
-                      <FaEye />
+                      <FaEye className="text-xl text-white" />
                     </Link>
                     <Link
                       href={`/admin/tenant-management/settings/${setting.id}/edit`}
-                      className="text-indigo-600 hover:text-indigo-900"
+                      className="icon-btn icon-btn-edit bg-blue-700 hover:bg-blue-800 text-white p-4 shadow-lg"
+                      title="Edit"
                     >
-                      <FaEdit />
+                      <FaEdit className="text-xl text-white" />
                     </Link>
                     <button
                       onClick={() => handleDelete(setting.id!)}
-                      className="text-red-600 hover:text-red-900"
+                      className="icon-btn icon-btn-delete bg-red-700 hover:bg-red-800 text-white p-4 shadow-lg"
+                      title="Delete"
                     >
-                      <FaTrashAlt />
+                      <FaTrashAlt className="text-xl text-white" />
                     </button>
                   </div>
                 </td>

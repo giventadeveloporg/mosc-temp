@@ -983,3 +983,295 @@ export interface WhatsAppWebhookPayload {
   ErrorMessage?: string;
   Timestamp: string;
 }
+
+/**
+ * Payment Provider Types
+ */
+export enum PaymentProviderType {
+  STRIPE = 'STRIPE',
+  PAYPAL = 'PAYPAL',
+  REVOLUT = 'REVOLUT',
+  ZEFFY = 'ZEFFY',
+  ZELLE = 'ZELLE',
+  CEFI = 'CEFI',
+}
+
+/**
+ * Payment Use Case Types
+ * Matches backend enum: PaymentUseCase
+ * Note: DONATION_ZERO_FEE is also supported (may need backend update)
+ */
+export enum PaymentUseCase {
+  TICKET_SALE = 'TICKET_SALE',
+  DONATION = 'DONATION',
+  DONATION_CEFI = 'DONATION_CEFI',
+  DONATION_ZERO_FEE = 'DONATION_ZERO_FEE',
+  OFFERING = 'OFFERING',
+  MEMBERSHIP_SUBSCRIPTION = 'MEMBERSHIP_SUBSCRIPTION',
+}
+
+/**
+ * Payment Status Types
+ */
+export enum PaymentStatus {
+  PENDING = 'PENDING',
+  INITIATED = 'INITIATED',
+  PROCESSING = 'PROCESSING',
+  SUCCEEDED = 'SUCCEEDED',
+  FAILED = 'FAILED',
+  CANCELLED = 'CANCELLED',
+  REFUNDED = 'REFUNDED',
+  PARTIALLY_REFUNDED = 'PARTIALLY_REFUNDED',
+  CONFIRMED = 'CONFIRMED', // For manual payments like Zelle
+}
+
+/**
+ * Payment Session Response - returned by /api/payments/initialize
+ * Matches backend PaymentSessionResponse structure
+ */
+export interface PaymentSessionResponse {
+  transactionId: string;
+  provider?: PaymentProviderType | string; // Backend returns PaymentProvider enum/string
+  providerType?: PaymentProviderType; // Normalized field (mapped from provider)
+  status?: string; // Payment status
+  clientSecret?: string; // For Stripe PaymentIntent
+  sessionUrl?: string; // For hosted checkouts (Stripe Instant Checkout, PayPal, Revolut)
+  publishableKey?: string; // For Stripe Elements (REQUIRED for Stripe)
+  supportedMethods?: string[]; // List of supported payment methods
+  amount?: number; // Payment amount
+  currency?: string; // Payment currency
+  providerMetadata?: Record<string, any>; // Provider-specific metadata
+  requiresAction?: boolean; // Whether payment requires additional action
+  actionType?: string; // Type of action required (e.g., 'redirect', '3ds')
+  actionData?: Record<string, any>; // Data for required action
+  failureReason?: string; // Failure reason if payment failed
+  metadata?: Record<string, any>; // Additional metadata
+  // Legacy fields (for backward compatibility)
+  paymentMethod?: string; // Payment method hint (e.g., 'card', 'wallet', 'zelle')
+  expiresAt?: string; // ISO date-time when session expires
+}
+
+/**
+ * Payment Status Response - returned by /api/payments/{transactionId}
+ */
+export interface PaymentStatusResponse {
+  transactionId: string;
+  status: PaymentStatus;
+  providerType: PaymentProviderType;
+  amount?: number;
+  currency?: string;
+  paymentMethod?: string;
+  paymentReference?: string; // Provider transaction ID
+  failureReason?: string;
+  settlementInfo?: PaymentSettlementInfo;
+  metadata?: Record<string, any>;
+  createdAt: string;
+  updatedAt: string;
+  // Ticket purchase fields (only populated when status=SUCCEEDED and it's a ticket purchase)
+  ticketTransactionId?: number; // EventTicketTransaction ID
+  qrCodeUrl?: string; // QR code image URL - REQUIRED for frontend display
+  emailSent?: boolean; // Whether ticket email was sent
+  eventId?: number; // Event ID for ticket purchases
+}
+
+/**
+ * Payment Settlement Information
+ */
+export interface PaymentSettlementInfo {
+  settlementBatchId?: string;
+  platformInvoiceId?: string;
+  platformFeeAmount?: number;
+  processingFeeAmount?: number;
+  netAmount?: number;
+  settlementDate?: string;
+}
+
+/**
+ * Payment Provider Configuration
+ */
+export interface PaymentProviderConfigDTO {
+  id?: number;
+  tenantId: string;
+  providerType: PaymentProviderType;
+  paymentUseCase?: PaymentUseCase;
+  isActive: boolean;
+  supportsAcp?: boolean; // Stripe Instant Checkout / ACP
+  supportsZeffy?: boolean;
+  supportsZelle?: boolean;
+  supportsRevolut?: boolean;
+  priorityOrder?: number; // Fallback ordering
+  configJson?: Record<string, any>; // Encrypted provider credentials
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/**
+ * Payment Transaction - unified payment record
+ */
+export interface PaymentTransactionDTO {
+  id?: number;
+  tenantId: string;
+  transactionReference: string; // Generated unique reference
+  providerType: PaymentProviderType;
+  paymentUseCase: PaymentUseCase;
+  amount: number;
+  currency: string;
+  status: PaymentStatus;
+  paymentMethod?: string;
+  paymentReference?: string; // Provider transaction ID
+  providerCustomerId?: string; // Provider customer ID (e.g., Stripe customer ID)
+  providerSessionId?: string; // Provider session ID (e.g., Stripe checkout session ID)
+  failureReason?: string;
+  refundAmount?: number;
+  refundDate?: string;
+  refundReason?: string;
+  settlementBatchId?: string;
+  platformInvoiceId?: string;
+  manualPaymentReference?: string; // For Zelle manual payments
+  metadata?: Record<string, any>;
+  // Related entities
+  eventId?: number;
+  userId?: number;
+  membershipSubscriptionId?: number;
+  // Timestamps
+  createdAt: string;
+  updatedAt: string;
+  // Relations
+  event?: EventDetailsDTO;
+  user?: UserProfileDTO;
+}
+
+/**
+ * Payment Transaction Item - line items for a payment
+ */
+export interface PaymentTransactionItemDTO {
+  id?: number;
+  transactionId: number;
+  itemType: string; // 'TICKET', 'DONATION', 'MEMBERSHIP', etc.
+  itemId?: number; // Reference to ticket type, membership plan, etc.
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  totalAmount: number;
+  taxAmount?: number;
+  discountAmount?: number;
+  platformFeeAmount?: number;
+  processingFeeAmount?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Payment Initialization Request
+ */
+export interface PaymentInitializeRequest {
+  paymentUseCase: PaymentUseCase;
+  amount: number;
+  currency: string;
+  items: PaymentItem[];
+  customerEmail: string;
+  customerName?: string;
+  customerPhone?: string;
+  returnUrl?: string; // For redirect-based flows
+  cancelUrl?: string; // For redirect-based flows
+  metadata?: Record<string, any>;
+  // Context-specific fields
+  eventId?: number;
+  membershipPlanId?: number;
+  discountCode?: string;
+}
+
+/**
+ * Payment Item for initialization
+ */
+export interface PaymentItem {
+  itemType: string;
+  itemId?: number;
+  description: string;
+  quantity: number;
+  unitPrice: number;
+}
+
+/**
+ * Payment Refund Request
+ */
+export interface PaymentRefundRequest {
+  transactionId: string;
+  amount?: number; // If not provided, full refund
+  reason?: string;
+}
+
+/**
+ * Membership Plan DTO
+ */
+export interface MembershipPlanDTO {
+  id?: number;
+  tenantId: string;
+  name: string;
+  description?: string;
+  billingInterval: 'MONTHLY' | 'YEARLY';
+  amount: number;
+  currency: string;
+  isActive: boolean;
+  stripePriceId?: string;
+  stripeProductId?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/**
+ * Membership Subscription DTO
+ */
+export interface MembershipSubscriptionDTO {
+  id?: number;
+  tenantId: string;
+  userId: number;
+  membershipPlanId: number;
+  status: 'ACTIVE' | 'CANCELLED' | 'PAST_DUE' | 'UNPAID';
+  currentPeriodStart: string;
+  currentPeriodEnd: string;
+  cancelAtPeriodEnd: boolean;
+  cancelledAt?: string;
+  providerSubscriptionId?: string; // Stripe subscription ID, PayPal subscription ID, etc.
+  providerCustomerId?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  // Relations
+  user?: UserProfileDTO;
+  membershipPlan?: MembershipPlanDTO;
+}
+
+/**
+ * Platform Settlement DTO
+ */
+export interface PlatformSettlementDTO {
+  id?: number;
+  tenantId: string;
+  providerType: PaymentProviderType;
+  settlementDate: string; // Date of settlement
+  grossAmount: number;
+  processingFeeAmount: number;
+  platformFeeAmount: number;
+  netAmount: number;
+  transactionCount: number;
+  status: 'PENDING' | 'SETTLED' | 'INVOICED';
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/**
+ * Platform Invoice DTO
+ */
+export interface PlatformInvoiceDTO {
+  id?: number;
+  tenantId: string;
+  invoiceNumber: string;
+  amount: number;
+  currency: string;
+  status: 'DRAFT' | 'SENT' | 'PAID' | 'OVERDUE' | 'CANCELLED';
+  dueDate: string;
+  paidAt?: string;
+  settlementBatchIds?: string[]; // Related settlement batches
+  createdAt?: string;
+  updatedAt?: string;
+}

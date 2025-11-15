@@ -532,16 +532,26 @@ export default function EventDetailsPage() {
                 const isPast = !isUpcomingLocal;
 
                 return (
-                  <div className="absolute top-4 right-4 lg:top-6 lg:right-6 z-10">
+                  <div className="absolute top-4 right-4 lg:top-6 lg:right-6 z-10 flex flex-col gap-2">
+                    {/* New Backend Payment Flow */}
                     <Link
-                      href={`/events/${event.id}/tickets`}
+                      href={`/events/${event.id}/checkout`}
                       className={`transition-transform hover:scale-105 ${isPast ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
+                      title="Buy Tickets (New Payment Flow)"
                     >
                       <img
                         src="/images/buy_tickets_click_here_red.webp"
                         alt="Buy Tickets"
                         className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
                       />
+                    </Link>
+                    {/* Legacy Stripe Flow - Keep for backward compatibility */}
+                    <Link
+                      href={`/events/${event.id}/tickets`}
+                      className={`transition-transform hover:scale-105 text-xs text-gray-600 hover:text-gray-800 ${isPast ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      title="Buy Tickets (Legacy Flow)"
+                    >
+                      <span className="text-[10px]">Legacy Flow</span>
                     </Link>
                   </div>
                 );
@@ -701,6 +711,93 @@ export default function EventDetailsPage() {
                 </div>
               )}
 
+              {/* Contact Information Section */}
+              {contacts.length > 0 && (
+                <div className="mb-6">
+                  <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-3">
+                    <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
+                      <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                      </svg>
+                    </div>
+                    Contact Information
+                  </h2>
+                  <div className={`${cardGridStyles.centeredCardGrid} items-stretch`}>
+                    {contacts.map((contact, index) => {
+                      const gradientBackground = cardBackgrounds[getColorIndex(contact.id || contact.name || index, cardBackgrounds.length)];
+                      return (
+                      <div
+                        key={contact.id}
+                        className={`${cardGridStyles.cardItem} ${gradientBackground} group relative overflow-hidden rounded-2xl border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col h-full`}
+                      >
+                        <div className="absolute inset-0 pointer-events-none opacity-0 transition-opacity duration-300 bg-white/25 group-hover:opacity-100" />
+                        <div className="relative z-10 flex flex-col h-full pl-3">
+                          <h3 className="font-heading text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                            <span className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-white/70 shadow-sm">
+                              <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 10c0 6-9 13-9 13S3 16 3 10a8 8 0 1 1 16 0z" />
+                              </svg>
+                            </span>
+                            {contact.name}
+                          </h3>
+                          <div className="space-y-4 text-sm text-gray-700">
+                            {contact.phone && (
+                              <div className="flex items-center gap-3">
+                                <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-emerald-100/90 text-emerald-700 flex items-center justify-center shadow-sm">
+                                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5a2 2 0 0 1 2-2h1.11a2 2 0 0 1 1.94 1.515l.72 2.878a2 2 0 0 1-.43 1.807l-.97 1.09a16 16 0 0 0 6.069 6.069l1.09-.97a2 2 0 0 1 1.807-.43l2.878.72A2 2 0 0 1 21 18.89V20a2 2 0 0 1-2 2h-.75C11.44 22 5 15.56 5 7.75V7a2 2 0 0 1 2-2h.25" />
+                                  </svg>
+                                </div>
+                                <div>
+                                  <p className="text-xs uppercase tracking-wide text-gray-500 font-semibold">Phone</p>
+                                  <a href={`tel:${contact.phone}`} className="text-base font-semibold text-emerald-700 hover:text-emerald-900 transition-colors duration-200">
+                                    {contact.phone}
+                                  </a>
+                                </div>
+                              </div>
+                            )}
+                            {contact.email && (
+                              <div className="flex items-center gap-3">
+                                <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-sky-100/90 text-sky-700 flex items-center justify-center shadow-sm">
+                                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 4.26a2 2 0 0 0 1.98 0L21 8m-2 8a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8" />
+                                  </svg>
+                                </div>
+                                <div>
+                                  <p className="text-xs uppercase tracking-wide text-gray-500 font-semibold">Email</p>
+                                  <a href={`mailto:${contact.email}`} className="text-base font-semibold text-sky-700 hover:text-sky-900 transition-colors duration-200">
+                                    {contact.email}
+                                  </a>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                          <div className="mt-6 pt-4 border-t border-white/50 grid grid-cols-2 gap-3 text-center">
+                          {contact.phone && (
+                              <a href={`tel:${contact.phone}`} className="inline-flex items-center justify-center gap-2 bg-white/70 text-emerald-700 font-semibold py-2 rounded-xl shadow-sm hover:bg-white transition-colors duration-200">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5a2 2 0 0 1 2-2h1.11a2 2 0 0 1 1.94 1.515l.72 2.878a2 2 0 0 1-.43 1.807l-.97 1.09a16 16 0 0 0 6.069 6.069l1.09-.97a2 2 0 0 1 1.807-.43l2.878.72A2 2 0 0 1 21 18.89V20a2 2 0 0 1-2 2h-.75C11.44 22 5 15.56 5 7.75V7a2 2 0 0 1 2-2h.25" />
+                                </svg>
+                                Call
+                              </a>
+                          )}
+                          {contact.email && (
+                              <a href={`mailto:${contact.email}`} className="inline-flex items-center justify-center gap-2 bg-white/70 text-sky-700 font-semibold py-2 rounded-xl shadow-sm hover:bg-white transition-colors duration-200">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 4.26a2 2 0 0 0 1.98 0L21 8m-2 8a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8" />
+                                </svg>
+                                Email
+                              </a>
+                          )}
+                          </div>
+                        </div>
+                      </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               {/* Featured Performers Section */}
               {featuredPerformers.length > 0 && (
                 <div className="mb-6">
@@ -835,93 +932,6 @@ export default function EventDetailsPage() {
                 </div>
               )}
 
-              {/* Contact Information Section */}
-              {contacts.length > 0 && (
-                <div className="mb-6">
-                  <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-3">
-                    <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
-                      <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                      </svg>
-                    </div>
-                    Contact Information
-                  </h2>
-                  <div className={`${cardGridStyles.centeredCardGrid} items-stretch`}>
-                    {contacts.map((contact, index) => {
-                      const gradientBackground = cardBackgrounds[getColorIndex(contact.id || contact.name || index, cardBackgrounds.length)];
-                      return (
-                      <div
-                        key={contact.id}
-                        className={`${cardGridStyles.cardItem} ${gradientBackground} group relative overflow-hidden rounded-2xl border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col h-full`}
-                      >
-                        <div className="absolute inset-0 pointer-events-none opacity-0 transition-opacity duration-300 bg-white/25 group-hover:opacity-100" />
-                        <div className="relative z-10 flex flex-col h-full pl-3">
-                          <h3 className="font-heading text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                            <span className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-white/70 shadow-sm">
-                              <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 10c0 6-9 13-9 13S3 16 3 10a8 8 0 1 1 16 0z" />
-                              </svg>
-                            </span>
-                            {contact.name}
-                          </h3>
-                          <div className="space-y-4 text-sm text-gray-700">
-                            {contact.phone && (
-                              <div className="flex items-center gap-3">
-                                <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-emerald-100/90 text-emerald-700 flex items-center justify-center shadow-sm">
-                                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5a2 2 0 0 1 2-2h1.11a2 2 0 0 1 1.94 1.515l.72 2.878a2 2 0 0 1-.43 1.807l-.97 1.09a16 16 0 0 0 6.069 6.069l1.09-.97a2 2 0 0 1 1.807-.43l2.878.72A2 2 0 0 1 21 18.89V20a2 2 0 0 1-2 2h-.75C11.44 22 5 15.56 5 7.75V7a2 2 0 0 1 2-2h.25" />
-                                  </svg>
-                                </div>
-                                <div>
-                                  <p className="text-xs uppercase tracking-wide text-gray-500 font-semibold">Phone</p>
-                                  <a href={`tel:${contact.phone}`} className="text-base font-semibold text-emerald-700 hover:text-emerald-900 transition-colors duration-200">
-                                    {contact.phone}
-                                  </a>
-                                </div>
-                              </div>
-                            )}
-                            {contact.email && (
-                              <div className="flex items-center gap-3">
-                                <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-sky-100/90 text-sky-700 flex items-center justify-center shadow-sm">
-                                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 4.26a2 2 0 0 0 1.98 0L21 8m-2 8a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8" />
-                                  </svg>
-                                </div>
-                                <div>
-                                  <p className="text-xs uppercase tracking-wide text-gray-500 font-semibold">Email</p>
-                                  <a href={`mailto:${contact.email}`} className="text-base font-semibold text-sky-700 hover:text-sky-900 transition-colors duration-200">
-                                    {contact.email}
-                                  </a>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                          <div className="mt-6 pt-4 border-t border-white/50 grid grid-cols-2 gap-3 text-center">
-                          {contact.phone && (
-                              <a href={`tel:${contact.phone}`} className="inline-flex items-center justify-center gap-2 bg-white/70 text-emerald-700 font-semibold py-2 rounded-xl shadow-sm hover:bg-white transition-colors duration-200">
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5a2 2 0 0 1 2-2h1.11a2 2 0 0 1 1.94 1.515l.72 2.878a2 2 0 0 1-.43 1.807l-.97 1.09a16 16 0 0 0 6.069 6.069l1.09-.97a2 2 0 0 1 1.807-.43l2.878.72A2 2 0 0 1 21 18.89V20a2 2 0 0 1-2 2h-.75C11.44 22 5 15.56 5 7.75V7a2 2 0 0 1 2-2h.25" />
-                                </svg>
-                                Call
-                              </a>
-                          )}
-                          {contact.email && (
-                              <a href={`mailto:${contact.email}`} className="inline-flex items-center justify-center gap-2 bg-white/70 text-sky-700 font-semibold py-2 rounded-xl shadow-sm hover:bg-white transition-colors duration-200">
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 4.26a2 2 0 0 0 1.98 0L21 8m-2 8a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8" />
-                                </svg>
-                                Email
-                              </a>
-                          )}
-                          </div>
-                        </div>
-                      </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
               {/* Program Directors Section */}
               {programDirectors.length > 0 && (
                 <div className="mb-6">
@@ -933,60 +943,66 @@ export default function EventDetailsPage() {
                     </div>
                     Program Directors
                   </h2>
-                  <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-3">
                     {programDirectors.map((director, index) => {
                       const gradientBackground = cardBackgrounds[getColorIndex(director.id || director.name || index, cardBackgrounds.length)];
                       const avatarGradient = avatarGradients[getColorIndex(director.id || director.name || index, avatarGradients.length)];
                       return (
                       <div
                         key={director.id}
-                        className={`${gradientBackground} group relative overflow-hidden rounded-2xl border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col w-full`}
-                        style={{ minHeight: '237px' }}
+                        className={`${gradientBackground} group relative overflow-hidden rounded-2xl border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col w-full h-full`}
+                        style={{ minHeight: '200px' }}
                       >
                         <div className="absolute inset-0 pointer-events-none opacity-0 transition-opacity duration-300 bg-white/25 group-hover:opacity-100" />
-                        <div className="flex items-start gap-4">
-                          <div className={`relative w-20 h-20 flex-shrink-0 rounded-full overflow-hidden ring-4 ring-white/70 shadow-xl bg-gradient-to-br ${avatarGradient.from} ${avatarGradient.to}`}>
-                            {director.photoUrl && !failedImages.has(`director-${director.id}`) ? (
-                              <Image
-                                src={director.photoUrl}
-                                alt={director.name}
-                                fill
-                                className="object-cover"
-                                onError={() => {
-                                  // Mark this image as failed
-                                  setFailedImages(prev => new Set(prev).add(`director-${director.id}`));
-                                }}
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-white font-bold text-lg">
-                                {getInitials(director.name || 'Director')}
-                              </div>
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0 flex flex-col">
-                            <h3 className="font-heading text-xl font-semibold text-gray-900 mb-2">
-                              {director.name}
-                            </h3>
-                            {director.bio && (
-                              <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
-                                {director.bio}
-                              </p>
-                            )}
-                            <div className="flex flex-wrap gap-2 mt-auto pt-4 border-t border-white/50 text-xs uppercase tracking-wide text-gray-600">
-                              <span className="inline-flex items-center gap-1 bg-white/70 text-gray-700 px-3 py-1 rounded-full">
-                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" />
-                                </svg>
-                                Program Director
-                              </span>
-                              {director.role && (
+                        <div className="relative z-10 p-4 flex flex-col h-full">
+                          <div className="flex items-start gap-4 flex-1">
+                            <div className={`relative w-20 h-20 flex-shrink-0 rounded-full overflow-hidden ring-4 ring-white/70 shadow-xl bg-gradient-to-br ${avatarGradient.from} ${avatarGradient.to}`}>
+                              {director.photoUrl && !failedImages.has(`director-${director.id}`) ? (
+                                <Image
+                                  src={director.photoUrl}
+                                  alt={director.name}
+                                  fill
+                                  className="object-cover"
+                                  onError={() => {
+                                    // Mark this image as failed
+                                    setFailedImages(prev => new Set(prev).add(`director-${director.id}`));
+                                  }}
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-white font-bold text-lg">
+                                  {getInitials(director.name || 'Director')}
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0 flex flex-col h-full">
+                              <h3 className="font-heading text-xl font-semibold text-gray-900 mb-2">
+                                {director.name}
+                              </h3>
+                              {director.bio ? (
+                                <div className="flex-1 flex flex-col min-h-0">
+                                  <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap flex-1">
+                                    {director.bio}
+                                  </p>
+                                </div>
+                              ) : (
+                                <div className="flex-1"></div>
+                              )}
+                              <div className="flex flex-wrap gap-2 mt-auto pt-3 border-t border-white/50 text-xs uppercase tracking-wide text-gray-600">
                                 <span className="inline-flex items-center gap-1 bg-white/70 text-gray-700 px-3 py-1 rounded-full">
                                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.5v15m-7.5-7.5h15" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" />
                                   </svg>
-                                  {director.role}
+                                  Program Director
                                 </span>
-                              )}
+                                {director.role && (
+                                  <span className="inline-flex items-center gap-1 bg-white/70 text-gray-700 px-3 py-1 rounded-full">
+                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.5v15m-7.5-7.5h15" />
+                                    </svg>
+                                    {director.role}
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -1036,9 +1052,17 @@ export default function EventDetailsPage() {
 
         {/* Sponsors Section - Matching homepage style */}
         {sponsors.length > 0 && (() => {
+          // Sort sponsors by priority ranking (lower value = higher priority)
+          // If priorityRanking is not set, treat it as lowest priority (sort to end)
+          const sortedSponsors = [...sponsors].sort((a, b) => {
+            const aPriority = a.sponsor?.priorityRanking ?? 999999;
+            const bPriority = b.sponsor?.priorityRanking ?? 999999;
+            return aPriority - bPriority; // Ascending order (lower = higher priority)
+          });
+
           // Limit to maximum 12 sponsors
-          const displayedSponsors = sponsors.slice(0, 12);
-          const hasMoreSponsors = sponsors.length > 12;
+          const displayedSponsors = sortedSponsors.slice(0, 12);
+          const hasMoreSponsors = sortedSponsors.length > 12;
 
           return (
             <div className="mb-8 mt-8">

@@ -1,0 +1,1165 @@
+'use client';
+
+import { useEffect, useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import {
+  FaCheckCircle, FaTicketAlt, FaCalendarAlt, FaUser, FaEnvelope,
+  FaMoneyBillWave, FaInfoCircle, FaReceipt, FaMapPin, FaClock, FaTags
+} from 'react-icons/fa';
+import { formatInTimeZone } from 'date-fns-tz';
+import LocationDisplay from '@/components/LocationDisplay';
+import { getAppUrl } from '@/lib/env';
+import type { PaymentTransactionDTO, EventTicketTransactionDTO, EventDetailsDTO } from '@/types';
+import { sendTicketEmailAsync } from '@/lib/emailUtils';
+
+interface PaymentSuccessClientProps {
+  transactionId: string;
+  eventId?: string;
+}
+
+export default function PaymentSuccessClient({ transactionId, eventId: eventIdParam }: PaymentSuccessClientProps) {
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [polling, setPolling] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [paymentTransaction, setPaymentTransaction] = useState<PaymentTransactionDTO | null>(null);
+  const [ticketTransaction, setTicketTransaction] = useState<EventTicketTransactionDTO | null>(null);
+  const [eventDetails, setEventDetails] = useState<EventDetailsDTO | null>(null);
+  const [heroImageUrl, setHeroImageUrl] = useState<string | null>(null);
+  const [qrCodeData, setQrCodeData] = useState<{ qrCodeImageUrl: string } | null>(null);
+  const [qrCodeLoading, setQrCodeLoading] = useState(false);
+  const [qrCodeError, setQrCodeError] = useState<string | null>(null);
+  const [transactionItems, setTransactionItems] = useState<any[]>([]);
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const pollingAttemptsRef = useRef(0);
+  const ticketPollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const ticketPollingAttemptsRef = useRef(0);
+  const qrCodeFetchAttemptedRef = useRef<Set<string>>(new Set());
+  const MAX_POLLING_ATTEMPTS = 30; // 30 attempts * 2 seconds = 60 seconds max
+  const POLLING_INTERVAL = 2000; // 2 seconds
+  const MAX_TICKET_POLLING_ATTEMPTS = 15; // 15 attempts * 2 seconds = 30 seconds max
+
+  // Use sessionStorage to prevent infinite refresh loops (persists across page reloads)
+  const getRefreshKey = () => `payment-refresh-${transactionId}`;
+  const hasRefreshed = () => {
+    if (typeof window === 'undefined') return false;
+    return sessionStorage.getItem(getRefreshKey()) === 'true';
+  };
+  const markAsRefreshed = () => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem(getRefreshKey(), 'true');
+    }
+  };
+
+  // Fetch payment status function
+  async function fetchPaymentStatus(): Promise<PaymentTransactionDTO | null> {
+    const baseUrl = getAppUrl();
+    const paymentRes = await fetch(`${baseUrl}/api/proxy/payments/${transactionId}`, {
+      cache: 'no-store',
+    });
+
+    if (!paymentRes.ok) {
+      // Handle 400 Bad Request for PENDING transactions without Stripe payment intent ID
+      if (paymentRes.status === 400) {
+        try {
+          const errorData = await paymentRes.json();
+          // If transaction exists but is PENDING without payment intent, create a minimal payment object
+          if (errorData.errorCode === 'STRIPE_PAYMENT_INTENT_NOT_FOUND' ||
+            errorData.error?.includes('does not have a Stripe payment intent ID')) {
+            console.warn('[PaymentSuccessClient] Payment transaction is PENDING without Stripe payment intent ID:', errorData);
+            // Create a minimal payment transaction object for PENDING transactions
+            const pendingPayment: Partial<PaymentTransactionDTO> = {
+              transactionReference: transactionId,
+              status: 'PENDING' as any,
+              amount: 0,
+              currency: 'USD',
+              eventId: eventIdParam ? parseInt(eventIdParam) : undefined,
+            };
+            return pendingPayment as PaymentTransactionDTO;
+          } else {
+            throw new Error(errorData.error || `Failed to fetch payment transaction: ${paymentRes.status}`);
+          }
+        } catch (parseError) {
+          throw new Error(`Failed to fetch payment transaction: ${paymentRes.status}`);
+        }
+      } else {
+        throw new Error(`Failed to fetch payment transaction: ${paymentRes.status}`);
+      }
+    } else {
+      const responseData = await paymentRes.json();
+      console.log('[PaymentSuccessClient] Payment status response:', {
+        status: responseData.status,
+        transactionId: responseData.transactionId,
+        qrCodeUrl: responseData.qrCodeUrl,
+        ticketTransactionId: responseData.ticketTransactionId,
+        emailSent: responseData.emailSent,
+        eventId: responseData.eventId,
+        stripePaymentIntentId: responseData.stripePaymentIntentId, // CRITICAL: Check if backend returns this
+        paymentReference: responseData.paymentReference,
+        metadata: responseData.metadata,
+        fullResponse: responseData
+      });
+
+      // CRITICAL CHECK: Log if stripePaymentIntentId is missing
+      if (!responseData.stripePaymentIntentId && !responseData.metadata?.stripePaymentIntentId) {
+        console.error('[PaymentSuccessClient] ⚠️ BACKEND ISSUE: stripePaymentIntentId is missing from payment response!', {
+          availableFields: Object.keys(responseData),
+          paymentReference: responseData.paymentReference
+        });
+      }
+      // Map PaymentStatusResponse to PaymentTransactionDTO format
+      // Backend returns PaymentStatusResponse with transactionId (string) and status fields
+      // PaymentTransactionDTO expects transactionReference (string) and status fields
+      const mappedData: PaymentTransactionDTO = {
+        transactionReference: responseData.transactionId || transactionId,
+        tenantId: responseData.tenantId || '', // Required field, will be set by backend
+        providerType: responseData.providerType || 'STRIPE',
+        paymentUseCase: responseData.paymentUseCase || 'TICKET_SALE',
+        status: (responseData.status?.toUpperCase() as any) || 'PENDING',
+        amount: responseData.amount ?? 0,
+        currency: responseData.currency || 'USD',
+        paymentMethod: responseData.paymentMethod,
+        paymentReference: responseData.paymentReference || responseData.transactionId,
+        eventId: responseData.eventId || (eventIdParam ? parseInt(eventIdParam) : undefined),
+        metadata: {
+          ...responseData.metadata,
+          // Store ticket purchase fields in metadata for easy access
+          // CRITICAL: These fields come from PaymentStatusResponse root level, not nested
+          qrCodeUrl: responseData.qrCodeUrl,
+          ticketTransactionId: responseData.ticketTransactionId,
+          emailSent: responseData.emailSent,
+          // Store Stripe payment intent ID for ticket lookup
+          stripePaymentIntentId: responseData.stripePaymentIntentId || responseData.metadata?.stripePaymentIntentId,
+        },
+        createdAt: responseData.createdAt || new Date().toISOString(),
+        updatedAt: responseData.updatedAt || new Date().toISOString(),
+      };
+
+      // NOTE: We use legacy workflow - fetch QR code separately after getting ticket transaction ID
+      // This ensures QR code is generated even if backend async processing isn't complete
+
+      // If backend returns ticketTransactionId, use it (but still fetch QR code separately)
+      if (responseData.ticketTransactionId) {
+        console.log('[PaymentSuccessClient] Ticket transaction ID received from payment status response:', responseData.ticketTransactionId);
+        // We'll fetch ticket transaction details and QR code in fetchFullData
+      }
+      console.log('[PaymentSuccessClient] Mapped payment data:', {
+        status: mappedData.status,
+        transactionReference: mappedData.transactionReference,
+        amount: mappedData.amount,
+        stripePaymentIntentId: mappedData.metadata?.stripePaymentIntentId,
+        eventId: mappedData.eventId
+      });
+      return mappedData;
+    }
+  }
+
+  // Poll payment status until it reaches a terminal state
+  async function pollPaymentStatus() {
+    if (pollingAttemptsRef.current >= MAX_POLLING_ATTEMPTS) {
+      console.warn('[PaymentSuccessClient] Polling timeout reached');
+      setPolling(false);
+      setLoading(false);
+      setError('Payment status check timed out. Please check your payment status manually.');
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+        pollingIntervalRef.current = null;
+      }
+      return;
+    }
+
+    pollingAttemptsRef.current++;
+    console.log(`[PaymentSuccessClient] Polling attempt ${pollingAttemptsRef.current}/${MAX_POLLING_ATTEMPTS}`);
+
+    try {
+      const paymentData = await fetchPaymentStatus();
+
+      if (paymentData) {
+        console.log(`[PaymentSuccessClient] Poll ${pollingAttemptsRef.current}: Received payment data:`, {
+          status: paymentData.status,
+          transactionReference: paymentData.transactionReference,
+          previousStatus: paymentTransaction?.status
+        });
+
+        setPaymentTransaction(paymentData);
+
+        // Normalize status to uppercase for comparison (backend may return lowercase from Stripe)
+        const normalizedStatus = paymentData.status?.toUpperCase() || paymentData.status;
+
+        // Check if payment reached a terminal state
+        if (normalizedStatus === 'SUCCEEDED' || normalizedStatus === 'FAILED' || normalizedStatus === 'CANCELLED') {
+          console.log(`[PaymentSuccessClient] Payment reached terminal state: ${normalizedStatus} (original: ${paymentData.status})`);
+          setPolling(false);
+          if (pollingIntervalRef.current) {
+            clearInterval(pollingIntervalRef.current);
+            pollingIntervalRef.current = null;
+          }
+
+          // If succeeded, fetch full data including ticket transaction and QR code
+          if (normalizedStatus === 'SUCCEEDED') {
+            // Update payment data with normalized status
+            const updatedPaymentData = { ...paymentData, status: normalizedStatus as any };
+            setPaymentTransaction(updatedPaymentData);
+            console.log('[PaymentSuccessClient] Payment succeeded via polling, fetching ticket transaction and QR code...');
+            await fetchFullData(updatedPaymentData);
+            setLoading(false);
+          } else {
+            // FAILED or CANCELLED - stop loading and show error
+            setLoading(false);
+            setError(`Payment ${normalizedStatus.toLowerCase()}. Please try again.`);
+          }
+        } else {
+          // Normalize status for comparison
+          const normalizedStatus = paymentData.status?.toUpperCase() || paymentData.status;
+
+          if (normalizedStatus === 'PENDING' || normalizedStatus === 'PROCESSING' || normalizedStatus === 'INITIATED') {
+            // Continue polling - keep loading and polling states active
+            // Interval is already set up, so just continue
+            console.log(`[PaymentSuccessClient] Payment still ${normalizedStatus} (attempt ${pollingAttemptsRef.current}/${MAX_POLLING_ATTEMPTS}), will check again in ${POLLING_INTERVAL}ms...`);
+          } else {
+            // Unknown status - log it but continue polling
+            console.warn(`[PaymentSuccessClient] Unknown payment status: ${paymentData.status} (normalized: ${normalizedStatus}), continuing to poll...`);
+          }
+        }
+      }
+    } catch (err: any) {
+      console.error('[PaymentSuccessClient] Error polling payment status:', err);
+      setPolling(false);
+      setLoading(false);
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+        pollingIntervalRef.current = null;
+      }
+      setError(err.message || 'Failed to check payment status');
+    }
+  }
+
+  // Fetch full data after payment succeeds
+  async function fetchFullData(paymentData: PaymentTransactionDTO) {
+    try {
+      const baseUrl = getAppUrl();
+
+      // Get eventId from payment transaction or parameter
+      const eventId = paymentData?.eventId || (eventIdParam ? parseInt(eventIdParam) : null);
+      if (!eventId) {
+        throw new Error('Event ID not found in payment transaction');
+      }
+
+      // Fetch event details if not already fetched
+      if (!eventDetails) {
+        const eventRes = await fetch(`${baseUrl}/api/proxy/event-details/${eventId}`, {
+          cache: 'no-store',
+        });
+        if (eventRes.ok) {
+          const eventData = await eventRes.json();
+          setEventDetails(eventData);
+        }
+      }
+
+      // NOTE: We use legacy workflow - fetch QR code separately after getting ticket transaction ID
+      // This ensures QR code is generated even if backend async processing isn't complete
+
+      // Find corresponding EventTicketTransaction
+      // Priority: 1) ticketTransactionId from metadata, 2) stripePaymentIntentId, 3) paymentReference
+      let ticketTransactionId: number | null = paymentData.metadata?.ticketTransactionId || null;
+
+      // Extract Stripe payment intent ID from metadata or paymentReference
+      const stripePaymentIntentId = paymentData.metadata?.stripePaymentIntentId ||
+        (paymentData.paymentReference?.startsWith('pi_') ? paymentData.paymentReference : null);
+
+      // If ticketTransactionId is already in metadata, use it
+      if (ticketTransactionId) {
+        console.log('[PaymentSuccessClient] Using ticket transaction ID from payment status response:', ticketTransactionId);
+        // Fetch ticket transaction details
+        const ticketRes = await fetch(`${baseUrl}/api/proxy/event-ticket-transactions/${ticketTransactionId}`, {
+          cache: 'no-store',
+        });
+        if (ticketRes.ok) {
+          const ticket = await ticketRes.json();
+          setTicketTransaction(ticket);
+          ticketTransactionId = ticket.id;
+        }
+      }
+
+      // Try to find by Stripe payment intent ID (most reliable method)
+      if (!ticketTransactionId && stripePaymentIntentId) {
+        console.log('[PaymentSuccessClient] Searching for ticket by stripePaymentIntentId:', stripePaymentIntentId);
+        const searchParams = new URLSearchParams();
+        searchParams.append('stripePaymentIntentId.equals', stripePaymentIntentId);
+        if (eventId) {
+          searchParams.append('eventId.equals', eventId.toString());
+        }
+
+        const ticketRes = await fetch(`${baseUrl}/api/proxy/event-ticket-transactions?${searchParams.toString()}`, {
+          cache: 'no-store',
+        });
+        if (ticketRes.ok) {
+          const ticketData = await ticketRes.json();
+          console.log('[PaymentSuccessClient] Ticket fetch by stripePaymentIntentId response:', {
+            stripePaymentIntentId,
+            isArray: Array.isArray(ticketData),
+            length: Array.isArray(ticketData) ? ticketData.length : 'not array',
+            data: ticketData
+          });
+          if (Array.isArray(ticketData) && ticketData.length > 0) {
+            const ticket = ticketData[0];
+            console.log('[PaymentSuccessClient] Ticket transaction found by stripePaymentIntentId, setting state:', {
+              ticketId: ticket.id,
+              ticketEmail: ticket.email,
+              qrCodeImageUrl: ticket.qrCodeImageUrl ? 'present' : 'missing'
+            });
+            setTicketTransaction(ticket);
+            ticketTransactionId = ticket.id;
+          } else {
+            console.log('[PaymentSuccessClient] No ticket transactions found by stripePaymentIntentId (empty array)');
+          }
+        } else {
+          console.warn('[PaymentSuccessClient] Failed to fetch ticket by stripePaymentIntentId:', ticketRes.status);
+        }
+      }
+
+      // Fallback: Try to find by paymentReference (if it's a Stripe session ID)
+      if (!ticketTransactionId && paymentData.paymentReference?.startsWith('cs_')) {
+        console.log('[PaymentSuccessClient] Searching for ticket by stripeCheckoutSessionId:', paymentData.paymentReference);
+        const searchParams = new URLSearchParams();
+        searchParams.append('stripeCheckoutSessionId.equals', paymentData.paymentReference);
+        if (eventId) {
+          searchParams.append('eventId.equals', eventId.toString());
+        }
+
+        const ticketRes = await fetch(`${baseUrl}/api/proxy/event-ticket-transactions?${searchParams.toString()}`, {
+          cache: 'no-store',
+        });
+        if (ticketRes.ok) {
+          const ticketData = await ticketRes.json();
+          if (Array.isArray(ticketData) && ticketData.length > 0) {
+            const ticket = ticketData[0];
+            console.log('[PaymentSuccessClient] Ticket transaction found by checkout session ID, setting state:', {
+              ticketId: ticket.id,
+              ticketEmail: ticket.email
+            });
+            setTicketTransaction(ticket);
+            ticketTransactionId = ticket.id;
+          }
+        }
+      }
+
+      // NOTE: QR code fetch is handled by useEffect hook when ticketTransaction.id becomes available
+      // This ensures automatic re-render when QR code data is set
+
+      // Fetch transaction items
+      if (ticketTransactionId) {
+        const itemsRes = await fetch(`${baseUrl}/api/proxy/event-ticket-transaction-items?eventTicketTransactionId.equals=${ticketTransactionId}`, {
+          cache: 'no-store',
+        });
+        if (itemsRes.ok) {
+          const itemsData = await itemsRes.json();
+          setTransactionItems(Array.isArray(itemsData) ? itemsData : []);
+        }
+      }
+    } catch (err: any) {
+      console.error('[PaymentSuccessClient] Error fetching full data:', err);
+      // Don't set error here, just log it
+    }
+  }
+
+  useEffect(() => {
+    async function fetchInitialData() {
+      setLoading(true);
+      setError(null);
+      pollingAttemptsRef.current = 0;
+
+      try {
+        // First, fetch event details to show hero image during loading
+        const eventId = eventIdParam ? parseInt(eventIdParam) : null;
+        if (eventId) {
+          const baseUrl = getAppUrl();
+          const eventRes = await fetch(`${baseUrl}/api/proxy/event-details/${eventId}`, {
+            cache: 'no-store',
+          });
+          if (eventRes.ok) {
+            const eventData = await eventRes.json();
+            setEventDetails(eventData);
+
+            // Fetch hero image from event-medias API
+            try {
+              // Try homepage hero image first
+              let mediaRes = await fetch(`${baseUrl}/api/proxy/event-medias?eventId.equals=${eventId}&isHomePageHeroImage.equals=true`, {
+                cache: 'no-store',
+              });
+              if (mediaRes.ok) {
+                const mediaData = await mediaRes.json();
+                const mediaArray = Array.isArray(mediaData) ? mediaData : (mediaData ? [mediaData] : []);
+                if (mediaArray.length > 0 && mediaArray[0].fileUrl) {
+                  setHeroImageUrl(mediaArray[0].fileUrl);
+                } else {
+                  // Try regular hero image
+                  mediaRes = await fetch(`${baseUrl}/api/proxy/event-medias?eventId.equals=${eventId}&isHeroImage.equals=true`, {
+                    cache: 'no-store',
+                  });
+                  if (mediaRes.ok) {
+                    const heroMediaData = await mediaRes.json();
+                    const heroMediaArray = Array.isArray(heroMediaData) ? heroMediaData : (heroMediaData ? [heroMediaData] : []);
+                    if (heroMediaArray.length > 0 && heroMediaArray[0].fileUrl) {
+                      setHeroImageUrl(heroMediaArray[0].fileUrl);
+                    }
+                  }
+                }
+              }
+            } catch (mediaErr) {
+              console.error('[PaymentSuccessClient] Error fetching hero image:', mediaErr);
+              // Continue without hero image
+            }
+          }
+        }
+
+        // Fetch initial payment status
+        const paymentData = await fetchPaymentStatus();
+
+        if (paymentData) {
+          setPaymentTransaction(paymentData);
+
+          // If payment is PENDING, start polling (keep loading=true)
+          if (paymentData.status === 'PENDING') {
+            console.log('[PaymentSuccessClient] Payment is PENDING, starting polling...');
+            setPolling(true);
+            // Keep loading=true while polling
+            // Set up interval for polling (only if not already set)
+            if (!pollingIntervalRef.current) {
+              pollingIntervalRef.current = setInterval(() => {
+                pollPaymentStatus();
+              }, POLLING_INTERVAL);
+            }
+            // Poll immediately (first check)
+            pollPaymentStatus();
+          } else {
+            // Normalize status to uppercase for comparison
+            const normalizedStatus = paymentData.status?.toUpperCase() || paymentData.status;
+
+            if (normalizedStatus === 'SUCCEEDED') {
+              // Payment succeeded - fetch full data including ticket transaction and QR code
+              console.log('[PaymentSuccessClient] Payment succeeded, fetching ticket transaction and QR code...');
+              const updatedPaymentData = { ...paymentData, status: normalizedStatus as any };
+              setPaymentTransaction(updatedPaymentData);
+              await fetchFullData(updatedPaymentData);
+              setLoading(false);
+            } else if (normalizedStatus === 'FAILED' || normalizedStatus === 'CANCELLED') {
+              // FAILED or CANCELLED - show error
+              setLoading(false);
+              setError(`Payment ${normalizedStatus.toLowerCase()}. Please try again.`);
+            } else {
+              // Unknown status - treat as pending and start polling
+              console.warn(`[PaymentSuccessClient] Unknown status: ${paymentData.status}, treating as PENDING`);
+              setPolling(true);
+              pollingAttemptsRef.current = 0;
+              pollingIntervalRef.current = setInterval(pollPaymentStatus, POLLING_INTERVAL);
+              pollPaymentStatus();
+            }
+          }
+        } else {
+          setLoading(false);
+          setError('Payment transaction not found');
+        }
+      } catch (err: any) {
+        console.error('[PaymentSuccessClient] Error fetching initial data:', err);
+        setError(err.message || 'Failed to load payment details');
+        setLoading(false);
+      }
+    }
+
+    if (transactionId) {
+      fetchInitialData();
+    }
+
+    // Cleanup polling intervals on unmount
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+        pollingIntervalRef.current = null;
+      }
+      if (ticketPollingIntervalRef.current) {
+        clearInterval(ticketPollingIntervalRef.current);
+        ticketPollingIntervalRef.current = null;
+      }
+    };
+  }, [transactionId, eventIdParam]);
+
+  // Update loading state when polling completes successfully
+  useEffect(() => {
+    // Only stop loading if polling is complete AND payment succeeded
+    const normalizedStatus = paymentTransaction?.status?.toUpperCase();
+    if (!polling && normalizedStatus === 'SUCCEEDED' && loading) {
+      setLoading(false);
+    }
+  }, [polling, paymentTransaction, loading]);
+
+  // Poll for ticket transaction if payment succeeded but ticket not found
+  useEffect(() => {
+    console.log('[PaymentSuccessClient] Ticket polling useEffect triggered', {
+      hasPaymentTransaction: !!paymentTransaction,
+      paymentStatus: paymentTransaction?.status,
+      hasTicketTransaction: !!ticketTransaction,
+      hasRefreshed: hasRefreshed()
+    });
+
+    const normalizedStatus = paymentTransaction?.status?.toUpperCase();
+
+    // Only poll if payment succeeded, we have Stripe payment intent ID, but no ticket transaction yet
+    if (
+      normalizedStatus === 'SUCCEEDED' &&
+      paymentTransaction &&
+      !ticketTransaction &&
+      !hasRefreshed() // Don't poll if we've already refreshed
+    ) {
+      const stripePaymentIntentId = paymentTransaction.metadata?.stripePaymentIntentId ||
+        (paymentTransaction.paymentReference?.startsWith('pi_') ? paymentTransaction.paymentReference : null);
+
+      console.log('[PaymentSuccessClient] Checking if should start ticket polling:', {
+        normalizedStatus,
+        hasPaymentTransaction: !!paymentTransaction,
+        hasTicketTransaction: !!ticketTransaction,
+        hasRefreshed: hasRefreshed(),
+        stripePaymentIntentId,
+        paymentReference: paymentTransaction.paymentReference
+      });
+
+      if (!stripePaymentIntentId) {
+        console.error('[PaymentSuccessClient] Cannot poll for ticket - no Stripe payment intent ID available', {
+          metadata: paymentTransaction.metadata,
+          paymentReference: paymentTransaction.paymentReference
+        });
+        return;
+      }
+
+      // Clear any existing polling interval
+      if (ticketPollingIntervalRef.current) {
+        clearInterval(ticketPollingIntervalRef.current);
+        ticketPollingIntervalRef.current = null;
+      }
+
+      ticketPollingAttemptsRef.current = 0;
+
+      async function pollForTicket() {
+        if (ticketPollingAttemptsRef.current >= MAX_TICKET_POLLING_ATTEMPTS) {
+          console.warn('[PaymentSuccessClient] Ticket polling timeout reached after 15 attempts');
+          if (ticketPollingIntervalRef.current) {
+            clearInterval(ticketPollingIntervalRef.current);
+            ticketPollingIntervalRef.current = null;
+          }
+          return;
+        }
+
+        ticketPollingAttemptsRef.current++;
+        console.log(`[PaymentSuccessClient] 🔍 Polling for ticket transaction attempt ${ticketPollingAttemptsRef.current}/${MAX_TICKET_POLLING_ATTEMPTS}`);
+
+        try {
+          if (!paymentTransaction) return; // Guard against null
+
+          const baseUrl = getAppUrl();
+          const eventId = paymentTransaction.eventId || (eventIdParam ? parseInt(eventIdParam) : null);
+          const searchParams = new URLSearchParams();
+          searchParams.append('stripePaymentIntentId.equals', stripePaymentIntentId);
+          if (eventId) {
+            searchParams.append('eventId.equals', eventId.toString());
+          }
+
+          const ticketUrl = `${baseUrl}/api/proxy/event-ticket-transactions?${searchParams.toString()}`;
+          console.log(`[PaymentSuccessClient] Fetching ticket from: ${ticketUrl}`);
+
+          const ticketRes = await fetch(ticketUrl, {
+            cache: 'no-store',
+          });
+
+          console.log(`[PaymentSuccessClient] Ticket fetch response status: ${ticketRes.status}`);
+
+          if (ticketRes.ok) {
+            const ticketData = await ticketRes.json();
+            console.log('[PaymentSuccessClient] Ticket fetch response data:', {
+              isArray: Array.isArray(ticketData),
+              length: Array.isArray(ticketData) ? ticketData.length : 'not array',
+              firstTicket: Array.isArray(ticketData) && ticketData.length > 0 ? {
+                id: ticketData[0].id,
+                email: ticketData[0].email,
+                hasQrCode: !!ticketData[0].qrCodeImageUrl
+              } : 'no tickets'
+            });
+
+            if (Array.isArray(ticketData) && ticketData.length > 0) {
+              const ticket = ticketData[0];
+              console.log('[PaymentSuccessClient] ✅ Ticket transaction found via polling:', {
+                ticketId: ticket.id,
+                qrCodeImageUrl: ticket.qrCodeImageUrl ? 'present' : 'missing',
+                email: ticket.email
+              });
+              setTicketTransaction(ticket);
+              // Stop polling
+              if (ticketPollingIntervalRef.current) {
+                clearInterval(ticketPollingIntervalRef.current);
+                ticketPollingIntervalRef.current = null;
+              }
+            } else {
+              console.log(`[PaymentSuccessClient] ❌ Ticket not found yet (attempt ${ticketPollingAttemptsRef.current}/${MAX_TICKET_POLLING_ATTEMPTS}) - will retry in 2 seconds`);
+            }
+          } else {
+            console.error(`[PaymentSuccessClient] Ticket fetch failed with status: ${ticketRes.status}`);
+          }
+        } catch (err) {
+          console.error('[PaymentSuccessClient] Error polling for ticket transaction:', err);
+        }
+      }
+
+      // Poll immediately, then set up interval
+      pollForTicket();
+      ticketPollingIntervalRef.current = setInterval(pollForTicket, POLLING_INTERVAL);
+
+      return () => {
+        if (ticketPollingIntervalRef.current) {
+          clearInterval(ticketPollingIntervalRef.current);
+          ticketPollingIntervalRef.current = null;
+        }
+      };
+    }
+  }, [paymentTransaction?.status, paymentTransaction?.metadata?.stripePaymentIntentId, paymentTransaction?.paymentReference, ticketTransaction, eventIdParam]);
+
+  // NOTE: Refresh logic removed - QR code displays correctly via React state updates
+  // The backend now returns ticketTransactionId directly, so we can fetch and display
+  // the QR code without needing a page refresh
+  useEffect(() => {
+    const normalizedStatus = paymentTransaction?.status?.toUpperCase();
+    if (
+      normalizedStatus === 'SUCCEEDED' &&
+      paymentTransaction &&
+      ticketTransaction &&
+      qrCodeData &&
+      qrCodeData.qrCodeImageUrl
+    ) {
+      console.log('[PaymentSuccessClient] ✅ All data ready (payment, ticket, QR code) - displaying without refresh');
+      // Mark as complete in sessionStorage to prevent any legacy refresh logic
+      markAsRefreshed();
+    }
+  }, [paymentTransaction?.status, ticketTransaction, qrCodeData, transactionId]);
+
+  // Trigger QR code fetch when ticket transaction ID becomes available
+  useEffect(() => {
+    // Skip if we already have QR code data or are currently loading
+    if (qrCodeData || qrCodeLoading) {
+      console.log('[PaymentSuccessClient] QR code useEffect skipped:', {
+        hasQrCodeData: !!qrCodeData,
+        qrCodeLoading
+      });
+      return;
+    }
+
+    const ticketId = ticketTransaction?.id;
+    const eventId = eventDetails?.id;
+
+    // Skip if we don't have both IDs
+    if (!ticketId || !eventId) {
+      console.log('[PaymentSuccessClient] QR code useEffect skipped - missing IDs:', {
+        ticketTransactionId: ticketId,
+        eventDetailsId: eventId
+      });
+      return;
+    }
+
+    // Check if we've already attempted to fetch for this combination
+    const fetchKey = `${eventId}-${ticketId}`;
+    if (qrCodeFetchAttemptedRef.current.has(fetchKey)) {
+      console.log('[PaymentSuccessClient] QR code fetch already attempted for:', fetchKey);
+      return;
+    }
+
+    // Mark as attempted
+    qrCodeFetchAttemptedRef.current.add(fetchKey);
+
+    async function fetchQrCode() {
+      console.log('[PaymentSuccessClient] Fetching QR code...', {
+        ticketTransactionId: ticketId,
+        eventId: eventId
+      });
+
+      const baseUrl = getAppUrl();
+      const emailHostUrlPrefix = window.location.origin;
+      const encodedEmailHostUrlPrefix = btoa(emailHostUrlPrefix);
+
+      setQrCodeLoading(true);
+      setQrCodeError(null);
+
+      try {
+        const qrUrl = `${baseUrl}/api/proxy/events/${eventId}/transactions/${ticketId}/emailHostUrlPrefix/${encodedEmailHostUrlPrefix}/qrcode`;
+        console.log('[PaymentSuccessClient] Fetching QR code from:', qrUrl);
+
+        const qrRes = await fetch(qrUrl, { cache: 'no-store' });
+
+        console.log('[PaymentSuccessClient] QR code fetch response:', {
+          status: qrRes.status,
+          ok: qrRes.ok
+        });
+
+        if (qrRes.ok) {
+          const qrUrlText = await qrRes.text();
+          console.log('[PaymentSuccessClient] QR code URL received:', {
+            length: qrUrlText?.length,
+            preview: qrUrlText?.substring(0, 100)
+          });
+
+          if (qrUrlText && qrUrlText.trim()) {
+            console.log('[PaymentSuccessClient] QR code fetched successfully, setting state...');
+            // Use functional update to ensure state is set correctly
+            setQrCodeData({ qrCodeImageUrl: qrUrlText.trim() });
+            setQrCodeLoading(false);
+            console.log('[PaymentSuccessClient] QR code state updated, component should re-render NOW');
+
+            // Send email after QR code is successfully fetched
+            const emailToUse = ticketTransaction?.email || paymentTransaction?.metadata?.customerEmail;
+            if (emailToUse) {
+              console.log('[PaymentSuccessClient] QR code loaded successfully, sending ticket email:', {
+                eventId: eventId,
+                transactionId: ticketId,
+                email: emailToUse
+              });
+
+              if (eventId && ticketId) {
+                sendTicketEmailAsync({
+                  eventId: eventId,
+                  transactionId: ticketId,
+                  email: emailToUse
+                });
+              }
+            }
+          } else {
+            console.warn('[PaymentSuccessClient] QR code URL is empty');
+            setQrCodeError('QR code URL is empty');
+            setQrCodeLoading(false);
+            // Remove from attempted set so we can retry
+            qrCodeFetchAttemptedRef.current.delete(fetchKey);
+          }
+        } else {
+          const errorText = await qrRes.text();
+          console.error('[PaymentSuccessClient] Failed to fetch QR code:', qrRes.status, errorText);
+          setQrCodeError(`Failed to fetch QR code: ${qrRes.status}`);
+          setQrCodeLoading(false);
+          // Remove from attempted set so we can retry
+          qrCodeFetchAttemptedRef.current.delete(fetchKey);
+        }
+      } catch (err) {
+        console.error('[PaymentSuccessClient] Exception fetching QR code:', err);
+        setQrCodeError(`Error fetching QR code: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        setQrCodeLoading(false);
+        // Remove from attempted set so we can retry
+        qrCodeFetchAttemptedRef.current.delete(fetchKey);
+      }
+    }
+
+    fetchQrCode();
+  }, [ticketTransaction?.id, eventDetails?.id, qrCodeData, qrCodeLoading, paymentTransaction?.metadata?.customerEmail]);
+
+  const defaultHeroImageUrl = '/images/default-event-hero.jpg';
+
+  if (loading || polling) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex flex-col">
+        {/* Hero Image Section */}
+        {heroImageUrl && (
+          <section className="hero-section" style={{
+            position: 'relative',
+            marginTop: '0',
+            backgroundColor: 'transparent',
+            minHeight: '400px',
+            overflow: 'hidden',
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '80px 0 0 0',
+            opacity: 0.7
+          }}>
+            <img
+              src={heroImageUrl || defaultHeroImageUrl}
+              alt="Event Hero"
+              className="hero-image"
+              style={{
+                margin: '0 auto',
+                padding: '0',
+                display: 'block',
+                width: '100%',
+                maxWidth: '100%',
+                height: 'auto',
+                objectFit: 'cover',
+                borderRadius: '0'
+              }}
+            />
+          </section>
+        )}
+
+        {/* Loading Message Overlay */}
+        <div className="flex-grow flex flex-col items-center justify-center min-h-[400px] p-6" style={{
+          marginTop: heroImageUrl ? '-300px' : '0',
+          position: 'relative',
+          zIndex: 10
+        }}>
+          <Image
+            src="/images/selling-tickets-vector-loading-image.jpg"
+            alt="Payment Processing"
+            width={180}
+            height={180}
+            className="mb-4 rounded shadow-lg bg-white p-4"
+            priority
+          />
+          <div className="text-xl font-bold text-teal-700 mb-2 bg-white px-4 py-2 rounded shadow">
+            {polling ? 'Processing your payment...' : 'Please wait while your payment is being verified...'}
+          </div>
+          <div className="text-gray-600 text-base text-center bg-white px-4 py-2 rounded shadow">
+            {polling ? (
+              <>
+                This may take a few moments.<br />
+                Please do not close or refresh this page.
+              </>
+            ) : (
+              <>
+                Loading your payment details...<br />
+                Please wait.
+              </>
+            )}
+          </div>
+          {polling && (
+            <div className="mt-4 bg-white px-4 py-2 rounded shadow">
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-teal-600"></div>
+                <span>Checking payment status...</span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-5xl mx-auto px-8 py-8">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+          <h2 className="text-xl font-semibold text-red-800 mb-2">Error</h2>
+          <p className="text-red-600">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!paymentTransaction) {
+    return (
+      <div className="max-w-5xl mx-auto px-8 py-8">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+          <h2 className="text-xl font-semibold text-yellow-800 mb-2">Payment Not Found</h2>
+          <p className="text-yellow-600">Unable to find payment transaction with ID: {transactionId}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Normalize status for comparison
+  const normalizedPaymentStatus = paymentTransaction.status?.toUpperCase();
+
+  // Don't show success page if payment is still pending
+  if (normalizedPaymentStatus === 'PENDING' || normalizedPaymentStatus === 'PROCESSING' || normalizedPaymentStatus === 'INITIATED') {
+    return (
+      <div className="max-w-5xl mx-auto px-8 py-8">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+          <h2 className="text-xl font-semibold text-yellow-800 mb-2">Payment Pending</h2>
+          <p className="text-yellow-600">
+            Your payment is still being processed. Please wait a moment and refresh this page.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't show success page if payment failed or was cancelled
+  if (normalizedPaymentStatus === 'FAILED' || normalizedPaymentStatus === 'CANCELLED') {
+    return (
+      <div className="max-w-5xl mx-auto px-8 py-8">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+          <h2 className="text-xl font-semibold text-red-800 mb-2">Payment {normalizedPaymentStatus}</h2>
+          <p className="text-red-600">
+            Your payment was not successful. Please try again or contact support if the problem persists.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Only show success page if payment succeeded
+  if (normalizedPaymentStatus !== 'SUCCEEDED') {
+    return (
+      <div className="max-w-5xl mx-auto px-8 py-8">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+          <h2 className="text-xl font-semibold text-yellow-800 mb-2">Payment Status: {normalizedPaymentStatus || paymentTransaction.status}</h2>
+          <p className="text-yellow-600">
+            Your payment is being processed. Please wait a moment and refresh this page.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Use ticket transaction if available, otherwise use payment transaction
+  const transaction = ticketTransaction || paymentTransaction;
+  const email = ticketTransaction?.email || paymentTransaction.metadata?.customerEmail || '';
+  const customerName = ticketTransaction?.firstName && ticketTransaction?.lastName
+    ? `${ticketTransaction.firstName} ${ticketTransaction.lastName}`
+    : paymentTransaction.metadata?.customerName || '';
+  const purchaseDate = ticketTransaction?.purchaseDate || paymentTransaction.createdAt;
+  const finalAmount = ticketTransaction?.finalAmount ?? ticketTransaction?.totalAmount ?? paymentTransaction.amount ?? 0;
+  const discountAmount = ticketTransaction?.discountAmount ?? 0;
+  const totalAmount = ticketTransaction?.totalAmount ?? paymentTransaction.amount ?? 0;
+
+  // Helper to get ticket number
+  function getTicketNumber(tx: PaymentTransactionDTO | EventTicketTransactionDTO | null): string {
+    if (!tx) return '';
+    if ('transactionReference' in tx) {
+      return tx.transactionReference || (tx.id ? `TKTN${tx.id}` : '');
+    }
+    return (tx as any).transaction_reference || (tx.id ? `TKTN${tx.id}` : '');
+  }
+
+  // Helper to format time
+  function formatTime(time: string): string {
+    if (!time) return '';
+    if (time.match(/AM|PM/i)) return time;
+    const [hourStr, minute] = time.split(':');
+    let hour = parseInt(hourStr, 10);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    hour = hour % 12;
+    if (hour === 0) hour = 12;
+    return `${hour.toString().padStart(2, '0')}:${minute} ${ampm}`;
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-100" style={{ overflowX: 'hidden' }}>
+      {/* HERO SECTION - styled to merge with header like TicketQrClient */}
+      <section className="hero-section" style={{
+        position: 'relative',
+        marginTop: '0',
+        backgroundColor: 'transparent',
+        minHeight: '400px',
+        overflow: 'hidden',
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '80px 0 0 0'
+      }}>
+        <img
+          src={heroImageUrl || defaultHeroImageUrl}
+          alt="Event Hero"
+          className="hero-image"
+          style={{
+            margin: '0 auto',
+            padding: '0',
+            display: 'block',
+            width: '100%',
+            maxWidth: '100%',
+            height: 'auto',
+            objectFit: 'cover',
+            borderRadius: '0'
+          }}
+        />
+        <div className="hero-overlay" style={{ opacity: 0.1, height: '5px', padding: '20' }}></div>
+      </section>
+
+      {/* Main content container */}
+      <div className="max-w-5xl mx-auto px-8 py-8" style={{ marginTop: '80px' }}>
+        {/* Payment Success Card */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+          <div className="text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 ring-4 ring-white -mt-16 mb-4">
+              <FaCheckCircle className="h-10 w-10 text-green-500" />
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-800">Payment Successful!</h1>
+            <p className="mt-2 text-gray-600">
+              Thank you for your purchase. {eventDetails && (
+                <>Your tickets for <strong>{eventDetails.title}</strong> are confirmed.</>
+              )}
+              {email && (
+                <> A confirmation is sent to your email: <strong>{email}</strong></>
+              )}
+            </p>
+          </div>
+        </div>
+
+        {/* Event Details Card */}
+        {eventDetails && (
+          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
+              {eventDetails.title}
+            </h2>
+            {eventDetails.caption && (
+              <div className="text-lg text-teal-700 font-semibold mb-4">{eventDetails.caption}</div>
+            )}
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-gray-600 mb-4">
+              {eventDetails.startDate && (
+                <div className="flex items-center gap-2">
+                  <FaCalendarAlt />
+                  <span>{formatInTimeZone(eventDetails.startDate, eventDetails.timezone || 'America/New_York', 'EEEE, MMMM d, yyyy')}</span>
+                </div>
+              )}
+              {eventDetails.startTime && (
+                <div className="flex items-center gap-2">
+                  <FaClock />
+                  <span>
+                    {formatTime(eventDetails.startTime)}{eventDetails.endTime ? ` - ${formatTime(eventDetails.endTime)}` : ''}
+                    {' '}
+                    ({formatInTimeZone(eventDetails.startDate || new Date().toISOString(), eventDetails.timezone || 'America/New_York', 'zzz')})
+                  </span>
+                </div>
+              )}
+              {eventDetails.location && (
+                <div className="flex items-center gap-2">
+                  <LocationDisplay location={eventDetails.location} />
+                </div>
+              )}
+            </div>
+            {eventDetails.description && <p className="text-gray-700 text-base">{eventDetails.description}</p>}
+          </div>
+        )}
+
+        {/* QR Code Section */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8 text-center">
+          {qrCodeLoading && (
+            <div className="text-lg text-teal-700 font-semibold flex items-center justify-center gap-2">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-teal-600"></div>
+              Please wait while your tickets are created…
+            </div>
+          )}
+          {!qrCodeData && !qrCodeLoading && !qrCodeError && (
+            <div className="text-lg text-teal-700 font-semibold flex items-center justify-center gap-2">
+              <FaTicketAlt className="animate-bounce" />
+              Please wait while your tickets are created…
+            </div>
+          )}
+          {qrCodeError && (
+            <div className="text-red-600 font-semibold">
+              {qrCodeError}
+            </div>
+          )}
+          {qrCodeData && (
+            <>
+              <div className="flex flex-col items-center justify-center gap-4">
+                <div className="text-lg font-semibold text-gray-800">Your Ticket QR Code</div>
+                {qrCodeData.qrCodeImageUrl ? (
+                  <img
+                    src={qrCodeData.qrCodeImageUrl}
+                    alt="Ticket QR Code"
+                    className="mx-auto w-48 h-48 object-contain border border-gray-300 rounded-lg shadow"
+                  />
+                ) : (
+                  <div className="text-gray-500">QR code not available.</div>
+                )}
+
+                {/* Email Status Section */}
+                {email && (
+                  <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="flex items-center gap-2 text-blue-700">
+                      <FaEnvelope className="text-sm" />
+                      <span className="text-sm font-medium">Ticket email sent to {email}</span>
+                    </div>
+                    <p className="text-xs text-blue-600 mt-1">
+                      Check your email for your tickets. If you don't see it, check your spam folder.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Transaction Summary */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+          <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-3 mb-6">
+            <FaReceipt className="text-teal-500" />
+            Transaction Summary
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+            {getTicketNumber(transaction) && (
+              <div className="flex flex-col">
+                <label className="text-sm font-medium text-gray-500 flex items-center gap-2 mb-1">
+                  <FaTicketAlt /> Ticket #
+                </label>
+                <p className="text-lg text-gray-800 font-medium">{getTicketNumber(transaction)}</p>
+              </div>
+            )}
+            {customerName && (
+              <div className="flex flex-col">
+                <label className="text-sm font-medium text-gray-500 flex items-center gap-2 mb-1">
+                  <FaUser /> Name
+                </label>
+                <p className="text-lg text-gray-800 font-medium">{customerName}</p>
+              </div>
+            )}
+            {email && (
+              <div className="flex flex-col">
+                <label className="text-sm font-medium text-gray-500 flex items-center gap-2 mb-1">
+                  <FaEnvelope /> Email
+                </label>
+                <p className="text-lg text-gray-800 font-medium">{email}</p>
+              </div>
+            )}
+            {purchaseDate && (
+              <div className="flex flex-col">
+                <label className="text-sm font-medium text-gray-500 flex items-center gap-2 mb-1">
+                  <FaCalendarAlt /> Date of Purchase
+                </label>
+                <p className="text-lg text-gray-800 font-medium">{new Date(purchaseDate).toLocaleString()}</p>
+              </div>
+            )}
+            <div className="flex flex-col">
+              <label className="text-sm font-medium text-gray-500 flex items-center gap-2 mb-1">
+                <FaMoneyBillWave /> Amount Paid
+              </label>
+              <p className="text-lg text-gray-800 font-medium">${finalAmount.toFixed(2)}</p>
+            </div>
+            {discountAmount > 0 && (
+              <div className="flex flex-col">
+                <label className="text-sm font-medium text-gray-500 flex items-center gap-2 mb-1">
+                  <FaTags /> Discount Applied
+                </label>
+                <p className="text-lg text-green-600 font-medium">-${discountAmount.toFixed(2)}</p>
+              </div>
+            )}
+            {discountAmount > 0 && (
+              <div className="col-span-1 md:col-span-2 bg-gray-50 p-4 rounded-lg">
+                <h3 className="text-sm font-semibold text-gray-700 mb-2">Price Breakdown</h3>
+                <div className="space-y-1 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Original Amount:</span>
+                    <span className="text-gray-800">${totalAmount.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Discount:</span>
+                    <span className="text-green-600">-${discountAmount.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between border-t pt-1">
+                    <span className="text-gray-800 font-semibold">Final Amount:</span>
+                    <span className="text-gray-800 font-semibold">${finalAmount.toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Back to Home */}
+        <div className="text-center">
+          <button
+            onClick={() => router.push('/')}
+            className="px-8 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
+          >
+            Return to Home
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+

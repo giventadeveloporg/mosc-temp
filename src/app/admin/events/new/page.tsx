@@ -1,5 +1,5 @@
 'use client';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { EventForm, defaultEvent } from '@/components/EventForm';
 import type { EventDetailsDTO, EventTypeDetailsDTO, UserProfileDTO } from '@/types';
@@ -10,7 +10,10 @@ import { useAuth, useUser } from '@clerk/nextjs';
 
 export default function CreateEventPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const copyFromId = searchParams?.get('copyFrom');
   const [eventTypes, setEventTypes] = useState<EventTypeDetailsDTO[]>([]);
+  const [initialEvent, setInitialEvent] = useState<EventDetailsDTO | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { userId } = useAuth();
@@ -21,6 +24,48 @@ export default function CreateEventPage() {
       .then(res => res.ok ? res.json() : [])
       .then(data => setEventTypes(Array.isArray(data) ? data : []));
   }, []);
+
+  // Fetch event to copy if copyFromId is provided
+  useEffect(() => {
+    if (copyFromId) {
+      fetch(`/api/proxy/event-details/${copyFromId}`)
+        .then(res => {
+          if (!res.ok) throw new Error('Failed to fetch event');
+          return res.json();
+        })
+        .then((event: EventDetailsDTO) => {
+          // Create a copy of the event with updated dates
+          const today = new Date();
+          const tomorrow = new Date(today);
+          tomorrow.setDate(tomorrow.getDate() + 1);
+
+          // Format dates as YYYY-MM-DD (EventForm expects this format internally)
+          const formatDate = (date: Date) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+          };
+
+          const copiedEvent: EventDetailsDTO = {
+            ...event,
+            id: undefined, // Remove ID so it's treated as a new event
+            title: event.title ? `${event.title} (Copy)` : '',
+            startDate: formatDate(today), // YYYY-MM-DD format - EventForm will convert to MM/DD/YYYY for display
+            endDate: formatDate(tomorrow), // YYYY-MM-DD format - EventForm will convert to MM/DD/YYYY for display
+            createdAt: '',
+            updatedAt: '',
+            createdBy: undefined,
+          };
+
+          setInitialEvent(copiedEvent);
+        })
+        .catch(err => {
+          console.error('Error fetching event to copy:', err);
+          setError('Failed to load event to copy');
+        });
+    }
+  }, [copyFromId]);
 
   async function handleSubmit(event: EventDetailsDTO) {
     setLoading(true);
@@ -79,10 +124,25 @@ export default function CreateEventPage() {
           </div>
         </div>
       </div>
-      <h1 className="text-2xl font-bold mb-4">Create Event</h1>
+      <h1 className="text-2xl font-bold mb-4">
+        {copyFromId ? 'Create Event (Copy)' : 'Create Event'}
+      </h1>
+      {copyFromId && initialEvent && (
+        <div className="bg-blue-50 text-blue-800 p-3 rounded mb-4 border border-blue-200">
+          <p className="text-sm">
+            <strong>Copying from Event ID {copyFromId}:</strong> All fields have been pre-populated.
+            Start date set to today and end date set to tomorrow. Please review and update as needed.
+          </p>
+        </div>
+      )}
       {error && <div className="bg-red-50 text-red-500 p-3 rounded mb-4">{error}</div>}
       <div className="border rounded p-4 bg-white shadow-sm min-h-[200px]">
-        <EventForm event={defaultEvent} eventTypes={eventTypes} onSubmit={handleSubmit} loading={loading} />
+        <EventForm
+          event={initialEvent || defaultEvent}
+          eventTypes={eventTypes}
+          onSubmit={handleSubmit}
+          loading={loading}
+        />
       </div>
     </div>
   );

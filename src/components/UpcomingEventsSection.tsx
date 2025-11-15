@@ -6,6 +6,63 @@ import Image from 'next/image';
 import type { EventWithMedia, EventDetailsDTO } from "@/types";
 import { formatInTimeZone } from 'date-fns-tz';
 
+// Component to handle event image loading errors and hide container when image fails
+function EventImageWithErrorHandling({
+  src,
+  alt,
+  isPastEvent,
+}: {
+  src: string;
+  alt: string;
+  isPastEvent: boolean;
+}) {
+  const [imageError, setImageError] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  // Don't render if image fails to load or src is empty
+  if (imageError || !src) {
+    return isPastEvent ? (
+      <div className="relative w-full pt-3 pr-3">
+        <div className="flex justify-end">
+          <span className="px-3 py-1 bg-gray-500 text-white text-xs font-medium rounded-full">
+            Past Event
+          </span>
+        </div>
+      </div>
+    ) : null;
+  }
+
+  return (
+    <div className="relative w-full h-auto rounded-t-2xl overflow-hidden">
+      <Image
+        src={src}
+        alt={alt}
+        width={800}
+        height={600}
+        className="w-full h-auto object-contain group-hover:scale-105 transition-transform duration-300"
+        style={{
+          backgroundColor: 'transparent',
+          borderRadius: '1rem 1rem 0 0',
+        }}
+        onError={() => {
+          setImageError(true);
+        }}
+        onLoad={() => {
+          setImageLoaded(true);
+        }}
+      />
+      {/* Past Event Badge */}
+      {isPastEvent && imageLoaded && !imageError && (
+        <div className="absolute top-3 right-3">
+          <span className="px-3 py-1 bg-gray-500 text-white text-xs font-medium rounded-full">
+            Past Event
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
 const UpcomingEventsSection: React.FC = () => {
   const [events, setEvents] = useState<EventWithMedia[]>([]);
   const [loading, setLoading] = useState(true);
@@ -246,46 +303,26 @@ const UpcomingEventsSection: React.FC = () => {
                 >
                   <div className="flex flex-col h-full">
                     {/* Image Section - Top on all screen sizes, exactly like events page */}
-                    <div className="relative w-full h-auto rounded-t-2xl overflow-hidden">
-                      {event.thumbnailUrl ? (
-                        <Image
-                          src={event.thumbnailUrl}
-                          alt={event.title}
-                          width={800}
-                          height={600}
-                          className="w-full h-auto object-contain group-hover:scale-105 transition-transform duration-300"
-                          style={{
-                            backgroundColor: 'transparent',
-                            borderRadius: '1rem 1rem 0 0'
-                          }}
-                        />
-                      ) : (
-                        <div
-                          className="w-full h-80 flex items-center justify-center"
-                          style={{
-                            backgroundColor: 'transparent',
-                            borderRadius: '1rem 1rem 0 0'
-                          }}
-                        >
-                          <div className="w-16 h-16 rounded-xl bg-gray-100 flex items-center justify-center">
-                            <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                          </div>
-                        </div>
-                      )}
-                      {/* Past Event Badge */}
-                      {!isUpcomingEvents && (
-                        <div className="absolute top-3 right-3">
+                    {event.thumbnailUrl && (
+                      <EventImageWithErrorHandling
+                        src={event.thumbnailUrl}
+                        alt={event.title}
+                        isPastEvent={!isUpcomingEvents}
+                      />
+                    )}
+                    {/* Past Event Badge - Show at top of content if no image */}
+                    {!event.thumbnailUrl && !isUpcomingEvents && (
+                      <div className="relative w-full pt-3 pr-3">
+                        <div className="flex justify-end">
                           <span className="px-3 py-1 bg-gray-500 text-white text-xs font-medium rounded-full">
                             Past Event
                           </span>
                         </div>
-                      )}
-                    </div>
+                      </div>
+                    )}
 
                     {/* Content Section - Bottom on all screen sizes, exactly like events page */}
-                    <div className="p-5 border-t border-white/20">
+                    <div className={`p-5 ${event.thumbnailUrl ? 'border-t border-white/20' : ''}`}>
                       {/* Title */}
                       <h2 className="text-xl font-bold text-gray-800 mb-2">
                         {event.title}
@@ -354,7 +391,10 @@ const UpcomingEventsSection: React.FC = () => {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              window.location.href = `/events/${event.id}/tickets`;
+                              // New backend payment flow
+                              window.location.href = `/events/${event.id}/checkout`;
+                              // Legacy Stripe flow (commented out):
+                              // window.location.href = `/events/${event.id}/tickets`;
                             }}
                             className="transition-transform hover:scale-105"
                           >
