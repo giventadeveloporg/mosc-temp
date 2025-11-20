@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 16.0 (Debian 16.0-1.pgdg120+1)
+-- Dumped ffile:/E:/project_workspace/mosc-temp/code_html_template/SQLS/corrected_event_media_inserts.ordered.sqlrom database version 16.0 (Debian 16.0-1.pgdg120+1)
 -- Dumped by pg_dump version 17.0
 
 -- Started on 2025-06-08 23:51:02
@@ -11,7 +11,7 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
---SET transaction_timeout = 0;
+--SET transactiofile:/E:/project_workspace/mosc-temp/code_html_template/SQLS/corrected_event_media_inserts.ordered.sqln_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -145,7 +145,13 @@ DROP TABLE IF EXISTS public.event_poll_option CASCADE;
 DROP TABLE IF EXISTS public.event_poll CASCADE;
 DROP TABLE IF EXISTS public.event_ticket_transaction CASCADE;
 DROP TABLE IF EXISTS public.event_ticket_transaction_item CASCADE;
+-- Payment orchestration tables (drop children first, then parents)
+DROP TABLE IF EXISTS public.membership_subscription CASCADE;
+DROP TABLE IF EXISTS public.platform_invoice CASCADE;
 DROP TABLE IF EXISTS public.user_payment_transaction CASCADE;
+DROP TABLE IF EXISTS public.platform_settlement CASCADE;
+DROP TABLE IF EXISTS public.membership_plan CASCADE;
+DROP TABLE IF EXISTS public.payment_provider_config CASCADE;
 DROP TABLE IF EXISTS public.event_ticket_type CASCADE;
 DROP TABLE IF EXISTS public.event_organizer CASCADE;
 -- New event-related tables (in reverse dependency order)
@@ -155,6 +161,9 @@ DROP TABLE IF EXISTS public.event_sponsors_join CASCADE;
 DROP TABLE IF EXISTS public.event_sponsors CASCADE;
 DROP TABLE IF EXISTS public.event_contacts CASCADE;
 DROP TABLE IF EXISTS public.event_featured_performers CASCADE;
+
+
+DROP TABLE IF EXISTS public.event_recurrence_series CASCADE;
 DROP TABLE IF EXISTS public.event_details CASCADE;
 DROP TABLE IF EXISTS public.event_admin CASCADE;
 DROP TABLE IF EXISTS public.event_live_update_attachment CASCADE;
@@ -703,6 +712,7 @@ CREATE TABLE public.event_details (
                                       enable_waitlist bool DEFAULT true NULL,
                                       enable_qr_code bool DEFAULT false NULL,
                                       external_registration_url varchar(1024) NULL,
+                                      email_header_image_url VARCHAR(2048) NULL,
                                       created_by_id int8 NULL,
                                       event_type_id int8 NULL,
                                       created_at timestamp DEFAULT now() NOT NULL,
@@ -713,6 +723,18 @@ CREATE TABLE public.event_details (
                                       is_featured_event BOOLEAN NOT NULL DEFAULT false,
                                       featured_event_priority_ranking INT4 NOT NULL DEFAULT 0,
                                       live_event_priority_ranking INT4 NOT NULL DEFAULT 0,
+                                      donation_metadata TEXT NULL,
+                                      event_recurrence_metadata TEXT NULL,
+                                      is_recurring bool DEFAULT false NULL,
+                                      recurrence_pattern varchar(50) NULL,
+                                      recurrence_interval int4 NULL,
+                                      recurrence_end_type varchar(20) NULL,
+                                      recurrence_end_date date NULL,
+                                      recurrence_occurrences int4 NULL,
+                                      recurrence_weekly_days int4[] NULL,
+                                      recurrence_monthly_day int4 NULL,
+                                      parent_event_id int8 NULL,
+                                      recurrence_series_id int8 NULL,
                                       CONSTRAINT check_age_ranges CHECK (((minimum_age IS NULL) OR (maximum_age IS NULL) OR (maximum_age >= minimum_age))),
                                       CONSTRAINT check_capacity_positive CHECK (((capacity IS NULL) OR (capacity > 0))),
                                       CONSTRAINT check_deadlines CHECK (((registration_deadline IS NULL) OR (cancellation_deadline IS NULL) OR (cancellation_deadline <= registration_deadline))),
@@ -795,6 +817,132 @@ COMMENT ON COLUMN public.event_details.is_sports_event IS 'Whether this event is
 
 COMMENT ON COLUMN public.event_details.is_live IS 'Whether this event is currently live and should be featured on the home page';
 
+
+--
+-- TOC entry 3952 (class 0 OID 0)
+-- Dependencies: 234
+-- Name: COLUMN event_details.metadata; Type: COMMENT; Schema: public; Owner: giventa_event_management
+--
+
+--COMMENT ON COLUMN public.event_details.metadata IS 'Flexible TEXT field for event configuration stored as JSON string. Stores fundraiser settings, donation config, etc. Parse JSON in application code (e.g., Jackson ObjectMapper in Spring Boot).';
+
+
+--
+-- TOC entry 3953 (class 0 OID 0)
+-- Dependencies: 234
+-- Name: COLUMN event_details.is_recurring; Type: COMMENT; Schema: public; Owner: giventa_event_management
+--
+
+COMMENT ON COLUMN public.event_details.is_recurring IS 'Whether this event is part of a recurring series';
+
+
+--
+-- TOC entry 3954 (class 0 OID 0)
+-- Dependencies: 234
+-- Name: COLUMN event_details.parent_event_id; Type: COMMENT; Schema: public; Owner: giventa_event_management
+--
+
+COMMENT ON COLUMN public.event_details.parent_event_id IS 'Reference to parent event for recurring event series. NULL for parent events, set for child occurrences.';
+
+
+--
+-- TOC entry 3955 (class 0 OID 0)
+-- Dependencies: 234
+-- Name: COLUMN event_details.recurrence_series_id; Type: COMMENT; Schema: public; Owner: giventa_event_management
+--
+
+COMMENT ON COLUMN public.event_details.recurrence_series_id IS 'Series identifier for grouping recurring events. Set to parent event ID for all events in a series.';
+
+
+--
+-- TOC entry 256 (class 1259 OID 0)
+-- Name: event_recurrence_series; Type: TABLE; Schema: public; Owner: giventa_event_management
+--
+
+CREATE TABLE public.event_recurrence_series (
+                                                id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                                tenant_id character varying(255) NULL,
+                                                parent_event_id bigint NOT NULL,
+                                                pattern character varying(50) NOT NULL,
+                                                interval integer NOT NULL,
+                                                end_type character varying(20) NOT NULL,
+                                                end_date date NULL,
+                                                occurrences integer NULL,
+                                                weekly_days integer[] NULL,
+                                                monthly_day integer NULL,
+                                                created_at timestamp without time zone DEFAULT now() NOT NULL,
+                                                updated_at timestamp without time zone DEFAULT now() NOT NULL,
+                                                CONSTRAINT event_recurrence_series_pkey PRIMARY KEY (id),
+                                                CONSTRAINT check_recurrence_occurrences CHECK (((occurrences IS NULL) OR (occurrences > 0 AND occurrences <= 1000))),
+                                                CONSTRAINT check_recurrence_interval CHECK ((interval > 0)),
+                                                CONSTRAINT check_recurrence_end_type CHECK ((end_type IN ('END_DATE', 'OCCURRENCES')))
+);
+
+
+-- ALTER TABLE public.event_recurrence_series OWNER TO giventa_event_management;
+
+
+--
+-- TOC entry 3956 (class 0 OID 0)
+-- Dependencies: 256
+-- Name: TABLE event_recurrence_series; Type: COMMENT; Schema: public; Owner: giventa_event_management
+--
+
+COMMENT ON TABLE public.event_recurrence_series IS 'Recurrence configuration for recurring event series. Stores pattern, interval, end conditions, and weekly/monthly specific settings.';
+
+
+--
+-- TOC entry 3957 (class 0 OID 0)
+-- Dependencies: 256
+-- Name: COLUMN event_recurrence_series.parent_event_id; Type: COMMENT; Schema: public; Owner: giventa_event_management
+--
+
+COMMENT ON COLUMN public.event_recurrence_series.parent_event_id IS 'Reference to the parent event that defines the recurring series';
+
+
+--
+-- TOC entry 3958 (class 0 OID 0)
+-- Dependencies: 256
+-- Name: COLUMN event_recurrence_series.pattern; Type: COMMENT; Schema: public; Owner: giventa_event_management
+--
+
+COMMENT ON COLUMN public.event_recurrence_series.pattern IS 'Recurrence pattern: DAILY, WEEKLY, BIWEEKLY, or MONTHLY';
+
+
+--
+-- TOC entry 3959 (class 0 OID 0)
+-- Dependencies: 256
+-- Name: COLUMN event_recurrence_series.interval; Type: COMMENT; Schema: public; Owner: giventa_event_management
+--
+
+COMMENT ON COLUMN public.event_recurrence_series.interval IS 'Interval for recurrence (e.g., every N days, weeks, or months)';
+
+
+--
+-- TOC entry 3960 (class 0 OID 0)
+-- Dependencies: 256
+-- Name: COLUMN event_recurrence_series.end_type; Type: COMMENT; Schema: public; Owner: giventa_event_management
+--
+
+COMMENT ON COLUMN public.event_recurrence_series.end_type IS 'How recurrence ends: END_DATE or OCCURRENCES';
+
+
+--
+-- TOC entry 3961 (class 0 OID 0)
+-- Dependencies: 256
+-- Name: COLUMN event_recurrence_series.weekly_days; Type: COMMENT; Schema: public; Owner: giventa_event_management
+--
+
+COMMENT ON COLUMN public.event_recurrence_series.weekly_days IS 'Array of weekday numbers (0=Sunday, 1=Monday, ..., 6=Saturday) for WEEKLY/BIWEEKLY patterns';
+
+
+--
+-- TOC entry 3962 (class 0 OID 0)
+-- Dependencies: 256
+-- Name: COLUMN event_recurrence_series.monthly_day; Type: COMMENT; Schema: public; Owner: giventa_event_management
+--
+
+COMMENT ON COLUMN public.event_recurrence_series.monthly_day IS 'Day of month (1-31) for MONTHLY pattern, or NULL if using last day of month';
 
 
 -- ===================================================
@@ -2331,6 +2479,22 @@ CREATE INDEX idx_event_details_require_guest_approval ON public.event_details US
 
 
 --
+-- TOC entry 3610 (class 1259 OID 0)
+-- Name: idx_recurrence_series_id; Type: INDEX; Schema: public; Owner: giventa_event_management
+--
+
+CREATE INDEX idx_recurrence_series_id ON public.event_details USING btree (recurrence_series_id) WHERE (recurrence_series_id IS NOT NULL);
+
+
+--
+-- TOC entry 3611 (class 1259 OID 0)
+-- Name: idx_parent_event_id; Type: INDEX; Schema: public; Owner: giventa_event_management
+--
+
+CREATE INDEX idx_parent_event_id ON public.event_details USING btree (parent_event_id) WHERE (parent_event_id IS NOT NULL);
+
+
+--
 -- TOC entry 3669 (class 1259 OID 83375)
 -- Name: idx_event_guest_pricing_description; Type: INDEX; Schema: public; Owner: giventa_event_management
 --
@@ -2573,6 +2737,25 @@ ALTER TABLE ONLY public.event_details
 
 ALTER TABLE ONLY public.event_details
     ADD CONSTRAINT fk_event__event_type_id FOREIGN KEY (event_type_id) REFERENCES public.event_type_details(id) ON DELETE SET NULL;
+
+
+--
+-- TOC entry 3688 (class 2606 OID 0)
+-- Name: event_details fk_parent_event; Type: FK CONSTRAINT; Schema: public; Owner: giventa_event_management
+--
+
+ALTER TABLE ONLY public.event_details
+    ADD CONSTRAINT fk_parent_event FOREIGN KEY (parent_event_id) REFERENCES public.event_details(id) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 3689 (class 2606 OID 0)
+-- Name: event_recurrence_series fk_recurrence_series_parent_event; Type: FK CONSTRAINT; Schema: public; Owner: giventa_event_management
+--
+
+ALTER TABLE ONLY public.event_recurrence_series
+    ADD CONSTRAINT fk_recurrence_series_parent_event FOREIGN KEY (parent_event_id) REFERENCES public.event_details(id) ON DELETE CASCADE;
+
 
 --
 -- TOC entry 3714 (class 2606 OID 83328)
@@ -3259,7 +3442,7 @@ CREATE TABLE public.event_sponsors_join (
                                             CONSTRAINT event_sponsors_join_pkey PRIMARY KEY (id),
                                             CONSTRAINT unique_event_sponsor UNIQUE (event_id, sponsor_id),
                                             CONSTRAINT check_custom_poster_url_format CHECK (custom_poster_url IS NULL OR custom_poster_url ~* '^https?://.*')
-);
+    );
 
 -- Table: event_emails
 -- For general event-level emails (for public or organizers)
@@ -3345,33 +3528,33 @@ ALTER TABLE ONLY public.event_program_directors
 
 -- event_contacts: Unique per tenant+event+name+phone
 CREATE UNIQUE INDEX IF NOT EXISTS unique_event_contact_tenant_event_name_phone
-ON public.event_contacts (tenant_id, event_id, name, phone)
-WHERE event_id IS NOT NULL;
+    ON public.event_contacts (tenant_id, event_id, name, phone)
+    WHERE event_id IS NOT NULL;
 
 -- event_contacts: Unique per tenant+event+email (if email provided)
 CREATE UNIQUE INDEX IF NOT EXISTS unique_event_contact_tenant_event_email
-ON public.event_contacts (tenant_id, event_id, email)
-WHERE event_id IS NOT NULL AND email IS NOT NULL;
+    ON public.event_contacts (tenant_id, event_id, email)
+    WHERE event_id IS NOT NULL AND email IS NOT NULL;
 
 -- event_featured_performers: Unique per tenant+event+name+stage_name
 CREATE UNIQUE INDEX IF NOT EXISTS unique_event_performer_tenant_event_name_stage
-ON public.event_featured_performers (tenant_id, event_id, name, stage_name)
-WHERE event_id IS NOT NULL AND stage_name IS NOT NULL;
+    ON public.event_featured_performers (tenant_id, event_id, name, stage_name)
+    WHERE event_id IS NOT NULL AND stage_name IS NOT NULL;
 
 -- event_featured_performers: Unique per tenant+event+email (if email provided)
 CREATE UNIQUE INDEX IF NOT EXISTS unique_event_performer_tenant_event_email
-ON public.event_featured_performers (tenant_id, event_id, email)
-WHERE event_id IS NOT NULL AND email IS NOT NULL;
+    ON public.event_featured_performers (tenant_id, event_id, email)
+    WHERE event_id IS NOT NULL AND email IS NOT NULL;
 
 -- event_emails: Unique per tenant+event+email
 CREATE UNIQUE INDEX IF NOT EXISTS unique_event_email_tenant_event_email
-ON public.event_emails (tenant_id, event_id, email)
-WHERE event_id IS NOT NULL;
+    ON public.event_emails (tenant_id, event_id, email)
+    WHERE event_id IS NOT NULL;
 
 -- event_program_directors: Unique per tenant+event+name
 CREATE UNIQUE INDEX IF NOT EXISTS unique_event_director_tenant_event_name
-ON public.event_program_directors (tenant_id, event_id, name)
-WHERE event_id IS NOT NULL;
+    ON public.event_program_directors (tenant_id, event_id, name)
+    WHERE event_id IS NOT NULL;
 
 -- =============================================
 -- PERFORMANCE INDEXES FOR MULTI-EVENT ASSOCIATION
@@ -3380,37 +3563,37 @@ WHERE event_id IS NOT NULL;
 
 -- Performance indexes for queries filtering by event_id (tenant_id, event_id)
 CREATE INDEX IF NOT EXISTS idx_event_featured_performers_tenant_event
-ON public.event_featured_performers (tenant_id, event_id)
-WHERE event_id IS NOT NULL;
+    ON public.event_featured_performers (tenant_id, event_id)
+    WHERE event_id IS NOT NULL;
 
 CREATE INDEX IF NOT EXISTS idx_event_contacts_tenant_event
-ON public.event_contacts (tenant_id, event_id)
-WHERE event_id IS NOT NULL;
+    ON public.event_contacts (tenant_id, event_id)
+    WHERE event_id IS NOT NULL;
 
 CREATE INDEX IF NOT EXISTS idx_event_emails_tenant_event
-ON public.event_emails (tenant_id, event_id)
-WHERE event_id IS NOT NULL;
+    ON public.event_emails (tenant_id, event_id)
+    WHERE event_id IS NOT NULL;
 
 CREATE INDEX IF NOT EXISTS idx_event_program_directors_tenant_event
-ON public.event_program_directors (tenant_id, event_id)
-WHERE event_id IS NOT NULL;
+    ON public.event_program_directors (tenant_id, event_id)
+    WHERE event_id IS NOT NULL;
 
 -- Indexes for finding tenant-level entities (where event_id IS NULL)
 CREATE INDEX IF NOT EXISTS idx_event_featured_performers_tenant_null_event
-ON public.event_featured_performers (tenant_id)
-WHERE event_id IS NULL;
+    ON public.event_featured_performers (tenant_id)
+    WHERE event_id IS NULL;
 
 CREATE INDEX IF NOT EXISTS idx_event_contacts_tenant_null_event
-ON public.event_contacts (tenant_id)
-WHERE event_id IS NULL;
+    ON public.event_contacts (tenant_id)
+    WHERE event_id IS NULL;
 
 CREATE INDEX IF NOT EXISTS idx_event_emails_tenant_null_event
-ON public.event_emails (tenant_id)
-WHERE event_id IS NULL;
+    ON public.event_emails (tenant_id)
+    WHERE event_id IS NULL;
 
 CREATE INDEX IF NOT EXISTS idx_event_program_directors_tenant_null_event
-ON public.event_program_directors (tenant_id)
-WHERE event_id IS NULL;
+    ON public.event_program_directors (tenant_id)
+    WHERE event_id IS NULL;
 
 -- =============================================
 -- POSTGRESQL CACHING FEATURES
@@ -3952,4 +4135,298 @@ CREATE TRIGGER trg_clerk_organization_role_updated_at
 --
 -- No additional tenant_memberships table is needed.
 -- All multi-tenant logic uses the existing clerk_user_tenant table.
+-- =====================================================
+
+-- =====================================================
+-- PAYMENT ORCHESTRATION LAYER - TASK 001
+-- =====================================================
+-- Database migrations for payment orchestration service
+-- Created: Task 001 - Set up project scaffolding and database migrations
+-- =====================================================
+
+--
+-- TOC entry: payment_provider_config
+-- Name: payment_provider_config; Type: TABLE; Schema: public
+-- Purpose: Stores tenant-level payment provider credentials, feature flags, and configuration
+--
+
+CREATE TABLE public.payment_provider_config (
+                                                id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                                tenant_id character varying(255) NOT NULL,
+                                                provider_name character varying(50) NOT NULL,
+                                                payment_use_case character varying(50),
+                                                is_active boolean DEFAULT true NOT NULL,
+                                                supports_acp boolean DEFAULT false NOT NULL,
+                                                supports_zeffy boolean DEFAULT false NOT NULL,
+                                                supports_zelle boolean DEFAULT false NOT NULL,
+                                                supports_revolut boolean DEFAULT false NOT NULL,
+                                                provider_api_key_encrypted text,
+                                                provider_secret_key_encrypted text,
+                                                webhook_secret_encrypted text,
+                                                publishable_key character varying(500),
+                                                fallback_order integer DEFAULT 0,
+                                                configuration_json jsonb,
+                                                created_at timestamp without time zone DEFAULT now() NOT NULL,
+                                                updated_at timestamp without time zone DEFAULT now() NOT NULL,
+                                                CONSTRAINT payment_provider_config_pkey PRIMARY KEY (id),
+                                                CONSTRAINT check_provider_name CHECK ((provider_name IN ('STRIPE', 'PAYPAL', 'ZEFFY', 'ZELLE_MANUAL', 'REVOLUT', 'CEFI_CHARITY', 'GIVEBUTTER'))),
+                                                CONSTRAINT check_payment_use_case CHECK ((payment_use_case IS NULL OR payment_use_case IN ('TICKET_SALE', 'DONATION', 'DONATION_CEFI', 'DONATION_ZERO_FEE', 'OFFERING', 'MEMBERSHIP_SUBSCRIPTION'))),
+                                                CONSTRAINT unique_tenant_provider UNIQUE (tenant_id, provider_name)
+);
+
+COMMENT ON TABLE public.payment_provider_config IS 'Stores tenant-level payment provider configurations and feature flags';
+COMMENT ON COLUMN public.payment_provider_config.tenant_id IS 'Tenant identifier';
+COMMENT ON COLUMN public.payment_provider_config.provider_name IS 'Payment provider name: STRIPE, PAYPAL, ZEFFY, ZELLE_MANUAL, REVOLUT, CEFI_CHARITY, GIVEBUTTER';
+COMMENT ON COLUMN public.payment_provider_config.payment_use_case IS 'Payment use case: TICKET_SALE, DONATION, DONATION_CEFI, DONATION_ZERO_FEE, OFFERING, MEMBERSHIP_SUBSCRIPTION';
+COMMENT ON COLUMN public.payment_provider_config.supports_acp IS 'Whether provider supports Stripe Instant Checkout (ACP)';
+COMMENT ON COLUMN public.payment_provider_config.supports_zeffy IS 'Whether provider supports Zeffy integration';
+COMMENT ON COLUMN public.payment_provider_config.supports_zelle IS 'Whether provider supports Zelle manual payments';
+COMMENT ON COLUMN public.payment_provider_config.supports_revolut IS 'Whether provider supports Revolut payments';
+COMMENT ON COLUMN public.payment_provider_config.provider_api_key_encrypted IS 'Encrypted provider API key (AES-256-GCM)';
+COMMENT ON COLUMN public.payment_provider_config.provider_secret_key_encrypted IS 'Encrypted provider secret key (AES-256-GCM)';
+COMMENT ON COLUMN public.payment_provider_config.fallback_order IS 'Order for fallback when primary provider fails (lower number = higher priority)';
+
+--
+-- TOC entry: platform_settlement
+-- Name: platform_settlement; Type: TABLE; Schema: public
+-- Purpose: Stores aggregated settlement totals per tenant/provider/day
+--
+
+CREATE TABLE public.platform_settlement (
+                                            id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                            tenant_id character varying(255) NOT NULL,
+                                            provider_name character varying(50) NOT NULL,
+                                            settlement_date date NOT NULL,
+                                            gross_amount numeric(21,2) NOT NULL DEFAULT 0,
+                                            processing_fee_amount numeric(21,2) NOT NULL DEFAULT 0,
+                                            platform_fee_amount numeric(21,2) NOT NULL DEFAULT 0,
+                                            net_amount numeric(21,2) NOT NULL DEFAULT 0,
+                                            transaction_count integer DEFAULT 0 NOT NULL,
+                                            status character varying(20) DEFAULT 'PENDING' NOT NULL,
+                                            settlement_reference character varying(255),
+                                            provider_settlement_id character varying(255),
+                                            settlement_file_url character varying(2048),
+                                            notes text,
+                                            created_at timestamp without time zone DEFAULT now() NOT NULL,
+                                            updated_at timestamp without time zone DEFAULT now() NOT NULL,
+                                            CONSTRAINT platform_settlement_pkey PRIMARY KEY (id),
+                                            CONSTRAINT check_settlement_amounts CHECK (((gross_amount >= (0)::numeric) AND (processing_fee_amount >= (0)::numeric) AND (platform_fee_amount >= (0)::numeric) AND (net_amount >= (0)::numeric) AND (transaction_count >= 0))),
+                                            CONSTRAINT check_settlement_status CHECK ((status IN ('PENDING', 'PROCESSING', 'SETTLED', 'FAILED', 'CANCELLED'))),
+                                            CONSTRAINT check_provider_name_settlement CHECK ((provider_name IN ('STRIPE', 'PAYPAL', 'ZEFFY', 'ZELLE_MANUAL', 'REVOLUT', 'CEFI_CHARITY'))),
+                                            CONSTRAINT unique_tenant_provider_date UNIQUE (tenant_id, provider_name, settlement_date)
+);
+
+COMMENT ON TABLE public.platform_settlement IS 'Aggregated settlement totals per tenant/provider/day for fee reconciliation';
+COMMENT ON COLUMN public.platform_settlement.settlement_date IS 'Date for which settlement is calculated';
+COMMENT ON COLUMN public.platform_settlement.gross_amount IS 'Total gross transaction amount';
+COMMENT ON COLUMN public.platform_settlement.processing_fee_amount IS 'Total processing fees charged by provider';
+COMMENT ON COLUMN public.platform_settlement.platform_fee_amount IS 'Total platform fees collected';
+COMMENT ON COLUMN public.platform_settlement.net_amount IS 'Net amount after all fees (gross - processing_fee - platform_fee)';
+COMMENT ON COLUMN public.platform_settlement.status IS 'Settlement status: PENDING, PROCESSING, SETTLED, FAILED, CANCELLED';
+
+--
+-- TOC entry: platform_invoice
+-- Name: platform_invoice; Type: TABLE; Schema: public
+-- Purpose: Invoices for outstanding platform fees; links to settlements
+--
+
+CREATE TABLE public.platform_invoice (
+                                         id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                         tenant_id character varying(255) NOT NULL,
+                                         invoice_number character varying(100) NOT NULL,
+                                         invoice_date date NOT NULL,
+                                         due_date date NOT NULL,
+                                         total_amount numeric(21,2) NOT NULL,
+                                         paid_amount numeric(21,2) DEFAULT 0 NOT NULL,
+                                         outstanding_amount numeric(21,2) NOT NULL,
+                                         status character varying(20) DEFAULT 'DRAFT' NOT NULL,
+                                         settlement_batch_id bigint,
+                                         payment_method character varying(50),
+                                         payment_reference character varying(255),
+                                         paid_at timestamp without time zone,
+                                         notes text,
+                                         created_at timestamp without time zone DEFAULT now() NOT NULL,
+                                         updated_at timestamp without time zone DEFAULT now() NOT NULL,
+                                         CONSTRAINT platform_invoice_pkey PRIMARY KEY (id),
+                                         CONSTRAINT check_invoice_amounts CHECK (((total_amount >= (0)::numeric) AND (paid_amount >= (0)::numeric) AND (outstanding_amount >= (0)::numeric) AND (paid_amount <= total_amount) AND (outstanding_amount = (total_amount - paid_amount)))),
+                                         CONSTRAINT check_invoice_status CHECK ((status IN ('DRAFT', 'SENT', 'PAID', 'OVERDUE', 'CANCELLED'))),
+                                         CONSTRAINT check_due_date CHECK ((due_date >= invoice_date)),
+                                         CONSTRAINT unique_invoice_number UNIQUE (invoice_number)
+);
+
+COMMENT ON TABLE public.platform_invoice IS 'Invoices for outstanding platform fees linked to settlements';
+COMMENT ON COLUMN public.platform_invoice.invoice_number IS 'Unique invoice number';
+COMMENT ON COLUMN public.platform_invoice.invoice_date IS 'Date invoice was created';
+COMMENT ON COLUMN public.platform_invoice.due_date IS 'Date payment is due';
+COMMENT ON COLUMN public.platform_invoice.total_amount IS 'Total invoice amount';
+COMMENT ON COLUMN public.platform_invoice.paid_amount IS 'Amount paid towards invoice';
+COMMENT ON COLUMN public.platform_invoice.outstanding_amount IS 'Outstanding amount (total_amount - paid_amount)';
+COMMENT ON COLUMN public.platform_invoice.status IS 'Invoice status: DRAFT, SENT, PAID, OVERDUE, CANCELLED';
+
+--
+-- TOC entry: membership_plan
+-- Name: membership_plan; Type: TABLE; Schema: public
+-- Purpose: Subscription plan definitions
+--
+
+CREATE TABLE public.membership_plan (
+                                        id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                        tenant_id character varying(255) NOT NULL,
+                                        plan_name character varying(255) NOT NULL,
+                                        plan_code character varying(100) NOT NULL,
+                                        description text,
+                                        plan_type character varying(50) DEFAULT 'SUBSCRIPTION' NOT NULL,
+                                        billing_interval character varying(20) DEFAULT 'MONTHLY' NOT NULL,
+                                        price numeric(21,2) NOT NULL,
+                                        currency character varying(3) DEFAULT 'USD' NOT NULL,
+                                        trial_days integer DEFAULT 0,
+                                        is_active boolean DEFAULT true NOT NULL,
+                                        max_events_per_month integer,
+                                        max_attendees_per_event integer,
+                                        features_json jsonb,
+                                        stripe_price_id character varying(255),
+                                        stripe_product_id character varying(255),
+                                        created_at timestamp without time zone DEFAULT now() NOT NULL,
+                                        updated_at timestamp without time zone DEFAULT now() NOT NULL,
+                                        CONSTRAINT membership_plan_pkey PRIMARY KEY (id),
+                                        CONSTRAINT check_plan_price CHECK ((price >= (0)::numeric)),
+                                        CONSTRAINT check_billing_interval CHECK ((billing_interval IN ('MONTHLY', 'QUARTERLY', 'YEARLY', 'ONE_TIME'))),
+                                        CONSTRAINT check_plan_type CHECK ((plan_type IN ('SUBSCRIPTION', 'ONE_TIME', 'FREEMIUM'))),
+                                        CONSTRAINT unique_tenant_plan_code UNIQUE (tenant_id, plan_code)
+);
+
+COMMENT ON TABLE public.membership_plan IS 'Subscription plan definitions for membership tiers';
+COMMENT ON COLUMN public.membership_plan.plan_code IS 'Unique plan code identifier';
+COMMENT ON COLUMN public.membership_plan.plan_type IS 'Plan type: SUBSCRIPTION, ONE_TIME, FREEMIUM';
+COMMENT ON COLUMN public.membership_plan.billing_interval IS 'Billing interval: MONTHLY, QUARTERLY, YEARLY, ONE_TIME';
+COMMENT ON COLUMN public.membership_plan.price IS 'Plan price';
+COMMENT ON COLUMN public.membership_plan.trial_days IS 'Number of trial days (0 = no trial)';
+COMMENT ON COLUMN public.membership_plan.features_json IS 'JSON object containing plan features and limits';
+
+--
+-- TOC entry: membership_subscription
+-- Name: membership_subscription; Type: TABLE; Schema: public
+-- Purpose: User subscription enrollments
+--
+
+CREATE TABLE public.membership_subscription (
+                                                id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                                tenant_id character varying(255) NOT NULL,
+                                                user_profile_id bigint NOT NULL,
+                                                membership_plan_id bigint NOT NULL,
+                                                subscription_status character varying(20) DEFAULT 'ACTIVE' NOT NULL,
+                                                current_period_start date NOT NULL,
+                                                current_period_end date NOT NULL,
+                                                trial_start date,
+                                                trial_end date,
+                                                cancel_at_period_end boolean DEFAULT false NOT NULL,
+                                                cancelled_at timestamp without time zone,
+                                                cancellation_reason text,
+                                                stripe_subscription_id character varying(255),
+                                                stripe_customer_id character varying(255),
+                                                payment_provider_config_id bigint,
+                                                created_at timestamp without time zone DEFAULT now() NOT NULL,
+                                                updated_at timestamp without time zone DEFAULT now() NOT NULL,
+                                                CONSTRAINT membership_subscription_pkey PRIMARY KEY (id),
+                                                CONSTRAINT check_subscription_status CHECK ((subscription_status IN ('ACTIVE', 'TRIAL', 'CANCELLED', 'PAST_DUE', 'EXPIRED', 'SUSPENDED'))),
+                                                CONSTRAINT check_period_dates CHECK ((current_period_end >= current_period_start)),
+                                                CONSTRAINT check_trial_dates CHECK (((trial_start IS NULL AND trial_end IS NULL) OR (trial_start IS NOT NULL AND trial_end IS NOT NULL AND trial_end >= trial_start)))
+);
+
+COMMENT ON TABLE public.membership_subscription IS 'User subscription enrollments to membership plans';
+COMMENT ON COLUMN public.membership_subscription.subscription_status IS 'Subscription status: ACTIVE, TRIAL, CANCELLED, PAST_DUE, EXPIRED, SUSPENDED';
+COMMENT ON COLUMN public.membership_subscription.current_period_start IS 'Start date of current billing period';
+COMMENT ON COLUMN public.membership_subscription.current_period_end IS 'End date of current billing period';
+COMMENT ON COLUMN public.membership_subscription.trial_start IS 'Trial period start date (if applicable)';
+COMMENT ON COLUMN public.membership_subscription.trial_end IS 'Trial period end date (if applicable)';
+COMMENT ON COLUMN public.membership_subscription.cancel_at_period_end IS 'Whether subscription will cancel at end of current period';
+
+-- =====================================================
+-- FOREIGN KEY CONSTRAINTS
+-- =====================================================
+
+-- Foreign key: platform_invoice -> platform_settlement
+ALTER TABLE ONLY public.platform_invoice
+    ADD CONSTRAINT fk_platform_invoice__settlement_batch_id FOREIGN KEY (settlement_batch_id) REFERENCES public.platform_settlement(id) ON DELETE SET NULL;
+
+-- Foreign key: membership_subscription -> user_profile
+ALTER TABLE ONLY public.membership_subscription
+    ADD CONSTRAINT fk_membership_subscription__user_profile_id FOREIGN KEY (user_profile_id) REFERENCES public.user_profile(id) ON DELETE CASCADE;
+
+-- Foreign key: membership_subscription -> membership_plan
+ALTER TABLE ONLY public.membership_subscription
+    ADD CONSTRAINT fk_membership_subscription__membership_plan_id FOREIGN KEY (membership_plan_id) REFERENCES public.membership_plan(id) ON DELETE RESTRICT;
+
+-- Foreign key: membership_subscription -> payment_provider_config
+ALTER TABLE ONLY public.membership_subscription
+    ADD CONSTRAINT fk_membership_subscription__payment_provider_config_id FOREIGN KEY (payment_provider_config_id) REFERENCES public.payment_provider_config(id) ON DELETE SET NULL;
+
+-- =====================================================
+-- INDEXES FOR PERFORMANCE
+-- =====================================================
+
+-- Indexes for payment_provider_config
+CREATE INDEX IF NOT EXISTS idx_payment_provider_config_tenant_id ON public.payment_provider_config(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_payment_provider_config_provider_name ON public.payment_provider_config(provider_name);
+CREATE INDEX IF NOT EXISTS idx_payment_provider_config_active ON public.payment_provider_config(is_active) WHERE is_active = true;
+CREATE INDEX IF NOT EXISTS idx_payment_provider_config_use_case ON public.payment_provider_config(payment_use_case);
+
+-- Indexes for platform_settlement
+CREATE INDEX IF NOT EXISTS idx_platform_settlement_tenant_id ON public.platform_settlement(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_platform_settlement_provider_name ON public.platform_settlement(provider_name);
+CREATE INDEX IF NOT EXISTS idx_platform_settlement_date ON public.platform_settlement(settlement_date);
+CREATE INDEX IF NOT EXISTS idx_platform_settlement_status ON public.platform_settlement(status);
+CREATE INDEX IF NOT EXISTS idx_platform_settlement_tenant_provider_date ON public.platform_settlement(tenant_id, provider_name, settlement_date);
+
+-- Indexes for platform_invoice
+CREATE INDEX IF NOT EXISTS idx_platform_invoice_tenant_id ON public.platform_invoice(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_platform_invoice_status ON public.platform_invoice(status);
+CREATE INDEX IF NOT EXISTS idx_platform_invoice_due_date ON public.platform_invoice(due_date);
+CREATE INDEX IF NOT EXISTS idx_platform_invoice_settlement_batch_id ON public.platform_invoice(settlement_batch_id);
+CREATE INDEX IF NOT EXISTS idx_platform_invoice_invoice_date ON public.platform_invoice(invoice_date);
+
+-- Indexes for membership_plan
+CREATE INDEX IF NOT EXISTS idx_membership_plan_tenant_id ON public.membership_plan(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_membership_plan_code ON public.membership_plan(plan_code);
+CREATE INDEX IF NOT EXISTS idx_membership_plan_active ON public.membership_plan(is_active) WHERE is_active = true;
+
+-- Indexes for membership_subscription
+CREATE INDEX IF NOT EXISTS idx_membership_subscription_tenant_id ON public.membership_subscription(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_membership_subscription_user_profile_id ON public.membership_subscription(user_profile_id);
+CREATE INDEX IF NOT EXISTS idx_membership_subscription_membership_plan_id ON public.membership_subscription(membership_plan_id);
+CREATE INDEX IF NOT EXISTS idx_membership_subscription_status ON public.membership_subscription(subscription_status);
+CREATE INDEX IF NOT EXISTS idx_membership_subscription_stripe_subscription_id ON public.membership_subscription(stripe_subscription_id);
+CREATE INDEX IF NOT EXISTS idx_membership_subscription_current_period_end ON public.membership_subscription(current_period_end);
+
+-- =====================================================
+-- TRIGGERS FOR AUTOMATIC updated_at TIMESTAMPS
+-- =====================================================
+
+CREATE TRIGGER trg_payment_provider_config_updated_at
+    BEFORE UPDATE ON public.payment_provider_config
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER trg_platform_settlement_updated_at
+    BEFORE UPDATE ON public.platform_settlement
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER trg_platform_invoice_updated_at
+    BEFORE UPDATE ON public.platform_invoice
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER trg_membership_plan_updated_at
+    BEFORE UPDATE ON public.membership_plan
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER trg_membership_subscription_updated_at
+    BEFORE UPDATE ON public.membership_subscription
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+-- =====================================================
+-- END OF PAYMENT ORCHESTRATION LAYER MIGRATION
 -- =====================================================

@@ -30,7 +30,7 @@ Copy the container ID (e.g., `0c2a38241eca`).
 **3. Export database data with INSERT statements:**
 
 ```bash
-docker exec -it 0c2a38241eca pg_dump -U event_site_app -d event_site_manager_db --data-only --column-inserts > corrected_event_media_inserts.sql
+docker exec -it 0c2a38241eca pg_dump -U event_site_app -d event_site_manager_db --data-only --column-inserts > corrected_event_media_inserts_TMP.sql
 ```
 
 **Important**: Replace `0c2a38241eca` with your actual container ID from step 2.
@@ -43,7 +43,7 @@ Still in the `code_html_template/SQLS` folder, run:
 node reorder_sql_inserts_final.cjs
 ```
 
-This will generate: `corrected_event_media_inserts.ordered.sql`
+This will generate: `corrected_event_media_inserts.ordered_TMP.sql`
 
 **5. Import the reordered data:**
 
@@ -51,19 +51,19 @@ Run the generated SQL file to insert data records into the database tables:
 
 ```bash
 # Using docker exec with psql
-docker exec -i 0c2a38241eca psql -U event_site_app -d event_site_manager_db < corrected_event_media_inserts.ordered.sql
+docker exec -i 0c2a38241eca psql -U event_site_app -d event_site_manager_db < corrected_event_media_inserts.ordered_TMP.sql
 
 # Or using docker-compose (if applicable)
-docker-compose exec -T postgresql psql -U event_site_app -d event_site_manager_db < corrected_event_media_inserts.ordered.sql
+docker-compose exec -T postgresql psql -U event_site_app -d event_site_manager_db < corrected_event_media_inserts.ordered_TMP.sql
 ```
 
 ### Summary
 
 1. ✅ Navigate to `code_html_template/SQLS`
 2. ✅ Get PostgreSQL container ID: `docker ps | findstr postgres`
-3. ✅ Export data: `docker exec -it <container_id> pg_dump -U event_site_app -d event_site_manager_db --data-only --column-inserts > corrected_event_media_inserts.sql`
+3. ✅ Export data: `docker exec -it <container_id> pg_dump -U event_site_app -d event_site_manager_db --data-only --column-inserts > corrected_event_media_inserts_TMP.sql`
 4. ✅ Reorder INSERTs: `node reorder_sql_inserts_final.cjs`
-5. ✅ Import data: Run `corrected_event_media_inserts.ordered.sql` into the database
+5. ✅ Import data: Run `corrected_event_media_inserts.ordered_TMP.sql` into the database
 
 ---
 
@@ -155,8 +155,8 @@ const TABLE_ORDER = [
 #### Default Configuration
 
 The script is pre-configured to use:
-- **Input File**: `corrected_event_media_inserts.sql` (in the same directory as the script)
-- **Output File**: `corrected_event_media_inserts.ordered.sql` (in the same directory as the script)
+- **Input File**: `corrected_event_media_inserts_TMP.sql` (in the same directory as the script)
+- **Output File**: `corrected_event_media_inserts.ordered_TMP.sql` (in the same directory as the script)
 
 #### Step 1: Run the Script
 
@@ -194,9 +194,9 @@ The script will create the output file with reordered INSERT statements. The out
 - Extra tables (not in TABLE_ORDER) placed before metadata tables
 - Statements separated by blank lines
 
-### Example: Using with `corrected_event_media_inserts.sql`
+### Example: Using with `corrected_event_media_inserts_TMP.sql`
 
-The script is pre-configured to use `corrected_event_media_inserts.sql` as the default input file.
+The script is pre-configured to use `corrected_event_media_inserts_TMP.sql` as the default input file.
 
 1. **Run the script** (from project root):
    ```bash
@@ -205,8 +205,8 @@ The script is pre-configured to use `corrected_event_media_inserts.sql` as the d
 
 2. **Expected output**:
    ```
-   📁 Reading input file: E:\project_workspace\mosc-temp\code_html_template\SQLS\corrected_event_media_inserts.sql
-   ✅ Success! Output written to: E:\project_workspace\mosc-temp\code_html_template\SQLS\corrected_event_media_inserts.ordered.sql
+   📁 Reading input file: E:\project_workspace\mosc-temp\code_html_template\SQLS\corrected_event_media_inserts_TMP.sql
+   ✅ Success! Output written to: E:\project_workspace\mosc-temp\code_html_template\SQLS\corrected_event_media_inserts.ordered_TMP.sql
    📊 Summary:
       • Total INSERT statements: [number]
       • Tables found: [table names]
@@ -591,7 +591,7 @@ docker-compose exec -T postgresql \
 
 - **Script**: `code_html_template/SQLS/reorder_sql_inserts_final.cjs`
 - **Schema File**: `code_html_template/SQLS/db_SQL_Temp_ VER_1.sql`
-- **Example INSERT File**: `code_html_template/SQLS/corrected_event_media_inserts.sql`
+- **Example INSERT File**: `code_html_template/SQLS/corrected_event_media_inserts_TMP.sql`
 - **Docker Compose**: `src/main/docker/Docker_Local/docker-compose.local.yml`
 
 ---

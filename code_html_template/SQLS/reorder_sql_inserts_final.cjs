@@ -3,7 +3,7 @@ const path = require('path');
 
 // Use path.join to ensure correct path resolution regardless of where script is run from
 const SCRIPT_DIR = __dirname;
-const INPUT_FILE = path.join(SCRIPT_DIR, 'corrected_event_media_inserts.sql');
+const INPUT_FILE = path.join(SCRIPT_DIR, 'export.sql');
 const OUTPUT_FILE = path.join(SCRIPT_DIR, 'corrected_event_media_inserts.ordered.sql');
 
 const TABLE_ORDER = [

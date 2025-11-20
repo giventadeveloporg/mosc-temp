@@ -120,7 +120,8 @@ const UpcomingEventsSection: React.FC = () => {
           sort: 'startDate,asc',
           page: '0',
           size: '6',
-          'startDate.greaterThanOrEqual': today
+          'startDate.greaterThanOrEqual': today,
+          'isActive.equals': 'true' // Only show active events
         });
 
         const upcomingRes = await fetch(`/api/proxy/event-details?${upcomingParams.toString()}`);
@@ -172,7 +173,8 @@ const UpcomingEventsSection: React.FC = () => {
             sort: 'startDate,desc',
             page: '0',
             size: '6',
-            'endDate.lessThan': today
+            'endDate.lessThan': today,
+            'isActive.equals': 'true' // Only show active events
           });
 
           const pastRes = await fetch(`/api/proxy/event-details?${pastParams.toString()}`);
@@ -295,20 +297,25 @@ const UpcomingEventsSection: React.FC = () => {
               {events.map((event, index) => (
                 <div
                   key={event.id}
-                  className={`${getRandomBackground(index)} rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 overflow-hidden group cursor-pointer`}
+                  className={`${getRandomBackground(index)} rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 overflow-hidden group`}
                   style={{
                     boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05)'
                   }}
-                  onClick={() => window.location.href = `/events/${event.id}`}
                 >
                   <div className="flex flex-col h-full">
                     {/* Image Section - Top on all screen sizes, exactly like events page */}
                     {event.thumbnailUrl && (
-                      <EventImageWithErrorHandling
-                        src={event.thumbnailUrl}
-                        alt={event.title}
-                        isPastEvent={!isUpcomingEvents}
-                      />
+                      <Link
+                        href={`/events/${event.id}/checkout`}
+                        className="block cursor-pointer"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <EventImageWithErrorHandling
+                          src={event.thumbnailUrl}
+                          alt={event.title}
+                          isPastEvent={!isUpcomingEvents}
+                        />
+                      </Link>
                     )}
                     {/* Past Event Badge - Show at top of content if no image */}
                     {!event.thumbnailUrl && !isUpcomingEvents && (
@@ -388,15 +395,10 @@ const UpcomingEventsSection: React.FC = () => {
 
                         {/* Buy Tickets Button - Only for upcoming events */}
                         {isUpcomingEvents && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              // New backend payment flow
-                              window.location.href = `/events/${event.id}/checkout`;
-                              // Legacy Stripe flow (commented out):
-                              // window.location.href = `/events/${event.id}/tickets`;
-                            }}
-                            className="transition-transform hover:scale-105"
+                          <Link
+                            href={`/events/${event.id}/checkout`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="transition-transform hover:scale-105 inline-block"
                           >
                             <img
                               src="/images/buy_tickets_click_here_red.webp"
@@ -407,7 +409,7 @@ const UpcomingEventsSection: React.FC = () => {
                                 height: '70px'
                               }}
                             />
-                          </button>
+                          </Link>
                         )}
                       </div>
                     </div>

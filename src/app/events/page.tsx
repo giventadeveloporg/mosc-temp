@@ -102,7 +102,8 @@ export default function EventsPage() {
         const queryParams = new URLSearchParams({
           sort: showPastEvents ? 'startDate,desc' : 'startDate,asc',
           page: page.toString(),
-          size: EVENTS_PAGE_SIZE.toString()
+          size: EVENTS_PAGE_SIZE.toString(),
+          'isActive.equals': 'true' // Only show active events
         });
 
         // Add search filters

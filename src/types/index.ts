@@ -116,6 +116,17 @@ export interface EventDetailsDTO {
   featuredEventPriorityRanking: number;
   /** Live event priority ranking */
   liveEventPriorityRanking: number;
+  /** Metadata - DEPRECATED: Use donationMetadata and eventRecurrenceMetadata instead.
+   * Flexible TEXT field for event configuration stored as JSON string.
+   * Stores fundraiser settings, donation config, etc.
+   * Parse JSON in application code using JSON.parse() */
+  metadata?: string;
+  /** Donation metadata - For fundraiser/charity configuration (JSON string) */
+  donationMetadata?: string;
+  /** Event recurrence metadata - For recurrence configuration (JSON string) */
+  eventRecurrenceMetadata?: string;
+  /** Email header image URL for ticket confirmation emails */
+  emailHeaderImageUrl?: string;
   /** Created at (ISO date-time) */
   createdAt: string;
   /** Updated at (ISO date-time) */
@@ -994,6 +1005,7 @@ export enum PaymentProviderType {
   ZEFFY = 'ZEFFY',
   ZELLE = 'ZELLE',
   CEFI = 'CEFI',
+  GIVEBUTTER = 'GIVEBUTTER',
 }
 
 /**
@@ -1125,9 +1137,7 @@ export interface PaymentTransactionDTO {
   refundAmount?: number;
   refundDate?: string;
   refundReason?: string;
-  settlementBatchId?: string;
-  platformInvoiceId?: string;
-  manualPaymentReference?: string; // For Zelle manual payments
+  // Removed deprecated fields: settlementBatchId, platformInvoiceId, manualPaymentReference
   metadata?: Record<string, any>;
   // Related entities
   eventId?: number;

@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import AdminNavigation from '@/components/AdminNavigation';
 import Image from 'next/image';
+import DeleteConfirmationDialog, { type DeleteStatus } from '@/components/DeleteConfirmationDialog';
 import {
   fetchEventsFilteredServer,
   fetchEventTypesServer,
@@ -37,6 +38,11 @@ export default function ManageEventsPage() {
   const [searchField, setSearchField] = useState<'title' | 'id' | 'caption'>('title');
   const [searchId, setSearchId] = useState('');
   const [showPastEvents, setShowPastEvents] = useState(false);
+  // Delete confirmation dialog state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteStatus, setDeleteStatus] = useState<DeleteStatus>('idle');
+  const [deleteMessage, setDeleteMessage] = useState<string>('');
+  const [eventToDelete, setEventToDelete] = useState<EventDetailsDTO | null>(null);
 
   async function loadAll(pageNum = 0) {
     setLoading(true);
@@ -47,48 +53,36 @@ export default function ManageEventsPage() {
 
       const filterParams: any = {
         admissionType: searchAdmissionType,
-        sort,
-        page: pageNum,
-        size: pageSize
+        sort: showPastEvents ? 'startDate,desc' : 'startDate,asc', // Override sort based on toggle
+        pageNum,
+        pageSize,
       };
 
+      // Apply date filtering based on toggle
+      if (showPastEvents) {
+        // Show events that ended before today
+        filterParams.endDate = today;
+      } else {
+        // Show events that start today or later (future events including today)
+        filterParams.startDate = today;
+      }
+
+      // Override with manual date filters if provided
+      if (searchStartDate) filterParams.startDate = searchStartDate;
+      if (searchEndDate) filterParams.endDate = searchEndDate;
+
       // Add search filters based on selected field
-      if (searchField === 'title' && searchTitle.trim()) {
-        filterParams.title = searchTitle.trim();
-      } else if (searchField === 'id' && searchId.trim()) {
-        filterParams.id = parseInt(searchId.trim());
-      } else if (searchField === 'caption' && searchCaption.trim()) {
-        filterParams.caption = searchCaption.trim();
-      }
+      if (searchField === 'title') filterParams.title = searchTitle;
+      else if (searchField === 'id') filterParams.id = searchId;
+      else if (searchField === 'caption') filterParams.caption = searchCaption;
 
-      // Add date filters
-      if (searchStartDate) {
-        filterParams.startDate = searchStartDate;
-      }
-      if (searchEndDate) {
-        filterParams.endDate = searchEndDate;
-      }
-
-      // Add date filter based on toggle
-      if (!searchStartDate && !searchEndDate) {
-        if (showPastEvents) {
-          filterParams.endDateBefore = today;
-        } else {
-          filterParams.startDateAfter = today;
-        }
-      }
-
-      const eventsData = await fetchEventsFilteredServer(filterParams);
-      setEvents(eventsData.events);
-      setTotalCount(eventsData.totalCount);
-
-      // Load event types
-      const eventTypesData = await fetchEventTypesServer();
-      setEventTypes(eventTypesData);
-
-      // Load calendar events
-      const calendarEventsData = await fetchCalendarEventsServer();
-      setCalendarEvents(calendarEventsData);
+      const { events: eventsResult, totalCount: fetchedTotalCount } = await fetchEventsFilteredServer(filterParams);
+      const types = await fetchEventTypesServer();
+      const calendarEventsResult = await fetchCalendarEventsServer();
+      setEvents(eventsResult);
+      setTotalCount(fetchedTotalCount);
+      setEventTypes(types);
+      setCalendarEvents(calendarEventsResult);
     } catch (e: any) {
       setError(e.message || 'Failed to load data');
     } finally {
@@ -100,9 +94,58 @@ export default function ManageEventsPage() {
     if (userId) {
       loadAll(page);
     }
-  }, [userId, page, searchTitle, searchCaption, searchId, searchStartDate, searchEndDate, searchAdmissionType, sort, searchField, showPastEvents]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, searchTitle, searchId, searchCaption, searchField, searchStartDate, searchEndDate, searchAdmissionType, sort, showPastEvents]);
+
+  function handleDeleteClick(event: EventDetailsDTO) {
+    setEventToDelete(event);
+    setDeleteStatus('confirming');
+    setDeleteDialogOpen(true);
+  }
+
+  async function handleConfirmDelete() {
+    if (!eventToDelete || !eventToDelete.id) return;
+
+    setDeleteStatus('deleting');
+    setDeleteMessage('Please wait while we mark this event as inactive...');
+
+    try {
+      setLoading(true);
+      await cancelEventServer(eventToDelete);
+      setDeleteStatus('success');
+      setDeleteMessage('The event has been marked as inactive successfully.');
+      await loadAll(page);
+      // Close dialog after 1.5 seconds
+      setTimeout(() => {
+        setDeleteDialogOpen(false);
+        setDeleteStatus('idle');
+        setEventToDelete(null);
+      }, 1500);
+    } catch (e: any) {
+      setDeleteStatus('error');
+      setDeleteMessage(e.message || 'Failed to mark event as inactive. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleCancelDelete() {
+    setDeleteDialogOpen(false);
+    setDeleteStatus('idle');
+    setEventToDelete(null);
+    setDeleteMessage('');
+  }
+
+  function handleCloseDeleteDialog() {
+    setDeleteDialogOpen(false);
+    setDeleteStatus('idle');
+    setEventToDelete(null);
+    setDeleteMessage('');
+  }
 
   async function handleCancelEvent(eventId: number) {
+    // This function is kept for backward compatibility but should not be called directly
+    // Use handleDeleteClick instead
     try {
       setLoading(true);
       await cancelEventServer(eventId);
@@ -151,6 +194,17 @@ export default function ManageEventsPage() {
 
       {/* Admin Navigation */}
       <AdminNavigation currentPage="manage-events" />
+
+      {/* Create Event Button - Matching admin homepage style */}
+      <div className="flex justify-end mb-6">
+        <Link
+          href="/admin/events/new"
+          className="bg-blue-600 text-white px-4 py-2 rounded shadow font-bold flex items-center gap-2 hover:bg-blue-700 transition"
+        >
+          <FaPlus />
+          Create Event
+        </Link>
+      </div>
 
       {/* Quick Action Buttons */}
       <div className="w-full overflow-x-auto mb-6">
@@ -261,13 +315,25 @@ export default function ManageEventsPage() {
         eventTypes={eventTypes}
         calendarEvents={calendarEvents}
         loading={loading}
-        onCancelEvent={handleCancelEvent}
+        onCancel={handleDeleteClick}
         onPrevPage={handlePrevPage}
         onNextPage={handleNextPage}
         currentPage={page}
         totalCount={totalCount}
         pageSize={pageSize}
         showPastEvents={showPastEvents}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmationDialog
+        isOpen={deleteDialogOpen}
+        status={deleteStatus}
+        eventTitle={eventToDelete?.title}
+        isRecurring={eventToDelete?.isRecurring || false}
+        message={deleteMessage}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        onClose={handleCloseDeleteDialog}
       />
     </div>
   );

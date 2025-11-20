@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import AdminNavigation from '@/components/AdminNavigation';
 import Image from 'next/image';
+import DeleteConfirmationDialog, { type DeleteStatus } from '@/components/DeleteConfirmationDialog';
 import {
   fetchEventsFilteredServer,
   fetchEventTypesServer,
@@ -38,6 +39,11 @@ export default function AdminPage() {
   const [searchField, setSearchField] = useState<'title' | 'id' | 'caption'>('title');
   const [searchId, setSearchId] = useState('');
   const [showPastEvents, setShowPastEvents] = useState(false);
+  // Delete confirmation dialog state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteStatus, setDeleteStatus] = useState<DeleteStatus>('idle');
+  const [deleteMessage, setDeleteMessage] = useState<string>('');
+  const [eventToDelete, setEventToDelete] = useState<EventDetailsDTO | null>(null);
 
   async function loadAll(pageNum = 0) {
     setLoading(true);
@@ -88,7 +94,62 @@ export default function AdminPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, searchTitle, searchId, searchCaption, searchField, searchStartDate, searchEndDate, searchAdmissionType, sort, showPastEvents]);
 
+  function handleDeleteClick(event: EventDetailsDTO) {
+    setEventToDelete(event);
+    setDeleteStatus('confirming');
+    setDeleteDialogOpen(true);
+  }
+
+  async function handleConfirmDelete() {
+    if (!eventToDelete || !eventToDelete.id) return;
+
+    setDeleteStatus('deleting');
+    setDeleteMessage('Please wait while we mark this event as inactive...');
+
+    try {
+      setLoading(true);
+      setError(null);
+      await cancelEventServer(eventToDelete);
+      try {
+        await deleteCalendarEventForEventServer(eventToDelete);
+      } catch (calendarErr) {
+        // Log calendar deletion error but don't fail the whole operation
+        console.warn('Failed to delete calendar event:', calendarErr);
+      }
+      setDeleteStatus('success');
+      setDeleteMessage('The event has been marked as inactive successfully.');
+      await loadAll(page);
+      // Close dialog after 1.5 seconds
+      setTimeout(() => {
+        setDeleteDialogOpen(false);
+        setDeleteStatus('idle');
+        setEventToDelete(null);
+      }, 1500);
+    } catch (e: any) {
+      setDeleteStatus('error');
+      setDeleteMessage(e.message || 'Failed to mark event as inactive. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleCancelDelete() {
+    setDeleteDialogOpen(false);
+    setDeleteStatus('idle');
+    setEventToDelete(null);
+    setDeleteMessage('');
+  }
+
+  function handleCloseDeleteDialog() {
+    setDeleteDialogOpen(false);
+    setDeleteStatus('idle');
+    setEventToDelete(null);
+    setDeleteMessage('');
+  }
+
   async function handleCancel(event: EventDetailsDTO) {
+    // This function is kept for backward compatibility but should not be called directly
+    // Use handleDeleteClick instead
     setLoading(true);
     setError(null);
     try {
@@ -250,7 +311,7 @@ export default function AdminPage() {
             eventTypes={eventTypes}
             calendarEvents={calendarEvents}
             onEdit={event => router.push(`/admin/events/${event.id}/edit`)}
-            onCancel={handleCancel}
+            onCancel={handleDeleteClick}
             loading={loading}
             onPrevPage={handlePrevPage}
             onNextPage={handleNextPage}
@@ -262,6 +323,18 @@ export default function AdminPage() {
           />
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmationDialog
+        isOpen={deleteDialogOpen}
+        status={deleteStatus}
+        eventTitle={eventToDelete?.title}
+        isRecurring={eventToDelete?.isRecurring || false}
+        message={deleteMessage}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        onClose={handleCloseDeleteDialog}
+      />
     </div>
   );
 }

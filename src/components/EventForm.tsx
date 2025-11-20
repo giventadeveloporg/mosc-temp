@@ -1,7 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { EventDetailsDTO, EventTypeDetailsDTO } from '@/types';
 import timezones from '@/lib/timezones'; // (We'll create this file for the IANA timezone list)
-import { FaCalendarAlt } from 'react-icons/fa';
+import { FaCalendarAlt, FaEnvelope } from 'react-icons/fa';
+import { parseEventMetadata, serializeEventMetadata, createFundraiserMetadata, createRecurrenceMetadata, getRecurrenceConfig, createDonationMetadata, removeNullUndefined } from '@/lib/eventUtils';
+import EmailHeaderImageUpload from '@/components/EmailHeaderImageUpload';
+import RecurrenceConfigSection from '@/components/RecurrenceConfigSection';
+import RecurrencePreview from '@/components/RecurrencePreview';
+import type { RecurrencePattern, RecurrenceEndType } from '@/lib/recurrenceUtils';
+import { validateRecurrenceEndDate, generateOccurrenceDates } from '@/lib/recurrenceUtils';
 
 interface EventFormProps {
   event?: EventDetailsDTO;
@@ -45,12 +51,120 @@ export function EventForm({ event, eventTypes, onSubmit, loading }: EventFormPro
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showErrors, setShowErrors] = useState(false);
 
+  // Fundraiser/Charity/Givebutter configuration state
+  const [isFundraiserEvent, setIsFundraiserEvent] = useState(false);
+  const [isCharityEvent, setIsCharityEvent] = useState(false);
+  const [useZeroFeeProvider, setUseZeroFeeProvider] = useState(false);
+  const [zeroFeeProvider, setZeroFeeProvider] = useState<string>('');
+  const [givebutterCampaignId, setGivebutterCampaignId] = useState<string>('');
+
+  // Recurrence configuration state
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [recurrencePattern, setRecurrencePattern] = useState<RecurrencePattern | ''>('');
+  const [recurrenceInterval, setRecurrenceInterval] = useState<number>(1);
+  const [recurrenceEndType, setRecurrenceEndType] = useState<RecurrenceEndType>('END_DATE');
+  const [recurrenceEndDate, setRecurrenceEndDate] = useState<string>('');
+  const [recurrenceOccurrences, setRecurrenceOccurrences] = useState<number>(1);
+  const [recurrenceWeeklyDays, setRecurrenceWeeklyDays] = useState<number[]>([]);
+  const [recurrenceMonthlyDay, setRecurrenceMonthlyDay] = useState<number | 'LAST' | null>(null);
+  const [recurrenceMonthlyDayType, setRecurrenceMonthlyDayType] = useState<'DAY_NUMBER' | 'LAST_DAY'>('DAY_NUMBER');
+
   // Refs for form fields to enable scroll-to-error functionality
   const fieldRefs = useRef<Record<string, HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>>({});
 
   useEffect(() => {
-    if (event) setForm({ ...defaultEvent, ...event });
+    if (event) {
+      setForm({ ...defaultEvent, ...event });
+
+      // Load donation metadata (NEW - preferred)
+      if (event.donationMetadata) {
+        try {
+          const donationMetadata = JSON.parse(event.donationMetadata);
+          setIsFundraiserEvent(Boolean(donationMetadata.isFundraiserEvent));
+          setIsCharityEvent(Boolean(donationMetadata.isCharityEvent));
+          setZeroFeeProvider(donationMetadata.zeroFeeProvider || '');
+          setGivebutterCampaignId(donationMetadata.givebutterCampaignId || '');
+          setUseZeroFeeProvider(Boolean(donationMetadata.zeroFeeProvider));
+        } catch (e) {
+          console.error('Failed to parse donation metadata', e);
+        }
+      }
+      // Fallback: Load from old metadata field (backward compatibility)
+      else if (event.metadata) {
+        const metadata = parseEventMetadata(event.metadata);
+        setIsFundraiserEvent(Boolean(metadata.isFundraiserEvent));
+        setIsCharityEvent(Boolean(metadata.isCharityEvent));
+
+        const donationConfig = metadata.donationConfig;
+        if (donationConfig) {
+          setUseZeroFeeProvider(Boolean(donationConfig.useZeroFeeProvider));
+          setZeroFeeProvider(donationConfig.zeroFeeProvider || '');
+          setGivebutterCampaignId(donationConfig.givebutterCampaignId || '');
+        }
+      }
+
+      // Load recurrence metadata (NEW - preferred)
+      if (event.eventRecurrenceMetadata) {
+        try {
+          const recurrenceConfig = JSON.parse(event.eventRecurrenceMetadata);
+          setIsRecurring(true);
+          setRecurrencePattern((recurrenceConfig.pattern as RecurrencePattern) || '');
+          setRecurrenceInterval(recurrenceConfig.interval || 1);
+          setRecurrenceEndType((recurrenceConfig.endType as RecurrenceEndType) || 'END_DATE');
+          setRecurrenceEndDate(recurrenceConfig.endDate || '');
+          setRecurrenceOccurrences(recurrenceConfig.occurrences || 1);
+          setRecurrenceWeeklyDays(recurrenceConfig.weeklyDays || []);
+          if (recurrenceConfig.monthlyDay === 'LAST') {
+            setRecurrenceMonthlyDay('LAST');
+            setRecurrenceMonthlyDayType('LAST_DAY');
+          } else if (recurrenceConfig.monthlyDay) {
+            setRecurrenceMonthlyDay(recurrenceConfig.monthlyDay);
+            setRecurrenceMonthlyDayType('DAY_NUMBER');
+          }
+        } catch (e) {
+          console.error('Failed to parse recurrence metadata', e);
+        }
+      }
+      // Fallback: Load from old metadata field (backward compatibility)
+      else if (event.metadata) {
+        const metadata = parseEventMetadata(event.metadata);
+        if (metadata.isRecurring) {
+          const recurrenceConfig = metadata.recurrenceConfig;
+          if (recurrenceConfig) {
+            setIsRecurring(true);
+            setRecurrencePattern((recurrenceConfig.pattern as RecurrencePattern) || '');
+            setRecurrenceInterval(recurrenceConfig.interval || 1);
+            setRecurrenceEndType((recurrenceConfig.endType as RecurrenceEndType) || 'END_DATE');
+            setRecurrenceEndDate(recurrenceConfig.endDate || '');
+            setRecurrenceOccurrences(recurrenceConfig.occurrences || 1);
+            setRecurrenceWeeklyDays(recurrenceConfig.weeklyDays || []);
+            if (recurrenceConfig.monthlyDay === 'LAST') {
+              setRecurrenceMonthlyDay('LAST');
+              setRecurrenceMonthlyDayType('LAST_DAY');
+            } else if (recurrenceConfig.monthlyDay) {
+              setRecurrenceMonthlyDay(recurrenceConfig.monthlyDay);
+              setRecurrenceMonthlyDayType('DAY_NUMBER');
+            }
+          }
+        }
+      }
+    }
   }, [event]);
+
+  // CRITICAL: Automatically set zero-fee provider configuration when fundraiser/charity is enabled
+  useEffect(() => {
+    if (isFundraiserEvent || isCharityEvent) {
+      // Automatically enable zero-fee provider and set to GIVEBUTTER
+      setUseZeroFeeProvider(true);
+      // Only set to GIVEBUTTER if it's currently empty or not set
+      setZeroFeeProvider(prev => prev || 'GIVEBUTTER');
+    } else {
+      // If fundraiser/charity is disabled, reset zero-fee provider settings
+      setUseZeroFeeProvider(false);
+      setZeroFeeProvider('');
+      setGivebutterCampaignId('');
+    }
+  }, [isFundraiserEvent, isCharityEvent]);
 
   // Function to scroll to the first error field
   const scrollToFirstError = () => {
@@ -112,6 +226,15 @@ export function EventForm({ event, eventTypes, onSubmit, loading }: EventFormPro
     if (!form.admissionType) errs.admissionType = 'Admission type is required';
     if (!form.timezone) errs.timezone = 'Timezone is required';
 
+    // Validate Givebutter configuration
+    if (useZeroFeeProvider) {
+      if (!zeroFeeProvider) {
+        errs.zeroFeeProvider = 'Zero-fee provider is required when using zero-fee provider';
+      }
+      // Note: givebutterCampaignId is optional - backend will fallback to provider config campaign ID
+      // However, it's recommended to set it per-event for better tracking
+    }
+
     // Date and time validations
     // Get today's date in local timezone (YYYY-MM-DD format)
     const today = new Date();
@@ -160,6 +283,47 @@ export function EventForm({ event, eventTypes, onSubmit, loading }: EventFormPro
     if (form.allowGuests) {
       if (!form.maxGuestsPerAttendee || Number(form.maxGuestsPerAttendee) <= 0) {
         errs.maxGuestsPerAttendee = 'When guests are allowed, max_guests_per_attendee must be greater than 0';
+      }
+    }
+
+    // Recurrence validation
+    if (isRecurring) {
+      if (!recurrencePattern) {
+        errs.recurrencePattern = 'Recurrence pattern is required';
+      }
+      if (!recurrenceEndType) {
+        errs.recurrenceEndType = 'End condition is required';
+      }
+      if (recurrenceEndType === 'END_DATE') {
+        if (!recurrenceEndDate) {
+          errs.recurrenceEndDate = 'End date is required';
+        } else {
+          // recurrenceEndDate is already in YYYY-MM-DD format from date input
+          const startDateObj = new Date(formatDateForStorage(startDateStr) + 'T00:00:00');
+          const endDateObj = new Date(recurrenceEndDate + 'T00:00:00');
+          if (isNaN(endDateObj.getTime())) {
+            errs.recurrenceEndDate = 'Invalid end date format';
+          } else {
+            const validation = validateRecurrenceEndDate(startDateObj, endDateObj);
+            if (!validation.valid) {
+              errs.recurrenceEndDate = validation.error || 'Invalid end date';
+            }
+          }
+        }
+      } else if (recurrenceEndType === 'OCCURRENCES') {
+        if (!recurrenceOccurrences || recurrenceOccurrences < 1 || recurrenceOccurrences > 1000) {
+          errs.recurrenceOccurrences = 'Occurrences must be between 1 and 1000';
+        }
+      }
+      if (recurrencePattern === 'WEEKLY' || recurrencePattern === 'BIWEEKLY') {
+        if (!recurrenceWeeklyDays || recurrenceWeeklyDays.length === 0) {
+          errs.recurrenceWeeklyDays = 'At least one weekday must be selected';
+        }
+      }
+      if (recurrencePattern === 'MONTHLY') {
+        if (recurrenceMonthlyDay === null) {
+          errs.recurrenceMonthlyDay = 'Day of month must be specified';
+        }
       }
     }
 
@@ -522,6 +686,22 @@ export function EventForm({ event, eventTypes, onSubmit, loading }: EventFormPro
     setForm({ ...defaultEvent });
     setErrors({});
     setShowErrors(false);
+    // Reset fundraiser/charity/Givebutter configuration
+    setIsFundraiserEvent(false);
+    setIsCharityEvent(false);
+    setUseZeroFeeProvider(false);
+    setZeroFeeProvider('');
+    setGivebutterCampaignId('');
+    // Reset recurrence configuration
+    setIsRecurring(false);
+    setRecurrencePattern('');
+    setRecurrenceInterval(1);
+    setRecurrenceEndType('END_DATE');
+    setRecurrenceEndDate('');
+    setRecurrenceOccurrences(1);
+    setRecurrenceWeeklyDays([]);
+    setRecurrenceMonthlyDay(null);
+    setRecurrenceMonthlyDayType('DAY_NUMBER');
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -532,10 +712,118 @@ export function EventForm({ event, eventTypes, onSubmit, loading }: EventFormPro
     setErrors({});
     setShowErrors(false);
 
+    // Build metadata object from fundraiser/charity/Givebutter configuration
+    // CRITICAL: When fundraiser/charity is enabled, ALWAYS set:
+    // - useZeroFeeProvider: true
+    // - zeroFeeProvider: "GIVEBUTTER"
+    // - givebutterCampaignId: from form (or keep existing if editing)
+    const isFundraiserOrCharity = isFundraiserEvent || isCharityEvent;
+
+    // Build donation metadata (fundraiser/charity) - SEPARATE from recurrence
+    const donationMetadataObj = createDonationMetadata({
+      isFundraiserEvent,
+      isCharityEvent,
+      zeroFeeProvider: isFundraiserOrCharity ? 'GIVEBUTTER' : (useZeroFeeProvider ? zeroFeeProvider : undefined),
+      givebutterCampaignId: (isFundraiserOrCharity || zeroFeeProvider === 'GIVEBUTTER') ? (givebutterCampaignId || undefined) : undefined,
+    });
+
+    // Calculate end date if "OCCURRENCES" is selected
+    let calculatedEndDate: string | undefined = undefined;
+    if (isRecurring && recurrenceEndType === 'OCCURRENCES' && recurrencePattern && form.startDate) {
+      try {
+        const startDateObj = new Date(formatDateForStorage(formatDateForDisplay(form.startDate)) + 'T00:00:00');
+        const occurrenceDates = generateOccurrenceDates(
+          startDateObj,
+          recurrencePattern as RecurrencePattern,
+          recurrenceInterval,
+          undefined, // No end date limit
+          recurrenceOccurrences, // Max occurrences
+          recurrenceWeeklyDays.length > 0 ? recurrenceWeeklyDays : undefined,
+          recurrenceMonthlyDay === null ? undefined : recurrenceMonthlyDay,
+          form.timezone
+        );
+
+        // Get the last occurrence date
+        if (occurrenceDates.length > 0) {
+          const lastDate = occurrenceDates[occurrenceDates.length - 1];
+          // Format as YYYY-MM-DD
+          calculatedEndDate = lastDate.toISOString().split('T')[0];
+        }
+      } catch (e) {
+        console.error('Failed to calculate recurrence end date', e);
+      }
+    }
+
+    // Use calculated end date if available, otherwise use the user-selected end date
+    const finalEndDate = calculatedEndDate || (recurrenceEndType === 'END_DATE' ? recurrenceEndDate : undefined);
+
+    // Build recurrence metadata - SEPARATE from donation (just the config, not wrapped)
+    const recurrenceMetadataObj = isRecurring ? {
+      pattern: recurrencePattern || undefined,
+      interval: recurrenceInterval,
+      endType: recurrenceEndType,
+      endDate: finalEndDate, // Include calculated end date even for OCCURRENCES
+      occurrences: recurrenceOccurrences,
+      weeklyDays: recurrenceWeeklyDays.length > 0 ? recurrenceWeeklyDays : undefined,
+      monthlyDay: recurrenceMonthlyDay || undefined,
+    } : null;
+
+    // Serialize metadata objects
+    const donationMetadataJson = Object.keys(donationMetadataObj).length > 0
+      ? serializeEventMetadata(donationMetadataObj)
+      : null;
+
+    const recurrenceMetadataJson = recurrenceMetadataObj
+      ? JSON.stringify(removeNullUndefined(recurrenceMetadataObj))
+      : null;
+
+    // Also create old metadata format for backward compatibility
+    const metadataObj = createFundraiserMetadata({
+      isFundraiserEvent,
+      isCharityEvent,
+      // Always set to true if fundraiser/charity is enabled
+      useZeroFeeProvider: isFundraiserOrCharity ? true : useZeroFeeProvider,
+      // Always set to GIVEBUTTER if fundraiser/charity is enabled, otherwise use selected value
+      zeroFeeProvider: isFundraiserOrCharity ? 'GIVEBUTTER' : (useZeroFeeProvider ? zeroFeeProvider : undefined),
+      // Include campaign ID if using GIVEBUTTER (either auto-set for fundraiser/charity or manually selected)
+      givebutterCampaignId: (isFundraiserOrCharity || zeroFeeProvider === 'GIVEBUTTER') ? (givebutterCampaignId || undefined) : undefined,
+    });
+
+    const recurrenceMetadataObjOld = createRecurrenceMetadata({
+      isRecurring,
+      pattern: recurrencePattern || undefined,
+      interval: recurrenceInterval,
+      endType: recurrenceEndType,
+      endDate: finalEndDate, // Use calculated end date even for OCCURRENCES
+      occurrences: recurrenceOccurrences,
+      weeklyDays: recurrenceWeeklyDays.length > 0 ? recurrenceWeeklyDays : undefined,
+      monthlyDay: recurrenceMonthlyDay || undefined,
+    });
+
+    // Merge with existing metadata if any
+    const existingMetadata = form.metadata ? parseEventMetadata(form.metadata) : {};
+    const mergedMetadata = { ...existingMetadata, ...metadataObj, ...recurrenceMetadataObjOld };
+
     // Ensure dates are in YYYY-MM-DD format before submitting
     // Ensure all booleans are true/false
     const sanitizedForm = {
       ...form,
+      // NEW: Send as separate fields
+      donationMetadata: donationMetadataJson,
+      eventRecurrenceMetadata: recurrenceMetadataJson,
+      // OLD: Keep metadata for backward compatibility during migration
+      metadata: serializeEventMetadata(mergedMetadata),
+      // CRITICAL: Explicitly set recurrence DTO fields from form state
+      isRecurring: isRecurring,
+      recurrencePattern: isRecurring ? (recurrencePattern || undefined) : undefined,
+      recurrenceInterval: isRecurring ? recurrenceInterval : undefined,
+      recurrenceEndType: isRecurring ? recurrenceEndType : undefined,
+      recurrenceEndDate: isRecurring ? finalEndDate : undefined,
+      recurrenceOccurrences: isRecurring && recurrenceEndType === 'OCCURRENCES' ? recurrenceOccurrences : undefined,
+      recurrenceWeeklyDays: isRecurring && (recurrencePattern === 'WEEKLY' || recurrencePattern === 'BIWEEKLY') && recurrenceWeeklyDays.length > 0 ? recurrenceWeeklyDays : undefined,
+      recurrenceMonthlyDay: isRecurring && recurrencePattern === 'MONTHLY' ? (recurrenceMonthlyDay === 'LAST' ? null : recurrenceMonthlyDay) : undefined,
+      recurrenceSeriesId: isRecurring ? (form.id || undefined) : undefined,
+      parentEventId: undefined, // Parent events have no parent
       startDate: formatDateForStorage(formatDateForDisplay(form.startDate)),
       endDate: formatDateForStorage(formatDateForDisplay(form.endDate)),
       promotionStartDate: formatDateForStorage(formatDateForDisplay(form.promotionStartDate)),
@@ -956,6 +1244,218 @@ export function EventForm({ event, eventTypes, onSubmit, loading }: EventFormPro
         ))}
       </div>
 
+      {/* Fundraiser & Charity Configuration Section */}
+      <div className="border-t border-gray-200 pt-6 mt-6 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 rounded-lg p-6">
+        <h3 className="text-lg font-semibold mb-4 text-gray-800">Fundraiser & Charity Configuration</h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-6">
+          <div className="custom-grid-cell">
+            <label className="flex flex-col items-center" htmlFor="isFundraiserEvent">
+              <span className="relative flex items-center justify-center">
+                <input
+                  type="checkbox"
+                  id="isFundraiserEvent"
+                  checked={isFundraiserEvent}
+                  onChange={(e) => {
+                    const newValue = e.target.checked;
+                    setIsFundraiserEvent(newValue);
+                    // If fundraiser is checked, uncheck charity (radio button behavior)
+                    if (newValue) {
+                      setIsCharityEvent(false);
+                    }
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                  className="custom-checkbox"
+                />
+                <span className="custom-checkbox-tick">
+                  {isFundraiserEvent && (
+                    <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l5 5L19 7" />
+                    </svg>
+                  )}
+                </span>
+              </span>
+              <span className="mt-2 text-xs text-center select-none break-words max-w-[6rem]">Is Fundraiser Event</span>
+            </label>
+          </div>
+
+          <div className="custom-grid-cell">
+            <label className="flex flex-col items-center" htmlFor="isCharityEvent">
+              <span className="relative flex items-center justify-center">
+                <input
+                  type="checkbox"
+                  id="isCharityEvent"
+                  checked={isCharityEvent}
+                  onChange={(e) => {
+                    const newValue = e.target.checked;
+                    setIsCharityEvent(newValue);
+                    // If charity is checked, uncheck fundraiser (radio button behavior)
+                    if (newValue) {
+                      setIsFundraiserEvent(false);
+                    }
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                  className="custom-checkbox"
+                />
+                <span className="custom-checkbox-tick">
+                  {isCharityEvent && (
+                    <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l5 5L19 7" />
+                    </svg>
+                  )}
+                </span>
+              </span>
+              <span className="mt-2 text-xs text-center select-none break-words max-w-[6rem]">Is Charity Event</span>
+            </label>
+          </div>
+        </div>
+
+        {/* Zero-Fee Provider Configuration */}
+        <div className="mt-6 p-4 bg-white/70 rounded-lg border border-gray-200 backdrop-blur-sm">
+          <h4 className="text-md font-semibold mb-4 text-gray-800">Zero-Fee Payment Provider</h4>
+
+          <div className="flex justify-start mb-4">
+            <div className="custom-grid-cell" style={{ minWidth: '120px' }}>
+              <label className="flex flex-col items-center" htmlFor="useZeroFeeProvider">
+                <span className="relative flex items-center justify-center">
+                  <input
+                    type="checkbox"
+                    id="useZeroFeeProvider"
+                    checked={useZeroFeeProvider}
+                    disabled={isFundraiserEvent || isCharityEvent} // Disable if fundraiser/charity is enabled (auto-enabled)
+                    onChange={(e) => {
+                      // Only allow changes if fundraiser/charity is not enabled
+                      if (!isFundraiserEvent && !isCharityEvent) {
+                        setUseZeroFeeProvider(e.target.checked);
+                        if (!e.target.checked) {
+                          setZeroFeeProvider('');
+                          setGivebutterCampaignId('');
+                        }
+                      }
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                    className="custom-checkbox"
+                    title={isFundraiserEvent || isCharityEvent ? "Automatically enabled for fundraiser/charity events" : ""}
+                  />
+                  <span className="custom-checkbox-tick">
+                    {useZeroFeeProvider && (
+                      <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l5 5L19 7" />
+                      </svg>
+                    )}
+                  </span>
+                </span>
+                <span className="mt-2 text-xs text-center select-none break-words max-w-[6rem]">Use Zero-Fee Provider</span>
+              </label>
+            </div>
+          </div>
+
+          {useZeroFeeProvider && (
+            <div className="ml-6 space-y-4">
+              <div>
+                <label htmlFor="zeroFeeProvider" className="block text-sm font-medium text-gray-700 mb-1">
+                  Zero-Fee Provider *
+                  {(isFundraiserEvent || isCharityEvent) && (
+                    <span className="ml-2 text-xs text-gray-500">(Auto-set to GIVEBUTTER for fundraiser/charity events)</span>
+                  )}
+                </label>
+                <select
+                  id="zeroFeeProvider"
+                  value={zeroFeeProvider}
+                  disabled={isFundraiserEvent || isCharityEvent} // Disable if fundraiser/charity is enabled (auto-set to GIVEBUTTER)
+                  onChange={(e) => {
+                    // Only allow changes if fundraiser/charity is not enabled
+                    if (!isFundraiserEvent && !isCharityEvent) {
+                      setZeroFeeProvider(e.target.value);
+                      if (e.target.value !== 'GIVEBUTTER') {
+                        setGivebutterCampaignId('');
+                      }
+                    }
+                    // Clear error when user selects a provider
+                    if (errors.zeroFeeProvider) {
+                      setErrors(prev => {
+                        const newErrors = { ...prev };
+                        delete newErrors.zeroFeeProvider;
+                        return newErrors;
+                      });
+                    }
+                  }}
+                  className={`w-full border rounded p-2 focus:ring-blue-500 ${
+                    errors.zeroFeeProvider
+                      ? 'border-red-500 focus:border-red-500'
+                      : 'border-gray-300 focus:border-blue-500'
+                  } ${(isFundraiserEvent || isCharityEvent) ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                  required={useZeroFeeProvider}
+                  title={isFundraiserEvent || isCharityEvent ? "Automatically set to GIVEBUTTER for fundraiser/charity events" : ""}
+                >
+                  <option value="">Select provider</option>
+                  <option value="GIVEBUTTER">Givebutter</option>
+                  {/* Add other zero-fee providers here as needed */}
+                </select>
+                {errors.zeroFeeProvider && (
+                  <div className="text-red-500 text-sm mt-1">{errors.zeroFeeProvider}</div>
+                )}
+              </div>
+
+              {zeroFeeProvider === 'GIVEBUTTER' && (
+                <div>
+                  <label htmlFor="givebutterCampaignId" className="block text-sm font-medium text-gray-700 mb-1">
+                    Givebutter Campaign ID <span className="text-gray-500 text-xs">(Optional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="givebutterCampaignId"
+                    value={givebutterCampaignId}
+                    onChange={(e) => {
+                      setGivebutterCampaignId(e.target.value);
+                      // Clear error when user starts typing
+                      if (errors.givebutterCampaignId) {
+                        setErrors(prev => {
+                          const newErrors = { ...prev };
+                          delete newErrors.givebutterCampaignId;
+                          return newErrors;
+                        });
+                      }
+                    }}
+                    placeholder="Enter Givebutter campaign ID"
+                    className={`w-full border rounded p-2 focus:ring-blue-500 ${
+                      errors.givebutterCampaignId
+                        ? 'border-red-500 focus:border-red-500'
+                        : 'border-gray-300 focus:border-blue-500'
+                    }`}
+                    required={false} // Optional - backend falls back to provider config campaign ID
+                  />
+                  {errors.givebutterCampaignId && (
+                    <div className="text-red-500 text-sm mt-1">{errors.givebutterCampaignId}</div>
+                  )}
+                  <div className="text-xs text-gray-600 mt-2 p-3 bg-blue-50 border border-blue-200 rounded">
+                    <p className="font-semibold text-blue-900 mb-2">GiveButter Campaign ID (Optional):</p>
+                    <div className="space-y-2 text-blue-800">
+                      <p><strong>For DEV/PROD:</strong> This field is <strong>optional</strong>. If left empty, the backend will use the default campaign ID from your GiveButter provider configuration.</p>
+                      <p><strong>Recommended:</strong> Set a specific campaign ID per event for better tracking and reporting.</p>
+                      <div className="mt-3 p-2 bg-blue-100 rounded">
+                        <p className="font-semibold mb-1">How to get your GiveButter Campaign ID:</p>
+                        <ol className="list-decimal list-inside space-y-1">
+                          <li>Create a campaign in your <a href="https://givebutter.com" target="_blank" rel="noopener noreferrer" className="underline font-semibold">GiveButter dashboard</a></li>
+                          <li>Open the campaign you want to use for this event</li>
+                          <li>Go to <strong>Settings</strong> → <strong>Advanced</strong> → Find <strong>Campaign ID</strong></li>
+                          <li>Or check the campaign URL: <code className="bg-white px-1 rounded">https://givebutter.com/[campaign-slug]</code></li>
+                          <li>Copy the Campaign ID (format: <code className="bg-white px-1 rounded">campaign_123abc</code>)</li>
+                          <li>Paste it in the field above</li>
+                        </ol>
+                      </div>
+                      <p className="mt-2 text-blue-700 text-xs">
+                        <strong>Fallback Behavior:</strong> If this field is empty, the system will use the campaign ID configured in your GiveButter payment provider settings (stored in <code className="bg-blue-100 px-1 rounded">payment_provider_config.metadata.campaignId</code>).
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Priority Fields */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
@@ -1000,6 +1500,85 @@ export function EventForm({ event, eventTypes, onSubmit, loading }: EventFormPro
         />
         {errors.maxGuestsPerAttendee && <div className="text-red-500 text-sm mt-1">{errors.maxGuestsPerAttendee}</div>}
       </div>
+
+      {/* Recurring Event Configuration Section */}
+      <RecurrenceConfigSection
+        isRecurring={isRecurring}
+        onRecurringChange={setIsRecurring}
+        pattern={recurrencePattern}
+        onPatternChange={setRecurrencePattern}
+        interval={recurrenceInterval}
+        onIntervalChange={setRecurrenceInterval}
+        endType={recurrenceEndType}
+        onEndTypeChange={setRecurrenceEndType}
+        endDate={recurrenceEndDate}
+        onEndDateChange={setRecurrenceEndDate}
+        occurrences={recurrenceOccurrences}
+        onOccurrencesChange={setRecurrenceOccurrences}
+        weeklyDays={recurrenceWeeklyDays}
+        onWeeklyDaysChange={setRecurrenceWeeklyDays}
+        monthlyDay={recurrenceMonthlyDay}
+        onMonthlyDayChange={setRecurrenceMonthlyDay}
+        monthlyDayType={recurrenceMonthlyDayType}
+        onMonthlyDayTypeChange={setRecurrenceMonthlyDayType}
+        errors={errors}
+        startDate={formatDateForStorage(form.startDate)}
+        startTime={form.startTime}
+        timezone={form.timezone}
+      />
+
+      {/* Recurrence Preview */}
+      {isRecurring && recurrencePattern && (
+        <RecurrencePreview
+          startDate={formatDateForStorage(form.startDate)}
+          startTime={form.startTime}
+          timezone={form.timezone}
+          pattern={recurrencePattern}
+          interval={recurrenceInterval}
+          endType={recurrenceEndType}
+          endDate={recurrenceEndDate ? formatDateForStorage(recurrenceEndDate) : undefined}
+          occurrences={recurrenceEndType === 'OCCURRENCES' ? recurrenceOccurrences : undefined}
+          weeklyDays={recurrenceWeeklyDays.length > 0 ? recurrenceWeeklyDays : undefined}
+          monthlyDay={recurrenceMonthlyDay || undefined}
+        />
+      )}
+
+      {/* Email Header Image Upload Section */}
+      {form.id && (
+        <div className="border-t border-gray-200 pt-6 mt-6">
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
+              <FaEnvelope className="text-blue-500" />
+              Email Header Image
+            </h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Upload an image to be used as the header in ticket confirmation emails sent to attendees.
+              This image will appear at the top of the email template.
+            </p>
+          </div>
+          <EmailHeaderImageUpload
+            eventId={form.id}
+            currentImageUrl={form.emailHeaderImageUrl}
+            onImageUploaded={(imageUrl) => {
+              setForm(prev => ({ ...prev, emailHeaderImageUrl: imageUrl }));
+            }}
+            onError={(error) => {
+              console.error('Email header image upload error:', error);
+              setErrors(prev => ({ ...prev, emailHeaderImage: error }));
+            }}
+            disabled={loading}
+            className="w-full"
+          />
+          {errors.emailHeaderImage && (
+            <div className="text-red-500 text-sm mt-2">{errors.emailHeaderImage}</div>
+          )}
+          {form.emailHeaderImageUrl && (
+            <p className="text-xs text-gray-500 mt-2">
+              Current email header image URL: <span className="font-mono text-xs break-all">{form.emailHeaderImageUrl}</span>
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Error Summary Display - Above the save button */}
       {showErrors && getErrorCount() > 0 && (

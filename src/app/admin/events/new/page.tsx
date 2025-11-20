@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { FaUsers, FaPhotoVideo, FaCalendarAlt } from 'react-icons/fa';
 import { createCalendarEventServer } from '../../ApiServerActions';
 import { useAuth, useUser } from '@clerk/nextjs';
+import SaveStatusDialog, { type SaveStatus } from '@/components/SaveStatusDialog';
 
 export default function CreateEventPage() {
   const router = useRouter();
@@ -15,9 +16,10 @@ export default function CreateEventPage() {
   const [eventTypes, setEventTypes] = useState<EventTypeDetailsDTO[]>([]);
   const [initialEvent, setInitialEvent] = useState<EventDetailsDTO | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const { userId } = useAuth();
   const { user } = useUser();
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  const [saveMessage, setSaveMessage] = useState<string>('');
 
   useEffect(() => {
     fetch('/api/proxy/event-type-details')
@@ -62,14 +64,16 @@ export default function CreateEventPage() {
         })
         .catch(err => {
           console.error('Error fetching event to copy:', err);
-          setError('Failed to load event to copy');
+          // Error is handled silently - user can still create a new event
         });
     }
   }, [copyFromId]);
 
   async function handleSubmit(event: EventDetailsDTO) {
     setLoading(true);
-    setError(null);
+    setSaveStatus('saving');
+    setSaveMessage('Please wait while we create your event...');
+
     try {
       const now = new Date().toISOString();
       const eventToSend = {
@@ -82,7 +86,49 @@ export default function CreateEventPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(eventToSend),
       });
-      if (!res.ok) throw new Error('Failed to create event');
+
+      if (!res.ok) {
+        let errorMessage = 'Failed to create event';
+        try {
+          const errorText = await res.text();
+          // Try to parse as JSON (JHipster error format)
+          try {
+            const errorJson = JSON.parse(errorText);
+            // Extract meaningful error message
+            if (errorJson.detail) {
+              // Parse JHipster error detail
+              const detail = errorJson.detail;
+              if (detail.includes('Unable to bind parameter')) {
+                errorMessage = 'Invalid data format. Please check all fields and try again.';
+              } else if (detail.includes('null') && detail.includes('Unknown Types value')) {
+                errorMessage = 'Some required fields are missing or invalid. Please review your event configuration and try again.';
+              } else if (detail.includes('recurrence_weekly_days') && detail.includes('integer[]')) {
+                errorMessage = 'Recurrence configuration error. Please check your recurrence settings and try again.';
+              } else if (detail.includes('could not execute batch')) {
+                errorMessage = 'Database error occurred while saving. Please check all fields and try again.';
+              } else {
+                // Use detail but truncate if too long
+                errorMessage = detail.length > 150 ? detail.substring(0, 150) + '...' : detail;
+              }
+            } else if (errorJson.message) {
+              errorMessage = errorJson.message;
+            } else if (errorJson.title) {
+              errorMessage = errorJson.title;
+            }
+          } catch {
+            // Not JSON, use text as-is but make it more concise
+            if (errorText.length > 200) {
+              errorMessage = errorText.substring(0, 200) + '...';
+            } else {
+              errorMessage = errorText;
+            }
+          }
+        } catch {
+          errorMessage = 'Failed to create event. Please try again.';
+        }
+        throw new Error(errorMessage);
+      }
+
       const newEvent = await res.json();
       let userProfile: UserProfileDTO | null = null;
       if (userId) {
@@ -91,16 +137,29 @@ export default function CreateEventPage() {
           userProfile = await profileRes.json();
         }
       }
+
+      // Try to create calendar event (non-blocking)
       try {
         if (userProfile) {
           await createCalendarEventServer(newEvent, userProfile);
         }
       } catch (calendarErr: any) {
-        setError('Event created, but failed to create calendar entry: ' + (calendarErr?.message || 'Unknown error'));
+        // Calendar error is non-critical, just log it
+        console.warn('Calendar event creation failed:', calendarErr);
       }
-      router.push('/admin');
+
+      // Show success message
+      setSaveStatus('success');
+      setSaveMessage('Your event has been created successfully. Redirecting to admin home...');
+
+      // Redirect after a brief delay
+      setTimeout(() => {
+        router.push('/admin');
+      }, 1500);
     } catch (e: any) {
-      setError(e.message || 'Failed to create event');
+      setSaveStatus('error');
+      const userMessage = e.message || 'Failed to create event. Please try again.';
+      setSaveMessage(userMessage);
     } finally {
       setLoading(false);
     }
@@ -135,7 +194,6 @@ export default function CreateEventPage() {
           </p>
         </div>
       )}
-      {error && <div className="bg-red-50 text-red-500 p-3 rounded mb-4">{error}</div>}
       <div className="border rounded p-4 bg-white shadow-sm min-h-[200px]">
         <EventForm
           event={initialEvent || defaultEvent}
@@ -144,6 +202,19 @@ export default function CreateEventPage() {
           loading={loading}
         />
       </div>
+
+      {/* Save Status Dialog */}
+      <SaveStatusDialog
+        isOpen={saveStatus !== 'idle'}
+        status={saveStatus}
+        message={saveMessage}
+        onClose={() => {
+          if (saveStatus === 'error') {
+            setSaveStatus('idle');
+            setSaveMessage('');
+          }
+        }}
+      />
     </div>
   );
 }

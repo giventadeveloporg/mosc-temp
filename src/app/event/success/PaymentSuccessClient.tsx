@@ -36,6 +36,7 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
   const ticketPollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const ticketPollingAttemptsRef = useRef(0);
   const qrCodeFetchAttemptedRef = useRef<Set<string>>(new Set());
+  const emailSentRef = useRef<boolean>(false); // Track if email has been sent to ensure it's only called once
   const MAX_POLLING_ATTEMPTS = 30; // 30 attempts * 2 seconds = 60 seconds max
   const POLLING_INTERVAL = 2000; // 2 seconds
   const MAX_TICKET_POLLING_ATTEMPTS = 15; // 15 attempts * 2 seconds = 30 seconds max
@@ -279,6 +280,10 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
           const ticket = await ticketRes.json();
           setTicketTransaction(ticket);
           ticketTransactionId = ticket.id;
+
+          // NOTE: Email is sent automatically by backend when payment succeeds
+          // No need to send email from frontend - backend handles this in webhook handler
+          console.log('[PaymentSuccessClient] Ticket transaction found by ID - backend should have already sent email');
         }
       }
 
@@ -311,6 +316,10 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
             });
             setTicketTransaction(ticket);
             ticketTransactionId = ticket.id;
+
+            // NOTE: Email is sent automatically by backend when payment succeeds
+            // No need to send email from frontend - backend handles this in webhook handler
+            console.log('[PaymentSuccessClient] Ticket transaction found by stripePaymentIntentId - backend should have already sent email');
           } else {
             console.log('[PaymentSuccessClient] No ticket transactions found by stripePaymentIntentId (empty array)');
           }
@@ -341,6 +350,10 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
             });
             setTicketTransaction(ticket);
             ticketTransactionId = ticket.id;
+
+            // NOTE: Email is sent automatically by backend when payment succeeds
+            // No need to send email from frontend - backend handles this in webhook handler
+            console.log('[PaymentSuccessClient] Ticket transaction found by checkout session ID - backend should have already sent email');
           }
         }
       }
@@ -593,6 +606,11 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
                 email: ticket.email
               });
               setTicketTransaction(ticket);
+
+              // NOTE: Email is sent automatically by backend when payment succeeds
+              // No need to send email from frontend - backend handles this in webhook handler
+              console.log('[PaymentSuccessClient] Ticket transaction found via polling - backend should have already sent email');
+
               // Stop polling
               if (ticketPollingIntervalRef.current) {
                 clearInterval(ticketPollingIntervalRef.current);
@@ -710,24 +728,7 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
             setQrCodeData({ qrCodeImageUrl: qrUrlText.trim() });
             setQrCodeLoading(false);
             console.log('[PaymentSuccessClient] QR code state updated, component should re-render NOW');
-
-            // Send email after QR code is successfully fetched
-            const emailToUse = ticketTransaction?.email || paymentTransaction?.metadata?.customerEmail;
-            if (emailToUse) {
-              console.log('[PaymentSuccessClient] QR code loaded successfully, sending ticket email:', {
-                eventId: eventId,
-                transactionId: ticketId,
-                email: emailToUse
-              });
-
-              if (eventId && ticketId) {
-                sendTicketEmailAsync({
-                  eventId: eventId,
-                  transactionId: ticketId,
-                  email: emailToUse
-                });
-              }
-            }
+            // NOTE: Email will be sent asynchronously in a separate useEffect after QR code is displayed
           } else {
             console.warn('[PaymentSuccessClient] QR code URL is empty');
             setQrCodeError('QR code URL is empty');
@@ -754,6 +755,46 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
 
     fetchQrCode();
   }, [ticketTransaction?.id, eventDetails?.id, qrCodeData, qrCodeLoading, paymentTransaction?.metadata?.customerEmail]);
+
+  // Send email once after QR code is successfully displayed
+  useEffect(() => {
+    // Only send email if:
+    // 1. QR code is successfully displayed (qrCodeData exists and has qrCodeImageUrl)
+    // 2. We have ticket transaction and event details
+    // 3. Email hasn't been sent yet (checked via ref to ensure it's only called once)
+    if (
+      qrCodeData &&
+      qrCodeData.qrCodeImageUrl &&
+      ticketTransaction?.id &&
+      eventDetails?.id &&
+      !emailSentRef.current
+    ) {
+      const emailToUse = ticketTransaction.email || paymentTransaction?.metadata?.customerEmail;
+
+      if (emailToUse) {
+        // Mark as sent immediately to prevent duplicate calls
+        emailSentRef.current = true;
+
+        console.log('[PaymentSuccessClient] QR code displayed successfully, sending email once:', {
+          eventId: eventDetails.id,
+          transactionId: ticketTransaction.id,
+          email: emailToUse
+        });
+
+        // Send email asynchronously (non-blocking)
+        sendTicketEmailAsync({
+          eventId: eventDetails.id,
+          transactionId: ticketTransaction.id,
+          email: emailToUse
+        });
+      } else {
+        console.warn('[PaymentSuccessClient] Cannot send email - no email address available', {
+          ticketEmail: ticketTransaction.email,
+          paymentEmail: paymentTransaction?.metadata?.customerEmail
+        });
+      }
+    }
+  }, [qrCodeData, ticketTransaction?.id, eventDetails?.id, paymentTransaction?.metadata?.customerEmail]);
 
   const defaultHeroImageUrl = '/images/default-event-hero.jpg';
 
@@ -976,8 +1017,8 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 ring-4 ring-white -mt-16 mb-4">
               <FaCheckCircle className="h-10 w-10 text-green-500" />
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-800">Payment Successful!</h1>
-            <p className="mt-2 text-gray-600">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800" style={{ fontFamily: 'Sora, sans-serif' }}>Payment Successful!</h1>
+            <p className="mt-2 text-lg text-gray-600">
               Thank you for your purchase. {eventDetails && (
                 <>Your tickets for <strong>{eventDetails.title}</strong> are confirmed.</>
               )}
@@ -991,23 +1032,33 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
         {/* Event Details Card */}
         {eventDetails && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4" style={{ fontFamily: 'Sora, sans-serif' }}>
               {eventDetails.title}
             </h2>
             {eventDetails.caption && (
               <div className="text-lg text-teal-700 font-semibold mb-4">{eventDetails.caption}</div>
             )}
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-gray-600 mb-4">
+            <div className="flex flex-wrap justify-center gap-3 mb-6">
               {eventDetails.startDate && (
-                <div className="flex items-center gap-2">
-                  <FaCalendarAlt />
-                  <span>{formatInTimeZone(eventDetails.startDate, eventDetails.timezone || 'America/New_York', 'EEEE, MMMM d, yyyy')}</span>
+                <div className="flex items-center gap-3 text-gray-700 w-full sm:w-auto sm:min-w-[280px]">
+                  <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <span className="text-lg font-semibold">
+                    {formatInTimeZone(eventDetails.startDate, eventDetails.timezone || 'America/New_York', 'EEEE, MMMM d, yyyy')}
+                  </span>
                 </div>
               )}
               {eventDetails.startTime && (
-                <div className="flex items-center gap-2">
-                  <FaClock />
-                  <span>
+                <div className="flex items-center gap-3 text-gray-700 w-full sm:w-auto sm:min-w-[280px]">
+                  <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <span className="text-lg font-semibold">
                     {formatTime(eventDetails.startTime)}{eventDetails.endTime ? ` - ${formatTime(eventDetails.endTime)}` : ''}
                     {' '}
                     ({formatInTimeZone(eventDetails.startDate || new Date().toISOString(), eventDetails.timezone || 'America/New_York', 'zzz')})
@@ -1015,8 +1066,16 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
                 </div>
               )}
               {eventDetails.location && (
-                <div className="flex items-center gap-2">
-                  <LocationDisplay location={eventDetails.location} />
+                <div className="flex items-center gap-3 text-gray-700 w-full sm:w-auto sm:min-w-[280px]">
+                  <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-red-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <span className="text-lg font-semibold">
+                    <LocationDisplay location={eventDetails.location} />
+                  </span>
                 </div>
               )}
             </div>
@@ -1027,15 +1086,21 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
         {/* QR Code Section */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-8 text-center">
           {qrCodeLoading && (
-            <div className="text-lg text-teal-700 font-semibold flex items-center justify-center gap-2">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-teal-600"></div>
-              Please wait while your tickets are created…
+            <div className="text-lg text-teal-700 font-semibold flex items-center justify-center gap-3">
+              <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-teal-100 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
+              </div>
+              <span>Please wait while your tickets are created…</span>
             </div>
           )}
           {!qrCodeData && !qrCodeLoading && !qrCodeError && (
-            <div className="text-lg text-teal-700 font-semibold flex items-center justify-center gap-2">
-              <FaTicketAlt className="animate-bounce" />
-              Please wait while your tickets are created…
+            <div className="text-lg text-teal-700 font-semibold flex items-center justify-center gap-3">
+              <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-teal-100 flex items-center justify-center">
+                <svg className="w-8 h-8 text-teal-500 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4v-3a2 2 0 00-2-2H5z" />
+                </svg>
+              </div>
+              <span>Please wait while your tickets are created…</span>
             </div>
           )}
           {qrCodeError && (
@@ -1046,7 +1111,7 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
           {qrCodeData && (
             <>
               <div className="flex flex-col items-center justify-center gap-4">
-                <div className="text-lg font-semibold text-gray-800">Your Ticket QR Code</div>
+                <div className="text-xl font-bold text-gray-800 mb-2" style={{ fontFamily: 'Sora, sans-serif' }}>Your Ticket QR Code</div>
                 {qrCodeData.qrCodeImageUrl ? (
                   <img
                     src={qrCodeData.qrCodeImageUrl}
@@ -1059,14 +1124,20 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
 
                 {/* Email Status Section */}
                 {email && (
-                  <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <div className="flex items-center gap-2 text-blue-700">
-                      <FaEnvelope className="text-sm" />
-                      <span className="text-sm font-medium">Ticket email sent to {email}</span>
+                  <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                    <div className="flex items-center gap-3">
+                      <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
+                        <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-base font-semibold text-blue-700">Ticket email sent to {email}</span>
+                        <p className="text-sm text-blue-600 mt-1">
+                          Check your email for your tickets. If you don't see it, check your spam folder.
+                        </p>
+                      </div>
                     </div>
-                    <p className="text-xs text-blue-600 mt-1">
-                      Check your email for your tickets. If you don't see it, check your spam folder.
-                    </p>
                   </div>
                 )}
               </div>
@@ -1076,55 +1147,89 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
 
         {/* Transaction Summary */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-3 mb-6">
-            <FaReceipt className="text-teal-500" />
-            Transaction Summary
-          </h2>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-teal-100 flex items-center justify-center">
+              <svg className="w-10 h-10 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-800">Transaction Summary</h2>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
             {getTicketNumber(transaction) && (
-              <div className="flex flex-col">
-                <label className="text-sm font-medium text-gray-500 flex items-center gap-2 mb-1">
-                  <FaTicketAlt /> Ticket #
-                </label>
-                <p className="text-lg text-gray-800 font-medium">{getTicketNumber(transaction)}</p>
+              <div className="flex items-center gap-3">
+                <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-teal-100 flex items-center justify-center">
+                  <svg className="w-10 h-10 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4v-3a2 2 0 00-2-2H5z" />
+                  </svg>
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-sm font-medium text-gray-500 mb-1">Ticket #</label>
+                  <p className="text-lg text-gray-800 font-semibold">{getTicketNumber(transaction)}</p>
+                </div>
               </div>
             )}
             {customerName && (
-              <div className="flex flex-col">
-                <label className="text-sm font-medium text-gray-500 flex items-center gap-2 mb-1">
-                  <FaUser /> Name
-                </label>
-                <p className="text-lg text-gray-800 font-medium">{customerName}</p>
+              <div className="flex items-center gap-3">
+                <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center">
+                  <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-sm font-medium text-gray-500 mb-1">Name</label>
+                  <p className="text-lg text-gray-800 font-semibold">{customerName}</p>
+                </div>
               </div>
             )}
             {email && (
-              <div className="flex flex-col">
-                <label className="text-sm font-medium text-gray-500 flex items-center gap-2 mb-1">
-                  <FaEnvelope /> Email
-                </label>
-                <p className="text-lg text-gray-800 font-medium">{email}</p>
+              <div className="flex items-center gap-3">
+                <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-indigo-100 flex items-center justify-center">
+                  <svg className="w-10 h-10 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-sm font-medium text-gray-500 mb-1">Email</label>
+                  <p className="text-lg text-gray-800 font-semibold">{email}</p>
+                </div>
               </div>
             )}
             {purchaseDate && (
-              <div className="flex flex-col">
-                <label className="text-sm font-medium text-gray-500 flex items-center gap-2 mb-1">
-                  <FaCalendarAlt /> Date of Purchase
-                </label>
-                <p className="text-lg text-gray-800 font-medium">{new Date(purchaseDate).toLocaleString()}</p>
+              <div className="flex items-center gap-3">
+                <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-amber-100 flex items-center justify-center">
+                  <svg className="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-sm font-medium text-gray-500 mb-1">Date of Purchase</label>
+                  <p className="text-lg text-gray-800 font-semibold">{new Date(purchaseDate).toLocaleString()}</p>
+                </div>
               </div>
             )}
-            <div className="flex flex-col">
-              <label className="text-sm font-medium text-gray-500 flex items-center gap-2 mb-1">
-                <FaMoneyBillWave /> Amount Paid
-              </label>
-              <p className="text-lg text-gray-800 font-medium">${finalAmount.toFixed(2)}</p>
+            <div className="flex items-center gap-3">
+              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center">
+                <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="flex flex-col">
+                <label className="text-sm font-medium text-gray-500 mb-1">Amount Paid</label>
+                <p className="text-lg text-gray-800 font-semibold">${finalAmount.toFixed(2)}</p>
+              </div>
             </div>
             {discountAmount > 0 && (
-              <div className="flex flex-col">
-                <label className="text-sm font-medium text-gray-500 flex items-center gap-2 mb-1">
-                  <FaTags /> Discount Applied
-                </label>
-                <p className="text-lg text-green-600 font-medium">-${discountAmount.toFixed(2)}</p>
+              <div className="flex items-center gap-3">
+                <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-pink-100 flex items-center justify-center">
+                  <svg className="w-10 h-10 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                  </svg>
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-sm font-medium text-gray-500 mb-1">Discount Applied</label>
+                  <p className="text-lg text-green-600 font-semibold">-${discountAmount.toFixed(2)}</p>
+                </div>
               </div>
             )}
             {discountAmount > 0 && (

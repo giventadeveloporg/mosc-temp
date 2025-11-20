@@ -191,6 +191,8 @@ export default function UniversalPaymentCheckout(props: Props) {
             normalizedProviderType = ProviderType.ZELLE;
           } else if (providerStr === 'CEFI') {
             normalizedProviderType = ProviderType.CEFI;
+          } else if (providerStr === 'GIVEBUTTER') {
+            normalizedProviderType = ProviderType.GIVEBUTTER;
           } else {
             // Fallback: try contains match
             if (providerStr.includes('STRIPE')) {
@@ -205,6 +207,8 @@ export default function UniversalPaymentCheckout(props: Props) {
               normalizedProviderType = ProviderType.ZELLE;
             } else if (providerStr.includes('CEFI')) {
               normalizedProviderType = ProviderType.CEFI;
+            } else if (providerStr.includes('GIVEBUTTER')) {
+              normalizedProviderType = ProviderType.GIVEBUTTER;
             } else {
               console.warn('[UniversalPaymentCheckout] Unknown provider value:', providerValue, providerStr);
             }
@@ -492,6 +496,30 @@ export default function UniversalPaymentCheckout(props: Props) {
         <div id="zeffy-embed-container" className="w-full"></div>
         <p className="text-xs text-muted-foreground text-center">
           Zeffy donation widget will be available here
+        </p>
+      </div>
+    );
+  }
+
+  // Render Givebutter redirect button (for fundraiser events)
+  if (providerType === ProviderType.GIVEBUTTER && paymentSession.sessionUrl) {
+    return (
+      <div className="space-y-4">
+        <button
+          onClick={() => {
+            if (paymentSession.sessionUrl) {
+              window.location.href = paymentSession.sessionUrl;
+            }
+          }}
+          className="w-full bg-primary text-primary-foreground px-6 py-3 rounded-md hover:bg-primary/90 font-semibold"
+        >
+          Pay with Givebutter
+        </button>
+        <p className="text-xs text-muted-foreground text-center">
+          You will be redirected to Givebutter to complete your payment
+        </p>
+        <p className="text-xs text-green-600 text-center font-medium">
+          ✨ Zero-fee payment processing
         </p>
       </div>
     );
