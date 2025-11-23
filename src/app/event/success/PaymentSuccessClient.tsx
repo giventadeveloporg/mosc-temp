@@ -30,16 +30,19 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
   const [qrCodeData, setQrCodeData] = useState<{ qrCodeImageUrl: string } | null>(null);
   const [qrCodeLoading, setQrCodeLoading] = useState(false);
   const [qrCodeError, setQrCodeError] = useState<string | null>(null);
+  const [qrCodeRetryTrigger, setQrCodeRetryTrigger] = useState(0); // Trigger retries by incrementing
   const [transactionItems, setTransactionItems] = useState<any[]>([]);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const pollingAttemptsRef = useRef(0);
   const ticketPollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const ticketPollingAttemptsRef = useRef(0);
   const qrCodeFetchAttemptedRef = useRef<Set<string>>(new Set());
+  const qrCodeRetryCountRef = useRef<Map<string, number>>(new Map()); // Track retry counts per fetch key
   const emailSentRef = useRef<boolean>(false); // Track if email has been sent to ensure it's only called once
   const MAX_POLLING_ATTEMPTS = 30; // 30 attempts * 2 seconds = 60 seconds max
   const POLLING_INTERVAL = 2000; // 2 seconds
   const MAX_TICKET_POLLING_ATTEMPTS = 15; // 15 attempts * 2 seconds = 30 seconds max
+  const MAX_QR_CODE_RETRY_ATTEMPTS = 3; // Maximum retries for QR code fetch (prevents infinite loops)
 
   // Use sessionStorage to prevent infinite refresh loops (persists across page reloads)
   const getRefreshKey = () => `payment-refresh-${transactionId}`;
@@ -683,13 +686,32 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
 
     // Check if we've already attempted to fetch for this combination
     const fetchKey = `${eventId}-${ticketId}`;
-    if (qrCodeFetchAttemptedRef.current.has(fetchKey)) {
-      console.log('[PaymentSuccessClient] QR code fetch already attempted for:', fetchKey);
+    const retryCount = qrCodeRetryCountRef.current.get(fetchKey) || 0;
+
+    // If we've exceeded max retries, stop trying and show error
+    if (retryCount >= MAX_QR_CODE_RETRY_ATTEMPTS) {
+      console.error('[PaymentSuccessClient] QR code fetch exceeded max retries:', {
+        fetchKey,
+        retryCount,
+        maxRetries: MAX_QR_CODE_RETRY_ATTEMPTS
+      });
+      setQrCodeError('Unable to load QR code. Please contact support if this issue persists.');
+      setQrCodeLoading(false);
       return;
     }
 
-    // Mark as attempted
+    // If we've attempted before but haven't exceeded max retries, allow retry
+    if (qrCodeFetchAttemptedRef.current.has(fetchKey) && retryCount > 0) {
+      console.log('[PaymentSuccessClient] QR code fetch retry attempt:', {
+        fetchKey,
+        retryCount: retryCount + 1,
+        maxRetries: MAX_QR_CODE_RETRY_ATTEMPTS
+      });
+    }
+
+    // Mark as attempted and increment retry count
     qrCodeFetchAttemptedRef.current.add(fetchKey);
+    qrCodeRetryCountRef.current.set(fetchKey, retryCount + 1);
 
     async function fetchQrCode() {
       console.log('[PaymentSuccessClient] Fetching QR code...', {
@@ -727,34 +749,93 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
             // Use functional update to ensure state is set correctly
             setQrCodeData({ qrCodeImageUrl: qrUrlText.trim() });
             setQrCodeLoading(false);
+            // Reset retry count on success
+            qrCodeRetryCountRef.current.delete(fetchKey);
             console.log('[PaymentSuccessClient] QR code state updated, component should re-render NOW');
             // NOTE: Email will be sent asynchronously in a separate useEffect after QR code is displayed
           } else {
-            console.warn('[PaymentSuccessClient] QR code URL is empty');
-            setQrCodeError('QR code URL is empty');
-            setQrCodeLoading(false);
-            // Remove from attempted set so we can retry
-            qrCodeFetchAttemptedRef.current.delete(fetchKey);
+            const currentRetryCount = qrCodeRetryCountRef.current.get(fetchKey) || 0;
+            console.warn('[PaymentSuccessClient] QR code URL is empty (backend returned empty response):', {
+              fetchKey,
+              retryCount: currentRetryCount,
+              maxRetries: MAX_QR_CODE_RETRY_ATTEMPTS,
+              responseStatus: qrRes.status,
+              responseHeaders: Object.fromEntries(qrRes.headers.entries())
+            });
+
+            // If we've exceeded max retries, set permanent error
+            if (currentRetryCount >= MAX_QR_CODE_RETRY_ATTEMPTS) {
+              setQrCodeError('Unable to load QR code. The backend returned an empty response. Please contact support.');
+              setQrCodeLoading(false);
+              // Don't remove from attempted set - we've given up
+            } else {
+              // Allow retry by removing from attempted set and triggering retry
+              setQrCodeError(`QR code temporarily unavailable (attempt ${currentRetryCount}/${MAX_QR_CODE_RETRY_ATTEMPTS}). Retrying...`);
+              setQrCodeLoading(false);
+              qrCodeFetchAttemptedRef.current.delete(fetchKey);
+              // Retry after a short delay (2 seconds)
+              setTimeout(() => {
+                setQrCodeRetryTrigger(prev => prev + 1); // Trigger useEffect to retry
+              }, 2000);
+            }
           }
         } else {
           const errorText = await qrRes.text();
-          console.error('[PaymentSuccessClient] Failed to fetch QR code:', qrRes.status, errorText);
-          setQrCodeError(`Failed to fetch QR code: ${qrRes.status}`);
-          setQrCodeLoading(false);
-          // Remove from attempted set so we can retry
-          qrCodeFetchAttemptedRef.current.delete(fetchKey);
+          const currentRetryCount = qrCodeRetryCountRef.current.get(fetchKey) || 0;
+          console.error('[PaymentSuccessClient] Failed to fetch QR code:', {
+            status: qrRes.status,
+            statusText: qrRes.statusText,
+            errorText,
+            fetchKey,
+            retryCount: currentRetryCount,
+            maxRetries: MAX_QR_CODE_RETRY_ATTEMPTS
+          });
+
+          // If we've exceeded max retries, set permanent error
+          if (currentRetryCount >= MAX_QR_CODE_RETRY_ATTEMPTS) {
+            setQrCodeError(`Unable to load QR code (HTTP ${qrRes.status}). Please contact support.`);
+            setQrCodeLoading(false);
+            // Don't remove from attempted set - we've given up
+          } else {
+            setQrCodeError(`Failed to fetch QR code (attempt ${currentRetryCount}/${MAX_QR_CODE_RETRY_ATTEMPTS}). Retrying...`);
+            setQrCodeLoading(false);
+            // Allow retry by removing from attempted set and triggering retry
+            qrCodeFetchAttemptedRef.current.delete(fetchKey);
+            // Retry after a short delay (2 seconds)
+            setTimeout(() => {
+              setQrCodeRetryTrigger(prev => prev + 1); // Trigger useEffect to retry
+            }, 2000);
+          }
         }
       } catch (err) {
-        console.error('[PaymentSuccessClient] Exception fetching QR code:', err);
-        setQrCodeError(`Error fetching QR code: ${err instanceof Error ? err.message : 'Unknown error'}`);
-        setQrCodeLoading(false);
-        // Remove from attempted set so we can retry
-        qrCodeFetchAttemptedRef.current.delete(fetchKey);
+        const currentRetryCount = qrCodeRetryCountRef.current.get(fetchKey) || 0;
+        console.error('[PaymentSuccessClient] Exception fetching QR code:', {
+          error: err,
+          fetchKey,
+          retryCount: currentRetryCount,
+          maxRetries: MAX_QR_CODE_RETRY_ATTEMPTS
+        });
+
+        // If we've exceeded max retries, set permanent error
+        if (currentRetryCount >= MAX_QR_CODE_RETRY_ATTEMPTS) {
+          setQrCodeError(`Unable to load QR code: ${err instanceof Error ? err.message : 'Unknown error'}. Please contact support.`);
+          setQrCodeLoading(false);
+          // Don't remove from attempted set - we've given up
+        } else {
+          setQrCodeError(`Error fetching QR code (attempt ${currentRetryCount}/${MAX_QR_CODE_RETRY_ATTEMPTS}). Retrying...`);
+          setQrCodeLoading(false);
+          // Allow retry by removing from attempted set and triggering retry
+          qrCodeFetchAttemptedRef.current.delete(fetchKey);
+          // Retry after a short delay (2 seconds)
+          setTimeout(() => {
+            setQrCodeRetryTrigger(prev => prev + 1); // Trigger useEffect to retry
+          }, 2000);
+        }
       }
     }
 
     fetchQrCode();
-  }, [ticketTransaction?.id, eventDetails?.id, qrCodeData, qrCodeLoading, paymentTransaction?.metadata?.customerEmail]);
+  }, [ticketTransaction?.id, eventDetails?.id, qrCodeData, qrCodeLoading, paymentTransaction?.metadata?.customerEmail, qrCodeRetryTrigger]);
 
   // Send email once after QR code is successfully displayed
   useEffect(() => {

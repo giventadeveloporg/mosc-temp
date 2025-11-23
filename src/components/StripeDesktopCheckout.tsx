@@ -40,6 +40,8 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
   const [confirming, setConfirming] = useState(false);
   const [expressCheckoutReady, setExpressCheckoutReady] = useState(false);
   const [paymentMethodSelected, setPaymentMethodSelected] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [showValidationErrors, setShowValidationErrors] = useState(false);
 
   // Add timeout to prevent stuck loading state
   useEffect(() => {
@@ -78,7 +80,8 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
         // Handle empty error object case (common when no payment method selected)
         if (!submitError.type && !submitError.message) {
           console.warn("[DESKTOP ECE] Payment validation failed: No payment method selected");
-          alert("Please select a payment method before proceeding. You can choose from the Link, Cash App, or credit card options above.");
+          setValidationErrors(['Please select a payment method before proceeding']);
+          setShowValidationErrors(true);
           setConfirming(false);
           return;
         }
@@ -91,25 +94,53 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
           fullError: submitError
         });
 
-        // Provide more specific error messages based on error type
-        let errorMessage = "Please check your payment details and try again.";
+        // Parse validation errors to provide specific field feedback
+        const errors: string[] = [];
 
         if (submitError.type === 'validation_error') {
-          if (submitError.message?.includes('payment_method') || submitError.message?.includes('method')) {
-            errorMessage = "Please select a payment method before proceeding.";
-          } else if (submitError.message?.includes('card')) {
-            errorMessage = "Please check your card details and try again.";
-          } else {
-            errorMessage = submitError.message || "Please complete all required fields.";
+          const message = submitError.message || '';
+
+          // Check for common missing fields based on error message
+          if (message.toLowerCase().includes('card number') || message.toLowerCase().includes('card_number')) {
+            errors.push('Card number is required');
+          }
+          if (message.toLowerCase().includes('expir') || message.toLowerCase().includes('expiry')) {
+            errors.push('Expiration date is required');
+          }
+          if (message.toLowerCase().includes('cvc') || message.toLowerCase().includes('security') || message.toLowerCase().includes('cvv')) {
+            errors.push('Security code (CVC) is required');
+          }
+          if (message.toLowerCase().includes('postal') || message.toLowerCase().includes('zip') || message.toLowerCase().includes('postal_code')) {
+            errors.push('ZIP code is required');
+          }
+          if (message.toLowerCase().includes('payment_method') || message.toLowerCase().includes('method')) {
+            errors.push('Please select a payment method before proceeding');
+          }
+
+          // If no specific errors found, use generic message
+          if (errors.length === 0) {
+            errors.push(message || 'Please complete all required payment fields');
           }
         } else if (submitError.type === 'card_error') {
-          errorMessage = submitError.message || "Card validation failed. Please check your details.";
+          errors.push(submitError.message || 'Card validation failed. Please check your details.');
         } else if (submitError.type === 'api_error') {
-          errorMessage = "Payment service error. Please try again.";
+          errors.push('Payment service error. Please try again.');
+        } else {
+          errors.push(submitError.message || 'Please check your payment details and try again.');
         }
 
-        // Show user-friendly error message
-        alert(errorMessage);
+        // Show validation errors in UI instead of alert
+        setValidationErrors(errors);
+        setShowValidationErrors(true);
+
+        // Scroll to validation errors
+        setTimeout(() => {
+          const errorElement = document.querySelector('.validation-errors-container');
+          if (errorElement) {
+            errorElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        }, 100);
+
         setConfirming(false);
         return;
       }
@@ -487,6 +518,25 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
           )}
         </div>
 
+        {/* Validation Errors Container */}
+        <div className="validation-errors-container">
+          {showValidationErrors && validationErrors.length > 0 && (
+            <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-md">
+              <div className="flex items-start">
+                <span className="text-red-600 mr-2">⚠️</span>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-red-800 mb-1">Please complete the following fields:</p>
+                  <ul className="list-disc list-inside text-sm text-red-700 space-y-1">
+                    {validationErrors.map((error, index) => (
+                      <li key={index}>{error}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* PaymentElement with improved styling for better visibility */}
         <div className="payment-element-container" style={{
           minHeight: '200px',
@@ -530,7 +580,7 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
               console.log('[DESKTOP ECE] PaymentElement ready');
               console.log('[DESKTOP ECE] PaymentElement should show: Credit Card, Link, Cash App Pay');
             }}
-            onChange={(event) => {
+            onChange={async (event) => {
               console.log('[DESKTOP ECE] PaymentElement changed:', event);
               console.log('[DESKTOP ECE] PaymentElement complete status:', event.complete);
               console.log('[DESKTOP ECE] PaymentElement value:', event.value);
@@ -538,9 +588,16 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
               // Track if a payment method is selected
               if (event.complete) {
                 setPaymentMethodSelected(true);
+                setValidationErrors([]);
+                setShowValidationErrors(false);
                 console.log('[DESKTOP ECE] ✅ Payment method selected and complete');
               } else {
                 setPaymentMethodSelected(false);
+                // Clear validation errors when user starts typing (form is being edited)
+                if (showValidationErrors) {
+                  setShowValidationErrors(false);
+                  setValidationErrors([]);
+                }
                 console.log('[DESKTOP ECE] ⚠️ Payment method not complete or not selected');
               }
             }}
@@ -556,8 +613,67 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
         </div>
         <button
           type="button"
-          onClick={paymentMethodSelected ? handleConfirm : () => {
-            alert("Please select a payment method first. You can choose from the Link, Cash App, or credit card options below.");
+          onClick={paymentMethodSelected ? handleConfirm : async () => {
+            // When button is clicked but disabled, check validation and show specific errors
+            if (!elements) {
+              alert("Payment system not ready. Please refresh the page and try again.");
+              return;
+            }
+
+            try {
+              // Try to submit to get specific validation errors
+              const { error: submitError } = await elements.submit();
+
+              if (submitError) {
+                const errors: string[] = [];
+
+                // Parse validation errors to provide specific field feedback
+                if (submitError.type === 'validation_error') {
+                  const message = submitError.message || '';
+
+                  // Check for common missing fields based on error message
+                  if (message.toLowerCase().includes('card number') || message.toLowerCase().includes('card_number')) {
+                    errors.push('Card number is required');
+                  }
+                  if (message.toLowerCase().includes('expir') || message.toLowerCase().includes('expiry')) {
+                    errors.push('Expiration date is required');
+                  }
+                  if (message.toLowerCase().includes('cvc') || message.toLowerCase().includes('security') || message.toLowerCase().includes('cvv')) {
+                    errors.push('Security code (CVC) is required');
+                  }
+                  if (message.toLowerCase().includes('postal') || message.toLowerCase().includes('zip') || message.toLowerCase().includes('postal_code')) {
+                    errors.push('ZIP code is required');
+                  }
+                  if (message.toLowerCase().includes('payment_method') || message.toLowerCase().includes('method')) {
+                    errors.push('Please select a payment method first');
+                  }
+
+                  // If no specific errors found, use generic message
+                  if (errors.length === 0) {
+                    errors.push('Please complete all required payment fields');
+                  }
+                } else {
+                  errors.push(submitError.message || 'Please check your payment details');
+                }
+
+                setValidationErrors(errors);
+                setShowValidationErrors(true);
+
+                // Scroll to validation errors
+                setTimeout(() => {
+                  const errorElement = document.querySelector('.validation-errors-container');
+                  if (errorElement) {
+                    errorElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                  }
+                }, 100);
+              } else {
+                // If validation passes but button is still disabled, it might be a state issue
+                alert("Please select a payment method first. You can choose from the Link, Cash App, or credit card options below.");
+              }
+            } catch (e) {
+              console.error('[DESKTOP ECE] Error checking validation:', e);
+              alert("Please select a payment method first. You can choose from the Link, Cash App, or credit card options below.");
+            }
           }}
           className="mt-3 w-full inline-flex items-center justify-center bg-gradient-to-r from-teal-500 to-green-500 text-white font-bold py-3 px-4 rounded-md hover:from-teal-600 hover:to-green-600 disabled:opacity-60 disabled:cursor-not-allowed"
           disabled={confirming || !paymentMethodSelected || !expressCheckoutReady}
