@@ -63,11 +63,15 @@ export default function CheckoutPage() {
       logger.log('CheckoutPage useEffect started', { eventId });
       logger.log('Window object available', { hasWindow: typeof window !== 'undefined' });
 
-      // CRITICAL: Test if mobile can reach API routes
+      // CRITICAL: Test if mobile can reach API routes (Pages Router - matches proxy pattern)
       try {
+        logger.log('Testing Pages Router API route', { endpoint: '/api/diagnostic/mobile-test' });
         const testRes = await fetch('/api/diagnostic/mobile-test', {
           method: 'GET',
           cache: 'no-store',
+          headers: {
+            'Content-Type': 'application/json',
+          },
         });
         const testData = await testRes.json();
         logger.log('Mobile diagnostic test result', {
@@ -79,6 +83,7 @@ export default function CheckoutPage() {
         logger.critical('Mobile diagnostic test failed', {
           error: testErr?.message || String(testErr),
           errorName: testErr?.name,
+          errorStack: testErr?.stack,
         });
       }
 

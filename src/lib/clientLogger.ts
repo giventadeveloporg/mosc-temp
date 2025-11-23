@@ -32,18 +32,24 @@ interface LogData {
  */
 async function forwardLogToServer(logData: LogData) {
   // ALWAYS forward logs in production (CloudWatch visibility)
-  // Also forward in development if explicitly enabled
+  // Check if we're in production by checking window location (more reliable than process.env in browser)
+  const isProduction = typeof window !== 'undefined' && (
+    window.location.hostname !== 'localhost' &&
+    !window.location.hostname.includes('127.0.0.1')
+  );
+
   const shouldForward =
-    process.env.NODE_ENV === 'production' ||
-    process.env.NEXT_PUBLIC_ENABLE_CLIENT_LOGGING === 'true';
+    isProduction ||
+    (typeof window !== 'undefined' && window.location.search.includes('enable_client_logging=true'));
 
   if (!shouldForward) {
-    return; // Skip forwarding in development unless explicitly enabled
+    // In development, still log to console but don't forward to server
+    return;
   }
 
-  // For critical errors, ALWAYS try to forward even if in development
+  // For critical errors, ALWAYS try to forward even if check fails
   if (logData.level === 'critical' || logData.level === 'error') {
-    // Force forward critical errors
+    // Force forward critical errors regardless of environment check
   }
 
   try {

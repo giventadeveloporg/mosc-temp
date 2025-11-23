@@ -13,16 +13,21 @@ interface ProxyHandlerOptions {
 export function createProxyHandler({ injectTenantId = true, allowedMethods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], backendPath }: ProxyHandlerOptions) {
   return async function handler(req: NextApiRequest, res: NextApiResponse) {
     // CRITICAL: Log immediately when handler is invoked (before any processing)
+    // Use multiple console.log statements to ensure visibility in CloudWatch
+    const timestamp = new Date().toISOString();
     const userAgent = req.headers['user-agent'] || 'unknown';
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
-    console.log('[ProxyHandler] ===== HANDLER INVOKED =====');
-    console.log('[ProxyHandler] Timestamp:', new Date().toISOString());
-    console.log('[ProxyHandler] Backend Path:', backendPath);
-    console.log('[ProxyHandler] Request URL:', req.url);
-    console.log('[ProxyHandler] Request Method:', req.method);
-    console.log('[ProxyHandler] Is Mobile:', isMobile);
-    console.log('[ProxyHandler] User-Agent:', userAgent.substring(0, 100));
-    console.log('[ProxyHandler] ===== END HANDLER INVOKE LOG =====');
+
+    // Log with unique prefix for easy CloudWatch filtering
+    console.log('[PROXY-HANDLER-START] ============================================');
+    console.log('[PROXY-HANDLER-START] HANDLER INVOKED AT:', timestamp);
+    console.log('[PROXY-HANDLER-START] Backend Path:', backendPath);
+    console.log('[PROXY-HANDLER-START] Request URL:', req.url);
+    console.log('[PROXY-HANDLER-START] Request Method:', req.method);
+    console.log('[PROXY-HANDLER-START] Is Mobile:', isMobile);
+    console.log('[PROXY-HANDLER-START] User-Agent:', userAgent.substring(0, 150));
+    console.log('[PROXY-HANDLER-START] Query Params:', JSON.stringify(req.query));
+    console.log('[PROXY-HANDLER-START] ============================================');
 
     try {
       const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
