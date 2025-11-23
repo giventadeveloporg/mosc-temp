@@ -11,6 +11,15 @@ import { NextApiRequest, NextApiResponse } from 'next';
  * Usage: Call from mobile browser: /api/diagnostic/mobile-test
  */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  // Handle CORS preflight requests (OPTIONS)
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.status(200).end();
+    return;
+  }
+
   const timestamp = new Date().toISOString();
   const userAgent = req.headers['user-agent'] || 'unknown';
 
