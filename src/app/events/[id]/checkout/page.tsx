@@ -59,6 +59,29 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     async function fetchData() {
+      // CRITICAL: Log immediately to verify useEffect is executing on mobile
+      logger.log('CheckoutPage useEffect started', { eventId });
+      logger.log('Window object available', { hasWindow: typeof window !== 'undefined' });
+
+      // CRITICAL: Test if mobile can reach API routes
+      try {
+        const testRes = await fetch('/api/diagnostic/mobile-test', {
+          method: 'GET',
+          cache: 'no-store',
+        });
+        const testData = await testRes.json();
+        logger.log('Mobile diagnostic test result', {
+          success: testRes.ok,
+          data: testData,
+          status: testRes.status,
+        });
+      } catch (testErr: any) {
+        logger.critical('Mobile diagnostic test failed', {
+          error: testErr?.message || String(testErr),
+          errorName: testErr?.name,
+        });
+      }
+
       setLoading(true);
 
       // Detect mobile browser for better error logging
@@ -67,44 +90,93 @@ export default function CheckoutPage() {
         window.innerWidth <= 768
       );
 
-      // Log environment info for debugging
-      if (isMobile) {
-        console.log('[CheckoutPage] Mobile browser detected:', {
-          userAgent: navigator.userAgent,
-          url: window.location.href,
-          hasClerkSync: window.location.search.includes('__clerk_synced'),
-        });
-      }
+      // Log environment info for debugging - ALWAYS forward to CloudWatch
+      const envInfo = {
+        userAgent: typeof window !== 'undefined' ? navigator.userAgent : 'server-side',
+        url: typeof window !== 'undefined' ? window.location.href : 'unknown',
+        hasClerkSync: typeof window !== 'undefined' ? window.location.search.includes('__clerk_synced') : false,
+        isMobile,
+        eventId,
+      };
+
+      console.log('[CheckoutPage] Environment info:', envInfo);
+      logger.log('Mobile browser detection', envInfo);
 
       try {
         // First, fetch event details to show hero image during loading
         const eventUrl = `/api/proxy/event-details/${eventId}`;
         console.log('[CheckoutPage] Fetching event details:', eventUrl);
+        logger.log('About to fetch event details', { eventUrl, eventId, isMobile });
 
-        const eventRes = await fetch(eventUrl, {
-          cache: 'no-store',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+        // CRITICAL: Log BEFORE fetch to verify we reach this point
+        logger.log('Fetch call initiated', {
+          url: eventUrl,
+          timestamp: new Date().toISOString(),
+          isMobile,
         });
 
-        console.log('[CheckoutPage] Event response status:', eventRes.status, eventRes.statusText);
+        const fetchStartTime = Date.now();
+        let fetchError: any = null;
 
-        if (!eventRes.ok) {
-          const errorText = await eventRes.text();
-          console.error('[CheckoutPage] Event fetch failed:', {
+        try {
+          const eventRes = await fetch(eventUrl, {
+            cache: 'no-store',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+
+          const fetchDuration = Date.now() - fetchStartTime;
+          console.log('[CheckoutPage] Event response status:', eventRes.status, eventRes.statusText);
+
+          // CRITICAL: Log fetch response to CloudWatch
+          logger.log('Fetch response received', {
             status: eventRes.status,
             statusText: eventRes.statusText,
-            error: errorText,
+            duration: fetchDuration,
             url: eventUrl,
             isMobile,
           });
-          throw new Error(`Failed to load event: ${eventRes.status} ${eventRes.statusText}`);
-        }
 
-        const eventData = await eventRes.json();
-        console.log('[CheckoutPage] Event data loaded:', eventData?.id || 'no id');
-        setEvent(eventData);
+          if (!eventRes.ok) {
+            const errorText = await eventRes.text();
+            const errorDetails = {
+              status: eventRes.status,
+              statusText: eventRes.statusText,
+              error: errorText,
+              url: eventUrl,
+              isMobile,
+            };
+            console.error('[CheckoutPage] Event fetch failed:', errorDetails);
+
+            // CRITICAL: Forward error to CloudWatch
+            logger.error('Event fetch failed', errorDetails);
+            throw new Error(`Failed to load event: ${eventRes.status} ${eventRes.statusText}`);
+          }
+
+          const eventData = await eventRes.json();
+          console.log('[CheckoutPage] Event data loaded:', eventData?.id || 'no id');
+          logger.log('Event data loaded successfully', { eventId: eventData?.id, isMobile });
+          setEvent(eventData);
+        } catch (fetchErr: any) {
+          // CRITICAL: Catch fetch errors (network failures, CORS, etc.)
+          fetchError = fetchErr;
+          const fetchDuration = Date.now() - fetchStartTime;
+          console.error('[CheckoutPage] Fetch threw error:', fetchErr);
+
+          logger.critical('Fetch call failed with exception', {
+            error: fetchErr?.message || String(fetchErr),
+            errorName: fetchErr?.name,
+            errorStack: fetchErr?.stack,
+            url: eventUrl,
+            duration: fetchDuration,
+            isMobile,
+            eventId,
+          });
+
+          // Re-throw to be caught by outer catch block
+          throw fetchErr;
+        }
 
         // Fetch hero image immediately (prioritize homepage hero, then regular hero, then flyer, then featured)
         try {

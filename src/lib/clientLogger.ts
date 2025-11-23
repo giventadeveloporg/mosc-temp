@@ -31,13 +31,19 @@ interface LogData {
  * If the request fails, it silently fails to prevent breaking the app.
  */
 async function forwardLogToServer(logData: LogData) {
-  // Only forward logs in production or when explicitly enabled
+  // ALWAYS forward logs in production (CloudWatch visibility)
+  // Also forward in development if explicitly enabled
   const shouldForward =
     process.env.NODE_ENV === 'production' ||
     process.env.NEXT_PUBLIC_ENABLE_CLIENT_LOGGING === 'true';
 
   if (!shouldForward) {
     return; // Skip forwarding in development unless explicitly enabled
+  }
+
+  // For critical errors, ALWAYS try to forward even if in development
+  if (logData.level === 'critical' || logData.level === 'error') {
+    // Force forward critical errors
   }
 
   try {

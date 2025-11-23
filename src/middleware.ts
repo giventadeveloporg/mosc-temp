@@ -62,6 +62,21 @@ export default authMiddleware({
 
   // Custom logic to add pathname header and handle prefetch requests
   afterAuth(auth, req) {
+    // CRITICAL: Log API proxy requests to verify they're reaching middleware
+    const isApiProxy = req.nextUrl.pathname.startsWith('/api/proxy');
+    const userAgent = req.headers.get('user-agent') || 'unknown';
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+
+    if (isApiProxy) {
+      console.log('[MIDDLEWARE] API Proxy request detected:', {
+        pathname: req.nextUrl.pathname,
+        method: req.method,
+        isMobile,
+        userAgent: userAgent.substring(0, 100), // Truncate for logging
+        timestamp: new Date().toISOString(),
+      });
+    }
+
     // Add pathname header for layout detection (used by ConditionalLayout)
     const response = NextResponse.next();
     response.headers.set('x-pathname', req.nextUrl.pathname);

@@ -12,6 +12,18 @@ interface ProxyHandlerOptions {
 
 export function createProxyHandler({ injectTenantId = true, allowedMethods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], backendPath }: ProxyHandlerOptions) {
   return async function handler(req: NextApiRequest, res: NextApiResponse) {
+    // CRITICAL: Log immediately when handler is invoked (before any processing)
+    const userAgent = req.headers['user-agent'] || 'unknown';
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+    console.log('[ProxyHandler] ===== HANDLER INVOKED =====');
+    console.log('[ProxyHandler] Timestamp:', new Date().toISOString());
+    console.log('[ProxyHandler] Backend Path:', backendPath);
+    console.log('[ProxyHandler] Request URL:', req.url);
+    console.log('[ProxyHandler] Request Method:', req.method);
+    console.log('[ProxyHandler] Is Mobile:', isMobile);
+    console.log('[ProxyHandler] User-Agent:', userAgent.substring(0, 100));
+    console.log('[ProxyHandler] ===== END HANDLER INVOKE LOG =====');
+
     try {
       const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
       console.log('[ProxyHandler] API_BASE_URL:', API_BASE_URL);
