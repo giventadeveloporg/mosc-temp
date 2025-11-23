@@ -63,6 +63,15 @@ export default authMiddleware({
   ignoredRoutes: [
     // Ignore Next.js RSC prefetch requests for public routes
     '/(.*)?_rsc=(.*)$',
+    // CRITICAL: Completely ignore API proxy routes (don't even apply Clerk middleware)
+    '/api/webhooks/(.*)',
+    '/api/proxy/(.*)',
+    '/api/stripe/(.*)',
+    '/api/payment/(.*)',
+    '/api/billing/(.*)',
+    '/api/checkout/(.*)',
+    '/api/diagnostic(.*)',
+    '/api/logs(.*)',
   ],
 
   // Custom logic to add pathname header and handle prefetch requests

@@ -15,20 +15,8 @@ interface ProxyHandlerOptions {
 
 export function createProxyHandler({ injectTenantId = true, allowedMethods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], backendPath }: ProxyHandlerOptions) {
   return async function handler(req: NextApiRequest, res: NextApiResponse) {
-    // CRITICAL: Set CORS headers IMMEDIATELY (before any processing)
-    // This is essential for mobile browsers which have strict CORS enforcement
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.setHeader('Access-Control-Max-Age', '86400'); // 24 hours
-
-    // Handle OPTIONS preflight requests (required for mobile browsers)
-    if (req.method === 'OPTIONS') {
-      logger.info('Handling OPTIONS preflight request', { backendPath });
-      console.log('[PROXY-HANDLER] Handling OPTIONS preflight request');
-      res.status(200).end();
-      return;
-    }
+    // NOTE: CORS headers removed - Next.js API routes are same-origin by default
+    // If CORS issues persist, re-enable these headers
 
     // CRITICAL: Log immediately when handler is invoked (before any processing)
     const timestamp = new Date().toISOString();
