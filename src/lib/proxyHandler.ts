@@ -16,7 +16,13 @@ export function createProxyHandler({ injectTenantId = true, allowedMethods = ['G
     // Use multiple console.log statements to ensure visibility in CloudWatch
     const timestamp = new Date().toISOString();
     const userAgent = req.headers['user-agent'] || 'unknown';
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+
+    // Enhanced mobile detection: Include WhatsApp, mobile browsers, and CloudFront headers
+    const userAgentMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|WhatsApp|Mobile|CriOS|FxiOS/i.test(userAgent);
+    const cloudfrontMobile = req.headers['cloudfront-is-mobile-viewer'] === 'true';
+    const cloudfrontAndroid = req.headers['cloudfront-is-android-viewer'] === 'true';
+    const cloudfrontIOS = req.headers['cloudfront-is-ios-viewer'] === 'true';
+    const isMobile = userAgentMobile || cloudfrontMobile || cloudfrontAndroid || cloudfrontIOS;
 
     // Log with unique prefix for easy CloudWatch filtering
     console.log('[PROXY-HANDLER-START] ============================================');

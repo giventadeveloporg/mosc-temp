@@ -65,7 +65,13 @@ export default authMiddleware({
     // CRITICAL: Log API proxy requests to verify they're reaching middleware
     const isApiProxy = req.nextUrl.pathname.startsWith('/api/proxy');
     const userAgent = req.headers.get('user-agent') || 'unknown';
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+
+    // Enhanced mobile detection: Include WhatsApp, mobile browsers, and CloudFront headers
+    const userAgentMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|WhatsApp|Mobile|CriOS|FxiOS/i.test(userAgent);
+    const cloudfrontMobile = req.headers.get('cloudfront-is-mobile-viewer') === 'true';
+    const cloudfrontAndroid = req.headers.get('cloudfront-is-android-viewer') === 'true';
+    const cloudfrontIOS = req.headers.get('cloudfront-is-ios-viewer') === 'true';
+    const isMobile = userAgentMobile || cloudfrontMobile || cloudfrontAndroid || cloudfrontIOS;
 
     if (isApiProxy) {
       console.log('[MIDDLEWARE] API Proxy request detected:', {

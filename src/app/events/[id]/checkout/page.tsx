@@ -89,9 +89,9 @@ export default function CheckoutPage() {
 
       setLoading(true);
 
-      // Detect mobile browser for better error logging
+      // Enhanced mobile browser detection: Include WhatsApp and other mobile browsers
       const isMobile = typeof window !== 'undefined' && (
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|WhatsApp|Mobile|CriOS|FxiOS/i.test(navigator.userAgent) ||
         window.innerWidth <= 768
       );
 
