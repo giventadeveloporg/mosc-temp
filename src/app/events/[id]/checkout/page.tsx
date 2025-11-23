@@ -9,6 +9,10 @@ import UniversalPaymentCheckout from '@/components/UniversalPaymentCheckout';
 import { formatInTimeZone } from 'date-fns-tz';
 import LocationDisplay from '@/components/LocationDisplay';
 import { PaymentUseCase } from '@/types';
+import { createComponentLogger } from '@/lib/clientLogger';
+
+// Create component-specific logger for CloudWatch visibility
+const logger = createComponentLogger('CheckoutPage');
 
 export default function CheckoutPage() {
   const params = useParams();
@@ -39,19 +43,75 @@ export default function CheckoutPage() {
 
   useEffect(() => { setMounted(true); }, []);
 
+  // Clean up Clerk sync parameter from URL on mount (for cleaner URLs)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('__clerk_synced')) {
+      // Remove Clerk sync parameter for cleaner URL
+      urlParams.delete('__clerk_synced');
+      const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+      // Use replace to avoid adding to history
+      window.history.replaceState({}, '', newUrl);
+    }
+  }, []);
+
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
+
+      // Detect mobile browser for better error logging
+      const isMobile = typeof window !== 'undefined' && (
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+        window.innerWidth <= 768
+      );
+
+      // Log environment info for debugging
+      if (isMobile) {
+        console.log('[CheckoutPage] Mobile browser detected:', {
+          userAgent: navigator.userAgent,
+          url: window.location.href,
+          hasClerkSync: window.location.search.includes('__clerk_synced'),
+        });
+      }
+
       try {
         // First, fetch event details to show hero image during loading
-        const eventRes = await fetch(`/api/proxy/event-details/${eventId}`);
+        const eventUrl = `/api/proxy/event-details/${eventId}`;
+        console.log('[CheckoutPage] Fetching event details:', eventUrl);
+
+        const eventRes = await fetch(eventUrl, {
+          cache: 'no-store',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        console.log('[CheckoutPage] Event response status:', eventRes.status, eventRes.statusText);
+
+        if (!eventRes.ok) {
+          const errorText = await eventRes.text();
+          console.error('[CheckoutPage] Event fetch failed:', {
+            status: eventRes.status,
+            statusText: eventRes.statusText,
+            error: errorText,
+            url: eventUrl,
+            isMobile,
+          });
+          throw new Error(`Failed to load event: ${eventRes.status} ${eventRes.statusText}`);
+        }
+
         const eventData = await eventRes.json();
+        console.log('[CheckoutPage] Event data loaded:', eventData?.id || 'no id');
         setEvent(eventData);
 
         // Fetch hero image immediately (prioritize homepage hero, then regular hero, then flyer, then featured)
         try {
           // Try homepage hero image first
-          let mediaRes = await fetch(`/api/proxy/event-medias?eventId.equals=${eventId}&isHomePageHeroImage.equals=true`);
+          let mediaRes = await fetch(`/api/proxy/event-medias?eventId.equals=${eventId}&isHomePageHeroImage.equals=true`, {
+            cache: 'no-store',
+          });
           if (mediaRes.ok) {
             const mediaData = await mediaRes.json();
             const mediaArray = Array.isArray(mediaData) ? mediaData : (mediaData ? [mediaData] : []);
@@ -59,7 +119,9 @@ export default function CheckoutPage() {
               setHeroImageUrl(mediaArray[0].fileUrl);
             } else {
               // Try regular hero image
-              mediaRes = await fetch(`/api/proxy/event-medias?eventId.equals=${eventId}&isHeroImage.equals=true`);
+              mediaRes = await fetch(`/api/proxy/event-medias?eventId.equals=${eventId}&isHeroImage.equals=true`, {
+                cache: 'no-store',
+              });
               if (mediaRes.ok) {
                 const heroMediaData = await mediaRes.json();
                 const heroMediaArray = Array.isArray(heroMediaData) ? heroMediaData : (heroMediaData ? [heroMediaData] : []);
@@ -67,7 +129,9 @@ export default function CheckoutPage() {
                   setHeroImageUrl(heroMediaArray[0].fileUrl);
                 } else {
                   // Try flyer image
-                  const flyerRes = await fetch(`/api/proxy/event-medias?eventId.equals=${eventId}&eventFlyer.equals=true`);
+                  const flyerRes = await fetch(`/api/proxy/event-medias?eventId.equals=${eventId}&eventFlyer.equals=true`, {
+                    cache: 'no-store',
+                  });
                   if (flyerRes.ok) {
                     const flyerData = await flyerRes.json();
                     const flyerArray = Array.isArray(flyerData) ? flyerData : (flyerData ? [flyerData] : []);
@@ -75,7 +139,9 @@ export default function CheckoutPage() {
                       setHeroImageUrl(flyerArray[0].fileUrl);
                     } else {
                       // Try featured image
-                      const featuredRes = await fetch(`/api/proxy/event-medias?eventId.equals=${eventId}&isFeaturedImage.equals=true`);
+                      const featuredRes = await fetch(`/api/proxy/event-medias?eventId.equals=${eventId}&isFeaturedImage.equals=true`, {
+                        cache: 'no-store',
+                      });
                       if (featuredRes.ok) {
                         const featuredData = await featuredRes.json();
                         if (Array.isArray(featuredData) && featuredData.length > 0 && featuredData[0].fileUrl) {
@@ -104,20 +170,87 @@ export default function CheckoutPage() {
         }
 
         // Fetch ticket types for this event (only active ones)
-        const ticketRes = await fetch(`/api/proxy/event-ticket-types?eventId.equals=${eventId}&isActive.equals=true`);
-        const ticketData = await ticketRes.json();
-        setTicketTypes(Array.isArray(ticketData) ? ticketData : []);
+        const ticketUrl = `/api/proxy/event-ticket-types?eventId.equals=${eventId}&isActive.equals=true`;
+        console.log('[CheckoutPage] Fetching ticket types:', ticketUrl);
+
+        const ticketRes = await fetch(ticketUrl, {
+          cache: 'no-store',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        console.log('[CheckoutPage] Ticket types response status:', ticketRes.status);
+
+        if (!ticketRes.ok) {
+          const errorText = await ticketRes.text();
+          console.error('[CheckoutPage] Ticket types fetch failed:', {
+            status: ticketRes.status,
+            statusText: ticketRes.statusText,
+            error: errorText,
+            url: ticketUrl,
+            isMobile,
+          });
+          // Don't throw - allow page to load with empty ticket types
+          setTicketTypes([]);
+        } else {
+          const ticketData = await ticketRes.json();
+          console.log('[CheckoutPage] Ticket types loaded:', Array.isArray(ticketData) ? ticketData.length : 'not array');
+          setTicketTypes(Array.isArray(ticketData) ? ticketData : []);
+        }
 
         // Fetch discount codes for this event
-        const discountRes = await fetch(`/api/proxy/discount-codes?eventId.equals=${eventId}&isActive.equals=true`);
+        const discountUrl = `/api/proxy/discount-codes?eventId.equals=${eventId}&isActive.equals=true`;
+        console.log('[CheckoutPage] Fetching discount codes:', discountUrl);
+
+        const discountRes = await fetch(discountUrl, {
+          cache: 'no-store',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        console.log('[CheckoutPage] Discount codes response status:', discountRes.status);
+
         if (discountRes.ok) {
           const discountData = await discountRes.json();
+          console.log('[CheckoutPage] Discount codes loaded:', Array.isArray(discountData) ? discountData.length : 'not array');
           setAvailableDiscounts(Array.isArray(discountData) ? discountData : []);
+        } else {
+          console.warn('[CheckoutPage] Discount codes fetch failed:', discountRes.status);
+          setAvailableDiscounts([]);
         }
-      } catch (e) {
+      } catch (e: any) {
+        // Enhanced error logging for mobile debugging
+        const errorDetails = {
+          message: e?.message || String(e),
+          stack: e?.stack,
+          name: e?.name,
+          isMobile,
+          url: typeof window !== 'undefined' ? window.location.href : 'unknown',
+          eventId,
+        };
+
+        console.error('[CheckoutPage] CRITICAL ERROR loading checkout page:', errorDetails);
+
+        // Log to console.error for mobile browser debugging
+        if (isMobile) {
+          console.error('[CheckoutPage] MOBILE ERROR DETAILS:', JSON.stringify(errorDetails, null, 2));
+        }
+
+        // Forward critical errors to CloudWatch via client logger
+        logger.critical('Failed to load checkout page', {
+          error: errorDetails.message,
+          eventId,
+          isMobile,
+          userAgent: typeof window !== 'undefined' ? navigator.userAgent : undefined,
+          url: errorDetails.url,
+        });
+
         setEvent(null);
         setTicketTypes([]);
         setHeroImageUrl(defaultHeroImageUrl);
+        setAvailableDiscounts([]);
       } finally {
         setLoading(false);
       }

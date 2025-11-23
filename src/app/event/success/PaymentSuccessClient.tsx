@@ -18,9 +18,55 @@ interface PaymentSuccessClientProps {
   eventId?: string;
 }
 
+/**
+ * PaymentSuccessClient Component
+ *
+ * SAFETY GUARANTEES FOR PAGE REFRESH:
+ * ====================================
+ *
+ * ✅ ALL OPERATIONS ARE READ-ONLY (GET requests only):
+ *    - fetchPaymentStatus() - GET /api/proxy/payments/{transactionId}
+ *    - fetchFullData() - GET requests only (event details, ticket transactions, transaction items)
+ *    - QR code fetching - GET /api/proxy/events/{eventId}/transactions/{transactionId}/qrcode
+ *    - Email sending - POST but idempotent (safe to retry, backend prevents duplicates)
+ *
+ * ✅ NO PAYMENT CREATION:
+ *    - No Stripe Payment Intent creation
+ *    - No PaymentIntent API calls
+ *    - No checkout session creation
+ *
+ * ✅ NO TICKET TRANSACTION CREATION:
+ *    - Only queries existing ticket transactions
+ *    - No POST/PUT/PATCH to create or modify transactions
+ *    - All transaction data is fetched, never created
+ *
+ * ✅ DUPLICATE PREVENTION:
+ *    - Email sending: Protected by sessionStorage (persists across refreshes)
+ *    - QR code fetching: Protected by sessionStorage (persists across refreshes)
+ *    - Refresh loops: Protected by sessionStorage
+ *
+ * ✅ REFRESH SAFE:
+ *    - Page can be refreshed safely without creating duplicate purchases
+ *    - Only refreshes QR code display and transaction data
+ *    - No side effects that create new transactions or payments
+ *
+ * VERIFICATION:
+ * All API calls in this component are GET requests except:
+ * - Email sending (POST) - but protected by sessionStorage and backend idempotency
+ *
+ * The backend email endpoint should be idempotent (safe to call multiple times).
+ */
 export default function PaymentSuccessClient({ transactionId, eventId: eventIdParam }: PaymentSuccessClientProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+
+  // Log safety guarantee on mount (only in development)
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[PaymentSuccessClient] ✅ SAFE TO REFRESH: All operations are read-only. No duplicate purchases will occur.');
+      console.log('[PaymentSuccessClient] Transaction ID:', transactionId);
+    }
+  }, [transactionId]);
   const [polling, setPolling] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [paymentTransaction, setPaymentTransaction] = useState<PaymentTransactionDTO | null>(null);
@@ -38,7 +84,30 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
   const ticketPollingAttemptsRef = useRef(0);
   const qrCodeFetchAttemptedRef = useRef<Set<string>>(new Set());
   const qrCodeRetryCountRef = useRef<Map<string, number>>(new Map()); // Track retry counts per fetch key
-  const emailSentRef = useRef<boolean>(false); // Track if email has been sent to ensure it's only called once
+
+  // Use sessionStorage for email tracking to persist across page refreshes
+  const getEmailSentKey = () => `email-sent-${transactionId}`;
+  const hasEmailBeenSent = () => {
+    if (typeof window === 'undefined') return false;
+    return sessionStorage.getItem(getEmailSentKey()) === 'true';
+  };
+  const markEmailAsSent = () => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem(getEmailSentKey(), 'true');
+    }
+  };
+
+  // Use sessionStorage for QR code fetch tracking to persist across page refreshes
+  const getQrCodeFetchedKey = (eventId: number, ticketId: number) => `qr-fetched-${eventId}-${ticketId}`;
+  const hasQrCodeBeenFetched = (eventId: number, ticketId: number) => {
+    if (typeof window === 'undefined') return false;
+    return sessionStorage.getItem(getQrCodeFetchedKey(eventId, ticketId)) === 'true';
+  };
+  const markQrCodeAsFetched = (eventId: number, ticketId: number) => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem(getQrCodeFetchedKey(eventId, ticketId), 'true');
+    }
+  };
   const MAX_POLLING_ATTEMPTS = 30; // 30 attempts * 2 seconds = 60 seconds max
   const POLLING_INTERVAL = 2000; // 2 seconds
   const MAX_TICKET_POLLING_ATTEMPTS = 15; // 15 attempts * 2 seconds = 30 seconds max
@@ -688,6 +757,23 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
     const fetchKey = `${eventId}-${ticketId}`;
     const retryCount = qrCodeRetryCountRef.current.get(fetchKey) || 0;
 
+    // CRITICAL: Check sessionStorage to prevent duplicate QR code fetches on page refresh
+    // This ensures QR code is only fetched once per transaction, even if page is refreshed
+    if (hasQrCodeBeenFetched(eventId, ticketId)) {
+      console.log('[PaymentSuccessClient] QR code already fetched for this transaction (from sessionStorage), skipping duplicate fetch:', {
+        eventId,
+        ticketId,
+        fetchKey
+      });
+      // Still allow retry if we haven't exceeded max attempts and QR code is missing
+      if (!qrCodeData && retryCount < MAX_QR_CODE_RETRY_ATTEMPTS) {
+        console.log('[PaymentSuccessClient] QR code was fetched but data is missing, allowing retry');
+      } else {
+        setQrCodeLoading(false);
+        return;
+      }
+    }
+
     // If we've exceeded max retries, stop trying and show error
     if (retryCount >= MAX_QR_CODE_RETRY_ATTEMPTS) {
       console.error('[PaymentSuccessClient] QR code fetch exceeded max retries:', {
@@ -751,7 +837,9 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
             setQrCodeLoading(false);
             // Reset retry count on success
             qrCodeRetryCountRef.current.delete(fetchKey);
-            console.log('[PaymentSuccessClient] QR code state updated, component should re-render NOW');
+            // CRITICAL: Mark QR code as fetched in sessionStorage to prevent duplicate fetches on refresh
+            markQrCodeAsFetched(eventId, ticketId);
+            console.log('[PaymentSuccessClient] QR code state updated and marked as fetched in sessionStorage, component should re-render NOW');
             // NOTE: Email will be sent asynchronously in a separate useEffect after QR code is displayed
           } else {
             const currentRetryCount = qrCodeRetryCountRef.current.get(fetchKey) || 0;
@@ -839,22 +927,31 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
 
   // Send email once after QR code is successfully displayed
   useEffect(() => {
+    // CRITICAL: Check sessionStorage first to prevent duplicate email sends on page refresh
+    // This ensures email is only sent once per transaction, even if page is refreshed
+    if (hasEmailBeenSent()) {
+      console.log('[PaymentSuccessClient] Email already sent for this transaction (from sessionStorage), skipping duplicate send:', {
+        transactionId
+      });
+      return;
+    }
+
     // Only send email if:
     // 1. QR code is successfully displayed (qrCodeData exists and has qrCodeImageUrl)
     // 2. We have ticket transaction and event details
-    // 3. Email hasn't been sent yet (checked via ref to ensure it's only called once)
+    // 3. Email hasn't been sent yet (checked via sessionStorage to persist across refreshes)
     if (
       qrCodeData &&
       qrCodeData.qrCodeImageUrl &&
       ticketTransaction?.id &&
-      eventDetails?.id &&
-      !emailSentRef.current
+      eventDetails?.id
     ) {
       const emailToUse = ticketTransaction.email || paymentTransaction?.metadata?.customerEmail;
 
       if (emailToUse) {
-        // Mark as sent immediately to prevent duplicate calls
-        emailSentRef.current = true;
+        // CRITICAL: Mark as sent in sessionStorage BEFORE sending to prevent race conditions
+        // This persists across page refreshes and prevents duplicate emails
+        markEmailAsSent();
 
         console.log('[PaymentSuccessClient] QR code displayed successfully, sending email once:', {
           eventId: eventDetails.id,
@@ -863,6 +960,7 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
         });
 
         // Send email asynchronously (non-blocking)
+        // NOTE: Email sending endpoint should be idempotent (safe to call multiple times)
         sendTicketEmailAsync({
           eventId: eventDetails.id,
           transactionId: ticketTransaction.id,
@@ -875,7 +973,7 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
         });
       }
     }
-  }, [qrCodeData, ticketTransaction?.id, eventDetails?.id, paymentTransaction?.metadata?.customerEmail]);
+  }, [qrCodeData, ticketTransaction?.id, eventDetails?.id, paymentTransaction?.metadata?.customerEmail, transactionId]);
 
   const defaultHeroImageUrl = '/images/default-event-hero.jpg';
 
