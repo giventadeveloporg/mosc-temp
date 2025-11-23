@@ -85,9 +85,21 @@ export default function UniversalPaymentCheckout(props: Props) {
   // Track the cart key for the current session to avoid unnecessary re-initialization
   const sessionCartKeyRef = useRef<string | null>(null);
 
+  // CRITICAL FIX: Use ref instead of state to prevent re-renders on mobile browsers
   // Track if payment section has been interacted with or is visible
+  const paymentSectionActiveRef = useRef(false);
   const [paymentSectionActive, setPaymentSectionActive] = useState(false);
   const paymentSectionRef = useRef<HTMLDivElement>(null);
+
+  // CRITICAL FIX: Memoize returnUrl and cancelUrl to prevent changing on every render
+  // Mobile browsers can regenerate window.location.origin during re-hydration
+  const memoizedReturnUrl = useMemo(() => {
+    return returnUrl || (typeof window !== 'undefined' ? `${window.location.origin}/event/success` : '/event/success');
+  }, [returnUrl]);
+
+  const memoizedCancelUrl = useMemo(() => {
+    return cancelUrl || (typeof window !== 'undefined' ? window.location.origin : '/');
+  }, [cancelUrl]);
 
   // Use Intersection Observer to detect when payment section is visible
   useEffect(() => {
@@ -96,7 +108,8 @@ export default function UniversalPaymentCheckout(props: Props) {
     // Check if element is already visible (fallback for immediate activation)
     const checkVisibility = () => {
       const rect = paymentSectionRef.current?.getBoundingClientRect();
-      if (rect && rect.top < window.innerHeight && rect.bottom > 0) {
+      if (rect && rect.top < window.innerHeight && rect.bottom > 0 && !paymentSectionActiveRef.current) {
+        paymentSectionActiveRef.current = true;
         setPaymentSectionActive(true);
         return true;
       }
@@ -111,7 +124,8 @@ export default function UniversalPaymentCheckout(props: Props) {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
+          if (entry.isIntersecting && !paymentSectionActiveRef.current) {
+            paymentSectionActiveRef.current = true;
             setPaymentSectionActive(true);
           }
         });
@@ -138,7 +152,8 @@ export default function UniversalPaymentCheckout(props: Props) {
 
     // Lazy initialization: Only initialize when payment section is visible/interacted with
     // This prevents unnecessary backend calls when user is just filling out form fields
-    if (!paymentSectionActive) {
+    // CRITICAL FIX: Use ref to check activity status to prevent re-render loops
+    if (!paymentSectionActiveRef.current) {
       console.log('[UniversalPaymentCheckout] Payment section not yet active, deferring initialization');
       return;
     }
@@ -175,8 +190,8 @@ export default function UniversalPaymentCheckout(props: Props) {
           customerEmail: email,
           customerName,
           customerPhone,
-          returnUrl: returnUrl || `${window.location.origin}/event/success`,
-          cancelUrl: cancelUrl || window.location.origin,
+          returnUrl: memoizedReturnUrl,
+          cancelUrl: memoizedCancelUrl,
           eventId: typeof eventId === 'string' ? parseInt(eventId) : eventId,
           discountCode: discountCodeId ? String(discountCodeId) : undefined,
         };
@@ -312,7 +327,7 @@ export default function UniversalPaymentCheckout(props: Props) {
     return () => {
       cancelled = true;
     };
-  }, [enabled, cartKey, email, amountCents, paymentUseCase, eventId, discountCodeId, customerName, customerPhone, returnUrl, cancelUrl, paymentSectionActive]);
+  }, [enabled, cartKey, email, amountCents, paymentUseCase, eventId, discountCodeId, customerName, customerPhone, memoizedReturnUrl, memoizedCancelUrl]);
 
   // Render loading state
   if (isInitializing) {
@@ -332,7 +347,8 @@ export default function UniversalPaymentCheckout(props: Props) {
         <p className="text-sm text-muted-foreground">{initializationError}</p>
         <button
           onClick={() => {
-            setPaymentSectionActive(true); // Activate section on retry
+            paymentSectionActiveRef.current = true; // Activate section on retry
+            setPaymentSectionActive(true);
             setInitializationError(null);
             setIsInitializing(true);
           }}
@@ -364,8 +380,9 @@ export default function UniversalPaymentCheckout(props: Props) {
         className="text-center p-8 text-muted-foreground"
         onClick={() => {
           // Activate payment section when user clicks/interacts with it
-          if (!paymentSectionActive) {
+          if (!paymentSectionActiveRef.current) {
             console.log('[UniversalPaymentCheckout] Payment section activated by user interaction');
+            paymentSectionActiveRef.current = true;
             setPaymentSectionActive(true);
           }
         }}

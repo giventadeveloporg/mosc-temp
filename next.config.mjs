@@ -95,19 +95,48 @@ const nextConfig = {
           },
         ],
       },
+      // CRITICAL FIX: Cache-busting headers for mobile browsers
+      // Prevents aggressive caching of JavaScript bundles that can cause stale code execution
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-cache, no-store, must-revalidate, max-age=0',
+          },
+          {
+            key: 'Pragma',
+            value: 'no-cache',
+          },
+          {
+            key: 'Expires',
+            value: '0',
+          },
+        ],
+      },
+      // Allow Next.js static assets to be cached (they have unique hashes)
+      {
+        source: '/_next/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
     ];
-  },
-
-  // Configure Server Actions body size limit for Next.js 15
-  serverActions: {
-    bodySizeLimit: '50mb', // Increase from default 1mb to 50mb for file uploads
   },
 
   // Enable experimental features if needed
   experimental: {
     // Add experimental features here
-    serverComponentsExternalPackages: [],
+    serverActions: {
+      bodySizeLimit: '50mb', // Increase from default 1mb to 50mb for file uploads
+    },
   },
+
+  // Server external packages (moved from experimental in Next.js 15)
+  serverExternalPackages: [],
 
   env: {
     // Clerk environment variables
