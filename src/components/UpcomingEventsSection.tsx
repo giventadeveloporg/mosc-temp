@@ -393,8 +393,27 @@ const UpcomingEventsSection: React.FC = () => {
                           </svg>
                         </Link>
 
-                        {/* Buy Tickets Button - Only for upcoming events */}
-                        {isUpcomingEvents && (
+                        {/* Register Here Button - Show if registration is required and event is upcoming */}
+                        {isUpcomingEvents && event.isRegistrationRequired === true && (
+                          <Link
+                            href={`/events/${event.id}/register`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="transition-transform hover:scale-105 inline-block"
+                          >
+                            <img
+                              src="/images/register_here_button.jpg"
+                              alt="Register Here"
+                              className="object-contain"
+                              style={{
+                                width: '200px',
+                                height: '70px'
+                              }}
+                            />
+                          </Link>
+                        )}
+
+                        {/* Buy Tickets Button - Only for TICKETED events and upcoming events (case-insensitive) */}
+                        {isUpcomingEvents && event.admissionType?.toUpperCase() === 'TICKETED' && (
                           <Link
                             href={`/events/${event.id}/checkout`}
                             onClick={(e) => e.stopPropagation()}

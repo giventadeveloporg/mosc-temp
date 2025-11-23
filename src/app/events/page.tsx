@@ -805,7 +805,7 @@ export default function EventsPage() {
                           </span>
                         </div>
                       )}
-                      {/* Buy Tickets Button - Top Right Corner */}
+                      {/* Action Buttons - Register Here and Buy Tickets - Top Right Corner */}
                       {(() => {
                         if (!event.startDate) return null;
 
@@ -824,13 +824,38 @@ export default function EventsPage() {
                         const isUpcomingLocal = isToday || isFuture;
                         const isPast = !isUpcomingLocal;
 
+                        // Determine which buttons to show
+                        const showRegisterButton = event.isRegistrationRequired === true && isUpcomingLocal;
+                        // Only show Buy Tickets button for TICKETED events (case-insensitive check)
+                        // Handles both 'TICKETED' and 'ticketed' from database/backend
+                        const showBuyTicketsButton = event.admissionType?.toUpperCase() === 'TICKETED' && isUpcomingLocal;
+
+                        // Don't render if no buttons should be shown
+                        if (!showRegisterButton && !showBuyTicketsButton) return null;
+
                         return (
-                          <div className="absolute top-4 right-4 lg:top-6 lg:right-6 z-10">
-                            {/* New backend payment flow */}
+                          <div className={`absolute top-4 right-4 lg:top-6 lg:right-6 z-10 ${showRegisterButton && showBuyTicketsButton ? 'flex flex-col gap-2' : ''}`}>
+                            {/* Register Here Button - Show if registration is required */}
+                            {showRegisterButton && (
                             <Link
-                              href={`/events/${event.id}/checkout`}
+                                href={`/events/${event.id}/register`}
+                                className="transition-transform hover:scale-105"
+                                title="Register Here"
+                            >
+                              <img
+                                  src="/images/register_here_button.jpg"
+                                  alt="Register Here"
+                                className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
+                              />
+                            </Link>
+                            )}
+
+                            {/* Buy Tickets Button - Show only for non-FREE events */}
+                            {showBuyTicketsButton && (
+                            <Link
+                                href={`/events/${event.id}/checkout`}
                               className={`transition-transform hover:scale-105 ${isPast ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
-                              title="Buy Tickets (New Payment Flow)"
+                                title="Buy Tickets (New Payment Flow)"
                             >
                               <img
                                 src="/images/buy_tickets_click_here_red.webp"
@@ -838,18 +863,7 @@ export default function EventsPage() {
                                 className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
                               />
                             </Link>
-                            {/* Legacy Stripe flow (commented out):
-                            <Link
-                              href={`/events/${event.id}/tickets`}
-                              className={`transition-transform hover:scale-105 ${isPast ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
-                            >
-                              <img
-                                src="/images/buy_tickets_click_here_red.webp"
-                                alt="Buy Tickets"
-                                className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
-                              />
-                            </Link>
-                            */}
+                            )}
                           </div>
                         );
                       })()}

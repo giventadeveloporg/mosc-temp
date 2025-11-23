@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import type { EventDetailsDTO, EventTypeDetailsDTO, EventCalendarEntryDTO } from '@/types';
-import { FaEdit, FaTrashAlt, FaUpload, FaCalendarDay, FaChevronLeft, FaChevronRight, FaPhotoVideo, FaTicketAlt, FaCopy } from 'react-icons/fa';
+import { FaEdit, FaTrashAlt, FaUpload, FaCalendarDay, FaChevronLeft, FaChevronRight, FaPhotoVideo, FaTicketAlt, FaCopy, FaCheckCircle } from 'react-icons/fa';
 import { Modal } from './Modal';
 import { getTenantId } from '@/lib/env';
 import { formatDateLocal } from '@/lib/date';
@@ -16,6 +16,8 @@ interface EventListProps {
   calendarEvents?: EventCalendarEntryDTO[];
   onEdit: (event: EventDetailsDTO) => void;
   onCancel: (event: EventDetailsDTO) => void;
+  onHardDelete?: (event: EventDetailsDTO) => void;
+  onActivate?: (event: EventDetailsDTO) => void;
   loading?: boolean;
   showDetailsOnHover?: boolean;
   onPrevPage?: () => void;
@@ -32,6 +34,8 @@ export function EventList({
   calendarEvents: calendarEventsProp = [],
   onEdit,
   onCancel,
+  onHardDelete,
+  onActivate,
   loading,
   showDetailsOnHover = false,
   onPrevPage,
@@ -261,19 +265,20 @@ export function EventList({
       >
         <thead>
           <tr className="bg-blue-100 font-bold border-b-2 border-blue-300">
-            <th className="p-2 border" rowSpan={2}>Title</th>
+            <th className="p-2 border" rowSpan={2}>Event Info</th>
             <th className="p-2 border" rowSpan={2}>Type</th>
             <th className="p-2 border" rowSpan={2}>Dates</th>
             <th className="p-2 border" rowSpan={2}>Active</th>
-            <th className="p-2 border" colSpan={2}>Actions</th>
+            <th className="p-2 border" rowSpan={2}>Edit/View</th>
+            <th className="p-2 border" colSpan={2}>Delete Actions</th>
             <th className="p-2 border" rowSpan={2}>Media</th>
             <th className="p-2 border" rowSpan={2}>Upload</th>
             <th className="p-2 border" rowSpan={2}>Calendar</th>
             <th className="p-2 border" rowSpan={2}>Tickets</th>
           </tr>
           <tr className="bg-blue-50 font-bold border-b border-blue-200">
-            <th className="p-2 border text-xs font-bold text-center">Edit/View</th>
-            <th className="p-2 border text-xs font-bold text-center">Delete</th>
+            <th className="p-2 border text-xs font-bold text-center">Deactivate</th>
+            <th className="p-2 border text-xs font-bold text-center">Hard Delete</th>
           </tr>
         </thead>
         <tbody>
@@ -299,6 +304,23 @@ export function EventList({
                   <div className="text-xs text-gray-500" style={boldEventIdLabel ? { fontWeight: 700 } : {}}>
                     {boldEventIdLabel ? <b>Event ID:</b> : 'Event ID:'} {event.id}
                   </div>
+                  {/* Parent/Child Event Indicator */}
+                  {event.parentEventId == null ? (
+                    <div className="mt-1 mb-1">
+                      <span className="inline-block px-2 py-1 bg-purple-100 text-purple-800 text-xs font-bold rounded border border-purple-300">
+                        📅 Parent Event
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="mt-1 mb-1">
+                      <span className="inline-block px-2 py-1 bg-blue-100 text-blue-800 text-xs font-bold rounded border border-blue-300">
+                        🔗 Child Event
+                      </span>
+                      <div className="text-xs text-gray-600 mt-1">
+                        Parent ID: {event.parentEventId}
+                      </div>
+                    </div>
+                  )}
                   <div><span className="font-bold">Title:</span> {event.title}</div>
                   <div className="mt-2">
                     <Link
@@ -323,7 +345,7 @@ export function EventList({
                   {getEventTypeName(event) || <span className="text-gray-400 italic">Unknown</span>}
                 </td>
                 <td
-                  className="p-2 border align-middle w-40"
+                  className="p-2 border align-middle w-32"
                   onMouseEnter={e => {
                     if (showDetailsOnHover) {
                       setTooltipEvent(event);
@@ -331,16 +353,55 @@ export function EventList({
                     }
                   }}
                 >
-                  <div>
-                    <span className="font-semibold">{formatDateLocal(event.startDate)}</span> {event.startTime}
-                  </div>
-                  <div className="text-xs text-gray-500">to</div>
-                  <div>
-                    <span className="font-semibold">{formatDateLocal(event.endDate)}</span> {event.endTime}
-                  </div>
+                  {(() => {
+                    // Format date to show first 3 letters of month (e.g., "Nov 20, 2025")
+                    const formatShortDate = (dateStr: string) => {
+                      if (!dateStr) return '';
+                      const date = new Date(dateStr);
+                      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                      const month = months[date.getMonth()];
+                      const day = date.getDate();
+                      const year = date.getFullYear();
+                      return `${month} ${day}, ${year}`;
+                    };
+                    return (
+                      <>
+                        <div className="text-xs">
+                          <span className="font-semibold">{formatShortDate(event.startDate)}</span>
+                          <div className="text-gray-600">{event.startTime}</div>
+                        </div>
+                        <div className="text-xs text-gray-500 mt-1">to</div>
+                        <div className="text-xs">
+                          <span className="font-semibold">{formatShortDate(event.endDate)}</span>
+                          <div className="text-gray-600">{event.endTime}</div>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </td>
                 <td className="p-2 border text-center align-middle">
-                  <span className={`px-2 py-1 rounded text-xs font-bold ${isActive ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}`}>{isActive ? 'Yes' : 'No'}</span>
+                  <div className="flex flex-col gap-2 items-center">
+                    <span className={`px-2 py-1 rounded text-xs font-bold ${isActive ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}`}>
+                      {isActive ? 'Yes' : 'No'}
+                    </span>
+                    {!isActive && onActivate && (
+                      <button
+                        className="relative inline-flex items-center justify-center px-3 py-2 bg-green-600 hover:bg-green-700 text-white font-bold text-xs rounded border-2 border-green-800 shadow-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                        style={{
+                          boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.2), 0 2px 4px rgba(0,0,0,0.3)',
+                          borderStyle: 'outset',
+                        }}
+                        onClick={() => onActivate(event)}
+                        disabled={isActive}
+                        title={isActive ? "Event is already active" : "Activate event"}
+                      >
+                        <div className="flex items-center gap-1.5">
+                          <FaCheckCircle className="w-4 h-4" />
+                          <span>Activate</span>
+                        </div>
+                      </button>
+                    )}
+                  </div>
                 </td>
                 <td className="p-2 border text-center align-middle">
                   <a
@@ -355,11 +416,46 @@ export function EventList({
                     <span className="text-[10px] text-gray-600 mt-1 block font-bold">Edit/View,<br />Event Details</span>
                   </a>
                 </td>
+                {/* Deactivate Button Cell */}
                 <td className="p-2 border text-center align-middle">
-                  <button className="flex flex-col items-center text-red-600 hover:text-red-800 focus:outline-none" onClick={() => onCancel(event)}>
-                    <FaTrashAlt className="w-7 h-7" />
-                    <span className="text-[10px] text-gray-600 mt-1 block font-bold">Delete</span>
-                  </button>
+                  <div className="flex flex-col items-center justify-center h-full">
+                    <div className="border-2 border-orange-400 rounded p-1.5 bg-amber-100" style={{
+                      boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.2)',
+                      borderStyle: 'inset',
+                    }}>
+                      <button
+                        className="flex flex-col items-center text-orange-700 hover:text-orange-900 focus:outline-none w-full disabled:opacity-50 disabled:cursor-not-allowed disabled:text-gray-400"
+                        onClick={() => onCancel(event)}
+                        disabled={!isActive}
+                        title={isActive ? "Deactivate event (soft delete)" : "Event is already inactive"}
+                      >
+                        <FaTrashAlt className="w-5 h-5" />
+                        <span className="text-[9px] text-gray-700 mt-1 block font-bold">Deactivate</span>
+                      </button>
+                    </div>
+                  </div>
+                </td>
+                {/* Hard Delete Button Cell */}
+                <td className="p-2 border text-center align-middle">
+                  <div className="flex flex-col items-center justify-center h-full">
+                    {onHardDelete ? (
+                      <div className="border-2 border-red-500 rounded p-1.5 bg-rose-200" style={{
+                        boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.2)',
+                        borderStyle: 'inset',
+                      }}>
+                        <button
+                          className="flex flex-col items-center text-red-700 hover:text-red-900 focus:outline-none w-full"
+                          onClick={() => onHardDelete(event)}
+                          title="Permanently delete event (hard delete)"
+                        >
+                          <FaTrashAlt className="w-5 h-5" />
+                          <span className="text-[9px] text-gray-700 mt-1 block font-bold">Hard Delete</span>
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="text-gray-400 text-xs">—</span>
+                    )}
+                  </div>
                 </td>
                 <td className="p-2 border text-center align-middle">
                   <span className="relative group flex flex-col items-center">

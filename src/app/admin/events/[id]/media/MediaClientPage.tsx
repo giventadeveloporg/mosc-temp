@@ -1,7 +1,7 @@
 "use client";
 import React, { useRef, useState, useEffect } from "react";
 import { EventMediaDTO, EventDetailsDTO } from "@/types";
-import { FaEdit, FaTrashAlt, FaUpload, FaFolderOpen, FaSpinner, FaUsers, FaPhotoVideo, FaCalendarAlt, FaBan, FaTicketAlt, FaTimes } from 'react-icons/fa';
+import { FaEdit, FaTrashAlt, FaUpload, FaFolderOpen, FaSpinner, FaUsers, FaPhotoVideo, FaCalendarAlt, FaBan, FaTicketAlt, FaTimes, FaCheckCircle } from 'react-icons/fa';
 import { deleteMediaServer, editMediaServer } from './ApiServerActions';
 import { createPortal } from "react-dom";
 import Link from 'next/link';
@@ -136,6 +136,7 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
   const [tooltipType, setTooltipType] = useState<'officialDocs' | 'uploadedMedia' | null>(null);
   const uploadedMediaSectionRef = useRef<HTMLDivElement>(null);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   useEffect(() => { setMounted(true); }, []);
 
   // Helper to infer eventMediaType from file extension
@@ -300,7 +301,11 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
       }
 
       const result = await res.json();
-      setMessage("Upload successful!");
+
+      // Show success dialog
+      setShowSuccessDialog(true);
+
+      // Clear form
       setFiles(null);
       setTitle("");
       setDescription("");
@@ -311,8 +316,12 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
       setIsHomePageHeroImage(false);
       setStartDisplayingFromDate("");
       if (fileInputRef.current) fileInputRef.current.value = "";
-      // Refresh the page after upload
-      setTimeout(() => window.location.reload(), 1200);
+
+      // Refresh the page after dialog is shown (user can close it manually or wait for auto-close)
+      setTimeout(() => {
+        setShowSuccessDialog(false);
+        window.location.reload();
+      }, 3000);
     } catch (err: any) {
       setMessage(`Upload error: ${err.message}`);
     } finally {
@@ -1359,6 +1368,58 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
           onClose={() => setEditMedia(null)}
           onSave={handleEditSave}
         />
+      )}
+      {/* Success Dialog */}
+      {showSuccessDialog && mounted && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50">
+          <div
+            className="bg-white rounded-lg shadow-xl p-8 min-w-[400px] max-w-md w-full mx-4 relative bg-green-50"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close button */}
+            <button
+              onClick={() => {
+                setShowSuccessDialog(false);
+                window.location.reload();
+              }}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+              aria-label="Close"
+            >
+              <FaTimes className="w-5 h-5" />
+            </button>
+
+            {/* Content */}
+            <div className="flex flex-col items-center text-center space-y-4">
+              {/* Icon */}
+              <div className="bg-green-100 rounded-full p-4 flex items-center justify-center">
+                <FaCheckCircle className="w-12 h-12 text-green-600" />
+              </div>
+
+              {/* Title */}
+              <h3 className="text-xl font-semibold text-green-800">
+                Upload Successful!
+              </h3>
+
+              {/* Message */}
+              <div className="text-sm text-green-800 leading-relaxed">
+                <p>Your media files have been uploaded successfully.</p>
+                <p className="mt-2">The page will refresh automatically to show the new files.</p>
+              </div>
+
+              {/* OK Button */}
+              <button
+                onClick={() => {
+                  setShowSuccessDialog(false);
+                  window.location.reload();
+                }}
+                className="mt-4 px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
       )}
     </div>
   );

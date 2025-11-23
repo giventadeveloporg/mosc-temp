@@ -512,7 +512,7 @@ export default function EventDetailsPage() {
           <div className="flex flex-col h-full">
             {/* Content Section - Styled like events page */}
             <div className="p-6 border-t border-white/20 relative">
-              {/* Buy Tickets Image - Top Right Corner */}
+              {/* Action Buttons - Register Here and Buy Tickets - Top Right Corner */}
               {(() => {
                 if (!event.startDate) return null;
 
@@ -531,9 +531,34 @@ export default function EventDetailsPage() {
                 const isUpcomingLocal = isToday || isFuture;
                 const isPast = !isUpcomingLocal;
 
+                // Determine which buttons to show
+                const showRegisterButton = event.isRegistrationRequired === true && isUpcomingLocal;
+                // Only show Buy Tickets button for TICKETED events (case-insensitive check)
+                // Handles both 'TICKETED' and 'ticketed' from database/backend
+                const showBuyTicketsButton = event.admissionType?.toUpperCase() === 'TICKETED' && isUpcomingLocal;
+
+                // Don't render if no buttons should be shown
+                if (!showRegisterButton && !showBuyTicketsButton) return null;
+
                 return (
                   <div className="absolute top-4 right-4 lg:top-6 lg:right-6 z-10 flex flex-col gap-2">
-                    {/* New Backend Payment Flow */}
+                    {/* Register Here Button - Show if registration is required */}
+                    {showRegisterButton && (
+                      <Link
+                        href={`/events/${event.id}/register`}
+                        className="transition-transform hover:scale-105"
+                        title="Register Here"
+                      >
+                        <img
+                          src="/images/register_here_button.jpg"
+                          alt="Register Here"
+                          className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
+                        />
+                      </Link>
+                    )}
+
+                    {/* Buy Tickets Button - Show only for non-FREE events */}
+                    {showBuyTicketsButton && (
                     <Link
                       href={`/events/${event.id}/checkout`}
                       className={`transition-transform hover:scale-105 ${isPast ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
@@ -545,14 +570,7 @@ export default function EventDetailsPage() {
                         className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
                       />
                     </Link>
-                    {/* Legacy Stripe Flow - Keep for backward compatibility */}
-                    <Link
-                      href={`/events/${event.id}/tickets`}
-                      className={`transition-transform hover:scale-105 text-xs text-gray-600 hover:text-gray-800 ${isPast ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      title="Buy Tickets (Legacy Flow)"
-                    >
-                      <span className="text-[10px]">Legacy Flow</span>
-                    </Link>
+                    )}
                   </div>
                 );
               })()}
@@ -1031,20 +1049,6 @@ export default function EventDetailsPage() {
                     <span className="text-lg">Add to Calendar</span>
                   </a>
                 )}
-
-                {/* See Event Details Button - Links back to this page (for consistency) */}
-                <Link
-                  href={`/events/${event.id}`}
-                  className="bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-3 px-6 rounded-xl border-2 border-emerald-400 transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-3"
-                >
-                  <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  </div>
-                  <span className="text-lg">See Event Details</span>
-                </Link>
               </div>
             </div>
           </div>

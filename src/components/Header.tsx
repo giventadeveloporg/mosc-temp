@@ -58,7 +58,7 @@ const navItems = [
 const adminSubmenuItems = [
   { name: 'Admin Home', href: '/admin' },
   { name: 'Manage Users', href: '/admin/manage-usage' },
-  { name: 'Manage Events', href: '/admin/events' },
+  { name: 'Manage Events', href: '/admin/manage-events' },
   { name: 'Event Analytics', href: '/admin/events/dashboard' },
   { name: 'Registrations', href: '/admin/events/registrations' },
   { name: 'Poll Management', href: '/admin/polls' },

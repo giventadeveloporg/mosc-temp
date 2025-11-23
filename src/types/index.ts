@@ -125,6 +125,12 @@ export interface EventDetailsDTO {
   donationMetadata?: string;
   /** Event recurrence metadata - For recurrence configuration (JSON string) */
   eventRecurrenceMetadata?: string;
+  /** Is recurring event */
+  isRecurring?: boolean;
+  /** Parent event ID (NULL for parent events, set to parent ID for child occurrences) */
+  parentEventId?: number;
+  /** Recurrence series ID (set to parent event ID for ALL events in series) */
+  recurrenceSeriesId?: number;
   /** Email header image URL for ticket confirmation emails */
   emailHeaderImageUrl?: string;
   /** Created at (ISO date-time) */

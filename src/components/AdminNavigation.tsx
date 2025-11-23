@@ -35,11 +35,11 @@ export default function AdminNavigation({ currentPage, showHome = true }: AdminN
       key: 'manage-events'
     },
     {
-      href: '/admin/events',
+      href: '/admin/event-analytics',
       icon: FaChartLine,
       label: 'Event Analytics',
       color: 'teal',
-      active: currentPage === 'events',
+      active: currentPage === 'event-analytics',
       key: 'event-analytics'
     },
     {

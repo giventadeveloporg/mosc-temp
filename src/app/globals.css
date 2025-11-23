@@ -19,6 +19,51 @@ body {
   box-sizing: border-box;
 }
 
+/* Global horizontal scrollbar styling - visible thumb for all scrollable containers */
+/* This applies to any element with overflow-x: scroll or auto */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #9CA3AF #F3F4F6;
+}
+
+/* WebKit browsers (Chrome, Safari, Edge) */
+*::-webkit-scrollbar {
+  height: 16px;
+  width: 16px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #F3F4F6;
+  border-radius: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #9CA3AF;
+  border-radius: 8px;
+  border: 3px solid #F3F4F6;
+  min-width: 30px;
+  min-height: 30px;
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #6B7280;
+  border-color: #E5E7EB;
+}
+
+*::-webkit-scrollbar-thumb:active {
+  background: #4B5563;
+  border-color: #D1D5DB;
+}
+
+*::-webkit-scrollbar-button {
+  display: none;
+}
+
+*::-webkit-scrollbar-corner {
+  background: #F3F4F6;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

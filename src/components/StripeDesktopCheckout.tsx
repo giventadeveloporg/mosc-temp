@@ -153,12 +153,14 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
           }
           if (eventId) params.set('eventId', String(eventId));
           if (params.toString()) {
+            // Keep confirming state true during redirect
             window.location.href = `/event/success?${params.toString()}`;
-            return; // Don't show alert, just redirect
+            return; // Don't reset confirming state, redirect will happen
           }
         }
 
         alert(errorMessage);
+        setConfirming(false);
       } else {
         console.log("[DESKTOP ECE] Payment confirmed successfully:", result);
 
@@ -176,7 +178,11 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
             console.log("[DESKTOP ECE] Using Payment Intent ID for success page lookup:", paymentIntent.id);
           }
           if (eventId) params.set('eventId', String(eventId));
+          // CRITICAL: Keep confirming state true during redirect - don't reset it
+          // The redirect will happen immediately, keeping the button in "Processing" state
           window.location.href = `/event/success?${params.toString()}`;
+          // Don't reset confirming state here - let redirect happen while button shows "Processing"
+          return;
         } else {
           // Fallback: try to extract from clientSecret
           const paymentIntentIdFromSecret = clientSecret?.split('_secret_')[0] || null;
@@ -189,17 +195,23 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
               params.set('pi', paymentIntentIdFromSecret);
             }
             if (eventId) params.set('eventId', String(eventId));
+            // Keep confirming state during redirect
             window.location.href = `/event/success?${params.toString()}`;
+            return;
           } else {
             console.warn("[DESKTOP ECE] No Payment Intent ID found in result or clientSecret");
             if (transactionId) {
               // If we have transactionId, use it directly
               const params = new URLSearchParams({ transactionId });
               if (eventId) params.set('eventId', String(eventId));
+              // Keep confirming state during redirect
               window.location.href = `/event/success?${params.toString()}`;
+              return;
             } else {
               console.warn("[DESKTOP ECE] No transactionId or Payment Intent ID, redirecting without parameters");
+              // Keep confirming state during redirect
               window.location.href = '/event/success';
+              return;
             }
           }
         }
@@ -219,9 +231,10 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
       }
 
       alert(errorMessage);
-    } finally {
       setConfirming(false);
     }
+    // Note: We don't reset confirming state in finally block for successful redirects
+    // This keeps the button in "Processing" state until the redirect completes
   };
 
   // Handle cancellation more robustly

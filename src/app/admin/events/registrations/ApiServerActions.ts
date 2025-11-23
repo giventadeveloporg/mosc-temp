@@ -24,12 +24,51 @@ export async function fetchRegistrationManagementData(
   search: string,
   searchType: string,
   status: string,
-  page: number
+  page: number,
+  eventName?: string,
+  startDate?: string,
+  endDate?: string
 ): Promise<RegistrationManagementData | null> {
   try {
-    const baseUrl = getAppUrl();
     const pageSize = 20;
     const offset = (page - 1) * pageSize;
+
+    // Fetch events for filter dropdown (limit to 50) - Always fetch regardless of eventId
+    const eventsParams = new URLSearchParams();
+    eventsParams.append('sort', 'startDate,desc');
+    eventsParams.append('size', '50');
+
+    const eventsResponse = await fetchWithJwtRetry(
+      `${API_BASE_URL}/api/event-details?${eventsParams.toString()}`,
+      {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+      },
+      'fetchEventsForDropdown'
+    );
+
+    let events: EventDetailsDTO[] = [];
+    if (eventsResponse.ok) {
+      const eventsData = await eventsResponse.json();
+      events = Array.isArray(eventsData) ? eventsData : [];
+    }
+
+    // Only fetch attendees if eventId is provided
+    if (!eventId) {
+      // Return empty data structure when no event is selected, but include events for dropdown
+      return {
+        attendees: [],
+        totalCount: 0,
+        currentPage: 1,
+        totalPages: 0,
+        events: events,
+        selectedEvent: null,
+        searchTerm: search,
+        searchType: searchType,
+        statusFilter: status,
+      };
+    }
 
     // Build query parameters
     const params = new URLSearchParams();
@@ -37,9 +76,7 @@ export async function fetchRegistrationManagementData(
     params.append('page', (offset / pageSize).toString());
     params.append('sort', 'registrationDate,desc');
 
-    if (eventId) {
-      params.append('eventId.equals', eventId.toString());
-    }
+    params.append('eventId.equals', eventId.toString());
 
     if (search) {
       if (searchType === 'name') {
@@ -56,12 +93,16 @@ export async function fetchRegistrationManagementData(
       params.append('registrationStatus.equals', status);
     }
 
-    // Fetch attendees
-    const attendeesResponse = await fetch(`${baseUrl}/api/proxy/event-attendees?${params.toString()}`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-      cache: 'no-store',
-    });
+    // Fetch attendees using fetchWithJwtRetry
+    const attendeesResponse = await fetchWithJwtRetry(
+      `${API_BASE_URL}/api/event-attendees?${params.toString()}`,
+      {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+      },
+      'fetchAttendees'
+    );
 
     if (!attendeesResponse.ok) {
       throw new Error(`Failed to fetch attendees: ${attendeesResponse.status}`);
@@ -76,11 +117,15 @@ export async function fetchRegistrationManagementData(
     countParams.delete('page');
     countParams.append('size', '1');
 
-    const countResponse = await fetch(`${baseUrl}/api/proxy/event-attendees?${countParams.toString()}`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-      cache: 'no-store',
-    });
+    const countResponse = await fetchWithJwtRetry(
+      `${API_BASE_URL}/api/event-attendees?${countParams.toString()}`,
+      {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+      },
+      'fetchAttendeesCount'
+    );
 
     let totalCount = 0;
     if (countResponse.ok) {
@@ -88,27 +133,18 @@ export async function fetchRegistrationManagementData(
       totalCount = countData.totalElements || attendeesArray.length;
     }
 
-    // Fetch events for filter dropdown
-    const eventsResponse = await fetch(`${baseUrl}/api/proxy/event-details?sort=startDate,desc&size=100`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-      cache: 'no-store',
-    });
-
-    let events: EventDetailsDTO[] = [];
-    if (eventsResponse.ok) {
-      const eventsData = await eventsResponse.json();
-      events = Array.isArray(eventsData) ? eventsData : [];
-    }
-
     // Fetch selected event details if eventId is provided
     let selectedEvent: EventDetailsDTO | null = null;
     if (eventId) {
-      const eventResponse = await fetch(`${baseUrl}/api/proxy/event-details/${eventId}`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        cache: 'no-store',
-      });
+      const eventResponse = await fetchWithJwtRetry(
+        `${API_BASE_URL}/api/event-details/${eventId}`,
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+        },
+        'fetchSelectedEvent'
+      );
 
       if (eventResponse.ok) {
         selectedEvent = await eventResponse.json();
@@ -131,6 +167,58 @@ export async function fetchRegistrationManagementData(
   } catch (error) {
     console.error('Error fetching registration management data:', error);
     return null;
+  }
+}
+
+/**
+ * Search events by name, ID, or date range
+ */
+export async function searchEvents(
+  eventName?: string,
+  eventId?: string,
+  startDate?: string,
+  endDate?: string
+): Promise<EventDetailsDTO[]> {
+  try {
+    const params = new URLSearchParams();
+    params.append('sort', 'startDate,desc');
+    params.append('size', '50'); // Limit to 50 events
+
+    if (eventId) {
+      params.append('id.equals', eventId);
+    }
+
+    if (eventName) {
+      params.append('title.contains', eventName);
+    }
+
+    if (startDate) {
+      params.append('startDate.greaterThanOrEqual', startDate);
+    }
+
+    if (endDate) {
+      params.append('endDate.lessThanOrEqual', endDate);
+    }
+
+    const eventsResponse = await fetchWithJwtRetry(
+      `${API_BASE_URL}/api/event-details?${params.toString()}`,
+      {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+      },
+      'searchEvents'
+    );
+
+    if (!eventsResponse.ok) {
+      throw new Error(`Failed to search events: ${eventsResponse.status}`);
+    }
+
+    const eventsData = await eventsResponse.json();
+    return Array.isArray(eventsData) ? eventsData : [];
+  } catch (error) {
+    console.error('Error searching events:', error);
+    return [];
   }
 }
 

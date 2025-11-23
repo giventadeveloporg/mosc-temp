@@ -1,14 +1,17 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { RegistrationManagementData } from './ApiServerActions';
+import { searchEvents } from './ApiServerActions';
+import type { EventDetailsDTO } from '@/types';
 import {
   FaSearch,
   FaFilter,
   FaDownload,
   FaEdit,
   FaTrash,
+  FaTrashAlt,
   FaEye,
   FaChevronLeft,
   FaChevronRight,
@@ -20,7 +23,10 @@ import {
   FaUser,
   FaUsers,
   FaExclamationTriangle,
-  FaStickyNote
+  FaStickyNote,
+  FaInfoCircle,
+  FaCheckCircle,
+  FaClock
 } from 'react-icons/fa';
 import Link from 'next/link';
 
@@ -52,11 +58,55 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
     statusFilter
   } = data;
 
+  // Event search state
+  const [eventSearchType, setEventSearchType] = useState<'id' | 'name' | 'dateRange'>('id');
+  const [eventSearchId, setEventSearchId] = useState('');
+  const [eventSearchName, setEventSearchName] = useState('');
+  const [eventStartDate, setEventStartDate] = useState('');
+  const [eventEndDate, setEventEndDate] = useState('');
+  const [searchResults, setSearchResults] = useState<EventDetailsDTO[]>([]);
+  const [isSearchingEvents, setIsSearchingEvents] = useState(false);
+
   const [searchType, setSearchType] = useState<'name' | 'email' | 'eventId'>(dataSearchType as 'name' | 'email' | 'eventId' || 'name');
   const [searchValue, setSearchValue] = useState(searchTerm);
 
+  // Only show registrants if an event is selected
+  const hasSelectedEvent = !!selectedEvent;
+
+  // Event search handler
+  const handleEventSearch = async () => {
+    setIsSearchingEvents(true);
+    try {
+      const results = await searchEvents(
+        eventSearchType === 'name' ? eventSearchName : undefined,
+        eventSearchType === 'id' ? eventSearchId : undefined,
+        eventSearchType === 'dateRange' ? eventStartDate : undefined,
+        eventSearchType === 'dateRange' ? eventEndDate : undefined
+      );
+      setSearchResults(results);
+    } catch (error) {
+      console.error('Error searching events:', error);
+      setSearchResults([]);
+    } finally {
+      setIsSearchingEvents(false);
+    }
+  };
+
+  const handleSelectEventFromSearch = (eventId: number) => {
+    const params = new URLSearchParams(searchParams || undefined);
+    params.set('eventId', eventId.toString());
+    params.delete('page'); // Reset to first page
+    params.delete('search'); // Clear search when changing event
+    params.delete('searchType'); // Clear search type when changing event
+    params.delete('status'); // Clear status filter when changing event
+    startTransition(() => {
+      router.push(`/admin/events/registrations?${params.toString()}`);
+    });
+  };
+
   const handleSearch = (search: string, type: 'name' | 'email' | 'eventId' = searchType) => {
-    const params = new URLSearchParams(searchParams);
+    if (!hasSelectedEvent) return; // Don't search if no event selected
+    const params = new URLSearchParams(searchParams || undefined);
     if (search) {
       params.set('search', search);
       params.set('searchType', type);
@@ -65,50 +115,74 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
       params.delete('searchType');
     }
     params.delete('page'); // Reset to first page
+    startTransition(() => {
     router.push(`/admin/events/registrations?${params.toString()}`);
+    });
   };
 
   const handleSearchTypeChange = (type: 'name' | 'email' | 'eventId') => {
     setSearchType(type);
-    if (searchValue) {
+    if (searchValue && hasSelectedEvent) {
       handleSearch(searchValue, type);
     }
   };
 
   const handleEventFilter = (eventId: string) => {
-    const params = new URLSearchParams(searchParams);
-    if (eventId) {
-      params.set('eventId', eventId);
-    } else {
+    if (!eventId || eventId === '') {
+      // Clear event selection
+      const params = new URLSearchParams(searchParams || undefined);
       params.delete('eventId');
+      params.delete('page');
+      params.delete('search');
+      params.delete('searchType');
+      params.delete('status');
+      startTransition(() => {
+        router.push(`/admin/events/registrations?${params.toString()}`);
+      });
+      return;
     }
+
+    // Set event ID and clear other filters
+    const params = new URLSearchParams();
+    params.set('eventId', eventId);
     params.delete('page'); // Reset to first page
+    params.delete('search'); // Clear search when changing event
+    params.delete('searchType'); // Clear search type when changing event
+    params.delete('status'); // Clear status filter when changing event
+
+    // Use startTransition for better UX
+    startTransition(() => {
     router.push(`/admin/events/registrations?${params.toString()}`);
+    });
   };
 
   const handleStatusFilter = (status: string) => {
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams || undefined);
     if (status) {
       params.set('status', status);
     } else {
       params.delete('status');
     }
     params.delete('page'); // Reset to first page
+    startTransition(() => {
     router.push(`/admin/events/registrations?${params.toString()}`);
+    });
   };
 
   const handlePageChange = (page: number) => {
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams || undefined);
     params.set('page', page.toString());
+    startTransition(() => {
     router.push(`/admin/events/registrations?${params.toString()}`);
+    });
   };
 
   const handleExportCSV = async () => {
     try {
-      const eventId = searchParams.get('eventId');
-      const search = searchParams.get('search') || '';
-      const searchType = searchParams.get('searchType') || 'name';
-      const status = searchParams.get('status') || '';
+      const eventId = searchParams?.get('eventId') || null;
+      const search = searchParams?.get('search') || '';
+      const searchType = searchParams?.get('searchType') || 'name';
+      const status = searchParams?.get('status') || '';
 
       const { exportRegistrationsToCSV } = await import('./ApiServerActions');
       const csvContent = await exportRegistrationsToCSV(
@@ -144,7 +218,7 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
   };
 
   const handleSelectAttendee = (attendeeId: number) => {
-    setSelectedAttendees(prev =>
+    setSelectedAttendees((prev: number[]) =>
       prev.includes(attendeeId)
         ? prev.filter(id => id !== attendeeId)
         : [...prev, attendeeId]
@@ -226,7 +300,7 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
   };
 
   const handleFormChange = (field: string, value: string) => {
-    setEditForm(prev => ({
+    setEditForm((prev: any) => ({
       ...prev,
       [field]: value
     }));
@@ -261,24 +335,232 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
     setEditForm({});
   };
 
+  // Calculate pagination display values
+  const pageSize = 20;
+  const startItem = hasSelectedEvent && totalCount > 0 ? (currentPage - 1) * pageSize + 1 : 0;
+  const endItem = hasSelectedEvent && totalCount > 0 ? Math.min(currentPage * pageSize, totalCount) : 0;
+
+  // Calculate registration statistics
+  const totalPeopleRegistered = totalCount; // Total number of primary registrants (all pages matching filter)
+  const totalGuests = attendees.reduce((sum, attendee) => sum + (attendee.totalNumberOfGuests || 0), 0);
+  // Estimate total guests based on average from current page
+  const avgGuestsPerRegistrant = attendees.length > 0 && totalCount > 0
+    ? totalGuests / attendees.length
+    : 0;
+  const estimatedTotalGuests = Math.round(totalCount * avgGuestsPerRegistrant);
+  const totalAttendees = totalPeopleRegistered + estimatedTotalGuests; // Total people (registrants + estimated guests)
+
+  // Status counts - estimate based on current page distribution
+  const registeredRatio = attendees.length > 0
+    ? attendees.filter(a => a.registrationStatus === 'REGISTERED').length / attendees.length
+    : 0;
+  const pendingRatio = attendees.length > 0
+    ? attendees.filter(a => a.registrationStatus === 'PENDING').length / attendees.length
+    : 0;
+  const cancelledRatio = attendees.length > 0
+    ? attendees.filter(a => a.registrationStatus === 'CANCELLED').length / attendees.length
+    : 0;
+
+  const registeredCount = Math.round(totalCount * registeredRatio);
+  const pendingCount = Math.round(totalCount * pendingRatio);
+  const cancelledCount = Math.round(totalCount * cancelledRatio);
+
   return (
-    <div className="max-w-7xl mx-auto px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+      <div className="mb-12 pt-16">
+        <h1 className="text-4xl font-bold text-gray-900 mb-6">
           Registration Management
         </h1>
-        <p className="text-gray-600">
-          {selectedEvent
-            ? `Manage registrations for ${selectedEvent.title}`
-            : 'Manage all event registrations'
-          }
+        <div className="pt-4">
+          <p className="text-xl font-semibold text-gray-700 leading-relaxed">
+            {selectedEvent ? (
+              <>
+                Manage registrations for{' '}
+                <span className="text-blue-600 font-bold">{selectedEvent.title}</span>
+              </>
+            ) : (
+              <span className="text-gray-600">Search by event to view registrations</span>
+            )}
         </p>
+        </div>
       </div>
 
-      {/* Filters and Actions */}
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
+      {/* Event Search Section - Show when no event selected */}
+      {!hasSelectedEvent && (
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <FaInfoCircle className="text-blue-600" />
+            <h2 className="text-xl font-semibold text-gray-900">
+              Search for an Event
+            </h2>
+          </div>
+          <p className="text-gray-600 mb-6">
+            Please search for an event by Event ID, Event Name, or Date Range to view its registrations.
+          </p>
+
+          {/* Event Search Type */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Search By
+            </label>
+            <select
+              value={eventSearchType}
+              onChange={(e) => setEventSearchType(e.target.value as 'id' | 'name' | 'dateRange')}
+              className="w-full md:w-64 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="id">Event ID</option>
+              <option value="name">Event Name</option>
+              <option value="dateRange">Date Range</option>
+            </select>
+          </div>
+
+          {/* Event Search Inputs */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            {eventSearchType === 'id' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Event ID
+                </label>
+                <input
+                  type="number"
+                  value={eventSearchId}
+                  onChange={(e) => setEventSearchId(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && eventSearchId && eventSearchId.trim() !== '') {
+                      handleEventSearch();
+                    }
+                  }}
+                  placeholder="Enter Event ID"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+            )}
+
+            {eventSearchType === 'name' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Event Name
+                </label>
+                <input
+                  type="text"
+                  value={eventSearchName}
+                  onChange={(e) => setEventSearchName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && eventSearchName && eventSearchName.trim() !== '') {
+                      handleEventSearch();
+                    }
+                  }}
+                  placeholder="Enter Event Name"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+            )}
+
+            {eventSearchType === 'dateRange' && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Start Date
+                  </label>
+                  <input
+                    type="date"
+                    value={eventStartDate}
+                    onChange={(e) => setEventStartDate(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    End Date
+                  </label>
+                  <input
+                    type="date"
+                    value={eventEndDate}
+                    onChange={(e) => setEventEndDate(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Search Button */}
+          <button
+            onClick={handleEventSearch}
+            disabled={
+              isSearchingEvents ||
+              (eventSearchType === 'id' && (!eventSearchId || eventSearchId.trim() === '')) ||
+              (eventSearchType === 'name' && (!eventSearchName || eventSearchName.trim() === '')) ||
+              (eventSearchType === 'dateRange' && (!eventStartDate || !eventEndDate))
+            }
+            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          >
+            <FaSearch />
+            {isSearchingEvents ? 'Searching...' : 'Search Events'}
+          </button>
+
+          {/* Search Results */}
+          {searchResults.length > 0 && (
+            <div className="mt-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Search Results ({searchResults.length} events found)
+              </h3>
+              <div className="space-y-2 max-h-96 overflow-y-auto">
+                {searchResults.map((event) => (
+                  <div
+                    key={event.id}
+                    className="p-4 border border-gray-200 rounded-md hover:bg-gray-50 cursor-pointer flex items-center justify-between"
+                    onClick={() => handleSelectEventFromSearch(event.id!)}
+                  >
+                    <div>
+                      <div className="font-medium text-gray-900">
+                        {event.title}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        Event ID: {event.id} | {event.startDate ? new Date(event.startDate).toLocaleDateString() : 'N/A'}
+                      </div>
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSelectEventFromSearch(event.id!);
+                      }}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+                    >
+                      View Registrations
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Quick Event Selection from Dropdown (limited to 50) */}
+          <div className="mt-6 pt-6 border-t border-gray-200">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Or select from recent events (max 50)
+            </label>
+            <select
+              value={data.selectedEvent && data.selectedEvent.id ? data.selectedEvent.id.toString() : ''}
+              onChange={(e) => handleEventFilter(e.target.value)}
+              className="w-full md:w-96 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="">Select an event...</option>
+              {events.slice(0, 50).map(event => (
+                <option key={event.id} value={event.id?.toString() || ''}>
+                  {event.title} (ID: {event.id})
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      )}
+
+      {/* Filters and Actions - Only show when event is selected */}
+      {hasSelectedEvent && (
+        <div className="bg-white rounded-lg shadow p-3 sm:p-4 lg:p-6 mb-4 sm:mb-6 overflow-x-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2 sm:gap-3 lg:gap-4 mb-4 min-w-fit">
           {/* Search Type Dropdown */}
           <div className="relative">
             <FaFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -316,7 +598,7 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
             />
           </div>
 
-          {/* Event Filter */}
+            {/* Event Filter - Change Event */}
           <div className="relative">
             <FaFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <select
@@ -324,10 +606,10 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
               onChange={(e) => handleEventFilter(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
             >
-              <option value="">All Events</option>
-              {events.map(event => (
+                <option value="">Change Event...</option>
+                {events.slice(0, 50).map(event => (
                 <option key={event.id} value={event.id}>
-                  {event.title}
+                    {event.title} (ID: {event.id})
                 </option>
               ))}
             </select>
@@ -349,9 +631,9 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
           {/* Export Button */}
           <button
             onClick={handleExportCSV}
-            className="flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+              className="flex items-center justify-center px-4 py-2.5 sm:py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors touch-manipulation text-sm sm:text-base"
           >
-            <FaDownload className="mr-2" />
+              <FaDownload className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
             Export CSV
           </button>
         </div>
@@ -368,40 +650,178 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
           )}
         </div>
       </div>
+      )}
 
-      {/* Registrations Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
+      {/* Event Analytics - Only show when event is selected */}
+      {hasSelectedEvent && (
+        <div className="bg-white rounded-lg shadow px-1.5 py-2 sm:px-3 sm:py-3 lg:p-6 mb-4 sm:mb-6 w-full overflow-hidden">
+          <h2 className="text-xs sm:text-sm lg:text-lg font-semibold text-gray-900 mb-1.5 sm:mb-2 lg:mb-4 px-0.5 sm:px-1">Event Registration Analytics</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1 sm:gap-2 lg:gap-4 w-full">
+            {/* Total People Registered */}
+            <div className="bg-blue-50 rounded-md sm:rounded-lg p-1 sm:p-2 lg:p-4 min-w-0 flex flex-col">
+              <div className="flex items-center mb-0.5 sm:mb-1 lg:mb-2">
+                <FaUsers className="h-2.5 w-2.5 sm:h-4 sm:w-4 lg:h-5 lg:w-5 text-blue-600 flex-shrink-0" />
+              </div>
+              <p className="text-[8px] sm:text-[10px] lg:text-xs font-medium text-gray-600 mb-0.5 sm:mb-1 leading-tight truncate">People Registered</p>
+              <p className="text-xs sm:text-base lg:text-2xl font-bold text-gray-900 truncate">{totalPeopleRegistered.toLocaleString()}</p>
+            </div>
+
+            {/* Total Guests */}
+            <div className="bg-green-50 rounded-md sm:rounded-lg p-1 sm:p-2 lg:p-4 min-w-0 flex flex-col">
+              <div className="flex items-center mb-0.5 sm:mb-1 lg:mb-2">
+                <FaUserFriends className="h-2.5 w-2.5 sm:h-4 sm:w-4 lg:h-5 lg:w-5 text-green-600 flex-shrink-0" />
+              </div>
+              <p className="text-[8px] sm:text-[10px] lg:text-xs font-medium text-gray-600 mb-0.5 sm:mb-1 leading-tight truncate">Total Guests</p>
+              <p className="text-xs sm:text-base lg:text-2xl font-bold text-gray-900 truncate">{totalGuests.toLocaleString()}</p>
+            </div>
+
+            {/* Total Attendees */}
+            <div className="bg-purple-50 rounded-md sm:rounded-lg p-1 sm:p-2 lg:p-4 min-w-0 flex flex-col">
+              <div className="flex items-center mb-0.5 sm:mb-1 lg:mb-2">
+                <FaUsers className="h-2.5 w-2.5 sm:h-4 sm:w-4 lg:h-5 lg:w-5 text-purple-600 flex-shrink-0" />
+              </div>
+              <p className="text-[8px] sm:text-[10px] lg:text-xs font-medium text-gray-600 mb-0.5 sm:mb-1 leading-tight truncate">Total Attendees</p>
+              <p className="text-xs sm:text-base lg:text-2xl font-bold text-gray-900 truncate">{totalAttendees.toLocaleString()}</p>
+            </div>
+
+            {/* Registered Status */}
+            <div className="bg-emerald-50 rounded-md sm:rounded-lg p-1 sm:p-2 lg:p-4 min-w-0 flex flex-col">
+              <div className="flex items-center mb-0.5 sm:mb-1 lg:mb-2">
+                <FaCheckCircle className="h-2.5 w-2.5 sm:h-4 sm:w-4 lg:h-5 lg:w-5 text-emerald-600 flex-shrink-0" />
+              </div>
+              <p className="text-[8px] sm:text-[10px] lg:text-xs font-medium text-gray-600 mb-0.5 sm:mb-1 leading-tight truncate">Registered</p>
+              <p className="text-xs sm:text-base lg:text-2xl font-bold text-gray-900 truncate">{registeredCount.toLocaleString()}</p>
+            </div>
+
+            {/* Pending Status */}
+            <div className="bg-yellow-50 rounded-md sm:rounded-lg p-1 sm:p-2 lg:p-4 min-w-0 flex flex-col">
+              <div className="flex items-center mb-0.5 sm:mb-1 lg:mb-2">
+                <FaClock className="h-2.5 w-2.5 sm:h-4 sm:w-4 lg:h-5 lg:w-5 text-yellow-600 flex-shrink-0" />
+              </div>
+              <p className="text-[8px] sm:text-[10px] lg:text-xs font-medium text-gray-600 mb-0.5 sm:mb-1 leading-tight truncate">Pending</p>
+              <p className="text-xs sm:text-base lg:text-2xl font-bold text-gray-900 truncate">{pendingCount.toLocaleString()}</p>
+            </div>
+
+            {/* Cancelled Status */}
+            <div className="bg-red-50 rounded-md sm:rounded-lg p-1 sm:p-2 lg:p-4 min-w-0 flex flex-col">
+              <div className="flex items-center mb-0.5 sm:mb-1 lg:mb-2">
+                <FaTimes className="h-2.5 w-2.5 sm:h-4 sm:w-4 lg:h-5 lg:w-5 text-red-600 flex-shrink-0" />
+              </div>
+              <p className="text-[8px] sm:text-[10px] lg:text-xs font-medium text-gray-600 mb-0.5 sm:mb-1 leading-tight truncate">Cancelled</p>
+              <p className="text-xs sm:text-base lg:text-2xl font-bold text-gray-900 truncate">{cancelledCount.toLocaleString()}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Registrations Table - Only show when event is selected */}
+      {hasSelectedEvent && (
+        <>
+          <style dangerouslySetInnerHTML={{
+            __html: `
+            .table-scroll-container {
+              overflow-x: scroll !important;
+              overflow-y: visible !important;
+              scrollbar-width: thin !important;
+              scrollbar-color: #EC4899 #FCE7F3 !important;
+              -ms-overflow-style: -ms-autohiding-scrollbar !important;
+            }
+            .table-scroll-container::-webkit-scrollbar {
+              height: 20px !important;
+              display: block !important;
+              -webkit-appearance: none !important;
+              appearance: none !important;
+            }
+            .table-scroll-container::-webkit-scrollbar-track {
+              background: linear-gradient(90deg, #DBEAFE, #E9D5FF, #FCE7F3, #FED7AA) !important;
+              border-radius: 10px !important;
+              -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.15) !important;
+              box-shadow: inset 0 0 6px rgba(0,0,0,0.15) !important;
+            }
+            .table-scroll-container::-webkit-scrollbar-thumb {
+              background: linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899, #F97316) !important;
+              border-radius: 10px !important;
+              border: 4px solid #F3F4F6 !important;
+              -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.4) !important;
+              box-shadow: inset 0 0 6px rgba(0,0,0,0.4) !important;
+              min-width: 50px !important;
+              background-clip: padding-box !important;
+            }
+            .table-scroll-container::-webkit-scrollbar-thumb:hover {
+              background: linear-gradient(90deg, #2563EB, #7C3AED, #DB2777, #EA580C) !important;
+              border-color: #E5E7EB !important;
+            }
+            .table-scroll-container::-webkit-scrollbar-thumb:active {
+              background: linear-gradient(90deg, #1D4ED8, #6D28D9, #BE185D, #C2410C) !important;
+              border-color: #D1D5DB !important;
+            }
+            .table-scroll-container::-webkit-scrollbar-button {
+              display: none !important;
+            }
+            .table-scroll-container::-webkit-scrollbar-corner {
+              background: #E0E7FF !important;
+            }
+            .table-scroll-container::after {
+              content: '';
+              display: block;
+              width: 100vw;
+              height: 1px;
+              flex-shrink: 0;
+            }
+            .table-scroll-container {
+              display: flex !important;
+            }
+          `
+          }} />
+          <div className="rounded-lg shadow w-full overflow-hidden" style={{
+            background: 'linear-gradient(to right, #3B82F6, #8B5CF6, #EC4899, #F97316)',
+            padding: '4px'
+          }}>
+            <div
+              className="w-full table-scroll-container"
+              style={{
+                overflowX: 'scroll',
+                overflowY: 'visible',
+                WebkitOverflowScrolling: 'touch',
+                maxWidth: '100%',
+                display: 'flex',
+                position: 'relative',
+                width: '100%',
+                minHeight: '1px',
+                scrollbarGutter: 'stable',
+                background: 'linear-gradient(to right, #3B82F6, #8B5CF6, #EC4899, #F97316)',
+                borderRadius: '8px',
+                padding: '20px'
+              }}
+            >
+              <table className="divide-y divide-gray-200" style={{
+                width: 'max-content',
+                minWidth: 'fit-content',
+                flexShrink: 0,
+                background: 'rgba(255, 255, 255, 0.95)',
+                borderRadius: '8px',
+                overflow: 'hidden'
+              }}>
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left">
+                    <th className="px-3 sm:px-6 py-3 text-left">
                   <input
                     type="checkbox"
                     checked={selectedAttendees.length === attendees.length && attendees.length > 0}
                     onChange={handleSelectAll}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        className="w-5 h-5 sm:w-4 sm:h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 touch-manipulation"
                   />
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Attendee
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Contact
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Event
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Registration Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Guests
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -409,83 +829,77 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
             <tbody className="bg-white divide-y divide-gray-200">
               {attendees.map((attendee) => (
                 <tr key={attendee.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                     <input
                       type="checkbox"
                       checked={selectedAttendees.includes(attendee.id!)}
                       onChange={() => handleSelectAttendee(attendee.id!)}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          className="w-5 h-5 sm:w-4 sm:h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 touch-manipulation"
                     />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10">
-                        <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                          <FaUserFriends className="h-5 w-5 text-gray-600" />
+                          <div className="flex-shrink-0 h-10 w-10 sm:h-12 sm:w-12">
+                            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-gray-300 flex items-center justify-center">
+                              <FaUserFriends className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600" />
                         </div>
                       </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
+                          <div className="ml-2 sm:ml-4 min-w-0">
+                            <div className="text-sm font-medium text-gray-900 truncate">
                           {attendee.firstName} {attendee.lastName}
                         </div>
-                        <div className="text-sm text-gray-500">
+                            <div className="text-xs sm:text-sm text-gray-500">
                           ID: {attendee.id}
                         </div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900 flex items-center">
-                      <FaEnvelope className="h-4 w-4 text-gray-400 mr-2" />
-                      {attendee.email}
+                          <FaEnvelope className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400 mr-2 flex-shrink-0" />
+                          <span className="break-all">{attendee.email}</span>
                     </div>
                     {attendee.phone && (
                       <div className="text-sm text-gray-500 flex items-center mt-1">
-                        <FaPhone className="h-4 w-4 text-gray-400 mr-2" />
-                        {attendee.phone}
+                            <FaPhone className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400 mr-2 flex-shrink-0" />
+                            <span>{attendee.phone}</span>
                       </div>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {selectedEvent?.title || `Event ${attendee.eventId}`}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex items-center">
-                    <FaCalendarAlt className="h-4 w-4 text-gray-400 mr-2" />
-                    {attendee.registrationDate
-                      ? new Date(attendee.registrationDate).toLocaleDateString()
-                      : 'N/A'
-                    }
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(attendee.registrationStatus || '')}`}>
+                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex px-2 sm:px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(attendee.registrationStatus || '')}`}>
                       {attendee.registrationStatus || 'Unknown'}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {attendee.totalNumberOfGuests || 0}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex space-x-2">
+                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div className="flex space-x-2 sm:space-x-3">
                       <button
                         onClick={() => handleViewAttendee(attendee)}
-                        className="text-blue-600 hover:text-blue-900 transition-colors"
+                            className="p-2 sm:p-2.5 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-colors touch-manipulation"
                         title="View Details"
+                            aria-label="View Details"
                       >
-                        <FaEye />
+                            <FaEye className="h-5 w-5 sm:h-6 sm:w-6" />
                       </button>
                       <button
                         onClick={() => handleEditAttendee(attendee)}
-                        className="text-green-600 hover:text-green-900 transition-colors"
+                            className="p-2 sm:p-2.5 text-green-600 hover:text-green-900 hover:bg-green-50 rounded-lg transition-colors touch-manipulation"
                         title="Edit"
+                            aria-label="Edit"
                       >
-                        <FaEdit />
+                            <FaEdit className="h-5 w-5 sm:h-6 sm:w-6" />
                       </button>
                       <button
                         onClick={() => handleDeleteAttendee(attendee)}
-                        className="text-red-600 hover:text-red-900 transition-colors"
-                        title="Delete"
+                            className="flex flex-col items-center text-red-700 hover:text-red-900 focus:outline-none touch-manipulation border-2 border-red-500 rounded p-1.5 sm:p-2 bg-rose-200 hover:bg-rose-300 transition-colors"
+                            style={{
+                              boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.2)',
+                              borderStyle: 'inset',
+                            }}
+                            title="Delete Registration"
+                            aria-label="Delete"
                       >
-                        <FaTrash />
+                            <FaTrashAlt className="h-6 w-6 sm:h-7 sm:w-7" />
                       </button>
                     </div>
                   </td>
@@ -493,76 +907,39 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
               ))}
             </tbody>
           </table>
+            </div>
         </div>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-            <div className="flex-1 flex justify-between sm:hidden">
+          {/* Pagination - Matching admin home page style */}
+          <div className="mt-4 px-2 sm:px-0">
+            <div className="flex justify-between items-center flex-wrap gap-2">
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 sm:px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors text-sm sm:text-base"
               >
-                Previous
+                <FaChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="hidden sm:inline">Previous</span>
               </button>
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Next
-              </button>
+              <div className="text-xs sm:text-sm font-semibold text-gray-700 px-2">
+                Page {currentPage} of {totalPages}
             </div>
-            <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm text-gray-700">
-                  Showing page <span className="font-medium">{currentPage}</span> of{' '}
-                  <span className="font-medium">{totalPages}</span>
-                </p>
-              </div>
-              <div>
-                <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                  <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <FaChevronLeft className="h-5 w-5" />
-                  </button>
-
-                  {/* Page numbers */}
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    const pageNum = Math.max(1, currentPage - 2) + i;
-                    if (pageNum > totalPages) return null;
-
-                    return (
-                      <button
-                        key={pageNum}
-                        onClick={() => handlePageChange(pageNum)}
-                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${pageNum === currentPage
-                          ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                          : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                          }`}
-                      >
-                        {pageNum}
-                      </button>
-                    );
-                  })}
-
                   <button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 sm:px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors text-sm sm:text-base"
                   >
-                    <FaChevronRight className="h-5 w-5" />
+                <span className="hidden sm:inline">Next</span>
+                <FaChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
                   </button>
-                </nav>
               </div>
+            <div className="text-center text-xs sm:text-sm text-gray-600 mt-2">
+              Showing <span className="font-medium">{startItem}</span> to <span className="font-medium">{endItem}</span> of{' '}
+              <span className="font-medium">{totalCount}</span> registrations
             </div>
           </div>
+        </>
         )}
-      </div>
 
       {/* Action Buttons */}
       <div className="mt-8 flex justify-center space-x-4">
@@ -573,10 +950,10 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
           Back to Dashboard
         </Link>
         <Link
-          href="/admin/events"
+          href="/admin/event-analytics"
           className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-md font-semibold"
         >
-          Manage Events
+          Event Analytics
         </Link>
       </div>
 

@@ -85,13 +85,61 @@ export default function UniversalPaymentCheckout(props: Props) {
   // Track the cart key for the current session to avoid unnecessary re-initialization
   const sessionCartKeyRef = useRef<string | null>(null);
 
-  // Initialize payment session when enabled and cart is ready
+  // Track if payment section has been interacted with or is visible
+  const [paymentSectionActive, setPaymentSectionActive] = useState(false);
+  const paymentSectionRef = useRef<HTMLDivElement>(null);
+
+  // Use Intersection Observer to detect when payment section is visible
+  useEffect(() => {
+    if (!paymentSectionRef.current) return;
+
+    // Check if element is already visible (fallback for immediate activation)
+    const checkVisibility = () => {
+      const rect = paymentSectionRef.current?.getBoundingClientRect();
+      if (rect && rect.top < window.innerHeight && rect.bottom > 0) {
+        setPaymentSectionActive(true);
+        return true;
+      }
+      return false;
+    };
+
+    // Check immediately if already visible
+    if (checkVisibility()) {
+      return; // Already visible, no need for observer
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setPaymentSectionActive(true);
+          }
+        });
+      },
+      { threshold: 0.1 } // Trigger when 10% of section is visible
+    );
+
+    observer.observe(paymentSectionRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  // Initialize payment session when enabled, cart is ready, AND payment section is active
   useEffect(() => {
     if (!enabled || cart.length === 0 || !email) {
       // Clear session if form is incomplete
       setPaymentSession(null);
       setProviderType(null);
       sessionCartKeyRef.current = null;
+      return;
+    }
+
+    // Lazy initialization: Only initialize when payment section is visible/interacted with
+    // This prevents unnecessary backend calls when user is just filling out form fields
+    if (!paymentSectionActive) {
+      console.log('[UniversalPaymentCheckout] Payment section not yet active, deferring initialization');
       return;
     }
 
@@ -264,12 +312,12 @@ export default function UniversalPaymentCheckout(props: Props) {
     return () => {
       cancelled = true;
     };
-  }, [enabled, cartKey, email, amountCents, paymentUseCase, eventId, discountCodeId, customerName, customerPhone, returnUrl, cancelUrl]);
+  }, [enabled, cartKey, email, amountCents, paymentUseCase, eventId, discountCodeId, customerName, customerPhone, returnUrl, cancelUrl, paymentSectionActive]);
 
   // Render loading state
   if (isInitializing) {
     return (
-      <div className="flex flex-col items-center justify-center p-8">
+      <div ref={paymentSectionRef} className="flex flex-col items-center justify-center p-8">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
         <p className="text-muted-foreground">Initializing payment...</p>
       </div>
@@ -279,11 +327,12 @@ export default function UniversalPaymentCheckout(props: Props) {
   // Render error state
   if (initializationError) {
     return (
-      <div className="bg-destructive/10 border border-destructive rounded-lg p-4">
+      <div ref={paymentSectionRef} className="bg-destructive/10 border border-destructive rounded-lg p-4">
         <p className="text-destructive font-semibold mb-2">Payment Initialization Failed</p>
         <p className="text-sm text-muted-foreground">{initializationError}</p>
         <button
           onClick={() => {
+            setPaymentSectionActive(true); // Activate section on retry
             setInitializationError(null);
             setIsInitializing(true);
           }}
@@ -306,14 +355,25 @@ export default function UniversalPaymentCheckout(props: Props) {
       enabled,
       cartLength: cart.length,
       hasEmail: !!email,
+      paymentSectionActive,
     });
 
     return (
-      <div className="text-center p-8 text-muted-foreground">
+      <div
+        ref={paymentSectionRef}
+        className="text-center p-8 text-muted-foreground"
+        onClick={() => {
+          // Activate payment section when user clicks/interacts with it
+          if (!paymentSectionActive) {
+            console.log('[UniversalPaymentCheckout] Payment section activated by user interaction');
+            setPaymentSectionActive(true);
+          }
+        }}
+      >
         <p>Please complete the form above to proceed with payment.</p>
         {process.env.NODE_ENV === 'development' && (
           <p className="text-xs mt-2 text-gray-500">
-            Debug: enabled={String(enabled)}, cart={cart.length}, email={email ? 'yes' : 'no'}
+            Debug: enabled={String(enabled)}, cart={cart.length}, email={email ? 'yes' : 'no'}, active={String(paymentSectionActive)}
           </p>
         )}
       </div>
@@ -327,7 +387,7 @@ export default function UniversalPaymentCheckout(props: Props) {
   if (providerType === ProviderType.STRIPE && paymentSession.clientSecret && stripePublishableKey) {
     console.log('[UniversalPaymentCheckout] Rendering Stripe Elements UI');
     return (
-      <div className="space-y-4">
+      <div ref={paymentSectionRef} className="space-y-4">
         {/* Apple Pay / Google Pay Button */}
         <StripePaymentRequestButton
           cart={cart}

@@ -133,7 +133,7 @@ function AdminEventsContent() {
       </div>
 
       {/* Admin Navigation */}
-      <AdminNavigation currentPage="events" />
+      <AdminNavigation currentPage="event-analytics" />
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -255,3 +255,4 @@ function AdminEventsContent() {
     </div>
   );
 }
+

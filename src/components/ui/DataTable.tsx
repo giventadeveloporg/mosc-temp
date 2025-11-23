@@ -69,9 +69,92 @@ export default function DataTable<T extends Record<string, any>>({
   }
 
   return (
-    <div className={`bg-white rounded-lg shadow-md overflow-hidden ${className}`}>
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
+    <>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .table-scroll-container {
+            overflow-x: scroll !important;
+            overflow-y: visible !important;
+            scrollbar-width: thin !important;
+            scrollbar-color: #EC4899 #FCE7F3 !important;
+            -ms-overflow-style: -ms-autohiding-scrollbar !important;
+          }
+          .table-scroll-container::-webkit-scrollbar {
+            height: 20px !important;
+            display: block !important;
+            -webkit-appearance: none !important;
+            appearance: none !important;
+          }
+          .table-scroll-container::-webkit-scrollbar-track {
+            background: linear-gradient(90deg, #DBEAFE, #E9D5FF, #FCE7F3, #FED7AA) !important;
+            border-radius: 10px !important;
+            -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.15) !important;
+            box-shadow: inset 0 0 6px rgba(0,0,0,0.15) !important;
+          }
+          .table-scroll-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899, #F97316) !important;
+            border-radius: 10px !important;
+            border: 4px solid #F3F4F6 !important;
+            -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.4) !important;
+            box-shadow: inset 0 0 6px rgba(0,0,0,0.4) !important;
+            min-width: 50px !important;
+            background-clip: padding-box !important;
+          }
+          .table-scroll-container::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(90deg, #2563EB, #7C3AED, #DB2777, #EA580C) !important;
+            border-color: #E5E7EB !important;
+          }
+          .table-scroll-container::-webkit-scrollbar-thumb:active {
+            background: linear-gradient(90deg, #1D4ED8, #6D28D9, #BE185D, #C2410C) !important;
+            border-color: #D1D5DB !important;
+          }
+          .table-scroll-container::-webkit-scrollbar-button {
+            display: none !important;
+          }
+          .table-scroll-container::-webkit-scrollbar-corner {
+            background: #E0E7FF !important;
+          }
+          .table-scroll-container::after {
+            content: '';
+            display: block;
+            width: 100vw;
+            height: 1px;
+            flex-shrink: 0;
+          }
+          .table-scroll-container {
+            display: flex !important;
+          }
+        `
+      }} />
+      <div className={`rounded-lg shadow-md overflow-hidden ${className}`} style={{
+        background: 'linear-gradient(to right, #3B82F6, #8B5CF6, #EC4899, #F97316)',
+        padding: '4px'
+      }}>
+        <div
+          className="w-full table-scroll-container"
+          style={{
+            overflowX: 'scroll',
+            overflowY: 'visible',
+            WebkitOverflowScrolling: 'touch',
+            maxWidth: '100%',
+            display: 'flex',
+            position: 'relative',
+            width: '100%',
+            minHeight: '1px',
+            scrollbarGutter: 'stable',
+            background: 'linear-gradient(to right, #3B82F6, #8B5CF6, #EC4899, #F97316)',
+            borderRadius: '8px',
+            padding: '20px'
+          }}
+        >
+          <table className="divide-y divide-gray-200" style={{
+            width: 'max-content',
+            minWidth: 'fit-content',
+            flexShrink: 0,
+            background: 'rgba(255, 255, 255, 0.95)',
+            borderRadius: '8px',
+            overflow: 'hidden'
+          }}>
           <thead className="bg-gray-50">
             <tr>
               {columns.map((column) => (
@@ -163,7 +246,8 @@ export default function DataTable<T extends Record<string, any>>({
             )}
           </tbody>
         </table>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

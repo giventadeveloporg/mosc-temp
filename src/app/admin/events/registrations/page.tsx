@@ -73,6 +73,7 @@ async function RegistrationManagementContent({
   status: string;
   page: number;
 }) {
+  // Only fetch registrants if an event is selected
   const data = await fetchRegistrationManagementData(eventId, search, searchType, status, page);
 
   if (!data) {

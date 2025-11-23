@@ -15,6 +15,10 @@ import {
   fetchCalendarEventsServer,
   cancelEventServer,
   deleteCalendarEventForEventServer,
+  fetchChildEventsBySeriesIdServer,
+  softDeleteEventWithChildrenServer,
+  hardDeleteEventWithChildrenServer,
+  activateEventWithChildrenServer,
 } from '../ApiServerActions';
 
 export default function ManageEventsPage() {
@@ -43,6 +47,15 @@ export default function ManageEventsPage() {
   const [deleteStatus, setDeleteStatus] = useState<DeleteStatus>('idle');
   const [deleteMessage, setDeleteMessage] = useState<string>('');
   const [eventToDelete, setEventToDelete] = useState<EventDetailsDTO | null>(null);
+  const [deleteMode, setDeleteMode] = useState<'soft' | 'hard'>('soft');
+  const [childEventCount, setChildEventCount] = useState(0);
+
+  // Activate confirmation dialog state
+  const [activateDialogOpen, setActivateDialogOpen] = useState(false);
+  const [activateStatus, setActivateStatus] = useState<DeleteStatus>('idle');
+  const [activateMessage, setActivateMessage] = useState<string>('');
+  const [eventToActivate, setEventToActivate] = useState<EventDetailsDTO | null>(null);
+  const [activateChildEventCount, setActivateChildEventCount] = useState(0);
 
   async function loadAll(pageNum = 0) {
     setLoading(true);
@@ -97,33 +110,101 @@ export default function ManageEventsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, searchTitle, searchId, searchCaption, searchField, searchStartDate, searchEndDate, searchAdmissionType, sort, showPastEvents]);
 
-  function handleDeleteClick(event: EventDetailsDTO) {
+  async function handleDeleteClick(event: EventDetailsDTO, mode: 'soft' | 'hard' = 'soft') {
     setEventToDelete(event);
+    setDeleteMode(mode);
     setDeleteStatus('confirming');
+
+    // Check if this is a parent event (parentEventId is null/undefined)
+    const isParentEvent = event.parentEventId == null || event.parentEventId === undefined;
+
+    if (isParentEvent) {
+      // Parent event: check how many children it has
+      const seriesId = event.recurrenceSeriesId || event.id;
+      if (seriesId) {
+        try {
+          const childEvents = await fetchChildEventsBySeriesIdServer(seriesId);
+          console.log(`[handleDeleteClick] Fetched events for series ${seriesId}:`, childEvents.map(e => ({ id: e.id, parentEventId: e.parentEventId, isActive: e.isActive })));
+          // Exclude the parent event itself from the count
+          // Also filter to only count active child events (children with parentEventId set)
+          const children = childEvents.filter(e =>
+            e.id !== event.id &&
+            e.parentEventId != null &&
+            e.parentEventId === event.id
+          );
+          console.log(`[handleDeleteClick] Filtered children (excluding parent ${event.id}):`, children.map(e => ({ id: e.id, parentEventId: e.parentEventId })));
+          console.log(`[handleDeleteClick] Child count: ${children.length}`);
+          setChildEventCount(children.length);
+        } catch (err) {
+          console.error('Failed to fetch child events:', err);
+          setChildEventCount(0);
+        }
+      } else {
+        setChildEventCount(0);
+      }
+    } else {
+      // Child event: no children, only delete this one
+      setChildEventCount(0);
+    }
+
     setDeleteDialogOpen(true);
   }
 
   async function handleConfirmDelete() {
-    if (!eventToDelete || !eventToDelete.id) return;
+    console.log('[handleConfirmDelete] Function called', { eventToDelete, deleteMode, childEventCount });
+
+    if (!eventToDelete || !eventToDelete.id) {
+      console.error('[handleConfirmDelete] No event to delete');
+      return;
+    }
+
+    console.log(`[handleConfirmDelete] Starting ${deleteMode} delete for event ${eventToDelete.id}, parentEventId: ${eventToDelete.parentEventId}, childCount: ${childEventCount}`);
 
     setDeleteStatus('deleting');
-    setDeleteMessage('Please wait while we mark this event as inactive...');
+    setDeleteMessage(
+      deleteMode === 'hard'
+        ? `Please wait while we permanently delete this event${childEventCount > 0 ? ` and ${childEventCount} child event${childEventCount !== 1 ? 's' : ''}` : ''}...`
+        : `Please wait while we deactivate this event${childEventCount > 0 ? ` and ${childEventCount} child event${childEventCount !== 1 ? 's' : ''}` : ''}...`
+    );
 
     try {
       setLoading(true);
-      await cancelEventServer(eventToDelete);
-      setDeleteStatus('success');
-      setDeleteMessage('The event has been marked as inactive successfully.');
+
+      if (deleteMode === 'hard') {
+        console.log(`[handleConfirmDelete] Hard deleting event ${eventToDelete.id}`);
+        await hardDeleteEventWithChildrenServer(eventToDelete);
+        setDeleteStatus('success');
+        setDeleteMessage(
+          `The event${childEventCount > 0 ? ` and ${childEventCount} child event${childEventCount !== 1 ? 's' : ''} have` : ' has'} been permanently deleted.`
+        );
+      } else {
+        // Soft delete: always use softDeleteEventWithChildrenServer (it handles parent/child logic internally)
+        console.log(`[handleConfirmDelete] Soft deleting event ${eventToDelete.id}, isParent: ${eventToDelete.parentEventId == null}, childCount: ${childEventCount}`);
+        await softDeleteEventWithChildrenServer(eventToDelete);
+        setDeleteStatus('success');
+        if (childEventCount > 0) {
+          setDeleteMessage(
+            `The event and ${childEventCount} child event${childEventCount !== 1 ? 's' : ''} have been marked as inactive successfully.`
+          );
+        } else {
+          setDeleteMessage('The event has been marked as inactive successfully.');
+        }
+      }
+
+      console.log(`[handleConfirmDelete] Successfully ${deleteMode === 'hard' ? 'deleted' : 'deactivated'} event ${eventToDelete.id}`);
       await loadAll(page);
+
       // Close dialog after 1.5 seconds
       setTimeout(() => {
         setDeleteDialogOpen(false);
         setDeleteStatus('idle');
         setEventToDelete(null);
+        setChildEventCount(0);
       }, 1500);
     } catch (e: any) {
+      console.error(`[handleConfirmDelete] Error ${deleteMode === 'hard' ? 'deleting' : 'deactivating'} event ${eventToDelete.id}:`, e);
       setDeleteStatus('error');
-      setDeleteMessage(e.message || 'Failed to mark event as inactive. Please try again.');
+      setDeleteMessage(e.message || `Failed to ${deleteMode === 'hard' ? 'delete' : 'deactivate'} event. Please try again.`);
     } finally {
       setLoading(false);
     }
@@ -134,6 +215,7 @@ export default function ManageEventsPage() {
     setDeleteStatus('idle');
     setEventToDelete(null);
     setDeleteMessage('');
+    setChildEventCount(0);
   }
 
   function handleCloseDeleteDialog() {
@@ -141,6 +223,90 @@ export default function ManageEventsPage() {
     setDeleteStatus('idle');
     setEventToDelete(null);
     setDeleteMessage('');
+    setChildEventCount(0);
+  }
+
+  async function handleActivateClick(event: EventDetailsDTO) {
+    setEventToActivate(event);
+    setActivateStatus('confirming');
+
+    // Check if this is a parent event (parentEventId is null/undefined)
+    const isParentEvent = event.parentEventId == null || event.parentEventId === undefined;
+
+    if (isParentEvent) {
+      // Parent event: check how many children it has
+      const seriesId = event.recurrenceSeriesId || event.id;
+      if (seriesId) {
+        try {
+          const childEvents = await fetchChildEventsBySeriesIdServer(seriesId);
+          // Exclude the parent event itself from the count
+          const children = childEvents.filter(e => e.id !== event.id);
+          setActivateChildEventCount(children.length);
+        } catch (err) {
+          console.error('Failed to fetch child events:', err);
+          setActivateChildEventCount(0);
+        }
+      } else {
+        setActivateChildEventCount(0);
+      }
+    } else {
+      // Child event: no children, only activate this one
+      setActivateChildEventCount(0);
+    }
+
+    setActivateDialogOpen(true);
+  }
+
+  async function handleConfirmActivate() {
+    if (!eventToActivate || !eventToActivate.id) return;
+
+    setActivateStatus('activating');
+    setActivateMessage(
+      activateChildEventCount > 0
+        ? `Please wait while we activate this event and ${activateChildEventCount} child event${activateChildEventCount !== 1 ? 's' : ''}...`
+        : 'Please wait while we activate this event...'
+    );
+
+    try {
+      setLoading(true);
+      await activateEventWithChildrenServer(eventToActivate);
+      setActivateStatus('success');
+      setActivateMessage(
+        activateChildEventCount > 0
+          ? `The event and ${activateChildEventCount} child event${activateChildEventCount !== 1 ? 's' : ''} have been activated successfully.`
+          : 'The event has been activated successfully.'
+      );
+
+      await loadAll(page);
+      // Close dialog after 1.5 seconds
+      setTimeout(() => {
+        setActivateDialogOpen(false);
+        setActivateStatus('idle');
+        setEventToActivate(null);
+        setActivateChildEventCount(0);
+      }, 1500);
+    } catch (e: any) {
+      setActivateStatus('error');
+      setActivateMessage(e.message || 'Failed to activate event. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleCancelActivate() {
+    setActivateDialogOpen(false);
+    setActivateStatus('idle');
+    setEventToActivate(null);
+    setActivateMessage('');
+    setActivateChildEventCount(0);
+  }
+
+  function handleCloseActivateDialog() {
+    setActivateDialogOpen(false);
+    setActivateStatus('idle');
+    setEventToActivate(null);
+    setActivateMessage('');
+    setActivateChildEventCount(0);
   }
 
   async function handleCancelEvent(eventId: number) {
@@ -213,7 +379,7 @@ export default function ManageEventsPage() {
             <FaPlus className="text-base sm:text-lg mb-1 mx-auto" />
             <span className="font-semibold text-center leading-tight">Create New<br />Event</span>
           </Link>
-          <Link href="/admin/events" className="w-48 max-w-xs mx-auto flex flex-col items-center justify-center bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-md shadow p-1 sm:p-2 text-xs sm:text-xs transition-all">
+          <Link href="/admin/event-analytics" className="w-48 max-w-xs mx-auto flex flex-col items-center justify-center bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-md shadow p-1 sm:p-2 text-xs sm:text-xs transition-all">
             <FaCalendarAlt className="text-base sm:text-lg mb-1 mx-auto" />
             <span className="font-semibold text-center leading-tight">Event Analytics<br />Dashboard</span>
           </Link>
@@ -315,7 +481,9 @@ export default function ManageEventsPage() {
         eventTypes={eventTypes}
         calendarEvents={calendarEvents}
         loading={loading}
-        onCancel={handleDeleteClick}
+        onCancel={(event) => handleDeleteClick(event, 'soft')}
+        onHardDelete={(event) => handleDeleteClick(event, 'hard')}
+        onActivate={(event) => handleActivateClick(event)}
         onPrevPage={handlePrevPage}
         onNextPage={handleNextPage}
         currentPage={page}
@@ -330,10 +498,36 @@ export default function ManageEventsPage() {
         status={deleteStatus}
         eventTitle={eventToDelete?.title}
         isRecurring={eventToDelete?.isRecurring || false}
+        hasChildren={childEventCount > 0}
+        childCount={childEventCount}
+        deleteMode={deleteMode}
         message={deleteMessage}
-        onConfirm={handleConfirmDelete}
+        onConfirm={async () => {
+          console.log('[ManageEventsPage] onConfirm callback called, calling handleConfirmDelete');
+          try {
+            await handleConfirmDelete();
+            console.log('[ManageEventsPage] handleConfirmDelete completed');
+          } catch (err) {
+            console.error('[ManageEventsPage] Error in handleConfirmDelete:', err);
+          }
+        }}
         onCancel={handleCancelDelete}
         onClose={handleCloseDeleteDialog}
+      />
+
+      {/* Activate Confirmation Dialog */}
+      <DeleteConfirmationDialog
+        isOpen={activateDialogOpen}
+        status={activateStatus}
+        eventTitle={eventToActivate?.title}
+        isRecurring={eventToActivate?.isRecurring || false}
+        hasChildren={activateChildEventCount > 0}
+        childCount={activateChildEventCount}
+        deleteMode="activate"
+        message={activateMessage}
+        onConfirm={handleConfirmActivate}
+        onCancel={handleCancelActivate}
+        onClose={handleCloseActivateDialog}
       />
     </div>
   );
