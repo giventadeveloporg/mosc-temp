@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { FaTags, FaCreditCard, FaCalendarAlt, FaClock, FaMapMarkerAlt, FaMapPin, FaTicketAlt, FaUser, FaEnvelope, FaMoneyBillWave, FaReceipt } from 'react-icons/fa';
 import { Modal } from '@/components/Modal';
@@ -37,7 +37,9 @@ export default function CheckoutPage() {
 
   const params = useParams();
   const router = useRouter();
-  const eventId = params?.id;
+  // CRITICAL FIX: Memoize eventId to prevent infinite re-renders
+  // useParams() returns a proxy that appears "new" on each render
+  const eventId = useMemo(() => params?.id, [params?.id]);
   const [event, setEvent] = useState<any>(null);
   const [ticketTypes, setTicketTypes] = useState<any[]>([]);
   const [selectedTickets, setSelectedTickets] = useState<{ [key: number]: number }>({});
@@ -60,6 +62,8 @@ export default function CheckoutPage() {
   const [showDiscountModal, setShowDiscountModal] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [paymentEnabled, setPaymentEnabled] = useState(false);
+  // CRITICAL FIX: Use ref to track fetch status without causing re-renders
+  const isFetchingRef = useRef(false);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -79,34 +83,18 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     async function fetchData() {
+      // CRITICAL FIX: Prevent duplicate fetches using ref
+      if (isFetchingRef.current) {
+        console.log('[CheckoutPage] Fetch already in progress, skipping duplicate');
+        logger.log('Fetch already in progress, skipping', { eventId });
+        return;
+      }
+
       // CRITICAL: Log immediately to verify useEffect is executing on mobile
       logger.log('CheckoutPage useEffect started', { eventId });
       logger.log('Window object available', { hasWindow: typeof window !== 'undefined' });
 
-      // CRITICAL: Test if mobile can reach API routes (Pages Router - matches proxy pattern)
-      try {
-        logger.log('Testing Pages Router API route', { endpoint: '/api/diagnostic/mobile-test' });
-        const testRes = await fetch('/api/diagnostic/mobile-test', {
-          method: 'GET',
-          cache: 'no-store',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        const testData = await testRes.json();
-        logger.log('Mobile diagnostic test result', {
-          success: testRes.ok,
-          data: testData,
-          status: testRes.status,
-        });
-      } catch (testErr: any) {
-        logger.critical('Mobile diagnostic test failed', {
-          error: testErr?.message || String(testErr),
-          errorName: testErr?.name,
-          errorStack: testErr?.stack,
-        });
-      }
-
+      isFetchingRef.current = true;
       setLoading(true);
 
       // Enhanced mobile browser detection: Include WhatsApp and other mobile browsers
@@ -350,6 +338,7 @@ export default function CheckoutPage() {
         setAvailableDiscounts([]);
       } finally {
         setLoading(false);
+        isFetchingRef.current = false;
       }
     }
     if (eventId) fetchData();
