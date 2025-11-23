@@ -63,6 +63,29 @@ const nextConfig = {
   // Configure headers if needed
   async headers() {
     return [
+      // Global CORS headers for all API routes (essential for mobile browsers)
+      {
+        source: '/api/:path*',
+        headers: [
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*',
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'Content-Type, Authorization',
+          },
+          {
+            key: 'Access-Control-Max-Age',
+            value: '86400',
+          },
+        ],
+      },
+      // Specific headers for file upload endpoint
       {
         source: '/api/proxy/event-medias/upload-multiple',
         headers: [

@@ -34,6 +34,8 @@ export default authMiddleware({
     '/api/webhooks(.*)',
     '/api/public(.*)',
     '/api/proxy(.*)',  // Public API proxy routes for public data (events, etc.)
+    '/api/diagnostic(.*)',  // Diagnostic endpoints for debugging
+    '/api/logs(.*)',  // Client log forwarding endpoint
     '/mosc(.*)',
     '/events(.*)',
     '/sponsors(.*)',  // Public sponsor pages
@@ -62,8 +64,11 @@ export default authMiddleware({
 
   // Custom logic to add pathname header and handle prefetch requests
   afterAuth(auth, req) {
-    // CRITICAL: Log API proxy requests to verify they're reaching middleware
-    const isApiProxy = req.nextUrl.pathname.startsWith('/api/proxy');
+    // CRITICAL: Log ALL API requests to verify they're reaching middleware
+    const pathname = req.nextUrl.pathname;
+    const isApiRoute = pathname.startsWith('/api/');
+    const isApiProxy = pathname.startsWith('/api/proxy');
+    const isDiagnostic = pathname.startsWith('/api/diagnostic');
     const userAgent = req.headers.get('user-agent') || 'unknown';
 
     // Enhanced mobile detection: Include WhatsApp, mobile browsers, and CloudFront headers
@@ -73,14 +78,17 @@ export default authMiddleware({
     const cloudfrontIOS = req.headers.get('cloudfront-is-ios-viewer') === 'true';
     const isMobile = userAgentMobile || cloudfrontMobile || cloudfrontAndroid || cloudfrontIOS;
 
-    if (isApiProxy) {
-      console.log('[MIDDLEWARE] API Proxy request detected:', {
-        pathname: req.nextUrl.pathname,
-        method: req.method,
-        isMobile,
-        userAgent: userAgent.substring(0, 100), // Truncate for logging
-        timestamp: new Date().toISOString(),
-      });
+    // CRITICAL: Log ALL API requests (not just proxy) to catch diagnostic and other routes
+    if (isApiRoute) {
+      console.log('[MIDDLEWARE] ===== API REQUEST DETECTED =====');
+      console.log('[MIDDLEWARE] Pathname:', pathname);
+      console.log('[MIDDLEWARE] Method:', req.method);
+      console.log('[MIDDLEWARE] Is Mobile:', isMobile);
+      console.log('[MIDDLEWARE] Is Proxy:', isApiProxy);
+      console.log('[MIDDLEWARE] Is Diagnostic:', isDiagnostic);
+      console.log('[MIDDLEWARE] User-Agent:', userAgent.substring(0, 150));
+      console.log('[MIDDLEWARE] Timestamp:', new Date().toISOString());
+      console.log('[MIDDLEWARE] ===== END API REQUEST LOG =====');
     }
 
     // Add pathname header for layout detection (used by ConditionalLayout)

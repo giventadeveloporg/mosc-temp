@@ -42,14 +42,22 @@ async function forwardLogToServer(logData: LogData) {
     isProduction ||
     (typeof window !== 'undefined' && window.location.search.includes('enable_client_logging=true'));
 
-  if (!shouldForward) {
-    // In development, still log to console but don't forward to server
+  // For critical/error logs, ALWAYS try to forward even in development
+  const forceForward = logData.level === 'critical' || logData.level === 'error';
+
+  if (!shouldForward && !forceForward) {
+    // In development, still log to console but don't forward to server (unless critical/error)
     return;
   }
 
-  // For critical errors, ALWAYS try to forward even if check fails
-  if (logData.level === 'critical' || logData.level === 'error') {
-    // Force forward critical errors regardless of environment check
+  // Log that we're attempting to forward (for debugging)
+  if (isProduction || forceForward) {
+    console.log('[ClientLogger] Attempting to forward log:', {
+      level: logData.level,
+      message: logData.message.substring(0, 100),
+      isProduction,
+      forceForward,
+    });
   }
 
   try {
@@ -65,17 +73,20 @@ async function forwardLogToServer(logData: LogData) {
       }),
       // Don't wait for response - fire and forget
     }).catch((err) => {
-      // Silently fail - don't break the app if logging fails
-      // Only log to console if in development
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('[ClientLogger] Failed to forward log to server:', err);
-      }
+      // Log failures even in production for debugging
+      console.error('[ClientLogger] Failed to forward log to server:', {
+        error: err?.message || String(err),
+        level: logData.level,
+        message: logData.message,
+      });
     });
   } catch (error) {
-    // Silently fail - don't break the app
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('[ClientLogger] Error forwarding log:', error);
-    }
+    // Log errors even in production for debugging
+    console.error('[ClientLogger] Error forwarding log:', {
+      error: error instanceof Error ? error.message : String(error),
+      level: logData.level,
+      message: logData.message,
+    });
   }
 }
 

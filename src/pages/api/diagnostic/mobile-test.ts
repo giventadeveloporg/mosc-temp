@@ -11,8 +11,15 @@ import { NextApiRequest, NextApiResponse } from 'next';
  * Usage: Call from mobile browser: /api/diagnostic/mobile-test
  */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  // CRITICAL: Log IMMEDIATELY at the very start - before ANY other code
+  console.log('[MOBILE-DIAGNOSTIC-PAGES] ===== HANDLER FUNCTION CALLED =====');
+  console.log('[MOBILE-DIAGNOSTIC-PAGES] Handler invoked at:', new Date().toISOString());
+  console.log('[MOBILE-DIAGNOSTIC-PAGES] Request method:', req.method);
+  console.log('[MOBILE-DIAGNOSTIC-PAGES] Request URL:', req.url);
+
   // Handle CORS preflight requests (OPTIONS)
   if (req.method === 'OPTIONS') {
+    console.log('[MOBILE-DIAGNOSTIC-PAGES] Handling OPTIONS preflight request');
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');

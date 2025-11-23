@@ -14,7 +14,27 @@ import { createComponentLogger } from '@/lib/clientLogger';
 // Create component-specific logger for CloudWatch visibility
 const logger = createComponentLogger('CheckoutPage');
 
+// CRITICAL: Log immediately when module loads (verifies JavaScript file is loaded)
+if (typeof window !== 'undefined') {
+  console.log('[CheckoutPage] ===== MODULE LOADED =====');
+  console.log('[CheckoutPage] Module loaded at:', new Date().toISOString());
+  console.log('[CheckoutPage] User-Agent:', navigator.userAgent);
+  console.log('[CheckoutPage] URL:', window.location.href);
+  logger.log('CheckoutPage module loaded', {
+    userAgent: navigator.userAgent,
+    url: window.location.href,
+    timestamp: new Date().toISOString(),
+  });
+}
+
 export default function CheckoutPage() {
+  // CRITICAL: Log immediately when component renders (verifies React is working)
+  if (typeof window !== 'undefined') {
+    console.log('[CheckoutPage] ===== COMPONENT RENDERING =====');
+    console.log('[CheckoutPage] Component rendering at:', new Date().toISOString());
+    logger.log('CheckoutPage component rendering', { timestamp: new Date().toISOString() });
+  }
+
   const params = useParams();
   const router = useRouter();
   const eventId = params?.id;
