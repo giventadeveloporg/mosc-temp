@@ -64,6 +64,8 @@ export default function CheckoutPage() {
   const [paymentEnabled, setPaymentEnabled] = useState(false);
   // CRITICAL FIX: Use ref to track fetch status without causing re-renders
   const isFetchingRef = useRef(false);
+  // CRITICAL FIX: Track which eventId has been fetched to prevent re-fetching same ID
+  const fetchedEventIdRef = useRef<string | string[] | null>(null);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -87,6 +89,13 @@ export default function CheckoutPage() {
       if (isFetchingRef.current) {
         console.log('[CheckoutPage] Fetch already in progress, skipping duplicate');
         logger.log('Fetch already in progress, skipping', { eventId });
+        return;
+      }
+
+      // CRITICAL FIX: Prevent re-fetching the same eventId (mobile browser cache issue)
+      if (fetchedEventIdRef.current === eventId) {
+        console.log('[CheckoutPage] Event already fetched, skipping', { eventId });
+        logger.log('Event already fetched, skipping re-fetch', { eventId, fetchedId: fetchedEventIdRef.current });
         return;
       }
 
@@ -339,6 +348,8 @@ export default function CheckoutPage() {
       } finally {
         setLoading(false);
         isFetchingRef.current = false;
+        // Mark this eventId as fetched (success or failure)
+        fetchedEventIdRef.current = eventId;
       }
     }
     if (eventId) fetchData();
@@ -502,7 +513,9 @@ export default function CheckoutPage() {
     );
   }
 
-  if (!event) {
+  // CRITICAL FIX: Only show "event not found" if we're done loading AND event is still null
+  // This prevents premature "event not found" message during mobile browser re-hydration
+  if (!event && !loading) {
     return <div className="min-h-screen flex items-center justify-center text-xl text-red-600">Event not found.</div>;
   }
 

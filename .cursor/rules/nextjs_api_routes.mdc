@@ -950,21 +950,59 @@ When API calls fail on mobile browsers but work on desktop:
    // Fix 1: Memoize useParams() result
    const eventId = useMemo(() => params?.id, [params?.id]);
 
-   // Fix 2: Add fetch guard
+   // Fix 2: Add fetch guard (prevent simultaneous fetches)
    const isFetchingRef = useRef(false);
    if (isFetchingRef.current) return;
    isFetchingRef.current = true;
 
-   // Fix 3: Add ignoredRoutes to middleware
+   // Fix 3: Track fetched eventId (prevent re-fetching same ID on mobile re-hydration)
+   const fetchedEventIdRef = useRef<string | string[] | null>(null);
+   if (fetchedEventIdRef.current === eventId) return;
+   // After fetch completes:
+   fetchedEventIdRef.current = eventId;
+
+   // Fix 4: Prevent premature "not found" message
+   if (!data && !loading) return <NotFound />;  // Only show if done loading
+
+   // Fix 5: Add ignoredRoutes to middleware
    ignoredRoutes: ['/api/proxy/(.*)']
 
-   // Fix 4: Remove manual CORS headers from proxy handler
+   // Fix 6: Remove manual CORS headers from proxy handler
    ```
+
+8. **Mobile Browser Re-hydration Issue**:
+   - **Problem**: Mobile browsers (especially iOS Safari) can re-hydrate/re-mount components multiple times during navigation, causing duplicate fetches
+   - **Symptoms**: Page flickers between "loading" and "not found", retries 100+ times, eventually loads
+   - **Root Cause**: `useParams()` returns new proxy object on each render, `useMemo` dependency changes, useEffect re-runs
+   - **Solution**: Track which eventId has been fetched using `useRef`, skip if already fetched
+   - **Example**:
+     ```typescript
+     const fetchedEventIdRef = useRef<string | string[] | null>(null);
+
+     useEffect(() => {
+       async function fetchData() {
+         // Prevent duplicate fetches
+         if (isFetchingRef.current) return;
+         // CRITICAL: Prevent re-fetching same ID (mobile re-hydration)
+         if (fetchedEventIdRef.current === eventId) return;
+
+         isFetchingRef.current = true;
+         try {
+           await fetch(...);
+         } finally {
+           isFetchingRef.current = false;
+           fetchedEventIdRef.current = eventId; // Mark as fetched
+         }
+       }
+       if (eventId) fetchData();
+     }, [eventId]);
+     ```
 
 - **References:**
   - Mobile browser debugging: Chrome Remote Debugging, Safari Web Inspector
   - CloudWatch logs for AWS Amplify deployments
   - See working `nextjs-template` project for comparison
+  - iOS Safari re-hydration: https://webkit.org/blog/7846/
 
 
 
