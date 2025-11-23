@@ -1,5 +1,8 @@
 import { authMiddleware } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger('MIDDLEWARE');
 
 /**
  * Clerk SDK Middleware (v4 compatible)
@@ -78,8 +81,20 @@ export default authMiddleware({
     const cloudfrontIOS = req.headers.get('cloudfront-is-ios-viewer') === 'true';
     const isMobile = userAgentMobile || cloudfrontMobile || cloudfrontAndroid || cloudfrontIOS;
 
-    // CRITICAL: Log ALL API requests (not just proxy) to catch diagnostic and other routes
+    // CRITICAL: Log ALL API requests using robust logger (can't be stripped)
     if (isApiRoute) {
+      // Use robust logger that can't be stripped by Next.js
+      logger.info('API REQUEST DETECTED', {
+        pathname,
+        method: req.method,
+        isMobile,
+        isProxy: isApiProxy,
+        isDiagnostic,
+        userAgent: userAgent.substring(0, 150),
+        timestamp: new Date().toISOString(),
+      });
+
+      // Also use console.log for backward compatibility
       console.log('[MIDDLEWARE] ===== API REQUEST DETECTED =====');
       console.log('[MIDDLEWARE] Pathname:', pathname);
       console.log('[MIDDLEWARE] Method:', req.method);

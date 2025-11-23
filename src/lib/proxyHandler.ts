@@ -3,6 +3,9 @@ import { getCachedApiJwt, generateApiJwt } from '@/lib/api/jwt';
 import { withTenantId } from '@/lib/withTenantId';
 import { getRawBody } from '@/lib/getRawBody';
 import { getTenantId } from '@/lib/env';
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('PROXY-HANDLER');
 
 interface ProxyHandlerOptions {
   injectTenantId?: boolean;
@@ -21,13 +24,13 @@ export function createProxyHandler({ injectTenantId = true, allowedMethods = ['G
 
     // Handle OPTIONS preflight requests (required for mobile browsers)
     if (req.method === 'OPTIONS') {
+      logger.info('Handling OPTIONS preflight request', { backendPath });
       console.log('[PROXY-HANDLER] Handling OPTIONS preflight request');
       res.status(200).end();
       return;
     }
 
     // CRITICAL: Log immediately when handler is invoked (before any processing)
-    // Use multiple console.log statements to ensure visibility in CloudWatch
     const timestamp = new Date().toISOString();
     const userAgent = req.headers['user-agent'] || 'unknown';
 
@@ -38,7 +41,18 @@ export function createProxyHandler({ injectTenantId = true, allowedMethods = ['G
     const cloudfrontIOS = req.headers['cloudfront-is-ios-viewer'] === 'true';
     const isMobile = userAgentMobile || cloudfrontMobile || cloudfrontAndroid || cloudfrontIOS;
 
-    // Log with unique prefix for easy CloudWatch filtering
+    // Use robust logger that can't be stripped by Next.js
+    logger.info('PROXY HANDLER INVOKED', {
+      timestamp,
+      backendPath,
+      requestUrl: req.url,
+      method: req.method,
+      isMobile,
+      userAgent: userAgent.substring(0, 150),
+      queryParams: req.query,
+    });
+
+    // Also use console.log for backward compatibility
     console.log('[PROXY-HANDLER-START] ============================================');
     console.log('[PROXY-HANDLER-START] HANDLER INVOKED AT:', timestamp);
     console.log('[PROXY-HANDLER-START] Backend Path:', backendPath);
