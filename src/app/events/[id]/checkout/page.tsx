@@ -125,6 +125,14 @@ export default function CheckoutPage() {
   const [isPageVisible, setIsPageVisible] = useState(true);
   const isFetchingRef = useRef(false);
   const fetchedEventIdRef = useRef<string | string[] | null>(null);
+  // CRITICAL MOBILE FIX: Track if data was restored from sessionStorage to prevent fetch flicker
+  const dataRestoredRef = useRef(false);
+  // CRITICAL MOBILE FIX: Track if initialization check is complete (restoration check done)
+  const initializationCompleteRef = useRef(false);
+  const lastFetchAttemptRef = useRef(0);
+  // Stabilization delay: Wait 150ms after restoration check before allowing fetch
+  // This ensures React state updates complete and prevents race conditions
+  const STABILIZATION_DELAY_MS = 150;
 
   // CRITICAL MOBILE FIX: Use sessionStorage to persist fetch state AND data across remounts
   // Mobile browsers can remount components, resetting refs and state, so we need persistent storage
@@ -227,6 +235,12 @@ export default function CheckoutPage() {
       });
       clearStoredData();
       fetchedEventIdRef.current = null;
+      dataRestoredRef.current = false; // Reset restoration flag for new event
+      // Mark initialization complete after clearing (allows fetch for new event)
+      setTimeout(() => {
+        initializationCompleteRef.current = true;
+        console.log('[CheckoutPage] ✅ INITIALIZATION COMPLETE - Ready for fetch (new event)');
+      }, STABILIZATION_DELAY_MS);
     } else if (storedFetchedId && storedFetchedId === currentEventIdStr) {
       // CRITICAL: Restore data from sessionStorage if available
       const restoredData = restoreFetchedDataFromStorage();
@@ -238,8 +252,13 @@ export default function CheckoutPage() {
           discountsCount: restoredData.availableDiscounts?.length || 0
         });
 
-        // CRITICAL: Restore React state from sessionStorage BEFORE setting loading to false
-        // This ensures the page renders with data immediately
+        // CRITICAL: Set restoration flag FIRST (synchronously) before any state updates
+        // This prevents fetch useEffect from running when state updates trigger re-render
+        dataRestoredRef.current = true;
+        fetchedEventIdRef.current = storedFetchedId;
+
+        // CRITICAL: Restore React state from sessionStorage AFTER setting refs
+        // This ensures fetch useEffect sees the flag before state updates complete
         setEvent(restoredData.event);
         setTicketTypes(restoredData.ticketTypes);
         setAvailableDiscounts(restoredData.availableDiscounts);
@@ -250,17 +269,45 @@ export default function CheckoutPage() {
         // CRITICAL: Set loading to false AFTER restoring state so page renders immediately
         setLoading(false);
 
-        // Also update ref to prevent future checks
-        fetchedEventIdRef.current = storedFetchedId;
+        // CRITICAL: Mark initialization complete after stabilization delay
+        // This ensures React state updates complete before fetch can run
+        setTimeout(() => {
+          initializationCompleteRef.current = true;
+          console.log('[CheckoutPage] ✅ INITIALIZATION COMPLETE - Data restored, fetch will be skipped');
+        }, STABILIZATION_DELAY_MS);
 
-        console.log('[CheckoutPage] ✅ DATA RESTORED - Page should render now');
+        console.log('[CheckoutPage] ✅ DATA RESTORED - Page should render now, fetch will be skipped');
       } else {
         console.log('[CheckoutPage] ⚠️ Stored eventId found but no data - will fetch');
         // If we have stored ID but no data, clear it and allow fetch
         clearStoredData();
         fetchedEventIdRef.current = null;
+        // Mark initialization complete after clearing (allows fetch)
+        setTimeout(() => {
+          initializationCompleteRef.current = true;
+          console.log('[CheckoutPage] ✅ INITIALIZATION COMPLETE - Ready for fetch (no stored data)');
+        }, STABILIZATION_DELAY_MS);
       }
+    } else {
+      // No stored data - mark initialization complete to allow fetch
+      setTimeout(() => {
+        initializationCompleteRef.current = true;
+        console.log('[CheckoutPage] ✅ INITIALIZATION COMPLETE - Ready for fetch (no stored data)');
+      }, STABILIZATION_DELAY_MS);
     }
+
+    // CRITICAL FALLBACK: Ensure initialization completes even if something goes wrong
+    // This prevents infinite loading if restoration useEffect has issues
+    const fallbackTimeout = setTimeout(() => {
+      if (!initializationCompleteRef.current) {
+        console.log('[CheckoutPage] ⚠️ FALLBACK - Initialization timeout, forcing completion');
+        initializationCompleteRef.current = true;
+      }
+    }, STABILIZATION_DELAY_MS * 2); // 300ms fallback (2x stabilization delay)
+
+    return () => {
+      clearTimeout(fallbackTimeout);
+    };
   }, [eventId, getFetchedEventIdFromStorage, restoreFetchedDataFromStorage, clearStoredData]);
 
   // MOBILE FIX: Handle page visibility changes (app switching on mobile)
@@ -329,6 +376,39 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     async function fetchData() {
+
+      // CRITICAL MOBILE FIX: Debounce rapid re-runs (prevent initialization spam)
+      const now = Date.now();
+      const timeSinceLastAttempt = now - lastFetchAttemptRef.current;
+      if (timeSinceLastAttempt < STABILIZATION_DELAY_MS && lastFetchAttemptRef.current > 0) {
+        console.log('[CheckoutPage] ⚠️ SKIP - Too soon since last attempt:', {
+          timeSinceLastAttempt,
+          debounceMs: STABILIZATION_DELAY_MS,
+        });
+        return;
+      }
+      lastFetchAttemptRef.current = now;
+
+      // CRITICAL MOBILE FIX: Check if data was already restored from sessionStorage
+      // This prevents flicker on initial page load when restoration happens
+      if (dataRestoredRef.current) {
+        console.log('[CheckoutPage] ✅ SKIP - Data already restored from sessionStorage, skipping fetch');
+        return;
+      }
+
+      // CRITICAL MOBILE FIX: Check if we already have data in state (from restoration)
+      // This prevents unnecessary fetches when data is already loaded
+      if (event && ticketTypes.length > 0) {
+        console.log('[CheckoutPage] ✅ SKIP - Data already in state, skipping fetch', {
+          hasEvent: !!event,
+          ticketTypesCount: ticketTypes.length
+        });
+        // Mark as fetched to prevent future checks
+        fetchedEventIdRef.current = eventId;
+        setLoading(false);
+        return;
+      }
+
       // CRITICAL MOBILE FIX: Prevent duplicate fetches using ref
       if (isFetchingRef.current) {
         console.log('[CheckoutPage] ⚠️ SKIP - Fetch already in progress, skipping duplicate');
@@ -474,7 +554,19 @@ export default function CheckoutPage() {
     }
 
     // CRITICAL MOBILE FIX: Only fetch if we have an eventId and haven't already fetched it
+    // CRITICAL: Skip entirely if data was restored (prevents flicker on initial load)
+    if (dataRestoredRef.current) {
+      console.log('[CheckoutPage] ✅ SKIP - Data restored, not calling fetchData');
+      return;
+    }
+
     if (eventId && isPageVisible) {
+      // CRITICAL: Check if we already have data in state (from restoration)
+      if (event && ticketTypes.length > 0) {
+        console.log('[CheckoutPage] ✅ SKIP - Data already in state, not calling fetchData');
+        return;
+      }
+
       const storedFetchedId = getFetchedEventIdFromStorage();
       const currentEventIdStr = typeof eventId === 'string' ? eventId : Array.isArray(eventId) ? eventId[0] : String(eventId);
 
@@ -494,9 +586,10 @@ export default function CheckoutPage() {
       fetchData();
     }
     // eslint-disable-next-line
-  }, [eventId, isPageVisible, getFetchedEventIdFromStorage, setFetchedEventIdInStorage, restoreFetchedDataFromStorage]);
+  }, [eventId, isPageVisible, event, ticketTypes, getFetchedEventIdFromStorage, setFetchedEventIdInStorage, restoreFetchedDataFromStorage]);
 
-  // Reactive calculation for total and discount
+  // Reactive calculation for total and discount changes.  These are the new changes
+
   useEffect(() => {
     const subtotal = Object.entries(selectedTickets).reduce((total, [ticketId, quantity]) => {
       const ticket = ticketTypes.find(t => t.id === parseInt(ticketId));
