@@ -56,10 +56,62 @@
 - Logs stored in debugLogsRef (doesn't trigger re-renders)
 - Only convert to state when user opens the debug panel
 
+### 4. Payment Flickering v2 - enabled Prop Transition (FIXED ✅)
+**Root Cause**: `enabled` prop changing from false to true during initial validation
+- Debug logs showed: `enabled: ""` → `enabled: true`
+- `UniversalPaymentCheckout` cleared session on EVERY `!enabled` check
+- This caused session clear → re-initialization cycle
+- Result: Visible flickering during form validation
+
+**Solution**: Track previous enabled state with ref
+- Added `enabledRef` to track previous enabled value
+- Only clear session when going from `true` → `false` (form becomes invalid)
+- Skip session clear when going from `false` → `true` (initial validation)
+- Session preserved during initial form completion
+
+**Code Location**: `src/components/UniversalPaymentCheckout.tsx:174-199`
+
+### 5. Apple Pay Not Available (REQUIRES CONFIGURATION ⚠️)
+**Root Cause**: Domain not registered in Stripe Dashboard
+- Debug logs showed: `[PRB] canMakePayment() result: null`
+- `[PRB] Native Google Pay API canMakePayment: false`
+- Apple Pay requires domain verification
+
+**Required Steps** (User must complete in Stripe Dashboard):
+1. Go to: https://dashboard.stripe.com/settings/payment_methods/apple_pay
+2. Add domain: `www.mosc-temp.com`
+3. Download Apple Pay verification file
+4. Upload to: `https://www.mosc-temp.com/.well-known/apple-developer-merchantid-domain-association`
+
+**Note**: This is NOT a code issue - it's a Stripe configuration requirement
+
 ## Testing the Fixes
 
-1. Refresh the page: https://www.mosc-temp.com/events/2/checkout
-2. Fill out the form - flickering should be GONE
-3. Payment options should appear immediately (no need to reselect tickets)
-4. Click "Show Debug Logs" button (bottom-right) to view browser console logs
-5. Try clicking Apple Pay and check the debug logs for button events
+### What Should Work Now:
+1. **NO MORE FLICKERING** when filling out the form ✅
+   - Payment section loads smoothly as you complete the form
+   - No more session clear/re-init cycle
+
+2. **Payment options appear immediately** ✅
+   - As soon as tickets selected + email entered
+   - No need to scroll or reselect tickets
+
+3. **Debug log viewer works in production** ✅
+   - Click "Show Debug Logs" button (bottom-right corner)
+   - View real-time browser console logs on mobile
+
+### Testing Steps:
+1. Clear browser cache and refresh: https://www.mosc-temp.com/events/2/checkout
+2. Fill out the form - watch for smooth loading (no flickering)
+3. Click "Show Debug Logs" to verify payment initialization logs
+4. Look for these logs to confirm fix:
+   ```
+   [UniversalPaymentCheckout] Form not yet valid, skipping session clear (prevent initial flicker)
+   [UniversalPaymentCheckout] ⚡ INITIALIZING PAYMENT SESSION
+   ```
+
+### Known Issue - Apple Pay Not Available:
+- **Apple Pay buttons will NOT be clickable** until domain is registered in Stripe
+- Debug logs will show: `[PRB] canMakePayment() result: null`
+- This requires Stripe Dashboard configuration (see Fix #5 above)
+- **This is expected and NOT a code bug**
