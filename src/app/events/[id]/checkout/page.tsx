@@ -87,7 +87,16 @@ PaymentSection.displayName = 'PaymentSection';
 export default function CheckoutPage() {
   const router = useRouter();
   const params = useParams();
-  const eventId = params?.id;
+
+  // CRITICAL MOBILE FIX: Memoize eventId to prevent infinite re-renders
+  // useParams() returns a proxy that appears "new" on each render on mobile browsers
+  // This causes useEffect to trigger repeatedly, causing infinite fetch loops
+  const eventId = useMemo(() => {
+    const id = params?.id;
+    // Convert to string to ensure stable reference across app switches
+    return typeof id === 'string' ? id : Array.isArray(id) ? id[0] : id;
+  }, [params?.id]);
+
   const [event, setEvent] = useState<any>(null);
   const [ticketTypes, setTicketTypes] = useState<any[]>([]);
   const [selectedTickets, setSelectedTickets] = useState<{ [key: number]: number }>({});
@@ -117,7 +126,52 @@ export default function CheckoutPage() {
   const isFetchingRef = useRef(false);
   const fetchedEventIdRef = useRef<string | string[] | null>(null);
 
+  // CRITICAL MOBILE FIX: Use sessionStorage to persist fetch state across remounts
+  // Mobile browsers can remount components, resetting refs, so we need persistent storage
+  const getFetchedEventIdFromStorage = useCallback(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      return sessionStorage.getItem('checkout_fetched_event_id');
+    } catch {
+      return null;
+    }
+  }, []);
+
+  const setFetchedEventIdInStorage = useCallback((id: string | string[] | null) => {
+    if (typeof window === 'undefined') return;
+    try {
+      if (id) {
+        const idStr = typeof id === 'string' ? id : Array.isArray(id) ? id[0] : String(id);
+        sessionStorage.setItem('checkout_fetched_event_id', idStr);
+      } else {
+        sessionStorage.removeItem('checkout_fetched_event_id');
+      }
+    } catch {
+      // Ignore storage errors
+    }
+  }, []);
+
   useEffect(() => { setMounted(true); }, []);
+
+  // CRITICAL MOBILE FIX: Initialize fetchedEventIdRef from sessionStorage on mount
+  // This restores fetch state after component remounts (mobile browsers can remount)
+  useEffect(() => {
+    const storedFetchedId = getFetchedEventIdFromStorage();
+    const currentEventIdStr = typeof eventId === 'string' ? eventId : Array.isArray(eventId) ? eventId[0] : String(eventId);
+
+    // If stored ID doesn't match current eventId, clear it (user navigated to different event)
+    if (storedFetchedId && storedFetchedId !== currentEventIdStr) {
+      console.log('[CheckoutPage] 🔄 CLEARING STORED FETCH STATE - Different eventId', {
+        storedId: storedFetchedId,
+        currentId: currentEventIdStr
+      });
+      setFetchedEventIdInStorage(null);
+      fetchedEventIdRef.current = null;
+    } else if (storedFetchedId && storedFetchedId === currentEventIdStr && !fetchedEventIdRef.current) {
+      console.log('[CheckoutPage] 🔄 RESTORING FETCH STATE from sessionStorage', { storedFetchedId });
+      fetchedEventIdRef.current = storedFetchedId;
+    }
+  }, [eventId, getFetchedEventIdFromStorage, setFetchedEventIdInStorage]);
 
   // MOBILE FIX: Handle page visibility changes (app switching on mobile)
   useEffect(() => {
@@ -185,26 +239,47 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     async function fetchData() {
-      // MOBILE FIX: Prevent duplicate fetches using ref
+      // CRITICAL MOBILE FIX: Prevent duplicate fetches using ref
       if (isFetchingRef.current) {
-        console.log('[CheckoutPage] Fetch already in progress, skipping duplicate');
+        console.log('[CheckoutPage] ⚠️ SKIP - Fetch already in progress, skipping duplicate');
+        return;
+      }
+
+      // CRITICAL MOBILE FIX: Check sessionStorage FIRST (persists across remounts)
+      const storedFetchedId = getFetchedEventIdFromStorage();
+      const currentEventIdStr = typeof eventId === 'string' ? eventId : Array.isArray(eventId) ? eventId[0] : String(eventId);
+
+      if (storedFetchedId === currentEventIdStr && storedFetchedId) {
+        console.log('[CheckoutPage] ✅ SKIP - Event already fetched (from sessionStorage), skipping re-fetch', {
+          eventId: currentEventIdStr,
+          storedId: storedFetchedId
+        });
+        // Also update ref to prevent future checks
+        fetchedEventIdRef.current = eventId;
         return;
       }
 
       // MOBILE FIX: Prevent re-fetching the same eventId (mobile browser re-hydration issue)
       if (fetchedEventIdRef.current === eventId) {
-        console.log('[CheckoutPage] Event already fetched, skipping re-fetch', { eventId });
+        console.log('[CheckoutPage] ✅ SKIP - Event already fetched (from ref), skipping re-fetch', { eventId });
         return;
       }
 
       // MOBILE FIX: Don't fetch if page is not visible (app in background)
       if (!isPageVisible) {
-        console.log('[CheckoutPage] Page not visible, deferring fetch');
+        console.log('[CheckoutPage] ⚠️ SKIP - Page not visible, deferring fetch');
         return;
       }
 
+      // CRITICAL MOBILE FIX: Set fetching flag immediately to prevent race conditions
       isFetchingRef.current = true;
       setLoading(true);
+
+      console.log('[CheckoutPage] ⚡ FETCHING EVENT DATA', {
+        eventId: currentEventIdStr,
+        timestamp: new Date().toISOString()
+      });
+
       try {
         // Fetch event details
         const eventRes = await fetch(`/api/proxy/event-details/${eventId}`);
@@ -274,15 +349,37 @@ export default function CheckoutPage() {
       } finally {
         setLoading(false);
         isFetchingRef.current = false;
-        // Mark this eventId as fetched to prevent re-fetching on mobile re-hydration
+        // CRITICAL MOBILE FIX: Mark this eventId as fetched in BOTH ref AND sessionStorage
+        // This prevents re-fetching on mobile browser remounts (refs reset, but sessionStorage persists)
         if (eventId) {
           fetchedEventIdRef.current = eventId;
+          setFetchedEventIdInStorage(eventId);
+          console.log('[CheckoutPage] ✅ FETCH COMPLETE - Marked event as fetched', {
+            eventId: typeof eventId === 'string' ? eventId : Array.isArray(eventId) ? eventId[0] : String(eventId)
+          });
         }
       }
     }
-    if (eventId && isPageVisible) fetchData();
+
+    // CRITICAL MOBILE FIX: Only fetch if we have an eventId and haven't already fetched it
+    if (eventId && isPageVisible) {
+      const storedFetchedId = getFetchedEventIdFromStorage();
+      const currentEventIdStr = typeof eventId === 'string' ? eventId : Array.isArray(eventId) ? eventId[0] : String(eventId);
+
+      // Skip if already fetched (check both ref and sessionStorage)
+      if (storedFetchedId === currentEventIdStr || fetchedEventIdRef.current === eventId) {
+        console.log('[CheckoutPage] ✅ SKIP - Event already fetched, not calling fetchData', {
+          eventId: currentEventIdStr,
+          storedId: storedFetchedId,
+          refId: fetchedEventIdRef.current
+        });
+        return;
+      }
+
+      fetchData();
+    }
     // eslint-disable-next-line
-  }, [eventId, isPageVisible]);
+  }, [eventId, isPageVisible, getFetchedEventIdFromStorage, setFetchedEventIdInStorage]);
 
   // Reactive calculation for total and discount
   useEffect(() => {
