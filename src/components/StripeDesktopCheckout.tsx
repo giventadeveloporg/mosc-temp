@@ -487,76 +487,6 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
             layout: 'horizontal' as any
           }}
         />
-
-        {/* Custom CSS for Express Checkout button layout */}
-        <style dangerouslySetInnerHTML={{
-          __html: `
-          /* Ensure Express Checkout buttons display horizontally */
-          .ElementsApp .ExpressCheckoutElement {
-            width: 100% !important;
-            max-width: 100% !important;
-          }
-
-          /* Force horizontal layout for Express Checkout buttons */
-          .ElementsApp .ExpressCheckoutElement button {
-            display: inline-block !important;
-            margin-right: 8px !important;
-            margin-bottom: 8px !important;
-            min-width: auto !important;
-            flex: 0 0 auto !important;
-          }
-
-          /* Desktop: Full-width horizontal layout with proper spacing */
-          @media (min-width: 768px) {
-            .ElementsApp .ExpressCheckoutElement {
-              display: flex !important;
-              flex-wrap: wrap !important;
-              gap: 12px !important;
-              justify-content: flex-start !important;
-              align-items: center !important;
-            }
-
-            .ElementsApp .ExpressCheckoutElement button {
-              flex: 0 0 auto !important;
-              margin: 0 !important;
-              min-width: 140px !important;
-              height: 48px !important;
-            }
-
-            /* Ensure all payment method buttons are visible */
-            .ElementsApp .ExpressCheckoutElement button[data-testid*="link"],
-            .ElementsApp .ExpressCheckoutElement button[data-testid*="google"],
-            .ElementsApp .ExpressCheckoutElement button[data-testid*="apple"],
-            .ElementsApp .ExpressCheckoutElement button[data-testid*="amazon"] {
-              display: inline-block !important;
-              visibility: visible !important;
-              opacity: 1 !important;
-            }
-          }
-
-          /* Mobile: Stack vertically but maintain button visibility */
-          @media (max-width: 767px) {
-            .ElementsApp .ExpressCheckoutElement {
-              display: block !important;
-            }
-
-            .ElementsApp .ExpressCheckoutElement button {
-              display: block !important;
-              width: 100% !important;
-              margin-bottom: 8px !important;
-            }
-          }
-
-          /* Override any Stripe default hiding */
-          .ElementsApp .ExpressCheckoutElement {
-            overflow: visible !important;
-          }
-
-          .ElementsApp .ExpressCheckoutElement * {
-            overflow: visible !important;
-          }
-        `
-        }} />
       </div>
       )}
 
@@ -602,44 +532,11 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
           position: 'relative',
           zIndex: 1
         }}>
-          <style dangerouslySetInnerHTML={{
-            __html: `
-              .payment-element-container {
-                width: 100%;
-                max-width: 100%;
-              }
-
-              /* Ensure payment methods are visible and properly spaced */
-              .payment-element-container .ElementsApp {
-                width: 100% !important;
-                max-width: 100% !important;
-              }
-
-              /* Make payment method tabs more horizontal on desktop */
-              @media (min-width: 768px) {
-                .payment-element-container .ElementsApp .Tab {
-                  display: inline-block !important;
-                  margin-right: 10px !important;
-                  margin-bottom: 10px !important;
-                }
-              }
-
-              /* Mobile-friendly payment method display */
-              @media (max-width: 767px) {
-                .payment-element-container .ElementsApp .Tab {
-                  display: block !important;
-                  width: 100% !important;
-                  margin-bottom: 8px !important;
-                }
-              }
-
-              /* CRITICAL FIX: Removed all manual validation CSS for Stripe Elements
-               * Stripe Elements are in an iframe - CSS targeting internal classes won't work
-               * Stripe handles its own validation styling automatically
-               * Removed: .p-Field, .p-Input-input, .p-FieldError, etc.
-               */
-            `
-          }} />
+          {/* CRITICAL FIX: Removed ALL CSS manipulation of Stripe Elements
+               * Stripe Elements render in an iframe and handle their own styling
+               * CSS with !important flags causes flickering and layout conflicts
+               * Let Stripe handle all internal styling automatically
+               */}
           <PaymentElement
             onReady={() => {
               console.log('[DESKTOP ECE] PaymentElement ready');
