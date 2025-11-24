@@ -42,12 +42,6 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
   const [paymentMethodSelected, setPaymentMethodSelected] = useState(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [showValidationErrors, setShowValidationErrors] = useState(false);
-  const [fieldErrors, setFieldErrors] = useState<{
-    cardNumber?: boolean;
-    expiry?: boolean;
-    cvc?: boolean;
-    postalCode?: boolean;
-  }>({});
 
   // Add timeout to prevent stuck loading state
   useEffect(() => {
@@ -136,50 +130,19 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
         }
 
         // Show validation errors in UI instead of alert
+        // CRITICAL FIX: Removed manual DOM manipulation of Stripe Elements
+        // Stripe Elements are in an iframe - we can't access their internal DOM
+        // Let Stripe handle its own validation and error display
         setValidationErrors(errors);
         setShowValidationErrors(true);
 
-        // Check DOM for empty fields and highlight them
+        // Scroll to validation errors container
         setTimeout(() => {
-          const numberField = document.querySelector('[data-field="number"] input');
-          const expiryField = document.querySelector('[data-field="expiry"] input');
-          const cvcField = document.querySelector('[data-field="cvc"] input');
-          const postalField = document.querySelector('[data-field="postalCode"] input');
-
-          const fieldErrors: typeof fieldErrors = {};
-
-          if (numberField && (numberField as HTMLInputElement).value.trim() === '') {
-            fieldErrors.cardNumber = true;
-            (numberField as HTMLInputElement).setAttribute('aria-invalid', 'true');
-          }
-          if (expiryField && (expiryField as HTMLInputElement).value.trim() === '') {
-            fieldErrors.expiry = true;
-            (expiryField as HTMLInputElement).setAttribute('aria-invalid', 'true');
-          }
-          if (cvcField && (cvcField as HTMLInputElement).value.trim() === '') {
-            fieldErrors.cvc = true;
-            (cvcField as HTMLInputElement).setAttribute('aria-invalid', 'true');
-          }
-          if (postalField && (postalField as HTMLInputElement).value.trim() === '') {
-            fieldErrors.postalCode = true;
-            (postalField as HTMLInputElement).setAttribute('aria-invalid', 'true');
-          }
-
-          setFieldErrors(fieldErrors);
-
-          // Scroll to validation errors
           const errorElement = document.querySelector('.validation-errors-container');
           if (errorElement) {
             errorElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
           }
-
-          // Scroll to first invalid field
-          const firstInvalidField = document.querySelector('[data-field="number"] input[aria-invalid="true"], [data-field="expiry"] input[aria-invalid="true"], [data-field="cvc"] input[aria-invalid="true"], [data-field="postalCode"] input[aria-invalid="true"]');
-          if (firstInvalidField) {
-            firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            (firstInvalidField as HTMLElement).focus();
-          }
-        }, 200);
+        }, 100);
 
         setConfirming(false);
         return;
@@ -614,92 +577,11 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
                 }
               }
 
-              /* Field-level validation highlighting for Stripe Elements */
-              /* Highlight fields with errors using Stripe's error classes */
-              .payment-element-container .p-Field[data-field="number"] .p-Input-input[aria-invalid="true"],
-              .payment-element-container .p-Field[data-field="number"]:has(.p-FieldError) .p-Input-input {
-                border-color: #ef4444 !important;
-                border-width: 2px !important;
-                box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
-              }
-
-              .payment-element-container .p-Field[data-field="expiry"] .p-Input-input[aria-invalid="true"],
-              .payment-element-container .p-Field[data-field="expiry"]:has(.p-FieldError) .p-Input-input {
-                border-color: #ef4444 !important;
-                border-width: 2px !important;
-                box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
-              }
-
-              .payment-element-container .p-Field[data-field="cvc"] .p-Input-input[aria-invalid="true"],
-              .payment-element-container .p-Field[data-field="cvc"]:has(.p-FieldError) .p-Input-input {
-                border-color: #ef4444 !important;
-                border-width: 2px !important;
-                box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
-              }
-
-              .payment-element-container .p-Field[data-field="postalCode"] .p-Input-input[aria-invalid="true"],
-              .payment-element-container .p-Field[data-field="postalCode"]:has(.p-FieldError) .p-Input-input {
-                border-color: #ef4444 !important;
-                border-width: 2px !important;
-                box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
-              }
-
-              /* Highlight empty required fields when form is incomplete */
-              .payment-element-container.field-validation-active .p-Field[data-field="number"] .p-Input-input.Input--empty:not(:focus) {
-                border-color: #f59e0b !important;
-                border-width: 2px !important;
-                background-color: #fef3c7 !important;
-              }
-
-              .payment-element-container.field-validation-active .p-Field[data-field="expiry"] .p-Input-input.Input--empty:not(:focus) {
-                border-color: #f59e0b !important;
-                border-width: 2px !important;
-                background-color: #fef3c7 !important;
-              }
-
-              .payment-element-container.field-validation-active .p-Field[data-field="cvc"] .p-Input-input.Input--empty:not(:focus) {
-                border-color: #f59e0b !important;
-                border-width: 2px !important;
-                background-color: #fef3c7 !important;
-              }
-
-              .payment-element-container.field-validation-active .p-Field[data-field="postalCode"] .p-Input-input.Input--empty:not(:focus) {
-                border-color: #f59e0b !important;
-                border-width: 2px !important;
-                background-color: #fef3c7 !important;
-              }
-
-              /* Add error icon indicator for empty/invalid fields */
-              .payment-element-container.field-validation-active .p-Field[data-field="number"]:has(.p-Input-input.Input--empty:not(:focus))::after,
-              .payment-element-container.field-validation-active .p-Field[data-field="expiry"]:has(.p-Input-input.Input--empty:not(:focus))::after,
-              .payment-element-container.field-validation-active .p-Field[data-field="cvc"]:has(.p-Input-input.Input--empty:not(:focus))::after,
-              .payment-element-container.field-validation-active .p-Field[data-field="postalCode"]:has(.p-Input-input.Input--empty:not(:focus))::after {
-                content: "⚠️";
-                position: absolute;
-                right: 8px;
-                top: 50%;
-                transform: translateY(-50%);
-                font-size: 16px;
-                z-index: 10;
-                pointer-events: none;
-              }
-
-              /* Ensure error messages are visible */
-              .payment-element-container .p-FieldError {
-                color: #dc2626 !important;
-                font-size: 0.875rem !important;
-                margin-top: 0.25rem !important;
-                display: block !important;
-              }
-
-              /* Highlight field labels for invalid fields */
-              .payment-element-container .p-Field[data-field="number"]:has(.p-Input-input[aria-invalid="true"]) .p-FieldLabel,
-              .payment-element-container .p-Field[data-field="expiry"]:has(.p-Input-input[aria-invalid="true"]) .p-FieldLabel,
-              .payment-element-container .p-Field[data-field="cvc"]:has(.p-Input-input[aria-invalid="true"]) .p-FieldLabel,
-              .payment-element-container .p-Field[data-field="postalCode"]:has(.p-Input-input[aria-invalid="true"]) .p-FieldLabel {
-                color: #dc2626 !important;
-                font-weight: 600 !important;
-              }
+              /* CRITICAL FIX: Removed all manual validation CSS for Stripe Elements
+               * Stripe Elements are in an iframe - CSS targeting internal classes won't work
+               * Stripe handles its own validation styling automatically
+               * Removed: .p-Field, .p-Input-input, .p-FieldError, etc.
+               */
             `
           }} />
           <PaymentElement
@@ -718,97 +600,21 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
                 setPaymentMethodSelected(true);
                 setValidationErrors([]);
                 setShowValidationErrors(false);
-                setFieldErrors({});
                 console.log('[DESKTOP ECE] ✅ Payment method selected and complete');
               } else {
                 setPaymentMethodSelected(false);
 
-                // Check for field-level errors
-                const errors: typeof fieldErrors = {};
-
-                // Use Stripe's error object to identify which fields have errors
-                if (event.error) {
-                  const errorMessage = event.error.message?.toLowerCase() || '';
-
-                  if (errorMessage.includes('card number') || errorMessage.includes('card_number') || errorMessage.includes('number')) {
-                    errors.cardNumber = true;
-                  }
-                  if (errorMessage.includes('expir') || errorMessage.includes('expiry') || errorMessage.includes('date')) {
-                    errors.expiry = true;
-                  }
-                  if (errorMessage.includes('cvc') || errorMessage.includes('security') || errorMessage.includes('cvv')) {
-                    errors.cvc = true;
-                  }
-                  if (errorMessage.includes('postal') || errorMessage.includes('zip') || errorMessage.includes('postal_code')) {
-                    errors.postalCode = true;
-                  }
-                }
-
-                // Also check DOM for empty fields when validation is active
-                if (showValidationErrors && elements) {
-                  try {
-                    // Use a small delay to let Stripe update the DOM
-                    setTimeout(() => {
-                      const numberField = document.querySelector('[data-field="number"] input');
-                      const expiryField = document.querySelector('[data-field="expiry"] input');
-                      const cvcField = document.querySelector('[data-field="cvc"] input');
-                      const postalField = document.querySelector('[data-field="postalCode"] input');
-
-                      const newErrors: typeof fieldErrors = {};
-
-                      if (numberField && (numberField as HTMLInputElement).value.trim() === '') {
-                        newErrors.cardNumber = true;
-                      }
-                      if (expiryField && (expiryField as HTMLInputElement).value.trim() === '') {
-                        newErrors.expiry = true;
-                      }
-                      if (cvcField && (cvcField as HTMLInputElement).value.trim() === '') {
-                        newErrors.cvc = true;
-                      }
-                      if (postalField && (postalField as HTMLInputElement).value.trim() === '') {
-                        newErrors.postalCode = true;
-                      }
-
-                      if (Object.keys(newErrors).length > 0) {
-                        setFieldErrors(newErrors);
-                      }
-                    }, 100);
-                  } catch (e) {
-                    console.log('[DESKTOP ECE] Error checking field states:', e);
-                  }
-                }
-
-                setFieldErrors(errors);
+                // CRITICAL FIX: Simplified to only use Stripe's built-in validation
+                // Removed all DOM manipulation - Stripe Elements are in an iframe and handle their own validation
 
                 // Clear validation errors when user starts typing (form is being edited)
                 if (showValidationErrors && event.value?.type) {
                   // User is actively editing, clear error display
                   setShowValidationErrors(false);
                   setValidationErrors([]);
-
-                  // Clear aria-invalid attributes when user starts typing
-                  setTimeout(() => {
-                    const numberField = document.querySelector('[data-field="number"] input');
-                    const expiryField = document.querySelector('[data-field="expiry"] input');
-                    const cvcField = document.querySelector('[data-field="cvc"] input');
-                    const postalField = document.querySelector('[data-field="postalCode"] input');
-
-                    if (numberField && (numberField as HTMLInputElement).value.trim() !== '') {
-                      (numberField as HTMLInputElement).removeAttribute('aria-invalid');
-                    }
-                    if (expiryField && (expiryField as HTMLInputElement).value.trim() !== '') {
-                      (expiryField as HTMLInputElement).removeAttribute('aria-invalid');
-                    }
-                    if (cvcField && (cvcField as HTMLInputElement).value.trim() !== '') {
-                      (cvcField as HTMLInputElement).removeAttribute('aria-invalid');
-                    }
-                    if (postalField && (postalField as HTMLInputElement).value.trim() !== '') {
-                      (postalField as HTMLInputElement).removeAttribute('aria-invalid');
-                    }
-                  }, 100);
                 }
 
-                console.log('[DESKTOP ECE] ⚠️ Payment method not complete or not selected', { errors });
+                console.log('[DESKTOP ECE] ⚠️ Payment method not complete or not selected');
               }
             }}
             options={{
@@ -866,50 +672,18 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
                   errors.push(submitError.message || 'Please check your payment details');
                 }
 
+                // CRITICAL FIX: Removed manual DOM manipulation of Stripe Elements
+                // Let Stripe handle its own field validation and error display
                 setValidationErrors(errors);
                 setShowValidationErrors(true);
 
-                // Check DOM for empty fields and highlight them
+                // Scroll to validation errors container
                 setTimeout(() => {
-                  const numberField = document.querySelector('[data-field="number"] input');
-                  const expiryField = document.querySelector('[data-field="expiry"] input');
-                  const cvcField = document.querySelector('[data-field="cvc"] input');
-                  const postalField = document.querySelector('[data-field="postalCode"] input');
-
-                  const fieldErrors: typeof fieldErrors = {};
-
-                  if (numberField && (numberField as HTMLInputElement).value.trim() === '') {
-                    fieldErrors.cardNumber = true;
-                    (numberField as HTMLInputElement).setAttribute('aria-invalid', 'true');
-                  }
-                  if (expiryField && (expiryField as HTMLInputElement).value.trim() === '') {
-                    fieldErrors.expiry = true;
-                    (expiryField as HTMLInputElement).setAttribute('aria-invalid', 'true');
-                  }
-                  if (cvcField && (cvcField as HTMLInputElement).value.trim() === '') {
-                    fieldErrors.cvc = true;
-                    (cvcField as HTMLInputElement).setAttribute('aria-invalid', 'true');
-                  }
-                  if (postalField && (postalField as HTMLInputElement).value.trim() === '') {
-                    fieldErrors.postalCode = true;
-                    (postalField as HTMLInputElement).setAttribute('aria-invalid', 'true');
-                  }
-
-                  setFieldErrors(fieldErrors);
-
-                  // Scroll to validation errors
                   const errorElement = document.querySelector('.validation-errors-container');
                   if (errorElement) {
                     errorElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                   }
-
-                  // Scroll to first invalid field
-                  const firstInvalidField = document.querySelector('[data-field="number"] input[aria-invalid="true"], [data-field="expiry"] input[aria-invalid="true"], [data-field="cvc"] input[aria-invalid="true"], [data-field="postalCode"] input[aria-invalid="true"]');
-                  if (firstInvalidField) {
-                    firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    (firstInvalidField as HTMLElement).focus();
-                  }
-                }, 200);
+                }, 100);
               } else {
                 // If validation passes but button is still disabled, it might be a state issue
                 alert("Please select a payment method first. You can choose from the Link, Cash App, or credit card options below.");
