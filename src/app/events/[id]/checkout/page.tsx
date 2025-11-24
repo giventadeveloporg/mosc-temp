@@ -523,7 +523,15 @@ export default function CheckoutPage() {
       .filter(item => item.ticketType);
   }, [selectedTickets, ticketTypes]);
 
-  const amountCents = Math.round(totalAmount * 100);
+  const amountCents = useMemo(() => Math.round(totalAmount * 100), [totalAmount]);
+
+  // CRITICAL FIX: Memoize customer info to prevent unnecessary re-renders
+  // These don't need to trigger Stripe Elements remounting
+  const customerInfo = useMemo(() => ({
+    email,
+    name: firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || undefined,
+    phone: phone || undefined,
+  }), [email, firstName, lastName, phone]);
 
   // Enable payment when form is valid
   // Only enable after user has interacted with the form (prevents auto-fill from triggering payment)
@@ -884,9 +892,9 @@ export default function CheckoutPage() {
                   <UniversalPaymentCheckout
                     cart={cart}
                     eventId={eventId as string}
-                    email={email}
-                    customerName={firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || undefined}
-                    customerPhone={phone || undefined}
+                    email={customerInfo.email}
+                    customerName={customerInfo.name}
+                    customerPhone={customerInfo.phone}
                     discountCodeId={appliedDiscount?.id || null}
                     enabled={paymentEnabled}
                     amountCents={amountCents}
