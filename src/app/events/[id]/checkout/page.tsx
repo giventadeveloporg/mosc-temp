@@ -101,7 +101,8 @@ export default function CheckoutPage() {
       if (args[0]?.includes?.('[') && (
         args[0]?.includes?.('UniversalPaymentCheckout') ||
         args[0]?.includes?.('DESKTOP ECE') ||
-        args[0]?.includes?.('CheckoutPage')
+        args[0]?.includes?.('CheckoutPage') ||
+        args[0]?.includes?.('PRB')  // CRITICAL: Capture Payment Request Button logs
       )) {
         addLog('LOG', ...args);
       }

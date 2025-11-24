@@ -43,6 +43,27 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [showValidationErrors, setShowValidationErrors] = useState(false);
 
+  // CRITICAL: Detect mobile to hide ExpressCheckoutElement (use PaymentRequestButton instead)
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      const mobileWidth = window.innerWidth <= 768;
+      const isMobileDetected = mobileUA || mobileWidth;
+      setIsMobile(isMobileDetected);
+      console.log('[DESKTOP ECE] Mobile detection:', { mobileUA, mobileWidth, isMobile: isMobileDetected });
+
+      // CRITICAL: On mobile, skip ExpressCheckoutElement loading - set ready immediately
+      if (isMobileDetected) {
+        console.log('[DESKTOP ECE] Mobile detected - skipping ExpressCheckoutElement, setting ready state');
+        setExpressCheckoutReady(true);
+      }
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   // Add timeout to prevent stuck loading state
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -317,11 +338,13 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
         </div>
       )}
 
-      {/* Express Checkout Section */}
-      <div className="relative">
-        {/* @ts-ignore - element may lack TS in some versions */}
-        <ExpressCheckoutElement
-          onConfirm={async (event: any) => {
+      {/* Express Checkout Section - DESKTOP ONLY */}
+      {/* CRITICAL FIX: Hide ExpressCheckoutElement on mobile - use PaymentRequestButton instead */}
+      {!isMobile && (
+        <div className="relative">
+          {/* @ts-ignore - element may lack TS in some versions */}
+          <ExpressCheckoutElement
+            onConfirm={async (event: any) => {
             console.log('[DESKTOP ECE] ⚡ EXPRESS CHECKOUT onConfirm TRIGGERED', {
               hasElements: !!elements,
               hasStripe: !!stripe,
@@ -534,6 +557,7 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
         `
         }} />
       </div>
+      )}
 
       {/* PaymentElement Section */}
       <div className="mt-3 bg-white border rounded-lg p-3 relative">
