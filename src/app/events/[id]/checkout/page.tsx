@@ -72,8 +72,55 @@ export default function CheckoutPage() {
   const fetchedEventIdRef = useRef<string | string[] | null>(null);
   // MOBILE FIX: Track page visibility to prevent flicker on app switch
   const [isPageVisible, setIsPageVisible] = useState(true);
+  // MOBILE DEBUG: Capture console logs for mobile debugging
+  const [debugLogs, setDebugLogs] = useState<string[]>([]);
+  const [showDebugLogs, setShowDebugLogs] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
+
+  // MOBILE DEBUG: Intercept console logs for mobile debugging
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const originalLog = console.log;
+    const originalError = console.error;
+    const originalWarn = console.warn;
+
+    const addLog = (level: string, ...args: any[]) => {
+      const logMessage = `[${level}] ${args.map(arg =>
+        typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+      ).join(' ')}`;
+
+      setDebugLogs(prev => [...prev.slice(-50), logMessage]); // Keep last 50 logs
+    };
+
+    console.log = (...args: any[]) => {
+      originalLog.apply(console, args);
+      if (args[0]?.includes?.('[') && (
+        args[0]?.includes?.('UniversalPaymentCheckout') ||
+        args[0]?.includes?.('DESKTOP ECE') ||
+        args[0]?.includes?.('CheckoutPage')
+      )) {
+        addLog('LOG', ...args);
+      }
+    };
+
+    console.error = (...args: any[]) => {
+      originalError.apply(console, args);
+      addLog('ERROR', ...args);
+    };
+
+    console.warn = (...args: any[]) => {
+      originalWarn.apply(console, args);
+      addLog('WARN', ...args);
+    };
+
+    return () => {
+      console.log = originalLog;
+      console.error = originalError;
+      console.warn = originalWarn;
+    };
+  }, []);
 
   // MOBILE FIX: Listen to page visibility changes to prevent flickering on app switch
   useEffect(() => {
@@ -853,6 +900,42 @@ export default function CheckoutPage() {
           </div>
         </div>
       </div>
+
+      {/* MOBILE DEBUG: Debug log viewer - floating button */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="fixed bottom-4 right-4 z-50">
+          <button
+            onClick={() => setShowDebugLogs(!showDebugLogs)}
+            className="bg-purple-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-purple-700"
+          >
+            {showDebugLogs ? 'Hide' : 'Show'} Debug Logs ({debugLogs.length})
+          </button>
+          {showDebugLogs && (
+            <div className="mt-2 bg-black text-white p-4 rounded-lg shadow-xl max-w-2xl max-h-96 overflow-auto">
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="font-bold">Debug Console Logs</h3>
+                <button
+                  onClick={() => setDebugLogs([])}
+                  className="text-xs bg-red-600 px-2 py-1 rounded"
+                >
+                  Clear
+                </button>
+              </div>
+              <div className="text-xs font-mono space-y-1">
+                {debugLogs.length === 0 ? (
+                  <p className="text-gray-400">No logs captured yet</p>
+                ) : (
+                  debugLogs.map((log, index) => (
+                    <div key={index} className="border-b border-gray-700 pb-1">
+                      {log}
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

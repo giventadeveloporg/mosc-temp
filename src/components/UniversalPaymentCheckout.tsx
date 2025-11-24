@@ -362,7 +362,10 @@ export default function UniversalPaymentCheckout(props: Props) {
     return () => {
       cancelled = true;
     };
-  }, [enabled, cartKey, email, amountCents, paymentUseCase, eventId, discountCodeId, customerName, customerPhone, memoizedReturnUrl, memoizedCancelUrl]);
+    // CRITICAL FIX: Removed customerName and customerPhone from dependencies
+    // These fields don't need to trigger re-initialization - they're just passed in the request
+    // This prevents flickering when user types in name/phone fields
+  }, [enabled, cartKey, email, amountCents, paymentUseCase, eventId, discountCodeId, memoizedReturnUrl, memoizedCancelUrl]);
 
   // Render loading state
   if (isInitializing) {
