@@ -72,13 +72,14 @@ export default function CheckoutPage() {
   const fetchedEventIdRef = useRef<string | string[] | null>(null);
   // MOBILE FIX: Track page visibility to prevent flicker on app switch
   const [isPageVisible, setIsPageVisible] = useState(true);
-  // MOBILE DEBUG: Capture console logs for mobile debugging
-  const [debugLogs, setDebugLogs] = useState<string[]>([]);
+  // MOBILE DEBUG: Use ref to capture logs without causing re-renders
+  const debugLogsRef = useRef<string[]>([]);
   const [showDebugLogs, setShowDebugLogs] = useState(false);
+  const [displayedLogs, setDisplayedLogs] = useState<string[]>([]);
 
   useEffect(() => { setMounted(true); }, []);
 
-  // MOBILE DEBUG: Intercept console logs for mobile debugging
+  // MOBILE DEBUG: Intercept console logs for mobile debugging (using ref to prevent re-renders)
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -91,7 +92,8 @@ export default function CheckoutPage() {
         typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
       ).join(' ')}`;
 
-      setDebugLogs(prev => [...prev.slice(-50), logMessage]); // Keep last 50 logs
+      // CRITICAL FIX: Use ref instead of setState to prevent infinite re-renders
+      debugLogsRef.current = [...debugLogsRef.current.slice(-50), logMessage];
     };
 
     console.log = (...args: any[]) => {
@@ -121,6 +123,13 @@ export default function CheckoutPage() {
       console.warn = originalWarn;
     };
   }, []);
+
+  // Update displayed logs when user opens the panel
+  useEffect(() => {
+    if (showDebugLogs) {
+      setDisplayedLogs([...debugLogsRef.current]);
+    }
+  }, [showDebugLogs]);
 
   // MOBILE FIX: Listen to page visibility changes to prevent flickering on app switch
   useEffect(() => {
@@ -908,24 +917,27 @@ export default function CheckoutPage() {
             onClick={() => setShowDebugLogs(!showDebugLogs)}
             className="bg-purple-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-purple-700"
           >
-            {showDebugLogs ? 'Hide' : 'Show'} Debug Logs ({debugLogs.length})
+            {showDebugLogs ? 'Hide' : 'Show'} Debug Logs ({debugLogsRef.current.length})
           </button>
           {showDebugLogs && (
             <div className="mt-2 bg-black text-white p-4 rounded-lg shadow-xl max-w-2xl max-h-96 overflow-auto">
               <div className="flex justify-between items-center mb-2">
                 <h3 className="font-bold">Debug Console Logs</h3>
                 <button
-                  onClick={() => setDebugLogs([])}
+                  onClick={() => {
+                    debugLogsRef.current = [];
+                    setDisplayedLogs([]);
+                  }}
                   className="text-xs bg-red-600 px-2 py-1 rounded"
                 >
                   Clear
                 </button>
               </div>
               <div className="text-xs font-mono space-y-1">
-                {debugLogs.length === 0 ? (
+                {displayedLogs.length === 0 ? (
                   <p className="text-gray-400">No logs captured yet</p>
                 ) : (
-                  debugLogs.map((log, index) => (
+                  displayedLogs.map((log, index) => (
                     <div key={index} className="border-b border-gray-700 pb-1">
                       {log}
                     </div>
