@@ -34,7 +34,10 @@ const defaultStripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
   ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
   : null;
 
-function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecret, transactionId, onLoadingChange }: Props & { clientSecret: string }) {
+// CRITICAL FIX: Memoize Inner component to prevent unnecessary re-renders and flickering
+// React.memo prevents this component from re-rendering when parent re-renders
+// unless the actual props have changed (deep comparison for cart, shallow for others)
+const InnerDesktopCheckout = React.memo(function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecret, transactionId, onLoadingChange }: Props & { clientSecret: string }) {
   const stripe = useStripe();
   const elements = useElements();
   const [confirming, setConfirming] = useState(false);
@@ -656,7 +659,19 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
       </div>
     </div>
   );
-}
+}, (prevProps, nextProps) => {
+  // Custom comparison function to prevent re-renders
+  // Only re-render if these specific props change
+  return (
+    prevProps.clientSecret === nextProps.clientSecret &&
+    prevProps.enabled === nextProps.enabled &&
+    prevProps.amountCents === nextProps.amountCents &&
+    prevProps.email === nextProps.email &&
+    prevProps.eventId === nextProps.eventId &&
+    prevProps.discountCodeId === nextProps.discountCodeId &&
+    JSON.stringify(prevProps.cart) === JSON.stringify(nextProps.cart) // Deep comparison for cart
+  );
+});
 
 export default function StripeDesktopCheckout(props: Props) {
   const [clientSecret, setClientSecret] = useState<string | null>(props.clientSecret || null);
