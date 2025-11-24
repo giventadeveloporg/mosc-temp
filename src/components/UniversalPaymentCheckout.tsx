@@ -85,6 +85,11 @@ export default function UniversalPaymentCheckout(props: Props) {
   // Track the cart key for the current session to avoid unnecessary re-initialization
   const sessionCartKeyRef = useRef<string | null>(null);
 
+  // CRITICAL FIX: Track previous enabled state to prevent session clear on initial enable
+  // Only clear session when going from enabled=true to enabled=false (form becomes invalid)
+  // Don't clear on initial mount when going from false/undefined to true
+  const enabledRef = useRef<boolean>(enabled);
+
   // CRITICAL FIX: Use ref instead of state to prevent re-renders on mobile browsers
   // Track if payment section has been interacted with or is visible
   const paymentSectionActiveRef = useRef(false);
@@ -167,13 +172,31 @@ export default function UniversalPaymentCheckout(props: Props) {
     });
 
     if (!enabled || cart.length === 0 || !email) {
-      // Clear session if form is incomplete
-      console.log('[UniversalPaymentCheckout] Form incomplete, clearing session');
-      setPaymentSession(null);
-      setProviderType(null);
-      sessionCartKeyRef.current = null;
+      // CRITICAL FIX: Only clear session if we were previously enabled
+      // Don't clear on initial mount when going from false -> true (prevents flickering)
+      // Only clear when form becomes invalid after being valid (true -> false)
+      if (enabledRef.current === true) {
+        console.log('[UniversalPaymentCheckout] Form became incomplete, clearing session', {
+          enabled,
+          previousEnabled: enabledRef.current,
+          cartLength: cart.length,
+          hasEmail: !!email
+        });
+        setPaymentSession(null);
+        setProviderType(null);
+        sessionCartKeyRef.current = null;
+      } else {
+        console.log('[UniversalPaymentCheckout] Form not yet valid, skipping session clear (prevent initial flicker)', {
+          enabled,
+          previousEnabled: enabledRef.current
+        });
+      }
+      enabledRef.current = enabled;
       return;
     }
+
+    // Update ref to track current enabled state
+    enabledRef.current = enabled;
 
     // Lazy initialization: Only initialize when payment section is visible/interacted with
     // This prevents unnecessary backend calls when user is just filling out form fields
