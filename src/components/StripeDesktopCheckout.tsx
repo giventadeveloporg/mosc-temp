@@ -321,10 +321,18 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
       <div className="relative">
         {/* @ts-ignore - element may lack TS in some versions */}
         <ExpressCheckoutElement
-          onConfirm={async () => {
+          onConfirm={async (event: any) => {
+            console.log('[DESKTOP ECE] ⚡ EXPRESS CHECKOUT onConfirm TRIGGERED', {
+              hasElements: !!elements,
+              hasStripe: !!stripe,
+              hasClientSecret: !!clientSecret,
+              event,
+              timestamp: new Date().toISOString(),
+            });
+
             // CRITICAL: Call elements.submit() first for validation
             if (!elements) {
-              console.error('[DESKTOP ECE] Elements not available for validation');
+              console.error('[DESKTOP ECE] ❌ Elements not available for validation');
               alert("Payment system not ready. Please refresh the page and try again.");
               return;
             }
@@ -382,13 +390,17 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
           }}
           onCancel={handleCancel}
           onReady={({ availablePaymentMethods }) => {
-            console.log('[DESKTOP ECE] Express Checkout ready');
+            console.log('[DESKTOP ECE] ⚡ EXPRESS CHECKOUT READY', {
+              timestamp: new Date().toISOString(),
+              hasAvailablePaymentMethods: !!availablePaymentMethods,
+              paymentMethodKeys: availablePaymentMethods ? Object.keys(availablePaymentMethods) : [],
+            });
             console.log('[DESKTOP ECE] Available payment methods:', availablePaymentMethods);
             setExpressCheckoutReady(true);
 
             // Enhanced debugging for payment methods
             if (availablePaymentMethods) {
-              console.log('[DESKTOP ECE] === PAYMENT METHODS DEBUG ===');
+              console.log('[DESKTOP ECE] ========== PAYMENT METHODS DEBUG ==========');
               console.log('[DESKTOP ECE] Available methods:', Object.keys(availablePaymentMethods));
 
               // Check specific payment methods
@@ -415,9 +427,21 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
                 console.log('[DESKTOP ECE] ❌ Link: Not available');
               }
 
-              console.log('[DESKTOP ECE] ================================');
+              if (availablePaymentMethods.cashApp) {
+                console.log('[DESKTOP ECE] ✅ Cash App: Available');
+              } else {
+                console.log('[DESKTOP ECE] ❌ Cash App: Not available');
+              }
+
+              if (availablePaymentMethods.amazonPay) {
+                console.log('[DESKTOP ECE] ✅ Amazon Pay: Available');
+              } else {
+                console.log('[DESKTOP ECE] ❌ Amazon Pay: Not available');
+              }
+
+              console.log('[DESKTOP ECE] ============================================');
             } else {
-              console.log('[DESKTOP ECE] ⚠️ No payment methods available');
+              console.log('[DESKTOP ECE] ⚠️ WARNING: No payment methods available');
               console.log('[DESKTOP ECE] Check Stripe Dashboard → Settings → Payment methods');
             }
 
@@ -425,8 +449,15 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
             console.log('[DESKTOP ECE] Note: Google Pay manifest errors in console are expected if domain not verified in Stripe');
 
             // Debug: Check what payment methods are available
-            console.log('[DESKTOP ECE] Available payment methods should include: Apple Pay, Google Pay, Link, Cash App');
+            console.log('[DESKTOP ECE] Expected payment methods: Apple Pay, Google Pay, Link, Cash App, Amazon Pay');
             console.log('[DESKTOP ECE] If only Link/Cash App show, check Stripe domain verification for Google Pay');
+          }}
+          onClick={(event: any) => {
+            console.log('[DESKTOP ECE] ⚡ EXPRESS CHECKOUT BUTTON CLICKED', {
+              event,
+              timestamp: new Date().toISOString(),
+              eventType: event?.resolve ? 'resolve function available' : 'no resolve function',
+            });
           }}
           options={{
             layout: 'horizontal' as any

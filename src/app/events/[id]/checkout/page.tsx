@@ -81,16 +81,26 @@ export default function CheckoutPage() {
 
     const handleVisibilityChange = () => {
       const visible = document.visibilityState === 'visible';
-      console.log('[CheckoutPage] Page visibility changed:', visible);
+      console.log('[CheckoutPage] ⚠️ PAGE VISIBILITY CHANGED:', {
+        visible,
+        wasVisible: isPageVisible,
+        timestamp: new Date().toISOString(),
+        eventId,
+        hasEvent: !!event,
+        ticketTypesCount: ticketTypes.length,
+      });
       setIsPageVisible(visible);
 
       // Don't trigger re-fetch when page becomes visible again
       // Data is already cached in state
+      if (visible) {
+        console.log('[CheckoutPage] ✅ Page became visible - NOT re-fetching (data already loaded)');
+      }
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, []);
+  }, [isPageVisible, eventId, event, ticketTypes.length]);
 
   // Clean up Clerk sync parameter from URL on mount (for cleaner URLs)
   useEffect(() => {

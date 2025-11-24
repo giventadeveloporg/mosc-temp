@@ -101,7 +101,18 @@ export default function UniversalPaymentCheckout(props: Props) {
     return cancelUrl || (typeof window !== 'undefined' ? window.location.origin : '/');
   }, [cancelUrl]);
 
-  // Use Intersection Observer to detect when payment section is visible
+  // CRITICAL FIX: Automatically activate payment section when form is valid
+  // Don't wait for IntersectionObserver if user has already completed the form
+  useEffect(() => {
+    // Auto-activate if form is complete (enabled) and not yet active
+    if (enabled && cart.length > 0 && email && !paymentSectionActiveRef.current) {
+      console.log('[UniversalPaymentCheckout] CRITICAL FIX: Auto-activating payment section (form is valid)');
+      paymentSectionActiveRef.current = true;
+      setPaymentSectionActive(true);
+    }
+  }, [enabled, cart.length, email]);
+
+  // Use Intersection Observer to detect when payment section is visible (fallback)
   useEffect(() => {
     if (!paymentSectionRef.current) return;
 
@@ -109,6 +120,7 @@ export default function UniversalPaymentCheckout(props: Props) {
     const checkVisibility = () => {
       const rect = paymentSectionRef.current?.getBoundingClientRect();
       if (rect && rect.top < window.innerHeight && rect.bottom > 0 && !paymentSectionActiveRef.current) {
+        console.log('[UniversalPaymentCheckout] Payment section scrolled into view, activating');
         paymentSectionActiveRef.current = true;
         setPaymentSectionActive(true);
         return true;
@@ -125,6 +137,7 @@ export default function UniversalPaymentCheckout(props: Props) {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting && !paymentSectionActiveRef.current) {
+            console.log('[UniversalPaymentCheckout] IntersectionObserver: Payment section visible, activating');
             paymentSectionActiveRef.current = true;
             setPaymentSectionActive(true);
           }
@@ -142,8 +155,20 @@ export default function UniversalPaymentCheckout(props: Props) {
 
   // Initialize payment session when enabled, cart is ready, AND payment section is active
   useEffect(() => {
+    console.log('[UniversalPaymentCheckout] EFFECT TRIGGERED - Dependencies changed:', {
+      enabled,
+      cartLength: cart.length,
+      hasEmail: !!email,
+      cartKey,
+      paymentSectionActive: paymentSectionActiveRef.current,
+      hasExistingSession: !!paymentSession,
+      sessionCartKey: sessionCartKeyRef.current,
+      timestamp: new Date().toISOString(),
+    });
+
     if (!enabled || cart.length === 0 || !email) {
       // Clear session if form is incomplete
+      console.log('[UniversalPaymentCheckout] Form incomplete, clearing session');
       setPaymentSession(null);
       setProviderType(null);
       sessionCartKeyRef.current = null;
@@ -160,9 +185,19 @@ export default function UniversalPaymentCheckout(props: Props) {
 
     // Don't re-initialize if we already have a valid session for the same cart
     if (paymentSession && providerType && sessionCartKeyRef.current === cartKey) {
-      console.log('[UniversalPaymentCheckout] Skipping re-initialization, session already exists for cart:', cartKey);
+      console.log('[UniversalPaymentCheckout] ✅ SKIP RE-INIT - Session already exists for cart:', {
+        cartKey,
+        existingCartKey: sessionCartKeyRef.current,
+        transactionId: paymentSession.transactionId,
+      });
       return;
     }
+
+    console.log('[UniversalPaymentCheckout] ⚡ INITIALIZING PAYMENT SESSION', {
+      cartKey,
+      previousCartKey: sessionCartKeyRef.current,
+      hasExistingSession: !!paymentSession,
+    });
 
     let cancelled = false;
 
