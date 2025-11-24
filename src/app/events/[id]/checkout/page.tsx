@@ -883,30 +883,30 @@ export default function CheckoutPage() {
               </div>
 
               {/* Payment Options Section */}
-              {canCheckout && (
-                <div className="mt-6 border-t border-gray-200 pt-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Payment Options</h3>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Choose your preferred payment method. We accept Apple Pay, Google Pay, and all major credit cards.
-                  </p>
-                  <UniversalPaymentCheckout
-                    cart={cart}
-                    eventId={eventId as string}
-                    email={customerInfo.email}
-                    customerName={customerInfo.name}
-                    customerPhone={customerInfo.phone}
-                    discountCodeId={appliedDiscount?.id || null}
-                    enabled={paymentEnabled}
-                    amountCents={amountCents}
-                    paymentUseCase={PaymentUseCase.TICKET_SALE}
-                    returnUrl={`${window.location.origin}/event/success`}
-                    cancelUrl={window.location.origin}
-                    onSuccess={handlePaymentSuccess}
-                    onError={handlePaymentError}
-                    onLoadingChange={setIsProcessing}
-                  />
-                </div>
-              )}
+              {/* CRITICAL FIX: Always render payment component to prevent unmount/remount flickering */}
+              {/* Use enabled prop to control behavior instead of conditional rendering */}
+              <div className="mt-6 border-t border-gray-200 pt-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Payment Options</h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  Choose your preferred payment method. We accept Apple Pay, Google Pay, and all major credit cards.
+                </p>
+                <UniversalPaymentCheckout
+                  cart={cart}
+                  eventId={eventId as string}
+                  email={customerInfo.email}
+                  customerName={customerInfo.name}
+                  customerPhone={customerInfo.phone}
+                  discountCodeId={appliedDiscount?.id || null}
+                  enabled={paymentEnabled}
+                  amountCents={amountCents}
+                  paymentUseCase={PaymentUseCase.TICKET_SALE}
+                  returnUrl={`${window.location.origin}/event/success`}
+                  cancelUrl={window.location.origin}
+                  onSuccess={handlePaymentSuccess}
+                  onError={handlePaymentError}
+                  onLoadingChange={setIsProcessing}
+                />
+              </div>
 
               {!canCheckout && (
                 <div className="mt-6 p-4 bg-gray-50 rounded-md text-center text-gray-600">
