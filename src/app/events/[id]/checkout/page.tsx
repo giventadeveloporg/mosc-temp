@@ -126,8 +126,8 @@ export default function CheckoutPage() {
   const isFetchingRef = useRef(false);
   const fetchedEventIdRef = useRef<string | string[] | null>(null);
 
-  // CRITICAL MOBILE FIX: Use sessionStorage to persist fetch state across remounts
-  // Mobile browsers can remount components, resetting refs, so we need persistent storage
+  // CRITICAL MOBILE FIX: Use sessionStorage to persist fetch state AND data across remounts
+  // Mobile browsers can remount components, resetting refs and state, so we need persistent storage
   const getFetchedEventIdFromStorage = useCallback(() => {
     if (typeof window === 'undefined') return null;
     try {
@@ -151,11 +151,71 @@ export default function CheckoutPage() {
     }
   }, []);
 
+  // CRITICAL MOBILE FIX: Store fetched data in sessionStorage
+  const storeFetchedDataInStorage = useCallback((data: {
+    event: any;
+    ticketTypes: any[];
+    availableDiscounts: any[];
+    heroImageUrl: string | null;
+  }) => {
+    if (typeof window === 'undefined') return;
+    try {
+      sessionStorage.setItem('checkout_event_data', JSON.stringify(data.event));
+      sessionStorage.setItem('checkout_ticket_types', JSON.stringify(data.ticketTypes));
+      sessionStorage.setItem('checkout_available_discounts', JSON.stringify(data.availableDiscounts));
+      if (data.heroImageUrl) {
+        sessionStorage.setItem('checkout_hero_image_url', data.heroImageUrl);
+      }
+    } catch {
+      // Ignore storage errors
+    }
+  }, []);
+
+  // CRITICAL MOBILE FIX: Restore fetched data from sessionStorage
+  const restoreFetchedDataFromStorage = useCallback(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      const eventData = sessionStorage.getItem('checkout_event_data');
+      const ticketTypesData = sessionStorage.getItem('checkout_ticket_types');
+      const discountsData = sessionStorage.getItem('checkout_available_discounts');
+      const heroImageUrlData = sessionStorage.getItem('checkout_hero_image_url');
+
+      if (eventData && ticketTypesData) {
+        return {
+          event: JSON.parse(eventData),
+          ticketTypes: JSON.parse(ticketTypesData),
+          availableDiscounts: discountsData ? JSON.parse(discountsData) : [],
+          heroImageUrl: heroImageUrlData || null,
+        };
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }, []);
+
+  // CRITICAL MOBILE FIX: Clear stored data when navigating to different event
+  const clearStoredData = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      sessionStorage.removeItem('checkout_fetched_event_id');
+      sessionStorage.removeItem('checkout_event_data');
+      sessionStorage.removeItem('checkout_ticket_types');
+      sessionStorage.removeItem('checkout_available_discounts');
+      sessionStorage.removeItem('checkout_hero_image_url');
+    } catch {
+      // Ignore storage errors
+    }
+  }, []);
+
   useEffect(() => { setMounted(true); }, []);
 
-  // CRITICAL MOBILE FIX: Initialize fetchedEventIdRef from sessionStorage on mount
-  // This restores fetch state after component remounts (mobile browsers can remount)
+  // CRITICAL MOBILE FIX: Restore data from sessionStorage on mount
+  // This restores both fetch state AND actual data after component remounts (mobile browsers can remount)
+  // This MUST run before the fetch useEffect to prevent unnecessary fetches
   useEffect(() => {
+    if (!eventId) return; // Wait for eventId to be available
+
     const storedFetchedId = getFetchedEventIdFromStorage();
     const currentEventIdStr = typeof eventId === 'string' ? eventId : Array.isArray(eventId) ? eventId[0] : String(eventId);
 
@@ -165,13 +225,43 @@ export default function CheckoutPage() {
         storedId: storedFetchedId,
         currentId: currentEventIdStr
       });
-      setFetchedEventIdInStorage(null);
+      clearStoredData();
       fetchedEventIdRef.current = null;
-    } else if (storedFetchedId && storedFetchedId === currentEventIdStr && !fetchedEventIdRef.current) {
-      console.log('[CheckoutPage] 🔄 RESTORING FETCH STATE from sessionStorage', { storedFetchedId });
-      fetchedEventIdRef.current = storedFetchedId;
+    } else if (storedFetchedId && storedFetchedId === currentEventIdStr) {
+      // CRITICAL: Restore data from sessionStorage if available
+      const restoredData = restoreFetchedDataFromStorage();
+      if (restoredData && restoredData.event) {
+        console.log('[CheckoutPage] 🔄 RESTORING DATA from sessionStorage', {
+          eventId: storedFetchedId,
+          hasEvent: !!restoredData.event,
+          ticketTypesCount: restoredData.ticketTypes?.length || 0,
+          discountsCount: restoredData.availableDiscounts?.length || 0
+        });
+
+        // CRITICAL: Restore React state from sessionStorage BEFORE setting loading to false
+        // This ensures the page renders with data immediately
+        setEvent(restoredData.event);
+        setTicketTypes(restoredData.ticketTypes);
+        setAvailableDiscounts(restoredData.availableDiscounts);
+        if (restoredData.heroImageUrl) {
+          setHeroImageUrl(restoredData.heroImageUrl);
+        }
+
+        // CRITICAL: Set loading to false AFTER restoring state so page renders immediately
+        setLoading(false);
+
+        // Also update ref to prevent future checks
+        fetchedEventIdRef.current = storedFetchedId;
+
+        console.log('[CheckoutPage] ✅ DATA RESTORED - Page should render now');
+      } else {
+        console.log('[CheckoutPage] ⚠️ Stored eventId found but no data - will fetch');
+        // If we have stored ID but no data, clear it and allow fetch
+        clearStoredData();
+        fetchedEventIdRef.current = null;
+      }
     }
-  }, [eventId, getFetchedEventIdFromStorage, setFetchedEventIdInStorage]);
+  }, [eventId, getFetchedEventIdFromStorage, restoreFetchedDataFromStorage, clearStoredData]);
 
   // MOBILE FIX: Handle page visibility changes (app switching on mobile)
   useEffect(() => {
@@ -249,14 +339,23 @@ export default function CheckoutPage() {
       const storedFetchedId = getFetchedEventIdFromStorage();
       const currentEventIdStr = typeof eventId === 'string' ? eventId : Array.isArray(eventId) ? eventId[0] : String(eventId);
 
+      // CRITICAL: Only skip if we have BOTH stored ID AND stored data
       if (storedFetchedId === currentEventIdStr && storedFetchedId) {
-        console.log('[CheckoutPage] ✅ SKIP - Event already fetched (from sessionStorage), skipping re-fetch', {
-          eventId: currentEventIdStr,
-          storedId: storedFetchedId
-        });
-        // Also update ref to prevent future checks
-        fetchedEventIdRef.current = eventId;
-        return;
+        const storedData = restoreFetchedDataFromStorage();
+        if (storedData && storedData.event) {
+          console.log('[CheckoutPage] ✅ SKIP - Event already fetched with data (from sessionStorage), skipping re-fetch', {
+            eventId: currentEventIdStr,
+            storedId: storedFetchedId,
+            hasData: !!storedData.event
+          });
+          // Also update ref to prevent future checks
+          fetchedEventIdRef.current = eventId;
+          return;
+        } else {
+          console.log('[CheckoutPage] ⚠️ Stored eventId found but no data - will fetch');
+          // Clear invalid stored state and allow fetch
+          clearStoredData();
+        }
       }
 
       // MOBILE FIX: Prevent re-fetching the same eventId (mobile browser re-hydration issue)
@@ -295,14 +394,17 @@ export default function CheckoutPage() {
         // Fetch ticket types for this event (only active ones)
         const ticketRes = await fetch(`/api/proxy/event-ticket-types?eventId.equals=${eventId}&isActive.equals=true`);
         const ticketData = await ticketRes.json();
-        setTicketTypes(Array.isArray(ticketData) ? ticketData : []);
+        const ticketTypesArray = Array.isArray(ticketData) ? ticketData : [];
+        setTicketTypes(ticketTypesArray);
 
         // Fetch discount codes for this event
         const discountRes = await fetch(`/api/proxy/discount-codes?eventId.equals=${eventId}&isActive.equals=true`);
+        let discountsArray: any[] = [];
         if (discountRes.ok) {
           const discountData = await discountRes.json();
-          setAvailableDiscounts(Array.isArray(discountData) ? discountData : []);
+          discountsArray = Array.isArray(discountData) ? discountData : [];
         }
+        setAvailableDiscounts(discountsArray);
 
         // --- Hero image selection logic (match home page) ---
         let imageUrl = null;
@@ -337,11 +439,21 @@ export default function CheckoutPage() {
         }
         setHeroImageUrl(imageUrl);
 
-        // Store hero image URL for loading page (enhanced buffering strategy)
-        if (imageUrl) {
-          console.log('Tickets page - storing hero image URL:', imageUrl);
-          // TODO: Implement hero image buffering if needed
-        }
+        // CRITICAL MOBILE FIX: Store all fetched data in sessionStorage for restoration after remounts
+        storeFetchedDataInStorage({
+          event: eventData,
+          ticketTypes: ticketTypesArray,
+          availableDiscounts: discountsArray,
+          heroImageUrl: imageUrl,
+        });
+
+        console.log('[CheckoutPage] ✅ DATA STORED in sessionStorage', {
+          eventId: currentEventIdStr,
+          hasEvent: !!eventData,
+          ticketTypesCount: ticketTypesArray.length,
+          discountsCount: discountsArray.length,
+          hasHeroImage: !!imageUrl
+        });
       } catch (e) {
         setEvent(null);
         setTicketTypes([]);
@@ -367,11 +479,14 @@ export default function CheckoutPage() {
       const currentEventIdStr = typeof eventId === 'string' ? eventId : Array.isArray(eventId) ? eventId[0] : String(eventId);
 
       // Skip if already fetched (check both ref and sessionStorage)
-      if (storedFetchedId === currentEventIdStr || fetchedEventIdRef.current === eventId) {
-        console.log('[CheckoutPage] ✅ SKIP - Event already fetched, not calling fetchData', {
+      // CRITICAL: Also check if we have stored data (not just stored ID)
+      const storedData = restoreFetchedDataFromStorage();
+      if ((storedFetchedId === currentEventIdStr || fetchedEventIdRef.current === eventId) && storedData && storedData.event) {
+        console.log('[CheckoutPage] ✅ SKIP - Event already fetched with data, not calling fetchData', {
           eventId: currentEventIdStr,
           storedId: storedFetchedId,
-          refId: fetchedEventIdRef.current
+          refId: fetchedEventIdRef.current,
+          hasStoredData: !!storedData.event
         });
         return;
       }
@@ -379,7 +494,7 @@ export default function CheckoutPage() {
       fetchData();
     }
     // eslint-disable-next-line
-  }, [eventId, isPageVisible, getFetchedEventIdFromStorage, setFetchedEventIdInStorage]);
+  }, [eventId, isPageVisible, getFetchedEventIdFromStorage, setFetchedEventIdInStorage, restoreFetchedDataFromStorage]);
 
   // Reactive calculation for total and discount
   useEffect(() => {
