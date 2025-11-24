@@ -39,7 +39,11 @@ export default function CheckoutPage() {
   const router = useRouter();
   // CRITICAL FIX: Memoize eventId to prevent infinite re-renders
   // useParams() returns a proxy that appears "new" on each render
-  const eventId = useMemo(() => params?.id, [params?.id]);
+  // MOBILE FIX: Convert to string to ensure stable reference across app switches
+  const eventId = useMemo(() => {
+    const id = params?.id;
+    return typeof id === 'string' ? id : Array.isArray(id) ? id[0] : id;
+  }, [params?.id]);
   const [event, setEvent] = useState<any>(null);
   const [ticketTypes, setTicketTypes] = useState<any[]>([]);
   const [selectedTickets, setSelectedTickets] = useState<{ [key: number]: number }>({});
@@ -66,8 +70,27 @@ export default function CheckoutPage() {
   const isFetchingRef = useRef(false);
   // CRITICAL FIX: Track which eventId has been fetched to prevent re-fetching same ID
   const fetchedEventIdRef = useRef<string | string[] | null>(null);
+  // MOBILE FIX: Track page visibility to prevent flicker on app switch
+  const [isPageVisible, setIsPageVisible] = useState(true);
 
   useEffect(() => { setMounted(true); }, []);
+
+  // MOBILE FIX: Listen to page visibility changes to prevent flickering on app switch
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+
+    const handleVisibilityChange = () => {
+      const visible = document.visibilityState === 'visible';
+      console.log('[CheckoutPage] Page visibility changed:', visible);
+      setIsPageVisible(visible);
+
+      // Don't trigger re-fetch when page becomes visible again
+      // Data is already cached in state
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
 
   // Clean up Clerk sync parameter from URL on mount (for cleaner URLs)
   useEffect(() => {

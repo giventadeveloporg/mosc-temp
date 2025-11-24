@@ -412,6 +412,7 @@ export default function UniversalPaymentCheckout(props: Props) {
           email={email}
           discountCodeId={discountCodeId}
           enabled={enabled}
+          showPlaceholder={true}
           amountCents={amountCents}
           publishableKey={stripePublishableKey}
           onInvalidClick={onInvalidClick}
