@@ -85,6 +85,20 @@ export default function UniversalPaymentCheckout(props: Props) {
   // Track the cart key for the current session to avoid unnecessary re-initialization
   const sessionCartKeyRef = useRef<string | null>(null);
 
+  // CRITICAL FIX: Track last initialized cart key to prevent re-initialization loops
+  const lastInitializedCartKeyRef = useRef<string | null>(null);
+
+  // CRITICAL FIX: Track if we've successfully initialized to prevent re-runs
+  const hasInitializedRef = useRef(false);
+
+  // CRITICAL FIX: Use ref to track payment session to avoid state-triggered re-renders
+  const paymentSessionRef = useRef<PaymentSessionResponse | null>(null);
+
+  // Sync ref with state
+  useEffect(() => {
+    paymentSessionRef.current = paymentSession;
+  }, [paymentSession]);
+
   // CRITICAL FIX: Track previous enabled state to prevent session clear on initial enable
   // Only clear session when going from enabled=true to enabled=false (form becomes invalid)
   // Don't clear on initial mount when going from false/undefined to true
@@ -96,6 +110,32 @@ export default function UniversalPaymentCheckout(props: Props) {
   const [paymentSectionActive, setPaymentSectionActive] = useState(false);
   const paymentSectionRef = useRef<HTMLDivElement>(null);
 
+  // CRITICAL FIX: Track last onLoadingChange call to prevent infinite loops
+  // Only call onLoadingChange when state actually changes
+  const lastLoadingStateRef = useRef<boolean | null>(null);
+
+  // CRITICAL FIX: Track if we've auto-activated payment section to prevent re-runs
+  const hasAutoActivatedRef = useRef(false);
+  const safeOnLoadingChange = useCallback((loading: boolean) => {
+    // Only call if state actually changed
+    if (lastLoadingStateRef.current === loading) {
+      return;
+    }
+    lastLoadingStateRef.current = loading;
+    try {
+      onLoadingChange?.(loading);
+    } catch (error) {
+      console.error('[UniversalPaymentCheckout] Error calling onLoadingChange:', error);
+    }
+  }, [onLoadingChange]);
+
+  // CRITICAL FIX: Prevent multiple simultaneous initializations
+  const isInitializingRef = useRef(false);
+
+  // CRITICAL FIX: Track last initialization attempt timestamp to prevent rapid re-runs
+  const lastInitAttemptRef = useRef<number>(0);
+  const INIT_DEBOUNCE_MS = 1000; // Wait 1 second between initialization attempts
+
   // CRITICAL FIX: Memoize returnUrl and cancelUrl to prevent changing on every render
   // Mobile browsers can regenerate window.location.origin during re-hydration
   const memoizedReturnUrl = useMemo(() => {
@@ -106,68 +146,86 @@ export default function UniversalPaymentCheckout(props: Props) {
     return cancelUrl || (typeof window !== 'undefined' ? window.location.origin : '/');
   }, [cancelUrl]);
 
-  // CRITICAL FIX: Automatically activate payment section when form is valid
-  // Don't wait for IntersectionObserver if user has already completed the form
-  useEffect(() => {
-    // Auto-activate if form is complete (enabled) and not yet active
-    if (enabled && cart.length > 0 && email && !paymentSectionActiveRef.current) {
-      console.log('[UniversalPaymentCheckout] CRITICAL FIX: Auto-activating payment section (form is valid)');
-      paymentSectionActiveRef.current = true;
-      setPaymentSectionActive(true);
-    }
-  }, [enabled, cart.length, email]);
+  // CRITICAL FIX: Removed separate auto-activation effect to prevent re-render loops
+  // Auto-activation is now handled inside the main initialization effect (see line ~294)
+  // This eliminates the separate effect that was causing dependency change triggers
 
   // Use Intersection Observer to detect when payment section is visible (fallback)
+  // CRITICAL FIX: Disable IntersectionObserver completely - it's causing re-activation loops
+  // Auto-activation is handled in the main effect when form is valid
   useEffect(() => {
-    if (!paymentSectionRef.current) return;
-
-    // Check if element is already visible (fallback for immediate activation)
-    const checkVisibility = () => {
-      const rect = paymentSectionRef.current?.getBoundingClientRect();
-      if (rect && rect.top < window.innerHeight && rect.bottom > 0 && !paymentSectionActiveRef.current) {
-        console.log('[UniversalPaymentCheckout] Payment section scrolled into view, activating');
-        paymentSectionActiveRef.current = true;
-        setPaymentSectionActive(true);
-        return true;
-      }
-      return false;
-    };
-
-    // Check immediately if already visible
-    if (checkVisibility()) {
-      return; // Already visible, no need for observer
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && !paymentSectionActiveRef.current) {
-            console.log('[UniversalPaymentCheckout] IntersectionObserver: Payment section visible, activating');
-            paymentSectionActiveRef.current = true;
-            setPaymentSectionActive(true);
-          }
-        });
-      },
-      { threshold: 0.1 } // Trigger when 10% of section is visible
-    );
-
-    observer.observe(paymentSectionRef.current);
-
-    return () => {
-      observer.disconnect();
-    };
+    // DISABLED: IntersectionObserver causes re-activation loops
+    // Auto-activation is handled in main effect when enabled && cart.length > 0 && email
+    return;
   }, []);
 
   // Initialize payment session when enabled, cart is ready, AND payment section is active
   useEffect(() => {
+    // CRITICAL FIX: Capture cartKey at the start of effect for cleanup comparison
+    const effectCartKey = cartKey;
+
+    // CRITICAL FIX: Check guard FIRST before any other logic to prevent race conditions
+    // Also check if we're already initializing for this exact cart
+    if (isInitializingRef.current && lastInitializedCartKeyRef.current === cartKey) {
+      console.log('[UniversalPaymentCheckout] ⚠️ SKIP - Already initializing for this exact cart (early guard)', {
+        cartKey,
+        lastInitialized: lastInitializedCartKeyRef.current,
+      });
+      return;
+    }
+    if (isInitializingRef.current) {
+      console.log('[UniversalPaymentCheckout] ⚠️ SKIP - Already initializing payment session (guard check)');
+      return;
+    }
+
+    // CRITICAL FIX: Prevent re-initialization if we already initialized for this exact cart
+    // Use ref instead of state to avoid re-render triggers
+    // Check this FIRST before any other logic to prevent unnecessary work
+    if (hasInitializedRef.current && lastInitializedCartKeyRef.current === cartKey && paymentSessionRef.current) {
+      console.log('[UniversalPaymentCheckout] ✅ SKIP - Already initialized for this cart:', {
+        cartKey,
+        lastInitialized: lastInitializedCartKeyRef.current,
+        hasSession: !!paymentSessionRef.current,
+        transactionId: paymentSessionRef.current?.transactionId,
+      });
+      return;
+    }
+
+    // CRITICAL FIX: Also check if we're currently initializing for this exact cart
+    // This prevents duplicate initializations when cleanup runs during async operation
+    if (isInitializingRef.current && lastInitializedCartKeyRef.current === cartKey) {
+      console.log('[UniversalPaymentCheckout] ✅ SKIP - Already initializing for this cart:', {
+        cartKey,
+        lastInitialized: lastInitializedCartKeyRef.current,
+      });
+      return;
+    }
+
+    // CRITICAL FIX: Debounce rapid re-runs (prevent initialization spam)
+    // Only apply debounce if we've already initialized before
+    if (hasInitializedRef.current) {
+      const now = Date.now();
+      const timeSinceLastAttempt = now - lastInitAttemptRef.current;
+      if (timeSinceLastAttempt < INIT_DEBOUNCE_MS) {
+        console.log('[UniversalPaymentCheckout] ⚠️ SKIP - Too soon since last attempt:', {
+          timeSinceLastAttempt,
+          debounceMs: INIT_DEBOUNCE_MS,
+        });
+        return;
+      }
+    }
+
     console.log('[UniversalPaymentCheckout] EFFECT TRIGGERED - Dependencies changed:', {
       enabled,
       cartLength: cart.length,
       hasEmail: !!email,
       cartKey,
       paymentSectionActive: paymentSectionActiveRef.current,
-      hasExistingSession: !!paymentSession,
+      hasExistingSession: !!paymentSessionRef.current,
       sessionCartKey: sessionCartKeyRef.current,
+      isInitializing: isInitializingRef.current,
+      hasInitialized: hasInitializedRef.current,
+      lastInitializedCartKey: lastInitializedCartKeyRef.current,
       timestamp: new Date().toISOString(),
     });
 
@@ -182,9 +240,18 @@ export default function UniversalPaymentCheckout(props: Props) {
           cartLength: cart.length,
           hasEmail: !!email
         });
+        // CRITICAL FIX: Update refs FIRST before state
+        paymentSessionRef.current = null;
+        sessionCartKeyRef.current = null;
+        hasInitializedRef.current = false;
+        lastInitializedCartKeyRef.current = null;
+        // CRITICAL: Reset activation flags
+        paymentSectionActiveRef.current = false;
+        hasAutoActivatedRef.current = false;
+
+        // Then update state
         setPaymentSession(null);
         setProviderType(null);
-        sessionCartKeyRef.current = null;
       } else {
         console.log('[UniversalPaymentCheckout] Form not yet valid, skipping session clear (prevent initial flicker)', {
           enabled,
@@ -200,34 +267,89 @@ export default function UniversalPaymentCheckout(props: Props) {
 
     // Lazy initialization: Only initialize when payment section is visible/interacted with
     // This prevents unnecessary backend calls when user is just filling out form fields
-    // CRITICAL FIX: Use ref to check activity status to prevent re-render loops
+    // CRITICAL FIX: Auto-activate if form is valid (don't wait for IntersectionObserver)
     if (!paymentSectionActiveRef.current) {
-      console.log('[UniversalPaymentCheckout] Payment section not yet active, deferring initialization');
-      return;
+      // Auto-activate if form is complete and we haven't already activated
+      if (enabled && cart.length > 0 && email && !hasAutoActivatedRef.current) {
+        console.log('[UniversalPaymentCheckout] CRITICAL FIX: Auto-activating payment section (form is valid)');
+        paymentSectionActiveRef.current = true;
+        hasAutoActivatedRef.current = true;
+      } else {
+        console.log('[UniversalPaymentCheckout] Payment section not yet active, deferring initialization');
+        return;
+      }
     }
 
-    // Don't re-initialize if we already have a valid session for the same cart
-    if (paymentSession && providerType && sessionCartKeyRef.current === cartKey) {
+    // CRITICAL FIX: Don't re-initialize if we already have a valid session for the same cart
+    // Use ref instead of state to avoid re-render triggers
+    // Check BOTH paymentSessionRef AND providerTypeRef (from state) to ensure we have everything
+    const currentProviderType = providerType; // Capture from state
+    // CRITICAL: Check refs FIRST - they persist even if state hasn't updated yet
+    // Don't require providerType from state - get it from ref if available
+    if (paymentSessionRef.current && sessionCartKeyRef.current === cartKey) {
+      // If we have a session ref but state hasn't caught up, update state now
+      if (!paymentSession && paymentSessionRef.current) {
+        console.log('[UniversalPaymentCheckout] ⚠️ STATE CATCH-UP - Updating state from ref');
+        const sessionProviderType = (paymentSessionRef.current as any).providerType || providerType;
+        setPaymentSession(paymentSessionRef.current);
+        if (sessionProviderType) {
+          setProviderType(sessionProviderType);
+        }
+      }
+
       console.log('[UniversalPaymentCheckout] ✅ SKIP RE-INIT - Session already exists for cart:', {
         cartKey,
         existingCartKey: sessionCartKeyRef.current,
-        transactionId: paymentSession.transactionId,
+        transactionId: paymentSessionRef.current.transactionId,
+        providerType: providerType || (paymentSessionRef.current as any).providerType,
+        hasState: !!paymentSession,
+        hasRef: !!paymentSessionRef.current,
       });
+      // Mark as initialized to prevent future re-runs
+      hasInitializedRef.current = true;
+      lastInitializedCartKeyRef.current = cartKey;
+      // CRITICAL: Ensure paymentSectionActiveRef is set so we don't re-trigger
+      paymentSectionActiveRef.current = true;
+      // CRITICAL: MUST also update state, not just ref, to prevent parent unmounting
+      if (!paymentSectionActive) {
+        setPaymentSectionActive(true);
+      }
+      hasAutoActivatedRef.current = true;
       return;
     }
+
+    // CRITICAL FIX: Set guard IMMEDIATELY before any async operations
+    // This prevents race conditions where multiple effects run simultaneously
+    isInitializingRef.current = true;
+    lastInitAttemptRef.current = Date.now();
 
     console.log('[UniversalPaymentCheckout] ⚡ INITIALIZING PAYMENT SESSION', {
       cartKey,
       previousCartKey: sessionCartKeyRef.current,
-      hasExistingSession: !!paymentSession,
+      hasExistingSession: !!paymentSessionRef.current,
+      timestamp: new Date().toISOString(),
     });
 
     let cancelled = false;
 
     const initializePaymentSession = async () => {
+      // CRITICAL FIX: Double-check guard and cancelled flag before starting async operation
+      if (cancelled) {
+        console.log('[UniversalPaymentCheckout] ⚠️ SKIP - Already cancelled before async started');
+        isInitializingRef.current = false;
+        return;
+      }
+
+      if (isInitializingRef.current === false) {
+        console.log('[UniversalPaymentCheckout] ⚠️ SKIP - Guard was reset before async started');
+        return;
+      }
+
       setIsInitializing(true);
       setInitializationError(null);
-      onLoadingChange?.(true);
+
+      // CRITICAL FIX: Use safe callback that prevents duplicate calls
+      safeOnLoadingChange(true);
 
       try {
         // Build payment items from cart
@@ -275,7 +397,9 @@ export default function UniversalPaymentCheckout(props: Props) {
           hasPublicKey: !!(session as any)?.publicKey, // Backend might use 'publicKey' instead
           hasSessionUrl: !!session?.sessionUrl,
           status: session?.status,
-          fullSession: session,
+          cancelled: cancelled, // Log cancelled state
+          cartKey: cartKey,
+          effectCartKey: effectCartKey,
         });
 
         // Normalize response: handle backend field differences
@@ -346,11 +470,50 @@ export default function UniversalPaymentCheckout(props: Props) {
           publishableKey: normalizedPublishableKey,
         };
 
-        if (!cancelled) {
+        // CRITICAL FIX: Check cancelled flag and log for debugging
+        // Note: cancelled is only set to true if cartKey changed, so we should be able to save
+        if (cancelled) {
+          console.log('[UniversalPaymentCheckout] ⚠️ SKIP STATE UPDATE - Operation was cancelled (cart changed)', {
+            cartKey,
+            effectCartKey,
+            transactionId: normalizedSession?.transactionId,
+          });
+          // Still reset loading state even if cancelled
+          safeOnLoadingChange(false);
+        } else {
+          console.log('[UniversalPaymentCheckout] ✅ SAVING PAYMENT SESSION', {
+            cartKey,
+            transactionId: normalizedSession?.transactionId,
+            providerType: normalizedProviderType || normalizedSession.providerType,
+          });
+
+          // CRITICAL FIX: Update ref FIRST before state to prevent race conditions
+          // Set ALL refs synchronously BEFORE any state updates
+          paymentSessionRef.current = normalizedSession;
+          sessionCartKeyRef.current = cartKey; // Track which cart this session is for
+          hasInitializedRef.current = true;
+          lastInitializedCartKeyRef.current = cartKey;
+          // CRITICAL: Ensure paymentSectionActiveRef is set so effect doesn't re-trigger
+          paymentSectionActiveRef.current = true;
+          // CRITICAL: Mark as auto-activated to prevent re-activation
+          hasAutoActivatedRef.current = true;
+
+          // CRITICAL FIX: Batch state updates to prevent multiple re-renders
+          // CRITICAL: MUST call setPaymentSectionActive(true) to update state, not just ref
+          // This prevents parent component from unmounting/remounting due to stale state
+          setPaymentSectionActive(true);
           setPaymentSession(normalizedSession);
           setProviderType(normalizedProviderType || normalizedSession.providerType || null);
-          sessionCartKeyRef.current = cartKey; // Track which cart this session is for
-          onLoadingChange?.(false);
+          safeOnLoadingChange(false);
+
+          // CRITICAL: Log ref state after setting to verify persistence
+          console.log('[UniversalPaymentCheckout] ✅ REFS SET AFTER SAVING:', {
+            hasPaymentSessionRef: !!paymentSessionRef.current,
+            hasSessionCartKey: !!sessionCartKeyRef.current,
+            hasInitialized: hasInitializedRef.current,
+            paymentSectionActive: paymentSectionActiveRef.current,
+            transactionId: paymentSessionRef.current?.transactionId,
+          });
         }
       } catch (error) {
         if (cancelled) return;
@@ -371,10 +534,19 @@ export default function UniversalPaymentCheckout(props: Props) {
         const errorMessage = getUserFriendlyErrorMessage(paymentError);
         setInitializationError(errorMessage);
         onError?.(errorMessage);
-        onLoadingChange?.(false);
+        safeOnLoadingChange(false);
       } finally {
+        // CRITICAL FIX: Always reset initialization flag in finally block
+        // This ensures the guard is reset even if the async operation is cancelled
+        // Reset guard FIRST before any other cleanup
+        isInitializingRef.current = false;
+
         if (!cancelled) {
           setIsInitializing(false);
+        } else {
+          // If cancelled, still reset loading state but don't update session
+          setIsInitializing(false);
+          safeOnLoadingChange(false);
         }
       }
     };
@@ -383,11 +555,30 @@ export default function UniversalPaymentCheckout(props: Props) {
 
     // Cleanup function to prevent state updates if component unmounts or dependencies change
     return () => {
-      cancelled = true;
+      // CRITICAL FIX: Only cancel if cartKey actually changed
+      // If cartKey is the same, let the operation complete (prevents losing payment session)
+      const currentCartKey = cartKey;
+      if (effectCartKey !== currentCartKey) {
+        console.log('[UniversalPaymentCheckout] Cleanup: Cart changed, cancelling operation', {
+          oldCartKey: effectCartKey,
+          newCartKey: currentCartKey,
+        });
+        cancelled = true;
+      } else {
+        console.log('[UniversalPaymentCheckout] Cleanup: Dependencies changed but cartKey same, allowing operation to complete', {
+          cartKey: effectCartKey,
+        });
+        // Don't cancel - let the operation complete since cart hasn't changed
+      }
+      // CRITICAL FIX: DO NOT reset guard in cleanup - let the async operation handle it
+      // The guard will be reset in the finally block of initializePaymentSession
     };
     // CRITICAL FIX: Removed customerName and customerPhone from dependencies
     // These fields don't need to trigger re-initialization - they're just passed in the request
     // This prevents flickering when user types in name/phone fields
+    // NOTE: safeOnLoadingChange is NOT in deps - it's only used inside the effect, not as a trigger
+    // This prevents the callback from causing re-runs when parent recreates it
+    // CRITICAL: paymentSession is NOT in deps - it's only checked via ref to prevent re-runs when state updates
   }, [enabled, cartKey, email, amountCents, paymentUseCase, eventId, discountCodeId, memoizedReturnUrl, memoizedCancelUrl]);
 
   // Render loading state
@@ -422,17 +613,45 @@ export default function UniversalPaymentCheckout(props: Props) {
   }
 
   // Render provider-specific UI
-  if (!paymentSession || !providerType) {
+  // CRITICAL FIX: Check refs first (they're set synchronously), then fall back to state
+  // This prevents "No payment session" message when state update is pending
+  const effectivePaymentSession = paymentSessionRef.current || paymentSession;
+  // CRITICAL: Also get providerType from ref if available (from session object)
+  const effectiveProviderType = providerType || (paymentSessionRef.current as any)?.providerType || null;
+
+  if (!effectivePaymentSession || !effectiveProviderType) {
+    // CRITICAL FIX: If refs show we have a session but state doesn't, wait for state to catch up
+    // This prevents flickering when state update is pending
+    if (paymentSessionRef.current && (!paymentSession || !providerType)) {
+      console.log('[UniversalPaymentCheckout] ⚠️ WAITING - Ref has session but state pending, showing loading...', {
+        hasPaymentSessionRef: !!paymentSessionRef.current,
+        hasPaymentSessionState: !!paymentSession,
+        hasProviderTypeState: !!providerType,
+        hasProviderTypeRef: !!(paymentSessionRef.current as any)?.providerType,
+        transactionId: paymentSessionRef.current?.transactionId,
+      });
+      // Show loading state while waiting for state to update
+      return (
+        <div ref={paymentSectionRef} className="flex flex-col items-center justify-center p-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+          <p className="text-muted-foreground">Loading payment options...</p>
+        </div>
+      );
+    }
+
     // Debug logging
     console.log('[UniversalPaymentCheckout] No payment session or provider type:', {
-      hasPaymentSession: !!paymentSession,
-      hasProviderType: !!providerType,
-      paymentSession,
+      hasPaymentSession: !!effectivePaymentSession,
+      hasProviderType: !!effectiveProviderType,
+      paymentSessionFromState: !!paymentSession,
+      paymentSessionFromRef: !!paymentSessionRef.current,
       providerType,
       enabled,
       cartLength: cart.length,
       hasEmail: !!email,
       paymentSectionActive,
+      hasInitialized: hasInitializedRef.current,
+      sessionCartKey: sessionCartKeyRef.current,
     });
 
     return (
@@ -459,10 +678,11 @@ export default function UniversalPaymentCheckout(props: Props) {
   }
 
   // Render Stripe Elements (default)
+  // CRITICAL FIX: Use effectivePaymentSession (from ref or state) instead of just state
   // Use publishableKey from session or fallback to env var (for backward compatibility)
-  const stripePublishableKey = paymentSession.publishableKey || process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+  const stripePublishableKey = effectivePaymentSession.publishableKey || process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 
-  if (providerType === ProviderType.STRIPE && paymentSession.clientSecret && stripePublishableKey) {
+  if (effectiveProviderType === ProviderType.STRIPE && effectivePaymentSession.clientSecret && stripePublishableKey) {
     console.log('[UniversalPaymentCheckout] Rendering Stripe Elements UI');
     return (
       <div ref={paymentSectionRef} className="space-y-4">
@@ -488,8 +708,8 @@ export default function UniversalPaymentCheckout(props: Props) {
           enabled={enabled && !isInitializing}
           amountCents={amountCents}
           publishableKey={stripePublishableKey}
-          clientSecret={paymentSession.clientSecret}
-          transactionId={paymentSession.transactionId}
+          clientSecret={effectivePaymentSession.clientSecret}
+          transactionId={effectivePaymentSession.transactionId}
           onInvalidClick={onInvalidClick}
           onLoadingChange={onLoadingChange}
         />
@@ -498,17 +718,17 @@ export default function UniversalPaymentCheckout(props: Props) {
   }
 
   // Debug: Log why Stripe Elements aren't rendering
-  if (providerType === ProviderType.STRIPE) {
+  if (effectiveProviderType === ProviderType.STRIPE) {
     console.warn('[UniversalPaymentCheckout] Stripe provider but missing required fields:', {
-      hasClientSecret: !!paymentSession.clientSecret,
-      hasPublishableKey: !!paymentSession.publishableKey,
+      hasClientSecret: !!effectivePaymentSession?.clientSecret,
+      hasPublishableKey: !!effectivePaymentSession?.publishableKey,
       hasEnvPublishableKey: !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
-      hasSessionUrl: !!paymentSession.sessionUrl,
-      paymentSession,
+      hasSessionUrl: !!effectivePaymentSession?.sessionUrl,
+      paymentSession: effectivePaymentSession,
     });
 
     // Show helpful error message if we have clientSecret but missing publishableKey
-    if (paymentSession.clientSecret && !stripePublishableKey) {
+    if (effectivePaymentSession.clientSecret && !stripePublishableKey) {
       return (
         <div className="bg-destructive/10 border border-destructive rounded-lg p-4">
           <p className="text-destructive font-semibold mb-2">Payment Configuration Error</p>
@@ -517,7 +737,7 @@ export default function UniversalPaymentCheckout(props: Props) {
           </p>
           {process.env.NODE_ENV === 'development' && (
             <p className="text-xs mt-2 text-gray-500">
-              Debug: transactionId={paymentSession.transactionId}, providerType={providerType}
+              Debug: transactionId={effectivePaymentSession.transactionId}, providerType={effectiveProviderType}
             </p>
           )}
         </div>
@@ -547,7 +767,7 @@ export default function UniversalPaymentCheckout(props: Props) {
         onLoadingChange?.(false);
 
         // Check payment status
-        if (paymentSession.transactionId) {
+        if (effectivePaymentSession?.transactionId) {
           // TODO: Poll payment status and call onSuccess if succeeded
           // This will be implemented when backend status endpoint is ready
         }
@@ -673,7 +893,7 @@ export default function UniversalPaymentCheckout(props: Props) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            transactionId: paymentSession.transactionId,
+            transactionId: effectivePaymentSession.transactionId,
             amount: amountCents / 100,
             currency: 'USD', // TODO: Get from tenant settings
             customerEmail: email,
@@ -687,7 +907,7 @@ export default function UniversalPaymentCheckout(props: Props) {
           throw new Error('Failed to create Zelle payment transaction');
         }
 
-        onSuccess?.(paymentSession.transactionId);
+        onSuccess?.(effectivePaymentSession.transactionId);
       } catch (error) {
         const paymentError = normalizePaymentError(error);
         logPaymentError(paymentError);

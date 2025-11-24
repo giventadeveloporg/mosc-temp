@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { FaTags, FaCreditCard, FaCalendarAlt, FaClock, FaMapMarkerAlt, FaMapPin, FaTicketAlt, FaUser, FaEnvelope, FaMoneyBillWave, FaReceipt } from 'react-icons/fa';
 import { Modal } from '@/components/Modal';
@@ -9,6 +9,80 @@ import UniversalPaymentCheckout from '@/components/UniversalPaymentCheckout';
 import { PaymentUseCase } from '@/types';
 import { formatInTimeZone } from 'date-fns-tz';
 import LocationDisplay from '@/components/LocationDisplay';
+
+// CRITICAL FIX: Move PaymentSection outside component to prevent recreation on every render
+// This prevents UniversalPaymentCheckout from unmounting/remounting and losing refs
+const PaymentSection = React.memo(({
+  cart,
+  eventId,
+  email,
+  customerName,
+  customerPhone,
+  discountCodeId,
+  enabled,
+  amountCents,
+  paymentUseCase,
+  returnUrl,
+  cancelUrl,
+  onInvalidClick,
+  onSuccess,
+  onError,
+  onLoadingChange,
+}: {
+  cart: Array<{ ticketType: any; quantity: number }>;
+  eventId: string;
+  email: string;
+  customerName?: string;
+  customerPhone?: string;
+  discountCodeId: number | null;
+  enabled: boolean;
+  amountCents: number;
+  paymentUseCase: PaymentUseCase;
+  returnUrl: string;
+  cancelUrl: string;
+  onInvalidClick: () => void;
+  onSuccess: (transactionId: string) => void;
+  onError: (error: string) => void;
+  onLoadingChange: (loading: boolean) => void;
+}) => {
+  return (
+    <UniversalPaymentCheckout
+      cart={cart}
+      eventId={eventId}
+      email={email}
+      customerName={customerName}
+      customerPhone={customerPhone}
+      discountCodeId={discountCodeId}
+      enabled={enabled}
+      amountCents={amountCents}
+      paymentUseCase={paymentUseCase}
+      returnUrl={returnUrl}
+      cancelUrl={cancelUrl}
+      onInvalidClick={onInvalidClick}
+      onSuccess={onSuccess}
+      onError={onError}
+      onLoadingChange={onLoadingChange}
+    />
+  );
+}, (prevProps, nextProps) => {
+  // Custom comparison: only re-render if payment-relevant props change
+  const cartEqual = JSON.stringify(prevProps.cart) === JSON.stringify(nextProps.cart);
+  return (
+    cartEqual &&
+    prevProps.eventId === nextProps.eventId &&
+    prevProps.email === nextProps.email &&
+    prevProps.customerName === nextProps.customerName &&
+    prevProps.customerPhone === nextProps.customerPhone &&
+    prevProps.discountCodeId === nextProps.discountCodeId &&
+    prevProps.enabled === nextProps.enabled &&
+    prevProps.amountCents === nextProps.amountCents &&
+    prevProps.paymentUseCase === nextProps.paymentUseCase &&
+    prevProps.returnUrl === nextProps.returnUrl &&
+    prevProps.cancelUrl === nextProps.cancelUrl
+  );
+});
+
+PaymentSection.displayName = 'PaymentSection';
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -38,7 +112,51 @@ export default function CheckoutPage() {
   const [cancelledPaymentInfo, setCancelledPaymentInfo] = useState<any>(null);
   const [expressCheckoutLoading, setExpressCheckoutLoading] = useState(true);
 
+  // MOBILE FIX: Track page visibility to prevent unnecessary re-renders on app switch
+  const [isPageVisible, setIsPageVisible] = useState(true);
+  const isFetchingRef = useRef(false);
+  const fetchedEventIdRef = useRef<string | string[] | null>(null);
+
   useEffect(() => { setMounted(true); }, []);
+
+  // MOBILE FIX: Handle page visibility changes (app switching on mobile)
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+
+    const handleVisibilityChange = () => {
+      const visible = document.visibilityState === 'visible';
+      console.log('[CheckoutPage] Page visibility changed:', {
+        visible,
+        timestamp: new Date().toISOString(),
+        eventId,
+      });
+      setIsPageVisible(visible);
+
+      // Don't trigger re-fetch when page becomes visible again
+      // Data is already cached in state
+      if (visible) {
+        console.log('[CheckoutPage] Page became visible - NOT re-fetching (using cached data)');
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [eventId]);
+
+  // MOBILE FIX: Clean up Clerk sync parameter from URL (prevents re-renders)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('__clerk_synced')) {
+      // Remove Clerk sync parameter for cleaner URL and to prevent re-renders
+      urlParams.delete('__clerk_synced');
+      const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+      // Use replace to avoid adding to history
+      window.history.replaceState({}, '', newUrl);
+      console.log('[CheckoutPage] Cleaned up Clerk sync parameter from URL');
+    }
+  }, []);
 
   // Check for cancelled payment parameters
   useEffect(() => {
@@ -67,6 +185,25 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     async function fetchData() {
+      // MOBILE FIX: Prevent duplicate fetches using ref
+      if (isFetchingRef.current) {
+        console.log('[CheckoutPage] Fetch already in progress, skipping duplicate');
+        return;
+      }
+
+      // MOBILE FIX: Prevent re-fetching the same eventId (mobile browser re-hydration issue)
+      if (fetchedEventIdRef.current === eventId) {
+        console.log('[CheckoutPage] Event already fetched, skipping re-fetch', { eventId });
+        return;
+      }
+
+      // MOBILE FIX: Don't fetch if page is not visible (app in background)
+      if (!isPageVisible) {
+        console.log('[CheckoutPage] Page not visible, deferring fetch');
+        return;
+      }
+
+      isFetchingRef.current = true;
       setLoading(true);
       try {
         // Fetch event details
@@ -136,11 +273,16 @@ export default function CheckoutPage() {
         setHeroImageUrl(defaultHeroImageUrl);
       } finally {
         setLoading(false);
+        isFetchingRef.current = false;
+        // Mark this eventId as fetched to prevent re-fetching on mobile re-hydration
+        if (eventId) {
+          fetchedEventIdRef.current = eventId;
+        }
       }
     }
-    if (eventId) fetchData();
+    if (eventId && isPageVisible) fetchData();
     // eslint-disable-next-line
-  }, [eventId]);
+  }, [eventId, isPageVisible]);
 
   // Reactive calculation for total and discount
   useEffect(() => {
@@ -171,16 +313,62 @@ export default function CheckoutPage() {
     setSavedAmount(amountSaved);
   }, [selectedTickets, appliedDiscount, ticketTypes]);
 
-  const handleTicketChange = (ticketId: number, quantity: number) => {
-    const ticketType = ticketTypes.find(t => t.id === ticketId);
-    if (!ticketType) return;
+  // Helper function to calculate remaining quantity (matches rendering logic)
+  // CRITICAL: Handles NULL values from database properly
+  // When soldQuantity is NULL, treats it as 0 and calculates: availableQuantity - 0
+  // This fixes the "sold out" error when soldQuantity is NULL in database
+  const calculateRemainingQuantity = (ticket: any): number => {
+    if (!ticket) return 0;
 
-    // Check if completely sold out
-    const remaining = ticketType.remainingQuantity ?? 0;
+    // Calculate remaining quantity from source data (availableQuantity - soldQuantity)
+    // Handle NULL values from database properly - NULL means 0 sold
+    const availableQty = ticket.availableQuantity ?? 0;
+    const soldQty = ticket.soldQuantity ?? 0; // NULL becomes 0
+    const calculatedRemaining = availableQty - soldQty;
+
+    // Use backend remainingQuantity only if it's explicitly provided (not NULL/undefined)
+    // Priority: remainingQuantity > calculatedRemaining > 0
+    if (ticket.remainingQuantity != null && ticket.remainingQuantity !== undefined) {
+      return ticket.remainingQuantity;
+    }
+
+    // If we have availableQuantity, use calculated value (handles NULL soldQuantity correctly)
+    // Example: availableQuantity=100, soldQuantity=NULL → remaining=100-0=100 ✅
+    if (ticket.availableQuantity != null && ticket.availableQuantity !== undefined) {
+      return calculatedRemaining;
+    }
+
+    // Fallback to 0 if no data available
+    return 0;
+  };
+
+  const handleTicketChange = (ticketId: number, quantity: number) => {
+    console.log('[handleTicketChange] Called:', { ticketId, quantity, selectedTickets });
+
+    const ticketType = ticketTypes.find(t => t.id === ticketId);
+    if (!ticketType) {
+      console.log('[handleTicketChange] Ticket type not found:', ticketId);
+      return;
+    }
+
+    // Use the same calculation logic as rendering
+    const remaining = calculateRemainingQuantity(ticketType);
+
     const isSoldOut = remaining <= 0;
 
+    console.log('[handleTicketChange] Ticket availability:', {
+      ticketName: ticketType.name,
+      availableQuantity: ticketType.availableQuantity,
+      soldQuantity: ticketType.soldQuantity,
+      remainingQuantity: ticketType.remainingQuantity,
+      calculatedRemaining: remaining,
+      remaining,
+      isSoldOut,
+      currentSelected: selectedTickets[ticketId] || 0
+    });
+
     if (isSoldOut) {
-      console.log(`Cannot select tickets for ${ticketType.name} - sold out`);
+      console.log(`[handleTicketChange] Cannot select tickets for ${ticketType.name} - sold out`);
       return;
     }
 
@@ -189,8 +377,20 @@ export default function CheckoutPage() {
     const maxSelectable = Math.min(remaining, maxOrderQuantity);
     const newQuantity = Math.max(0, Math.min(quantity, maxSelectable));
 
+    console.log('[handleTicketChange] Quantity calculation:', {
+      quantity,
+      maxOrderQuantity,
+      maxSelectable,
+      newQuantity
+    });
+
     if (newQuantity >= 0) {
-      setSelectedTickets(prev => ({ ...prev, [ticketId]: newQuantity }));
+      console.log('[handleTicketChange] Updating selectedTickets:', { ticketId, newQuantity });
+      setSelectedTickets(prev => {
+        const updated = { ...prev, [ticketId]: newQuantity };
+        console.log('[handleTicketChange] New selectedTickets state:', updated);
+        return updated;
+      });
       // Clear email to force re-validation and PRB recalculation with new total
       setEmail('');
       // Trigger immediate email validation to show user they need to enter email
@@ -211,7 +411,7 @@ export default function CheckoutPage() {
 
   const isTicketTypeAvailable = (ticketType: any, quantity: number) => {
     if (!ticketType) return false;
-    const remaining = ticketType.remainingQuantity ?? 0;
+    const remaining = calculateRemainingQuantity(ticketType);
     const maxOrderQuantity = ticketType.maxQuantityPerOrder ?? 10;
     return remaining > 0 && remaining >= Math.min(quantity, maxOrderQuantity);
   };
@@ -228,7 +428,20 @@ export default function CheckoutPage() {
     if (quantity === 0) return false;
     const ticket = ticketTypes.find(t => t.id === parseInt(ticketId));
     if (!ticket) return false;
-    const remaining = ticket.remainingQuantity ?? 0;
+
+    // Use the same calculation logic as rendering
+    const remaining = calculateRemainingQuantity(ticket);
+    console.log('[hasUnavailableTickets] Checking ticket:', {
+      ticketId,
+      ticketName: ticket.name,
+      quantity,
+      availableQuantity: ticket.availableQuantity,
+      soldQuantity: ticket.soldQuantity,
+      remainingQuantity: ticket.remainingQuantity,
+      calculatedRemaining: remaining,
+      isSoldOut: remaining <= 0
+    });
+
     return remaining <= 0; // Only consider completely sold out tickets
   });
   const canCheckout = hasTicketsSelected && emailIsValid && !hasUnavailableTickets;
@@ -281,16 +494,71 @@ export default function CheckoutPage() {
   };
 
   // Handle payment success - redirect to success page
-  const handlePaymentSuccess = (transactionId: string) => {
+  const handlePaymentSuccess = useCallback((transactionId: string) => {
     console.log('[CheckoutPage] Payment successful, transactionId:', transactionId);
     router.push(`/event/success?transactionId=${transactionId}&eventId=${eventId}`);
-  };
+  }, [router, eventId]);
 
   // Handle payment error - show alert
-  const handlePaymentError = (error: string) => {
+  const handlePaymentError = useCallback((error: string) => {
     console.error('[CheckoutPage] Payment error:', error);
     alert(`Payment failed: ${error}. Please try again.`);
-  };
+  }, []);
+
+  // MOBILE FIX: Memoize payment cart to prevent unnecessary re-renders
+  const paymentCart = useMemo(() => {
+    return Object.entries(selectedTickets)
+      .filter(([, quantity]) => quantity > 0)
+      .map(([ticketId, quantity]) => {
+        const ticketType = ticketTypes.find(t => t.id === parseInt(ticketId));
+        return { ticketType, quantity };
+      });
+  }, [selectedTickets, ticketTypes]);
+
+  // MOBILE FIX: Memoize payment props to prevent re-renders from form state changes
+  const paymentProps = useMemo(() => ({
+    cart: paymentCart,
+    eventId: String(eventId),
+    email,
+    customerName: firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || undefined,
+    customerPhone: phone || undefined,
+    discountCodeId: appliedDiscount?.id ?? null,
+    enabled: canCheckout,
+    amountCents: Math.round(totalAmount * 100),
+    paymentUseCase: PaymentUseCase.TICKET_SALE,
+    returnUrl: typeof window !== 'undefined' ? `${window.location.origin}/event/success` : '/event/success',
+    cancelUrl: typeof window !== 'undefined' ? window.location.origin : '/',
+  }), [
+    paymentCart,
+    eventId,
+    email,
+    firstName,
+    lastName,
+    phone,
+    appliedDiscount?.id,
+    canCheckout,
+    totalAmount,
+  ]);
+
+  // MOBILE FIX: Memoize callbacks to prevent re-renders
+  const handleInvalidClick = useCallback(() => {
+    if (!emailIsValid) setEmailError(true);
+    if (!hasTicketsSelected) alert('Please select at least one ticket.');
+    if (hasUnavailableTickets) alert('Some selected tickets are sold out. Please adjust your selection.');
+  }, [emailIsValid, hasTicketsSelected, hasUnavailableTickets]);
+
+  // CRITICAL FIX: Use ref for onLoadingChange to prevent infinite loops
+  // onLoadingChange triggers parent re-renders which can cause infinite initialization loops
+  const onLoadingChangeRef = useRef(setIsProcessing);
+  useEffect(() => {
+    onLoadingChangeRef.current = setIsProcessing;
+  }, [setIsProcessing]);
+
+  const handleLoadingChange = useCallback((loading: boolean) => {
+    onLoadingChangeRef.current(loading);
+  }, []);
+
+  // PaymentSection is now defined outside the component to prevent recreation on every render
 
   // Define renderOrderSummary function here, after all the required functions and variables
   const renderOrderSummary = () => {
@@ -321,33 +589,47 @@ export default function CheckoutPage() {
 
     return (
       <>
-        {/* Discount Code Section */}
-        {availableDiscounts.length > 0 && (
-          <div className="mb-6">
-            <label htmlFor="discountCode" className="block text-sm font-medium text-gray-700 mb-2">
-              Discount Code
-            </label>
-            <div className="space-y-3">
-              <input
-                type="text"
-                id="discountCode"
-                value={discountCode}
-                onChange={(e) => setDiscountCode(e.target.value)}
-                placeholder="Enter discount code"
-                className="w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
-              />
-              <button
-                onClick={handleApplyDiscount}
-                className="w-full bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 disabled:bg-blue-300 font-semibold flex items-center justify-center gap-2"
-              >
-                <FaTags />
-                Apply
-              </button>
-            </div>
-            {discountError && <p className="text-red-500 text-sm mt-2">{discountError}</p>}
-            {discountSuccessMessage && <p className="text-green-600 text-sm mt-2">{discountSuccessMessage}</p>}
+        {/* Discount Code Section - Always visible */}
+        <div className="mb-6">
+          <label htmlFor="discountCode" className="block text-sm font-medium text-gray-700 mb-2">
+            Discount Code {availableDiscounts.length > 0 && <span className="text-gray-500 text-sm">(Optional)</span>}
+          </label>
+          <div className="space-y-3">
+            <input
+              type="text"
+              id="discountCode"
+              value={discountCode}
+              onChange={(e) => {
+                setDiscountCode(e.target.value);
+                // Clear errors when user types
+                if (discountError) setDiscountError('');
+                if (discountSuccessMessage) setDiscountSuccessMessage('');
+              }}
+              placeholder="Enter discount code"
+              className="w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
+            />
+            <button
+              type="button"
+              onClick={handleApplyDiscount}
+              className="w-full bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 disabled:bg-blue-300 font-semibold flex items-center justify-center gap-2"
+              disabled={!discountCode.trim()}
+            >
+              <FaTags />
+              Apply
+            </button>
           </div>
-        )}
+          {discountError && <p className="text-red-500 text-sm mt-2">{discountError}</p>}
+          {discountSuccessMessage && <p className="text-green-600 text-sm mt-2">{discountSuccessMessage}</p>}
+          {appliedDiscount && (
+            <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-md">
+              <p className="text-sm text-green-800">
+                <strong>{appliedDiscount.code}</strong> applied: {appliedDiscount.discountType === 'PERCENTAGE'
+                  ? `${appliedDiscount.discountValue}% off`
+                  : `$${appliedDiscount.discountValue} off`}
+              </p>
+            </div>
+          )}
+        </div>
 
         {/* Total */}
         <div className="border-t border-gray-200 pt-6 mb-6">
@@ -447,32 +729,14 @@ export default function CheckoutPage() {
         </div>
 
         {/* Universal Payment Checkout - Backend-integrated */}
+        {/* MOBILE FIX: Isolated payment section prevents form state changes from causing flickering */}
         <div className="mt-4">
-          <UniversalPaymentCheckout
-            cart={Object.entries(selectedTickets)
-              .filter(([, quantity]) => quantity > 0)
-              .map(([ticketId, quantity]) => {
-                const ticketType = ticketTypes.find(t => t.id === parseInt(ticketId));
-                return { ticketType, quantity };
-              })}
-            eventId={String(eventId)}
-            email={email}
-            customerName={firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || undefined}
-            customerPhone={phone || undefined}
-            discountCodeId={appliedDiscount?.id ?? null}
-            enabled={canCheckout}
-            amountCents={Math.round(totalAmount * 100)}
-            paymentUseCase={PaymentUseCase.TICKET_SALE}
-            returnUrl={typeof window !== 'undefined' ? `${window.location.origin}/event/success` : '/event/success'}
-            cancelUrl={typeof window !== 'undefined' ? window.location.origin : '/'}
-            onInvalidClick={() => {
-              if (!emailIsValid) setEmailError(true);
-              if (!hasTicketsSelected) alert('Please select at least one ticket.');
-              if (hasUnavailableTickets) alert('Some selected tickets are sold out. Please adjust your selection.');
-            }}
+          <PaymentSection
+            {...paymentProps}
+            onInvalidClick={handleInvalidClick}
             onSuccess={handlePaymentSuccess}
             onError={handlePaymentError}
-            onLoadingChange={setIsProcessing}
+            onLoadingChange={handleLoadingChange}
           />
         </div>
       </>
@@ -773,12 +1037,8 @@ export default function CheckoutPage() {
                 remainingQuantity: ticket.remainingQuantity
               });
 
-              // Calculate remaining quantity from source data (availableQuantity - soldQuantity)
-              // Use backend remainingQuantity only if source data is not available
-              const calculatedRemaining = (ticket.availableQuantity ?? 0) - (ticket.soldQuantity ?? 0);
-              const remainingQuantity = (ticket.availableQuantity !== undefined && ticket.soldQuantity !== undefined)
-                ? calculatedRemaining
-                : (ticket.remainingQuantity ?? calculatedRemaining);
+              // Calculate remaining quantity using the same helper function
+              const remainingQuantity = calculateRemainingQuantity(ticket);
 
               // Check if tickets are sold out
               const isSoldOut = remainingQuantity <= 0;
@@ -816,15 +1076,29 @@ export default function CheckoutPage() {
 
                   <div className="flex items-center gap-3">
                     <button
-                      onClick={() => handleTicketChange(ticket.id, (selectedTickets[ticket.id] || 0) - 1)}
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const currentQty = selectedTickets[ticket.id] || 0;
+                        handleTicketChange(ticket.id, currentQty - 1);
+                      }}
                       className="bg-gray-200 text-gray-700 px-3 py-1 rounded-l-md hover:bg-gray-300 transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
                       disabled={isSoldOut || (selectedTickets[ticket.id] || 0) <= 0}
                     >
                       -
                     </button>
-                    <span className="px-4 py-1 bg-white border-t border-b">{selectedTickets[ticket.id] || 0}</span>
+                    <span className="px-4 py-1 bg-white border-t border-b border-gray-200 min-w-[3rem] text-center">
+                      {selectedTickets[ticket.id] || 0}
+                    </span>
                     <button
-                      onClick={() => handleTicketChange(ticket.id, (selectedTickets[ticket.id] || 0) + 1)}
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const currentQty = selectedTickets[ticket.id] || 0;
+                        handleTicketChange(ticket.id, currentQty + 1);
+                      }}
                       className="bg-gray-200 text-gray-700 px-3 py-1 rounded-r-md hover:bg-gray-300 transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
                       disabled={isSoldOut || (selectedTickets[ticket.id] || 0) >= Math.min(remainingQuantity, maxOrderQuantity)}
                     >
