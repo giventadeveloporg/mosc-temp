@@ -50,7 +50,11 @@ function InnerPRB({ cart, eventId, email, discountCodeId, enabled, showPlacehold
   }, [enabled]);
 
   useEffect(() => {
-    if (!stripe || !enabled) return;
+    console.log('[PRB] INIT useEffect triggered:', { hasStripe: !!stripe, enabled, cart: cart.length, email });
+    if (!stripe || !enabled) {
+      console.log('[PRB] INIT blocked:', { hasStripe: !!stripe, enabled });
+      return;
+    }
 
     // Create PR only once per enable window
     const prConfig = {
@@ -304,10 +308,23 @@ function InnerPRB({ cart, eventId, email, discountCodeId, enabled, showPlacehold
   );
 
   if (!stripe || !paymentRequest || !ready) {
+    console.log('[PRB] RENDER: Showing placeholder or null', {
+      hasStripe: !!stripe,
+      hasPaymentRequest: !!paymentRequest,
+      ready,
+      showPlaceholder,
+      eligible
+    });
     return showPlaceholder ? renderPlaceholderImage : null;
   }
 
   // When enabled, render live PR button
+  console.log('[PRB] RENDER: Rendering live PaymentRequestButtonElement', {
+    hasStripe: !!stripe,
+    hasPaymentRequest: !!paymentRequest,
+    ready,
+    eligible
+  });
 
   return (
     <div id="prb-container" style={{ minHeight: 48, display: 'block', position: 'relative' }}>

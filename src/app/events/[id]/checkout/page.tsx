@@ -912,8 +912,8 @@ export default function CheckoutPage() {
       </div>
 
       {/* MOBILE DEBUG: Debug log viewer - floating button */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="fixed bottom-4 right-4 z-50">
+      {/* CRITICAL: Enable in production for mobile debugging */}
+      <div className="fixed bottom-4 right-4 z-50">
           <button
             onClick={() => setShowDebugLogs(!showDebugLogs)}
             className="bg-purple-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-purple-700"
@@ -948,7 +948,6 @@ export default function CheckoutPage() {
             </div>
           )}
         </div>
-      )}
     </div>
   );
 }

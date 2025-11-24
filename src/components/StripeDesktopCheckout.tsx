@@ -327,8 +327,9 @@ function InnerDesktopCheckout({ cart, eventId, email, discountCodeId, clientSecr
   // Render Express Checkout Element if available; provide a fallback Pay button using PaymentElement
   return (
     <div className="w-full relative">
-      {/* Loading overlay while Express Checkout initializes - covers entire payment section */}
-      {!expressCheckoutReady && (
+      {/* Loading overlay while Express Checkout initializes - DESKTOP ONLY */}
+      {/* CRITICAL: Don't show loading overlay on mobile - PaymentRequestButton handles its own loading */}
+      {!isMobile && !expressCheckoutReady && (
         <div className="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center z-20 rounded-lg" style={{ minHeight: '400px' }}>
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-500 mx-auto mb-2"></div>
