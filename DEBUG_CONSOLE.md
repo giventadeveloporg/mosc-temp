@@ -71,6 +71,27 @@
 
 **Code Location**: `src/components/UniversalPaymentCheckout.tsx:174-199`
 
+### 6. Payment Flickering v3 - CSS Manipulation of Stripe Elements (FIXED ✅)
+**Root Cause**: 104 lines of CSS with `!important` flags forcefully overriding Stripe's internal styles
+- CSS targeted `.ElementsApp`, `.ExpressCheckoutElement`, `.Tab`, `.PaymentElement`
+- Stripe Elements render in iframes - external CSS causes rendering conflicts
+- Our CSS fought with Stripe's internal layout calculations
+- Result: Flickering as Stripe tried to render and our CSS overrode it
+
+**Solution**: Removed ALL CSS manipulation of Stripe Elements
+- Deleted 67 lines of ExpressCheckoutElement CSS (lines 491-559)
+- Deleted 37 lines of PaymentElement CSS (lines 535-572)
+- Removed all !important flags targeting Stripe internals
+- Let Stripe handle all internal styling automatically
+
+**Why This Matters**:
+- Stripe Elements are isolated in iframes for security
+- External CSS with !important creates race conditions during initialization
+- Proper approach: Use wrapper divs for positioning, let Stripe handle internal styling
+- Use Stripe's options API for legitimate customization
+
+**Code Location**: `src/components/StripeDesktopCheckout.tsx:491-559 (removed)`
+
 ### 5. Apple Pay Not Available (REQUIRES CONFIGURATION ⚠️)
 **Root Cause**: Domain not registered in Stripe Dashboard
 - Debug logs showed: `[PRB] canMakePayment() result: null`
