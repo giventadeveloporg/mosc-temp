@@ -136,6 +136,16 @@ export default function CheckoutPage() {
   // This ensures React state updates complete and prevents race conditions
   const STABILIZATION_DELAY_MS = 150;
 
+  // CRITICAL ANTI-FLICKER: Guard function to prevent setLoading(true) once data is ready
+  const setLoadingSafe = useCallback((value: boolean) => {
+    // NEVER allow loading=true if data is already ready (prevents flicker)
+    if (value === true && dataReadyRef.current) {
+      console.log('[CheckoutPage] 🛡️ GUARDED - Preventing setLoading(true) because data is ready');
+      return;
+    }
+    setLoading(value);
+  }, []);
+
   // CRITICAL MOBILE FIX: Use sessionStorage to persist fetch state AND data across remounts
   // Mobile browsers can remount components, resetting refs and state, so we need persistent storage
   const getFetchedEventIdFromStorage = useCallback(() => {
@@ -223,8 +233,33 @@ export default function CheckoutPage() {
   // CRITICAL MOBILE FIX: Restore data from sessionStorage on mount
   // This restores both fetch state AND actual data after component remounts (mobile browsers can remount)
   // This MUST run before the fetch useEffect to prevent unnecessary fetches
+  // HANDLES: Page refresh, navigation from another page, direct URL access, app switching
   useEffect(() => {
     if (!eventId) return; // Wait for eventId to be available
+
+    // CRITICAL: Check sessionStorage IMMEDIATELY on mount (before any state updates)
+    // This prevents flicker by restoring data synchronously if available
+    const quickCheck = () => {
+      try {
+        const storedFetchedId = getFetchedEventIdFromStorage();
+        const currentEventIdStr = typeof eventId === 'string' ? eventId : Array.isArray(eventId) ? eventId[0] : String(eventId);
+
+        if (storedFetchedId === currentEventIdStr) {
+          const restoredData = restoreFetchedDataFromStorage();
+          if (restoredData && restoredData.event) {
+            // Data exists - mark as ready immediately to prevent loading screen flash
+            dataReadyRef.current = true;
+            dataRestoredRef.current = true;
+            return true; // Data found
+          }
+        }
+      } catch (e) {
+        // Ignore errors in quick check
+      }
+      return false; // No data found
+    };
+
+    const hasData = quickCheck();
 
     const storedFetchedId = getFetchedEventIdFromStorage();
     const currentEventIdStr = typeof eventId === 'string' ? eventId : Array.isArray(eventId) ? eventId[0] : String(eventId);
@@ -246,6 +281,7 @@ export default function CheckoutPage() {
       }, STABILIZATION_DELAY_MS);
     } else if (storedFetchedId && storedFetchedId === currentEventIdStr) {
       // CRITICAL: Restore data from sessionStorage if available
+      // SCENARIO: Page refresh or navigation from another page (sessionStorage persists)
       const restoredData = restoreFetchedDataFromStorage();
       if (restoredData && restoredData.event) {
         console.log('[CheckoutPage] 🔄 RESTORING DATA from sessionStorage', {
@@ -273,7 +309,7 @@ export default function CheckoutPage() {
         dataReadyRef.current = true;
 
         // CRITICAL: Set loading to false AFTER restoring state so page renders immediately
-        setLoading(false);
+        setLoadingSafe(false);
 
         // CRITICAL: Mark initialization complete after stabilization delay
         // This ensures React state updates complete before fetch can run
@@ -296,6 +332,7 @@ export default function CheckoutPage() {
       }
     } else {
       // No stored data - mark initialization complete to allow fetch
+      // SCENARIO: Fresh page load, direct URL access, or sessionStorage cleared
       setTimeout(() => {
         initializationCompleteRef.current = true;
         console.log('[CheckoutPage] ✅ INITIALIZATION COMPLETE - Ready for fetch (no stored data)');
@@ -419,7 +456,7 @@ export default function CheckoutPage() {
         fetchedEventIdRef.current = eventId || null;
         // CRITICAL ANTI-FLICKER: Mark data as ready before setting loading=false
         dataReadyRef.current = true;
-        setLoading(false);
+        setLoadingSafe(false);
         return;
       }
 
@@ -486,7 +523,7 @@ export default function CheckoutPage() {
 
       // CRITICAL MOBILE FIX: Set fetching flag immediately to prevent race conditions
       isFetchingRef.current = true;
-      setLoading(true);
+      setLoadingSafe(true);
 
       console.log('[CheckoutPage] ⚡ FETCHING EVENT DATA', {
         eventId: currentEventIdStr,
@@ -577,7 +614,7 @@ export default function CheckoutPage() {
         if (event && ticketTypes.length > 0) {
           dataReadyRef.current = true;
         }
-        setLoading(false);
+        setLoadingSafe(false);
         isFetchingRef.current = false;
         // CRITICAL MOBILE FIX: Mark this eventId as fetched in BOTH ref AND sessionStorage
         // This prevents re-fetching on mobile browser remounts (refs reset, but sessionStorage persists)
@@ -589,6 +626,12 @@ export default function CheckoutPage() {
           });
         }
       }
+    }
+
+    // CRITICAL ANTI-FLICKER: Skip entirely if data is already ready (prevents any fetch attempts)
+    if (dataReadyRef.current) {
+      console.log('[CheckoutPage] ✅ SKIP - Data already ready, not calling fetchData (prevents flicker)');
+      return;
     }
 
     // CRITICAL MOBILE FIX: Only fetch if we have an eventId and haven't already fetched it
@@ -920,7 +963,9 @@ export default function CheckoutPage() {
     });
 
     // Safety check - only render if component is ready
-    if (!mounted || loading || !eventId) {
+    // CRITICAL ANTI-FLICKER: Use effectiveLoading instead of loading
+    const effectiveLoading = loading && !dataReadyRef.current;
+    if (!mounted || effectiveLoading || !eventId) {
       console.log('[renderOrderSummary] Component not ready, returning loading state');
       return (
         <div className="text-center py-8">
@@ -1086,7 +1131,11 @@ export default function CheckoutPage() {
     );
   };
 
-  if (loading) {
+  // CRITICAL ANTI-FLICKER: Use computed loading state that respects dataReadyRef
+  // Once data is ready, NEVER show loading screen (prevents flicker)
+  const effectiveLoading = loading && !dataReadyRef.current;
+
+  if (effectiveLoading) {
     return (
       <div className="min-h-screen bg-gray-100 flex flex-col" style={{ overflowX: 'hidden' }}>
         {/* HERO SECTION - Full width bleeding to header */}
