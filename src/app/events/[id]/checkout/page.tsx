@@ -130,6 +130,8 @@ export default function CheckoutPage() {
   // CRITICAL MOBILE FIX: Track if initialization check is complete (restoration check done)
   const initializationCompleteRef = useRef(false);
   const lastFetchAttemptRef = useRef(0);
+  // CRITICAL ANTI-FLICKER: Track if data is confirmed ready (prevents any loading state changes)
+  const dataReadyRef = useRef(false);
   // Stabilization delay: Wait 150ms after restoration check before allowing fetch
   // This ensures React state updates complete and prevents race conditions
   const STABILIZATION_DELAY_MS = 150;
@@ -236,6 +238,7 @@ export default function CheckoutPage() {
       clearStoredData();
       fetchedEventIdRef.current = null;
       dataRestoredRef.current = false; // Reset restoration flag for new event
+      dataReadyRef.current = false; // Reset data ready flag for new event
       // Mark initialization complete after clearing (allows fetch for new event)
       setTimeout(() => {
         initializationCompleteRef.current = true;
@@ -265,6 +268,9 @@ export default function CheckoutPage() {
         if (restoredData.heroImageUrl) {
           setHeroImageUrl(restoredData.heroImageUrl);
         }
+
+        // CRITICAL: Mark data as ready FIRST (prevents any loading state changes)
+        dataReadyRef.current = true;
 
         // CRITICAL: Set loading to false AFTER restoring state so page renders immediately
         setLoading(false);
@@ -396,6 +402,12 @@ export default function CheckoutPage() {
         return;
       }
 
+      // CRITICAL ANTI-FLICKER: Check dataReadyRef FIRST (most reliable check)
+      if (dataReadyRef.current) {
+        console.log('[CheckoutPage] ✅ SKIP - Data already ready, skipping fetch (prevents flicker)');
+        return;
+      }
+
       // CRITICAL MOBILE FIX: Check if we already have data in state (from restoration)
       // This prevents unnecessary fetches when data is already loaded
       if (event && ticketTypes.length > 0) {
@@ -404,7 +416,9 @@ export default function CheckoutPage() {
           ticketTypesCount: ticketTypes.length
         });
         // Mark as fetched to prevent future checks
-        fetchedEventIdRef.current = eventId;
+        fetchedEventIdRef.current = eventId || null;
+        // CRITICAL ANTI-FLICKER: Mark data as ready before setting loading=false
+        dataReadyRef.current = true;
         setLoading(false);
         return;
       }
@@ -429,7 +443,7 @@ export default function CheckoutPage() {
             hasData: !!storedData.event
           });
           // Also update ref to prevent future checks
-          fetchedEventIdRef.current = eventId;
+          fetchedEventIdRef.current = eventId || null;
           return;
         } else {
           console.log('[CheckoutPage] ⚠️ Stored eventId found but no data - will fetch');
@@ -447,6 +461,26 @@ export default function CheckoutPage() {
       // MOBILE FIX: Don't fetch if page is not visible (app in background)
       if (!isPageVisible) {
         console.log('[CheckoutPage] ⚠️ SKIP - Page not visible, deferring fetch');
+        return;
+      }
+
+      // CRITICAL ANTI-FLICKER: Prevent setting loading=true if data is already ready
+      // Check dataReadyRef FIRST (most reliable), then refs and state
+      if (dataReadyRef.current) {
+        console.log('[CheckoutPage] ⚠️ SKIP - Data already ready, not setting loading=true (prevents flicker)');
+        return;
+      }
+
+      // CRITICAL MOBILE FIX: Prevent setting loading=true if data is already available (prevents flicker)
+      // Check BOTH refs and state before setting loading state
+      if (dataRestoredRef.current || (event && ticketTypes.length > 0)) {
+        console.log('[CheckoutPage] ⚠️ SKIP - Data already available, not setting loading=true', {
+          dataRestored: dataRestoredRef.current,
+          hasEvent: !!event,
+          ticketTypesCount: ticketTypes.length
+        });
+        // Mark as ready to prevent future loading state changes
+        dataReadyRef.current = true;
         return;
       }
 
@@ -539,12 +573,16 @@ export default function CheckoutPage() {
         setTicketTypes([]);
         setHeroImageUrl(defaultHeroImageUrl);
       } finally {
+        // CRITICAL ANTI-FLICKER: Mark data as ready if we have event and ticketTypes
+        if (event && ticketTypes.length > 0) {
+          dataReadyRef.current = true;
+        }
         setLoading(false);
         isFetchingRef.current = false;
         // CRITICAL MOBILE FIX: Mark this eventId as fetched in BOTH ref AND sessionStorage
         // This prevents re-fetching on mobile browser remounts (refs reset, but sessionStorage persists)
         if (eventId) {
-          fetchedEventIdRef.current = eventId;
+          fetchedEventIdRef.current = eventId || null;
           setFetchedEventIdInStorage(eventId);
           console.log('[CheckoutPage] ✅ FETCH COMPLETE - Marked event as fetched', {
             eventId: typeof eventId === 'string' ? eventId : Array.isArray(eventId) ? eventId[0] : String(eventId)
