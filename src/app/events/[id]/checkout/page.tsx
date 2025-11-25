@@ -97,6 +97,8 @@ export default function CheckoutPage() {
     return typeof id === 'string' ? id : Array.isArray(id) ? id[0] : id;
   }, [params?.id]);
 
+  // CRITICAL: Initialize state as null/empty to prevent hydration mismatch
+  // Server doesn't have sessionStorage, so must match client initial state
   const [event, setEvent] = useState<any>(null);
   const [ticketTypes, setTicketTypes] = useState<any[]>([]);
   const [selectedTickets, setSelectedTickets] = useState<{ [key: number]: number }>({});
@@ -111,6 +113,8 @@ export default function CheckoutPage() {
   const [availableDiscounts, setAvailableDiscounts] = useState<any[]>([]);
   const [emailError, setEmailError] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  // CRITICAL: Always start with loading=true to prevent hydration mismatch
+  // Server doesn't have sessionStorage, so must match client initial state
   const [loading, setLoading] = useState(true);
   const [heroImageUrl, setHeroImageUrl] = useState<string | null>(null);
   const [totalAmount, setTotalAmount] = useState(0);
@@ -234,32 +238,13 @@ export default function CheckoutPage() {
   // This restores both fetch state AND actual data after component remounts (mobile browsers can remount)
   // This MUST run before the fetch useEffect to prevent unnecessary fetches
   // HANDLES: Page refresh, navigation from another page, direct URL access, app switching
+  // CRITICAL: Wait for mount to prevent hydration mismatch (server doesn't have sessionStorage)
   useEffect(() => {
+    if (!mounted) return; // CRITICAL: Wait for mount to prevent hydration mismatch
     if (!eventId) return; // Wait for eventId to be available
 
-    // CRITICAL: Check sessionStorage IMMEDIATELY on mount (before any state updates)
-    // This prevents flicker by restoring data synchronously if available
-    const quickCheck = () => {
-      try {
-        const storedFetchedId = getFetchedEventIdFromStorage();
-        const currentEventIdStr = typeof eventId === 'string' ? eventId : Array.isArray(eventId) ? eventId[0] : String(eventId);
-
-        if (storedFetchedId === currentEventIdStr) {
-          const restoredData = restoreFetchedDataFromStorage();
-          if (restoredData && restoredData.event) {
-            // Data exists - mark as ready immediately to prevent loading screen flash
-            dataReadyRef.current = true;
-            dataRestoredRef.current = true;
-            return true; // Data found
-          }
-        }
-      } catch (e) {
-        // Ignore errors in quick check
-      }
-      return false; // No data found
-    };
-
-    const hasData = quickCheck();
+    // CRITICAL: Check sessionStorage after mount (client-side only to prevent hydration mismatch)
+    // Server doesn't have sessionStorage, so we wait for mount before checking
 
     const storedFetchedId = getFetchedEventIdFromStorage();
     const currentEventIdStr = typeof eventId === 'string' ? eventId : Array.isArray(eventId) ? eventId[0] : String(eventId);
@@ -351,7 +336,7 @@ export default function CheckoutPage() {
     return () => {
       clearTimeout(fallbackTimeout);
     };
-  }, [eventId, getFetchedEventIdFromStorage, restoreFetchedDataFromStorage, clearStoredData]);
+  }, [mounted, eventId, getFetchedEventIdFromStorage, restoreFetchedDataFromStorage, clearStoredData]);
 
   // MOBILE FIX: Handle page visibility changes (app switching on mobile)
   useEffect(() => {
@@ -700,32 +685,33 @@ export default function CheckoutPage() {
   }, [selectedTickets, appliedDiscount, ticketTypes]);
 
   // Helper function to calculate remaining quantity (matches rendering logic)
-  // CRITICAL: Handles NULL values from database properly
-  // When soldQuantity is NULL, treats it as 0 and calculates: availableQuantity - 0
-  // This fixes the "sold out" error when soldQuantity is NULL in database
+  // CRITICAL: Handles NULL/zero values properly - zero or null is OK as long as sold doesn't exceed available
+  // Only mark as sold out if soldQuantity >= availableQuantity (both must be valid numbers)
   const calculateRemainingQuantity = (ticket: any): number => {
     if (!ticket) return 0;
 
-    // Calculate remaining quantity from source data (availableQuantity - soldQuantity)
-    // Handle NULL values from database properly - NULL means 0 sold
+    // Use backend remainingQuantity if explicitly provided (not NULL/undefined)
+    if (ticket.remainingQuantity != null && ticket.remainingQuantity !== undefined) {
+      return Math.max(0, ticket.remainingQuantity); // Ensure non-negative
+    }
+
+    // Calculate from availableQuantity and soldQuantity
+    // Handle NULL/undefined values: treat as 0 for calculation
     const availableQty = ticket.availableQuantity ?? 0;
-    const soldQty = ticket.soldQuantity ?? 0; // NULL becomes 0
+    const soldQty = ticket.soldQuantity ?? 0;
+
+    // CRITICAL: If availableQuantity is null/undefined/0, allow tickets (treat as unlimited)
+    // Only restrict if we have valid availableQuantity AND soldQuantity exceeds it
+    if (availableQty === null || availableQty === undefined || availableQty === 0) {
+      // No restriction - allow ticket selection (treat as unlimited or not yet set)
+      return 999999; // Large number to allow selection
+    }
+
+    // Calculate remaining: available - sold
     const calculatedRemaining = availableQty - soldQty;
 
-    // Use backend remainingQuantity only if it's explicitly provided (not NULL/undefined)
-    // Priority: remainingQuantity > calculatedRemaining > 0
-    if (ticket.remainingQuantity != null && ticket.remainingQuantity !== undefined) {
-      return ticket.remainingQuantity;
-    }
-
-    // If we have availableQuantity, use calculated value (handles NULL soldQuantity correctly)
-    // Example: availableQuantity=100, soldQuantity=NULL → remaining=100-0=100 ✅
-    if (ticket.availableQuantity != null && ticket.availableQuantity !== undefined) {
-      return calculatedRemaining;
-    }
-
-    // Fallback to 0 if no data available
-    return 0;
+    // Return calculated value (can be negative if sold exceeds available, but we'll handle that in isSoldOut check)
+    return Math.max(0, calculatedRemaining);
   };
 
   const handleTicketChange = (ticketId: number, quantity: number) => {
@@ -797,6 +783,22 @@ export default function CheckoutPage() {
 
   const isTicketTypeAvailable = (ticketType: any, quantity: number) => {
     if (!ticketType) return false;
+
+    // CRITICAL: Prioritize remainingQuantity from backend if provided (source of truth)
+    // If remainingQuantity is provided and > 0, tickets are available
+    // Only use soldQty >= availableQty check if remainingQuantity is not provided
+    const hasRemainingQuantity = ticketType.remainingQuantity != null && ticketType.remainingQuantity !== undefined;
+    const isSoldOut = hasRemainingQuantity
+      ? ticketType.remainingQuantity <= 0  // Use backend remainingQuantity as source of truth
+      : (() => {
+        // Fallback: check if sold >= available (only if remainingQuantity not provided)
+        const availableQty = ticketType.availableQuantity ?? 0;
+        const soldQty = ticketType.soldQuantity ?? 0;
+        return availableQty > 0 && soldQty >= availableQty;
+      })();
+
+    if (isSoldOut) return false;
+
     const remaining = calculateRemainingQuantity(ticketType);
     const maxOrderQuantity = ticketType.maxQuantityPerOrder ?? 10;
     return remaining > 0 && remaining >= Math.min(quantity, maxOrderQuantity);
@@ -815,6 +817,18 @@ export default function CheckoutPage() {
     const ticket = ticketTypes.find(t => t.id === parseInt(ticketId));
     if (!ticket) return false;
 
+    // CRITICAL: Prioritize remainingQuantity from backend if provided
+    // If remainingQuantity is provided and > 0, tickets are available
+    const hasRemainingQuantity = ticket.remainingQuantity != null && ticket.remainingQuantity !== undefined;
+    const isSoldOut = hasRemainingQuantity
+      ? ticket.remainingQuantity <= 0  // Use backend remainingQuantity as source of truth
+      : (() => {
+        // Fallback: check if sold >= available (only if remainingQuantity not provided)
+        const availableQty = ticket.availableQuantity ?? 0;
+        const soldQty = ticket.soldQuantity ?? 0;
+        return availableQty > 0 && soldQty >= availableQty;
+      })();
+
     // Use the same calculation logic as rendering
     const remaining = calculateRemainingQuantity(ticket);
     console.log('[hasUnavailableTickets] Checking ticket:', {
@@ -825,10 +839,11 @@ export default function CheckoutPage() {
       soldQuantity: ticket.soldQuantity,
       remainingQuantity: ticket.remainingQuantity,
       calculatedRemaining: remaining,
-      isSoldOut: remaining <= 0
+      isSoldOut,
+      hasRemainingQuantity
     });
 
-    return remaining <= 0; // Only consider completely sold out tickets
+    return isSoldOut; // Only consider completely sold out tickets
   });
   const canCheckout = hasTicketsSelected && emailIsValid && !hasUnavailableTickets;
 
@@ -1433,7 +1448,18 @@ export default function CheckoutPage() {
               const remainingQuantity = calculateRemainingQuantity(ticket);
 
               // Check if tickets are sold out
-              const isSoldOut = remainingQuantity <= 0;
+              // CRITICAL: Prioritize remainingQuantity from backend if provided
+              // If remainingQuantity is provided and > 0, tickets are available
+              // Only use soldQty >= availableQty check if remainingQuantity is not provided
+              const hasRemainingQuantity = ticket.remainingQuantity != null && ticket.remainingQuantity !== undefined;
+              const isSoldOut = hasRemainingQuantity
+                ? ticket.remainingQuantity <= 0  // Use backend remainingQuantity as source of truth
+                : (() => {
+                  // Fallback: check if sold >= available (only if remainingQuantity not provided)
+                  const availableQty = ticket.availableQuantity ?? 0;
+                  const soldQty = ticket.soldQuantity ?? 0;
+                  return availableQty > 0 && soldQty >= availableQty;
+                })();
               const maxOrderQuantity = ticket.maxQuantityPerOrder ?? 10;
 
               return (
