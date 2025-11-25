@@ -37,22 +37,20 @@ export default function SuccessClient({ session_id, payment_intent }: SuccessCli
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Enhanced desktop debug logging
-  console.log('[DESKTOP SUCCESS DEBUG] SuccessClient component initialized');
-  console.log('[DESKTOP SUCCESS DEBUG] Props:', { session_id, payment_intent });
-  console.log('[DESKTOP SUCCESS DEBUG] User Agent:', typeof window !== 'undefined' ? navigator.userAgent : 'SSR');
-  console.log('[DESKTOP SUCCESS DEBUG] URL:', typeof window !== 'undefined' ? window.location.href : 'SSR');
-  console.log('[DESKTOP SUCCESS DEBUG] Referrer:', typeof window !== 'undefined' ? document.referrer : 'SSR');
-
-  // Log component initialization
-  console.log('[SuccessClient] Component initialized with props:', {
-    session_id,
-    payment_intent
-  });
-
   // Mobile detection and redirect logic - show brief success then redirect
   useEffect(() => {
     if (typeof window === 'undefined') return;
+
+    // Enhanced debug logging - now inside useEffect
+    console.log('[DESKTOP SUCCESS DEBUG] SuccessClient component mounted');
+    console.log('[DESKTOP SUCCESS DEBUG] Props:', { session_id, payment_intent });
+    console.log('[DESKTOP SUCCESS DEBUG] User Agent:', navigator.userAgent);
+    console.log('[DESKTOP SUCCESS DEBUG] URL:', window.location.href);
+    console.log('[DESKTOP SUCCESS DEBUG] Referrer:', document.referrer);
+    console.log('[SuccessClient] Component initialized with props:', {
+      session_id,
+      payment_intent
+    });
 
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
       window.innerWidth <= 768;
