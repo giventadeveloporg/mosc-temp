@@ -145,6 +145,7 @@ export default function TicketQrClient({ initialPi, initialSessionId }: TicketQr
     console.log('[QR CLIENT SSR] Props received:', { initialPi, initialSessionId });
   }
 
+  const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<any>(null);
@@ -154,6 +155,12 @@ export default function TicketQrClient({ initialPi, initialSessionId }: TicketQr
   const [qrFetching, setQrFetching] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // Mark as mounted on client to prevent hydration issues
+  useEffect(() => {
+    console.log('[QR CLIENT] Component mounting on client');
+    setMounted(true);
+  }, []);
 
   // Helper function to add logs that will be visible in error screen
   const addApiLog = (message: string) => {
@@ -565,9 +572,11 @@ export default function TicketQrClient({ initialPi, initialSessionId }: TicketQr
     }
   };
 
-  if (loading) {
+  // Show simple loading during SSR and initial client render to prevent hydration mismatch
+  if (!mounted || loading) {
     return (
       <div>
+        <MobileDebugConsole />
         <LoadingTicket sessionId={identifier || ''} />
       </div>
     );

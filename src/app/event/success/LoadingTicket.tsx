@@ -73,105 +73,28 @@ export default function LoadingTicket({ sessionId }: LoadingTicketProps) {
   }, [sessionId, mounted]);
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col" style={{ overflowX: 'hidden' }}>
+    <div className="min-h-screen bg-gray-100 flex flex-col">
+      {/* HERO SECTION - Only show after mounted to avoid hydration issues */}
+      {mounted && (
+        <div className="relative w-full overflow-hidden bg-transparent" style={{ minHeight: '400px', paddingTop: '80px' }}>
+          <img
+            src={heroImageUrl}
+            alt="Event Hero"
+            style={{
+              display: 'block',
+              width: '100%',
+              height: 'auto',
+              objectFit: 'cover',
+              margin: '0 auto'
+            }}
+            onLoad={() => console.log('Hero image loaded')}
+            onError={(e) => console.error('Hero image error:', e)}
+          />
+        </div>
+      )}
 
-      {/* HERO SECTION - Full width bleeding to header */}
-      <section className="hero-section" style={{
-        position: 'relative',
-        marginTop: '0',
-        backgroundColor: 'transparent',
-        minHeight: '400px',
-        overflow: 'hidden',
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '80px 0 0 0'
-      }}>
-        {/* Use standard img tag to avoid hydration issues */}
-        <img
-          src={heroImageUrl}
-          alt="Event Hero"
-          className="hero-image"
-          style={{
-            margin: '0 auto',
-            padding: '0',
-            display: 'block',
-            width: '100%',
-            maxWidth: '100%',
-            height: 'auto',
-            objectFit: 'cover',
-            borderRadius: '0'
-          }}
-          onLoad={() => {
-            console.log('Hero image loaded successfully');
-          }}
-          onError={(e) => {
-            console.error('Hero image failed to load:', e);
-          }}
-        />
-        <div className="hero-overlay" style={{ opacity: 0.1, height: '5px', padding: '20' }}></div>
-      </section>
-
-      {/* CSS Styles for hero section */}
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          .hero-image {
-            width: 100%;
-            max-width: 100%;
-            height: auto;
-            object-fit: cover;
-            object-position: center;
-            display: block;
-            margin: 0 auto;
-            padding: 0;
-            border-radius: 0;
-          }
-
-          .hero-section {
-            min-height: 15vh;
-            background-color: transparent !important;
-            padding: 80px 0 0 0 !important;
-            width: 100% !important;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-          }
-
-          @media (max-width: 768px) {
-            .hero-image {
-              width: 100%;
-              max-width: 100%;
-              height: auto;
-              padding: 0;
-              border-radius: 0;
-            }
-
-            .hero-section {
-              padding: 95px 0 15px 0 !important;
-              min-height: 12vh !important;
-            }
-          }
-
-          @media (max-width: 480px) {
-            .hero-image {
-              width: 100%;
-              padding: 0;
-              border-radius: 0;
-            }
-
-            .hero-section {
-              padding: 90px 0 10px 0 !important;
-              min-height: 10vh !important;
-            }
-          }
-        `
-      }} />
-
-      {/* Loading content - flex-grow to push footer down */}
-      <div className="flex-grow flex flex-col items-center justify-center min-h-[200px] p-6 animate-pulse" style={{ marginTop: '150px', paddingTop: '60px' }}>
-        {/* Use standard img tag to avoid hydration issues */}
+      {/* Loading content - Always rendered the same on SSR and client */}
+      <div className="flex-grow flex flex-col items-center justify-center p-6 animate-pulse" style={{ marginTop: mounted ? '150px' : '200px', paddingTop: '60px' }}>
         <img
           src="/images/selling-tickets-vector-loading-image.jpg"
           alt="Ticket Loading"
@@ -179,11 +102,13 @@ export default function LoadingTicket({ sessionId }: LoadingTicketProps) {
           height="180"
           className="mb-4 rounded shadow-lg"
         />
-        <div className="text-xl font-bold text-teal-700 mb-2">Processing your payment and generating your QR code</div>
-        <div className="text-gray-600 text-base text-center">This may take a few moments.<br />Please do not close or refresh this page.</div>
+        <div className="text-xl font-bold text-teal-700 mb-2">
+          Processing your payment and generating your QR code
+        </div>
+        <div className="text-gray-600 text-base text-center">
+          This may take a few moments.<br />Please do not close or refresh this page.
+        </div>
       </div>
-
-
     </div>
   );
 }
