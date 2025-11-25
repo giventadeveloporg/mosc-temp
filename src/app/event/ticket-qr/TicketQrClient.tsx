@@ -383,7 +383,9 @@ export default function TicketQrClient({ initialPi, initialSessionId }: TicketQr
 
         if (getRes.ok) {
           const data = await getRes.json();
-          console.log('[MOBILE QR DEBUG] GET response data:', data);
+          console.log('[MOBILE QR DEBUG] ✅ GET response data:', data);
+          console.log('[MOBILE QR DEBUG] ✅ Transaction found:', !!data.transaction);
+          console.log('[MOBILE QR DEBUG] ✅ Transaction ID:', data.transaction?.id);
           addApiLog(`GET response received: ${JSON.stringify({
             hasTransaction: !!data.transaction,
             transactionId: data.transaction?.id,
@@ -391,14 +393,17 @@ export default function TicketQrClient({ initialPi, initialSessionId }: TicketQr
           })}`);
 
           if (data.transaction && !cancelled) {
-            console.log('[MOBILE QR DEBUG] Transaction data loaded:', data.transaction.id);
+            console.log('[MOBILE QR DEBUG] ✅✅✅ SUCCESS! Transaction data loaded:', data.transaction.id);
+            console.log('[MOBILE QR DEBUG] ✅ Setting result and stopping loading...');
             addApiLog(`Transaction data loaded successfully: ID ${data.transaction.id}`);
             setResult(data);
             setLoading(false);
+            console.log('[MOBILE QR DEBUG] ✅ Loading set to false, page should show success UI now');
 
             // Immediately fetch QR code using singleton - NO useEffect, NO setTimeout
             // This is the ONLY place QR code should be fetched in mobile flow to prevent duplicate emails
             addApiLog('Mobile client will now fetch QR code (this is the ONLY QR fetch for mobile)');
+            console.log('[MOBILE QR DEBUG] ✅ About to fetch QR code via singleton...');
             fetchQrCodeViaSingleton(data);
             return;
           } else {
