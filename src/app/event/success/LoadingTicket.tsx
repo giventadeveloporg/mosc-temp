@@ -16,6 +16,9 @@ export default function LoadingTicket({ sessionId }: LoadingTicketProps) {
 
   // Fetch hero image data using the success process endpoint
   useEffect(() => {
+    console.log('LoadingTicket: useEffect RUNNING - sessionId:', sessionId);
+    console.log('LoadingTicket: Window available:', typeof window !== 'undefined');
+
     if (sessionId) {
       const fetchHeroImage = async () => {
         try {

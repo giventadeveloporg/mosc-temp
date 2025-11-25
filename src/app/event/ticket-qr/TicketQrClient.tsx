@@ -228,10 +228,14 @@ export default function TicketQrClient({ initialPi, initialSessionId }: TicketQr
   }, [searchParams]);
 
   // CRITICAL: Also run on initial mount to catch params immediately
+  // This ensures we have identifiers even if searchParams hook hasn't populated yet
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
     console.log('[MOBILE QR] ===== INITIAL MOUNT - IMMEDIATE URL PARSE =====');
+    console.log('[MOBILE QR] Initial state at mount:', { identifier, session_id, payment_intent });
+    console.log('[MOBILE QR] Initial props:', { initialPi, initialSessionId });
+
     const urlParams = new URLSearchParams(window.location.search);
     const pi = urlParams.get('pi');
     const sid = urlParams.get('session_id');
@@ -243,16 +247,32 @@ export default function TicketQrClient({ initialPi, initialSessionId }: TicketQr
       search: window.location.search
     });
 
-    // If we have parameters, update state immediately
-    if (pi || sid) {
+    // If we have parameters from URL or props, ensure they're set
+    const effectivePi = pi || initialPi;
+    const effectiveSid = sid || initialSessionId;
+    const effectiveIdentifier = effectivePi || effectiveSid;
+
+    console.log('[MOBILE QR] Effective params:', {
+      effectivePi,
+      effectiveSid,
+      effectiveIdentifier
+    });
+
+    // Update state immediately if we have valid params
+    if (effectiveIdentifier && effectiveIdentifier !== identifier) {
       console.log('[MOBILE QR] Found params on mount, updating state immediately');
-      if (pi) {
-        setPaymentIntent(pi);
-        setIdentifier(pi);
-      } else if (sid) {
-        setSessionId(sid);
-        setIdentifier(sid);
+      if (effectivePi) {
+        setPaymentIntent(effectivePi);
+        setIdentifier(effectivePi);
+      } else if (effectiveSid) {
+        setSessionId(effectiveSid);
+        setIdentifier(effectiveSid);
       }
+    } else if (!effectiveIdentifier) {
+      console.error('[MOBILE QR CRITICAL] No payment parameters found anywhere!');
+      console.error('[MOBILE QR CRITICAL] URL:', window.location.href);
+      console.error('[MOBILE QR CRITICAL] Props:', { initialPi, initialSessionId });
+      console.error('[MOBILE QR CRITICAL] This will result in a stuck loading screen!');
     }
   }, []); // Run only once on mount
 
@@ -286,6 +306,21 @@ export default function TicketQrClient({ initialPi, initialSessionId }: TicketQr
 
   // First, load transaction data - wait for parameters to be initialized
   useEffect(() => {
+    // CRITICAL FIX: Only run on client side, never during SSR
+    if (typeof window === 'undefined') {
+      console.log('[MOBILE QR DEBUG] SSR detected, skipping useEffect');
+      return;
+    }
+
+    console.log('[MOBILE QR DEBUG] ===== TRANSACTION FETCH EFFECT RUNNING =====');
+    console.log('[MOBILE QR DEBUG] Current state:', {
+      identifier,
+      session_id,
+      payment_intent,
+      loading,
+      hasResult: !!result
+    });
+
     // Skip if parameters haven't been initialized yet (identifier will be null during SSR)
     if (identifier === null) {
       console.log('[MOBILE QR DEBUG] Parameters not initialized yet, waiting...');
