@@ -392,13 +392,14 @@ export default function CheckoutPage() {
           });
           // CRITICAL: Set refs and loading FIRST to prevent flickering
           // Use string value to ensure stable comparison
-          fetchedEventIdRef.current = currentEventIdStr || null;
+          fetchedEventIdRef.current = currentEventIdStr ? currentEventIdStr : null;
           isFetchingRef.current = false; // Mark as not fetching
           // CRITICAL: Mark data as ready BEFORE setting loading to false
           dataReadyRef.current = true;
-          // CRITICAL: Set loading to false FIRST (before state updates) to prevent flicker
+          // CRITICAL: Set ALL loading states to false FIRST (before state updates) to prevent flicker
           // This ensures loading screen doesn't flash during state updates
           setLoading(false);
+          setExpressCheckoutLoading(false); // CRITICAL: Also reset express checkout loading
           // Then restore state (these updates are batched by React)
           setEvent(storedData.event);
           setTicketTypes(storedData.ticketTypes);
@@ -1019,8 +1020,10 @@ export default function CheckoutPage() {
   }, [mounted, loading, eventId, event, ticketTypes, selectedTickets, email, emailIsValid, hasTicketsSelected, hasUnavailableTickets, availableDiscounts, discountCode, appliedDiscount, totalAmount, canCheckout, paymentCart, paymentProps, handleInvalidClick, handlePaymentSuccess, handlePaymentError, handleLoadingChange, discountError, discountSuccessMessage, emailError, firstName, lastName, phone, handleApplyDiscount]);
 
   // SIMPLE APPROACH: Match legacy code - just check loading state
-  // Legacy code works because it's simple - no complex guards or refs
-  if (loading) {
+  // CRITICAL FIX: Also check if data is ready (restored from sessionStorage)
+  // This prevents flickering when data is restored but loading state hasn't updated yet
+  // React state updates are async, so we need to check refs too
+  if (loading && !dataReadyRef.current) {
     return (
       <div className="min-h-screen bg-gray-100 flex flex-col" style={{ overflowX: 'hidden' }}>
         {/* TEMPORARY DEBUG: Debug log viewer for mobile browser debugging */}
