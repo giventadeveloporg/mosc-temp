@@ -80,9 +80,16 @@ const InnerDesktopCheckout = React.memo(function InnerDesktopCheckout({ cart, ev
   }, [expressCheckoutReady]);
 
   // Notify parent component of loading state changes
+  // CRITICAL FIX: Use ref to prevent callback dependency from causing re-runs
+  // onLoadingChange callback reference might change, but we only care about expressCheckoutReady
+  const onLoadingChangeRef = useRef(onLoadingChange);
   useEffect(() => {
-    onLoadingChange?.(!expressCheckoutReady);
-  }, [expressCheckoutReady, onLoadingChange]);
+    onLoadingChangeRef.current = onLoadingChange;
+  }, [onLoadingChange]);
+
+  useEffect(() => {
+    onLoadingChangeRef.current?.(!expressCheckoutReady);
+  }, [expressCheckoutReady]); // Only depend on expressCheckoutReady, not the callback
 
   const handleConfirm = async () => {
     if (!stripe || !elements || !clientSecret) return;

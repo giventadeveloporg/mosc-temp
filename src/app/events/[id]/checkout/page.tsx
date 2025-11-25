@@ -91,6 +91,43 @@ export default function CheckoutPage() {
   const router = useRouter();
   const params = useParams();
 
+  // TEMPORARY DEBUG: Track re-renders to identify flickering cause
+  const renderCountRef = useRef(0);
+  const lastRenderTimeRef = useRef(Date.now());
+  const prevStateRef = useRef<any>({});
+  renderCountRef.current += 1;
+  const timeSinceLastRender = Date.now() - lastRenderTimeRef.current;
+
+  useEffect(() => {
+    const currentState = {
+      event: !!event,
+      ticketTypesCount: ticketTypes.length,
+      loading,
+      expressCheckoutLoading,
+      hasEvent: !!event,
+      hasTicketTypes: ticketTypes.length > 0,
+    };
+
+    const changedKeys = Object.keys(currentState).filter(
+      (key) => {
+        const typedKey = key as keyof typeof currentState;
+        return prevStateRef.current[typedKey] !== currentState[typedKey];
+      }
+    );
+
+    console.log('[CheckoutPage] 🔄 COMPONENT RE-RENDER', {
+      renderCount: renderCountRef.current,
+      timeSinceLastRender,
+      changedState: changedKeys.length > 0 ? changedKeys : 'none',
+      currentState,
+      prevState: prevStateRef.current,
+      timestamp: new Date().toISOString(),
+    });
+
+    prevStateRef.current = currentState;
+    lastRenderTimeRef.current = Date.now();
+  });
+
   // CRITICAL MOBILE FIX: Memoize eventId to prevent infinite re-renders
   // useParams() returns a proxy that appears "new" on each render on mobile browsers
   // This causes useEffect to trigger repeatedly, causing infinite fetch loops
@@ -355,7 +392,7 @@ export default function CheckoutPage() {
           });
           // CRITICAL: Set refs and loading FIRST to prevent flickering
           // Use string value to ensure stable comparison
-          fetchedEventIdRef.current = currentEventIdStr;
+          fetchedEventIdRef.current = currentEventIdStr || null;
           isFetchingRef.current = false; // Mark as not fetching
           // CRITICAL: Set loading to false FIRST (before state updates) to prevent flicker
           // This ensures loading screen doesn't flash during state updates
@@ -795,15 +832,12 @@ export default function CheckoutPage() {
     if (hasUnavailableTickets) alert('Some selected tickets are sold out. Please adjust your selection.');
   }, [emailIsValid, hasTicketsSelected, hasUnavailableTickets]);
 
-  // CRITICAL FIX: Use ref for onLoadingChange to prevent infinite loops
-  // onLoadingChange triggers parent re-renders which can cause infinite initialization loops
-  const onLoadingChangeRef = useRef(setIsProcessing);
-  useEffect(() => {
-    onLoadingChangeRef.current = setIsProcessing;
-  }, [setIsProcessing]);
-
+  // CRITICAL FIX: Match legacy code - use setExpressCheckoutLoading directly
+  // Legacy code uses: onLoadingChange={setExpressCheckoutLoading}
+  // Using useCallback with empty deps ensures stable reference (prevents re-renders)
+  // This matches the legacy pattern exactly
   const handleLoadingChange = useCallback((loading: boolean) => {
-    onLoadingChangeRef.current(loading);
+    setExpressCheckoutLoading(loading);
   }, []);
 
   // PaymentSection is now defined outside the component to prevent recreation on every render
@@ -1284,14 +1318,8 @@ export default function CheckoutPage() {
               <div className="text-center text-gray-500 py-8">No ticket types available for this event.</div>
             )}
             {ticketTypes.map(ticket => {
-              // Debug: Log ticket data to understand what backend is returning
-              console.log('Ticket data:', {
-                id: ticket.id,
-                name: ticket.name,
-                availableQuantity: ticket.availableQuantity,
-                soldQuantity: ticket.soldQuantity,
-                remainingQuantity: ticket.remainingQuantity
-              });
+              // REMOVED: Debug log - was causing noise in logs
+              // The re-renders are the real issue, not ticket data
 
               // Calculate remaining quantity using the same helper function
               const remainingQuantity = calculateRemainingQuantity(ticket);

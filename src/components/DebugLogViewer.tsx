@@ -117,16 +117,39 @@ export default function DebugLogViewer() {
   }, [logs, isExpanded]);
 
   const copyLogs = () => {
-    const logText = logs.map(log => {
-      const dataStr = log.data ? `\n  Data: ${JSON.stringify(log.data, null, 2)}` : '';
-      return `[${log.timestamp}] [${log.level.toUpperCase()}] ${log.message}${dataStr}`;
-    }).join('\n\n');
+    try {
+      const logText = logs.map(log => {
+        const dataStr = log.data ? `\n  Data: ${JSON.stringify(log.data, null, 2)}` : '';
+        return `[${log.timestamp}] [${log.level.toUpperCase()}] ${log.message}${dataStr}`;
+      }).join('\n\n');
 
-    navigator.clipboard.writeText(logText).then(() => {
-      alert('Logs copied to clipboard!');
-    }).catch(err => {
+      // Create a temporary textarea element for better clipboard support
+      const textarea = document.createElement('textarea');
+      textarea.value = logText;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      textarea.setSelectionRange(0, 99999); // For mobile devices
+
+      const successful = document.execCommand('copy');
+      document.body.removeChild(textarea);
+
+      if (successful) {
+        alert(`✅ Copied ${logs.length} log entries to clipboard!`);
+      } else {
+        // Fallback to modern clipboard API
+        navigator.clipboard.writeText(logText).then(() => {
+          alert(`✅ Copied ${logs.length} log entries to clipboard!`);
+        }).catch(err => {
+          console.error('Failed to copy logs:', err);
+          alert('❌ Failed to copy logs. Please select and copy manually.');
+        });
+      }
+    } catch (err) {
       console.error('Failed to copy logs:', err);
-    });
+      alert('❌ Failed to copy logs. Please select and copy manually.');
+    }
   };
 
   const clearLogs = () => {
