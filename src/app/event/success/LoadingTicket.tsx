@@ -1,5 +1,4 @@
 "use client";
-import Image from "next/image";
 import { useEffect, useState } from 'react';
 
 interface LoadingTicketProps {
@@ -7,28 +6,33 @@ interface LoadingTicketProps {
 }
 
 export default function LoadingTicket({ sessionId }: LoadingTicketProps) {
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [hasError, setHasError] = useState(false);
-  const [heroImageUrl, setHeroImageUrl] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+  const [heroImageUrl, setHeroImageUrl] = useState<string>("/images/default_placeholder_hero_image.jpeg");
 
   console.log('LoadingTicket received sessionId:', sessionId);
-  console.log('LoadingTicket image status - loaded:', isLoaded, 'error:', hasError);
+  console.log('LoadingTicket mounted state:', mounted);
+
+  // Mark as mounted to prevent hydration mismatch
+  useEffect(() => {
+    console.log('LoadingTicket: Component mounted on client');
+    setMounted(true);
+  }, []);
 
   // Fetch hero image data using the success process endpoint
   useEffect(() => {
     console.log('LoadingTicket: useEffect RUNNING - sessionId:', sessionId);
     console.log('LoadingTicket: Window available:', typeof window !== 'undefined');
 
-    if (sessionId) {
+    if (sessionId && mounted) {
       const fetchHeroImage = async () => {
         try {
           console.log('LoadingTicket: Fetching hero image for session:', sessionId);
-          
+
           // Get the pi parameter from URL if available
           const url = new URL(window.location.href);
           const pi = url.searchParams.get('pi');
           const qs = sessionId ? `session_id=${encodeURIComponent(sessionId)}` : (pi ? `pi=${encodeURIComponent(pi)}` : '');
-          
+
           if (!qs) {
             console.log('LoadingTicket: No session_id or pi available');
             return;
@@ -45,12 +49,12 @@ export default function LoadingTicket({ sessionId }: LoadingTicketProps) {
 
           if (response.ok) {
             const data = await response.json();
-            console.log('LoadingTicket: Response data:', { 
+            console.log('LoadingTicket: Response data:', {
               hasTransaction: !!data.transaction,
               hasEventDetails: !!data.eventDetails,
-              hasHeroImageUrl: !!data.heroImageUrl 
+              hasHeroImageUrl: !!data.heroImageUrl
             });
-            
+
             if (data.heroImageUrl) {
               setHeroImageUrl(data.heroImageUrl);
               console.log('LoadingTicket: Successfully fetched hero image URL:', data.heroImageUrl);
@@ -66,7 +70,7 @@ export default function LoadingTicket({ sessionId }: LoadingTicketProps) {
       };
       fetchHeroImage();
     }
-  }, [sessionId]);
+  }, [sessionId, mounted]);
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col" style={{ overflowX: 'hidden' }}>
@@ -84,12 +88,11 @@ export default function LoadingTicket({ sessionId }: LoadingTicketProps) {
         justifyContent: 'center',
         padding: '80px 0 0 0'
       }}>
-        <Image
-          src={heroImageUrl || "/images/default_placeholder_hero_image.jpeg"}
+        {/* Use standard img tag to avoid hydration issues */}
+        <img
+          src={heroImageUrl}
           alt="Event Hero"
-          width={1200}
-          height={400}
-          className="hero-image object-cover"
+          className="hero-image"
           style={{
             margin: '0 auto',
             padding: '0',
@@ -102,11 +105,9 @@ export default function LoadingTicket({ sessionId }: LoadingTicketProps) {
           }}
           onLoad={() => {
             console.log('Hero image loaded successfully');
-            setIsLoaded(true);
           }}
           onError={(e) => {
             console.error('Hero image failed to load:', e);
-            setHasError(true);
           }}
         />
         <div className="hero-overlay" style={{ opacity: 0.1, height: '5px', padding: '20' }}></div>
@@ -170,13 +171,13 @@ export default function LoadingTicket({ sessionId }: LoadingTicketProps) {
 
       {/* Loading content - flex-grow to push footer down */}
       <div className="flex-grow flex flex-col items-center justify-center min-h-[200px] p-6 animate-pulse" style={{ marginTop: '150px', paddingTop: '60px' }}>
-        <Image
+        {/* Use standard img tag to avoid hydration issues */}
+        <img
           src="/images/selling-tickets-vector-loading-image.jpg"
           alt="Ticket Loading"
-          width={180}
-          height={180}
+          width="180"
+          height="180"
           className="mb-4 rounded shadow-lg"
-          priority
         />
         <div className="text-xl font-bold text-teal-700 mb-2">Processing your payment and generating your QR code</div>
         <div className="text-gray-600 text-base text-center">This may take a few moments.<br />Please do not close or refresh this page.</div>
