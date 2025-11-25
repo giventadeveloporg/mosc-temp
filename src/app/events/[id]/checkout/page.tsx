@@ -297,16 +297,21 @@ export default function CheckoutPage() {
   // SIMPLE APPROACH: Match legacy code exactly - single useEffect with simple fetch
   // Legacy code works because it's simple - no complex guards or restoration logic
   useEffect(() => {
-    // CRITICAL FIX: Check ref FIRST before doing anything else
-    // This prevents infinite loops when state updates trigger re-renders on mobile browsers
-    // When we restore from sessionStorage and call setEvent/setTicketTypes, it triggers re-render
-    // On mobile, params?.id might be a new reference each time, causing useMemo to recalculate
-    // Even if eventId is the same value, useEffect dependency triggers again
-    // By checking fetchedEventIdRef FIRST, we prevent the restore logic from running multiple times
-    if (fetchedEventIdRef.current === eventId) {
-      console.log('[CheckoutPage] ✅ SKIP - Already processed this eventId (prevents infinite loop)', {
-        fetchedId: fetchedEventIdRef.current,
-        currentId: eventId,
+    // CRITICAL FIX: Use STRING comparison instead of reference comparison
+    // On mobile browsers, params?.id might be a new reference each render
+    // This causes useMemo to recalculate eventId even if value is same
+    // By comparing STRING values, we prevent infinite loops regardless of reference changes
+    const currentEventIdStr = typeof eventId === 'string' ? eventId : Array.isArray(eventId) ? eventId[0] : String(eventId);
+    const fetchedEventIdStr = typeof fetchedEventIdRef.current === 'string'
+      ? fetchedEventIdRef.current
+      : Array.isArray(fetchedEventIdRef.current)
+        ? fetchedEventIdRef.current[0]
+        : String(fetchedEventIdRef.current || '');
+
+    if (fetchedEventIdStr && fetchedEventIdStr === currentEventIdStr) {
+      console.log('[CheckoutPage] ✅ SKIP - Already processed this eventId (string comparison prevents infinite loop)', {
+        fetchedId: fetchedEventIdStr,
+        currentId: currentEventIdStr,
       });
       return; // Already fetched/restored - don't run again
     }
@@ -346,7 +351,8 @@ export default function CheckoutPage() {
             currentId: currentEventIdStr,
           });
           // CRITICAL: Set refs BEFORE state updates to prevent re-trigger
-          fetchedEventIdRef.current = eventId || null;
+          // Use string value to ensure stable comparison
+          fetchedEventIdRef.current = currentEventIdStr;
           isFetchingRef.current = false; // Mark as not fetching
           setEvent(storedData.event);
           setTicketTypes(storedData.ticketTypes);
@@ -467,8 +473,10 @@ export default function CheckoutPage() {
         setLoading(false);
         isFetchingRef.current = false;
         if (eventId) {
-          fetchedEventIdRef.current = eventId || null;
-          setFetchedEventIdInStorage(eventId);
+          // Use string value to ensure stable comparison
+          const eventIdStr = typeof eventId === 'string' ? eventId : Array.isArray(eventId) ? eventId[0] : String(eventId);
+          fetchedEventIdRef.current = eventIdStr;
+          setFetchedEventIdInStorage(eventIdStr);
         }
       }
     }
