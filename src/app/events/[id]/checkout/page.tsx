@@ -1,144 +1,49 @@
 'use client';
 
 import Image from 'next/image';
-import React, { useState, useEffect, useLayoutEffect, useMemo, useRef, useCallback } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { FaTags, FaCreditCard, FaCalendarAlt, FaClock, FaMapMarkerAlt, FaMapPin, FaTicketAlt, FaUser, FaEnvelope, FaMoneyBillWave, FaReceipt } from 'react-icons/fa';
 import { Modal } from '@/components/Modal';
 import UniversalPaymentCheckout from '@/components/UniversalPaymentCheckout';
-import { PaymentUseCase } from '@/types';
 import { formatInTimeZone } from 'date-fns-tz';
 import LocationDisplay from '@/components/LocationDisplay';
+import { PaymentUseCase } from '@/types';
+import { createComponentLogger } from '@/lib/clientLogger';
 
-// CRITICAL FIX: Move PaymentSection outside component to prevent recreation on every render
-// This prevents UniversalPaymentCheckout from unmounting/remounting and losing refs
-const PaymentSection = React.memo(({
-  cart,
-  eventId,
-  email,
-  customerName,
-  customerPhone,
-  discountCodeId,
-  enabled,
-  amountCents,
-  paymentUseCase,
-  returnUrl,
-  cancelUrl,
-  onInvalidClick,
-  onSuccess,
-  onError,
-  onLoadingChange,
-}: {
-  cart: Array<{ ticketType: any; quantity: number }>;
-  eventId: string;
-  email: string;
-  customerName?: string;
-  customerPhone?: string;
-  discountCodeId: number | null;
-  enabled: boolean;
-  amountCents: number;
-  paymentUseCase: PaymentUseCase;
-  returnUrl: string;
-  cancelUrl: string;
-  onInvalidClick: () => void;
-  onSuccess: (transactionId: string) => void;
-  onError: (error: string) => void;
-  onLoadingChange: (loading: boolean) => void;
-}) => {
-  return (
-    <UniversalPaymentCheckout
-      cart={cart}
-      eventId={eventId}
-      email={email}
-      customerName={customerName}
-      customerPhone={customerPhone}
-      discountCodeId={discountCodeId}
-      enabled={enabled}
-      amountCents={amountCents}
-      paymentUseCase={paymentUseCase}
-      returnUrl={returnUrl}
-      cancelUrl={cancelUrl}
-      onInvalidClick={onInvalidClick}
-      onSuccess={onSuccess}
-      onError={onError}
-      onLoadingChange={onLoadingChange}
-    />
-  );
-}, (prevProps, nextProps) => {
-  // Custom comparison: only re-render if payment-relevant props change
-  const cartEqual = JSON.stringify(prevProps.cart) === JSON.stringify(nextProps.cart);
-  return (
-    cartEqual &&
-    prevProps.eventId === nextProps.eventId &&
-    prevProps.email === nextProps.email &&
-    prevProps.customerName === nextProps.customerName &&
-    prevProps.customerPhone === nextProps.customerPhone &&
-    prevProps.discountCodeId === nextProps.discountCodeId &&
-    prevProps.enabled === nextProps.enabled &&
-    prevProps.amountCents === nextProps.amountCents &&
-    prevProps.paymentUseCase === nextProps.paymentUseCase &&
-    prevProps.returnUrl === nextProps.returnUrl &&
-    prevProps.cancelUrl === nextProps.cancelUrl
-  );
-});
+// Create component-specific logger for CloudWatch visibility
+const logger = createComponentLogger('CheckoutPage');
 
-PaymentSection.displayName = 'PaymentSection';
-
-// TEMPORARY DEBUG: Import debug log viewer for mobile debugging
-import DebugLogViewer from '@/components/DebugLogViewer';
+// CRITICAL: Log immediately when module loads (verifies JavaScript file is loaded)
+if (typeof window !== 'undefined') {
+  console.log('[CheckoutPage] ===== MODULE LOADED =====');
+  console.log('[CheckoutPage] Module loaded at:', new Date().toISOString());
+  console.log('[CheckoutPage] User-Agent:', navigator.userAgent);
+  console.log('[CheckoutPage] URL:', window.location.href);
+  logger.log('CheckoutPage module loaded', {
+    userAgent: navigator.userAgent,
+    url: window.location.href,
+    timestamp: new Date().toISOString(),
+  });
+}
 
 export default function CheckoutPage() {
-  const router = useRouter();
+  // CRITICAL: Log immediately when component renders (verifies React is working)
+  if (typeof window !== 'undefined') {
+    console.log('[CheckoutPage] ===== COMPONENT RENDERING =====');
+    console.log('[CheckoutPage] Component rendering at:', new Date().toISOString());
+    logger.log('CheckoutPage component rendering', { timestamp: new Date().toISOString() });
+  }
+
   const params = useParams();
-
-  // TEMPORARY DEBUG: Track re-renders to identify flickering cause
-  const renderCountRef = useRef(0);
-  const lastRenderTimeRef = useRef(Date.now());
-  const prevStateRef = useRef<any>({});
-  renderCountRef.current += 1;
-  const timeSinceLastRender = Date.now() - lastRenderTimeRef.current;
-
-  useEffect(() => {
-    const currentState = {
-      event: !!event,
-      ticketTypesCount: ticketTypes.length,
-      loading,
-      expressCheckoutLoading,
-      hasEvent: !!event,
-      hasTicketTypes: ticketTypes.length > 0,
-    };
-
-    const changedKeys = Object.keys(currentState).filter(
-      (key) => {
-        const typedKey = key as keyof typeof currentState;
-        return prevStateRef.current[typedKey] !== currentState[typedKey];
-      }
-    );
-
-    console.log('[CheckoutPage] 🔄 COMPONENT RE-RENDER', {
-      renderCount: renderCountRef.current,
-      timeSinceLastRender,
-      changedState: changedKeys.length > 0 ? changedKeys : 'none',
-      currentState,
-      prevState: prevStateRef.current,
-      timestamp: new Date().toISOString(),
-    });
-
-    prevStateRef.current = currentState;
-    lastRenderTimeRef.current = Date.now();
-  });
-
-  // CRITICAL MOBILE FIX: Memoize eventId to prevent infinite re-renders
-  // useParams() returns a proxy that appears "new" on each render on mobile browsers
-  // This causes useEffect to trigger repeatedly, causing infinite fetch loops
+  const router = useRouter();
+  // CRITICAL FIX: Memoize eventId to prevent infinite re-renders
+  // useParams() returns a proxy that appears "new" on each render
+  // MOBILE FIX: Convert to string to ensure stable reference across app switches
   const eventId = useMemo(() => {
     const id = params?.id;
-    // Convert to string to ensure stable reference across app switches
     return typeof id === 'string' ? id : Array.isArray(id) ? id[0] : id;
   }, [params?.id]);
-
-  // CRITICAL: Initialize state as null/empty to prevent hydration mismatch
-  // Server doesn't have sessionStorage, so must match client initial state
   const [event, setEvent] = useState<any>(null);
   const [ticketTypes, setTicketTypes] = useState<any[]>([]);
   const [selectedTickets, setSelectedTickets] = useState<{ [key: number]: number }>({});
@@ -153,492 +58,394 @@ export default function CheckoutPage() {
   const [availableDiscounts, setAvailableDiscounts] = useState<any[]>([]);
   const [emailError, setEmailError] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  // CRITICAL: Always start with loading=true to prevent hydration mismatch
-  // Server doesn't have sessionStorage, so must match client initial state
   const [loading, setLoading] = useState(true);
-  const [heroImageUrl, setHeroImageUrl] = useState<string | null>(null);
+  const defaultHeroImageUrl = '/images/default_placeholder_hero_image.jpeg';
+  const [heroImageUrl, setHeroImageUrl] = useState<string | null>(defaultHeroImageUrl);
   const [totalAmount, setTotalAmount] = useState(0);
   const [savedAmount, setSavedAmount] = useState(0);
   const [showDiscountModal, setShowDiscountModal] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [showCancelledMessage, setShowCancelledMessage] = useState(false);
-  const [cancelledPaymentInfo, setCancelledPaymentInfo] = useState<any>(null);
-  const [expressCheckoutLoading, setExpressCheckoutLoading] = useState(true);
-
-  // MOBILE FIX: Track page visibility to prevent unnecessary re-renders on app switch
-  const [isPageVisible, setIsPageVisible] = useState(true);
+  const [paymentEnabled, setPaymentEnabled] = useState(false);
+  // CRITICAL FIX: Use ref to track fetch status without causing re-renders
   const isFetchingRef = useRef(false);
+  // CRITICAL FIX: Track which eventId has been fetched to prevent re-fetching same ID
   const fetchedEventIdRef = useRef<string | string[] | null>(null);
-  // CRITICAL MOBILE FIX: Track if data was restored from sessionStorage to prevent fetch flicker
-  const dataRestoredRef = useRef(false);
-  // CRITICAL MOBILE FIX: Track if initialization check is complete (restoration check done)
-  const initializationCompleteRef = useRef(false);
-  const lastFetchAttemptRef = useRef(0);
-  // CRITICAL ANTI-FLICKER: Track if data is confirmed ready (prevents any loading state changes)
-  const dataReadyRef = useRef(false);
-  // CRITICAL FIX: Store restored data in ref for synchronous access during render
-  // This prevents flickering when React state updates are async
-  const restoredDataRef = useRef<{ event: any; ticketTypes: any[]; availableDiscounts: any[]; heroImageUrl: string | null } | null>(null);
-
-  // CRITICAL FIX: Initialize restoredDataRef in useEffect (not synchronously) to prevent hydration mismatch
-  // Server doesn't have sessionStorage, so we must restore on client only
-  // This runs AFTER mount, so initial render matches server
-  useEffect(() => {
-    if (typeof window === 'undefined' || restoredDataRef.current) return;
-
-    const storedFetchedId = sessionStorage.getItem('checkout_fetched_event_id');
-    const currentEventIdStr: string = typeof eventId === 'string'
-      ? eventId
-      : Array.isArray(eventId)
-        ? (eventId[0] ? String(eventId[0]) : String(eventId))
-        : String(eventId || '');
-
-    if (storedFetchedId === currentEventIdStr && storedFetchedId) {
-      try {
-        const eventData = sessionStorage.getItem('checkout_event_data');
-        const ticketTypesData = sessionStorage.getItem('checkout_ticket_types');
-        const discountsData = sessionStorage.getItem('checkout_available_discounts');
-        const heroImageUrlData = sessionStorage.getItem('checkout_hero_image_url');
-
-        if (eventData && ticketTypesData) {
-          restoredDataRef.current = {
-            event: JSON.parse(eventData),
-            ticketTypes: JSON.parse(ticketTypesData),
-            availableDiscounts: discountsData ? JSON.parse(discountsData) : [],
-            heroImageUrl: heroImageUrlData || null,
-          };
-          // Also set dataReadyRef to prevent loading screen
-          dataReadyRef.current = true;
-          fetchedEventIdRef.current = currentEventIdStr ? currentEventIdStr : null;
-          // CRITICAL: Update state immediately to trigger re-render with restored data
-          setLoading(false);
-          setExpressCheckoutLoading(false);
-          setEvent(restoredDataRef.current.event);
-          setTicketTypes(restoredDataRef.current.ticketTypes);
-          setAvailableDiscounts(restoredDataRef.current.availableDiscounts);
-          if (restoredDataRef.current.heroImageUrl) {
-            setHeroImageUrl(restoredDataRef.current.heroImageUrl);
-          }
-        }
-      } catch (e) {
-        // Ignore parse errors
-        console.error('[CheckoutPage] Error restoring from sessionStorage:', e);
-      }
-    }
-  }, [eventId]); // Only run when eventId changes
-
-  // Stabilization delay: Wait 150ms after restoration check before allowing fetch
-  // This ensures React state updates complete and prevents race conditions
-  const STABILIZATION_DELAY_MS = 150;
-
-  // SIMPLE APPROACH: Remove guard function - use setLoading directly like legacy code
-  // The guard was causing issues - legacy code doesn't need it
-
-  // CRITICAL MOBILE FIX: Use sessionStorage to persist fetch state AND data across remounts
-  // Mobile browsers can remount components, resetting refs and state, so we need persistent storage
-  const getFetchedEventIdFromStorage = useCallback(() => {
-    if (typeof window === 'undefined') return null;
-    try {
-      return sessionStorage.getItem('checkout_fetched_event_id');
-    } catch {
-      return null;
-    }
-  }, []);
-
-  const setFetchedEventIdInStorage = useCallback((id: string | string[] | null) => {
-    if (typeof window === 'undefined') return;
-    try {
-      if (id) {
-        const idStr = typeof id === 'string' ? id : Array.isArray(id) ? id[0] : String(id);
-        sessionStorage.setItem('checkout_fetched_event_id', idStr);
-      } else {
-        sessionStorage.removeItem('checkout_fetched_event_id');
-      }
-    } catch {
-      // Ignore storage errors
-    }
-  }, []);
-
-  // CRITICAL MOBILE FIX: Store fetched data in sessionStorage
-  const storeFetchedDataInStorage = useCallback((data: {
-    event: any;
-    ticketTypes: any[];
-    availableDiscounts: any[];
-    heroImageUrl: string | null;
-  }) => {
-    if (typeof window === 'undefined') return;
-    try {
-      sessionStorage.setItem('checkout_event_data', JSON.stringify(data.event));
-      sessionStorage.setItem('checkout_ticket_types', JSON.stringify(data.ticketTypes));
-      sessionStorage.setItem('checkout_available_discounts', JSON.stringify(data.availableDiscounts));
-      if (data.heroImageUrl) {
-        sessionStorage.setItem('checkout_hero_image_url', data.heroImageUrl);
-      }
-    } catch {
-      // Ignore storage errors
-    }
-  }, []);
-
-  // CRITICAL MOBILE FIX: Restore fetched data from sessionStorage
-  const restoreFetchedDataFromStorage = useCallback(() => {
-    if (typeof window === 'undefined') return null;
-    try {
-      const eventData = sessionStorage.getItem('checkout_event_data');
-      const ticketTypesData = sessionStorage.getItem('checkout_ticket_types');
-      const discountsData = sessionStorage.getItem('checkout_available_discounts');
-      const heroImageUrlData = sessionStorage.getItem('checkout_hero_image_url');
-
-      if (eventData && ticketTypesData) {
-        return {
-          event: JSON.parse(eventData),
-          ticketTypes: JSON.parse(ticketTypesData),
-          availableDiscounts: discountsData ? JSON.parse(discountsData) : [],
-          heroImageUrl: heroImageUrlData || null,
-        };
-      }
-      return null;
-    } catch {
-      return null;
-    }
-  }, []);
-
-  // CRITICAL MOBILE FIX: Clear stored data when navigating to different event
-  const clearStoredData = useCallback(() => {
-    if (typeof window === 'undefined') return;
-    try {
-      sessionStorage.removeItem('checkout_fetched_event_id');
-      sessionStorage.removeItem('checkout_event_data');
-      sessionStorage.removeItem('checkout_ticket_types');
-      sessionStorage.removeItem('checkout_available_discounts');
-      sessionStorage.removeItem('checkout_hero_image_url');
-    } catch {
-      // Ignore storage errors
-    }
-  }, []);
+  // MOBILE FIX: Track page visibility to prevent flicker on app switch
+  const [isPageVisible, setIsPageVisible] = useState(true);
+  // MOBILE DEBUG: Use ref to capture logs without causing re-renders
+  const debugLogsRef = useRef<string[]>([]);
+  const [showDebugLogs, setShowDebugLogs] = useState(false);
+  const [displayedLogs, setDisplayedLogs] = useState<string[]>([]);
 
   useEffect(() => { setMounted(true); }, []);
 
-  // REMOVED: useLayoutEffect restoration - React state updates are async, so this doesn't work reliably
-  // Instead, we restore in the main useEffect and check if data exists before showing loading screen
+  // MOBILE DEBUG: Intercept console logs for mobile debugging (using ref to prevent re-renders)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
 
-  // REMOVED: Complex restoration useEffect - it was causing flickering
-  // Legacy code doesn't have this - restoration is handled inside fetch useEffect
+    const originalLog = console.log;
+    const originalError = console.error;
+    const originalWarn = console.warn;
 
-  // MOBILE FIX: Handle page visibility changes (app switching on mobile)
+    const addLog = (level: string, ...args: any[]) => {
+      const logMessage = `[${level}] ${args.map(arg =>
+        typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+      ).join(' ')}`;
+
+      // CRITICAL FIX: Use ref instead of setState to prevent infinite re-renders
+      debugLogsRef.current = [...debugLogsRef.current.slice(-50), logMessage];
+    };
+
+    console.log = (...args: any[]) => {
+      originalLog.apply(console, args);
+      if (args[0]?.includes?.('[') && (
+        args[0]?.includes?.('UniversalPaymentCheckout') ||
+        args[0]?.includes?.('DESKTOP ECE') ||
+        args[0]?.includes?.('CheckoutPage') ||
+        args[0]?.includes?.('PRB')  // CRITICAL: Capture Payment Request Button logs
+      )) {
+        addLog('LOG', ...args);
+      }
+    };
+
+    console.error = (...args: any[]) => {
+      originalError.apply(console, args);
+      addLog('ERROR', ...args);
+    };
+
+    console.warn = (...args: any[]) => {
+      originalWarn.apply(console, args);
+      addLog('WARN', ...args);
+    };
+
+    return () => {
+      console.log = originalLog;
+      console.error = originalError;
+      console.warn = originalWarn;
+    };
+  }, []);
+
+  // Update displayed logs when user opens the panel
+  useEffect(() => {
+    if (showDebugLogs) {
+      setDisplayedLogs([...debugLogsRef.current]);
+    }
+  }, [showDebugLogs]);
+
+  // MOBILE FIX: Listen to page visibility changes to prevent flickering on app switch
   useEffect(() => {
     if (typeof document === 'undefined') return;
 
     const handleVisibilityChange = () => {
       const visible = document.visibilityState === 'visible';
-      console.log('[CheckoutPage] Page visibility changed:', {
+      console.log('[CheckoutPage] ⚠️ PAGE VISIBILITY CHANGED:', {
         visible,
+        wasVisible: isPageVisible,
         timestamp: new Date().toISOString(),
         eventId,
+        hasEvent: !!event,
+        ticketTypesCount: ticketTypes.length,
       });
       setIsPageVisible(visible);
 
       // Don't trigger re-fetch when page becomes visible again
       // Data is already cached in state
       if (visible) {
-        console.log('[CheckoutPage] Page became visible - NOT re-fetching (using cached data)');
+        console.log('[CheckoutPage] ✅ Page became visible - NOT re-fetching (data already loaded)');
       }
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [eventId]);
+  }, [isPageVisible, eventId, event, ticketTypes.length]);
 
-  // MOBILE FIX: Clean up Clerk sync parameter from URL (prevents re-renders)
+  // Clean up Clerk sync parameter from URL on mount (for cleaner URLs)
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('__clerk_synced')) {
-      // Remove Clerk sync parameter for cleaner URL and to prevent re-renders
+      // Remove Clerk sync parameter for cleaner URL
       urlParams.delete('__clerk_synced');
       const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
       // Use replace to avoid adding to history
       window.history.replaceState({}, '', newUrl);
-      console.log('[CheckoutPage] Cleaned up Clerk sync parameter from URL');
     }
   }, []);
 
-  // Check for cancelled payment parameters
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const urlParams = new URLSearchParams(window.location.search);
-      const cancelled = urlParams.get('payment_cancelled');
-      const pi = urlParams.get('pi');
-      const status = urlParams.get('status');
-
-      if (cancelled === 'true' && pi) {
-        console.log('[TICKETS] Payment cancelled detected:', { pi, status });
-        setCancelledPaymentInfo({ pi, status });
-        setShowCancelledMessage(true);
-
-        // Clear the URL parameters to prevent showing the message again on refresh
-        const newUrl = new URL(window.location.href);
-        newUrl.searchParams.delete('payment_cancelled');
-        newUrl.searchParams.delete('pi');
-        newUrl.searchParams.delete('status');
-        window.history.replaceState({}, '', newUrl.toString());
-      }
-    }
-  }, []);
-
-  const defaultHeroImageUrl = '/images/default_placeholder_hero_image.jpeg';
-
-  // SIMPLE APPROACH: Match legacy code exactly - single useEffect with simple fetch
-  // Legacy code works because it's simple - no complex guards or restoration logic
-  useEffect(() => {
-    // CRITICAL FIX: Use STRING comparison instead of reference comparison
-    // On mobile browsers, params?.id might be a new reference each render
-    // This causes useMemo to recalculate eventId even if value is same
-    // By comparing STRING values, we prevent infinite loops regardless of reference changes
-    const currentEventIdStr: string = typeof eventId === 'string'
-      ? eventId
-      : Array.isArray(eventId)
-        ? (eventId[0] ? String(eventId[0]) : String(eventId))
-        : String(eventId || '');
-    const fetchedEventIdStr = typeof fetchedEventIdRef.current === 'string'
-      ? fetchedEventIdRef.current
-      : Array.isArray(fetchedEventIdRef.current)
-        ? fetchedEventIdRef.current[0]
-        : String(fetchedEventIdRef.current || '');
-
-    // CRITICAL FIX: If ref says we fetched but event is null, restore from sessionStorage
-    // This handles the case where component remounted and state was lost but ref persisted
-    if (fetchedEventIdStr && fetchedEventIdStr === currentEventIdStr) {
-      if (!event && !restoredDataRef.current) {
-        // Ref says we fetched, but event is null and ref doesn't have data - restore from sessionStorage
-        const storedData = restoreFetchedDataFromStorage();
-        if (storedData && storedData.event) {
-          console.log('[CheckoutPage] 🔄 RESTORING - Ref set but event null, restoring from sessionStorage');
-          // Store in ref FIRST for synchronous access
-          restoredDataRef.current = {
-            event: storedData.event,
-            ticketTypes: storedData.ticketTypes,
-            availableDiscounts: storedData.availableDiscounts,
-            heroImageUrl: storedData.heroImageUrl || null,
-          };
-          dataReadyRef.current = true;
-          setLoading(false);
-          setExpressCheckoutLoading(false);
-          setEvent(storedData.event);
-          setTicketTypes(storedData.ticketTypes);
-          setAvailableDiscounts(storedData.availableDiscounts);
-          if (storedData.heroImageUrl) {
-            setHeroImageUrl(storedData.heroImageUrl);
-          }
-          return; // Skip fetch - data restored
-        }
-      }
-      console.log('[CheckoutPage] ✅ SKIP - Already processed this eventId (string comparison prevents infinite loop)', {
-        fetchedId: fetchedEventIdStr,
-        currentId: currentEventIdStr,
-      });
-      return; // Already fetched/restored - don't run again
-    }
-
-    // DIAGNOSTIC: Log every useEffect run to identify infinite loop
-    console.log('[CheckoutPage] 🔍 useEffect RUN', {
-      eventId,
-      eventIdType: typeof eventId,
-      isFetching: isFetchingRef.current,
-      fetchedEventId: fetchedEventIdRef.current,
-      hasEvent: !!event,
-      ticketTypesCount: ticketTypes.length,
-      loading,
-      timestamp: new Date().toISOString(),
-      paramsId: params?.id,
-      paramsIdType: typeof params?.id,
-    });
-
     async function fetchData() {
-      // DIAGNOSTIC: Log fetch attempt
-      console.log('[CheckoutPage] 🔍 fetchData CALLED', {
-        eventId,
-        isFetching: isFetchingRef.current,
-        fetchedEventId: fetchedEventIdRef.current,
-      });
-
-      // SIMPLE: Check sessionStorage FIRST (like legacy but with restoration)
-      const storedFetchedId = getFetchedEventIdFromStorage();
-      const currentEventIdStr: string = typeof eventId === 'string'
-        ? eventId
-        : Array.isArray(eventId)
-          ? (eventId[0] ? String(eventId[0]) : String(eventId))
-          : String(eventId || '');
-
-      // If we have stored data for this eventId, restore it immediately
-      if (storedFetchedId === currentEventIdStr && storedFetchedId) {
-        const storedData = restoreFetchedDataFromStorage();
-        if (storedData && storedData.event) {
-          console.log('[CheckoutPage] ✅ RESTORING from sessionStorage - skipping fetch', {
-            storedId: storedFetchedId,
-            currentId: currentEventIdStr,
-          });
-          // CRITICAL: Store restored data in ref FIRST for synchronous access during render
-          // This prevents flickering when React state updates are async
-          restoredDataRef.current = {
-            event: storedData.event,
-            ticketTypes: storedData.ticketTypes,
-            availableDiscounts: storedData.availableDiscounts,
-            heroImageUrl: storedData.heroImageUrl || null,
-          };
-          // CRITICAL: Set refs and loading FIRST to prevent flickering
-          // Use string value to ensure stable comparison
-          fetchedEventIdRef.current = currentEventIdStr ? currentEventIdStr : null;
-          isFetchingRef.current = false; // Mark as not fetching
-          // CRITICAL: Mark data as ready BEFORE setting loading to false
-          dataReadyRef.current = true;
-          // CRITICAL: Set ALL loading states to false FIRST (before state updates) to prevent flicker
-          // This ensures loading screen doesn't flash during state updates
-          setLoading(false);
-          setExpressCheckoutLoading(false); // CRITICAL: Also reset express checkout loading
-          // Then restore state (these updates are batched by React)
-          setEvent(storedData.event);
-          setTicketTypes(storedData.ticketTypes);
-          setAvailableDiscounts(storedData.availableDiscounts);
-          if (storedData.heroImageUrl) {
-            setHeroImageUrl(storedData.heroImageUrl);
-          }
-          return; // Skip fetch - data restored
-        }
-      }
-
-      // SIMPLE: Prevent duplicate fetches
+      // CRITICAL FIX: Prevent duplicate fetches using ref
       if (isFetchingRef.current) {
-        console.log('[CheckoutPage] ⚠️ SKIP - Already fetching');
+        console.log('[CheckoutPage] Fetch already in progress, skipping duplicate');
+        logger.log('Fetch already in progress, skipping', { eventId });
         return;
       }
 
-      // SIMPLE: Prevent re-fetching same eventId (use string comparison)
-      const fetchedIdStr = typeof fetchedEventIdRef.current === 'string'
-        ? fetchedEventIdRef.current
-        : Array.isArray(fetchedEventIdRef.current)
-          ? fetchedEventIdRef.current[0]
-          : String(fetchedEventIdRef.current || '');
-      if (fetchedIdStr && fetchedIdStr === currentEventIdStr) {
-        console.log('[CheckoutPage] ⚠️ SKIP - Already fetched this eventId', {
-          fetchedId: fetchedIdStr,
-          currentId: currentEventIdStr,
-        });
+      // CRITICAL FIX: Prevent re-fetching the same eventId (mobile browser cache issue)
+      if (fetchedEventIdRef.current === eventId) {
+        console.log('[CheckoutPage] Event already fetched, skipping', { eventId });
+        logger.log('Event already fetched, skipping re-fetch', { eventId, fetchedId: fetchedEventIdRef.current });
         return;
       }
 
-      // SIMPLE: Set loading and fetch flag (like legacy code)
+      // CRITICAL: Log immediately to verify useEffect is executing on mobile
+      logger.log('CheckoutPage useEffect started', { eventId });
+      logger.log('Window object available', { hasWindow: typeof window !== 'undefined' });
+
       isFetchingRef.current = true;
       setLoading(true);
 
-      console.log('[CheckoutPage] ⚡ FETCHING EVENT DATA', {
-        eventId: currentEventIdStr,
-        timestamp: new Date().toISOString()
-      });
+      // Enhanced mobile browser detection: Include WhatsApp and other mobile browsers
+      const isMobile = typeof window !== 'undefined' && (
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|WhatsApp|Mobile|CriOS|FxiOS/i.test(navigator.userAgent) ||
+        window.innerWidth <= 768
+      );
+
+      // Log environment info for debugging - ALWAYS forward to CloudWatch
+      const envInfo = {
+        userAgent: typeof window !== 'undefined' ? navigator.userAgent : 'server-side',
+        url: typeof window !== 'undefined' ? window.location.href : 'unknown',
+        hasClerkSync: typeof window !== 'undefined' ? window.location.search.includes('__clerk_synced') : false,
+        isMobile,
+        eventId,
+      };
+
+      console.log('[CheckoutPage] Environment info:', envInfo);
+      logger.log('Mobile browser detection', envInfo);
 
       try {
-        // Fetch event details
-        const eventRes = await fetch(`/api/proxy/event-details/${eventId}`);
-        const eventData = await eventRes.json();
-        setEvent(eventData);
+        // First, fetch event details to show hero image during loading
+        const eventUrl = `/api/proxy/event-details/${eventId}`;
+        console.log('[CheckoutPage] Fetching event details:', eventUrl);
+        logger.log('About to fetch event details', { eventUrl, eventId, isMobile });
 
-        // Store event details early for loading page
-        if (eventData) {
-          sessionStorage.setItem('eventTitle', eventData.title || '');
-          sessionStorage.setItem('eventLocation', eventData.location || '');
+        // CRITICAL: Log BEFORE fetch to verify we reach this point
+        logger.log('Fetch call initiated', {
+          url: eventUrl,
+          timestamp: new Date().toISOString(),
+          isMobile,
+        });
+
+        const fetchStartTime = Date.now();
+        let fetchError: any = null;
+
+        try {
+          const eventRes = await fetch(eventUrl, {
+            cache: 'no-store',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+
+          const fetchDuration = Date.now() - fetchStartTime;
+          console.log('[CheckoutPage] Event response status:', eventRes.status, eventRes.statusText);
+
+          // CRITICAL: Log fetch response to CloudWatch
+          logger.log('Fetch response received', {
+            status: eventRes.status,
+            statusText: eventRes.statusText,
+            duration: fetchDuration,
+            url: eventUrl,
+            isMobile,
+          });
+
+          if (!eventRes.ok) {
+            const errorText = await eventRes.text();
+            const errorDetails = {
+              status: eventRes.status,
+              statusText: eventRes.statusText,
+              error: errorText,
+              url: eventUrl,
+              isMobile,
+            };
+            console.error('[CheckoutPage] Event fetch failed:', errorDetails);
+
+            // CRITICAL: Forward error to CloudWatch
+            logger.error('Event fetch failed', errorDetails);
+            throw new Error(`Failed to load event: ${eventRes.status} ${eventRes.statusText}`);
+          }
+
+          const eventData = await eventRes.json();
+          console.log('[CheckoutPage] Event data loaded:', eventData?.id || 'no id');
+          logger.log('Event data loaded successfully', { eventId: eventData?.id, isMobile });
+          setEvent(eventData);
+        } catch (fetchErr: any) {
+          // CRITICAL: Catch fetch errors (network failures, CORS, etc.)
+          fetchError = fetchErr;
+          const fetchDuration = Date.now() - fetchStartTime;
+          console.error('[CheckoutPage] Fetch threw error:', fetchErr);
+
+          logger.critical('Fetch call failed with exception', {
+            error: fetchErr?.message || String(fetchErr),
+            errorName: fetchErr?.name,
+            errorStack: fetchErr?.stack,
+            url: eventUrl,
+            duration: fetchDuration,
+            isMobile,
+            eventId,
+          });
+
+          // Re-throw to be caught by outer catch block
+          throw fetchErr;
+        }
+
+        // Fetch hero image immediately (prioritize homepage hero, then regular hero, then flyer, then featured)
+        try {
+          // Try homepage hero image first
+          let mediaRes = await fetch(`/api/proxy/event-medias?eventId.equals=${eventId}&isHomePageHeroImage.equals=true`, {
+            cache: 'no-store',
+          });
+          if (mediaRes.ok) {
+            const mediaData = await mediaRes.json();
+            const mediaArray = Array.isArray(mediaData) ? mediaData : (mediaData ? [mediaData] : []);
+            if (mediaArray.length > 0 && mediaArray[0].fileUrl) {
+              setHeroImageUrl(mediaArray[0].fileUrl);
+            } else {
+              // Try regular hero image
+              mediaRes = await fetch(`/api/proxy/event-medias?eventId.equals=${eventId}&isHeroImage.equals=true`, {
+                cache: 'no-store',
+              });
+              if (mediaRes.ok) {
+                const heroMediaData = await mediaRes.json();
+                const heroMediaArray = Array.isArray(heroMediaData) ? heroMediaData : (heroMediaData ? [heroMediaData] : []);
+                if (heroMediaArray.length > 0 && heroMediaArray[0].fileUrl) {
+                  setHeroImageUrl(heroMediaArray[0].fileUrl);
+                } else {
+                  // Try flyer image
+                  const flyerRes = await fetch(`/api/proxy/event-medias?eventId.equals=${eventId}&eventFlyer.equals=true`, {
+                    cache: 'no-store',
+                  });
+                  if (flyerRes.ok) {
+                    const flyerData = await flyerRes.json();
+                    const flyerArray = Array.isArray(flyerData) ? flyerData : (flyerData ? [flyerData] : []);
+                    if (flyerArray.length > 0 && flyerArray[0].fileUrl) {
+                      setHeroImageUrl(flyerArray[0].fileUrl);
+                    } else {
+                      // Try featured image
+                      const featuredRes = await fetch(`/api/proxy/event-medias?eventId.equals=${eventId}&isFeaturedImage.equals=true`, {
+                        cache: 'no-store',
+                      });
+                      if (featuredRes.ok) {
+                        const featuredData = await featuredRes.json();
+                        if (Array.isArray(featuredData) && featuredData.length > 0 && featuredData[0].fileUrl) {
+                          setHeroImageUrl(featuredData[0].fileUrl);
+                        } else {
+                          setHeroImageUrl(defaultHeroImageUrl);
+                        }
+                      } else {
+                        setHeroImageUrl(defaultHeroImageUrl);
+                      }
+                    }
+                  } else {
+                    setHeroImageUrl(defaultHeroImageUrl);
+                  }
+                }
+              } else {
+                setHeroImageUrl(defaultHeroImageUrl);
+              }
+            }
+          } else {
+            setHeroImageUrl(defaultHeroImageUrl);
+          }
+        } catch (mediaErr) {
+          console.error('[CheckoutPage] Error fetching hero image:', mediaErr);
+          setHeroImageUrl(defaultHeroImageUrl);
         }
 
         // Fetch ticket types for this event (only active ones)
-        const ticketRes = await fetch(`/api/proxy/event-ticket-types?eventId.equals=${eventId}&isActive.equals=true`);
-        const ticketData = await ticketRes.json();
-        const ticketTypesArray = Array.isArray(ticketData) ? ticketData : [];
-        setTicketTypes(ticketTypesArray);
+        const ticketUrl = `/api/proxy/event-ticket-types?eventId.equals=${eventId}&isActive.equals=true`;
+        console.log('[CheckoutPage] Fetching ticket types:', ticketUrl);
+
+        const ticketRes = await fetch(ticketUrl, {
+          cache: 'no-store',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        console.log('[CheckoutPage] Ticket types response status:', ticketRes.status);
+
+        if (!ticketRes.ok) {
+          const errorText = await ticketRes.text();
+          console.error('[CheckoutPage] Ticket types fetch failed:', {
+            status: ticketRes.status,
+            statusText: ticketRes.statusText,
+            error: errorText,
+            url: ticketUrl,
+            isMobile,
+          });
+          // Don't throw - allow page to load with empty ticket types
+          setTicketTypes([]);
+        } else {
+          const ticketData = await ticketRes.json();
+          console.log('[CheckoutPage] Ticket types loaded:', Array.isArray(ticketData) ? ticketData.length : 'not array');
+          setTicketTypes(Array.isArray(ticketData) ? ticketData : []);
+        }
 
         // Fetch discount codes for this event
-        const discountRes = await fetch(`/api/proxy/discount-codes?eventId.equals=${eventId}&isActive.equals=true`);
-        let discountsArray: any[] = [];
+        const discountUrl = `/api/proxy/discount-codes?eventId.equals=${eventId}&isActive.equals=true`;
+        console.log('[CheckoutPage] Fetching discount codes:', discountUrl);
+
+        const discountRes = await fetch(discountUrl, {
+          cache: 'no-store',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        console.log('[CheckoutPage] Discount codes response status:', discountRes.status);
+
         if (discountRes.ok) {
           const discountData = await discountRes.json();
-          discountsArray = Array.isArray(discountData) ? discountData : [];
+          console.log('[CheckoutPage] Discount codes loaded:', Array.isArray(discountData) ? discountData.length : 'not array');
+          setAvailableDiscounts(Array.isArray(discountData) ? discountData : []);
+        } else {
+          console.warn('[CheckoutPage] Discount codes fetch failed:', discountRes.status);
+          setAvailableDiscounts([]);
         }
-        setAvailableDiscounts(discountsArray);
+      } catch (e: any) {
+        // Enhanced error logging for mobile debugging
+        const errorDetails = {
+          message: e?.message || String(e),
+          stack: e?.stack,
+          name: e?.name,
+          isMobile,
+          url: typeof window !== 'undefined' ? window.location.href : 'unknown',
+          eventId,
+        };
 
-        // --- Hero image selection logic (match home page) ---
-        let imageUrl = null;
-        // 1. Try flyer
-        const flyerRes = await fetch(`/api/proxy/event-medias?eventId.equals=${eventId}&eventFlyer.equals=true`);
-        if (flyerRes.ok) {
-          const flyerData = await flyerRes.json();
-          const flyerArray = Array.isArray(flyerData) ? flyerData : (flyerData ? [flyerData] : []);
-          if (flyerArray.length > 0 && flyerArray[0].fileUrl) {
-            imageUrl = flyerArray[0].fileUrl;
-          }
-        }
-        // 2. If no flyer, try featured
-        if (!imageUrl) {
-          // Try to get featured image
-          let featuredImageUrl;
-          try {
-            const featuredRes = await fetch(`/api/proxy/event-medias?eventId.equals=${eventId}&isFeaturedImage.equals=true`);
-            if (featuredRes.ok) {
-              const featuredData = await featuredRes.json();
-              if (Array.isArray(featuredData) && featuredData.length > 0) {
-                featuredImageUrl = featuredData[0].fileUrl;
-              }
-            }
-          } catch (error) {
-            console.error('Error fetching featured image:', error);
-          }
-        }
-        // 3. Fallback to default
-        if (!imageUrl) {
-          imageUrl = defaultHeroImageUrl;
-        }
-        setHeroImageUrl(imageUrl);
+        console.error('[CheckoutPage] CRITICAL ERROR loading checkout page:', errorDetails);
 
-        // CRITICAL MOBILE FIX: Store all fetched data in sessionStorage for restoration after remounts
-        storeFetchedDataInStorage({
-          event: eventData,
-          ticketTypes: ticketTypesArray,
-          availableDiscounts: discountsArray,
-          heroImageUrl: imageUrl,
+        // Log to console.error for mobile browser debugging
+        if (isMobile) {
+          console.error('[CheckoutPage] MOBILE ERROR DETAILS:', JSON.stringify(errorDetails, null, 2));
+        }
+
+        // Forward critical errors to CloudWatch via client logger
+        logger.critical('Failed to load checkout page', {
+          error: errorDetails.message,
+          eventId,
+          isMobile,
+          userAgent: typeof window !== 'undefined' ? navigator.userAgent : undefined,
+          url: errorDetails.url,
         });
 
-        console.log('[CheckoutPage] ✅ DATA STORED in sessionStorage', {
-          eventId: currentEventIdStr,
-          hasEvent: !!eventData,
-          ticketTypesCount: ticketTypesArray.length,
-          discountsCount: discountsArray.length,
-          hasHeroImage: !!imageUrl
-        });
-      } catch (e) {
         setEvent(null);
         setTicketTypes([]);
         setHeroImageUrl(defaultHeroImageUrl);
+        setAvailableDiscounts([]);
       } finally {
-        // SIMPLE: Just set loading to false like legacy code
         setLoading(false);
         isFetchingRef.current = false;
-        if (eventId) {
-          // Use string value to ensure stable comparison
-          const eventIdStr = typeof eventId === 'string' ? eventId : Array.isArray(eventId) ? eventId[0] : String(eventId);
-          fetchedEventIdRef.current = eventIdStr ? eventIdStr : null;
-          setFetchedEventIdInStorage(eventIdStr || '');
-        }
+        // Mark this eventId as fetched (success or failure)
+        fetchedEventIdRef.current = eventId;
       }
     }
-
-    // SIMPLE: Just check if we have eventId - match legacy code exactly
-    if (eventId) {
-      fetchData();
-    } else {
-      console.log('[CheckoutPage] ⚠️ SKIP - No eventId');
-    }
-    // eslint-disable-next-line
+    if (eventId) fetchData();
   }, [eventId]);
 
-  // Reactive calculation for total and discount changes.  These are the new changes
-
+  // Reactive calculation for total and discount
   useEffect(() => {
     const subtotal = Object.entries(selectedTickets).reduce((total, [ticketId, quantity]) => {
       const ticket = ticketTypes.find(t => t.id === parseInt(ticketId));
@@ -650,490 +457,109 @@ export default function CheckoutPage() {
 
     if (appliedDiscount) {
       if (appliedDiscount.discountType === 'PERCENTAGE') {
-        amountSaved = subtotal * (appliedDiscount.discountValue / 100);
-      } else if (appliedDiscount.discountType === 'FIXED_AMOUNT') {
-        amountSaved = Math.min(subtotal, appliedDiscount.discountValue);
+        const discountValue = (subtotal * appliedDiscount.discountValue) / 100;
+        amountSaved = discountValue;
+        finalAmount = subtotal - discountValue;
+      } else if (appliedDiscount.discountType === 'FIXED') {
+        amountSaved = appliedDiscount.discountValue;
+        finalAmount = Math.max(0, subtotal - appliedDiscount.discountValue);
       }
-      finalAmount = Math.max(0, subtotal - amountSaved);
-
-      if (amountSaved > 0) {
-        setDiscountSuccessMessage(`Discount '${appliedDiscount.code}' applied! You saved $${amountSaved.toFixed(2)}.`);
-      }
-    } else {
-      setDiscountSuccessMessage('');
     }
 
     setTotalAmount(finalAmount);
     setSavedAmount(amountSaved);
-  }, [selectedTickets, appliedDiscount, ticketTypes]);
+  }, [selectedTickets, ticketTypes, appliedDiscount]);
 
-  // Helper function to calculate remaining quantity (matches rendering logic)
-  // CRITICAL: Handles NULL/zero values properly - zero or null is OK as long as sold doesn't exceed available
-  // Only mark as sold out if soldQuantity >= availableQuantity (both must be valid numbers)
-  const calculateRemainingQuantity = (ticket: any): number => {
-    if (!ticket) return 0;
-
-    // Use backend remainingQuantity if explicitly provided (not NULL/undefined)
-    if (ticket.remainingQuantity != null && ticket.remainingQuantity !== undefined) {
-      return Math.max(0, ticket.remainingQuantity); // Ensure non-negative
-    }
-
-    // Calculate from availableQuantity and soldQuantity
-    // Handle NULL/undefined values: treat as 0 for calculation
-    const availableQty = ticket.availableQuantity ?? 0;
-    const soldQty = ticket.soldQuantity ?? 0;
-
-    // CRITICAL: If availableQuantity is null/undefined/0, allow tickets (treat as unlimited)
-    // Only restrict if we have valid availableQuantity AND soldQuantity exceeds it
-    if (availableQty === null || availableQty === undefined || availableQty === 0) {
-      // No restriction - allow ticket selection (treat as unlimited or not yet set)
-      return 999999; // Large number to allow selection
-    }
-
-    // Calculate remaining: available - sold
-    const calculatedRemaining = availableQty - soldQty;
-
-    // Return calculated value (can be negative if sold exceeds available, but we'll handle that in isSoldOut check)
-    return Math.max(0, calculatedRemaining);
-  };
-
-  const handleTicketChange = (ticketId: number, quantity: number) => {
-    console.log('[handleTicketChange] Called:', { ticketId, quantity, selectedTickets });
-
-    const ticketType = ticketTypes.find(t => t.id === ticketId);
-    if (!ticketType) {
-      console.log('[handleTicketChange] Ticket type not found:', ticketId);
-      return;
-    }
-
-    // Use the same calculation logic as rendering
-    const remaining = calculateRemainingQuantity(ticketType);
-
-    const isSoldOut = remaining <= 0;
-
-    console.log('[handleTicketChange] Ticket availability:', {
-      ticketName: ticketType.name,
-      availableQuantity: ticketType.availableQuantity,
-      soldQuantity: ticketType.soldQuantity,
-      remainingQuantity: ticketType.remainingQuantity,
-      calculatedRemaining: remaining,
-      remaining,
-      isSoldOut,
-      currentSelected: selectedTickets[ticketId] || 0
-    });
-
-    if (isSoldOut) {
-      console.log(`[handleTicketChange] Cannot select tickets for ${ticketType.name} - sold out`);
-      return;
-    }
-
-    // Calculate the maximum quantity that can be selected
-    const maxOrderQuantity = ticketType.maxQuantityPerOrder ?? 10;
-    const maxSelectable = Math.min(remaining, maxOrderQuantity);
-    const newQuantity = Math.max(0, Math.min(quantity, maxSelectable));
-
-    console.log('[handleTicketChange] Quantity calculation:', {
-      quantity,
-      maxOrderQuantity,
-      maxSelectable,
-      newQuantity
-    });
-
-    if (newQuantity >= 0) {
-      console.log('[handleTicketChange] Updating selectedTickets:', { ticketId, newQuantity });
-      setSelectedTickets(prev => {
-        const updated = { ...prev, [ticketId]: newQuantity };
-        console.log('[handleTicketChange] New selectedTickets state:', updated);
-        return updated;
-      });
-      // Clear email to force re-validation and PRB recalculation with new total
-      setEmail('');
-      // Trigger immediate email validation to show user they need to enter email
-      if (newQuantity > 0) {
-        setEmailError(true); // Show email error immediately when tickets are selected
-      } else {
-        setEmailError(false); // Hide email error when no tickets are selected
-      }
-    }
-  };
-
-  const calculateSubtotal = () => {
-    return Object.entries(selectedTickets).reduce((total, [ticketId, quantity]) => {
-      const ticket = ticketTypes.find(t => t.id === parseInt(ticketId));
-      return total + (ticket?.price || 0) * quantity;
-    }, 0);
-  };
-
-  const isTicketTypeAvailable = (ticketType: any, quantity: number) => {
-    if (!ticketType) return false;
-
-    // CRITICAL: Prioritize remainingQuantity from backend if provided (source of truth)
-    // If remainingQuantity is provided and > 0, tickets are available
-    // Only use soldQty >= availableQty check if remainingQuantity is not provided
-    const hasRemainingQuantity = ticketType.remainingQuantity != null && ticketType.remainingQuantity !== undefined;
-    const isSoldOut = hasRemainingQuantity
-      ? ticketType.remainingQuantity <= 0  // Use backend remainingQuantity as source of truth
-      : (() => {
-        // Fallback: check if sold >= available (only if remainingQuantity not provided)
-        const availableQty = ticketType.availableQuantity ?? 0;
-        const soldQty = ticketType.soldQuantity ?? 0;
-        return availableQty > 0 && soldQty >= availableQty;
-      })();
-
-    if (isSoldOut) return false;
-
-    const remaining = calculateRemainingQuantity(ticketType);
-    const maxOrderQuantity = ticketType.maxQuantityPerOrder ?? 10;
-    return remaining > 0 && remaining >= Math.min(quantity, maxOrderQuantity);
-  };
-
-  const emailIsValid = useMemo(() => {
-    if (!email) return false;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  }, [email]);
-
-  // Derived flags used for validations and enabling/disabling actions
-  const hasTicketsSelected = Object.values(selectedTickets).some(q => q > 0);
-  const hasUnavailableTickets = Object.entries(selectedTickets).some(([ticketId, quantity]) => {
-    if (quantity === 0) return false;
-    const ticket = ticketTypes.find(t => t.id === parseInt(ticketId));
-    if (!ticket) return false;
-
-    // CRITICAL: Prioritize remainingQuantity from backend if provided
-    // If remainingQuantity is provided and > 0, tickets are available
-    const hasRemainingQuantity = ticket.remainingQuantity != null && ticket.remainingQuantity !== undefined;
-    const isSoldOut = hasRemainingQuantity
-      ? ticket.remainingQuantity <= 0  // Use backend remainingQuantity as source of truth
-      : (() => {
-        // Fallback: check if sold >= available (only if remainingQuantity not provided)
-        const availableQty = ticket.availableQuantity ?? 0;
-        const soldQty = ticket.soldQuantity ?? 0;
-        return availableQty > 0 && soldQty >= availableQty;
-      })();
-
-    // Use the same calculation logic as rendering
-    const remaining = calculateRemainingQuantity(ticket);
-    console.log('[hasUnavailableTickets] Checking ticket:', {
-      ticketId,
-      ticketName: ticket.name,
-      quantity,
-      availableQuantity: ticket.availableQuantity,
-      soldQuantity: ticket.soldQuantity,
-      remainingQuantity: ticket.remainingQuantity,
-      calculatedRemaining: remaining,
-      isSoldOut,
-      hasRemainingQuantity
-    });
-
-    return isSoldOut; // Only consider completely sold out tickets
-  });
-  const canCheckout = hasTicketsSelected && emailIsValid && !hasUnavailableTickets;
-
+  // Validate discount code
   const validateAndApplyDiscount = (code: string) => {
-    if (Object.values(selectedTickets).every(q => q === 0)) {
-      setDiscountError('Please select tickets before applying a discount.');
+    if (!code.trim()) {
+      setAppliedDiscount(null);
+      setDiscountError('');
+      setDiscountSuccessMessage('');
       return null;
     }
 
-    setDiscountError('');
-    const codeToValidate = code.trim().toLowerCase();
+    const discount = availableDiscounts.find(
+      d => d.code.toLowerCase() === code.toLowerCase() && d.isActive
+    );
 
-    if (!codeToValidate) {
-      setAppliedDiscount(null); // Clear discount if input is empty
-      return null;
-    }
-
-    const codeToApply = availableDiscounts.find(d => d.code.toLowerCase() === codeToValidate);
-
-    if (codeToApply) {
-      if (codeToApply.usesCount >= (codeToApply.maxUses || Infinity)) {
-        setDiscountError('This discount code has reached its maximum usage limit.');
-        setAppliedDiscount(null);
-        return null;
-      } else {
-        setAppliedDiscount(codeToApply); // Success! Set the discount object.
-        return codeToApply;
-      }
-    } else {
-      setDiscountError('Invalid code. Please clear the field or enter a valid code to proceed.');
+    if (!discount) {
+      setDiscountError('Invalid discount code');
+      setDiscountSuccessMessage('');
       setAppliedDiscount(null);
       return null;
     }
+
+    // Check if discount is expired
+    if (discount.expiryDate) {
+      const expiryDate = new Date(discount.expiryDate);
+      if (expiryDate < new Date()) {
+        setDiscountError('Discount code has expired');
+        setDiscountSuccessMessage('');
+        setAppliedDiscount(null);
+        return null;
+      }
+    }
+
+    setAppliedDiscount(discount);
+    setDiscountError('');
+    setDiscountSuccessMessage(`Discount "${discount.code}" applied successfully!`);
+    return discount;
   };
 
-  const handleApplyDiscount = () => {
-    // Validation 1: No tickets selected
-    if (Object.values(selectedTickets).every(q => q === 0)) {
-      setDiscountError('Please select at least one ticket before applying a discount.');
-      return;
-    }
-    // Validation 2: Discount code is empty
-    if (!discountCode.trim()) {
-      setDiscountError('Please enter the discount code.');
-      return;
-    }
+  const handleDiscountApply = () => {
     setDiscountError('');
     validateAndApplyDiscount(discountCode);
   };
 
-  // Handle payment success - redirect to success page
-  const handlePaymentSuccess = useCallback((transactionId: string) => {
-    console.log('[CheckoutPage] Payment successful, transactionId:', transactionId);
-    router.push(`/event/success?transactionId=${transactionId}&eventId=${eventId}`);
-  }, [router, eventId]);
-
-  // Handle payment error - show alert
-  const handlePaymentError = useCallback((error: string) => {
-    console.error('[CheckoutPage] Payment error:', error);
-    alert(`Payment failed: ${error}. Please try again.`);
-  }, []);
-
-  // MOBILE FIX: Memoize payment cart to prevent unnecessary re-renders
-  const paymentCart = useMemo(() => {
+  // Build cart for UniversalPaymentCheckout
+  const cart = useMemo(() => {
     return Object.entries(selectedTickets)
       .filter(([, quantity]) => quantity > 0)
       .map(([ticketId, quantity]) => {
         const ticketType = ticketTypes.find(t => t.id === parseInt(ticketId));
         return { ticketType, quantity };
-      });
+      })
+      .filter(item => item.ticketType);
   }, [selectedTickets, ticketTypes]);
 
-  // MOBILE FIX: Memoize payment props to prevent re-renders from form state changes
-  const paymentProps = useMemo(() => ({
-    cart: paymentCart,
-    eventId: String(eventId),
+  const amountCents = useMemo(() => Math.round(totalAmount * 100), [totalAmount]);
+
+  // CRITICAL FIX: Memoize customer info to prevent unnecessary re-renders
+  // These don't need to trigger Stripe Elements remounting
+  const customerInfo = useMemo(() => ({
     email,
-    customerName: firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || undefined,
-    customerPhone: phone || undefined,
-    discountCodeId: appliedDiscount?.id ?? null,
-    enabled: canCheckout,
-    amountCents: Math.round(totalAmount * 100),
-    paymentUseCase: PaymentUseCase.TICKET_SALE,
-    returnUrl: typeof window !== 'undefined' ? `${window.location.origin}/event/success` : '/event/success',
-    cancelUrl: typeof window !== 'undefined' ? window.location.origin : '/',
-  }), [
-    paymentCart,
-    eventId,
-    email,
-    firstName,
-    lastName,
-    phone,
-    appliedDiscount?.id,
-    canCheckout,
-    totalAmount,
-  ]);
+    name: firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || undefined,
+    phone: phone || undefined,
+  }), [email, firstName, lastName, phone]);
 
-  // MOBILE FIX: Memoize callbacks to prevent re-renders
-  const handleInvalidClick = useCallback(() => {
-    if (!emailIsValid) setEmailError(true);
-    if (!hasTicketsSelected) alert('Please select at least one ticket.');
-    if (hasUnavailableTickets) alert('Some selected tickets are sold out. Please adjust your selection.');
-  }, [emailIsValid, hasTicketsSelected, hasUnavailableTickets]);
+  // Enable payment when form is valid
+  // Only enable after user has interacted with the form (prevents auto-fill from triggering payment)
+  useEffect(() => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const isValid = email && emailRegex.test(email) && cart.length > 0 && amountCents > 0;
+    // Only enable if user has actually selected tickets (not just auto-filled)
+    const hasUserSelectedTickets = Object.values(selectedTickets).some(qty => qty > 0);
+    setPaymentEnabled(isValid && hasUserSelectedTickets);
+  }, [email, cart, amountCents, selectedTickets]);
 
-  // CRITICAL FIX: Match legacy code - use setExpressCheckoutLoading directly
-  // Legacy code uses: onLoadingChange={setExpressCheckoutLoading}
-  // Using useCallback with empty deps ensures stable reference (prevents re-renders)
-  // This matches the legacy pattern exactly
-  const handleLoadingChange = useCallback((loading: boolean) => {
-    setExpressCheckoutLoading(loading);
-  }, []);
+  // Handle payment success
+  const handlePaymentSuccess = (transactionId: string) => {
+    console.log('[CheckoutPage] Payment successful, transactionId:', transactionId);
+    // Redirect to success page with transaction ID
+    router.push(`/event/success?transactionId=${transactionId}&eventId=${eventId}`);
+  };
 
-  // PaymentSection is now defined outside the component to prevent recreation on every render
+  // Handle payment error
+  const handlePaymentError = (error: string) => {
+    console.error('[CheckoutPage] Payment error:', error);
+    alert(`Payment error: ${error}`);
+  };
 
-  // CRITICAL FIX: Memoize renderOrderSummary to prevent infinite re-renders
-  // The function was being recreated on every render, causing infinite loops
-  const renderOrderSummary = useCallback(() => {
-    // REMOVED: Debug logging - was causing noise and performance issues
-    // The function is now memoized, so it won't be recreated on every render
-
-    // Safety check - only render if component is ready
-    // CRITICAL ANTI-FLICKER: Use effectiveLoading instead of loading
-    const effectiveLoading = loading && !dataReadyRef.current;
-    if (!mounted || effectiveLoading || !eventId) {
-      return (
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-500 mx-auto mb-2"></div>
-          <p className="text-sm text-gray-600">Loading payment options...</p>
-        </div>
-      );
-    }
-
+  if (loading || !mounted) {
     return (
-      <>
-        {/* Discount Code Section - Always visible */}
-        <div className="mb-6">
-          <label htmlFor="discountCode" className="block text-sm font-medium text-gray-700 mb-2">
-            Discount Code {availableDiscounts.length > 0 && <span className="text-gray-500 text-sm">(Optional)</span>}
-          </label>
-          <div className="space-y-3">
-            <input
-              type="text"
-              id="discountCode"
-              value={discountCode}
-              onChange={(e) => {
-                setDiscountCode(e.target.value);
-                // Clear errors when user types
-                if (discountError) setDiscountError('');
-                if (discountSuccessMessage) setDiscountSuccessMessage('');
-              }}
-              placeholder="Enter discount code"
-              className="w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
-            />
-            <button
-              type="button"
-              onClick={handleApplyDiscount}
-              className="w-full bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 disabled:bg-blue-300 font-semibold flex items-center justify-center gap-2"
-              disabled={!discountCode.trim()}
-            >
-              <FaTags />
-              Apply
-            </button>
-          </div>
-          {discountError && <p className="text-red-500 text-sm mt-2">{discountError}</p>}
-          {discountSuccessMessage && <p className="text-green-600 text-sm mt-2">{discountSuccessMessage}</p>}
-          {appliedDiscount && (
-            <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-md">
-              <p className="text-sm text-green-800">
-                <strong>{appliedDiscount.code}</strong> applied: {appliedDiscount.discountType === 'PERCENTAGE'
-                  ? `${appliedDiscount.discountValue}% off`
-                  : `$${appliedDiscount.discountValue} off`}
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Total */}
-        <div className="border-t border-gray-200 pt-6 mb-6">
-          <div className="flex justify-between items-center mb-4">
-            <span className="text-lg font-medium text-gray-600">Total:</span>
-            <span className="text-2xl font-bold text-gray-900">${totalAmount.toFixed(2)}</span>
-          </div>
-
-          {/* Warning for sold out tickets */}
-          {hasUnavailableTickets && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-              <div className="flex items-center text-red-700 text-sm">
-                <span className="mr-2">⚠️</span>
-                <span>Some selected tickets are sold out</span>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Email and Checkout */}
-        <div>
-          {/* Show requirement indicator when tickets are selected */}
-          {hasTicketsSelected && (
-            <div className="mb-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
-              <div className="flex items-center text-blue-700 text-sm">
-                <span className="mr-2">📧</span>
-                <span>Email required to enable payment options</span>
-              </div>
-            </div>
-          )}
-
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-            Email for ticket confirmation
-          </label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              if (emailError) setEmailError(false);
-            }}
-            className={`mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base ${emailError ? 'border-red-500' : 'border-gray-400'}`}
-            required
-            placeholder="you@example.com"
-          />
-          {emailError && (
-            <p className="text-red-500 text-xs mt-1">
-              {email ? 'Please enter a valid email address.' : 'Please enter your email address to proceed with payment.'}
-            </p>
-          )}
-        </div>
-
-        {/* First Name */}
-        <div>
-          <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
-            First Name
-          </label>
-          <input
-            type="text"
-            id="firstName"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
-            placeholder="John"
-          />
-        </div>
-
-        {/* Last Name */}
-        <div>
-          <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
-            Last Name
-          </label>
-          <input
-            type="text"
-            id="lastName"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
-            placeholder="Doe"
-          />
-        </div>
-
-        {/* Phone */}
-        <div>
-          <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-            Phone Number (optional)
-          </label>
-          <input
-            type="tel"
-            id="phone"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
-            placeholder="+1 (555) 123-4567"
-          />
-        </div>
-
-        {/* Universal Payment Checkout - Backend-integrated */}
-        {/* MOBILE FIX: Isolated payment section prevents form state changes from causing flickering */}
-        <div className="mt-4">
-          <PaymentSection
-            {...paymentProps}
-            onInvalidClick={handleInvalidClick}
-            onSuccess={handlePaymentSuccess}
-            onError={handlePaymentError}
-            onLoadingChange={handleLoadingChange}
-          />
-        </div>
-      </>
-    );
-  }, [mounted, loading, eventId, event, ticketTypes, selectedTickets, email, emailIsValid, hasTicketsSelected, hasUnavailableTickets, availableDiscounts, discountCode, appliedDiscount, totalAmount, canCheckout, paymentCart, paymentProps, handleInvalidClick, handlePaymentSuccess, handlePaymentError, handleLoadingChange, discountError, discountSuccessMessage, emailError, firstName, lastName, phone, handleApplyDiscount]);
-
-  // SIMPLE APPROACH: Match legacy code - just check loading state
-  // CRITICAL FIX: Check restored data ref FIRST - if we have restored data, use it synchronously
-  // This prevents flickering when React state updates are async
-  // Use effective values throughout render to prevent flickering
-  const effectiveEvent = restoredDataRef.current?.event || event;
-  const effectiveTicketTypes = restoredDataRef.current?.ticketTypes || ticketTypes;
-  const effectiveAvailableDiscounts = restoredDataRef.current?.availableDiscounts || availableDiscounts;
-  const effectiveHeroImageUrl = restoredDataRef.current?.heroImageUrl ?? heroImageUrl;
-
-  // CRITICAL FIX: Also check if data is ready (restored from sessionStorage OR already loaded)
-  // This prevents flickering when data is restored but loading state hasn't updated yet
-  // React state updates are async, so we need to check refs AND actual data
-  // If we have event data (from ref or state), don't show loading screen even if loading state is true
-  if (loading && !dataReadyRef.current && !effectiveEvent) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex flex-col" style={{ overflowX: 'hidden' }}>
-        {/* TEMPORARY DEBUG: Debug log viewer for mobile browser debugging */}
-        <DebugLogViewer />
-        {/* HERO SECTION - Full width bleeding to header */}
+      <div className="min-h-screen bg-gray-100 flex flex-col">
+        {/* Hero Image Section */}
         <section className="hero-section" style={{
           position: 'relative',
           marginTop: '0',
@@ -1144,14 +570,13 @@ export default function CheckoutPage() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: '80px 0 0 0'
+          padding: '80px 0 0 0',
+          opacity: 0.7
         }}>
-          <Image
+          <img
             src={heroImageUrl || defaultHeroImageUrl}
             alt="Event Hero"
-            width={1200}
-            height={400}
-            className="hero-image object-cover"
+            className="hero-image"
             style={{
               margin: '0 auto',
               padding: '0',
@@ -1162,138 +587,43 @@ export default function CheckoutPage() {
               objectFit: 'cover',
               borderRadius: '0'
             }}
-            priority
           />
-          <div className="hero-overlay" style={{ opacity: 0.1, height: '5px', padding: '20' }}></div>
         </section>
 
-        {/* Responsive Hero Image CSS */}
-        <style dangerouslySetInnerHTML={{
-          __html: `
-            .hero-image {
-              width: 100%;
-              max-width: 100%;
-              height: auto;
-              object-fit: cover;
-              object-position: center;
-              display: block;
-              margin: 0 auto;
-              padding: 0;
-              border-radius: 0;
-            }
-
-            .hero-section {
-              min-height: 15vh;
-              background-color: transparent !important;
-              padding: 80px 0 0 0 !important;
-              width: 100% !important;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              overflow: hidden;
-            }
-
-            @media (max-width: 768px) {
-              .hero-image {
-                width: 100%;
-                max-width: 100%;
-                height: auto;
-                padding: 0;
-                border-radius: 0;
-              }
-
-              .hero-section {
-                padding: 95px 0 15px 0 !important;
-                min-height: 12vh !important;
-              }
-            }
-
-            @media (max-width: 480px) {
-              .hero-image {
-                width: 100%;
-                padding: 0;
-                border-radius: 0;
-              }
-
-              .hero-section {
-                padding: 90px 0 10px 0 !important;
-                min-height: 10vh !important;
-              }
-            }
-          `
-        }} />
-
-        {/* Loading content - flex-grow to push footer down */}
-        <div className="flex-grow flex flex-col items-center justify-center min-h-[200px] p-6 animate-pulse" style={{ marginTop: '150px', paddingTop: '60px' }}>
+        {/* Loading Message Overlay */}
+        <div className="flex-grow flex flex-col items-center justify-center min-h-[400px] p-6" style={{
+          marginTop: '-300px',
+          position: 'relative',
+          zIndex: 10
+        }}>
           <Image
             src="/images/selling-tickets-vector-loading-image.jpg"
             alt="Ticket Loading"
             width={180}
             height={180}
-            className="mb-4 rounded shadow-lg"
+            className="mb-4 rounded shadow-lg bg-white p-4"
             priority
           />
-          <div className="text-xl font-bold text-teal-700 mb-2">Please wait while your tickets are being loaded...</div>
-          <div className="text-gray-600 text-base text-center">This may take a few moments.<br />Please do not close or refresh this page.</div>
+          <div className="text-xl font-bold text-teal-700 mb-2 bg-white px-4 py-2 rounded shadow">Please wait while your tickets are being loaded...</div>
+          <div className="text-gray-600 text-base text-center bg-white px-4 py-2 rounded shadow">This may take a few moments.<br />Please do not close or refresh this page.</div>
         </div>
       </div>
     );
   }
-  // CRITICAL FIX: Use effectiveEvent (from ref or state) to check if event exists
-  // This prevents "Event not found" when data is restored but state hasn't updated yet
-  if (!effectiveEvent && !dataReadyRef.current && !loading) {
+
+  // CRITICAL FIX: Only show "event not found" if we're done loading AND event is still null
+  // This prevents premature "event not found" message during mobile browser re-hydration
+  if (!event && !loading) {
     return <div className="min-h-screen flex items-center justify-center text-xl text-red-600">Event not found.</div>;
   }
 
-  // If loading or data is being restored, show loading screen instead of "Event not found"
-  if (!effectiveEvent && (loading || dataReadyRef.current)) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex flex-col" style={{ overflowX: 'hidden' }}>
-        <DebugLogViewer />
-        <section className="hero-section" style={{
-          position: 'relative',
-          marginTop: '0',
-          backgroundColor: 'transparent',
-          minHeight: '400px',
-          overflow: 'hidden',
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '80px 0 0 0'
-        }}>
-          <Image
-            src={heroImageUrl || defaultHeroImageUrl}
-            alt="Event Hero"
-            width={1200}
-            height={400}
-            className="hero-image object-cover"
-            style={{
-              margin: '0 auto',
-              padding: '0',
-              display: 'block',
-              width: '100%',
-              height: '400px',
-              objectFit: 'cover'
-            }}
-          />
-        </section>
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading event...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const hasTicketsSelected = Object.values(selectedTickets).some(qty => qty > 0);
+  const emailIsValid = email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const canCheckout = hasTicketsSelected && emailIsValid && amountCents > 0;
 
-  // --- HERO SECTION (prompt-compliant) ---
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col" style={{ overflowX: 'hidden' }}>
-      {/* TEMPORARY DEBUG: Debug log viewer for mobile browser debugging */}
-      <DebugLogViewer />
-      {/* HERO SECTION - Full width bleeding to header */}
+      {/* Hero Section */}
       <section className="hero-section" style={{
         position: 'relative',
         marginTop: '0',
@@ -1321,275 +651,312 @@ export default function CheckoutPage() {
             borderRadius: '0'
           }}
         />
-        <div className="hero-overlay" style={{ opacity: 0.1, height: '5px', padding: '20' }}></div>
       </section>
 
-      {/* Responsive Hero Image CSS */}
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          .hero-image {
-            width: 100%;
-            max-width: 100%;
-            height: auto;
-            object-fit: cover;
-            object-position: center;
-            display: block;
-            margin: 0 auto;
-            padding: 0;
-            border-radius: 0;
-          }
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1">
+        <div className="max-w-4xl mx-auto">
+          {/* Event Details & Form Section */}
+          <div>
+            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+              <h1 className="text-3xl font-bold text-gray-900 mb-4">{event.title}</h1>
 
-          .hero-section {
-            min-height: 15vh;
-            background-color: transparent !important;
-            padding: 80px 0 0 0 !important;
-            width: 100% !important;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-          }
-
-          @media (max-width: 768px) {
-            .hero-image {
-              width: 100%;
-              max-width: 100%;
-              height: auto;
-              padding: 0;
-              border-radius: 0;
-            }
-
-            .hero-section {
-              padding: 95px 0 15px 0 !important;
-              min-height: 12vh !important;
-            }
-          }
-
-          @media (max-width: 480px) {
-            .hero-image {
-              width: 100%;
-              padding: 0;
-              border-radius: 0;
-            }
-
-            .hero-section {
-              padding: 90px 0 10px 0 !important;
-              min-height: 10vh !important;
-            }
-          }
-        `
-      }} />
-
-      {/* Cancelled Payment Message */}
-      {showCancelledMessage && (
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-            <div className="flex items-start">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-yellow-800">
-                  Payment Cancelled
-                </h3>
-                <div className="mt-2 text-sm text-yellow-700">
-                  <p>Your payment was cancelled. You can try again with a different payment method.</p>
-                  {cancelledPaymentInfo && (
-                    <p className="mt-1 text-xs text-yellow-600">
-                      Payment ID: {cancelledPaymentInfo.pi} (Status: {cancelledPaymentInfo.status})
-                    </p>
-                  )}
-                </div>
-                <div className="mt-3">
-                  <button
-                    type="button"
-                    onClick={() => setShowCancelledMessage(false)}
-                    className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-md text-sm font-medium hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
-                  >
-                    Dismiss
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="flex-grow max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Event Details Card */}
-        <div className="bg-teal-50 rounded-xl shadow-lg p-6 md:p-8 mb-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
-            {effectiveEvent.title}
-          </h2>
-          {effectiveEvent.caption && (
-            <div className="text-lg text-teal-700 font-semibold mb-2">{effectiveEvent.caption}</div>
-          )}
-          <div className="space-y-3 mb-4">
-            <div className="flex items-center gap-2 text-gray-700">
-              <span className="text-xl">📅</span>
-              <span className="font-semibold">
-                {formatInTimeZone(effectiveEvent.startDate, effectiveEvent.timezone || 'America/New_York', 'EEEE, MMMM d, yyyy')}
-              </span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-700">
-              <span className="text-xl">🕐</span>
-              <span className="font-semibold">
-                {formatTime(effectiveEvent.startTime)}{effectiveEvent.endTime ? ` - ${formatTime(effectiveEvent.endTime)}` : ''} ({formatInTimeZone(effectiveEvent.startDate, effectiveEvent.timezone || 'America/New_York', 'zzz')})
-              </span>
-            </div>
-            {effectiveEvent.location && (
-              <div className="flex items-center gap-2 text-gray-700">
-                <LocationDisplay location={effectiveEvent.location} />
-              </div>
-            )}
-            {effectiveEvent.venueName && (
-              <div className="flex items-center gap-2 text-gray-700">
-                <span className="text-xl">🏢</span>
-                <span className="font-semibold">{effectiveEvent.venueName}</span>
-              </div>
-            )}
-          </div>
-          <p className="text-gray-700 text-base">{effectiveEvent.description}</p>
-        </div>
-
-        {/* Ticket Selection Section */}
-        <div className="bg-slate-50 rounded-xl shadow-lg p-6 md:p-8 mb-8">
-          <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800">Select Your Tickets</h2>
-          <div className="space-y-6">
-            {ticketTypes.length === 0 && (
-              <div className="text-center text-gray-500 py-8">No ticket types available for this event.</div>
-            )}
-            {ticketTypes.map(ticket => {
-              // REMOVED: Debug log - was causing noise in logs
-              // The re-renders are the real issue, not ticket data
-
-              // Calculate remaining quantity using the same helper function
-              const remainingQuantity = calculateRemainingQuantity(ticket);
-
-              // Check if tickets are sold out
-              // CRITICAL: Prioritize remainingQuantity from backend if provided
-              // If remainingQuantity is provided and > 0, tickets are available
-              // Only use soldQty >= availableQty check if remainingQuantity is not provided
-              const hasRemainingQuantity = ticket.remainingQuantity != null && ticket.remainingQuantity !== undefined;
-              const isSoldOut = hasRemainingQuantity
-                ? ticket.remainingQuantity <= 0  // Use backend remainingQuantity as source of truth
-                : (() => {
-                  // Fallback: check if sold >= available (only if remainingQuantity not provided)
-                  const availableQty = ticket.availableQuantity ?? 0;
-                  const soldQty = ticket.soldQuantity ?? 0;
-                  return availableQty > 0 && soldQty >= availableQty;
-                })();
-              const maxOrderQuantity = ticket.maxQuantityPerOrder ?? 10;
-
-              return (
-                <div key={ticket.id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 border border-gray-200 rounded-lg bg-white shadow-sm relative">
-                  {/* Sold Out Image Only */}
-                  {isSoldOut && (
-                    <div className="absolute top-4 right-4 z-10">
-                      <Image
-                        src="/images/tickets_sold_out.jpg"
-                        alt="Tickets Sold Out"
-                        width={60}
-                        height={60}
-                        className="rounded shadow-sm"
-                      />
+              <div className="space-y-4 mb-6">
+                {event.startDate && (
+                  <div className="flex items-start gap-3">
+                    <FaCalendarAlt className="text-teal-600 mt-1" />
+                    <div>
+                      <p className="font-semibold text-gray-800">Date</p>
+                      <p className="text-gray-600">
+                        {formatInTimeZone(event.startDate, event.timezone || 'America/New_York', 'EEEE, MMMM d, yyyy')}
+                      </p>
                     </div>
-                  )}
+                  </div>
+                )}
 
-                  <div className="mb-4 sm:mb-0">
-                    <h3 className="text-xl font-semibold text-gray-900">{ticket.name}</h3>
-                    <p className="text-lg font-bold text-blue-600 mt-1">${ticket.price.toFixed(2)}</p>
-                    <p className="text-sm text-gray-600 mt-2">{ticket.description}</p>
+                {event.startTime && event.endTime && (
+                  <div className="flex items-start gap-3">
+                    <FaClock className="text-teal-600 mt-1" />
+                    <div>
+                      <p className="font-semibold text-gray-800">Time</p>
+                      <p className="text-gray-600">{event.startTime} - {event.endTime}</p>
+                    </div>
+                  </div>
+                )}
 
-                    {/* Low stock warning only */}
-                    {!isSoldOut && remainingQuantity <= 5 && remainingQuantity > 0 && (
-                      <div className="mt-3">
-                        <p className="text-sm text-orange-600 font-medium">
-                          ⚠️ Low stock - only {remainingQuantity} left!
-                        </p>
+                {event.location && (
+                  <div className="flex items-start gap-3">
+                    <FaMapMarkerAlt className="text-teal-600 mt-1" />
+                    <div>
+                      <p className="font-semibold text-gray-800">Location</p>
+                      <LocationDisplay location={event.location} />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Ticket Selection */}
+            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Select Tickets</h2>
+
+              {ticketTypes.length === 0 ? (
+                <p className="text-gray-600">No tickets available for this event.</p>
+              ) : (
+                <div className="space-y-4">
+                  {ticketTypes.map((ticket) => (
+                    <div key={ticket.id} className="border border-gray-200 rounded-lg p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h3 className="font-semibold text-lg text-gray-900">{ticket.name}</h3>
+                          {ticket.description && (
+                            <p className="text-sm text-gray-600 mt-1">{ticket.description}</p>
+                          )}
+                          <p className="text-xl font-bold text-teal-600 mt-2">
+                            ${ticket.price.toFixed(2)}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => {
+                              const currentQty = selectedTickets[ticket.id] || 0;
+                              if (currentQty > 0) {
+                                setSelectedTickets({ ...selectedTickets, [ticket.id]: currentQty - 1 });
+                              }
+                            }}
+                            className="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center hover:border-teal-500 disabled:opacity-50"
+                            disabled={(selectedTickets[ticket.id] || 0) === 0}
+                          >
+                            -
+                          </button>
+                          <span className="text-lg font-semibold w-8 text-center">
+                            {selectedTickets[ticket.id] || 0}
+                          </span>
+                          <button
+                            onClick={() => {
+                              const currentQty = selectedTickets[ticket.id] || 0;
+                              setSelectedTickets({ ...selectedTickets, [ticket.id]: currentQty + 1 });
+                            }}
+                            className="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center hover:border-teal-500"
+                          >
+                            +
+                          </button>
+                        </div>
                       </div>
-                    )}
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const currentQty = selectedTickets[ticket.id] || 0;
-                        handleTicketChange(ticket.id, currentQty - 1);
-                      }}
-                      className="bg-gray-200 text-gray-700 px-3 py-1 rounded-l-md hover:bg-gray-300 transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
-                      disabled={isSoldOut || (selectedTickets[ticket.id] || 0) <= 0}
-                    >
-                      -
-                    </button>
-                    <span className="px-4 py-1 bg-white border-t border-b border-gray-200 min-w-[3rem] text-center">
-                      {selectedTickets[ticket.id] || 0}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const currentQty = selectedTickets[ticket.id] || 0;
-                        handleTicketChange(ticket.id, currentQty + 1);
-                      }}
-                      className="bg-gray-200 text-gray-700 px-3 py-1 rounded-r-md hover:bg-gray-300 transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
-                      disabled={isSoldOut || (selectedTickets[ticket.id] || 0) >= Math.min(remainingQuantity, maxOrderQuantity)}
-                    >
-                      +
-                    </button>
-                  </div>
-
-                  {/* Quantity validation warning */}
-                  {selectedTickets[ticket.id] > 0 && selectedTickets[ticket.id] > remainingQuantity && (
-                    <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
-                      ⚠️ Only {remainingQuantity} tickets available for this selection
                     </div>
-                  )}
+                  ))}
                 </div>
-              );
-            })}
-          </div>
-        </div>
+              )}
+            </div>
 
-        {/* Order Summary Section - Full width below tickets */}
-        <div className="bg-slate-50 rounded-xl shadow-lg p-6 md:p-8">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800">Order Summary</h2>
-          {renderOrderSummary()}
+            {/* Customer Information */}
+            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Your Information</h2>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Email <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setEmailError(false);
+                    }}
+                    className={`w-full px-4 py-2 border rounded-md ${emailError ? 'border-red-500' : 'border-gray-300'}`}
+                    placeholder="your@email.com"
+                    required
+                  />
+                  {emailError && <p className="text-red-500 text-sm mt-1">Please enter a valid email address</p>}
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                    <input
+                      type="text"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md"
+                      placeholder="First Name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                    <input
+                      type="text"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-md"
+                      placeholder="Last Name"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md"
+                    placeholder="(555) 123-4567"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Discount Code */}
+            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Discount Code</h2>
+
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={discountCode}
+                  onChange={(e) => {
+                    setDiscountCode(e.target.value);
+                    setDiscountError('');
+                    setDiscountSuccessMessage('');
+                  }}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-md"
+                  placeholder="Enter discount code"
+                />
+                <button
+                  onClick={handleDiscountApply}
+                  className="px-6 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700"
+                >
+                  Apply
+                </button>
+              </div>
+
+              {discountError && (
+                <p className="text-red-500 text-sm mt-2">{discountError}</p>
+              )}
+              {discountSuccessMessage && (
+                <p className="text-green-600 text-sm mt-2">{discountSuccessMessage}</p>
+              )}
+              {appliedDiscount && (
+                <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-md">
+                  <p className="text-sm text-green-800">
+                    <strong>{appliedDiscount.code}</strong> applied: {appliedDiscount.discountType === 'PERCENTAGE'
+                      ? `${appliedDiscount.discountValue}% off`
+                      : `$${appliedDiscount.discountValue} off`}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Order Summary & Payment - Full Width at Bottom */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Order Summary</h2>
+
+              <div className="space-y-2 mb-4">
+                {cart.length === 0 ? (
+                  <p className="text-gray-600 text-sm">No tickets selected.</p>
+                ) : (
+                  cart.map((item) => (
+                    <div key={item.ticketType.id} className="flex justify-between text-sm">
+                      <span>{item.ticketType.name} x {item.quantity}</span>
+                      <span>${(item.ticketType.price * item.quantity).toFixed(2)}</span>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {appliedDiscount && (
+                <div className="border-t border-gray-200 pt-2 mb-2">
+                  <div className="flex justify-between text-sm text-green-600">
+                    <span>Discount ({appliedDiscount.code})</span>
+                    <span>-${savedAmount.toFixed(2)}</span>
+                  </div>
+                </div>
+              )}
+
+              <div className="border-t border-gray-200 pt-4 mt-4">
+                <div className="flex justify-between text-xl font-bold">
+                  <span>Total</span>
+                  <span>${totalAmount.toFixed(2)}</span>
+                </div>
+              </div>
+
+              {/* Payment Options Section */}
+              {/* CRITICAL FIX: Always render payment component to prevent unmount/remount flickering */}
+              {/* Use enabled prop to control behavior instead of conditional rendering */}
+              <div className="mt-6 border-t border-gray-200 pt-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Payment Options</h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  Choose your preferred payment method. We accept Apple Pay, Google Pay, and all major credit cards.
+                </p>
+                <UniversalPaymentCheckout
+                  cart={cart}
+                  eventId={eventId as string}
+                  email={customerInfo.email}
+                  customerName={customerInfo.name}
+                  customerPhone={customerInfo.phone}
+                  discountCodeId={appliedDiscount?.id || null}
+                  enabled={paymentEnabled}
+                  amountCents={amountCents}
+                  paymentUseCase={PaymentUseCase.TICKET_SALE}
+                  returnUrl={`${window.location.origin}/event/success`}
+                  cancelUrl={window.location.origin}
+                  onSuccess={handlePaymentSuccess}
+                  onError={handlePaymentError}
+                  onLoadingChange={setIsProcessing}
+                />
+              </div>
+
+              {!canCheckout && (
+                <div className="mt-6 p-4 bg-gray-50 rounded-md text-center text-gray-600">
+                  {!hasTicketsSelected && <p>Please select at least one ticket</p>}
+                  {hasTicketsSelected && !emailIsValid && <p>Please enter a valid email address</p>}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
-      <Modal open={showDiscountModal} onClose={() => setShowDiscountModal(false)} title="Discount Code Error">
-        <div className="text-center">
-          <p className="text-lg">
-            Please enter valid discount code or clear the field before proceeding.
-          </p>
-          <div className="mt-6 flex justify-center gap-4">
-            <button
-              onClick={() => setShowDiscountModal(false)}
-              className="bg-teal-100 hover:bg-teal-200 text-teal-800 px-4 py-2 rounded-md flex items-center gap-2"
-            >
-              OK
-            </button>
-          </div>
+
+      {/* MOBILE DEBUG: Debug log viewer - floating button */}
+      {/* CRITICAL: Enable in production for mobile debugging */}
+      <div className="fixed bottom-4 right-4 z-50">
+          <button
+            onClick={() => setShowDebugLogs(!showDebugLogs)}
+            className="bg-purple-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-purple-700"
+          >
+            {showDebugLogs ? 'Hide' : 'Show'} Debug Logs ({debugLogsRef.current.length})
+          </button>
+          {showDebugLogs && (
+            <div className="mt-2 bg-black text-white p-4 rounded-lg shadow-xl max-w-2xl max-h-96 overflow-auto">
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="font-bold">Debug Console Logs</h3>
+                <button
+                  onClick={() => {
+                    debugLogsRef.current = [];
+                    setDisplayedLogs([]);
+                  }}
+                  className="text-xs bg-red-600 px-2 py-1 rounded"
+                >
+                  Clear
+                </button>
+              </div>
+              <div className="text-xs font-mono space-y-1">
+                {displayedLogs.length === 0 ? (
+                  <p className="text-gray-400">No logs captured yet</p>
+                ) : (
+                  displayedLogs.map((log, index) => (
+                    <div key={index} className="border-b border-gray-700 pb-1">
+                      {log}
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
         </div>
-      </Modal>
     </div>
   );
 }
 
-function formatTime(time: string): string {
-  if (!time) return '';
-  // Accepts 'HH:mm' or 'hh:mm AM/PM' and returns 'hh:mm AM/PM'
-  if (time.match(/AM|PM/i)) return time;
-  const [hourStr, minute] = time.split(':');
-  let hour = parseInt(hourStr, 10);
-  const ampm = hour >= 12 ? 'PM' : 'AM';
-  hour = hour % 12;
-  if (hour === 0) hour = 12;
-  return `${hour.toString().padStart(2, '0')}:${minute} ${ampm}`;
-}
