@@ -130,20 +130,6 @@ interface TicketQrClientProps {
 }
 
 export default function TicketQrClient({ initialPi, initialSessionId }: TicketQrClientProps) {
-  // IMMEDIATE LOGGING - Before any hooks
-  if (typeof window !== 'undefined') {
-    console.log('[QR CLIENT] ===== CLIENT-SIDE RENDER =====');
-    console.log('[QR CLIENT] URL:', window.location.href);
-    console.log('[QR CLIENT] Search params:', window.location.search);
-    console.log('[QR CLIENT] Props received:', { initialPi, initialSessionId });
-    const urlParams = new URLSearchParams(window.location.search);
-    console.log('[QR CLIENT] Payment Intent from URL:', urlParams.get('pi'));
-    console.log('[QR CLIENT] Session ID from URL:', urlParams.get('session_id'));
-  } else {
-    console.log('[QR CLIENT] ===== SERVER-SIDE RENDER =====');
-    console.log('[QR CLIENT SSR] Props received:', { initialPi, initialSessionId });
-  }
-
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -155,11 +141,21 @@ export default function TicketQrClient({ initialPi, initialSessionId }: TicketQr
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Mark as mounted on client to prevent hydration issues
+  // Mark as mounted on client and do all initial logging in useEffect
   useEffect(() => {
+    console.log('[QR CLIENT] ===== CLIENT-SIDE RENDER =====');
     console.log('[QR CLIENT] Component mounting on client');
+    console.log('[QR CLIENT] URL:', window.location.href);
+    console.log('[QR CLIENT] Search params:', window.location.search);
+    console.log('[QR CLIENT] Props received:', { initialPi, initialSessionId });
+    const urlParams = new URLSearchParams(window.location.search);
+    console.log('[QR CLIENT] Payment Intent from URL:', urlParams.get('pi'));
+    console.log('[QR CLIENT] Session ID from URL:', urlParams.get('session_id'));
+    console.log('[MOBILE QR] TicketQrClient mounted');
+    console.log('[MOBILE QR] Window location:', window.location.href);
+    console.log('[MOBILE QR] User Agent:', navigator.userAgent);
     setMounted(true);
-  }, []);
+  }, [initialPi, initialSessionId]);
 
   // Helper function to add logs that will be visible in error screen
   const addApiLog = (message: string) => {
@@ -167,24 +163,11 @@ export default function TicketQrClient({ initialPi, initialSessionId }: TicketQr
     setApiLogs(prev => [...prev, `${new Date().toLocaleTimeString()}: ${message}`]);
   };
 
-  console.log('[QR CLIENT DEBUG] State and hooks initialized');
-
-  // Component initialization
-  console.log('[MOBILE QR] TicketQrClient mounted');
-  console.log('[MOBILE QR] Window location:', typeof window !== 'undefined' ? window.location.href : 'SSR');
-  console.log('[MOBILE QR] User Agent:', typeof window !== 'undefined' ? navigator.userAgent : 'SSR');
-
   // Get session_id or payment_intent from URL params or sessionStorage
   // Initialize with props from server
   const [session_id, setSessionId] = useState<string | null>(initialSessionId || null);
   const [payment_intent, setPaymentIntent] = useState<string | null>(initialPi || null);
   const [identifier, setIdentifier] = useState<string | null>(initialPi || initialSessionId || null);
-
-  console.log('[QR CLIENT] Initial state set:', {
-    session_id: initialSessionId,
-    payment_intent: initialPi,
-    identifier: initialPi || initialSessionId
-  });
 
   // Initialize parameters on client side to avoid SSR issues
   useEffect(() => {
