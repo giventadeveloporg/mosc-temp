@@ -12,6 +12,7 @@ import LocationDisplay from '@/components/LocationDisplay';
 import { getAppUrl } from '@/lib/env';
 import type { PaymentTransactionDTO, EventTicketTransactionDTO, EventDetailsDTO } from '@/types';
 import { sendTicketEmailAsync } from '@/lib/emailUtils';
+import MobileDebugConsole from '@/components/MobileDebugConsole';
 
 interface PaymentSuccessClientProps {
   transactionId: string;
@@ -60,13 +61,16 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
   const router = useRouter();
   const [loading, setLoading] = useState(true);
 
-  // Log safety guarantee on mount (only in development)
+  // Log safety guarantee on mount (always log for mobile debugging)
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[PaymentSuccessClient] ✅ SAFE TO REFRESH: All operations are read-only. No duplicate purchases will occur.');
-      console.log('[PaymentSuccessClient] Transaction ID:', transactionId);
-    }
-  }, [transactionId]);
+    console.log('[PaymentSuccessClient] ===== COMPONENT MOUNTED =====');
+    console.log('[PaymentSuccessClient] ✅ SAFE TO REFRESH: All operations are read-only. No duplicate purchases will occur.');
+    console.log('[PaymentSuccessClient] Transaction ID:', transactionId);
+    console.log('[PaymentSuccessClient] Event ID Param:', eventIdParam);
+    console.log('[PaymentSuccessClient] User Agent:', navigator.userAgent);
+    console.log('[PaymentSuccessClient] Current URL:', window.location.href);
+    console.log('[PaymentSuccessClient] Timestamp:', new Date().toISOString());
+  }, [transactionId, eventIdParam]);
   const [polling, setPolling] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [paymentTransaction, setPaymentTransaction] = useState<PaymentTransactionDTO | null>(null);
@@ -128,9 +132,16 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
   // Fetch payment status function
   async function fetchPaymentStatus(): Promise<PaymentTransactionDTO | null> {
     const baseUrl = getAppUrl();
+    console.log('[PaymentSuccessClient] ===== FETCHING PAYMENT STATUS =====');
+    console.log('[PaymentSuccessClient] Base URL:', baseUrl);
+    console.log('[PaymentSuccessClient] Transaction ID:', transactionId);
+    console.log('[PaymentSuccessClient] Full URL:', `${baseUrl}/api/proxy/payments/${transactionId}`);
+
     const paymentRes = await fetch(`${baseUrl}/api/proxy/payments/${transactionId}`, {
       cache: 'no-store',
     });
+
+    console.log('[PaymentSuccessClient] Payment response status:', paymentRes.status, paymentRes.statusText);
 
     if (!paymentRes.ok) {
       // Handle 400 Bad Request for PENDING transactions without Stripe payment intent ID
@@ -1443,6 +1454,9 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
           </button>
         </div>
       </div>
+
+      {/* Mobile Debug Console - Only visible on mobile browsers */}
+      <MobileDebugConsole />
     </div>
   );
 }
