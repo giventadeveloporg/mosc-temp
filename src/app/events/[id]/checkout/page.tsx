@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useMemo, useRef, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { FaTags, FaCreditCard, FaCalendarAlt, FaClock, FaMapMarkerAlt, FaMapPin, FaTicketAlt, FaUser, FaEnvelope, FaMoneyBillWave, FaReceipt } from 'react-icons/fa';
 import { Modal } from '@/components/Modal';
@@ -267,6 +267,36 @@ export default function CheckoutPage() {
 
   useEffect(() => { setMounted(true); }, []);
 
+  // CRITICAL FIX: Check sessionStorage synchronously on mount to prevent flickering
+  // This runs BEFORE the first render completes, so we can restore data early
+  // if data exists in sessionStorage
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    // Check if we have stored data for the current eventId
+    const storedFetchedId = getFetchedEventIdFromStorage();
+    const currentEventIdStr = typeof eventId === 'string' ? eventId : Array.isArray(eventId) ? eventId[0] : String(eventId || '');
+
+    if (storedFetchedId === currentEventIdStr && storedFetchedId) {
+      const storedData = restoreFetchedDataFromStorage();
+      if (storedData && storedData.event) {
+        // CRITICAL: Set refs FIRST to prevent loading screen flash
+        dataReadyRef.current = true;
+        fetchedEventIdRef.current = currentEventIdStr ? currentEventIdStr : null;
+        isFetchingRef.current = false;
+        // CRITICAL: Also restore state synchronously to prevent "Event not found"
+        setLoading(false);
+        setExpressCheckoutLoading(false);
+        setEvent(storedData.event);
+        setTicketTypes(storedData.ticketTypes);
+        setAvailableDiscounts(storedData.availableDiscounts);
+        if (storedData.heroImageUrl) {
+          setHeroImageUrl(storedData.heroImageUrl);
+        }
+      }
+    }
+  }, [eventId, getFetchedEventIdFromStorage, restoreFetchedDataFromStorage]);
+
   // REMOVED: Complex restoration useEffect - it was causing flickering
   // Legacy code doesn't have this - restoration is handled inside fetch useEffect
 
@@ -380,7 +410,7 @@ export default function CheckoutPage() {
 
       // SIMPLE: Check sessionStorage FIRST (like legacy but with restoration)
       const storedFetchedId = getFetchedEventIdFromStorage();
-      const currentEventIdStr = typeof eventId === 'string' ? eventId : Array.isArray(eventId) ? eventId[0] : String(eventId);
+      const currentEventIdStr = typeof eventId === 'string' ? eventId : Array.isArray(eventId) ? (eventId[0] || String(eventId)) : String(eventId || '');
 
       // If we have stored data for this eventId, restore it immediately
       if (storedFetchedId === currentEventIdStr && storedFetchedId) {
@@ -526,8 +556,8 @@ export default function CheckoutPage() {
         if (eventId) {
           // Use string value to ensure stable comparison
           const eventIdStr = typeof eventId === 'string' ? eventId : Array.isArray(eventId) ? eventId[0] : String(eventId);
-          fetchedEventIdRef.current = eventIdStr;
-          setFetchedEventIdInStorage(eventIdStr);
+          fetchedEventIdRef.current = eventIdStr ? eventIdStr : null;
+          setFetchedEventIdInStorage(eventIdStr || '');
         }
       }
     }
@@ -1020,10 +1050,11 @@ export default function CheckoutPage() {
   }, [mounted, loading, eventId, event, ticketTypes, selectedTickets, email, emailIsValid, hasTicketsSelected, hasUnavailableTickets, availableDiscounts, discountCode, appliedDiscount, totalAmount, canCheckout, paymentCart, paymentProps, handleInvalidClick, handlePaymentSuccess, handlePaymentError, handleLoadingChange, discountError, discountSuccessMessage, emailError, firstName, lastName, phone, handleApplyDiscount]);
 
   // SIMPLE APPROACH: Match legacy code - just check loading state
-  // CRITICAL FIX: Also check if data is ready (restored from sessionStorage)
+  // CRITICAL FIX: Also check if data is ready (restored from sessionStorage OR already loaded)
   // This prevents flickering when data is restored but loading state hasn't updated yet
-  // React state updates are async, so we need to check refs too
-  if (loading && !dataReadyRef.current) {
+  // React state updates are async, so we need to check refs AND actual data
+  // If we have event data, don't show loading screen even if loading state is true
+  if (loading && !dataReadyRef.current && !event) {
     return (
       <div className="min-h-screen bg-gray-100 flex flex-col" style={{ overflowX: 'hidden' }}>
         {/* TEMPORARY DEBUG: Debug log viewer for mobile browser debugging */}
@@ -1134,8 +1165,53 @@ export default function CheckoutPage() {
       </div>
     );
   }
-  if (!event) {
+  // CRITICAL FIX: Don't show "Event not found" if data is being restored from sessionStorage
+  // React state updates are async, so event might be null even if dataReadyRef indicates data exists
+  if (!event && !dataReadyRef.current && !loading) {
     return <div className="min-h-screen flex items-center justify-center text-xl text-red-600">Event not found.</div>;
+  }
+
+  // If loading or data is being restored, show loading screen instead of "Event not found"
+  if (!event && (loading || dataReadyRef.current)) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex flex-col" style={{ overflowX: 'hidden' }}>
+        <DebugLogViewer />
+        <section className="hero-section" style={{
+          position: 'relative',
+          marginTop: '0',
+          backgroundColor: 'transparent',
+          minHeight: '400px',
+          overflow: 'hidden',
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '80px 0 0 0'
+        }}>
+          <Image
+            src={heroImageUrl || defaultHeroImageUrl}
+            alt="Event Hero"
+            width={1200}
+            height={400}
+            className="hero-image object-cover"
+            style={{
+              margin: '0 auto',
+              padding: '0',
+              display: 'block',
+              width: '100%',
+              height: '400px',
+              objectFit: 'cover'
+            }}
+          />
+        </section>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading event...</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   // --- HERO SECTION (prompt-compliant) ---
