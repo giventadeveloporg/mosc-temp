@@ -176,6 +176,9 @@ export default function CheckoutPage() {
   const lastFetchAttemptRef = useRef(0);
   // CRITICAL ANTI-FLICKER: Track if data is confirmed ready (prevents any loading state changes)
   const dataReadyRef = useRef(false);
+  // CRITICAL FIX: Store restored data in ref for synchronous access during render
+  // This prevents flickering when React state updates are async
+  const restoredDataRef = useRef<{ event: any; ticketTypes: any[]; availableDiscounts: any[]; heroImageUrl: string | null } | null>(null);
   // Stabilization delay: Wait 150ms after restoration check before allowing fetch
   // This ensures React state updates complete and prevents race conditions
   const STABILIZATION_DELAY_MS = 150;
@@ -354,11 +357,18 @@ export default function CheckoutPage() {
     // CRITICAL FIX: If ref says we fetched but event is null, restore from sessionStorage
     // This handles the case where component remounted and state was lost but ref persisted
     if (fetchedEventIdStr && fetchedEventIdStr === currentEventIdStr) {
-      if (!event) {
-        // Ref says we fetched, but event is null - restore from sessionStorage
+      if (!event && !restoredDataRef.current) {
+        // Ref says we fetched, but event is null and ref doesn't have data - restore from sessionStorage
         const storedData = restoreFetchedDataFromStorage();
         if (storedData && storedData.event) {
           console.log('[CheckoutPage] 🔄 RESTORING - Ref set but event null, restoring from sessionStorage');
+          // Store in ref FIRST for synchronous access
+          restoredDataRef.current = {
+            event: storedData.event,
+            ticketTypes: storedData.ticketTypes,
+            availableDiscounts: storedData.availableDiscounts,
+            heroImageUrl: storedData.heroImageUrl || null,
+          };
           dataReadyRef.current = true;
           setLoading(false);
           setExpressCheckoutLoading(false);
@@ -416,6 +426,14 @@ export default function CheckoutPage() {
             storedId: storedFetchedId,
             currentId: currentEventIdStr,
           });
+          // CRITICAL: Store restored data in ref FIRST for synchronous access during render
+          // This prevents flickering when React state updates are async
+          restoredDataRef.current = {
+            event: storedData.event,
+            ticketTypes: storedData.ticketTypes,
+            availableDiscounts: storedData.availableDiscounts,
+            heroImageUrl: storedData.heroImageUrl || null,
+          };
           // CRITICAL: Set refs and loading FIRST to prevent flickering
           // Use string value to ensure stable comparison
           fetchedEventIdRef.current = currentEventIdStr ? currentEventIdStr : null;
@@ -1046,11 +1064,19 @@ export default function CheckoutPage() {
   }, [mounted, loading, eventId, event, ticketTypes, selectedTickets, email, emailIsValid, hasTicketsSelected, hasUnavailableTickets, availableDiscounts, discountCode, appliedDiscount, totalAmount, canCheckout, paymentCart, paymentProps, handleInvalidClick, handlePaymentSuccess, handlePaymentError, handleLoadingChange, discountError, discountSuccessMessage, emailError, firstName, lastName, phone, handleApplyDiscount]);
 
   // SIMPLE APPROACH: Match legacy code - just check loading state
+  // CRITICAL FIX: Check restored data ref FIRST - if we have restored data, use it synchronously
+  // This prevents flickering when React state updates are async
+  // Use effective values throughout render to prevent flickering
+  const effectiveEvent = restoredDataRef.current?.event || event;
+  const effectiveTicketTypes = restoredDataRef.current?.ticketTypes || ticketTypes;
+  const effectiveAvailableDiscounts = restoredDataRef.current?.availableDiscounts || availableDiscounts;
+  const effectiveHeroImageUrl = restoredDataRef.current?.heroImageUrl ?? heroImageUrl;
+
   // CRITICAL FIX: Also check if data is ready (restored from sessionStorage OR already loaded)
   // This prevents flickering when data is restored but loading state hasn't updated yet
   // React state updates are async, so we need to check refs AND actual data
-  // If we have event data, don't show loading screen even if loading state is true
-  if (loading && !dataReadyRef.current && !event) {
+  // If we have event data (from ref or state), don't show loading screen even if loading state is true
+  if (loading && !dataReadyRef.current && !effectiveEvent) {
     return (
       <div className="min-h-screen bg-gray-100 flex flex-col" style={{ overflowX: 'hidden' }}>
         {/* TEMPORARY DEBUG: Debug log viewer for mobile browser debugging */}
@@ -1161,14 +1187,14 @@ export default function CheckoutPage() {
       </div>
     );
   }
-  // CRITICAL FIX: Don't show "Event not found" if data is being restored from sessionStorage
-  // React state updates are async, so event might be null even if dataReadyRef indicates data exists
-  if (!event && !dataReadyRef.current && !loading) {
+  // CRITICAL FIX: Use effectiveEvent (from ref or state) to check if event exists
+  // This prevents "Event not found" when data is restored but state hasn't updated yet
+  if (!effectiveEvent && !dataReadyRef.current && !loading) {
     return <div className="min-h-screen flex items-center justify-center text-xl text-red-600">Event not found.</div>;
   }
 
   // If loading or data is being restored, show loading screen instead of "Event not found"
-  if (!event && (loading || dataReadyRef.current)) {
+  if (!effectiveEvent && (loading || dataReadyRef.current)) {
     return (
       <div className="min-h-screen bg-gray-100 flex flex-col" style={{ overflowX: 'hidden' }}>
         <DebugLogViewer />
@@ -1343,37 +1369,37 @@ export default function CheckoutPage() {
         {/* Event Details Card */}
         <div className="bg-teal-50 rounded-xl shadow-lg p-6 md:p-8 mb-8">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
-            {event.title}
+            {effectiveEvent.title}
           </h2>
-          {event.caption && (
-            <div className="text-lg text-teal-700 font-semibold mb-2">{event.caption}</div>
+          {effectiveEvent.caption && (
+            <div className="text-lg text-teal-700 font-semibold mb-2">{effectiveEvent.caption}</div>
           )}
           <div className="space-y-3 mb-4">
             <div className="flex items-center gap-2 text-gray-700">
               <span className="text-xl">📅</span>
               <span className="font-semibold">
-                {formatInTimeZone(event.startDate, event.timezone || 'America/New_York', 'EEEE, MMMM d, yyyy')}
+                {formatInTimeZone(effectiveEvent.startDate, effectiveEvent.timezone || 'America/New_York', 'EEEE, MMMM d, yyyy')}
               </span>
             </div>
             <div className="flex items-center gap-2 text-gray-700">
               <span className="text-xl">🕐</span>
               <span className="font-semibold">
-                {formatTime(event.startTime)}{event.endTime ? ` - ${formatTime(event.endTime)}` : ''} ({formatInTimeZone(event.startDate, event.timezone || 'America/New_York', 'zzz')})
+                {formatTime(effectiveEvent.startTime)}{effectiveEvent.endTime ? ` - ${formatTime(effectiveEvent.endTime)}` : ''} ({formatInTimeZone(effectiveEvent.startDate, effectiveEvent.timezone || 'America/New_York', 'zzz')})
               </span>
             </div>
-            {event.location && (
+            {effectiveEvent.location && (
               <div className="flex items-center gap-2 text-gray-700">
-                <LocationDisplay location={event.location} />
+                <LocationDisplay location={effectiveEvent.location} />
               </div>
             )}
-            {event.venueName && (
+            {effectiveEvent.venueName && (
               <div className="flex items-center gap-2 text-gray-700">
                 <span className="text-xl">🏢</span>
-                <span className="font-semibold">{event.venueName}</span>
+                <span className="font-semibold">{effectiveEvent.venueName}</span>
               </div>
             )}
           </div>
-          <p className="text-gray-700 text-base">{event.description}</p>
+          <p className="text-gray-700 text-base">{effectiveEvent.description}</p>
         </div>
 
         {/* Ticket Selection Section */}
