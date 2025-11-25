@@ -362,11 +362,13 @@ export default function TicketQrClient({ initialPi, initialSessionId }: TicketQr
           } else {
             console.log('[MOBILE QR DEBUG] No transaction in GET response, will try POST');
             addApiLog('No transaction in GET response, attempting POST');
+            addApiLog(`GET response was: ${JSON.stringify(data).substring(0, 500)}`);
           }
         } else {
           const errorText = await getRes.text();
           console.error('[MOBILE QR DEBUG] GET request failed:', getRes.status, errorText);
           addApiLog(`GET request failed: ${getRes.status} - ${errorText.substring(0, 200)}`);
+          addApiLog('Will attempt POST to create transaction');
         }
 
         // If not found, POST to create it
@@ -400,18 +402,20 @@ export default function TicketQrClient({ initialPi, initialSessionId }: TicketQr
 
         if (!postRes.ok) {
           const errorText = await postRes.text();
-          addApiLog(`POST request failed: ${postRes.status} - ${errorText.substring(0, 200)}`);
+          console.error('[TicketQrClient] POST failed:', errorText);
+          addApiLog(`POST request failed: ${postRes.status} - ${errorText.substring(0, 500)}`);
           throw new Error(errorText);
         }
 
         const postData = await postRes.json();
+        console.log('[TicketQrClient] POST response data:', postData);
         addApiLog(`POST response received: ${JSON.stringify({
           hasTransaction: !!postData.transaction,
           transactionId: postData.transaction?.id,
           error: postData.error
         })}`);
 
-        if (!cancelled) {
+        if (postData.transaction && !cancelled) {
           console.log('[MOBILE QR DEBUG] Transaction created:', postData.transaction.id);
           addApiLog(`Transaction created successfully: ID ${postData.transaction.id}`);
           setResult(postData);
@@ -422,6 +426,10 @@ export default function TicketQrClient({ initialPi, initialSessionId }: TicketQr
             addApiLog('Mobile client will now fetch QR code after POST (credit card flow)');
             fetchQrCodeViaSingleton(postData);
           }, 300);
+        } else {
+          console.error('[TicketQrClient] POST succeeded but no transaction in response');
+          addApiLog(`POST succeeded but no transaction! Full response: ${JSON.stringify(postData).substring(0, 500)}`);
+          throw new Error('Transaction creation failed - no transaction in response');
         }
       } catch (err: any) {
         if (!cancelled) {
