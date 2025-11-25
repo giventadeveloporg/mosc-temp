@@ -126,8 +126,17 @@ class QrFetchSingleton {
 const qrSingleton = QrFetchSingleton.getInstance();
 
 export default function TicketQrClient() {
-  // Add immediate debug logging to see if component is even instantiated
-  console.log('[QR CLIENT DEBUG] TicketQrClient function called - component starting');
+  // IMMEDIATE LOGGING - Before any hooks
+  if (typeof window !== 'undefined') {
+    console.log('[QR CLIENT] ===== CLIENT-SIDE RENDER =====');
+    console.log('[QR CLIENT] URL:', window.location.href);
+    console.log('[QR CLIENT] Search params:', window.location.search);
+    const urlParams = new URLSearchParams(window.location.search);
+    console.log('[QR CLIENT] Payment Intent:', urlParams.get('pi'));
+    console.log('[QR CLIENT] Session ID:', urlParams.get('session_id'));
+  } else {
+    console.log('[QR CLIENT] ===== SERVER-SIDE RENDER =====');
+  }
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
