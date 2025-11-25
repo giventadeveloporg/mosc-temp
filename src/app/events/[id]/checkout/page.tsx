@@ -267,35 +267,8 @@ export default function CheckoutPage() {
 
   useEffect(() => { setMounted(true); }, []);
 
-  // CRITICAL FIX: Check sessionStorage synchronously on mount to prevent flickering
-  // This runs BEFORE the first render completes, so we can restore data early
-  // if data exists in sessionStorage
-  useLayoutEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    // Check if we have stored data for the current eventId
-    const storedFetchedId = getFetchedEventIdFromStorage();
-    const currentEventIdStr = typeof eventId === 'string' ? eventId : Array.isArray(eventId) ? eventId[0] : String(eventId || '');
-
-    if (storedFetchedId === currentEventIdStr && storedFetchedId) {
-      const storedData = restoreFetchedDataFromStorage();
-      if (storedData && storedData.event) {
-        // CRITICAL: Set refs FIRST to prevent loading screen flash
-        dataReadyRef.current = true;
-        fetchedEventIdRef.current = currentEventIdStr ? currentEventIdStr : null;
-        isFetchingRef.current = false;
-        // CRITICAL: Also restore state synchronously to prevent "Event not found"
-        setLoading(false);
-        setExpressCheckoutLoading(false);
-        setEvent(storedData.event);
-        setTicketTypes(storedData.ticketTypes);
-        setAvailableDiscounts(storedData.availableDiscounts);
-        if (storedData.heroImageUrl) {
-          setHeroImageUrl(storedData.heroImageUrl);
-        }
-      }
-    }
-  }, [eventId, getFetchedEventIdFromStorage, restoreFetchedDataFromStorage]);
+  // REMOVED: useLayoutEffect restoration - React state updates are async, so this doesn't work reliably
+  // Instead, we restore in the main useEffect and check if data exists before showing loading screen
 
   // REMOVED: Complex restoration useEffect - it was causing flickering
   // Legacy code doesn't have this - restoration is handled inside fetch useEffect
@@ -378,7 +351,26 @@ export default function CheckoutPage() {
         ? fetchedEventIdRef.current[0]
         : String(fetchedEventIdRef.current || '');
 
+    // CRITICAL FIX: If ref says we fetched but event is null, restore from sessionStorage
+    // This handles the case where component remounted and state was lost but ref persisted
     if (fetchedEventIdStr && fetchedEventIdStr === currentEventIdStr) {
+      if (!event) {
+        // Ref says we fetched, but event is null - restore from sessionStorage
+        const storedData = restoreFetchedDataFromStorage();
+        if (storedData && storedData.event) {
+          console.log('[CheckoutPage] 🔄 RESTORING - Ref set but event null, restoring from sessionStorage');
+          dataReadyRef.current = true;
+          setLoading(false);
+          setExpressCheckoutLoading(false);
+          setEvent(storedData.event);
+          setTicketTypes(storedData.ticketTypes);
+          setAvailableDiscounts(storedData.availableDiscounts);
+          if (storedData.heroImageUrl) {
+            setHeroImageUrl(storedData.heroImageUrl);
+          }
+          return; // Skip fetch - data restored
+        }
+      }
       console.log('[CheckoutPage] ✅ SKIP - Already processed this eventId (string comparison prevents infinite loop)', {
         fetchedId: fetchedEventIdStr,
         currentId: currentEventIdStr,
@@ -410,7 +402,11 @@ export default function CheckoutPage() {
 
       // SIMPLE: Check sessionStorage FIRST (like legacy but with restoration)
       const storedFetchedId = getFetchedEventIdFromStorage();
-      const currentEventIdStr = typeof eventId === 'string' ? eventId : Array.isArray(eventId) ? (eventId[0] || String(eventId)) : String(eventId || '');
+      const currentEventIdStr: string = typeof eventId === 'string'
+        ? eventId
+        : Array.isArray(eventId)
+          ? (eventId[0] ? String(eventId[0]) : String(eventId))
+          : String(eventId || '');
 
       // If we have stored data for this eventId, restore it immediately
       if (storedFetchedId === currentEventIdStr && storedFetchedId) {
