@@ -157,18 +157,26 @@ export default function TicketQrClient({ initialPi, initialSessionId }: TicketQr
 
   // Mark as mounted on client and do all initial logging in useEffect
   useEffect(() => {
-    console.log('[QR CLIENT] ===== CLIENT-SIDE RENDER =====');
-    console.log('[QR CLIENT] Component mounting on client');
-    console.log('[QR CLIENT] URL:', window.location.href);
-    console.log('[QR CLIENT] Search params:', window.location.search);
-    console.log('[QR CLIENT] Props received:', { initialPi, initialSessionId });
-    const urlParams = new URLSearchParams(window.location.search);
-    console.log('[QR CLIENT] Payment Intent from URL:', urlParams.get('pi'));
-    console.log('[QR CLIENT] Session ID from URL:', urlParams.get('session_id'));
-    console.log('[MOBILE QR] TicketQrClient mounted');
-    console.log('[MOBILE QR] Window location:', window.location.href);
-    console.log('[MOBILE QR] User Agent:', navigator.userAgent);
-    setMounted(true);
+    try {
+      console.log('[QR CLIENT VERSION] v2025-11-25-22:52 - All hydration fixes applied');
+      console.log('[QR CLIENT] ===== CLIENT-SIDE RENDER =====');
+      console.log('[QR CLIENT] Component mounting on client');
+      console.log('[QR CLIENT] URL:', window.location.href);
+      console.log('[QR CLIENT] Search params:', window.location.search);
+      console.log('[QR CLIENT] Props received:', { initialPi, initialSessionId });
+      const urlParams = new URLSearchParams(window.location.search);
+      console.log('[QR CLIENT] Payment Intent from URL:', urlParams.get('pi'));
+      console.log('[QR CLIENT] Session ID from URL:', urlParams.get('session_id'));
+      console.log('[MOBILE QR] TicketQrClient mounted');
+      console.log('[MOBILE QR] Window location:', window.location.href);
+      console.log('[MOBILE QR] User Agent:', navigator.userAgent);
+      setMounted(true);
+    } catch (error) {
+      console.error('[QR CLIENT] CRITICAL ERROR in mount useEffect:', error);
+      console.error('[QR CLIENT] Error stack:', error instanceof Error ? error.stack : 'No stack');
+      // Still set mounted even if logging fails
+      setMounted(true);
+    }
   }, [initialPi, initialSessionId]);
 
   // Initialize parameters on client side to avoid SSR issues
