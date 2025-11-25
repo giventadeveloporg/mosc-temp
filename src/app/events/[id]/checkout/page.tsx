@@ -394,6 +394,8 @@ export default function CheckoutPage() {
           // Use string value to ensure stable comparison
           fetchedEventIdRef.current = currentEventIdStr || null;
           isFetchingRef.current = false; // Mark as not fetching
+          // CRITICAL: Mark data as ready BEFORE setting loading to false
+          dataReadyRef.current = true;
           // CRITICAL: Set loading to false FIRST (before state updates) to prevent flicker
           // This ensures loading screen doesn't flash during state updates
           setLoading(false);
@@ -842,27 +844,16 @@ export default function CheckoutPage() {
 
   // PaymentSection is now defined outside the component to prevent recreation on every render
 
-  // Define renderOrderSummary function here, after all the required functions and variables
-  const renderOrderSummary = () => {
-    // Debug logging to help identify any undefined variables
-    console.log('[renderOrderSummary] Debug variables:', {
-      availableDiscounts: availableDiscounts?.length,
-      discountCode,
-      appliedDiscount: appliedDiscount?.id,
-      totalAmount,
-      hasUnavailableTickets,
-      hasTicketsSelected,
-      emailIsValid,
-      canCheckout,
-      email,
-      eventId
-    });
+  // CRITICAL FIX: Memoize renderOrderSummary to prevent infinite re-renders
+  // The function was being recreated on every render, causing infinite loops
+  const renderOrderSummary = useCallback(() => {
+    // REMOVED: Debug logging - was causing noise and performance issues
+    // The function is now memoized, so it won't be recreated on every render
 
     // Safety check - only render if component is ready
     // CRITICAL ANTI-FLICKER: Use effectiveLoading instead of loading
     const effectiveLoading = loading && !dataReadyRef.current;
     if (!mounted || effectiveLoading || !eventId) {
-      console.log('[renderOrderSummary] Component not ready, returning loading state');
       return (
         <div className="text-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-500 mx-auto mb-2"></div>
@@ -1025,7 +1016,7 @@ export default function CheckoutPage() {
         </div>
       </>
     );
-  };
+  }, [mounted, loading, eventId, event, ticketTypes, selectedTickets, email, emailIsValid, hasTicketsSelected, hasUnavailableTickets, availableDiscounts, discountCode, appliedDiscount, totalAmount, canCheckout, paymentCart, paymentProps, handleInvalidClick, handlePaymentSuccess, handlePaymentError, handleLoadingChange, discountError, discountSuccessMessage, emailError, firstName, lastName, phone, handleApplyDiscount]);
 
   // SIMPLE APPROACH: Match legacy code - just check loading state
   // Legacy code works because it's simple - no complex guards or refs

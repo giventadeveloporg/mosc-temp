@@ -275,9 +275,9 @@ export default function UniversalPaymentCheckout(props: Props) {
         paymentSectionActiveRef.current = true;
         hasAutoActivatedRef.current = true;
       } else {
-        console.log('[UniversalPaymentCheckout] Payment section not yet active, deferring initialization');
-        return;
-      }
+      console.log('[UniversalPaymentCheckout] Payment section not yet active, deferring initialization');
+      return;
+    }
     }
 
     // CRITICAL FIX: Don't re-initialize if we already have a valid session for the same cart
@@ -563,7 +563,7 @@ export default function UniversalPaymentCheckout(props: Props) {
           oldCartKey: effectCartKey,
           newCartKey: currentCartKey,
         });
-        cancelled = true;
+      cancelled = true;
       } else {
         console.log('[UniversalPaymentCheckout] Cleanup: Dependencies changed but cartKey same, allowing operation to complete', {
           cartKey: effectCartKey,
