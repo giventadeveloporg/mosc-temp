@@ -10,6 +10,7 @@ import { formatInTimeZone } from "date-fns-tz";
 import LocationDisplay from '@/components/LocationDisplay';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { sendTicketEmailAsync } from '@/lib/emailUtils';
+import MobileDebugConsole from '@/components/MobileDebugConsole';
 
 interface SuccessClientProps {
   session_id: string;
@@ -278,11 +279,26 @@ export default function SuccessClient({ session_id, payment_intent }: SuccessCli
     return <LoadingTicket sessionId={session_id} />;
   }
   if (error) {
+    console.error('[SuccessClient] Error state:', error);
+    console.error('[SuccessClient] Error context:', {
+      session_id,
+      payment_intent
+    });
+
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 text-center p-4">
         <FaInfoCircle className="text-4xl text-red-500 mb-4" />
         <h1 className="text-2xl font-bold text-gray-800">Error</h1>
         <p className="text-gray-600 mt-2">{error}</p>
+        <button
+          onClick={() => router.push('/')}
+          className="mt-4 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          Return Home
+        </button>
+
+        {/* Mobile Debug Console */}
+        <MobileDebugConsole />
       </div>
     );
   }
@@ -317,11 +333,29 @@ export default function SuccessClient({ session_id, payment_intent }: SuccessCli
     localStorage.removeItem('eventId');
   }
   if (!transaction) {
+    console.error('[SuccessClient] Transaction not found');
+    console.error('[SuccessClient] Transaction context:', {
+      session_id,
+      payment_intent,
+      hasResult: !!result,
+      resultKeys: result ? Object.keys(result) : []
+    });
+
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 text-center p-4">
         <FaInfoCircle className="text-4xl text-red-500 mb-4" />
         <h1 className="text-2xl font-bold text-gray-800">Transaction Not Found</h1>
         <p className="text-gray-600 mt-2">We could not find the details for your transaction. Please check your email for a confirmation.</p>
+        <p className="text-sm text-gray-500 mt-2">Payment Intent: {payment_intent || 'N/A'}</p>
+        <button
+          onClick={() => router.push('/')}
+          className="mt-4 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          Return Home
+        </button>
+
+        {/* Mobile Debug Console */}
+        <MobileDebugConsole />
       </div>
     );
   }

@@ -10,6 +10,7 @@ import {
 import { formatInTimeZone } from "date-fns-tz";
 import LocationDisplay from '@/components/LocationDisplay';
 import { sendTicketEmailAsync } from '@/lib/emailUtils';
+import MobileDebugConsole from '@/components/MobileDebugConsole';
 
 function formatTime(time: string): string {
   if (!time) return '';
@@ -445,17 +446,41 @@ export default function TicketQrClient() {
   }
 
   if (error) {
+    console.error('[TicketQrClient] Error state:', error);
+    console.error('[TicketQrClient] Error context:', {
+      session_id,
+      payment_intent,
+      identifier,
+      apiLogsCount: apiLogs.length
+    });
+
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 text-center p-4">
         <FaInfoCircle className="text-4xl text-red-500 mb-4" />
         <h1 className="text-2xl font-bold text-gray-800">Error</h1>
         <p className="text-gray-600 mt-2">{error}</p>
+
+        {/* Show API logs for debugging */}
+        {apiLogs.length > 0 && (
+          <div className="mt-4 p-4 bg-gray-50 rounded-lg text-left max-w-2xl w-full">
+            <h3 className="font-semibold text-sm text-gray-700 mb-2">Request Log:</h3>
+            <div className="text-xs text-gray-600 space-y-1 max-h-60 overflow-y-auto">
+              {apiLogs.map((log, i) => (
+                <div key={i}>{log}</div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <button
           onClick={() => router.push('/')}
           className="mt-4 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
         >
           Return Home
         </button>
+
+        {/* Mobile Debug Console */}
+        <MobileDebugConsole />
       </div>
     );
   }
@@ -463,17 +488,43 @@ export default function TicketQrClient() {
   const { transaction, userProfile, eventDetails, transactionItems, heroImageUrl: fetchedHeroImageUrl } = result || {};
 
   if (!transaction) {
+    console.error('[TicketQrClient] Transaction not found');
+    console.error('[TicketQrClient] Transaction context:', {
+      session_id,
+      payment_intent,
+      identifier,
+      hasResult: !!result,
+      resultKeys: result ? Object.keys(result) : []
+    });
+
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 text-center p-4">
         <FaInfoCircle className="text-4xl text-red-500 mb-4" />
         <h1 className="text-2xl font-bold text-gray-800">Transaction Not Found</h1>
         <p className="text-gray-600 mt-2">We could not find the details for your transaction.</p>
+        <p className="text-sm text-gray-500 mt-2">Payment Intent: {payment_intent || 'N/A'}</p>
+
+        {/* Show API logs for debugging */}
+        {apiLogs.length > 0 && (
+          <div className="mt-4 p-4 bg-gray-50 rounded-lg text-left max-w-2xl w-full">
+            <h3 className="font-semibold text-sm text-gray-700 mb-2">Request Log:</h3>
+            <div className="text-xs text-gray-600 space-y-1 max-h-60 overflow-y-auto">
+              {apiLogs.map((log, i) => (
+                <div key={i}>{log}</div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <button
           onClick={() => router.push('/')}
           className="mt-4 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
         >
           Return Home
         </button>
+
+        {/* Mobile Debug Console */}
+        <MobileDebugConsole />
       </div>
     );
   }
@@ -668,6 +719,9 @@ export default function TicketQrClient() {
           </button>
         </div>
       </div>
+
+      {/* Mobile Debug Console */}
+      <MobileDebugConsole />
     </div>
   );
 }

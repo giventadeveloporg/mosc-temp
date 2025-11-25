@@ -174,15 +174,19 @@ export async function POST(req: NextRequest) {
 
     // If no existing transaction, try to create via Stripe session processing
     let result = null;
+    const paymentIntentId = pi || (session_id?.startsWith('pi_') ? session_id : null);
+
     if (session_id) {
       if (session_id.startsWith('pi_')) {
         // Payment intent processing - convert to session_id first
         console.log('[API POST] Processing payment intent from session_id parameter:', session_id);
         const sessionId = await getSessionIdFromPaymentIntent(session_id);
         if (!sessionId) {
-          return NextResponse.json({ error: 'Could not find session for payment intent' }, { status: 404 });
+          console.log('[API POST] Could not find session for payment intent - will try fallback creation');
+          // Don't return error yet - try fallback below
+        } else {
+          result = await processStripeSessionServer(sessionId);
         }
-        result = await processStripeSessionServer(sessionId);
       } else {
         result = await processStripeSessionServer(session_id);
       }
@@ -191,9 +195,65 @@ export async function POST(req: NextRequest) {
       console.log('[API POST] Processing payment intent:', pi);
       const sessionId = await getSessionIdFromPaymentIntent(pi);
       if (!sessionId) {
-        return NextResponse.json({ error: 'Could not find session for payment intent' }, { status: 404 });
+        console.log('[API POST] Could not find session for payment intent - will try fallback creation');
+        // Don't return error yet - try fallback below
+      } else {
+        result = await processStripeSessionServer(sessionId);
       }
-      result = await processStripeSessionServer(sessionId);
+    }
+
+    // FALLBACK: If webhook failed and no session found, create transaction directly from payment intent
+    // This handles the case where Stripe webhook signature verification failed on AWS Lambda
+    if (!result && paymentIntentId) {
+      console.log('[API POST FALLBACK] Attempting to create transaction directly from payment intent:', paymentIntentId);
+      try {
+        const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+        console.log('[API POST FALLBACK] Retrieved payment intent:', {
+          id: paymentIntent.id,
+          status: paymentIntent.status,
+          amount: paymentIntent.amount,
+          metadata: paymentIntent.metadata
+        });
+
+        if (paymentIntent.status === 'succeeded' && paymentIntent.metadata) {
+          const { eventId, cart, customerEmail } = paymentIntent.metadata;
+
+          if (!eventId || !cart || !customerEmail) {
+            console.error('[API POST FALLBACK] Missing required metadata:', { eventId, cart, customerEmail });
+            return NextResponse.json({ error: 'Payment intent missing required metadata' }, { status: 400 });
+          }
+
+          console.log('[API POST FALLBACK] Creating transaction from payment intent metadata');
+
+          // Parse cart
+          const cartItems = JSON.parse(cart);
+
+          // Import create transaction function
+          const { createTransactionFromPaymentIntent } = await import('@/app/event/success/ApiServerActions');
+
+          // Create transaction
+          const transaction = await createTransactionFromPaymentIntent(
+            paymentIntent.id,
+            parseInt(eventId),
+            customerEmail,
+            cartItems,
+            paymentIntent.amount / 100 // Convert cents to dollars
+          );
+
+          console.log('[API POST FALLBACK] Transaction created successfully:', transaction.id);
+
+          result = { transaction, userProfile: null };
+        } else {
+          console.error('[API POST FALLBACK] Payment intent not succeeded or missing metadata:', {
+            status: paymentIntent.status,
+            hasMetadata: !!paymentIntent.metadata
+          });
+          return NextResponse.json({ error: 'Payment intent not completed' }, { status: 400 });
+        }
+      } catch (fallbackError: any) {
+        console.error('[API POST FALLBACK] Failed to create transaction from payment intent:', fallbackError);
+        return NextResponse.json({ error: `Fallback creation failed: ${fallbackError.message}` }, { status: 500 });
+      }
     }
     const transaction = result?.transaction;
     const userProfile = result?.userProfile;

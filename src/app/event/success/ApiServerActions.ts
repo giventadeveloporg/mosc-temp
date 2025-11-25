@@ -623,3 +623,112 @@ export async function getEventAttendeeGuests(attendeeId: number): Promise<EventA
     return [];
   }
 }
+
+/**
+ * Create transaction directly from payment intent (fallback when webhook fails)
+ * This handles mobile payments where webhook signature verification fails on AWS Lambda
+ */
+export async function createTransactionFromPaymentIntent(
+  paymentIntentId: string,
+  eventId: number,
+  customerEmail: string,
+  cart: { ticketTypeId: number; quantity: number }[],
+  amountPaid: number
+): Promise<EventTicketTransactionDTO> {
+  console.log('[createTransactionFromPaymentIntent] Creating transaction:', {
+    paymentIntentId,
+    eventId,
+    customerEmail,
+    cart,
+    amountPaid
+  });
+
+  const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const now = new Date().toISOString();
+
+  // Fetch Stripe fee
+  let stripeFeeAmount = null;
+  try {
+    stripeFeeAmount = await fetchStripeFeeAmount(paymentIntentId);
+  } catch (err) {
+    console.error('[createTransactionFromPaymentIntent] Failed to fetch Stripe fee:', err);
+  }
+
+  // Build transaction data
+  const transactionData: Omit<EventTicketTransactionDTO, 'id'> = withTenantId({
+    email: customerEmail,
+    firstName: '',
+    lastName: '',
+    phone: '',
+    quantity: totalQuantity,
+    pricePerUnit: totalQuantity > 0 ? amountPaid / totalQuantity : 0,
+    totalAmount: amountPaid,
+    taxAmount: 0,
+    platformFeeAmount: stripeFeeAmount || undefined,
+    netAmount: stripeFeeAmount ? amountPaid - stripeFeeAmount : undefined,
+    discountCodeId: undefined,
+    discountAmount: 0,
+    finalAmount: amountPaid,
+    status: 'COMPLETED',
+    paymentMethod: 'card', // Mobile payments are card-based
+    paymentReference: paymentIntentId,
+    purchaseDate: now,
+    confirmationSentAt: undefined,
+    refundAmount: undefined,
+    refundDate: undefined,
+    refundReason: undefined,
+    stripeCheckoutSessionId: undefined, // No session for direct payment intent
+    stripePaymentIntentId: paymentIntentId,
+    stripeCustomerId: undefined,
+    stripePaymentStatus: 'paid',
+    stripeCustomerEmail: customerEmail,
+    stripePaymentCurrency: 'usd',
+    stripeAmountDiscount: 0,
+    stripeAmountTax: 0,
+    eventId,
+    userId: undefined,
+    createdAt: now,
+    updatedAt: now,
+  });
+
+  console.log('[createTransactionFromPaymentIntent] Transaction data prepared:', transactionData);
+
+  // Create transaction
+  const transaction = await createTransaction(transactionData);
+  console.log('[createTransactionFromPaymentIntent] Transaction created:', transaction.id);
+
+  // Create transaction items
+  const transactionItems = [];
+  for (const cartItem of cart) {
+    // Fetch ticket type to get price
+    const ticketType = await fetchTicketTypeByIdServer(cartItem.ticketTypeId);
+    if (!ticketType) {
+      console.error('[createTransactionFromPaymentIntent] Could not find ticket type:', cartItem.ticketTypeId);
+      continue;
+    }
+
+    const itemData = withTenantId({
+      transactionId: transaction.id,
+      ticketTypeId: cartItem.ticketTypeId,
+      quantity: cartItem.quantity,
+      pricePerUnit: ticketType.price,
+      totalAmount: ticketType.price * cartItem.quantity,
+      ticketTypeName: ticketType.name,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    transactionItems.push(itemData);
+  }
+
+  if (transactionItems.length > 0) {
+    try {
+      await createTransactionItemsBulk(transactionItems);
+      console.log('[createTransactionFromPaymentIntent] Transaction items created:', transactionItems.length);
+    } catch (err) {
+      console.error('[createTransactionFromPaymentIntent] Failed to create transaction items:', err);
+    }
+  }
+
+  return transaction;
+}
