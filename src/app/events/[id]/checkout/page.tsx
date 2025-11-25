@@ -179,6 +179,54 @@ export default function CheckoutPage() {
   // CRITICAL FIX: Store restored data in ref for synchronous access during render
   // This prevents flickering when React state updates are async
   const restoredDataRef = useRef<{ event: any; ticketTypes: any[]; availableDiscounts: any[]; heroImageUrl: string | null } | null>(null);
+
+  // CRITICAL FIX: Initialize restoredDataRef in useEffect (not synchronously) to prevent hydration mismatch
+  // Server doesn't have sessionStorage, so we must restore on client only
+  // This runs AFTER mount, so initial render matches server
+  useEffect(() => {
+    if (typeof window === 'undefined' || restoredDataRef.current) return;
+
+    const storedFetchedId = sessionStorage.getItem('checkout_fetched_event_id');
+    const currentEventIdStr: string = typeof eventId === 'string'
+      ? eventId
+      : Array.isArray(eventId)
+        ? (eventId[0] ? String(eventId[0]) : String(eventId))
+        : String(eventId || '');
+
+    if (storedFetchedId === currentEventIdStr && storedFetchedId) {
+      try {
+        const eventData = sessionStorage.getItem('checkout_event_data');
+        const ticketTypesData = sessionStorage.getItem('checkout_ticket_types');
+        const discountsData = sessionStorage.getItem('checkout_available_discounts');
+        const heroImageUrlData = sessionStorage.getItem('checkout_hero_image_url');
+
+        if (eventData && ticketTypesData) {
+          restoredDataRef.current = {
+            event: JSON.parse(eventData),
+            ticketTypes: JSON.parse(ticketTypesData),
+            availableDiscounts: discountsData ? JSON.parse(discountsData) : [],
+            heroImageUrl: heroImageUrlData || null,
+          };
+          // Also set dataReadyRef to prevent loading screen
+          dataReadyRef.current = true;
+          fetchedEventIdRef.current = currentEventIdStr ? currentEventIdStr : null;
+          // CRITICAL: Update state immediately to trigger re-render with restored data
+          setLoading(false);
+          setExpressCheckoutLoading(false);
+          setEvent(restoredDataRef.current.event);
+          setTicketTypes(restoredDataRef.current.ticketTypes);
+          setAvailableDiscounts(restoredDataRef.current.availableDiscounts);
+          if (restoredDataRef.current.heroImageUrl) {
+            setHeroImageUrl(restoredDataRef.current.heroImageUrl);
+          }
+        }
+      } catch (e) {
+        // Ignore parse errors
+        console.error('[CheckoutPage] Error restoring from sessionStorage:', e);
+      }
+    }
+  }, [eventId]); // Only run when eventId changes
+
   // Stabilization delay: Wait 150ms after restoration check before allowing fetch
   // This ensures React state updates complete and prevents race conditions
   const STABILIZATION_DELAY_MS = 150;
@@ -347,7 +395,11 @@ export default function CheckoutPage() {
     // On mobile browsers, params?.id might be a new reference each render
     // This causes useMemo to recalculate eventId even if value is same
     // By comparing STRING values, we prevent infinite loops regardless of reference changes
-    const currentEventIdStr = typeof eventId === 'string' ? eventId : Array.isArray(eventId) ? eventId[0] : String(eventId);
+    const currentEventIdStr: string = typeof eventId === 'string'
+      ? eventId
+      : Array.isArray(eventId)
+        ? (eventId[0] ? String(eventId[0]) : String(eventId))
+        : String(eventId || '');
     const fetchedEventIdStr = typeof fetchedEventIdRef.current === 'string'
       ? fetchedEventIdRef.current
       : Array.isArray(fetchedEventIdRef.current)
