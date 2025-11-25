@@ -125,17 +125,24 @@ class QrFetchSingleton {
 
 const qrSingleton = QrFetchSingleton.getInstance();
 
-export default function TicketQrClient() {
+interface TicketQrClientProps {
+  initialPi?: string;
+  initialSessionId?: string;
+}
+
+export default function TicketQrClient({ initialPi, initialSessionId }: TicketQrClientProps) {
   // IMMEDIATE LOGGING - Before any hooks
   if (typeof window !== 'undefined') {
     console.log('[QR CLIENT] ===== CLIENT-SIDE RENDER =====');
     console.log('[QR CLIENT] URL:', window.location.href);
     console.log('[QR CLIENT] Search params:', window.location.search);
+    console.log('[QR CLIENT] Props received:', { initialPi, initialSessionId });
     const urlParams = new URLSearchParams(window.location.search);
-    console.log('[QR CLIENT] Payment Intent:', urlParams.get('pi'));
-    console.log('[QR CLIENT] Session ID:', urlParams.get('session_id'));
+    console.log('[QR CLIENT] Payment Intent from URL:', urlParams.get('pi'));
+    console.log('[QR CLIENT] Session ID from URL:', urlParams.get('session_id'));
   } else {
     console.log('[QR CLIENT] ===== SERVER-SIDE RENDER =====');
+    console.log('[QR CLIENT SSR] Props received:', { initialPi, initialSessionId });
   }
 
   const [loading, setLoading] = useState(true);
@@ -162,9 +169,16 @@ export default function TicketQrClient() {
   console.log('[MOBILE QR] User Agent:', typeof window !== 'undefined' ? navigator.userAgent : 'SSR');
 
   // Get session_id or payment_intent from URL params or sessionStorage
-  const [session_id, setSessionId] = useState<string | null>(null);
-  const [payment_intent, setPaymentIntent] = useState<string | null>(null);
-  const [identifier, setIdentifier] = useState<string | null>(null);
+  // Initialize with props from server
+  const [session_id, setSessionId] = useState<string | null>(initialSessionId || null);
+  const [payment_intent, setPaymentIntent] = useState<string | null>(initialPi || null);
+  const [identifier, setIdentifier] = useState<string | null>(initialPi || initialSessionId || null);
+
+  console.log('[QR CLIENT] Initial state set:', {
+    session_id: initialSessionId,
+    payment_intent: initialPi,
+    identifier: initialPi || initialSessionId
+  });
 
   // Initialize parameters on client side to avoid SSR issues
   useEffect(() => {
