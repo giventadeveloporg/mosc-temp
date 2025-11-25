@@ -94,7 +94,7 @@ export default function LoadingTicket({ sessionId }: LoadingTicketProps) {
       )}
 
       {/* Loading content - Always rendered the same on SSR and client */}
-      <div className="flex-grow flex flex-col items-center justify-center p-6 animate-pulse" style={{ marginTop: mounted ? '150px' : '200px', paddingTop: '60px' }}>
+      <div className="flex-grow flex flex-col items-center justify-center p-6 animate-pulse" style={{ marginTop: '200px', paddingTop: '60px' }}>
         <img
           src="/images/selling-tickets-vector-loading-image.jpg"
           alt="Ticket Loading"
