@@ -433,4 +433,167 @@ console.log('[MOBILE FLOW]', {
 - Check payment completion across different network conditions
 - Validate session persistence across mobile browser behavior
 
+## React Hydration Issues and Solutions
+
+### Critical Hydration Fixes for Mobile Success Pages
+
+Mobile browsers are particularly sensitive to React hydration mismatches. The following issues were encountered and fixed:
+
+#### Issue 1: Dynamic Debug Banners Causing Hydration Mismatch
+**Problem**: Debug banners with dynamic server/client values (e.g., `{pi || 'N/A'}`) caused hydration failures.
+
+**Solution**: Remove all debug banners from server components. Use logging instead:
+```typescript
+// ❌ BAD - Causes hydration mismatch
+<div style={{ padding: '20px', background: 'yellow' }}>
+  <p>PI: {pi || 'N/A'} | Session: {session_id || 'N/A'}</p>
+</div>
+
+// ✅ GOOD - Use console logging
+console.log('[QR PAGE SERVER] Search params:', { pi, session_id });
+```
+
+#### Issue 2: Next.js Image Component Optimization Differences
+**Problem**: Next.js `Image` component has different optimization behavior between SSR and client, causing hydration failures.
+
+**Solution**: Use standard `<img>` tags in mobile success/loading pages:
+```typescript
+// ❌ BAD - Causes hydration mismatch
+import Image from "next/image";
+<Image src={heroImageUrl || "/default.jpg"} width={1200} height={400} />
+
+// ✅ GOOD - Use standard img tag
+<img
+  src={heroImageUrl}
+  alt="Event Hero"
+  style={{ width: '100%', height: 'auto', objectFit: 'cover' }}
+/>
+```
+
+#### Issue 3: dangerouslySetInnerHTML Style Injection
+**Problem**: Injecting styles via `dangerouslySetInnerHTML` during hydration can cause timing mismatches.
+
+**Solution**: Use inline styles or external CSS files:
+```typescript
+// ❌ BAD - Timing issues during hydration
+<style dangerouslySetInnerHTML={{__html: `
+  .hero-image { width: 100%; }
+`}} />
+
+// ✅ GOOD - Inline styles or Tailwind classes
+<img className="w-full h-auto object-cover" />
+```
+
+#### Issue 4: Early Return Pattern Causing Different DOM
+**Problem**: Returning different content on server vs client causes hydration mismatch.
+
+**Solution**: Always render same base structure, use conditional rendering for progressive enhancement:
+```typescript
+// ❌ BAD - Different server/client DOM
+const [mounted, setMounted] = useState(false);
+useEffect(() => setMounted(true), []);
+
+if (!mounted) {
+  return <div>Loading...</div>; // Simple DOM on server
+}
+return <ComplexUI />; // Complex DOM on client
+
+// ✅ GOOD - Same base structure, conditional content
+return (
+  <div className="min-h-screen bg-gray-100 flex flex-col">
+    {mounted && <HeroSection />} {/* Progressive enhancement */}
+    <LoadingContent /> {/* Always rendered */}
+  </div>
+);
+```
+
+#### Issue 5: Mount Guard Pattern for Client-Only Features
+**Problem**: Client-only features (like hero image fetching) run on server causing errors.
+
+**Solution**: Use mount guard with proper state initialization:
+```typescript
+const [mounted, setMounted] = useState(false);
+const [heroImageUrl, setHeroImageUrl] = useState<string>("/images/default.jpeg"); // Default value
+
+useEffect(() => {
+  console.log('Component mounted on client');
+  setMounted(true);
+}, []);
+
+useEffect(() => {
+  // Client-only code runs ONLY after mount
+  if (sessionId && mounted) {
+    fetchHeroImage();
+  }
+}, [sessionId, mounted]);
+
+// Render with conditional enhancement
+return (
+  <div>
+    {mounted && <div>Client-only content</div>}
+    <div>Always rendered content</div>
+  </div>
+);
+```
+
+#### Issue 6: Desktop Data Fetching Interfering with Mobile Redirect
+**Problem**: Desktop transaction fetching useEffect runs simultaneously with mobile redirect logic, causing 404 errors and "Error: null" pages.
+
+**Solution**: Use state coordination to prevent desktop fetch on mobile:
+```typescript
+// Track mobile detection state
+const [isMobileDevice, setIsMobileDevice] = useState<boolean | null>(null);
+
+// Mobile detection sets state immediately
+useEffect(() => {
+  const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent) ||
+                   window.innerWidth <= 768;
+  setIsMobileDevice(isMobile); // Prevents desktop fetch
+
+  if (isMobile) {
+    // Show brief success, then redirect
+    setTimeout(() => router.replace(`/event/ticket-qr?pi=${pi}`), 2000);
+  }
+}, []);
+
+// Desktop fetch waits for mobile detection and skips if mobile
+useEffect(() => {
+  if (isMobileDevice === null) return; // Wait for detection
+  if (isMobileDevice === true) return; // Skip for mobile
+
+  // Only desktop users reach here
+  fetchTransactionData();
+}, [session_id, isMobileDevice]); // Include isMobileDevice in deps
+```
+
+### Hydration Debugging Best Practices
+
+1. **Add Extensive Logging**: Use checkmark emojis (✅) for visibility in mobile browser console
+```typescript
+console.log('[MOBILE QR DEBUG] ✅✅✅ SUCCESS! Transaction loaded:', data.id);
+```
+
+2. **Use MobileDebugConsole Component**: Intercepts console.log and displays on-screen for mobile debugging
+```typescript
+import MobileDebugConsole from '@/components/MobileDebugConsole';
+
+// Add to layout or page component
+<MobileDebugConsole />
+```
+
+3. **Test Hydration in Production Build**: Development mode can hide hydration issues
+```bash
+npm run build && npm start
+```
+
+4. **Monitor CloudWatch Logs**: Compare SSR logs vs client-side logs to identify where hydration fails
+
+### Files Affected by Hydration Fixes
+
+- `src/app/event/ticket-qr/page.tsx` - Removed debug banner
+- `src/app/event/success/LoadingTicket.tsx` - Replaced Image, removed dangerouslySetInnerHTML, added mount guard
+- `src/app/event/ticket-qr/TicketQrClient.tsx` - Added mount guard, enhanced logging
+- `src/app/event/success/SuccessClient.tsx` - Fixed desktop/mobile fetch coordination
+- `src/components/MobileDebugConsole.tsx` - On-screen console for mobile debugging
+
 This architecture ensures optimal mobile payment experience while maintaining security, reliability, and proper email delivery for the MCEFEE event management system.

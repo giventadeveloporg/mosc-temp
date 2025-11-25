@@ -33,6 +33,7 @@ export default function SuccessClient({ session_id, payment_intent }: SuccessCli
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<any>(null);
   const [readyToShowNotFound, setReadyToShowNotFound] = useState(false);
+  const [isMobileDevice, setIsMobileDevice] = useState<boolean | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -65,6 +66,9 @@ export default function SuccessClient({ session_id, payment_intent }: SuccessCli
       mobileRegexMatch: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
       narrowScreenMatch: window.innerWidth <= 768
     });
+
+    // Set mobile detection state immediately to prevent desktop data fetching
+    setIsMobileDevice(isMobile);
 
     if (isMobile) {
       console.log('[SuccessClient] Mobile browser detected - will show brief success then redirect');
@@ -172,15 +176,19 @@ export default function SuccessClient({ session_id, payment_intent }: SuccessCli
 
   // Data fetching effect for desktop flow
   useEffect(() => {
-    // Skip data fetching for mobile users - they get the brief success page
-    if (typeof window !== 'undefined') {
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-        window.innerWidth <= 768;
-      if (isMobile) {
-        console.log('[SuccessClient] Skipping data fetch for mobile user');
-        return;
-      }
+    // Skip data fetching until mobile detection is complete
+    if (isMobileDevice === null) {
+      console.log('[SuccessClient] Waiting for mobile detection to complete');
+      return;
     }
+
+    // Skip data fetching for mobile users - they get the brief success page
+    if (isMobileDevice === true) {
+      console.log('[SuccessClient] Skipping data fetch for mobile user');
+      return;
+    }
+
+    console.log('[SuccessClient] Desktop user confirmed - proceeding with data fetch');
 
     // Desktop data fetching logic
     let cancelled = false;
@@ -272,7 +280,7 @@ export default function SuccessClient({ session_id, payment_intent }: SuccessCli
 
     fetchData();
     return () => { cancelled = true; };
-  }, [session_id]);
+  }, [session_id, isMobileDevice]);
 
 
   if (loading) {
