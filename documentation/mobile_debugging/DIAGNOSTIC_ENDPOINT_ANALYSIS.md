@@ -207,3 +207,6 @@ https://www.mosc-temp.com/api/diagnostic/mobile-test
 The diagnostic endpoint proves mobile CAN reach API routes, so the issue is likely in the checkout page's client-side code execution.
 
 
+
+
+

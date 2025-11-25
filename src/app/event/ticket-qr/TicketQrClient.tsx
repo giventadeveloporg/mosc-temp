@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from 'next/navigation';
 import LoadingTicket from "../success/LoadingTicket";
-import Image from "next/image";
 import {
   FaCheckCircle, FaTicketAlt, FaCalendarAlt, FaUser, FaEnvelope,
   FaMoneyBillWave, FaInfoCircle, FaReceipt, FaMapPin, FaClock, FaTags

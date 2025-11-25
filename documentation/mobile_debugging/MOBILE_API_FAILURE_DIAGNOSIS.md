@@ -318,3 +318,6 @@ The enhanced logging will help identify exactly where the mobile requests are fa
 Once deployed, check CloudWatch logs to see which logs appear and which don't - this will pinpoint the exact failure point.
 
 
+
+
+
