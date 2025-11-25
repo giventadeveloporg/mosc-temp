@@ -9,9 +9,6 @@ export default function LoadingTicket({ sessionId }: LoadingTicketProps) {
   const [mounted, setMounted] = useState(false);
   const [heroImageUrl, setHeroImageUrl] = useState<string>("/images/default_placeholder_hero_image.jpeg");
 
-  console.log('LoadingTicket received sessionId:', sessionId);
-  console.log('LoadingTicket mounted state:', mounted);
-
   // Mark as mounted to prevent hydration mismatch
   useEffect(() => {
     console.log('LoadingTicket: Component mounted on client');
