@@ -297,7 +297,42 @@ export default function CheckoutPage() {
   // SIMPLE APPROACH: Match legacy code exactly - single useEffect with simple fetch
   // Legacy code works because it's simple - no complex guards or restoration logic
   useEffect(() => {
+    // CRITICAL FIX: Check ref FIRST before doing anything else
+    // This prevents infinite loops when state updates trigger re-renders on mobile browsers
+    // When we restore from sessionStorage and call setEvent/setTicketTypes, it triggers re-render
+    // On mobile, params?.id might be a new reference each time, causing useMemo to recalculate
+    // Even if eventId is the same value, useEffect dependency triggers again
+    // By checking fetchedEventIdRef FIRST, we prevent the restore logic from running multiple times
+    if (fetchedEventIdRef.current === eventId) {
+      console.log('[CheckoutPage] ✅ SKIP - Already processed this eventId (prevents infinite loop)', {
+        fetchedId: fetchedEventIdRef.current,
+        currentId: eventId,
+      });
+      return; // Already fetched/restored - don't run again
+    }
+
+    // DIAGNOSTIC: Log every useEffect run to identify infinite loop
+    console.log('[CheckoutPage] 🔍 useEffect RUN', {
+      eventId,
+      eventIdType: typeof eventId,
+      isFetching: isFetchingRef.current,
+      fetchedEventId: fetchedEventIdRef.current,
+      hasEvent: !!event,
+      ticketTypesCount: ticketTypes.length,
+      loading,
+      timestamp: new Date().toISOString(),
+      paramsId: params?.id,
+      paramsIdType: typeof params?.id,
+    });
+
     async function fetchData() {
+      // DIAGNOSTIC: Log fetch attempt
+      console.log('[CheckoutPage] 🔍 fetchData CALLED', {
+        eventId,
+        isFetching: isFetchingRef.current,
+        fetchedEventId: fetchedEventIdRef.current,
+      });
+
       // SIMPLE: Check sessionStorage FIRST (like legacy but with restoration)
       const storedFetchedId = getFetchedEventIdFromStorage();
       const currentEventIdStr = typeof eventId === 'string' ? eventId : Array.isArray(eventId) ? eventId[0] : String(eventId);
@@ -306,7 +341,13 @@ export default function CheckoutPage() {
       if (storedFetchedId === currentEventIdStr && storedFetchedId) {
         const storedData = restoreFetchedDataFromStorage();
         if (storedData && storedData.event) {
-          console.log('[CheckoutPage] ✅ RESTORING from sessionStorage - skipping fetch');
+          console.log('[CheckoutPage] ✅ RESTORING from sessionStorage - skipping fetch', {
+            storedId: storedFetchedId,
+            currentId: currentEventIdStr,
+          });
+          // CRITICAL: Set refs BEFORE state updates to prevent re-trigger
+          fetchedEventIdRef.current = eventId || null;
+          isFetchingRef.current = false; // Mark as not fetching
           setEvent(storedData.event);
           setTicketTypes(storedData.ticketTypes);
           setAvailableDiscounts(storedData.availableDiscounts);
@@ -320,6 +361,16 @@ export default function CheckoutPage() {
 
       // SIMPLE: Prevent duplicate fetches
       if (isFetchingRef.current) {
+        console.log('[CheckoutPage] ⚠️ SKIP - Already fetching');
+        return;
+      }
+
+      // SIMPLE: Prevent re-fetching same eventId
+      if (fetchedEventIdRef.current === eventId) {
+        console.log('[CheckoutPage] ⚠️ SKIP - Already fetched this eventId', {
+          fetchedId: fetchedEventIdRef.current,
+          currentId: eventId,
+        });
         return;
       }
 
@@ -423,7 +474,11 @@ export default function CheckoutPage() {
     }
 
     // SIMPLE: Just check if we have eventId - match legacy code exactly
-    if (eventId) fetchData();
+    if (eventId) {
+      fetchData();
+    } else {
+      console.log('[CheckoutPage] ⚠️ SKIP - No eventId');
+    }
     // eslint-disable-next-line
   }, [eventId]);
 
