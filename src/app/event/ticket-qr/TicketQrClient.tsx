@@ -149,6 +149,8 @@ export default function TicketQrClient() {
 
   // Component initialization
   console.log('[MOBILE QR] TicketQrClient mounted');
+  console.log('[MOBILE QR] Window location:', typeof window !== 'undefined' ? window.location.href : 'SSR');
+  console.log('[MOBILE QR] User Agent:', typeof window !== 'undefined' ? navigator.userAgent : 'SSR');
 
   // Get session_id or payment_intent from URL params or sessionStorage
   const [session_id, setSessionId] = useState<string | null>(null);
@@ -157,8 +159,21 @@ export default function TicketQrClient() {
 
   // Initialize parameters on client side to avoid SSR issues
   useEffect(() => {
-    const urlSessionId = searchParams?.get('session_id');
-    const urlPaymentIntent = searchParams?.get('pi');
+    console.log('[MOBILE QR] ===== PARAMETER INITIALIZATION EFFECT =====');
+
+    // Try multiple sources for parameters
+    let urlSessionId = searchParams?.get('session_id');
+    let urlPaymentIntent = searchParams?.get('pi');
+
+    // Fallback: parse URL manually if searchParams fails
+    if (typeof window !== 'undefined' && !urlSessionId && !urlPaymentIntent) {
+      console.log('[MOBILE QR] searchParams empty, parsing URL manually');
+      const urlParams = new URLSearchParams(window.location.search);
+      urlSessionId = urlParams.get('session_id');
+      urlPaymentIntent = urlParams.get('pi');
+      console.log('[MOBILE QR] Manual parse results:', { urlSessionId, urlPaymentIntent });
+    }
+
     const storageSessionId = sessionStorage.getItem('stripe_session_id');
     const storagePaymentIntent = sessionStorage.getItem('stripe_payment_intent');
 
@@ -173,13 +188,50 @@ export default function TicketQrClient() {
       storagePaymentIntent,
       finalSessionId,
       finalPaymentIntent,
-      finalIdentifier
+      finalIdentifier,
+      searchParamsAvailable: !!searchParams,
+      windowLocation: typeof window !== 'undefined' ? window.location.href : 'N/A'
     });
 
     setSessionId(finalSessionId);
     setPaymentIntent(finalPaymentIntent);
     setIdentifier(finalIdentifier);
+
+    console.log('[MOBILE QR] State updated with:', {
+      session_id: finalSessionId,
+      payment_intent: finalPaymentIntent,
+      identifier: finalIdentifier
+    });
   }, [searchParams]);
+
+  // CRITICAL: Also run on initial mount to catch params immediately
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    console.log('[MOBILE QR] ===== INITIAL MOUNT - IMMEDIATE URL PARSE =====');
+    const urlParams = new URLSearchParams(window.location.search);
+    const pi = urlParams.get('pi');
+    const sid = urlParams.get('session_id');
+
+    console.log('[MOBILE QR] Immediate parse:', {
+      pi,
+      session_id: sid,
+      fullUrl: window.location.href,
+      search: window.location.search
+    });
+
+    // If we have parameters, update state immediately
+    if (pi || sid) {
+      console.log('[MOBILE QR] Found params on mount, updating state immediately');
+      if (pi) {
+        setPaymentIntent(pi);
+        setIdentifier(pi);
+      } else if (sid) {
+        setSessionId(sid);
+        setIdentifier(sid);
+      }
+    }
+  }, []); // Run only once on mount
 
   // Debug logging for parameter retrieval will now happen in useEffect above
 
@@ -227,6 +279,12 @@ export default function TicketQrClient() {
     let cancelled = false;
     async function fetchTransactionData() {
       try {
+        console.log('[TicketQrClient] ===== STARTING TRANSACTION FETCH =====');
+        console.log('[TicketQrClient] identifier:', identifier);
+        console.log('[TicketQrClient] session_id:', session_id);
+        console.log('[TicketQrClient] payment_intent:', payment_intent);
+        console.log('[TicketQrClient] URL:', window.location.href);
+
         addApiLog('Starting transaction fetch');
         addApiLog(`Fetching for identifier: ${identifier}`);
         addApiLog(`session_id: ${session_id}, payment_intent: ${payment_intent}`);
@@ -303,14 +361,18 @@ export default function TicketQrClient() {
           addApiLog(`POST body prepared with payment_intent: ${payment_intent}`);
         }
 
-        console.log('[TicketQrClient] Making POST request to create transaction');
+        console.log('[TicketQrClient] ===== MAKING POST REQUEST =====');
+        console.log('[TicketQrClient] POST body:', postBody);
         addApiLog('Making POST request to create transaction');
+        addApiLog(`POST body: ${JSON.stringify(postBody)}`);
+
         const postRes = await fetch("/api/event/success/process", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(postBody),
         });
 
+        console.log('[TicketQrClient] POST response status:', postRes.status);
         addApiLog(`POST response status: ${postRes.status}`);
 
         if (!postRes.ok) {
