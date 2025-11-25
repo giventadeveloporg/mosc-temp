@@ -130,6 +130,7 @@ interface TicketQrClientProps {
 }
 
 export default function TicketQrClient({ initialPi, initialSessionId }: TicketQrClientProps) {
+  // ===== ALL HOOKS MUST BE DECLARED FIRST (Rules of Hooks) =====
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -138,8 +139,21 @@ export default function TicketQrClient({ initialPi, initialSessionId }: TicketQr
   const [qrError, setQrError] = useState<string | null>(null);
   const [apiLogs, setApiLogs] = useState<string[]>([]);
   const [qrFetching, setQrFetching] = useState(false);
+
+  // Get session_id or payment_intent from URL params or sessionStorage
+  // Initialize with props from server
+  const [session_id, setSessionId] = useState<string | null>(initialSessionId || null);
+  const [payment_intent, setPaymentIntent] = useState<string | null>(initialPi || null);
+  const [identifier, setIdentifier] = useState<string | null>(initialPi || initialSessionId || null);
+
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // Helper function to add logs that will be visible in error screen
+  const addApiLog = (message: string) => {
+    console.log(message);
+    setApiLogs(prev => [...prev, `${new Date().toLocaleTimeString()}: ${message}`]);
+  };
 
   // Mark as mounted on client and do all initial logging in useEffect
   useEffect(() => {
@@ -156,18 +170,6 @@ export default function TicketQrClient({ initialPi, initialSessionId }: TicketQr
     console.log('[MOBILE QR] User Agent:', navigator.userAgent);
     setMounted(true);
   }, [initialPi, initialSessionId]);
-
-  // Helper function to add logs that will be visible in error screen
-  const addApiLog = (message: string) => {
-    console.log(message);
-    setApiLogs(prev => [...prev, `${new Date().toLocaleTimeString()}: ${message}`]);
-  };
-
-  // Get session_id or payment_intent from URL params or sessionStorage
-  // Initialize with props from server
-  const [session_id, setSessionId] = useState<string | null>(initialSessionId || null);
-  const [payment_intent, setPaymentIntent] = useState<string | null>(initialPi || null);
-  const [identifier, setIdentifier] = useState<string | null>(initialPi || initialSessionId || null);
 
   // Initialize parameters on client side to avoid SSR issues
   useEffect(() => {
