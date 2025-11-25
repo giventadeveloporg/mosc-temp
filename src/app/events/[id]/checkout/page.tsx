@@ -140,15 +140,8 @@ export default function CheckoutPage() {
   // This ensures React state updates complete and prevents race conditions
   const STABILIZATION_DELAY_MS = 150;
 
-  // CRITICAL ANTI-FLICKER: Guard function to prevent setLoading(true) once data is ready
-  const setLoadingSafe = useCallback((value: boolean) => {
-    // NEVER allow loading=true if data is already ready (prevents flicker)
-    if (value === true && dataReadyRef.current) {
-      console.log('[CheckoutPage] 🛡️ GUARDED - Preventing setLoading(true) because data is ready');
-      return;
-    }
-    setLoading(value);
-  }, []);
+  // SIMPLE APPROACH: Remove guard function - use setLoading directly like legacy code
+  // The guard was causing issues - legacy code doesn't need it
 
   // CRITICAL MOBILE FIX: Use sessionStorage to persist fetch state AND data across remounts
   // Mobile browsers can remount components, resetting refs and state, so we need persistent storage
@@ -234,109 +227,8 @@ export default function CheckoutPage() {
 
   useEffect(() => { setMounted(true); }, []);
 
-  // CRITICAL MOBILE FIX: Restore data from sessionStorage on mount
-  // This restores both fetch state AND actual data after component remounts (mobile browsers can remount)
-  // This MUST run before the fetch useEffect to prevent unnecessary fetches
-  // HANDLES: Page refresh, navigation from another page, direct URL access, app switching
-  // CRITICAL: Wait for mount to prevent hydration mismatch (server doesn't have sessionStorage)
-  useEffect(() => {
-    if (!mounted) return; // CRITICAL: Wait for mount to prevent hydration mismatch
-    if (!eventId) return; // Wait for eventId to be available
-
-    // CRITICAL: Check sessionStorage after mount (client-side only to prevent hydration mismatch)
-    // Server doesn't have sessionStorage, so we wait for mount before checking
-
-    const storedFetchedId = getFetchedEventIdFromStorage();
-    const currentEventIdStr = typeof eventId === 'string' ? eventId : Array.isArray(eventId) ? eventId[0] : String(eventId);
-
-    // If stored ID doesn't match current eventId, clear it (user navigated to different event)
-    if (storedFetchedId && storedFetchedId !== currentEventIdStr) {
-      console.log('[CheckoutPage] 🔄 CLEARING STORED FETCH STATE - Different eventId', {
-        storedId: storedFetchedId,
-        currentId: currentEventIdStr
-      });
-      clearStoredData();
-      fetchedEventIdRef.current = null;
-      dataRestoredRef.current = false; // Reset restoration flag for new event
-      dataReadyRef.current = false; // Reset data ready flag for new event
-      // Mark initialization complete after clearing (allows fetch for new event)
-      setTimeout(() => {
-        initializationCompleteRef.current = true;
-        console.log('[CheckoutPage] ✅ INITIALIZATION COMPLETE - Ready for fetch (new event)');
-      }, STABILIZATION_DELAY_MS);
-    } else if (storedFetchedId && storedFetchedId === currentEventIdStr) {
-      // CRITICAL: Restore data from sessionStorage if available
-      // SCENARIO: Page refresh or navigation from another page (sessionStorage persists)
-      const restoredData = restoreFetchedDataFromStorage();
-      if (restoredData && restoredData.event) {
-        console.log('[CheckoutPage] 🔄 RESTORING DATA from sessionStorage', {
-          eventId: storedFetchedId,
-          hasEvent: !!restoredData.event,
-          ticketTypesCount: restoredData.ticketTypes?.length || 0,
-          discountsCount: restoredData.availableDiscounts?.length || 0
-        });
-
-        // CRITICAL: Set restoration flag FIRST (synchronously) before any state updates
-        // This prevents fetch useEffect from running when state updates trigger re-render
-        dataRestoredRef.current = true;
-        fetchedEventIdRef.current = storedFetchedId;
-
-        // CRITICAL: Restore React state from sessionStorage AFTER setting refs
-        // This ensures fetch useEffect sees the flag before state updates complete
-        setEvent(restoredData.event);
-        setTicketTypes(restoredData.ticketTypes);
-        setAvailableDiscounts(restoredData.availableDiscounts);
-        if (restoredData.heroImageUrl) {
-          setHeroImageUrl(restoredData.heroImageUrl);
-        }
-
-        // CRITICAL: Mark data as ready FIRST (prevents any loading state changes)
-        dataReadyRef.current = true;
-
-        // CRITICAL: Set loading to false AFTER restoring state so page renders immediately
-        setLoadingSafe(false);
-
-        // CRITICAL: Mark initialization complete after stabilization delay
-        // This ensures React state updates complete before fetch can run
-        setTimeout(() => {
-          initializationCompleteRef.current = true;
-          console.log('[CheckoutPage] ✅ INITIALIZATION COMPLETE - Data restored, fetch will be skipped');
-        }, STABILIZATION_DELAY_MS);
-
-        console.log('[CheckoutPage] ✅ DATA RESTORED - Page should render now, fetch will be skipped');
-      } else {
-        console.log('[CheckoutPage] ⚠️ Stored eventId found but no data - will fetch');
-        // If we have stored ID but no data, clear it and allow fetch
-        clearStoredData();
-        fetchedEventIdRef.current = null;
-        // Mark initialization complete after clearing (allows fetch)
-        setTimeout(() => {
-          initializationCompleteRef.current = true;
-          console.log('[CheckoutPage] ✅ INITIALIZATION COMPLETE - Ready for fetch (no stored data)');
-        }, STABILIZATION_DELAY_MS);
-      }
-    } else {
-      // No stored data - mark initialization complete to allow fetch
-      // SCENARIO: Fresh page load, direct URL access, or sessionStorage cleared
-      setTimeout(() => {
-        initializationCompleteRef.current = true;
-        console.log('[CheckoutPage] ✅ INITIALIZATION COMPLETE - Ready for fetch (no stored data)');
-      }, STABILIZATION_DELAY_MS);
-    }
-
-    // CRITICAL FALLBACK: Ensure initialization completes even if something goes wrong
-    // This prevents infinite loading if restoration useEffect has issues
-    const fallbackTimeout = setTimeout(() => {
-      if (!initializationCompleteRef.current) {
-        console.log('[CheckoutPage] ⚠️ FALLBACK - Initialization timeout, forcing completion');
-        initializationCompleteRef.current = true;
-      }
-    }, STABILIZATION_DELAY_MS * 2); // 300ms fallback (2x stabilization delay)
-
-    return () => {
-      clearTimeout(fallbackTimeout);
-    };
-  }, [mounted, eventId, getFetchedEventIdFromStorage, restoreFetchedDataFromStorage, clearStoredData]);
+  // REMOVED: Complex restoration useEffect - it was causing flickering
+  // Legacy code doesn't have this - restoration is handled inside fetch useEffect
 
   // MOBILE FIX: Handle page visibility changes (app switching on mobile)
   useEffect(() => {
@@ -402,113 +294,38 @@ export default function CheckoutPage() {
 
   const defaultHeroImageUrl = '/images/default_placeholder_hero_image.jpeg';
 
+  // SIMPLE APPROACH: Match legacy code exactly - single useEffect with simple fetch
+  // Legacy code works because it's simple - no complex guards or restoration logic
   useEffect(() => {
     async function fetchData() {
-
-      // CRITICAL MOBILE FIX: Debounce rapid re-runs (prevent initialization spam)
-      const now = Date.now();
-      const timeSinceLastAttempt = now - lastFetchAttemptRef.current;
-      if (timeSinceLastAttempt < STABILIZATION_DELAY_MS && lastFetchAttemptRef.current > 0) {
-        console.log('[CheckoutPage] ⚠️ SKIP - Too soon since last attempt:', {
-          timeSinceLastAttempt,
-          debounceMs: STABILIZATION_DELAY_MS,
-        });
-        return;
-      }
-      lastFetchAttemptRef.current = now;
-
-      // CRITICAL MOBILE FIX: Check if data was already restored from sessionStorage
-      // This prevents flicker on initial page load when restoration happens
-      if (dataRestoredRef.current) {
-        console.log('[CheckoutPage] ✅ SKIP - Data already restored from sessionStorage, skipping fetch');
-        return;
-      }
-
-      // CRITICAL ANTI-FLICKER: Check dataReadyRef FIRST (most reliable check)
-      if (dataReadyRef.current) {
-        console.log('[CheckoutPage] ✅ SKIP - Data already ready, skipping fetch (prevents flicker)');
-        return;
-      }
-
-      // CRITICAL MOBILE FIX: Check if we already have data in state (from restoration)
-      // This prevents unnecessary fetches when data is already loaded
-      if (event && ticketTypes.length > 0) {
-        console.log('[CheckoutPage] ✅ SKIP - Data already in state, skipping fetch', {
-          hasEvent: !!event,
-          ticketTypesCount: ticketTypes.length
-        });
-        // Mark as fetched to prevent future checks
-        fetchedEventIdRef.current = eventId || null;
-        // CRITICAL ANTI-FLICKER: Mark data as ready before setting loading=false
-        dataReadyRef.current = true;
-        setLoadingSafe(false);
-        return;
-      }
-
-      // CRITICAL MOBILE FIX: Prevent duplicate fetches using ref
-      if (isFetchingRef.current) {
-        console.log('[CheckoutPage] ⚠️ SKIP - Fetch already in progress, skipping duplicate');
-        return;
-      }
-
-      // CRITICAL MOBILE FIX: Check sessionStorage FIRST (persists across remounts)
+      // SIMPLE: Check sessionStorage FIRST (like legacy but with restoration)
       const storedFetchedId = getFetchedEventIdFromStorage();
       const currentEventIdStr = typeof eventId === 'string' ? eventId : Array.isArray(eventId) ? eventId[0] : String(eventId);
 
-      // CRITICAL: Only skip if we have BOTH stored ID AND stored data
+      // If we have stored data for this eventId, restore it immediately
       if (storedFetchedId === currentEventIdStr && storedFetchedId) {
         const storedData = restoreFetchedDataFromStorage();
         if (storedData && storedData.event) {
-          console.log('[CheckoutPage] ✅ SKIP - Event already fetched with data (from sessionStorage), skipping re-fetch', {
-            eventId: currentEventIdStr,
-            storedId: storedFetchedId,
-            hasData: !!storedData.event
-          });
-          // Also update ref to prevent future checks
-          fetchedEventIdRef.current = eventId || null;
-          return;
-        } else {
-          console.log('[CheckoutPage] ⚠️ Stored eventId found but no data - will fetch');
-          // Clear invalid stored state and allow fetch
-          clearStoredData();
+          console.log('[CheckoutPage] ✅ RESTORING from sessionStorage - skipping fetch');
+          setEvent(storedData.event);
+          setTicketTypes(storedData.ticketTypes);
+          setAvailableDiscounts(storedData.availableDiscounts);
+          if (storedData.heroImageUrl) {
+            setHeroImageUrl(storedData.heroImageUrl);
+          }
+          setLoading(false);
+          return; // Skip fetch - data restored
         }
       }
 
-      // MOBILE FIX: Prevent re-fetching the same eventId (mobile browser re-hydration issue)
-      if (fetchedEventIdRef.current === eventId) {
-        console.log('[CheckoutPage] ✅ SKIP - Event already fetched (from ref), skipping re-fetch', { eventId });
+      // SIMPLE: Prevent duplicate fetches
+      if (isFetchingRef.current) {
         return;
       }
 
-      // MOBILE FIX: Don't fetch if page is not visible (app in background)
-      if (!isPageVisible) {
-        console.log('[CheckoutPage] ⚠️ SKIP - Page not visible, deferring fetch');
-        return;
-      }
-
-      // CRITICAL ANTI-FLICKER: Prevent setting loading=true if data is already ready
-      // Check dataReadyRef FIRST (most reliable), then refs and state
-      if (dataReadyRef.current) {
-        console.log('[CheckoutPage] ⚠️ SKIP - Data already ready, not setting loading=true (prevents flicker)');
-        return;
-      }
-
-      // CRITICAL MOBILE FIX: Prevent setting loading=true if data is already available (prevents flicker)
-      // Check BOTH refs and state before setting loading state
-      if (dataRestoredRef.current || (event && ticketTypes.length > 0)) {
-        console.log('[CheckoutPage] ⚠️ SKIP - Data already available, not setting loading=true', {
-          dataRestored: dataRestoredRef.current,
-          hasEvent: !!event,
-          ticketTypesCount: ticketTypes.length
-        });
-        // Mark as ready to prevent future loading state changes
-        dataReadyRef.current = true;
-        return;
-      }
-
-      // CRITICAL MOBILE FIX: Set fetching flag immediately to prevent race conditions
+      // SIMPLE: Set loading and fetch flag (like legacy code)
       isFetchingRef.current = true;
-      setLoadingSafe(true);
+      setLoading(true);
 
       console.log('[CheckoutPage] ⚡ FETCHING EVENT DATA', {
         eventId: currentEventIdStr,
@@ -595,64 +412,20 @@ export default function CheckoutPage() {
         setTicketTypes([]);
         setHeroImageUrl(defaultHeroImageUrl);
       } finally {
-        // CRITICAL ANTI-FLICKER: Mark data as ready if we have event and ticketTypes
-        if (event && ticketTypes.length > 0) {
-          dataReadyRef.current = true;
-        }
-        setLoadingSafe(false);
+        // SIMPLE: Just set loading to false like legacy code
+        setLoading(false);
         isFetchingRef.current = false;
-        // CRITICAL MOBILE FIX: Mark this eventId as fetched in BOTH ref AND sessionStorage
-        // This prevents re-fetching on mobile browser remounts (refs reset, but sessionStorage persists)
         if (eventId) {
           fetchedEventIdRef.current = eventId || null;
           setFetchedEventIdInStorage(eventId);
-          console.log('[CheckoutPage] ✅ FETCH COMPLETE - Marked event as fetched', {
-            eventId: typeof eventId === 'string' ? eventId : Array.isArray(eventId) ? eventId[0] : String(eventId)
-          });
         }
       }
     }
 
-    // CRITICAL ANTI-FLICKER: Skip entirely if data is already ready (prevents any fetch attempts)
-    if (dataReadyRef.current) {
-      console.log('[CheckoutPage] ✅ SKIP - Data already ready, not calling fetchData (prevents flicker)');
-      return;
-    }
-
-    // CRITICAL MOBILE FIX: Only fetch if we have an eventId and haven't already fetched it
-    // CRITICAL: Skip entirely if data was restored (prevents flicker on initial load)
-    if (dataRestoredRef.current) {
-      console.log('[CheckoutPage] ✅ SKIP - Data restored, not calling fetchData');
-      return;
-    }
-
-    if (eventId && isPageVisible) {
-      // CRITICAL: Check if we already have data in state (from restoration)
-      if (event && ticketTypes.length > 0) {
-        console.log('[CheckoutPage] ✅ SKIP - Data already in state, not calling fetchData');
-        return;
-      }
-
-      const storedFetchedId = getFetchedEventIdFromStorage();
-      const currentEventIdStr = typeof eventId === 'string' ? eventId : Array.isArray(eventId) ? eventId[0] : String(eventId);
-
-      // Skip if already fetched (check both ref and sessionStorage)
-      // CRITICAL: Also check if we have stored data (not just stored ID)
-      const storedData = restoreFetchedDataFromStorage();
-      if ((storedFetchedId === currentEventIdStr || fetchedEventIdRef.current === eventId) && storedData && storedData.event) {
-        console.log('[CheckoutPage] ✅ SKIP - Event already fetched with data, not calling fetchData', {
-          eventId: currentEventIdStr,
-          storedId: storedFetchedId,
-          refId: fetchedEventIdRef.current,
-          hasStoredData: !!storedData.event
-        });
-        return;
-      }
-
-      fetchData();
-    }
+    // SIMPLE: Just check if we have eventId - match legacy code exactly
+    if (eventId) fetchData();
     // eslint-disable-next-line
-  }, [eventId, isPageVisible, event, ticketTypes, getFetchedEventIdFromStorage, setFetchedEventIdInStorage, restoreFetchedDataFromStorage]);
+  }, [eventId]);
 
   // Reactive calculation for total and discount changes.  These are the new changes
 
@@ -1146,11 +919,9 @@ export default function CheckoutPage() {
     );
   };
 
-  // CRITICAL ANTI-FLICKER: Use computed loading state that respects dataReadyRef
-  // Once data is ready, NEVER show loading screen (prevents flicker)
-  const effectiveLoading = loading && !dataReadyRef.current;
-
-  if (effectiveLoading) {
+  // SIMPLE APPROACH: Match legacy code - just check loading state
+  // Legacy code works because it's simple - no complex guards or refs
+  if (loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex flex-col" style={{ overflowX: 'hidden' }}>
         {/* HERO SECTION - Full width bleeding to header */}
