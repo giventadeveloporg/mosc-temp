@@ -84,6 +84,9 @@ const PaymentSection = React.memo(({
 
 PaymentSection.displayName = 'PaymentSection';
 
+// TEMPORARY DEBUG: Import debug log viewer for mobile debugging
+import DebugLogViewer from '@/components/DebugLogViewer';
+
 export default function CheckoutPage() {
   const router = useRouter();
   const params = useParams();
@@ -350,17 +353,20 @@ export default function CheckoutPage() {
             storedId: storedFetchedId,
             currentId: currentEventIdStr,
           });
-          // CRITICAL: Set refs BEFORE state updates to prevent re-trigger
+          // CRITICAL: Set refs and loading FIRST to prevent flickering
           // Use string value to ensure stable comparison
           fetchedEventIdRef.current = currentEventIdStr;
           isFetchingRef.current = false; // Mark as not fetching
+          // CRITICAL: Set loading to false FIRST (before state updates) to prevent flicker
+          // This ensures loading screen doesn't flash during state updates
+          setLoading(false);
+          // Then restore state (these updates are batched by React)
           setEvent(storedData.event);
           setTicketTypes(storedData.ticketTypes);
           setAvailableDiscounts(storedData.availableDiscounts);
           if (storedData.heroImageUrl) {
             setHeroImageUrl(storedData.heroImageUrl);
           }
-          setLoading(false);
           return; // Skip fetch - data restored
         }
       }
@@ -371,11 +377,16 @@ export default function CheckoutPage() {
         return;
       }
 
-      // SIMPLE: Prevent re-fetching same eventId
-      if (fetchedEventIdRef.current === eventId) {
+      // SIMPLE: Prevent re-fetching same eventId (use string comparison)
+      const fetchedIdStr = typeof fetchedEventIdRef.current === 'string'
+        ? fetchedEventIdRef.current
+        : Array.isArray(fetchedEventIdRef.current)
+          ? fetchedEventIdRef.current[0]
+          : String(fetchedEventIdRef.current || '');
+      if (fetchedIdStr && fetchedIdStr === currentEventIdStr) {
         console.log('[CheckoutPage] ⚠️ SKIP - Already fetched this eventId', {
-          fetchedId: fetchedEventIdRef.current,
-          currentId: eventId,
+          fetchedId: fetchedIdStr,
+          currentId: currentEventIdStr,
         });
         return;
       }
@@ -987,6 +998,8 @@ export default function CheckoutPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex flex-col" style={{ overflowX: 'hidden' }}>
+        {/* TEMPORARY DEBUG: Debug log viewer for mobile browser debugging */}
+        <DebugLogViewer />
         {/* HERO SECTION - Full width bleeding to header */}
         <section className="hero-section" style={{
           position: 'relative',
@@ -1100,6 +1113,8 @@ export default function CheckoutPage() {
   // --- HERO SECTION (prompt-compliant) ---
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col" style={{ overflowX: 'hidden' }}>
+      {/* TEMPORARY DEBUG: Debug log viewer for mobile browser debugging */}
+      <DebugLogViewer />
       {/* HERO SECTION - Full width bleeding to header */}
       <section className="hero-section" style={{
         position: 'relative',
