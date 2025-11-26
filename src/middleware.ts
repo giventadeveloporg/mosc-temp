@@ -37,6 +37,7 @@ export default authMiddleware({
     '/api/webhooks(.*)',
     '/api/public(.*)',
     '/api/proxy(.*)',  // Public API proxy routes for public data (events, etc.)
+    '/api/event/success(.*)',  // Public payment success processing (no auth required - uses Payment Intent/Session ID)
     '/api/diagnostic(.*)',  // Diagnostic endpoints for debugging
     '/api/logs(.*)',  // Client log forwarding endpoint
     '/mosc(.*)',
@@ -66,6 +67,7 @@ export default authMiddleware({
     // CRITICAL: Completely ignore API proxy routes (don't even apply Clerk middleware)
     '/api/webhooks/(.*)',
     '/api/proxy/(.*)',
+    '/api/event/success/(.*)',  // CRITICAL: Ignore payment success processing (mobile browser compatibility)
     '/api/stripe/(.*)',
     '/api/payment/(.*)',
     '/api/billing/(.*)',
