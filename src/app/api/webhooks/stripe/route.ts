@@ -683,11 +683,8 @@ function extractNameFromStripe(stripeName: string | null | undefined): { firstNa
   return { firstName, lastName };
 }
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+// Disable body parsing for App Router (not needed, but kept for reference)
+// App Router doesn't parse body by default for POST requests
 
 export async function POST(req: NextRequest) {
   const { serverRuntimeConfig } = getConfig() || { serverRuntimeConfig: {} };
@@ -720,32 +717,85 @@ export async function POST(req: NextRequest) {
       )
     });
 
-    // Read the raw body as an ArrayBuffer
-    const rawBody = await req.arrayBuffer();
-    const signature = req.headers.get('stripe-signature');
-    if (!signature) {
-      console.error('[STRIPE-WEBHOOK] Missing Stripe signature header');
-      return new Response('Missing Stripe signature', { status: 400 });
+    // CRITICAL: Read raw body for signature verification
+    // In AWS Lambda/Amplify, we need to ensure we get the raw body
+    // For App Router in Lambda, use arrayBuffer() to get raw bytes
+    let rawBody: Buffer;
+    let signature: string | null;
+    let bodyText: string = '';
+
+    try {
+      // Get signature header first (before reading body)
+      signature = req.headers.get('stripe-signature');
+      if (!signature) {
+        console.error('[STRIPE-WEBHOOK] Missing Stripe signature header');
+        return new NextResponse('Missing Stripe signature', { status: 400 });
+      }
+
+      // In AWS Lambda/Amplify, read as ArrayBuffer first to preserve raw bytes
+      // Then convert to Buffer for Stripe verification
+      const arrayBuffer = await req.arrayBuffer();
+      rawBody = Buffer.from(arrayBuffer);
+
+      // Also get text version for logging (but don't use for verification)
+      bodyText = rawBody.toString('utf8');
+
+      console.log('[STRIPE-WEBHOOK] Raw body length:', rawBody.length);
+      console.log('[STRIPE-WEBHOOK] Signature header:', signature.substring(0, 50) + '...');
+      console.log('[STRIPE-WEBHOOK] Is Lambda:', !!process.env.AWS_LAMBDA_FUNCTION_NAME);
+
+    } catch (bodyError) {
+      console.error('[STRIPE-WEBHOOK] Error reading request body:', bodyError);
+      return new NextResponse('Error reading request body', { status: 400 });
     }
-    // Convert ArrayBuffer to Buffer for stripe-node
-    const buf = Buffer.from(rawBody);
-    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+    const webhookSecret = getStripeEnvVar('STRIPE_WEBHOOK_SECRET');
     if (!webhookSecret) {
       console.error('[STRIPE-WEBHOOK] Stripe webhook secret is not configured');
-      return new Response('Stripe webhook secret not configured', { status: 500 });
+      return new NextResponse('Stripe webhook secret not configured', { status: 500 });
     }
+
     // Initialize Stripe with environment variable checks
     const stripe = initStripeConfig();
     if (!stripe) {
       throw new Error('[STRIPE-WEBHOOK] Failed to initialize Stripe configuration');
     }
-    let event;
+
+    let event: Stripe.Event;
     try {
-      event = stripe.webhooks.constructEvent(buf, signature, webhookSecret);
-      console.log('[STRIPE-WEBHOOK] Successfully verified webhook signature');
-    } catch (err) {
-      console.error('[STRIPE-WEBHOOK] Error verifying webhook signature:', err);
-      return new Response('Webhook signature verification failed', { status: 400 });
+      // Verify webhook signature using raw body Buffer
+      event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
+      console.log('[STRIPE-WEBHOOK] ✅ Successfully verified webhook signature');
+      console.log('[STRIPE-WEBHOOK] Event type:', event.type);
+      console.log('[STRIPE-WEBHOOK] Event ID:', event.id);
+    } catch (err: any) {
+      console.error('[STRIPE-WEBHOOK] ❌ Error verifying webhook signature:', err);
+      console.error('[STRIPE-WEBHOOK] Error type:', err?.type);
+      console.error('[STRIPE-WEBHOOK] Error message:', err?.message);
+
+      // Log additional debugging info
+      if (err?.type === 'StripeSignatureVerificationError') {
+        const bodyText = rawBody.toString('utf8');
+        console.error('[STRIPE-WEBHOOK] Signature verification failed - possible causes:');
+        console.error('[STRIPE-WEBHOOK] 1. Webhook secret mismatch');
+        console.error('[STRIPE-WEBHOOK] 2. Body was modified before reaching handler');
+        console.error('[STRIPE-WEBHOOK] 3. Signature header was modified');
+        console.error('[STRIPE-WEBHOOK] 4. Body encoding mismatch');
+        console.error('[STRIPE-WEBHOOK] Body preview (first 200 chars):', bodyText.substring(0, 200));
+        console.error('[STRIPE-WEBHOOK] Body length:', rawBody.length);
+        console.error('[STRIPE-WEBHOOK] Signature received:', signature?.substring(0, 50));
+      }
+
+      return new NextResponse(
+        JSON.stringify({
+          error: 'Webhook signature verification failed',
+          details: err?.message || 'Unknown error'
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
     }
 
     // Get baseUrl for proxy API calls

@@ -254,6 +254,67 @@ const UpcomingEventsSection: React.FC = () => {
     return null;
   }
 
+  // Handle fetch error state - return complete section with header
+  if (fetchError) {
+    return (
+      <section className="py-24 bg-gray-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <div className="flex items-center justify-center space-x-2 mb-4">
+              <div className="w-5 h-2 bg-yellow-400 rounded"></div>
+              <p className="text-gray-600 font-medium">Upcoming Events</p>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Our Upcoming Events
+            </h2>
+          </div>
+          <div className="text-center text-gray-500 py-8">
+            <div className="bg-white rounded-lg shadow-sm p-8 max-w-md mx-auto">
+              <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full">
+                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Upcoming Events Information Temporarily Unavailable</h3>
+              <p className="text-gray-500">We're currently updating our upcoming events information. Please check back later.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Handle no events state - return complete section with header
+  if (events.length === 0) {
+    return (
+      <section className="py-24 bg-gray-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <div className="flex items-center justify-center space-x-2 mb-4">
+              <div className="w-5 h-2 bg-yellow-400 rounded"></div>
+              <p className="text-gray-600 font-medium">Upcoming Events</p>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Our Upcoming Events
+            </h2>
+          </div>
+          <div className="text-center text-gray-500 py-8">
+            <div className="bg-white rounded-lg shadow-sm p-8 max-w-md mx-auto">
+              <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full">
+                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Upcoming Events Information Temporarily Unavailable</h3>
+              <p className="text-gray-500">We're currently updating our upcoming events information. Please check back later.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Normal render with events
   return (
     <section className="py-16 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -274,26 +335,8 @@ const UpcomingEventsSection: React.FC = () => {
           </p>
         </div>
 
-        {fetchError ? (
-          <div className="text-center text-red-600 font-bold py-8">
-            Sorry, we couldn't load events at this time. Please try again later.
-          </div>
-        ) : events.length === 0 ? (
-          <div className="text-center text-gray-500 py-8">
-            <div className="bg-white rounded-lg shadow-sm p-8 max-w-md mx-auto">
-              <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full">
-                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No Events Available</h3>
-              <p className="text-gray-500">We're currently planning our next events. Check back soon for updates!</p>
-            </div>
-          </div>
-        ) : (
-          <>
-            {/* Events List - Single column layout exactly like sponsors section */}
-            <div className="space-y-8 mb-8">
+        {/* Events List - Single column layout exactly like sponsors section */}
+        <div className="space-y-8 mb-8">
               {events.map((event, index) => (
                 <div
                   key={event.id}
@@ -435,22 +478,20 @@ const UpcomingEventsSection: React.FC = () => {
                   </div>
                 </div>
               ))}
-            </div>
+        </div>
 
-            {/* View All Events Button */}
-            <div className="text-center">
-              <Link
-                href="/events"
-                className="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3 px-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200"
-              >
-                <span>View All Events</span>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
-            </div>
-          </>
-        )}
+        {/* View All Events Button */}
+        <div className="text-center">
+          <Link
+            href="/events"
+            className="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3 px-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200"
+          >
+            <span>View All Events</span>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
+        </div>
       </div>
 
       <style jsx>{`

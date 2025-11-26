@@ -77,12 +77,18 @@ export const getCheckoutData = cache(async (eventId: string): Promise<CheckoutDa
     console.log('[CheckoutServerData] Fetching event data server-side for eventId:', eventId);
 
     // Fetch event details - using fetchWithJwtRetry per cursor rules
-    const eventRes = await fetchWithJwtRetry(
-      `${API_BASE_URL}/api/event-details/${eventId}`,
-      {
-        cache: 'no-store', // Don't cache at fetch level, Next.js cache() handles it
-      }
-    );
+    let eventRes;
+    try {
+      eventRes = await fetchWithJwtRetry(
+        `${API_BASE_URL}/api/event-details/${eventId}`,
+        {
+          cache: 'no-store', // Don't cache at fetch level, Next.js cache() handles it
+        }
+      );
+    } catch (fetchError) {
+      console.error('[CheckoutServerData] Network error fetching event:', fetchError);
+      throw new Error('Unable to connect to the server. Please check your internet connection and try again.');
+    }
 
     if (!eventRes.ok) {
       throw new Error(`Failed to fetch event: ${eventRes.status}`);
@@ -92,12 +98,18 @@ export const getCheckoutData = cache(async (eventId: string): Promise<CheckoutDa
 
     // Fetch ticket types (only active ones)
     // Use JHipster criteria syntax: field.operation=value
-    const ticketRes = await fetchWithJwtRetry(
-      `${API_BASE_URL}/api/event-ticket-types?eventId.equals=${eventId}&isActive.equals=true&tenantId.equals=${tenantId}`,
-      {
-        cache: 'no-store',
-      }
-    );
+    let ticketRes;
+    try {
+      ticketRes = await fetchWithJwtRetry(
+        `${API_BASE_URL}/api/event-ticket-types?eventId.equals=${eventId}&isActive.equals=true&tenantId.equals=${tenantId}`,
+        {
+          cache: 'no-store',
+        }
+      );
+    } catch (fetchError) {
+      console.error('[CheckoutServerData] Network error fetching tickets:', fetchError);
+      throw new Error('Unable to connect to the server. Please check your internet connection and try again.');
+    }
 
     if (!ticketRes.ok) {
       throw new Error(`Failed to fetch tickets: ${ticketRes.status}`);
@@ -182,6 +194,19 @@ export const getCheckoutData = cache(async (eventId: string): Promise<CheckoutDa
     };
   } catch (error) {
     console.error('[CheckoutServerData] Error fetching checkout data:', error);
-    throw error;
+    console.error('[CheckoutServerData] Error type:', error instanceof Error ? error.constructor.name : typeof error);
+    console.error('[CheckoutServerData] Error message:', error instanceof Error ? error.message : String(error));
+
+    // Re-throw with user-friendly message if not already wrapped
+    if (error instanceof Error) {
+      // If it's already a user-friendly message, keep it
+      if (error.message.includes('Unable to connect') || error.message.includes('check your internet')) {
+        throw error;
+      }
+      // Otherwise, wrap it
+      throw new Error('Unable to load checkout data. Please check your connection and try again.');
+    }
+
+    throw new Error('Unable to load checkout data. Please try again later.');
   }
 });
