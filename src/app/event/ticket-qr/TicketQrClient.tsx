@@ -156,28 +156,46 @@ export default function TicketQrClient({ initialPi, initialSessionId }: TicketQr
   };
 
   // Mark as mounted on client and do all initial logging in useEffect
+  // CRITICAL: Use setTimeout to ensure this runs even if hydration fails
   useEffect(() => {
-    try {
-      console.log('[QR CLIENT VERSION] v2025-11-25-22:52 - All hydration fixes applied');
-      console.log('[QR CLIENT] ===== CLIENT-SIDE RENDER =====');
-      console.log('[QR CLIENT] Component mounting on client');
-      console.log('[QR CLIENT] URL:', window.location.href);
-      console.log('[QR CLIENT] Search params:', window.location.search);
-      console.log('[QR CLIENT] Props received:', { initialPi, initialSessionId });
-      const urlParams = new URLSearchParams(window.location.search);
-      console.log('[QR CLIENT] Payment Intent from URL:', urlParams.get('pi'));
-      console.log('[QR CLIENT] Session ID from URL:', urlParams.get('session_id'));
-      console.log('[MOBILE QR] TicketQrClient mounted');
-      console.log('[MOBILE QR] Window location:', window.location.href);
-      console.log('[MOBILE QR] User Agent:', navigator.userAgent);
-      setMounted(true);
-    } catch (error) {
-      console.error('[QR CLIENT] CRITICAL ERROR in mount useEffect:', error);
-      console.error('[QR CLIENT] Error stack:', error instanceof Error ? error.stack : 'No stack');
-      // Still set mounted even if logging fails
-      setMounted(true);
-    }
+    // Use setTimeout to ensure this runs after hydration, even if there are issues
+    const timeoutId = setTimeout(() => {
+      try {
+        console.log('[QR CLIENT VERSION] v2025-11-26-02:48 - Mobile hydration fix applied');
+        console.log('[QR CLIENT] ===== CLIENT-SIDE RENDER =====');
+        console.log('[QR CLIENT] Component mounting on client');
+        console.log('[QR CLIENT] URL:', window.location.href);
+        console.log('[QR CLIENT] Search params:', window.location.search);
+        console.log('[QR CLIENT] Props received:', { initialPi, initialSessionId });
+        const urlParams = new URLSearchParams(window.location.search);
+        console.log('[QR CLIENT] Payment Intent from URL:', urlParams.get('pi'));
+        console.log('[QR CLIENT] Session ID from URL:', urlParams.get('session_id'));
+        console.log('[MOBILE QR] TicketQrClient mounted');
+        console.log('[MOBILE QR] Window location:', window.location.href);
+        console.log('[MOBILE QR] User Agent:', navigator.userAgent);
+        setMounted(true);
+      } catch (error) {
+        console.error('[QR CLIENT] CRITICAL ERROR in mount useEffect:', error);
+        console.error('[QR CLIENT] Error stack:', error instanceof Error ? error.stack : 'No stack');
+        // Still set mounted even if logging fails - CRITICAL for mobile browsers
+        setMounted(true);
+      }
+    }, 0); // Run on next tick to ensure it executes even if hydration has issues
+
+    return () => clearTimeout(timeoutId);
   }, [initialPi, initialSessionId]);
+
+  // FALLBACK: Also set mounted after a short delay to ensure it happens even if useEffect fails
+  useEffect(() => {
+    const fallbackTimeout = setTimeout(() => {
+      if (!mounted) {
+        console.warn('[QR CLIENT] Fallback: Setting mounted=true after delay (hydration may have failed)');
+        setMounted(true);
+      }
+    }, 100); // 100ms fallback
+
+    return () => clearTimeout(fallbackTimeout);
+  }, [mounted]);
 
   // Initialize parameters on client side to avoid SSR issues
   useEffect(() => {
