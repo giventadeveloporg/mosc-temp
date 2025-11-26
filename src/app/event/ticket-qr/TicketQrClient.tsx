@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useLayoutEffect } from "react";
 import { useRouter, useSearchParams } from 'next/navigation';
 import LoadingTicket from "../success/LoadingTicket";
 import {
@@ -149,6 +149,20 @@ export default function TicketQrClient({ initialPi, initialSessionId }: TicketQr
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  // CRITICAL: Immediate mount detection using useLayoutEffect (runs synchronously before paint)
+  // This ensures we set mounted=true even if regular useEffect fails due to hydration issues
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    console.log('[QR CLIENT] [LAYOUT EFFECT] ✅ useLayoutEffect executing - component is mounting');
+    console.log('[QR CLIENT] [LAYOUT EFFECT] Props:', { initialPi, initialSessionId });
+    console.log('[QR CLIENT] [LAYOUT EFFECT] URL:', window.location.href);
+    console.log('[QR CLIENT] [LAYOUT EFFECT] User Agent:', navigator.userAgent);
+
+    // Set mounted immediately - this is critical for mobile browsers
+    setMounted(true);
+  }, [initialPi, initialSessionId]);
+
   // Helper function to add logs that will be visible in error screen
   const addApiLog = (message: string) => {
     console.log(message);
@@ -156,34 +170,36 @@ export default function TicketQrClient({ initialPi, initialSessionId }: TicketQr
   };
 
   // Mark as mounted on client and do all initial logging in useEffect
-  // CRITICAL: Use setTimeout to ensure this runs even if hydration fails
+  // CRITICAL: This runs AFTER useLayoutEffect, so mounted should already be true from useLayoutEffect
+  // But we keep this for additional logging and as a backup
   useEffect(() => {
-    // Use setTimeout to ensure this runs after hydration, even if there are issues
-    const timeoutId = setTimeout(() => {
-      try {
-        console.log('[QR CLIENT VERSION] v2025-11-26-02:48 - Mobile hydration fix applied');
-        console.log('[QR CLIENT] ===== CLIENT-SIDE RENDER =====');
-        console.log('[QR CLIENT] Component mounting on client');
-        console.log('[QR CLIENT] URL:', window.location.href);
-        console.log('[QR CLIENT] Search params:', window.location.search);
-        console.log('[QR CLIENT] Props received:', { initialPi, initialSessionId });
-        const urlParams = new URLSearchParams(window.location.search);
-        console.log('[QR CLIENT] Payment Intent from URL:', urlParams.get('pi'));
-        console.log('[QR CLIENT] Session ID from URL:', urlParams.get('session_id'));
-        console.log('[MOBILE QR] TicketQrClient mounted');
-        console.log('[MOBILE QR] Window location:', window.location.href);
-        console.log('[MOBILE QR] User Agent:', navigator.userAgent);
-        setMounted(true);
-      } catch (error) {
-        console.error('[QR CLIENT] CRITICAL ERROR in mount useEffect:', error);
-        console.error('[QR CLIENT] Error stack:', error instanceof Error ? error.stack : 'No stack');
-        // Still set mounted even if logging fails - CRITICAL for mobile browsers
+    try {
+      console.log('[QR CLIENT VERSION] v2025-11-26-03:18 - useLayoutEffect + useEffect hydration fix');
+      console.log('[QR CLIENT] ===== CLIENT-SIDE RENDER (useEffect) =====');
+      console.log('[QR CLIENT] Component mounting on client');
+      console.log('[QR CLIENT] URL:', window.location.href);
+      console.log('[QR CLIENT] Search params:', window.location.search);
+      console.log('[QR CLIENT] Props received:', { initialPi, initialSessionId });
+      const urlParams = new URLSearchParams(window.location.search);
+      console.log('[QR CLIENT] Payment Intent from URL:', urlParams.get('pi'));
+      console.log('[QR CLIENT] Session ID from URL:', urlParams.get('session_id'));
+      console.log('[MOBILE QR] TicketQrClient useEffect executing');
+      console.log('[MOBILE QR] Window location:', window.location.href);
+      console.log('[MOBILE QR] User Agent:', navigator.userAgent);
+      console.log('[MOBILE QR] Mounted state:', mounted);
+
+      // Ensure mounted is set (backup in case useLayoutEffect failed)
+      if (!mounted) {
+        console.warn('[QR CLIENT] Mounted was false in useEffect, setting to true');
         setMounted(true);
       }
-    }, 0); // Run on next tick to ensure it executes even if hydration has issues
-
-    return () => clearTimeout(timeoutId);
-  }, [initialPi, initialSessionId]);
+    } catch (error) {
+      console.error('[QR CLIENT] CRITICAL ERROR in mount useEffect:', error);
+      console.error('[QR CLIENT] Error stack:', error instanceof Error ? error.stack : 'No stack');
+      // Still set mounted even if logging fails - CRITICAL for mobile browsers
+      setMounted(true);
+    }
+  }, [initialPi, initialSessionId, mounted]);
 
   // FALLBACK: Also set mounted after a short delay to ensure it happens even if useEffect fails
   useEffect(() => {
