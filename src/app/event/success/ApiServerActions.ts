@@ -643,6 +643,20 @@ export async function createTransactionFromPaymentIntent(
     amountPaid
   });
 
+  // CRITICAL: Check if transaction already exists before creating (prevent duplicates)
+  const existingTransaction = await findTransactionByPaymentIntentId(paymentIntentId);
+  if (existingTransaction) {
+    console.log('[createTransactionFromPaymentIntent] Transaction already exists for Payment Intent:', {
+      paymentIntentId,
+      existingTransactionId: existingTransaction.id,
+      existingQrCodeUrl: existingTransaction.qrCodeImageUrl || 'NULL',
+      timestamp: new Date().toISOString()
+    });
+
+    // Return existing transaction instead of creating duplicate
+    return existingTransaction;
+  }
+
   const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
   const now = new Date().toISOString();
 

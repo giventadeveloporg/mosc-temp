@@ -1302,6 +1302,27 @@ export async function POST(req: NextRequest) {
               extractionTimestamp: now
             });
 
+            // CRITICAL: Check if transaction already exists before creating (prevent duplicates)
+            const { findTransactionByPaymentIntentId } = await import('@/app/event/success/ApiServerActions');
+            const existingTransaction = await findTransactionByPaymentIntentId(pi.id);
+
+            if (existingTransaction) {
+              console.log('[STRIPE-WEBHOOK] Transaction already exists for Payment Intent:', {
+                paymentIntentId: pi.id,
+                existingTransactionId: existingTransaction.id,
+                existingQrCodeUrl: existingTransaction.qrCodeImageUrl || 'NULL',
+                timestamp: now
+              });
+
+              // If QR code is missing, we might want to trigger QR generation, but don't create duplicate transaction
+              if (!existingTransaction.qrCodeImageUrl) {
+                console.log('[STRIPE-WEBHOOK] Existing transaction has no QR code URL - QR generation should happen separately');
+              }
+
+              // Skip transaction creation - already exists
+              break;
+            }
+
             // Build payload similar to processStripeSessionServer
             const txPayload: Omit<EventTicketTransactionDTO, 'id'> = {
               email: customerEmail,
