@@ -297,30 +297,71 @@ export async function processStripeSessionServer(
       throw new Error('Transaction ID missing after creation');
     }
 
-    // Check if transaction items already exist
+    // CRITICAL: Enhanced idempotency check - verify items don't exist for this transaction
+    // Check each cart item individually to prevent duplicates even if partial items exist
+    // IMPORTANT: This check is NOT atomic - backend should enforce uniqueness at DB level
     const baseUrl = getAppUrl();
     const itemsCheckUrl = `${baseUrl}/api/proxy/event-ticket-transaction-items?transactionId.equals=${newTransaction.id}&tenantId.equals=${getTenantId()}`;
-    const itemsCheckRes = await fetchWithJwtRetry(itemsCheckUrl, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' }
-    });
 
-    let existingItemsCount = 0;
-    if (itemsCheckRes.ok) {
-      const existingItems = await itemsCheckRes.json();
-      existingItemsCount = Array.isArray(existingItems) ? existingItems.length : 0;
+    // Retry logic to handle race conditions: check multiple times with small delay
+    let existingItems: any[] = [];
+    const maxRetries = 3;
+    for (let retry = 0; retry < maxRetries; retry++) {
+      if (retry > 0) {
+        // Small delay between retries to allow concurrent requests to complete
+        await new Promise(resolve => setTimeout(resolve, 100 * retry));
+      }
+
+      const itemsCheckRes = await fetchWithJwtRetry(itemsCheckUrl, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store' // Ensure fresh data on every check
+      });
+
+      if (itemsCheckRes.ok) {
+        const itemsData = await itemsCheckRes.json();
+        existingItems = Array.isArray(itemsData) ? itemsData : [];
+        // If we found items, break early (no need to retry)
+        if (existingItems.length > 0) break;
+      } else {
+        console.warn(`[processStripeSessionServer] Failed to check existing items (attempt ${retry + 1}/${maxRetries}):`, itemsCheckRes.status, itemsCheckRes.statusText);
+      }
     }
 
     console.log('[processStripeSessionServer] Transaction items check:', {
       transactionId: newTransaction.id,
-      existingItemsCount,
+      existingItemsCount: existingItems.length,
+      existingItems: existingItems.map(item => ({ id: item.id, ticketTypeId: item.ticketTypeId, quantity: item.quantity })),
       cartItemsCount: cart.length
     });
 
-    // Only create items if they don't already exist (backend webhook may have created them)
-    if (existingItemsCount === 0 && cart.length > 0) {
-      console.log('[processStripeSessionServer] Creating transaction items (none exist yet)');
-      const itemsPayload = cart.map((item: ShoppingCartItem) => withTenantId({
+    // Filter out items that already exist (by transactionId + ticketTypeId combination)
+    const itemsToCreate: ShoppingCartItem[] = [];
+    for (const cartItem of cart) {
+      const ticketTypeId = parseInt(cartItem.ticketTypeId, 10);
+      const existingItem = existingItems.find(
+        (item: any) => item.ticketTypeId === ticketTypeId && item.transactionId === newTransaction.id
+      );
+
+      if (!existingItem) {
+        itemsToCreate.push(cartItem);
+        console.log('[processStripeSessionServer] Item needs to be created:', {
+          ticketTypeId,
+          quantity: cartItem.quantity
+        });
+      } else {
+        console.log('[processStripeSessionServer] Item already exists - skipping:', {
+          ticketTypeId,
+          existingItemId: existingItem.id,
+          existingQuantity: existingItem.quantity
+        });
+      }
+    }
+
+    // Only create items that don't already exist
+    if (itemsToCreate.length > 0) {
+      console.log('[processStripeSessionServer] Creating transaction items (none exist yet for these ticket types):', itemsToCreate.length);
+      const itemsPayload = itemsToCreate.map((item: ShoppingCartItem) => withTenantId({
         transactionId: newTransaction.id as number,
         ticketTypeId: parseInt(item.ticketTypeId, 10),
         quantity: item.quantity,
@@ -332,8 +373,8 @@ export async function processStripeSessionServer(
       }));
       await createTransactionItemsBulk(itemsPayload);
       console.log('[processStripeSessionServer] Successfully created transaction items:', itemsPayload.length);
-    } else if (existingItemsCount > 0) {
-      console.log('[processStripeSessionServer] Transaction items already exist - skipping creation to prevent duplicates');
+    } else if (existingItems.length > 0) {
+      console.log('[processStripeSessionServer] All transaction items already exist - skipping creation to prevent duplicates');
     } else {
       console.log('[processStripeSessionServer] No cart items to create transaction items for');
     }
@@ -795,33 +836,76 @@ export async function createTransactionFromPaymentIntent(
   // but keeping the check as a safety measure
   if (transactionItems.length > 0) {
     try {
-      // Check if transaction items already exist
+      // CRITICAL: Enhanced idempotency check - verify items don't exist for this transaction
+      // Check each item individually to prevent duplicates even if partial items exist
+      // IMPORTANT: This check is NOT atomic - backend should enforce uniqueness at DB level
       const baseUrl = getAppUrl();
       const itemsCheckUrl = `${baseUrl}/api/proxy/event-ticket-transaction-items?transactionId.equals=${transaction.id}&tenantId.equals=${getTenantId()}`;
-      const itemsCheckRes = await fetchWithJwtRetry(itemsCheckUrl, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
-      });
 
-      let existingItemsCount = 0;
-      if (itemsCheckRes.ok) {
-        const existingItems = await itemsCheckRes.json();
-        existingItemsCount = Array.isArray(existingItems) ? existingItems.length : 0;
+      // Retry logic to handle race conditions: check multiple times with small delay
+      let existingItems: any[] = [];
+      const maxRetries = 3;
+      for (let retry = 0; retry < maxRetries; retry++) {
+        if (retry > 0) {
+          // Small delay between retries to allow concurrent requests to complete
+          await new Promise(resolve => setTimeout(resolve, 100 * retry));
+        }
+
+        const itemsCheckRes = await fetchWithJwtRetry(itemsCheckUrl, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store' // Ensure fresh data on every check
+        });
+
+        if (itemsCheckRes.ok) {
+          const itemsData = await itemsCheckRes.json();
+          existingItems = Array.isArray(itemsData) ? itemsData : [];
+          // If we found items, break early (no need to retry)
+          if (existingItems.length > 0) break;
+        } else {
+          console.warn(`[createTransactionFromPaymentIntent] Failed to check existing items (attempt ${retry + 1}/${maxRetries}):`, itemsCheckRes.status, itemsCheckRes.statusText);
+        }
       }
 
       console.log('[createTransactionFromPaymentIntent] Transaction items check:', {
         transactionId: transaction.id,
-        existingItemsCount,
+        existingItemsCount: existingItems.length,
+        existingItems: existingItems.map(item => ({ id: item.id, ticketTypeId: item.ticketTypeId, quantity: item.quantity })),
         cartItemsCount: transactionItems.length
       });
 
-      // Only create items if they don't already exist (backend webhook may have created them)
-      if (existingItemsCount === 0) {
-        console.log('[createTransactionFromPaymentIntent] Creating transaction items (none exist yet)');
-        await createTransactionItemsBulk(transactionItems);
-        console.log('[createTransactionFromPaymentIntent] Successfully created transaction items:', transactionItems.length);
+      // Filter out items that already exist (by transactionId + ticketTypeId combination)
+      const itemsToCreate = transactionItems.filter((item: any) => {
+        const ticketTypeId = item.ticketTypeId;
+        const existingItem = existingItems.find(
+          (existing: any) => existing.ticketTypeId === ticketTypeId && existing.transactionId === transaction.id
+        );
+
+        if (!existingItem) {
+          console.log('[createTransactionFromPaymentIntent] Item needs to be created:', {
+            ticketTypeId,
+            quantity: item.quantity
+          });
+          return true;
+        } else {
+          console.log('[createTransactionFromPaymentIntent] Item already exists - skipping:', {
+            ticketTypeId,
+            existingItemId: existingItem.id,
+            existingQuantity: existingItem.quantity
+          });
+          return false;
+        }
+      });
+
+      // Only create items that don't already exist
+      if (itemsToCreate.length > 0) {
+        console.log('[createTransactionFromPaymentIntent] Creating transaction items (none exist yet for these ticket types):', itemsToCreate.length);
+        await createTransactionItemsBulk(itemsToCreate);
+        console.log('[createTransactionFromPaymentIntent] Successfully created transaction items:', itemsToCreate.length);
+      } else if (existingItems.length > 0) {
+        console.log('[createTransactionFromPaymentIntent] All transaction items already exist - skipping creation to prevent duplicates');
       } else {
-        console.log('[createTransactionFromPaymentIntent] Transaction items already exist - skipping creation to prevent duplicates');
+        console.log('[createTransactionFromPaymentIntent] No transaction items to create');
       }
     } catch (err) {
       console.error('[createTransactionFromPaymentIntent] Failed to create transaction items:', err);

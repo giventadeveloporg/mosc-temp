@@ -1356,87 +1356,119 @@ export async function POST(req: NextRequest) {
 
               // CRITICAL: Check if transaction items exist - if not, create them even if transaction exists
               // This handles cases where transaction was created but items failed to create
+              // ENHANCED: Check each item individually to prevent duplicates even if partial items exist
               if (Array.isArray(cart) && cart.length > 0) {
                 try {
                   // Check if transaction items exist by fetching them
                   const itemsCheckUrl = `${API_BASE_URL}/api/event-ticket-transaction-items?transactionId.equals=${existingTransaction.id}&tenantId.equals=${getTenantId()}`;
                   const itemsCheckRes = await fetchWithJwtRetry(itemsCheckUrl, {
                     method: 'GET',
-                    headers: { 'Content-Type': 'application/json' }
+                    headers: { 'Content-Type': 'application/json' },
+                    cache: 'no-store' // Ensure fresh data on every check
                   });
 
+                  let existingItems: any[] = [];
                   if (itemsCheckRes.ok) {
-                    const existingItems = await itemsCheckRes.json();
-                    const existingItemsCount = Array.isArray(existingItems) ? existingItems.length : 0;
+                    const itemsData = await itemsCheckRes.json();
+                    existingItems = Array.isArray(itemsData) ? itemsData : [];
+                  } else {
+                    console.warn('[STRIPE-WEBHOOK] Failed to check existing items:', itemsCheckRes.status, itemsCheckRes.statusText);
+                  }
 
-                    console.log('[STRIPE-WEBHOOK] Existing transaction items count:', existingItemsCount, 'Cart items count:', cart.length);
+                  console.log('[STRIPE-WEBHOOK] Transaction items check:', {
+                    transactionId: existingTransaction.id,
+                    existingItemsCount: existingItems.length,
+                    existingItems: existingItems.map(item => ({ id: item.id, ticketTypeId: item.ticketTypeId, quantity: item.quantity })),
+                    cartItemsCount: cart.length
+                  });
 
-                    // If no items exist but cart has items, create them now
-                    if (existingItemsCount === 0 && cart.length > 0) {
-                      console.log('[STRIPE-WEBHOOK] Transaction exists but has no items - creating transaction items now');
+                  // Import the bulk creation function
+                  const { createTransactionItemsBulkServer } = await import('./ApiServerActions');
 
-                      // Import the bulk creation function
-                      const { createTransactionItemsBulkServer } = await import('./ApiServerActions');
-
-                      // Fetch prices and create items (same logic as below)
-                      const cartWithPrices = [];
-                      for (const item of cart) {
-                        try {
-                          let ticketTypeId = item.ticketTypeId;
-                          if (!ticketTypeId && item.ticketType && item.ticketType.id) {
-                            ticketTypeId = item.ticketType.id;
-                          }
-
-                          if (!ticketTypeId || typeof item.quantity !== 'number' || item.quantity <= 0) {
-                            continue;
-                          }
-
-                          const ticketTypeRes = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-ticket-types/${ticketTypeId}`, {
-                            method: 'GET',
-                            headers: { 'Content-Type': 'application/json' }
-                          });
-
-                          if (!ticketTypeRes.ok) continue;
-                          const ticketType = await ticketTypeRes.json();
-                          const price = ticketType.price;
-
-                          if (typeof price !== 'number' || price < 0) continue;
-
-                          cartWithPrices.push({
-                            ...item,
-                            ticketTypeId,
-                            price,
-                            ticketType
-                          });
-                        } catch (error) {
-                          console.error('[STRIPE-WEBHOOK] Error fetching price for cart item:', item, error);
-                        }
+                  // Fetch prices and prepare items (same logic as below)
+                  const cartWithPrices = [];
+                  for (const item of cart) {
+                    try {
+                      let ticketTypeId = item.ticketTypeId;
+                      if (!ticketTypeId && item.ticketType && item.ticketType.id) {
+                        ticketTypeId = item.ticketType.id;
                       }
 
-                      if (cartWithPrices.length > 0) {
-                        const itemsPayload = cartWithPrices.map((item: any) => {
-                          const parsedTicketTypeId = parseInt(item.ticketTypeId, 10);
-                          const quantity = item.quantity;
-                          const pricePerUnit = parseFloat(item.price.toString());
-                          const totalAmount = pricePerUnit * quantity;
-
-                          return withTenantId({
-                            transactionId: existingTransaction.id as number,
-                            ticketTypeId: parsedTicketTypeId,
-                            quantity,
-                            pricePerUnit,
-                            totalAmount,
-                            createdAt: now,
-                            updatedAt: now,
-                          });
-                        });
-
-                        await createTransactionItemsBulkServer(itemsPayload);
-                        console.log('[STRIPE-WEBHOOK] Successfully created missing transaction items:', itemsPayload.length);
+                      if (!ticketTypeId || typeof item.quantity !== 'number' || item.quantity <= 0) {
+                        continue;
                       }
-                    } else {
-                      console.log('[STRIPE-WEBHOOK] Transaction items already exist - skipping creation');
+
+                      const ticketTypeRes = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-ticket-types/${ticketTypeId}`, {
+                        method: 'GET',
+                        headers: { 'Content-Type': 'application/json' }
+                      });
+
+                      if (!ticketTypeRes.ok) continue;
+                      const ticketType = await ticketTypeRes.json();
+                      const price = ticketType.price;
+
+                      if (typeof price !== 'number' || price < 0) continue;
+
+                      cartWithPrices.push({
+                        ...item,
+                        ticketTypeId,
+                        price,
+                        ticketType
+                      });
+                    } catch (error) {
+                      console.error('[STRIPE-WEBHOOK] Error fetching price for cart item:', item, error);
                     }
+                  }
+
+                  // Filter out items that already exist (by transactionId + ticketTypeId combination)
+                  const itemsToCreate: any[] = [];
+                  for (const cartItem of cartWithPrices) {
+                    const ticketTypeId = parseInt(cartItem.ticketTypeId, 10);
+                    const existingItem = existingItems.find(
+                      (item: any) => item.ticketTypeId === ticketTypeId && item.transactionId === existingTransaction.id
+                    );
+
+                    if (!existingItem) {
+                      itemsToCreate.push(cartItem);
+                      console.log('[STRIPE-WEBHOOK] Item needs to be created:', {
+                        ticketTypeId,
+                        quantity: cartItem.quantity
+                      });
+                    } else {
+                      console.log('[STRIPE-WEBHOOK] Item already exists - skipping:', {
+                        ticketTypeId,
+                        existingItemId: existingItem.id,
+                        existingQuantity: existingItem.quantity
+                      });
+                    }
+                  }
+
+                  // Only create items that don't already exist
+                  if (itemsToCreate.length > 0) {
+                    console.log('[STRIPE-WEBHOOK] Creating transaction items (none exist yet for these ticket types):', itemsToCreate.length);
+                    const itemsPayload = itemsToCreate.map((item: any) => {
+                      const parsedTicketTypeId = parseInt(item.ticketTypeId, 10);
+                      const quantity = item.quantity;
+                      const pricePerUnit = parseFloat(item.price.toString());
+                      const totalAmount = pricePerUnit * quantity;
+
+                      return withTenantId({
+                        transactionId: existingTransaction.id as number,
+                        ticketTypeId: parsedTicketTypeId,
+                        quantity,
+                        pricePerUnit,
+                        totalAmount,
+                        createdAt: now,
+                        updatedAt: now,
+                      });
+                    });
+
+                    await createTransactionItemsBulkServer(itemsPayload);
+                    console.log('[STRIPE-WEBHOOK] Successfully created transaction items:', itemsPayload.length);
+                  } else if (existingItems.length > 0) {
+                    console.log('[STRIPE-WEBHOOK] All transaction items already exist - skipping creation to prevent duplicates');
+                  } else {
+                    console.log('[STRIPE-WEBHOOK] No cart items to create transaction items for');
                   }
                 } catch (itemsCheckError) {
                   console.error('[STRIPE-WEBHOOK] Error checking for existing transaction items:', itemsCheckError);
@@ -1512,9 +1544,34 @@ export async function POST(req: NextRequest) {
               console.warn('[STRIPE-WEBHOOK] Transaction creation failed, but webhook will succeed to prevent infinite retries');
             } else if (created?.id && Array.isArray(cart)) {
               // CRITICAL FIX: Create transaction items for mobile flow (just like desktop)
+              // ENHANCED: Check each item individually to prevent duplicates even if partial items exist
               console.log('[STRIPE-WEBHOOK] Creating transaction items for mobile payment intent flow...');
 
               try {
+                // CRITICAL: Enhanced idempotency check - verify items don't exist for this transaction
+                // Check each item individually to prevent duplicates even if partial items exist
+                const itemsCheckUrl = `${API_BASE_URL}/api/event-ticket-transaction-items?transactionId.equals=${created.id}&tenantId.equals=${getTenantId()}`;
+                const itemsCheckRes = await fetchWithJwtRetry(itemsCheckUrl, {
+                  method: 'GET',
+                  headers: { 'Content-Type': 'application/json' },
+                  cache: 'no-store' // Ensure fresh data on every check
+                });
+
+                let existingItems: any[] = [];
+                if (itemsCheckRes.ok) {
+                  const itemsData = await itemsCheckRes.json();
+                  existingItems = Array.isArray(itemsData) ? itemsData : [];
+                } else {
+                  console.warn('[STRIPE-WEBHOOK] Failed to check existing items:', itemsCheckRes.status, itemsCheckRes.statusText);
+                }
+
+                console.log('[STRIPE-WEBHOOK] Transaction items check:', {
+                  transactionId: created.id,
+                  existingItemsCount: existingItems.length,
+                  existingItems: existingItems.map(item => ({ id: item.id, ticketTypeId: item.ticketTypeId, quantity: item.quantity })),
+                  cartItemsCount: cart.length
+                });
+
                 // Import the bulk creation function
                 const { createTransactionItemsBulkServer } = await import('./ApiServerActions');
 
@@ -1596,39 +1653,65 @@ export async function POST(req: NextRequest) {
                   cartWithPrices: JSON.stringify(cartWithPrices, null, 2)
                 });
 
-                // Now build transaction items payload with complete data
-                const itemsPayload = cartWithPrices.map((item: any) => {
-                  const parsedTicketTypeId = parseInt(item.ticketTypeId, 10);
-                  const quantity = item.quantity;
-                  const pricePerUnit = parseFloat(item.price.toString());
-                  const totalAmount = pricePerUnit * quantity;
+                // Filter out items that already exist (by transactionId + ticketTypeId combination)
+                const itemsToCreate: any[] = [];
+                for (const cartItem of cartWithPrices) {
+                  const ticketTypeId = parseInt(cartItem.ticketTypeId, 10);
+                  const existingItem = existingItems.find(
+                    (item: any) => item.ticketTypeId === ticketTypeId && item.transactionId === created.id
+                  );
 
-                  console.log('[STRIPE-WEBHOOK] Creating transaction item with complete data:', {
-                    ticketTypeId: parsedTicketTypeId,
-                    quantity,
-                    pricePerUnit,
-                    totalAmount,
-                    transactionId: created.id
+                  if (!existingItem) {
+                    itemsToCreate.push(cartItem);
+                    console.log('[STRIPE-WEBHOOK] Item needs to be created:', {
+                      ticketTypeId,
+                      quantity: cartItem.quantity
+                    });
+                  } else {
+                    console.log('[STRIPE-WEBHOOK] Item already exists - skipping:', {
+                      ticketTypeId,
+                      existingItemId: existingItem.id,
+                      existingQuantity: existingItem.quantity
+                    });
+                  }
+                }
+
+                // Only create items that don't already exist
+                if (itemsToCreate.length > 0) {
+                  console.log('[STRIPE-WEBHOOK] Creating transaction items (none exist yet for these ticket types):', itemsToCreate.length);
+                  const itemsPayload = itemsToCreate.map((item: any) => {
+                    const parsedTicketTypeId = parseInt(item.ticketTypeId, 10);
+                    const quantity = item.quantity;
+                    const pricePerUnit = parseFloat(item.price.toString());
+                    const totalAmount = pricePerUnit * quantity;
+
+                    console.log('[STRIPE-WEBHOOK] Creating transaction item with complete data:', {
+                      ticketTypeId: parsedTicketTypeId,
+                      quantity,
+                      pricePerUnit,
+                      totalAmount,
+                      transactionId: created.id
+                    });
+
+                    return withTenantId({
+                      transactionId: created.id as number,
+                      ticketTypeId: parsedTicketTypeId,
+                      quantity,
+                      pricePerUnit,
+                      totalAmount,
+                      // Add required fields to match backend validation
+                      createdAt: now,
+                      updatedAt: now,
+                    });
                   });
 
-                  return withTenantId({
-                    transactionId: created.id as number,
-                    ticketTypeId: parsedTicketTypeId,
-                    quantity,
-                    pricePerUnit,
-                    totalAmount,
-                    // Add required fields to match backend validation
-                    createdAt: now,
-                    updatedAt: now,
-                  });
-                });
-
-                if (itemsPayload.length > 0) {
                   await createTransactionItemsBulkServer(itemsPayload);
                   console.log('[STRIPE-WEBHOOK] Successfully created transaction items for mobile payment:', itemsPayload.length);
+                } else if (existingItems.length > 0) {
+                  console.log('[STRIPE-WEBHOOK] All transaction items already exist - skipping creation to prevent duplicates');
                 } else {
-                  console.error('[STRIPE-WEBHOOK] No valid cart items to create - all items were filtered out');
-                  console.error('[STRIPE-WEBHOOK] Original cart data:', JSON.stringify(cart, null, 2));
+                  console.log('[STRIPE-WEBHOOK] No valid cart items to create - all items were filtered out');
+                  console.log('[STRIPE-WEBHOOK] Original cart data:', JSON.stringify(cart, null, 2));
                 }
               } catch (itemsError) {
                 console.error('[STRIPE-WEBHOOK] Failed to create transaction items for mobile payment:', itemsError);
