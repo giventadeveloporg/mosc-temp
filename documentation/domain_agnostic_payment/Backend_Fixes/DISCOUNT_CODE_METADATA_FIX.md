@@ -402,3 +402,4 @@ Please implement discount code capture in the ticket transaction flow:
 - See `documentation/Swagger_API_Docs/api-docs.json` for `PaymentInitializeRequest` schema
 - Frontend sends `discountCode` as string (discount code ID)
 
+

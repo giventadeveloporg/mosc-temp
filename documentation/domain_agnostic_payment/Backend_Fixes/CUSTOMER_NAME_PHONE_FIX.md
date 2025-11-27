@@ -206,3 +206,4 @@ WHERE stripe_payment_intent_id = 'pi_XXX';
 - `FRONTEND_CART_METADATA_ISSUE.md` - Related cart metadata issue
 - `BACKEND_TRANSACTION_ITEMS_FIX.md` - Backend transaction items fix
 
+

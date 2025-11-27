@@ -7,9 +7,11 @@ import type { EventWithMedia, EventDetailsDTO } from "@/types";
 import { formatInTimeZone } from 'date-fns-tz';
 import LocationDisplay from '@/components/LocationDisplay';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { isRecurringEvent, getNextOccurrenceDate } from '@/lib/eventUtils';
 // import { formatInTimeZone } from 'date-fns-tz';
 
-const EVENTS_PAGE_SIZE = 10;
+const EVENTS_PAGE_SIZE = 20; // Minimum events to display per page
+const BACKEND_FETCH_SIZE = 50; // Fetch more from backend to account for recurring event filtering
 
 // Component for handling long descriptions with expand/collapse
 function DescriptionDisplay({ description }: { description: string }) {
@@ -65,6 +67,7 @@ export default function EventsPage() {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const [displayedCount, setDisplayedCount] = useState(0); // Actual count after filtering recurring events
   const [heroImageUrl, setHeroImageUrl] = useState<string>("/images/default_placeholder_hero_image.jpeg");
   const [fetchError, setFetchError] = useState(false);
   const [showPastEvents, setShowPastEvents] = useState(false);
@@ -98,11 +101,13 @@ export default function EventsPage() {
       setFetchError(false);
       try {
         // Build query parameters based on date filter
+        // Fetch more events from backend to account for recurring event filtering
+        // We fetch BACKEND_FETCH_SIZE events to ensure we have at least EVENTS_PAGE_SIZE after filtering
         const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
         const queryParams = new URLSearchParams({
           sort: showPastEvents ? 'startDate,desc' : 'startDate,asc',
           page: page.toString(),
-          size: EVENTS_PAGE_SIZE.toString(),
+          size: BACKEND_FETCH_SIZE.toString(), // Fetch more to account for filtering
           'isActive.equals': 'true' // Only show active events
         });
 
@@ -140,15 +145,98 @@ export default function EventsPage() {
         const totalCountValue = totalCountHeader ? parseInt(totalCountHeader, 10) : 0;
         setTotalCount(totalCountValue);
 
-        // Calculate total pages
-        const calculatedTotalPages = Math.max(1, Math.ceil(totalCountValue / EVENTS_PAGE_SIZE));
+        // Calculate total pages based on backend fetch size (not displayed size)
+        // This accounts for the fact that we fetch more than we display
+        const calculatedTotalPages = Math.max(1, Math.ceil(totalCountValue / BACKEND_FETCH_SIZE));
         setTotalPages(calculatedTotalPages);
 
         const events: EventDetailsDTO[] = await eventsRes.json();
         let eventList = Array.isArray(events) ? events : [events];
+
+        // Process recurring events to show only next occurrence (same logic as HeroSection)
+        const todayDate = new Date();
+        todayDate.setHours(0, 0, 0, 0);
+        const oneYearFromNow = new Date();
+        oneYearFromNow.setFullYear(todayDate.getFullYear() + 1);
+        oneYearFromNow.setHours(23, 59, 59, 999);
+
+        const processedEvents: EventDetailsDTO[] = [];
+        const recurringSeriesMap = new Map<number, EventDetailsDTO>(); // Map seriesId -> event with earliest next occurrence
+
+        // Process events and filter recurring events to show only next occurrence
+        eventList.forEach((event) => {
+          // Handle recurring events
+          if (isRecurringEvent(event)) {
+            const seriesId = event.recurrenceSeriesId || event.parentEventId || event.id;
+
+            // Calculate next occurrence date
+            const nextOccurrence = getNextOccurrenceDate(event, todayDate);
+
+            if (!nextOccurrence) {
+              console.log(`[EventsPage] Skipping recurring event ${event.id}: No next occurrence found`);
+              return; // Skip if no next occurrence
+            }
+
+            // Check if next occurrence is within 1 year
+            if (nextOccurrence > oneYearFromNow) {
+              console.log(`[EventsPage] Skipping recurring event ${event.id}: Next occurrence ${nextOccurrence.toISOString()} is beyond 1 year`);
+              return; // Skip if beyond 1 year
+            }
+
+            // Update event startDate to next occurrence for display
+            const nextOccurrenceStr = nextOccurrence.toISOString().split('T')[0];
+            const eventWithNextOccurrence = { ...event, startDate: nextOccurrenceStr };
+
+            // Check if we already have an event from this series
+            const existingSeriesEvent = recurringSeriesMap.get(seriesId);
+            if (!existingSeriesEvent) {
+              // First event from this series - add it
+              recurringSeriesMap.set(seriesId, eventWithNextOccurrence);
+              console.log(`[EventsPage] Added recurring event series ${seriesId}: ${event.title} (Next occurrence: ${nextOccurrenceStr})`);
+            } else {
+              // Compare dates - keep the one with earlier next occurrence
+              const existingDate = new Date(existingSeriesEvent.startDate!);
+              if (nextOccurrence < existingDate) {
+                recurringSeriesMap.set(seriesId, eventWithNextOccurrence);
+                console.log(`[EventsPage] Updated recurring event series ${seriesId}: ${event.title} (Earlier occurrence: ${nextOccurrenceStr})`);
+              }
+            }
+          } else {
+            // Check if this is a child event (has parentEventId or recurrenceSeriesId but isRecurring = false)
+            const seriesId = event.recurrenceSeriesId || event.parentEventId;
+            if (seriesId) {
+              // This is a child event - skip it (we'll use the parent event instead)
+              console.log(`[EventsPage] Skipping child event ${event.id} (series ${seriesId}) - will use parent event`);
+              return;
+            }
+            // Non-recurring event - add directly
+            processedEvents.push(event);
+          }
+        });
+
+        // Add recurring events (only one per series - the next occurrence)
+        recurringSeriesMap.forEach((event) => {
+          processedEvents.push(event);
+        });
+
+        // Sort by startDate to show earliest events first
+        processedEvents.sort((a, b) => {
+          if (!a.startDate || !b.startDate) return 0;
+          return new Date(a.startDate).getTime() - new Date(b.startDate).getTime();
+        });
+
+        // Limit to EVENTS_PAGE_SIZE (20) events for display after filtering
+        const limitedProcessedEvents = processedEvents.slice(0, EVENTS_PAGE_SIZE);
+
+        console.log(`[EventsPage] Processed ${processedEvents.length} events (${recurringSeriesMap.size} recurring series, ${processedEvents.length - recurringSeriesMap.size} non-recurring) from ${eventList.length} fetched events, displaying ${limitedProcessedEvents.length} events`);
+
+        // Track actual displayed count after filtering and limiting
+        const actualDisplayedCount = limitedProcessedEvents.length;
+        setDisplayedCount(actualDisplayedCount);
+
         // For each event, fetch its hero image (homepage hero or regular hero)
         const eventsWithMedia = await Promise.all(
-          eventList.map(async (event: EventDetailsDTO) => {
+          limitedProcessedEvents.map(async (event: EventDetailsDTO) => {
             try {
               // First try to find homepage hero image
               let mediaRes = await fetch(`/api/proxy/event-medias?eventId.equals=${event.id}&isHomePageHeroImage.equals=true`);
@@ -1064,7 +1152,7 @@ export default function EventsPage() {
               ))}
             </div>
             {/* Pagination controls - Matching admin page style */}
-            {!loading && totalCount > 0 && (
+            {!loading && displayedCount > 0 && (
               <div className="mt-8">
                 <div className="flex justify-between items-center">
                   <button
@@ -1088,8 +1176,13 @@ export default function EventsPage() {
                   </button>
                 </div>
                 <div className="text-center text-sm text-gray-600 mt-2">
-                  Showing <span className="font-medium">{totalCount > 0 ? page * EVENTS_PAGE_SIZE + 1 : 0}</span> to <span className="font-medium">{totalCount > 0 ? Math.min((page + 1) * EVENTS_PAGE_SIZE, totalCount) : 0}</span> of{' '}
-                  <span className="font-medium">{totalCount}</span> results
+                  Showing <span className="font-medium">{displayedCount > 0 ? page * EVENTS_PAGE_SIZE + 1 : 0}</span> to <span className="font-medium">{displayedCount > 0 ? page * EVENTS_PAGE_SIZE + displayedCount : 0}</span> of{' '}
+                  <span className="font-medium">{totalCount}</span> result{totalCount !== 1 ? 's' : ''}
+                  {totalCount > displayedCount && (
+                    <span className="text-gray-500 text-xs block mt-1">
+                      ({displayedCount} events displayed after filtering recurring events - grouped by series)
+                    </span>
+                  )}
                 </div>
               </div>
             )}

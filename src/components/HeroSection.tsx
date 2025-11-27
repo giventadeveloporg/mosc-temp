@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { EventDetailsDTO, EventWithMedia } from '@/types';
 import { getAppUrl } from '@/lib/env';
 import { useFilteredEvents } from '@/hooks/useFilteredEvents';
+import { isRecurringEvent, getNextOccurrenceDate } from '@/lib/eventUtils';
 
 // Add local extension for placeholder text
 interface EventWithMediaExtended extends EventWithMedia {
@@ -72,31 +73,94 @@ const DynamicHeroImage: React.FC = () => {
           let heroImageUrl = defaultImage;
           let nextEvent: EventWithMediaExtended | null = null;
 
-          // Convert filtered events to the expected format
-          const upcomingEvents = filteredEvents.map(({ event, media }) => ({
-            ...event,
-            thumbnailUrl: media.fileUrl,
-            media: [media]
-          } as EventWithMediaExtended));
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const oneYearFromNow = new Date();
+          oneYearFromNow.setFullYear(today.getFullYear() + 1);
+          oneYearFromNow.setHours(23, 59, 59, 999);
+
+          // Process events and filter recurring events to show only next occurrence
+          const processedEvents: EventWithMediaExtended[] = [];
+          const recurringSeriesMap = new Map<number, EventWithMediaExtended>(); // Map recurrenceSeriesId -> event with earliest next occurrence
+
+          filteredEvents.forEach(({ event, media }) => {
+            const eventWithMedia: EventWithMediaExtended = {
+              ...event,
+              thumbnailUrl: media.fileUrl,
+              media: [media]
+            };
+
+            // Handle recurring events
+            if (isRecurringEvent(event)) {
+              const seriesId = event.recurrenceSeriesId || event.parentEventId || event.id;
+
+              // Calculate next occurrence date
+              const nextOccurrence = getNextOccurrenceDate(event, today);
+
+              if (!nextOccurrence) {
+                console.log(`Skipping recurring event ${event.id}: No next occurrence found`);
+                return; // Skip if no next occurrence
+              }
+
+              // Check if next occurrence is within 1 year
+              if (nextOccurrence > oneYearFromNow) {
+                console.log(`Skipping recurring event ${event.id}: Next occurrence ${nextOccurrence.toISOString()} is beyond 1 year`);
+                return; // Skip if beyond 1 year
+              }
+
+              // Update event startDate to next occurrence for display
+              const nextOccurrenceStr = nextOccurrence.toISOString().split('T')[0];
+              eventWithMedia.startDate = nextOccurrenceStr;
+
+              // Check if we already have an event from this series
+              const existingSeriesEvent = recurringSeriesMap.get(seriesId);
+              if (!existingSeriesEvent) {
+                // First event from this series - add it
+                recurringSeriesMap.set(seriesId, eventWithMedia);
+                console.log(`Added recurring event series ${seriesId}: ${event.title} (Next occurrence: ${nextOccurrenceStr})`);
+              } else {
+                // Compare dates - keep the one with earlier next occurrence
+                const existingDate = new Date(existingSeriesEvent.startDate!);
+                if (nextOccurrence < existingDate) {
+                  recurringSeriesMap.set(seriesId, eventWithMedia);
+                  console.log(`Updated recurring event series ${seriesId}: ${event.title} (Earlier occurrence: ${nextOccurrenceStr})`);
+                }
+              }
+            } else {
+              // Non-recurring event - add directly
+              processedEvents.push(eventWithMedia);
+            }
+          });
+
+          // Add recurring events (only one per series - the next occurrence)
+          recurringSeriesMap.forEach((event) => {
+            processedEvents.push(event);
+          });
+
+          // Sort by startDate to show earliest events first
+          processedEvents.sort((a, b) => {
+            if (!a.startDate || !b.startDate) return 0;
+            return new Date(a.startDate).getTime() - new Date(b.startDate).getTime();
+          });
 
           // Store upcoming events for image rotation logic
-          setUpcomingEvents(upcomingEvents);
+          setUpcomingEvents(processedEvents);
 
-          console.log(`Found ${upcomingEvents.length} upcoming events with isHomePageHeroImage = true`);
+          console.log(`Found ${processedEvents.length} upcoming events with isHomePageHeroImage = true (${recurringSeriesMap.size} recurring series, ${processedEvents.length - recurringSeriesMap.size} non-recurring)`);
 
-          // Build dynamic images array with ALL events in next 3 months
+          // Build dynamic images array with filtered events
           const imageUrls: string[] = [];
           const eventData: EventWithMediaExtended[] = [];
 
-          // Add ALL upcoming events with isHomePageHeroImage = true (all events in next 3 months)
-          // This ensures all events in the next 3 months are considered for rotation
-          upcomingEvents.forEach((event, index) => {
+          // Add filtered upcoming events (only next occurrence for recurring events)
+          processedEvents.forEach((event, index) => {
             if (event.thumbnailUrl) {
               imageUrls.push(event.thumbnailUrl);
               eventData.push(event);
-              console.log(`  [${index + 1}/${upcomingEvents.length}] Added event to rotation: ${event.title} (ID: ${event.id}, Date: ${event.startDate})`);
+              const isRecurring = isRecurringEvent(event);
+              console.log(`  [${index + 1}/${processedEvents.length}] Added event to rotation: ${event.title} (ID: ${event.id}, Date: ${event.startDate}${isRecurring ? ', Recurring - Next occurrence' : ''})`);
             } else {
-              console.warn(`  [${index + 1}/${upcomingEvents.length}] Skipped event (no thumbnail): ${event.title} (ID: ${event.id})`);
+              console.warn(`  [${index + 1}/${processedEvents.length}] Skipped event (no thumbnail): ${event.title} (ID: ${event.id})`);
             }
           });
 
@@ -106,7 +170,7 @@ const DynamicHeroImage: React.FC = () => {
             heroImageUrl = event.thumbnailUrl!;
             nextEvent = event;
             console.log(`Using hero image from event: ${event.title} (ID: ${event.id})`);
-            console.log(`✅ Total events in rotation: ${imageUrls.length} (all events in next 3 months with isHomePageHeroImage = true)`);
+            console.log(`✅ Total events in rotation: ${imageUrls.length} (all events in next 1 year with isHomePageHeroImage = true, recurring events show only next occurrence)`);
           }
 
           // Add fallback to original image

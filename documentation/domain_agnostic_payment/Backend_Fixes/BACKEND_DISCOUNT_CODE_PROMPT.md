@@ -220,3 +220,4 @@ CREATE TABLE public.event_ticket_transaction (
 - Discount amount calculation should use `totalAmount` (sum of all ticket prices before discount)
 - Follow existing patterns for Payment Intent metadata extraction (similar to `customerName`/`customerPhone`)
 
+

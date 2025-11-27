@@ -1,4 +1,5 @@
 import type { EventDetailsDTO } from '@/types';
+import { calculateNextOccurrence, type RecurrencePattern } from '@/lib/recurrenceUtils';
 
 /**
  * Parse event metadata JSON string to object
@@ -236,8 +237,76 @@ export function getRecurrenceConfig(event: EventDetailsDTO): {
   weeklyDays?: number[];
   monthlyDay?: number | 'LAST';
 } | null {
+  // Check new eventRecurrenceMetadata field first
+  if (event.eventRecurrenceMetadata) {
+    try {
+      const recurrenceConfig = JSON.parse(event.eventRecurrenceMetadata);
+      return recurrenceConfig;
+    } catch (error) {
+      console.error('Failed to parse eventRecurrenceMetadata:', error);
+    }
+  }
+
+  // Fallback to old metadata field
   const metadata = parseEventMetadata(event.metadata);
   return metadata.recurrenceConfig || null;
+}
+
+/**
+ * Get the next occurrence date for a recurring event
+ * @param event - Event details DTO
+ * @param currentDate - Current date to calculate from (defaults to today)
+ * @returns Next occurrence date or null if event is not recurring or no next occurrence
+ */
+export function getNextOccurrenceDate(
+  event: EventDetailsDTO,
+  currentDate: Date = new Date()
+): Date | null {
+  if (!event.isRecurring || !event.startDate) {
+    return null;
+  }
+
+  const recurrenceConfig = getRecurrenceConfig(event);
+  if (!recurrenceConfig || !recurrenceConfig.pattern) {
+    return null;
+  }
+
+  try {
+    // Parse start date
+    const [year, month, day] = event.startDate.split('-').map(Number);
+    const startDate = new Date(year, month - 1, day);
+    startDate.setHours(0, 0, 0, 0);
+
+    // Normalize current date
+    const today = new Date(currentDate);
+    today.setHours(0, 0, 0, 0);
+
+    // Calculate next occurrence
+    const nextDate = calculateNextOccurrence(
+      startDate,
+      recurrenceConfig.pattern as RecurrencePattern,
+      recurrenceConfig.interval || 1,
+      today,
+      recurrenceConfig.weeklyDays,
+      recurrenceConfig.monthlyDay
+    );
+
+    // Check if next occurrence is within end date (if specified)
+    if (recurrenceConfig.endType === 'END_DATE' && recurrenceConfig.endDate && nextDate) {
+      const [endYear, endMonth, endDay] = recurrenceConfig.endDate.split('-').map(Number);
+      const endDate = new Date(endYear, endMonth - 1, endDay);
+      endDate.setHours(23, 59, 59, 999);
+
+      if (nextDate > endDate) {
+        return null; // Beyond end date
+      }
+    }
+
+    return nextDate;
+  } catch (error) {
+    console.error('Error calculating next occurrence date:', error);
+    return null;
+  }
 }
 
 /**

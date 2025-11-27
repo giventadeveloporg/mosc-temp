@@ -185,33 +185,46 @@ export default function CheckoutClient({ initialData, eventId }: CheckoutClientP
   const calculateRemainingQuantity = (ticket: any): number => {
     if (!ticket) return 0;
 
+    // Priority 1: Use remainingQuantity from backend if available
     if (ticket.remainingQuantity != null && ticket.remainingQuantity !== undefined) {
-      return Math.max(0, ticket.remainingQuantity);
+      const remaining = Math.max(0, ticket.remainingQuantity);
+      console.log(`[calculateRemainingQuantity] Ticket ${ticket.id} (${ticket.name}): Using backend remainingQuantity=${remaining}`);
+      return remaining;
     }
 
+    // Priority 2: Calculate from availableQuantity - soldQuantity
     const availableQty = ticket.availableQuantity ?? 0;
     const soldQty = ticket.soldQuantity ?? 0;
 
+    // If availableQuantity is null/undefined/0, treat as unlimited (Infinity)
     if (availableQty === null || availableQty === undefined || availableQty === 0) {
+      console.log(`[calculateRemainingQuantity] Ticket ${ticket.id} (${ticket.name}): availableQuantity is ${availableQty}, treating as unlimited (Infinity)`);
       return Infinity; // Treat as unlimited
     }
 
     const calculatedRemaining = availableQty - soldQty;
-    return Math.max(0, calculatedRemaining);
+    const result = Math.max(0, calculatedRemaining);
+    console.log(`[calculateRemainingQuantity] Ticket ${ticket.id} (${ticket.name}): Calculated remaining=${result} (available=${availableQty}, sold=${soldQty})`);
+    return result;
   };
 
   const handleTicketChange = (ticketId: number, quantity: number) => {
     const ticketType = ticketTypes.find(t => t.id === ticketId);
     if (!ticketType) return;
 
-        const remaining = calculateRemainingQuantity(ticketType);
-        // Mark as sold out if remaining quantity is less than or equal to 20 to avoid race conditions
-        const isSoldOut = remaining <= 20;
+    const remaining = calculateRemainingQuantity(ticketType);
+    // Mark as sold out if remaining quantity is less than or equal to 20 to avoid race conditions
+    const isSoldOut = remaining <= 20;
 
-        if (isSoldOut) {
-          console.log(`[CheckoutClient] Cannot select tickets for ${ticketType.name} - sold out (remaining: ${remaining})`);
-          return;
-        }
+    // CRITICAL: Allow decrementing even if sold out (user may want to deselect tickets they already selected)
+    // Only prevent INCREASING quantity when sold out, allow DECREASING (including to 0)
+    const currentQty = selectedTickets[ticketId] || 0;
+    if (isSoldOut && quantity > currentQty) {
+      // Only block if trying to increase quantity when sold out
+      console.log(`[CheckoutClient] Cannot increase tickets for ${ticketType.name} - sold out (remaining: ${remaining})`);
+      return;
+    }
+    // Allow decreasing (quantity < currentQty) or setting to 0 even when sold out
 
     // Use actual DTO values - if maxQuantityPerOrder is null/undefined, treat as unlimited (Infinity)
     const maxOrderQuantity = ticketType.maxQuantityPerOrder ?? Infinity;
@@ -224,11 +237,26 @@ export default function CheckoutClient({ initialData, eventId }: CheckoutClientP
 
     // Validate quantity against constraints
     let newQuantity = quantity;
+    const isDecreasing = quantity < currentQty;
 
-    // If trying to set to 0, allow it (user can deselect)
+    // CRITICAL: Always allow setting to 0 (user can deselect tickets)
+    // Also allow decreasing below minimum (user may want to deselect)
+    // Only enforce minimum when INCREASING or when setting a new quantity
     if (quantity === 0) {
       newQuantity = 0;
+      console.log(`[CheckoutClient] User deselecting ticket ${ticketId} - setting quantity to 0`);
+    } else if (isDecreasing) {
+      // User is decreasing - allow it even if below minimum (they're deselecting)
+      // But still enforce maximum and remaining quantity limits
+      if (quantity > maxSelectable) {
+        newQuantity = maxSelectable;
+      }
+      if (quantity > remaining) {
+        newQuantity = remaining;
+      }
+      console.log(`[CheckoutClient] User decreasing ticket ${ticketId} from ${currentQty} to ${quantity} (allowing below minimum)`);
     } else {
+      // User is increasing or setting a new quantity - enforce all constraints
       // If quantity is below minimum, clamp to minimum
       if (quantity > 0 && quantity < minOrderQuantity) {
         newQuantity = minOrderQuantity;
@@ -243,9 +271,16 @@ export default function CheckoutClient({ initialData, eventId }: CheckoutClientP
       }
     }
 
+    // Always allow setting quantity (including 0)
     if (newQuantity >= 0) {
+      console.log(`[CheckoutClient] Updating ticket ${ticketId} quantity from ${selectedTickets[ticketId] || 0} to ${newQuantity}`);
       setSelectedTickets(prev => {
         const updated = { ...prev, [ticketId]: newQuantity };
+        // Remove ticket from state if quantity is 0 (cleanup)
+        if (newQuantity === 0) {
+          const { [ticketId]: _, ...rest } = updated;
+          return rest;
+        }
         return updated;
       });
       setEmail('');
@@ -843,15 +878,31 @@ export default function CheckoutClient({ initialData, eventId }: CheckoutClientP
               .map(ticket => {
               const remainingQuantity = calculateRemainingQuantity(ticket);
               // Mark as sold out if remainingQuantity is less than or equal to 20 to avoid race conditions and overselling
-              const isSoldOut = remainingQuantity <= 20;
+              // CRITICAL: Only mark as sold out if remainingQuantity is a finite number (not Infinity)
+              // Also check that it's a valid number (not null/undefined/NaN)
+              const isSoldOut = typeof remainingQuantity === 'number' &&
+                                !isNaN(remainingQuantity) &&
+                                remainingQuantity !== Infinity &&
+                                remainingQuantity <= 20;
               // Use actual DTO values - if maxQuantityPerOrder is null/undefined, treat as unlimited (Infinity)
               const maxOrderQuantity = ticket.maxQuantityPerOrder ?? Infinity;
               const minOrderQuantity = ticket.minQuantityPerOrder ?? 1; // Default to 1 per database schema
 
+              // Debug logging for ALL tickets to verify sold-out detection
+              console.log(`[CheckoutClient] Ticket ${ticket.id} (${ticket.name}): remainingQuantity=${remainingQuantity} (type: ${typeof remainingQuantity}), isSoldOut=${isSoldOut}, availableQuantity=${ticket.availableQuantity}, soldQuantity=${ticket.soldQuantity}, backendRemainingQuantity=${ticket.remainingQuantity}`);
+
+              if (isSoldOut) {
+                console.log(`[CheckoutClient] ⚠️⚠️⚠️ SOLD OUT DETECTED: Ticket ${ticket.id} (${ticket.name}) - remainingQuantity=${remainingQuantity} <= 20`);
+              }
+
               return (
-                <div key={ticket.id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 border border-gray-200 rounded-lg bg-white shadow-sm relative">
+                <div key={ticket.id} className={`flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 border rounded-lg shadow-sm relative ${
+                  isSoldOut
+                    ? 'border-red-300 bg-red-50/20'
+                    : 'border-gray-200 bg-white'
+                }`}>
                   {isSoldOut && (
-                    <div className="absolute top-4 right-4 z-10">
+                    <div className="absolute top-4 right-4 z-20">
                       <Image
                         src="/images/tickets_sold_out.jpg"
                         alt="Tickets Sold Out"
@@ -862,10 +913,12 @@ export default function CheckoutClient({ initialData, eventId }: CheckoutClientP
                     </div>
                   )}
 
-                  <div className="mb-4 sm:mb-0 flex-1 min-w-0">
+                  <div className="mb-4 sm:mb-0 flex-1 min-w-0 pr-4">
                     <h3 className="text-xl font-semibold text-gray-900">{ticket.name}</h3>
                     <p className="text-lg font-bold text-blue-600 mt-1">${ticket.price.toFixed(2)}</p>
-                    <p className="text-sm text-gray-600 mt-2">{ticket.description}</p>
+                    {ticket.description && (
+                      <p className="text-sm text-gray-600 mt-2 mb-2">{ticket.description}</p>
+                    )}
 
                     {/* Show min/max quantity per order limits - desktop only */}
                     {minOrderQuantity > 1 && (
@@ -889,21 +942,21 @@ export default function CheckoutClient({ initialData, eventId }: CheckoutClientP
                   </div>
 
                   {/* Controls and messages container - responsive layout */}
-                  <div className="w-full sm:w-auto flex flex-col gap-2">
+                  <div className="w-full sm:w-auto flex flex-col gap-3 mt-4 sm:mt-0">
                     {/* Min/Max limit messages - shown above controls on mobile only */}
                     {minOrderQuantity > 1 && (
-                      <p className="sm:hidden text-xs text-gray-500 text-center sm:text-left">
+                      <p className="sm:hidden text-xs text-gray-500 text-center sm:text-left mb-1">
                         Min {minOrderQuantity} per order
                       </p>
                     )}
                     {maxOrderQuantity !== Infinity && maxOrderQuantity < Number.MAX_SAFE_INTEGER && (
-                      <p className="sm:hidden text-xs text-gray-500 text-center sm:text-left">
+                      <p className="sm:hidden text-xs text-gray-500 text-center sm:text-left mb-1">
                         Max {maxOrderQuantity} per order
                       </p>
                     )}
 
                     {/* Ticket selection controls */}
-                    <div className="flex items-center justify-center sm:justify-start gap-3">
+                    <div className={`flex items-center justify-center sm:justify-start gap-3 ${isSoldOut ? 'opacity-50 pointer-events-none' : ''}`}>
                       <button
                         type="button"
                         onClick={(e) => {
@@ -915,7 +968,9 @@ export default function CheckoutClient({ initialData, eventId }: CheckoutClientP
                         className="bg-gray-200 text-gray-700 px-3 py-1 rounded-l-md hover:bg-gray-300 transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
                         disabled={isSoldOut || (() => {
                           const currentQty = selectedTickets[ticket.id] || 0;
-                          return currentQty <= 0 || currentQty <= minOrderQuantity;
+                          // Disable if already at 0, OR if sold out and no tickets selected
+                          // Allow deselecting if user already has tickets selected (even if sold out)
+                          return currentQty <= 0 || (isSoldOut && currentQty === 0);
                         })()}
                       >
                         -
@@ -944,7 +999,7 @@ export default function CheckoutClient({ initialData, eventId }: CheckoutClientP
                       </button>
                     </div>
 
-                    {/* Validation messages - shown below controls, responsive */}
+                    {/* Validation messages - shown below controls with proper spacing */}
                     {(() => {
                       const currentQty = selectedTickets[ticket.id] || 0;
                       const hasValidationIssues =
@@ -957,25 +1012,25 @@ export default function CheckoutClient({ initialData, eventId }: CheckoutClientP
                       if (!hasValidationIssues && currentQty === 0) return null;
 
                       return (
-                        <div className="w-full space-y-2">
+                        <div className="w-full space-y-1.5 mt-2">
                           {/* Error: Below minimum quantity - CRITICAL */}
                           {currentQty > 0 && currentQty < minOrderQuantity && (
-                            <div className="p-2 bg-red-50 border border-red-300 rounded text-xs sm:text-sm text-red-800 break-words">
-                              ❌ Minimum {minOrderQuantity} {minOrderQuantity === 1 ? 'ticket' : 'tickets'} required per order for this ticket type. Please select at least {minOrderQuantity}.
+                            <div className="p-2 bg-red-50 border border-red-300 rounded text-xs text-red-800 break-words leading-tight">
+                              <span className="font-semibold">Min {minOrderQuantity} required.</span> Select {minOrderQuantity} or set to 0 to cancel.
                             </div>
                           )}
                           {/* Error: Selected more than available */}
                           {currentQty > remainingQuantity && (
-                            <div className="p-2 bg-red-50 border border-red-300 rounded text-xs sm:text-sm text-red-800 break-words">
-                              ❌ Only {remainingQuantity} {remainingQuantity === 1 ? 'ticket is' : 'tickets are'} available for this selection
+                            <div className="p-2 bg-red-50 border border-red-300 rounded text-xs text-red-800 break-words leading-tight">
+                              <span className="font-semibold">Only {remainingQuantity} available.</span> Please reduce selection.
                             </div>
                           )}
                           {/* Error: Exceeds maximum per order limit */}
                           {maxOrderQuantity !== Infinity &&
                            currentQty > maxOrderQuantity &&
                            currentQty <= remainingQuantity && (
-                            <div className="p-2 bg-red-50 border border-red-300 rounded text-xs sm:text-sm text-red-800 break-words">
-                              ❌ Maximum {maxOrderQuantity} tickets per order allowed for this ticket type. Please reduce your selection.
+                            <div className="p-2 bg-red-50 border border-red-300 rounded text-xs text-red-800 break-words leading-tight">
+                              <span className="font-semibold">Max {maxOrderQuantity} per order.</span> Please reduce selection.
                             </div>
                           )}
                           {/* Info: Reached max per order limit (but not exceeded) */}
@@ -984,8 +1039,8 @@ export default function CheckoutClient({ initialData, eventId }: CheckoutClientP
                            remainingQuantity > maxOrderQuantity &&
                            currentQty >= minOrderQuantity &&
                            currentQty <= remainingQuantity && (
-                            <div className="p-2 bg-blue-50 border border-blue-200 rounded text-xs sm:text-sm text-blue-800 break-words">
-                              ℹ️ Maximum {maxOrderQuantity} tickets per order for this ticket type
+                            <div className="p-1.5 bg-blue-50 border border-blue-200 rounded text-xs text-blue-800 break-words leading-tight">
+                              ℹ️ Max {maxOrderQuantity} per order
                             </div>
                           )}
                           {/* Info: At minimum quantity */}
@@ -993,8 +1048,8 @@ export default function CheckoutClient({ initialData, eventId }: CheckoutClientP
                            minOrderQuantity > 1 &&
                            currentQty <= remainingQuantity &&
                            (maxOrderQuantity === Infinity || currentQty <= maxOrderQuantity) && (
-                            <div className="p-2 bg-green-50 border border-green-200 rounded text-xs sm:text-sm text-green-800 break-words">
-                              ✓ Minimum quantity requirement met ({minOrderQuantity} {minOrderQuantity === 1 ? 'ticket' : 'tickets'})
+                            <div className="p-1.5 bg-green-50 border border-green-200 rounded text-xs text-green-800 break-words leading-tight">
+                              ✓ Min requirement met ({minOrderQuantity} {minOrderQuantity === 1 ? 'ticket' : 'tickets'})
                             </div>
                           )}
                         </div>

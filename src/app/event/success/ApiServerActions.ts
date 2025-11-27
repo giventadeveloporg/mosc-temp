@@ -174,6 +174,28 @@ export async function processStripeSessionServer(
       return null;
     }
 
+    // CRITICAL: Check if transaction already exists (backend webhook may have created it)
+    // This prevents duplicate transactions and transaction items
+    const paymentIntentId = session.payment_intent as string;
+    const existingTransaction = await findTransactionByPaymentIntentId(paymentIntentId);
+
+    if (existingTransaction) {
+      console.log('[processStripeSessionServer] Transaction already exists for Payment Intent:', {
+        paymentIntentId,
+        existingTransactionId: existingTransaction.id,
+        existingQrCodeUrl: existingTransaction.qrCodeImageUrl || 'NULL',
+        hasFirstName: !!existingTransaction.firstName,
+        hasLastName: !!existingTransaction.lastName,
+        hasPhone: !!existingTransaction.phone,
+        timestamp: new Date().toISOString(),
+        message: 'Backend webhook already created transaction - returning existing transaction'
+      });
+
+      // Return existing transaction - do NOT create duplicate transaction or items
+      // Backend webhook handles all transaction and item creation
+      return { transaction: existingTransaction, userProfile: null, attendee: null };
+    }
+
     const cart: ShoppingCartItem[] = JSON.parse(session.metadata.cart || '[]');
     const eventId = parseInt(session.metadata.eventId, 10);
     if (!eventId || cart.length === 0) {
@@ -269,20 +291,52 @@ export async function processStripeSessionServer(
     }
 
     // Bulk create transaction items
+    // CRITICAL: Check if transaction items already exist before creating (prevent duplicates)
+    // Backend webhook may have already created items
     if (!newTransaction.id) {
       throw new Error('Transaction ID missing after creation');
     }
-    const itemsPayload = cart.map((item: ShoppingCartItem) => withTenantId({
-      transactionId: newTransaction.id as number,
-      ticketTypeId: parseInt(item.ticketTypeId, 10),
-      quantity: item.quantity,
-      pricePerUnit: item.price,
-      totalAmount: item.price * item.quantity,
-      // Add discountAmount, serviceFee, etc. if available
-      createdAt: now,
-      updatedAt: now,
-    }));
-    await createTransactionItemsBulk(itemsPayload);
+
+    // Check if transaction items already exist
+    const baseUrl = getAppUrl();
+    const itemsCheckUrl = `${baseUrl}/api/proxy/event-ticket-transaction-items?transactionId.equals=${newTransaction.id}&tenantId.equals=${getTenantId()}`;
+    const itemsCheckRes = await fetchWithJwtRetry(itemsCheckUrl, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+    let existingItemsCount = 0;
+    if (itemsCheckRes.ok) {
+      const existingItems = await itemsCheckRes.json();
+      existingItemsCount = Array.isArray(existingItems) ? existingItems.length : 0;
+    }
+
+    console.log('[processStripeSessionServer] Transaction items check:', {
+      transactionId: newTransaction.id,
+      existingItemsCount,
+      cartItemsCount: cart.length
+    });
+
+    // Only create items if they don't already exist (backend webhook may have created them)
+    if (existingItemsCount === 0 && cart.length > 0) {
+      console.log('[processStripeSessionServer] Creating transaction items (none exist yet)');
+      const itemsPayload = cart.map((item: ShoppingCartItem) => withTenantId({
+        transactionId: newTransaction.id as number,
+        ticketTypeId: parseInt(item.ticketTypeId, 10),
+        quantity: item.quantity,
+        pricePerUnit: item.price,
+        totalAmount: item.price * item.quantity,
+        // Add discountAmount, serviceFee, etc. if available
+        createdAt: now,
+        updatedAt: now,
+      }));
+      await createTransactionItemsBulk(itemsPayload);
+      console.log('[processStripeSessionServer] Successfully created transaction items:', itemsPayload.length);
+    } else if (existingItemsCount > 0) {
+      console.log('[processStripeSessionServer] Transaction items already exist - skipping creation to prevent duplicates');
+    } else {
+      console.log('[processStripeSessionServer] No cart items to create transaction items for');
+    }
 
     // --- Event Attendee Upsert Logic ---
     // Look up attendee by email and eventId
@@ -735,10 +789,40 @@ export async function createTransactionFromPaymentIntent(
     transactionItems.push(itemData);
   }
 
+  // CRITICAL: Check if transaction items already exist before creating (prevent duplicates)
+  // Backend webhook may have already created items
+  // NOTE: This function should not be called anymore since we disabled fallback creation,
+  // but keeping the check as a safety measure
   if (transactionItems.length > 0) {
     try {
-      await createTransactionItemsBulk(transactionItems);
-      console.log('[createTransactionFromPaymentIntent] Transaction items created:', transactionItems.length);
+      // Check if transaction items already exist
+      const baseUrl = getAppUrl();
+      const itemsCheckUrl = `${baseUrl}/api/proxy/event-ticket-transaction-items?transactionId.equals=${transaction.id}&tenantId.equals=${getTenantId()}`;
+      const itemsCheckRes = await fetchWithJwtRetry(itemsCheckUrl, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      let existingItemsCount = 0;
+      if (itemsCheckRes.ok) {
+        const existingItems = await itemsCheckRes.json();
+        existingItemsCount = Array.isArray(existingItems) ? existingItems.length : 0;
+      }
+
+      console.log('[createTransactionFromPaymentIntent] Transaction items check:', {
+        transactionId: transaction.id,
+        existingItemsCount,
+        cartItemsCount: transactionItems.length
+      });
+
+      // Only create items if they don't already exist (backend webhook may have created them)
+      if (existingItemsCount === 0) {
+        console.log('[createTransactionFromPaymentIntent] Creating transaction items (none exist yet)');
+        await createTransactionItemsBulk(transactionItems);
+        console.log('[createTransactionFromPaymentIntent] Successfully created transaction items:', transactionItems.length);
+      } else {
+        console.log('[createTransactionFromPaymentIntent] Transaction items already exist - skipping creation to prevent duplicates');
+      }
     } catch (err) {
       console.error('[createTransactionFromPaymentIntent] Failed to create transaction items:', err);
     }

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { EventWithMedia, EventDetailsDTO } from "@/types";
 import { formatInTimeZone } from 'date-fns-tz';
+import { isRecurringEvent, getNextOccurrenceDate } from '@/lib/eventUtils';
 
 // Component to handle event image loading errors and hide container when image fails
 function EventImageWithErrorHandling({
@@ -114,12 +115,14 @@ const UpcomingEventsSection: React.FC = () => {
       setLoading(true);
       setFetchError(false);
       try {
-        // First try to get upcoming events (max 6)
+        // First try to get upcoming events
+        // Fetch more events (15) to account for recurring events being grouped into single occurrences
+        // After processing, we'll limit to 6 events for display
         const today = new Date().toISOString().split('T')[0];
         const upcomingParams = new URLSearchParams({
           sort: 'startDate,asc',
           page: '0',
-          size: '6',
+          size: '15', // Increased from 6 to 15 to ensure we have enough after recurring event grouping
           'startDate.greaterThanOrEqual': today,
           'isActive.equals': 'true' // Only show active events
         });
@@ -131,8 +134,85 @@ const UpcomingEventsSection: React.FC = () => {
 
         // If we have upcoming events, use them
         if (upcomingEventList.length > 0) {
+          // Process recurring events to show only next occurrence (same logic as HeroSection)
+          const todayDate = new Date();
+          todayDate.setHours(0, 0, 0, 0);
+          const oneYearFromNow = new Date();
+          oneYearFromNow.setFullYear(todayDate.getFullYear() + 1);
+          oneYearFromNow.setHours(23, 59, 59, 999);
+
+          const processedEvents: EventDetailsDTO[] = [];
+          const recurringSeriesMap = new Map<number, EventDetailsDTO>(); // Map seriesId -> event with earliest next occurrence
+
+          // Process events and filter recurring events to show only next occurrence
+          upcomingEventList.forEach((event) => {
+            // Handle recurring events
+            if (isRecurringEvent(event)) {
+              const seriesId = event.recurrenceSeriesId || event.parentEventId || event.id;
+
+              // Calculate next occurrence date
+              const nextOccurrence = getNextOccurrenceDate(event, todayDate);
+
+              if (!nextOccurrence) {
+                console.log(`[UpcomingEventsSection] Skipping recurring event ${event.id}: No next occurrence found`);
+                return; // Skip if no next occurrence
+              }
+
+              // Check if next occurrence is within 1 year
+              if (nextOccurrence > oneYearFromNow) {
+                console.log(`[UpcomingEventsSection] Skipping recurring event ${event.id}: Next occurrence ${nextOccurrence.toISOString()} is beyond 1 year`);
+                return; // Skip if beyond 1 year
+              }
+
+              // Update event startDate to next occurrence for display
+              const nextOccurrenceStr = nextOccurrence.toISOString().split('T')[0];
+              const eventWithNextOccurrence = { ...event, startDate: nextOccurrenceStr };
+
+              // Check if we already have an event from this series
+              const existingSeriesEvent = recurringSeriesMap.get(seriesId);
+              if (!existingSeriesEvent) {
+                // First event from this series - add it
+                recurringSeriesMap.set(seriesId, eventWithNextOccurrence);
+                console.log(`[UpcomingEventsSection] Added recurring event series ${seriesId}: ${event.title} (Next occurrence: ${nextOccurrenceStr})`);
+              } else {
+                // Compare dates - keep the one with earlier next occurrence
+                const existingDate = new Date(existingSeriesEvent.startDate!);
+                if (nextOccurrence < existingDate) {
+                  recurringSeriesMap.set(seriesId, eventWithNextOccurrence);
+                  console.log(`[UpcomingEventsSection] Updated recurring event series ${seriesId}: ${event.title} (Earlier occurrence: ${nextOccurrenceStr})`);
+                }
+              }
+            } else {
+              // Check if this is a child event (has parentEventId or recurrenceSeriesId but isRecurring = false)
+              const seriesId = event.recurrenceSeriesId || event.parentEventId;
+              if (seriesId) {
+                // This is a child event - skip it (we'll use the parent event instead)
+                console.log(`[UpcomingEventsSection] Skipping child event ${event.id} (series ${seriesId}) - will use parent event`);
+                return;
+              }
+              // Non-recurring event - add directly
+              processedEvents.push(event);
+            }
+          });
+
+          // Add recurring events (only one per series - the next occurrence)
+          recurringSeriesMap.forEach((event) => {
+            processedEvents.push(event);
+          });
+
+          // Sort by startDate to show earliest events first
+          processedEvents.sort((a, b) => {
+            if (!a.startDate || !b.startDate) return 0;
+            return new Date(a.startDate).getTime() - new Date(b.startDate).getTime();
+          });
+
+          // Limit to 6 events for display after processing
+          const limitedEvents = processedEvents.slice(0, 6);
+
+          console.log(`[UpcomingEventsSection] Processed ${processedEvents.length} events (${recurringSeriesMap.size} recurring series, ${processedEvents.length - recurringSeriesMap.size} non-recurring), displaying ${limitedEvents.length} events`);
+
           const eventsWithMedia = await Promise.all(
-            upcomingEventList.map(async (event: EventDetailsDTO) => {
+            limitedEvents.map(async (event: EventDetailsDTO) => {
               try {
                 // First try to find homepage hero image
                 let mediaRes = await fetch(`/api/proxy/event-medias?eventId.equals=${event.id}&isHomePageHeroImage.equals=true`);
@@ -168,11 +248,13 @@ const UpcomingEventsSection: React.FC = () => {
           setEvents(eventsWithMedia);
           setIsUpcomingEvents(true);
         } else {
-          // No upcoming events, try to get past events (max 6)
+          // No upcoming events, try to get past events
+          // Fetch more events (15) to account for recurring events being grouped into single occurrences
+          // After processing, we'll limit to 6 events for display
           const pastParams = new URLSearchParams({
             sort: 'startDate,desc',
             page: '0',
-            size: '6',
+            size: '15', // Increased from 6 to 15 to ensure we have enough after recurring event grouping
             'endDate.lessThan': today,
             'isActive.equals': 'true' // Only show active events
           });
@@ -182,8 +264,85 @@ const UpcomingEventsSection: React.FC = () => {
           const pastEvents: EventDetailsDTO[] = await pastRes.json();
           let pastEventList = Array.isArray(pastEvents) ? pastEvents : [pastEvents];
 
+          // Process recurring events to show only next occurrence (same logic as upcoming events)
+          const todayDate = new Date();
+          todayDate.setHours(0, 0, 0, 0);
+          const oneYearFromNow = new Date();
+          oneYearFromNow.setFullYear(todayDate.getFullYear() + 1);
+          oneYearFromNow.setHours(23, 59, 59, 999);
+
+          const processedPastEvents: EventDetailsDTO[] = [];
+          const recurringSeriesMap = new Map<number, EventDetailsDTO>(); // Map seriesId -> event with earliest next occurrence
+
+          // Process events and filter recurring events to show only next occurrence
+          pastEventList.forEach((event) => {
+            // Handle recurring events
+            if (isRecurringEvent(event)) {
+              const seriesId = event.recurrenceSeriesId || event.parentEventId || event.id;
+
+              // Calculate next occurrence date
+              const nextOccurrence = getNextOccurrenceDate(event, todayDate);
+
+              if (!nextOccurrence) {
+                console.log(`[UpcomingEventsSection] Skipping recurring past event ${event.id}: No next occurrence found`);
+                return; // Skip if no next occurrence
+              }
+
+              // Check if next occurrence is within 1 year
+              if (nextOccurrence > oneYearFromNow) {
+                console.log(`[UpcomingEventsSection] Skipping recurring past event ${event.id}: Next occurrence ${nextOccurrence.toISOString()} is beyond 1 year`);
+                return; // Skip if beyond 1 year
+              }
+
+              // Update event startDate to next occurrence for display
+              const nextOccurrenceStr = nextOccurrence.toISOString().split('T')[0];
+              const eventWithNextOccurrence = { ...event, startDate: nextOccurrenceStr };
+
+              // Check if we already have an event from this series
+              const existingSeriesEvent = recurringSeriesMap.get(seriesId);
+              if (!existingSeriesEvent) {
+                // First event from this series - add it
+                recurringSeriesMap.set(seriesId, eventWithNextOccurrence);
+                console.log(`[UpcomingEventsSection] Added recurring past event series ${seriesId}: ${event.title} (Next occurrence: ${nextOccurrenceStr})`);
+              } else {
+                // Compare dates - keep the one with earlier next occurrence
+                const existingDate = new Date(existingSeriesEvent.startDate!);
+                if (nextOccurrence < existingDate) {
+                  recurringSeriesMap.set(seriesId, eventWithNextOccurrence);
+                  console.log(`[UpcomingEventsSection] Updated recurring past event series ${seriesId}: ${event.title} (Earlier occurrence: ${nextOccurrenceStr})`);
+                }
+              }
+            } else {
+              // Check if this is a child event (has parentEventId or recurrenceSeriesId but isRecurring = false)
+              const seriesId = event.recurrenceSeriesId || event.parentEventId;
+              if (seriesId) {
+                // This is a child event - skip it (we'll use the parent event instead)
+                console.log(`[UpcomingEventsSection] Skipping child past event ${event.id} (series ${seriesId}) - will use parent event`);
+                return;
+              }
+              // Non-recurring event - add directly
+              processedPastEvents.push(event);
+            }
+          });
+
+          // Add recurring events (only one per series - the next occurrence)
+          recurringSeriesMap.forEach((event) => {
+            processedPastEvents.push(event);
+          });
+
+          // Sort by startDate descending (most recent first for past events)
+          processedPastEvents.sort((a, b) => {
+            if (!a.startDate || !b.startDate) return 0;
+            return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
+          });
+
+          // Limit to 6 events for display after processing
+          const limitedPastEvents = processedPastEvents.slice(0, 6);
+
+          console.log(`[UpcomingEventsSection] Processed ${processedPastEvents.length} past events (${recurringSeriesMap.size} recurring series, ${processedPastEvents.length - recurringSeriesMap.size} non-recurring), displaying ${limitedPastEvents.length} events`);
+
           const eventsWithMedia = await Promise.all(
-            pastEventList.map(async (event: EventDetailsDTO) => {
+            limitedPastEvents.map(async (event: EventDetailsDTO) => {
               try {
                 // First try to find homepage hero image
                 let mediaRes = await fetch(`/api/proxy/event-medias?eventId.equals=${event.id}&isHomePageHeroImage.equals=true`);

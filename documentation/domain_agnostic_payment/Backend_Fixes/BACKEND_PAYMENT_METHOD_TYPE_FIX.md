@@ -92,3 +92,4 @@ After implementing:
 
 The frontend webhook handler (`src/app/api/webhooks/stripe/route.ts`) will also be updated to send the correct payment method type, but the backend should extract it independently for reliability.
 
+

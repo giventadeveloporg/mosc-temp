@@ -447,3 +447,4 @@ The original client-side implementation has been preserved as `page_old_client_i
 - [Next.js Server Components](https://nextjs.org/docs/app/building-your-application/rendering/server-components)
 - [Next.js cache() function](https://nextjs.org/docs/app/building-your-application/caching#react-cache-function)
 
+

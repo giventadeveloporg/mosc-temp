@@ -202,76 +202,44 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // FALLBACK: If webhook failed and no session found, create transaction directly from payment intent
-    // This handles the case where Stripe webhook signature verification failed on AWS Lambda
-    // CRITICAL: Check for existing transaction first to prevent duplicates
+    // FALLBACK: Check if transaction exists (backend webhook should have created it)
+    // CRITICAL: DO NOT create transactions here - backend webhook handles all transaction creation
+    // This prevents duplicate transactions and ensures firstName, lastName, phone are captured correctly
     if (!result && paymentIntentId) {
-      console.log('[API POST FALLBACK] Attempting to create transaction directly from payment intent:', paymentIntentId);
+      console.log('[API POST FALLBACK] Checking for existing transaction created by backend webhook:', paymentIntentId);
 
-      // CRITICAL: Check if transaction already exists before creating (prevent duplicates)
+      // CRITICAL: Only look up existing transaction, do NOT create
+      // Backend webhook (src/app/api/webhooks/stripe/route.ts) handles all transaction creation
+      // Frontend should only look up existing transactions to avoid duplicates
       const { findTransactionByPaymentIntentId } = await import('@/app/event/success/ApiServerActions');
       const existingTransaction = await findTransactionByPaymentIntentId(paymentIntentId);
 
       if (existingTransaction) {
-        console.log('[API POST FALLBACK] Transaction already exists for Payment Intent:', {
+        console.log('[API POST FALLBACK] Found existing transaction created by backend webhook:', {
           paymentIntentId,
           existingTransactionId: existingTransaction.id,
           existingQrCodeUrl: existingTransaction.qrCodeImageUrl || 'NULL',
+          hasFirstName: !!existingTransaction.firstName,
+          hasLastName: !!existingTransaction.lastName,
+          hasPhone: !!existingTransaction.phone,
           timestamp: new Date().toISOString()
         });
 
-        // Use existing transaction instead of creating duplicate
+        // Use existing transaction from backend webhook
         result = { transaction: existingTransaction, userProfile: null };
       } else {
-        // No existing transaction, proceed with creation
-        try {
-          const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-          console.log('[API POST FALLBACK] Retrieved payment intent:', {
-            id: paymentIntent.id,
-            status: paymentIntent.status,
-            amount: paymentIntent.amount,
-            metadata: paymentIntent.metadata
-          });
-
-          if (paymentIntent.status === 'succeeded' && paymentIntent.metadata) {
-            const { eventId, cart, customerEmail } = paymentIntent.metadata;
-
-            if (!eventId || !cart || !customerEmail) {
-              console.error('[API POST FALLBACK] Missing required metadata:', { eventId, cart, customerEmail });
-              return NextResponse.json({ error: 'Payment intent missing required metadata' }, { status: 400 });
-            }
-
-            console.log('[API POST FALLBACK] Creating transaction from payment intent metadata');
-
-            // Parse cart
-            const cartItems = JSON.parse(cart);
-
-            // Import create transaction function
-            const { createTransactionFromPaymentIntent } = await import('@/app/event/success/ApiServerActions');
-
-            // Create transaction
-            const transaction = await createTransactionFromPaymentIntent(
-              paymentIntent.id,
-              parseInt(eventId),
-              customerEmail,
-              cartItems,
-              paymentIntent.amount / 100 // Convert cents to dollars
-            );
-
-            console.log('[API POST FALLBACK] Transaction created successfully:', transaction.id);
-
-            result = { transaction, userProfile: null };
-          } else {
-            console.error('[API POST FALLBACK] Payment intent not succeeded or missing metadata:', {
-              status: paymentIntent.status,
-              hasMetadata: !!paymentIntent.metadata
-            });
-            return NextResponse.json({ error: 'Payment intent not completed' }, { status: 400 });
-          }
-        } catch (fallbackError: any) {
-          console.error('[API POST FALLBACK] Failed to create transaction from payment intent:', fallbackError);
-          return NextResponse.json({ error: `Fallback creation failed: ${fallbackError.message}` }, { status: 500 });
-        }
+        // Transaction not found - backend webhook may still be processing
+        // Return null transaction instead of creating duplicate
+        console.log('[API POST FALLBACK] Transaction not found yet - backend webhook may still be processing:', {
+          paymentIntentId,
+          message: 'Returning null transaction - backend webhook will create it'
+        });
+        // Don't create transaction here - let backend webhook handle it
+        // Frontend should retry or wait for webhook to complete
+        return NextResponse.json({
+          transaction: null,
+          message: 'Transaction not found - backend webhook may still be processing. Please refresh in a moment.'
+        }, { status: 200 });
       }
     }
     const transaction = result?.transaction;

@@ -269,3 +269,4 @@ WHERE stripe_payment_intent_id IS NOT NULL;
 - [Stripe Webhook Signature Fix](./STRIPE_WEBHOOK_SIGNATURE_FIX.md)
 - [Mobile QR Page Stuck Fix](./MOBILE_QR_PAGE_STUCK_FIX.md)
 
+
