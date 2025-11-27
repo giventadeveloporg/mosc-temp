@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { FaUsers, FaCalendarAlt, FaEdit, FaTrashAlt, FaPlus, FaSave, FaTimes, FaBan, FaPhotoVideo, FaTicketAlt, FaTags } from 'react-icons/fa';
 import type { EventDetailsDTO, EventTicketTypeDTO, EventTicketTypeFormDTO } from '@/types';
 import { Modal } from '@/components/Modal';
+import SaveStatusDialog, { SaveStatus } from '@/components/SaveStatusDialog';
 import { createTicketTypeServer, updateTicketTypeServer, deleteTicketTypeServer } from './ApiServerActions';
 
 interface ValidationErrors {
@@ -103,6 +104,14 @@ function TicketTypeDetailsTooltip({ ticketType, anchorRect, onClose }: { ticketT
               {ticketType.isActive ? 'Active' : 'Inactive'}
             </span>
           </div>
+          <div className="flex justify-between">
+            <span className="text-gray-600">Minimum Order Required:</span>
+            <span className="font-medium">{ticketType.minQuantityPerOrder ?? 1}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-600">Maximum Order Required:</span>
+            <span className="font-medium">{ticketType.maxQuantityPerOrder != null ? ticketType.maxQuantityPerOrder : 'Unlimited'}</span>
+          </div>
           {ticketType.description && (
             <div className="pt-2 border-t border-gray-200">
               <span className="text-gray-600 text-xs">Description:</span>
@@ -129,6 +138,9 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
   const [error, setError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
   const [isCheckingCode, setIsCheckingCode] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  const [saveStatusMessage, setSaveStatusMessage] = useState<string>('');
+  const [saveStatusTitle, setSaveStatusTitle] = useState<string>('');
 
   const [editingTicketType, setEditingTicketType] = useState<EventTicketTypeDTO | null>(null);
   const [deletingTicketType, setDeletingTicketType] = useState<EventTicketTypeDTO | null>(null);
@@ -153,6 +165,8 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
         isServiceFeeIncluded: editingTicketType.isServiceFeeIncluded,
         serviceFee: editingTicketType.serviceFee,
         isActive: editingTicketType.isActive,
+        minQuantityPerOrder: editingTicketType.minQuantityPerOrder,
+        maxQuantityPerOrder: editingTicketType.maxQuantityPerOrder,
       });
       setIsModalOpen(true);
     } else {
@@ -165,6 +179,8 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
         isServiceFeeIncluded: false,
         serviceFee: 0,
         isActive: true,
+        minQuantityPerOrder: 1,
+        maxQuantityPerOrder: 10,
       });
     }
   }, [editingTicketType]);
@@ -182,6 +198,15 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
     setEditingTicketType(null);
     setValidationErrors({});
     setError(null);
+    setSaveStatus('idle');
+    setSaveStatusMessage('');
+    setSaveStatusTitle('');
+  };
+
+  const handleCloseSaveStatus = () => {
+    setSaveStatus('idle');
+    setSaveStatusMessage('');
+    setSaveStatusTitle('');
   };
 
   const handleAddNewClick = () => {
@@ -195,6 +220,8 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
       isServiceFeeIncluded: false,
       serviceFee: 0,
       isActive: true,
+      minQuantityPerOrder: 1,
+      maxQuantityPerOrder: 10,
     });
     setIsModalOpen(true);
   };
@@ -324,24 +351,70 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    console.log('[TicketTypeListClient] handleSubmit called');
+    console.log('[TicketTypeListClient] Form data:', formData);
+    console.log('[TicketTypeListClient] Editing ticket type:', editingTicketType);
+
+    if (!validateForm()) {
+      console.log('[TicketTypeListClient] Form validation failed');
+      return;
+    }
 
     setError(null);
+    setSaveStatus('saving');
+    setSaveStatusTitle(editingTicketType ? 'Updating Ticket Type...' : 'Creating Ticket Type...');
+    setSaveStatusMessage(editingTicketType ? 'Please wait while we update the ticket type...' : 'Please wait while we create the ticket type...');
 
     startTransition(async () => {
-      const result = editingTicketType
-        ? await updateTicketTypeServer(editingTicketType.id!, eventId, formData)
-        : await createTicketTypeServer(eventId, formData as EventTicketTypeFormDTO);
+      console.log('[TicketTypeListClient] Starting transition, isEdit:', !!editingTicketType);
 
-      if (result.success && result.data) {
-        if (editingTicketType) {
-          setTicketTypes(prev => prev.map(tt => tt.id === result.data!.id ? result.data! : tt));
+      try {
+        const result = editingTicketType
+          ? await updateTicketTypeServer(editingTicketType.id!, eventId, formData)
+          : await createTicketTypeServer(eventId, formData as EventTicketTypeFormDTO);
+
+        console.log('[TicketTypeListClient] Server action result:', result);
+
+        if (result.success && result.data) {
+          console.log('[TicketTypeListClient] Update/create successful, updating state');
+          if (editingTicketType) {
+            setTicketTypes(prev => prev.map(tt => tt.id === result.data!.id ? result.data! : tt));
+            setSaveStatus('success');
+            setSaveStatusTitle('Ticket Type Updated!');
+            setSaveStatusMessage(`Ticket type "${result.data!.name}" has been updated successfully!`);
+          } else {
+            setTicketTypes(prev => [...prev, result.data!]);
+            setSaveStatus('success');
+            setSaveStatusTitle('Ticket Type Created!');
+            setSaveStatusMessage(`Ticket type "${result.data!.name}" has been created successfully!`);
+          }
+
+          // Close the form modal
+          setIsModalOpen(false);
+          setEditingTicketType(null);
+          setValidationErrors({});
+          setError(null);
+
+          // Auto-close success dialog after 2 seconds
+          setTimeout(() => {
+            setSaveStatus('idle');
+            setSaveStatusMessage('');
+            setSaveStatusTitle('');
+          }, 2000);
         } else {
-          setTicketTypes(prev => [...prev, result.data!]);
+          console.error('[TicketTypeListClient] Update/create failed:', result.error);
+          setError(result.error || 'An unexpected error occurred.');
+          setSaveStatus('error');
+          setSaveStatusTitle('Save Failed');
+          setSaveStatusMessage(result.error || 'Failed to save ticket type. Please try again.');
         }
-        handleModalClose();
-      } else {
-        setError(result.error || 'An unexpected error occurred.');
+      } catch (err) {
+        console.error('[TicketTypeListClient] Exception in handleSubmit:', err);
+        const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred while saving.';
+        setError(errorMessage);
+        setSaveStatus('error');
+        setSaveStatusTitle('Save Failed');
+        setSaveStatusMessage(errorMessage);
       }
     });
   };
@@ -368,11 +441,11 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-gray-800">Ticket Types for {eventDetails?.title}</h2>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
+        <h2 className="text-xl font-bold text-gray-800 break-words flex-1 min-w-0">Ticket Types for {eventDetails?.title}</h2>
         <button
           onClick={handleAddNewClick}
-          className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2 transition-colors"
+          className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors w-full sm:w-auto whitespace-nowrap"
         >
           <FaPlus /> Add New Ticket Type
         </button>
@@ -607,6 +680,69 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
               />
             </div>
           </div>
+          {/* Tip message for min/max quantity */}
+          <div className="bg-blue-50 border-l-4 border-blue-400 p-3 rounded-r-md">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3 flex-1">
+                <p className="text-sm text-blue-700">
+                  <strong className="font-semibold">Tip:</strong> Specify the minimum and maximum number of tickets customers can purchase per order. This helps control ticket sales and prevents bulk purchases.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Minimum Quantity Per Order</label>
+              <input
+                type="number"
+                name="minQuantityPerOrder"
+                value={formData.minQuantityPerOrder ?? 1}
+                onChange={handleInputChange}
+                className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
+                min="1"
+                required
+              />
+              {validationErrors.minQuantityPerOrder && <p className="text-red-500 text-xs mt-1">{validationErrors.minQuantityPerOrder}</p>}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Maximum Quantity Per Order</label>
+              <input
+                type="number"
+                name="maxQuantityPerOrder"
+                value={formData.maxQuantityPerOrder ?? 10}
+                onChange={handleInputChange}
+                className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
+                min="1"
+                required
+              />
+              {validationErrors.maxQuantityPerOrder && <p className="text-red-500 text-xs mt-1">{validationErrors.maxQuantityPerOrder}</p>}
+            </div>
+          </div>
+          {/* Tip message for Active checkbox */}
+          <div className="bg-amber-50 border-l-4 border-amber-400 p-3 rounded-r-md">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3 flex-1">
+                <p className="text-sm text-amber-700">
+                  <strong className="font-semibold">Important:</strong> The <strong>"Active"</strong> checkbox controls whether this ticket type is displayed or hidden on the checkout page. Uncheck to hide it from customers.
+                </p>
+                <p className="text-sm text-amber-700 mt-2">
+                  <strong className="font-semibold">Note:</strong> If the remaining quantity is less than 20, the ticket type will automatically be shown as "Sold Out" on the checkout page to avoid race conditions and overselling.
+                </p>
+              </div>
+            </div>
+          </div>
+
           <div className="flex items-center space-x-8 mt-4">
             <label className="flex flex-col items-center cursor-pointer">
               <span className="relative flex items-center justify-center">
@@ -679,6 +815,15 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
           </div>
         </form>
       </Modal>
+
+      {/* Save Status Dialog */}
+      <SaveStatusDialog
+        isOpen={saveStatus !== 'idle'}
+        status={saveStatus}
+        title={saveStatusTitle}
+        message={saveStatusMessage}
+        onClose={saveStatus === 'error' ? handleCloseSaveStatus : undefined}
+      />
     </div>
   );
 }

@@ -1177,9 +1177,39 @@ export async function POST(req: NextRequest) {
 
             const cart = JSON.parse(cartJson);
             const now = new Date().toISOString();
+
+            // CRITICAL: Calculate total quantity by summing all cart item quantities
             const totalQuantity = Array.isArray(cart)
-              ? cart.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0)
+              ? cart.reduce((sum: number, item: any) => {
+                  const qty = Number(item.quantity) || 0;
+                  console.log('[STRIPE-WEBHOOK] Adding to total quantity:', {
+                    ticketTypeId: item.ticketTypeId,
+                    quantity: qty,
+                    runningTotal: sum + qty
+                  });
+                  return sum + qty;
+                }, 0)
               : 0;
+
+            // CRITICAL: Log cart data and quantity calculation for debugging
+            console.log('[STRIPE-WEBHOOK] 🔍 Cart data parsed and quantity calculated:', {
+              cartJson,
+              cartArray: JSON.stringify(cart, null, 2),
+              cartLength: Array.isArray(cart) ? cart.length : 0,
+              totalQuantity,
+              quantityBreakdown: Array.isArray(cart) ? cart.map((item: any, index: number) => ({
+                index,
+                ticketTypeId: item.ticketTypeId,
+                quantity: item.quantity,
+                quantityType: typeof item.quantity,
+                quantityNumber: Number(item.quantity) || 0,
+                isValid: typeof item.quantity === 'number' && item.quantity > 0
+              })) : [],
+              quantitySum: Array.isArray(cart)
+                ? cart.reduce((sum: number, item: any) => sum + (Number(item.quantity) || 0), 0)
+                : 0
+            });
+
             const eventId = Number(eventIdRaw);
             const amountTotal = typeof pi.amount_received === 'number' ? pi.amount_received / 100 : (typeof pi.amount === 'number' ? pi.amount / 100 : 0);
 
@@ -1224,12 +1254,21 @@ export async function POST(req: NextRequest) {
               piCreatedTimestamp: pi.created ? new Date(pi.created * 1000).toISOString() : 'N/A'
             });
 
-            // Try to get customer details from Stripe if customer ID exists
-            let customerName = '';
-            let customerPhone = '';
+            // CRITICAL: Extract customer data from Payment Intent metadata first (for mobile payments)
+            // Then fall back to Stripe customer data if available
+            let customerName = md.customerName || '';
+            let customerPhone = md.customerPhone || '';
             let customerEmail = email;
 
-            if (pi.customer && typeof pi.customer === 'string') {
+            console.log('[STRIPE-WEBHOOK] [USER-DATA-EXTRACTION] Extracted from Payment Intent metadata:', {
+              customerName: customerName || 'NOT_IN_METADATA',
+              customerPhone: customerPhone || 'NOT_IN_METADATA',
+              customerEmail: customerEmail || 'NOT_IN_METADATA',
+              timestamp: now
+            });
+
+            // Try to get customer details from Stripe if customer ID exists (fallback)
+            if (pi.customer && typeof pi.customer === 'string' && (!customerName || !customerPhone)) {
               try {
                 console.log('[STRIPE-WEBHOOK] [USER-DATA-EXTRACTION] Fetching customer details from Stripe API:', pi.customer);
                 const customerResponse = await stripe.customers.retrieve(pi.customer);
@@ -1247,11 +1286,12 @@ export async function POST(req: NextRequest) {
                     'name' in customerResponse) {
 
                   const customer = customerResponse as Stripe.Customer;
-                  customerName = customer.name || '';
-                  customerPhone = customer.phone || '';
-                  customerEmail = customer.email || email;
+                  // Only use Stripe data if metadata didn't provide it
+                  if (!customerName) customerName = customer.name || '';
+                  if (!customerPhone) customerPhone = customer.phone || '';
+                  if (!customerEmail) customerEmail = customer.email || email;
 
-                  console.log('[STRIPE-WEBHOOK] [USER-DATA-EXTRACTION] Successfully extracted customer data:', {
+                  console.log('[STRIPE-WEBHOOK] [USER-DATA-EXTRACTION] Successfully extracted customer data from Stripe:', {
                     customerId: customer.id,
                     customerName,
                     customerEmail,
@@ -1259,7 +1299,7 @@ export async function POST(req: NextRequest) {
                     customerMetadata: customer.metadata
                   });
                 } else {
-                  console.log('[STRIPE-WEBHOOK] [USER-DATA-EXTRACTION] Customer not found or deleted, using defaults');
+                  console.log('[STRIPE-WEBHOOK] [USER-DATA-EXTRACTION] Customer not found or deleted, using metadata values');
                 }
               } catch (customerError) {
                 console.warn('[STRIPE-WEBHOOK] [USER-DATA-EXTRACTION] Failed to fetch customer details from Stripe:', {
@@ -1268,15 +1308,15 @@ export async function POST(req: NextRequest) {
                   timestamp: now
                 });
               }
-            } else {
-              console.log('[STRIPE-WEBHOOK] [USER-DATA-EXTRACTION] No customer ID in Payment Intent, skipping customer lookup:', {
-                customerId: pi.customer,
-                customerType: typeof pi.customer,
+            } else if (!pi.customer) {
+              console.log('[STRIPE-WEBHOOK] [USER-DATA-EXTRACTION] No customer ID in Payment Intent, using metadata values:', {
+                customerName: customerName || 'EMPTY',
+                customerPhone: customerPhone || 'EMPTY',
                 timestamp: now
               });
             }
 
-            // Extract and split name from Stripe customer data
+            // Extract and split name from customerName (from metadata or Stripe)
             const { firstName, lastName } = extractNameFromStripe(customerName);
             console.log('[STRIPE-WEBHOOK] [USER-DATA-EXTRACTION] Final extracted user data:', {
               originalName: customerName,
@@ -1314,6 +1354,95 @@ export async function POST(req: NextRequest) {
                 timestamp: now
               });
 
+              // CRITICAL: Check if transaction items exist - if not, create them even if transaction exists
+              // This handles cases where transaction was created but items failed to create
+              if (Array.isArray(cart) && cart.length > 0) {
+                try {
+                  // Check if transaction items exist by fetching them
+                  const itemsCheckUrl = `${API_BASE_URL}/api/event-ticket-transaction-items?transactionId.equals=${existingTransaction.id}&tenantId.equals=${getTenantId()}`;
+                  const itemsCheckRes = await fetchWithJwtRetry(itemsCheckUrl, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                  });
+
+                  if (itemsCheckRes.ok) {
+                    const existingItems = await itemsCheckRes.json();
+                    const existingItemsCount = Array.isArray(existingItems) ? existingItems.length : 0;
+
+                    console.log('[STRIPE-WEBHOOK] Existing transaction items count:', existingItemsCount, 'Cart items count:', cart.length);
+
+                    // If no items exist but cart has items, create them now
+                    if (existingItemsCount === 0 && cart.length > 0) {
+                      console.log('[STRIPE-WEBHOOK] Transaction exists but has no items - creating transaction items now');
+
+                      // Import the bulk creation function
+                      const { createTransactionItemsBulkServer } = await import('./ApiServerActions');
+
+                      // Fetch prices and create items (same logic as below)
+                      const cartWithPrices = [];
+                      for (const item of cart) {
+                        try {
+                          let ticketTypeId = item.ticketTypeId;
+                          if (!ticketTypeId && item.ticketType && item.ticketType.id) {
+                            ticketTypeId = item.ticketType.id;
+                          }
+
+                          if (!ticketTypeId || typeof item.quantity !== 'number' || item.quantity <= 0) {
+                            continue;
+                          }
+
+                          const ticketTypeRes = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-ticket-types/${ticketTypeId}`, {
+                            method: 'GET',
+                            headers: { 'Content-Type': 'application/json' }
+                          });
+
+                          if (!ticketTypeRes.ok) continue;
+                          const ticketType = await ticketTypeRes.json();
+                          const price = ticketType.price;
+
+                          if (typeof price !== 'number' || price < 0) continue;
+
+                          cartWithPrices.push({
+                            ...item,
+                            ticketTypeId,
+                            price,
+                            ticketType
+                          });
+                        } catch (error) {
+                          console.error('[STRIPE-WEBHOOK] Error fetching price for cart item:', item, error);
+                        }
+                      }
+
+                      if (cartWithPrices.length > 0) {
+                        const itemsPayload = cartWithPrices.map((item: any) => {
+                          const parsedTicketTypeId = parseInt(item.ticketTypeId, 10);
+                          const quantity = item.quantity;
+                          const pricePerUnit = parseFloat(item.price.toString());
+                          const totalAmount = pricePerUnit * quantity;
+
+                          return withTenantId({
+                            transactionId: existingTransaction.id as number,
+                            ticketTypeId: parsedTicketTypeId,
+                            quantity,
+                            pricePerUnit,
+                            totalAmount,
+                            createdAt: now,
+                            updatedAt: now,
+                          });
+                        });
+
+                        await createTransactionItemsBulkServer(itemsPayload);
+                        console.log('[STRIPE-WEBHOOK] Successfully created missing transaction items:', itemsPayload.length);
+                      }
+                    } else {
+                      console.log('[STRIPE-WEBHOOK] Transaction items already exist - skipping creation');
+                    }
+                  }
+                } catch (itemsCheckError) {
+                  console.error('[STRIPE-WEBHOOK] Error checking for existing transaction items:', itemsCheckError);
+                }
+              }
+
               // If QR code is missing, we might want to trigger QR generation, but don't create duplicate transaction
               if (!existingTransaction.qrCodeImageUrl) {
                 console.log('[STRIPE-WEBHOOK] Existing transaction has no QR code URL - QR generation should happen separately');
@@ -1321,6 +1450,21 @@ export async function POST(req: NextRequest) {
 
               // Skip transaction creation - already exists
               break;
+            }
+
+            // Extract payment method type from Payment Intent
+            // Option 1: Use payment_method_types array (simplest)
+            let paymentMethodType = 'card'; // Default fallback
+            if (pi.payment_method_types && pi.payment_method_types.length > 0) {
+              paymentMethodType = pi.payment_method_types[0];
+            }
+
+            // Option 2: Extract from charge details (more accurate, if available)
+            if (pi.charges && pi.charges.data && pi.charges.data.length > 0) {
+              const charge = pi.charges.data[0];
+              if (charge.payment_method_details && charge.payment_method_details.type) {
+                paymentMethodType = charge.payment_method_details.type;
+              }
             }
 
             // Build payload similar to processStripeSessionServer
@@ -1338,7 +1482,7 @@ export async function POST(req: NextRequest) {
               discountAmount: undefined,
               finalAmount: amountTotal,
               status: 'COMPLETED',
-              paymentMethod: 'wallet',
+              paymentMethod: paymentMethodType, // Extract type instead of hardcoding 'wallet'
               paymentReference: pi.id,
               purchaseDate: now as any,
               confirmationSentAt: undefined as any,

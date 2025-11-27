@@ -9,6 +9,7 @@ interface SaveStatusDialogProps {
   isOpen: boolean;
   status: SaveStatus;
   message?: string;
+  title?: string;
   onClose?: () => void;
 }
 
@@ -16,6 +17,7 @@ export default function SaveStatusDialog({
   isOpen,
   status,
   message,
+  title,
   onClose,
 }: SaveStatusDialogProps) {
   if (!isOpen) return null;
@@ -25,8 +27,8 @@ export default function SaveStatusDialog({
       case 'saving':
         return {
           icon: <FaSpinner className="w-12 h-12 text-blue-500 animate-spin" />,
-          title: 'Saving Event...',
-          message: message || 'Please wait while we save your event details.',
+          title: title || 'Saving...',
+          message: message || 'Please wait while we save your changes.',
           bgColor: 'bg-blue-50',
           iconBg: 'bg-blue-100',
           textColor: 'text-blue-800',
@@ -34,8 +36,8 @@ export default function SaveStatusDialog({
       case 'success':
         return {
           icon: <FaCheckCircle className="w-12 h-12 text-green-600" />,
-          title: 'Event Saved Successfully!',
-          message: message || 'Your event has been saved successfully.',
+          title: title || 'Saved Successfully!',
+          message: message || 'Your changes have been saved successfully.',
           bgColor: 'bg-green-50',
           iconBg: 'bg-green-100',
           textColor: 'text-green-800',
@@ -43,8 +45,8 @@ export default function SaveStatusDialog({
       case 'error':
         return {
           icon: <FaExclamationCircle className="w-12 h-12 text-red-600" />,
-          title: 'Save Failed',
-          message: message || 'An error occurred while saving the event. Please try again.',
+          title: title || 'Save Failed',
+          message: message || 'An error occurred while saving. Please try again.',
           bgColor: 'bg-red-50',
           iconBg: 'bg-red-100',
           textColor: 'text-red-800',

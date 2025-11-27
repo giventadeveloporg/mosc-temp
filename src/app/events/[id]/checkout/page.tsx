@@ -1,5 +1,6 @@
 import { getCheckoutData } from './CheckoutServerData';
 import CheckoutClient from './CheckoutClient';
+import { unstable_noStore } from 'next/cache';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -9,8 +10,13 @@ interface PageProps {
  * Server Component - Fetches data on server before rendering
  * No flickering because data is ready before page renders
  * Uses Next.js cache() for request-level caching
+ *
+ * NOTE: unstable_noStore() prevents Next.js from caching this page
+ * This ensures hero images are always fresh
  */
 export default async function CheckoutPage({ params }: PageProps) {
+  // Prevent Next.js from caching this page to ensure fresh hero images
+  unstable_noStore();
   const resolvedParams = await params;
   const eventId = resolvedParams.id;
 
@@ -21,6 +27,8 @@ export default async function CheckoutPage({ params }: PageProps) {
     const checkoutData = await getCheckoutData(eventId);
 
     console.log('[CheckoutPage SERVER] Data fetched, rendering client component');
+    console.log('[CheckoutPage SERVER] Hero image URL:', checkoutData.heroImageUrl);
+    console.log('[CheckoutPage SERVER] Event ID:', eventId);
 
     // Pass server-fetched data to client component
     return <CheckoutClient initialData={checkoutData} eventId={eventId} />;

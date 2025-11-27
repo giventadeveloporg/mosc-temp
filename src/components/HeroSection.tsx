@@ -84,35 +84,30 @@ const DynamicHeroImage: React.FC = () => {
 
           console.log(`Found ${upcomingEvents.length} upcoming events with isHomePageHeroImage = true`);
 
+          // Build dynamic images array with ALL events in next 3 months
+          const imageUrls: string[] = [];
+          const eventData: EventWithMediaExtended[] = [];
+
+          // Add ALL upcoming events with isHomePageHeroImage = true (all events in next 3 months)
+          // This ensures all events in the next 3 months are considered for rotation
+          upcomingEvents.forEach((event, index) => {
+            if (event.thumbnailUrl) {
+              imageUrls.push(event.thumbnailUrl);
+              eventData.push(event);
+              console.log(`  [${index + 1}/${upcomingEvents.length}] Added event to rotation: ${event.title} (ID: ${event.id}, Date: ${event.startDate})`);
+            } else {
+              console.warn(`  [${index + 1}/${upcomingEvents.length}] Skipped event (no thumbnail): ${event.title} (ID: ${event.id})`);
+            }
+          });
+
+          // Set first event for initial display
           if (upcomingEvents.length > 0) {
             const event = upcomingEvents[0];
             heroImageUrl = event.thumbnailUrl!;
             nextEvent = event;
             console.log(`Using hero image from event: ${event.title} (ID: ${event.id})`);
+            console.log(`✅ Total events in rotation: ${imageUrls.length} (all events in next 3 months with isHomePageHeroImage = true)`);
           }
-
-
-          // Build dynamic images array with multiple events
-          const imageUrls: string[] = [];
-          const eventData: EventWithMediaExtended[] = [];
-
-          // Add hero image if it's not the default
-          if (heroImageUrl !== defaultImage) {
-            imageUrls.push(heroImageUrl);
-            if (nextEvent) {
-              eventData.push(nextEvent);
-            }
-          }
-
-          // Add more upcoming events with isHomePageHeroImage = true (up to 3 total)
-          const additionalEvents = upcomingEvents
-            .filter(event => event.id !== nextEvent?.id)
-            .slice(0, 2); // Take up to 2 more events
-
-          additionalEvents.forEach(event => {
-            imageUrls.push(event.thumbnailUrl!);
-            eventData.push(event);
-          });
 
           // Add fallback to original image
           imageUrls.push("https://cdn.builder.io/api/v1/image/assets%2Fa70a28525f6f491aaa751610252a199c%2F67c8b636de774dd2bb5d7097f5fcc176?format=webp&width=800");
@@ -162,13 +157,18 @@ const DynamicHeroImage: React.FC = () => {
           setCurrentImageIndex((prev) => {
             const newIndex = (prev + 1) % dynamicImages.length;
 
+            // Calculate number of event images (excluding fallback image at the end)
+            const eventImageCount = dynamicImages.length - 1; // Subtract 1 for fallback image
+
             // Update current event when image changes - key implementation for overlay sync
-            if (newIndex < upcomingEvents.length) {
+            if (newIndex < eventImageCount && newIndex < upcomingEvents.length) {
               // Show event-specific overlay for event images
               setCurrentEvent(upcomingEvents[newIndex]);
+              console.log(`Hero rotation: Showing event ${newIndex + 1}/${eventImageCount}: ${upcomingEvents[newIndex]?.title}`);
             } else {
               // No overlay for fallback/default images
               setCurrentEvent(null);
+              console.log(`Hero rotation: Showing fallback image (index ${newIndex})`);
             }
 
             return newIndex;
@@ -185,7 +185,7 @@ const DynamicHeroImage: React.FC = () => {
     }
 
     return () => clearTimeout(defaultTimer);
-  }, [dynamicImages.length]);
+  }, [dynamicImages.length, upcomingEvents]);
 
   // Show default image for first 2 seconds
   if (isShowingDefault) {

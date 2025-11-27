@@ -15,6 +15,8 @@ export async function POST(req: NextRequest) {
     const eventIdRaw = body.eventId;
     const discountCodeId: number | null = body.discountCodeId ?? null;
     const email: string | undefined = body.email;
+    const customerName: string | undefined = body.customerName;
+    const customerPhone: string | undefined = body.customerPhone;
 
     if (!cart.length) {
       return NextResponse.json({ error: 'Cart is empty' }, { status: 400 });
@@ -92,14 +94,25 @@ export async function POST(req: NextRequest) {
     const idemSource = `${eventIdRaw}|${email || ''}|${discountCodeId ?? ''}|${totalCents}|${JSON.stringify(cartKey)}|${timestampWindow}`;
     const idempotencyKey = crypto.createHash('sha256').update(idemSource).digest('hex');
 
+    // Build cart metadata with all ticket types and quantities
+    const cartMetadata = cart.map((c) => ({
+      ticketTypeId: c?.ticketType?.id,
+      quantity: c?.quantity,
+    }));
+
     console.log('[PI] Creating PaymentIntent:', {
       totalCents,
       eventId: eventIdRaw,
       email,
+      customerName: customerName || 'NOT_PROVIDED',
+      customerPhone: customerPhone || 'NOT_PROVIDED',
       discountCodeId,
       timestampWindow,
       idempotencyKey: idempotencyKey.substring(0, 8) + '...',
       cartItems: cart.length,
+      cartMetadata: JSON.stringify(cartMetadata, null, 2),
+      cartQuantities: cartMetadata.map(item => ({ ticketTypeId: item.ticketTypeId, quantity: item.quantity })),
+      totalQuantity: cartMetadata.reduce((sum, item) => sum + (item.quantity || 0), 0),
       timestamp: new Date().toISOString()
     });
 
@@ -111,17 +124,12 @@ export async function POST(req: NextRequest) {
       automatic_payment_methods: { enabled: true },
       metadata: {
         eventId: String(eventIdRaw ?? ''),
-        cart: JSON.stringify(
-          cart.map((c) => ({
-            ticketTypeId: c?.ticketType?.id,
-            quantity: c?.quantity,
-          }))
-        ),
+        cart: JSON.stringify(cartMetadata),
         ...(discountCodeId ? { discountCodeId: String(discountCodeId) } : {}),
         // Enhanced metadata for user profile creation
-        customerEmail: email,
-        // Note: We can't get name/phone from the form here, but we can store what we have
-        // The webhook will extract additional data from Stripe's customer details if available
+        customerEmail: email || '',
+        ...(customerName ? { customerName: customerName } : {}),
+        ...(customerPhone ? { customerPhone: customerPhone } : {}),
         metadataSource: 'mobile_payment_intent',
         timestamp: new Date().toISOString(),
       },

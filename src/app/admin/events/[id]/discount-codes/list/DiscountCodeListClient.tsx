@@ -80,6 +80,8 @@ export default function DiscountCodeListClient({
             ...formData,
             eventId: parseInt(eventId, 10),
             createdAt: editingCode.createdAt, // preserve original
+            validFrom: formData.validFrom || undefined,
+            validTo: formData.validTo || undefined,
           };
           updatedCode = await patchDiscountCodeServer(editingCode.id!, payload);
           setSuccessMessage(`Discount code "${updatedCode.code}" updated successfully!`);
@@ -98,6 +100,8 @@ export default function DiscountCodeListClient({
             maxUses: formData.maxUses,
             usesCount: formData.usesCount,
             isActive: formData.isActive,
+            validFrom: formData.validFrom || undefined,
+            validTo: formData.validTo || undefined,
           };
           updatedCode = await createDiscountCodeServer(payload, eventId);
           setSuccessMessage(`Discount code "${updatedCode.code}" created successfully!`);
@@ -154,18 +158,18 @@ export default function DiscountCodeListClient({
         </div>
       </div>
       <div className="bg-white rounded-lg shadow-md p-6">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-800">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl font-bold text-gray-800 break-words">
               Discount Codes for {eventDetails?.title}
             </h1>
             <p className="text-gray-600 mt-1">Manage discount codes for this event</p>
           </div>
           <button
             onClick={handleAddNewClick}
-            className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg flex items-center gap-3 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+            className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 sm:px-6 rounded-lg flex items-center justify-center gap-2 sm:gap-3 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 w-full sm:w-auto whitespace-nowrap"
           >
-            <FaPlus className="text-lg" /> Add New Discount Code
+            <FaPlus className="text-xl sm:text-lg" /> <span>Add New Discount Code</span>
           </button>
         </div>
 
@@ -221,8 +225,24 @@ export default function DiscountCodeListClient({
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button onClick={() => handleEditClick(code)} className="text-indigo-600 hover:text-indigo-900 mr-4"><FaEdit className="w-5 h-5" /></button>
-                    <button onClick={() => handleDeleteClick(code)} className="text-red-600 hover:text-red-900"><FaTrashAlt className="w-5 h-5" /></button>
+                    <div className="flex items-center justify-end gap-4">
+                      <button
+                        onClick={() => handleEditClick(code)}
+                        className="flex flex-col items-center text-indigo-600 hover:text-indigo-900 focus:outline-none transition-colors"
+                        aria-label="Edit discount code"
+                      >
+                        <FaEdit className="w-7 h-7" />
+                        <span className="text-[10px] text-gray-600 mt-1 block font-bold">Edit</span>
+                      </button>
+                      <button
+                        onClick={() => handleDeleteClick(code)}
+                        className="flex flex-col items-center text-red-600 hover:text-red-900 focus:outline-none transition-colors"
+                        aria-label="Delete discount code"
+                      >
+                        <FaTrashAlt className="w-7 h-7" />
+                        <span className="text-[10px] text-gray-600 mt-1 block font-bold">Delete</span>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -295,6 +315,8 @@ function DiscountCodeModal({ open, onClose, onSave, code, isPending, error }: {
         discountValue: code.discountValue || 0,
         maxUses: code.maxUses || 100,
         isActive: code.isActive !== undefined ? code.isActive : true,
+        validFrom: code.validFrom || '',
+        validTo: code.validTo || '',
       });
     } else {
       // Add new mode - set clean defaults
@@ -305,6 +327,8 @@ function DiscountCodeModal({ open, onClose, onSave, code, isPending, error }: {
         discountValue: 10,
         maxUses: 100,
         isActive: true,
+        validFrom: '',
+        validTo: '',
       });
     }
   }, [code]);
@@ -448,6 +472,50 @@ function DiscountCodeModal({ open, onClose, onSave, code, isPending, error }: {
             placeholder="Leave empty for unlimited"
           />
           <p className="mt-1 text-xs text-gray-500">Leave empty or set to 0 for unlimited uses</p>
+        </div>
+
+        {/* Valid From and Valid To Dates */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="validFrom" className="block text-sm font-medium text-gray-700 mb-1">
+              Valid From (Optional)
+            </label>
+            <input
+              type="datetime-local"
+              name="validFrom"
+              id="validFrom"
+              value={formData.validFrom ? new Date(formData.validFrom).toISOString().slice(0, 16) : ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                setFormData(prev => ({
+                  ...prev,
+                  validFrom: value ? new Date(value).toISOString() : ''
+                }));
+              }}
+              className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            />
+            <p className="mt-1 text-xs text-gray-500">Leave empty for no start date restriction</p>
+          </div>
+          <div>
+            <label htmlFor="validTo" className="block text-sm font-medium text-gray-700 mb-1">
+              Valid To (Optional)
+            </label>
+            <input
+              type="datetime-local"
+              name="validTo"
+              id="validTo"
+              value={formData.validTo ? new Date(formData.validTo).toISOString().slice(0, 16) : ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                setFormData(prev => ({
+                  ...prev,
+                  validTo: value ? new Date(value).toISOString() : ''
+                }));
+              }}
+              className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            />
+            <p className="mt-1 text-xs text-gray-500">Leave empty for no end date restriction</p>
+          </div>
         </div>
 
         {/* Active Status */}

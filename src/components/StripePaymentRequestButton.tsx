@@ -13,6 +13,8 @@ type Props = {
   cart: CartItem[];
   eventId: number | string;
   email?: string;
+  customerName?: string;
+  customerPhone?: string;
   discountCodeId?: number | null;
   enabled: boolean; // whether fields are valid; when false, we show disabled overlay/placeholder
   showPlaceholder?: boolean; // show a disabled-looking placeholder if not eligible yet
@@ -26,7 +28,7 @@ const defaultStripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
   ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
   : null;
 
-function InnerPRB({ cart, eventId, email, discountCodeId, enabled, showPlaceholder, amountCents, onInvalidClick }: Props) {
+function InnerPRB({ cart, eventId, email, customerName, customerPhone, discountCodeId, enabled, showPlaceholder, amountCents, onInvalidClick }: Props) {
   const stripe = useStripe();
   const [paymentRequest, setPaymentRequest] = useState<StripePaymentRequest | null>(null);
   const [ready, setReady] = useState(false);
@@ -154,7 +156,14 @@ function InnerPRB({ cart, eventId, email, discountCodeId, enabled, showPlacehold
           const res = await fetch('/api/stripe/payment-intent', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ cart, eventId, email, discountCodeId }),
+            body: JSON.stringify({
+              cart,
+              eventId,
+              email,
+              customerName,
+              customerPhone,
+              discountCodeId
+            }),
           });
           if (!res.ok) {
             if (!isApplePay) { try { ev.complete('fail'); } catch { } }

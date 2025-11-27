@@ -30,6 +30,8 @@ export async function createTicketTypeServer(eventId: string, formData: EventTic
       price: Number(formData.price),
       availableQuantity: Number(formData.availableQuantity),
       serviceFee: formData.isServiceFeeIncluded && formData.serviceFee ? Number(formData.serviceFee) : 0,
+      minQuantityPerOrder: formData.minQuantityPerOrder ? Number(formData.minQuantityPerOrder) : 1,
+      maxQuantityPerOrder: formData.maxQuantityPerOrder ? Number(formData.maxQuantityPerOrder) : 10,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     });
@@ -56,38 +58,79 @@ export async function createTicketTypeServer(eventId: string, formData: EventTic
 
 export async function updateTicketTypeServer(ticketTypeId: number, eventId: string, formData: Partial<EventTicketTypeFormDTO>) {
   try {
+    console.log('[updateTicketTypeServer] Starting update for ticket type:', ticketTypeId);
+    console.log('[updateTicketTypeServer] Form data received:', formData);
+
     // First fetch the existing ticket type to get the createdAt timestamp
     const existingTicketType = await fetchTicketTypeByIdServer(ticketTypeId);
     if (!existingTicketType) {
+      console.error('[updateTicketTypeServer] Ticket type not found:', ticketTypeId);
       return { success: false, error: 'Ticket type not found' };
     }
 
+    console.log('[updateTicketTypeServer] Existing ticket type:', existingTicketType);
+
+    // Ensure minQuantityPerOrder and maxQuantityPerOrder are properly handled
+    // Use formData value if provided (even if 0), otherwise use existing, otherwise default
+    // Check for both undefined and null, and handle 0 as a valid value
+    const minQuantityPerOrder = (formData.minQuantityPerOrder !== undefined && formData.minQuantityPerOrder !== null)
+      ? Number(formData.minQuantityPerOrder)
+      : ((existingTicketType.minQuantityPerOrder !== undefined && existingTicketType.minQuantityPerOrder !== null)
+          ? existingTicketType.minQuantityPerOrder
+          : 1);
+
+    const maxQuantityPerOrder = (formData.maxQuantityPerOrder !== undefined && formData.maxQuantityPerOrder !== null)
+      ? Number(formData.maxQuantityPerOrder)
+      : ((existingTicketType.maxQuantityPerOrder !== undefined && existingTicketType.maxQuantityPerOrder !== null)
+          ? existingTicketType.maxQuantityPerOrder
+          : 10);
+
+    // Build payload explicitly to ensure all fields are included
     const payload = withTenantId({
       id: ticketTypeId,
-      ...formData,
+      name: formData.name || existingTicketType.name,
+      code: formData.code || existingTicketType.code,
+      description: formData.description ?? existingTicketType.description ?? '',
+      price: Number(formData.price ?? existingTicketType.price),
+      availableQuantity: Number(formData.availableQuantity ?? existingTicketType.availableQuantity ?? 0),
+      isServiceFeeIncluded: formData.isServiceFeeIncluded ?? existingTicketType.isServiceFeeIncluded ?? false,
+      serviceFee: formData.isServiceFeeIncluded && formData.serviceFee ? Number(formData.serviceFee) : (existingTicketType.serviceFee ?? 0),
+      isActive: formData.isActive ?? existingTicketType.isActive ?? true,
+      minQuantityPerOrder, // Already calculated above
+      maxQuantityPerOrder, // Already calculated above
       event: { id: parseInt(eventId) },
-      price: Number(formData.price),
-      availableQuantity: Number(formData.availableQuantity),
-      serviceFee: formData.isServiceFeeIncluded && formData.serviceFee ? Number(formData.serviceFee) : 0,
       createdAt: existingTicketType.createdAt, // Preserve existing createdAt
       updatedAt: new Date().toISOString(),
     });
 
+    console.log('[updateTicketTypeServer] Payload being sent:', JSON.stringify(payload, null, 2));
+    console.log('[updateTicketTypeServer] Calling backend PUT:', `${API_BASE_URL}/api/event-ticket-types/${ticketTypeId}`);
+
+    // Server actions should call backend directly using fetchWithJwtRetry (not through proxy)
+    // This ensures proper JWT authentication and retry logic
     const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-ticket-types/${ticketTypeId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),
+      cache: 'no-store',
     });
+
+    console.log('[updateTicketTypeServer] Response status:', response.status);
+    console.log('[updateTicketTypeServer] Response ok:', response.ok);
 
     if (!response.ok) {
       const errorData = await response.text();
+      console.error('[updateTicketTypeServer] Update failed:', errorData);
       return { success: false, error: `Failed to update ticket type: ${errorData}` };
     }
+
     const data: EventTicketTypeDTO = await response.json();
+    console.log('[updateTicketTypeServer] Update successful, returned data:', data);
     return { success: true, data };
   } catch (error) {
+    console.error('[updateTicketTypeServer] Exception during update:', error);
     return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }

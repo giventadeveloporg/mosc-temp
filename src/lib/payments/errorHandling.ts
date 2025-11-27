@@ -66,8 +66,10 @@ export function logPaymentError(error: PaymentError, context?: Record<string, an
  */
 export function normalizePaymentError(error: unknown, context?: Record<string, any>): PaymentError {
   if (error instanceof Error) {
+    const errorMessage = error.message.toLowerCase();
+
     // Network errors
-    if (error.message.includes('fetch') || error.message.includes('network')) {
+    if (errorMessage.includes('fetch') || errorMessage.includes('network') || errorMessage.includes('failed to fetch')) {
       return createPaymentError(
         PaymentErrorType.NETWORK_ERROR,
         'Network error occurred. Please check your connection and try again.',
@@ -78,11 +80,38 @@ export function normalizePaymentError(error: unknown, context?: Record<string, a
     }
 
     // Timeout errors
-    if (error.message.includes('timeout') || error.message.includes('Timeout')) {
+    if (errorMessage.includes('timeout') || errorMessage.includes('timed out')) {
       return createPaymentError(
         PaymentErrorType.TIMEOUT_ERROR,
         'Request timed out. Please try again.',
         { originalError: error.message },
+        context?.transactionId,
+        context?.providerType
+      );
+    }
+
+    // Internal server errors - classify as INITIALIZATION_FAILED for payment initialization
+    if (errorMessage.includes('internal server error') ||
+        errorMessage.includes('500') ||
+        errorMessage.includes('server error') ||
+        errorMessage.includes('internal error')) {
+      return createPaymentError(
+        PaymentErrorType.INITIALIZATION_FAILED,
+        'Unable to initialize payment. Please refresh the page and try again.',
+        { originalError: error.message },
+        context?.transactionId,
+        context?.providerType
+      );
+    }
+
+    // Generic error - check if it's a payment initialization error
+    if (errorMessage.includes('payment initialization') ||
+        errorMessage.includes('initialize payment') ||
+        errorMessage.includes('failed to initialize')) {
+      return createPaymentError(
+        PaymentErrorType.INITIALIZATION_FAILED,
+        'Unable to initialize payment. Please refresh the page and try again.',
+        { originalError: error.message, stack: error.stack },
         context?.transactionId,
         context?.providerType
       );
@@ -100,6 +129,21 @@ export function normalizePaymentError(error: unknown, context?: Record<string, a
 
   // String errors
   if (typeof error === 'string') {
+    const errorMessage = error.toLowerCase();
+
+    // Check for internal server error in string errors too
+    if (errorMessage.includes('internal server error') ||
+        errorMessage.includes('500') ||
+        errorMessage.includes('server error')) {
+      return createPaymentError(
+        PaymentErrorType.INITIALIZATION_FAILED,
+        'Unable to initialize payment. Please refresh the page and try again.',
+        { originalError: error },
+        context?.transactionId,
+        context?.providerType
+      );
+    }
+
     return createPaymentError(
       PaymentErrorType.UNKNOWN_ERROR,
       error,
@@ -121,25 +165,47 @@ export function normalizePaymentError(error: unknown, context?: Record<string, a
 
 /**
  * Get user-friendly error message
+ * Always returns a user-friendly message, never technical error details
  */
 export function getUserFriendlyErrorMessage(error: PaymentError): string {
+  // Check if the error message itself contains technical terms that should be replaced
+  const message = error.message || '';
+  const messageLower = message.toLowerCase();
+
+  // Replace technical error messages with user-friendly ones
+  if (messageLower.includes('internal server error') ||
+      messageLower.includes('500') ||
+      messageLower.includes('server error') ||
+      messageLower.includes('internal error')) {
+    return 'The payment service is temporarily unavailable. Please try again in a few moments.';
+  }
+
   switch (error.type) {
     case PaymentErrorType.NETWORK_ERROR:
       return 'Unable to connect to payment service. Please check your internet connection and try again.';
     case PaymentErrorType.TIMEOUT_ERROR:
       return 'The request took too long. Please try again.';
     case PaymentErrorType.VALIDATION_ERROR:
-      return error.message || 'Please check your payment information and try again.';
+      // Only return user-friendly validation messages, not technical ones
+      if (messageLower.includes('validation') || messageLower.includes('invalid')) {
+        return 'Please check your payment information and try again.';
+      }
+      return message || 'Please check your payment information and try again.';
     case PaymentErrorType.PAYMENT_FAILED:
-      return error.message || 'Payment could not be processed. Please try a different payment method.';
+      // Only return user-friendly payment failure messages
+      if (messageLower.includes('declined') || messageLower.includes('insufficient')) {
+        return 'Your payment could not be processed. Please check your payment method or try a different one.';
+      }
+      return 'Payment could not be processed. Please try a different payment method.';
     case PaymentErrorType.INITIALIZATION_FAILED:
-      return 'Unable to initialize payment. Please refresh the page and try again.';
+      return 'The payment option is not available right now. Please try again later or contact support if the problem persists.';
     case PaymentErrorType.REFUND_FAILED:
       return 'Refund could not be processed. Please contact support.';
     case PaymentErrorType.PROVIDER_ERROR:
-      return error.message || 'Payment provider error. Please try again or use a different payment method.';
+      return 'Payment provider error. Please try again or use a different payment method.';
     default:
-      return error.message || 'An unexpected error occurred. Please try again or contact support.';
+      // For unknown errors, always return a generic user-friendly message
+      return 'The payment option is not available right now. Please try again later or contact support if the problem persists.';
   }
 }
 

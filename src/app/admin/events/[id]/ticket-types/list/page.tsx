@@ -44,8 +44,8 @@ export default async function TicketTypeListPage({ params }: PageProps) {
         )}
 
         {/* Responsive Button Group */}
-        <div className="w-full">
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1 sm:gap-2 mb-8 justify-items-stretch max-w-[280px] sm:max-w-4xl sm:mx-auto">
+        <div className="w-full overflow-x-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1 sm:gap-2 mb-8 justify-items-stretch min-w-[280px] max-w-full sm:max-w-4xl sm:mx-auto">
             <Link href="/admin" className="flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 text-gray-800 rounded-lg shadow-sm hover:shadow-md p-1.5 sm:p-3 text-xs transition-all duration-200 min-h-[60px] sm:min-h-[80px]">
               <FaHome className="text-xs sm:text-base mb-0.5 sm:mb-1" />
               <span className="font-medium text-center leading-tight text-[8px] sm:text-xs">Admin Home</span>
@@ -89,8 +89,8 @@ export default async function TicketTypeListPage({ params }: PageProps) {
     return (
       <div className="max-w-6xl mx-auto px-4 pb-8" style={{ paddingTop: '180px' }}>
         {/* Responsive Button Group */}
-        <div className="w-full">
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1 sm:gap-2 mb-8 justify-items-stretch max-w-[280px] sm:max-w-4xl sm:mx-auto">
+        <div className="w-full overflow-x-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1 sm:gap-2 mb-8 justify-items-stretch min-w-[280px] max-w-full sm:max-w-4xl sm:mx-auto">
             <Link href="/admin" className="flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 text-gray-800 rounded-lg shadow-sm hover:shadow-md p-1.5 sm:p-3 text-xs transition-all duration-200 min-h-[60px] sm:min-h-[80px]">
               <FaHome className="text-xs sm:text-base mb-0.5 sm:mb-1" />
               <span className="font-medium text-center leading-tight text-[8px] sm:text-xs">Admin Home</span>

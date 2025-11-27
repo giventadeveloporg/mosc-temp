@@ -12,6 +12,7 @@ import { PaymentProviderType as ProviderType } from '@/types';
 import StripeDesktopCheckout from './StripeDesktopCheckout';
 import StripePaymentRequestButton from './StripePaymentRequestButton';
 import ZelleManualPayment from './payments/ZelleManualPayment';
+import ErrorDialog from './ErrorDialog';
 import {
   normalizePaymentError,
   logPaymentError,
@@ -376,6 +377,22 @@ export default function UniversalPaymentCheckout(props: Props) {
           discountCode: discountCodeId ? String(discountCodeId) : undefined,
         };
 
+        // Debug logging for customer information and discount
+        console.log('[UniversalPaymentCheckout] Payment initialization request:', {
+          customerEmail: request.customerEmail,
+          customerName: request.customerName || 'NOT_PROVIDED',
+          customerPhone: request.customerPhone || 'NOT_PROVIDED',
+          discountCode: request.discountCode || 'NOT_PROVIDED',
+          eventId: request.eventId,
+          itemsCount: request.items.length,
+          items: request.items.map(item => ({
+            itemType: item.itemType,
+            itemId: item.itemId,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+          })),
+        });
+
         // Retry initialization with exponential backoff for network errors
         // Use the imported initializePaymentApi function (not the local one)
         const session = await retryWithBackoff(
@@ -532,8 +549,10 @@ export default function UniversalPaymentCheckout(props: Props) {
 
         // Get user-friendly error message
         const errorMessage = getUserFriendlyErrorMessage(paymentError);
-        setInitializationError(errorMessage);
-        onError?.(errorMessage);
+        // Use a more user-friendly message for payment initialization failures
+        const userFriendlyMessage = errorMessage || "The payment option is not available right now. Please try again later or contact support if the problem persists.";
+        setInitializationError(userFriendlyMessage);
+        onError?.(userFriendlyMessage);
         safeOnLoadingChange(false);
       } finally {
         // CRITICAL FIX: Always reset initialization flag in finally block
@@ -581,34 +600,29 @@ export default function UniversalPaymentCheckout(props: Props) {
     // CRITICAL: paymentSession is NOT in deps - it's only checked via ref to prevent re-runs when state updates
   }, [enabled, cartKey, email, amountCents, paymentUseCase, eventId, discountCodeId, memoizedReturnUrl, memoizedCancelUrl]);
 
+  // Handle error dialog close
+  const handleCloseErrorDialog = useCallback(() => {
+    setInitializationError(null);
+    // Reset payment section state to allow retry
+    paymentSectionActiveRef.current = true;
+    setPaymentSectionActive(true);
+  }, []);
+
   // Render loading state
   if (isInitializing) {
     return (
-      <div ref={paymentSectionRef} className="flex flex-col items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
-        <p className="text-muted-foreground">Initializing payment...</p>
-      </div>
-    );
-  }
-
-  // Render error state
-  if (initializationError) {
-    return (
-      <div ref={paymentSectionRef} className="bg-destructive/10 border border-destructive rounded-lg p-4">
-        <p className="text-destructive font-semibold mb-2">Payment Initialization Failed</p>
-        <p className="text-sm text-muted-foreground">{initializationError}</p>
-        <button
-          onClick={() => {
-            paymentSectionActiveRef.current = true; // Activate section on retry
-            setPaymentSectionActive(true);
-            setInitializationError(null);
-            setIsInitializing(true);
-          }}
-          className="mt-4 bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90"
-        >
-          Retry
-        </button>
-      </div>
+      <>
+        <ErrorDialog
+          isOpen={!!initializationError}
+          onClose={handleCloseErrorDialog}
+          title="Payment Unavailable"
+          message={initializationError || "The payment option is not available right now. Please try again later or contact support if the problem persists."}
+        />
+        <div ref={paymentSectionRef} className="flex flex-col items-center justify-center p-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+          <p className="text-muted-foreground">Initializing payment...</p>
+        </div>
+      </>
     );
   }
 
@@ -632,10 +646,18 @@ export default function UniversalPaymentCheckout(props: Props) {
       });
       // Show loading state while waiting for state to update
       return (
-        <div ref={paymentSectionRef} className="flex flex-col items-center justify-center p-8">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
-          <p className="text-muted-foreground">Loading payment options...</p>
-        </div>
+        <>
+          <ErrorDialog
+            isOpen={!!initializationError}
+            onClose={handleCloseErrorDialog}
+            title="Payment Unavailable"
+            message={initializationError || "The payment option is not available right now. Please try again later or contact support if the problem persists."}
+          />
+          <div ref={paymentSectionRef} className="flex flex-col items-center justify-center p-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+            <p className="text-muted-foreground">Loading payment options...</p>
+          </div>
+        </>
       );
     }
 
@@ -655,25 +677,33 @@ export default function UniversalPaymentCheckout(props: Props) {
     });
 
     return (
-      <div
-        ref={paymentSectionRef}
-        className="text-center p-8 text-muted-foreground"
-        onClick={() => {
-          // Activate payment section when user clicks/interacts with it
-          if (!paymentSectionActiveRef.current) {
-            console.log('[UniversalPaymentCheckout] Payment section activated by user interaction');
-            paymentSectionActiveRef.current = true;
-            setPaymentSectionActive(true);
-          }
-        }}
-      >
-        <p>Please complete the form above to proceed with payment.</p>
-        {process.env.NODE_ENV === 'development' && (
-          <p className="text-xs mt-2 text-gray-500">
-            Debug: enabled={String(enabled)}, cart={cart.length}, email={email ? 'yes' : 'no'}, active={String(paymentSectionActive)}
-          </p>
-        )}
-      </div>
+      <>
+        <ErrorDialog
+          isOpen={!!initializationError}
+          onClose={handleCloseErrorDialog}
+          title="Payment Unavailable"
+          message={initializationError || "The payment option is not available right now. Please try again later or contact support if the problem persists."}
+        />
+        <div
+          ref={paymentSectionRef}
+          className="text-center p-8 text-muted-foreground"
+          onClick={() => {
+            // Activate payment section when user clicks/interacts with it
+            if (!paymentSectionActiveRef.current) {
+              console.log('[UniversalPaymentCheckout] Payment section activated by user interaction');
+              paymentSectionActiveRef.current = true;
+              setPaymentSectionActive(true);
+            }
+          }}
+        >
+          <p>Please complete the form above to proceed with payment.</p>
+          {process.env.NODE_ENV === 'development' && (
+            <p className="text-xs mt-2 text-gray-500">
+              Debug: enabled={String(enabled)}, cart={cart.length}, email={email ? 'yes' : 'no'}, active={String(paymentSectionActive)}
+            </p>
+          )}
+        </div>
+      </>
     );
   }
 
@@ -685,35 +715,45 @@ export default function UniversalPaymentCheckout(props: Props) {
   if (effectiveProviderType === ProviderType.STRIPE && effectivePaymentSession.clientSecret && stripePublishableKey) {
     console.log('[UniversalPaymentCheckout] Rendering Stripe Elements UI');
     return (
-      <div ref={paymentSectionRef} className="space-y-4">
-        {/* Apple Pay / Google Pay Button */}
-        <StripePaymentRequestButton
-          cart={cart}
-          eventId={eventId}
-          email={email}
-          discountCodeId={discountCodeId}
-          enabled={enabled}
-          showPlaceholder={true}
-          amountCents={amountCents}
-          publishableKey={stripePublishableKey}
-          onInvalidClick={onInvalidClick}
+      <>
+        <ErrorDialog
+          isOpen={!!initializationError}
+          onClose={handleCloseErrorDialog}
+          title="Payment Unavailable"
+          message={initializationError || "The payment option is not available right now. Please try again later or contact support if the problem persists."}
         />
+        <div ref={paymentSectionRef} className="space-y-4">
+          {/* Apple Pay / Google Pay Button */}
+          <StripePaymentRequestButton
+            cart={cart}
+            eventId={eventId}
+            email={email}
+            customerName={customerName}
+            customerPhone={customerPhone}
+            discountCodeId={discountCodeId}
+            enabled={enabled}
+            showPlaceholder={true}
+            amountCents={amountCents}
+            publishableKey={stripePublishableKey}
+            onInvalidClick={onInvalidClick}
+          />
 
-        {/* Stripe Elements Card Form */}
-        <StripeDesktopCheckout
-          cart={cart}
-          eventId={eventId}
-          email={email}
-          discountCodeId={discountCodeId}
-          enabled={enabled && !isInitializing}
-          amountCents={amountCents}
-          publishableKey={stripePublishableKey}
-          clientSecret={effectivePaymentSession.clientSecret}
-          transactionId={effectivePaymentSession.transactionId}
-          onInvalidClick={onInvalidClick}
-          onLoadingChange={onLoadingChange}
-        />
-      </div>
+          {/* Stripe Elements Card Form */}
+          <StripeDesktopCheckout
+            cart={cart}
+            eventId={eventId}
+            email={email}
+            discountCodeId={discountCodeId}
+            enabled={enabled && !isInitializing}
+            amountCents={amountCents}
+            publishableKey={stripePublishableKey}
+            clientSecret={effectivePaymentSession.clientSecret}
+            transactionId={effectivePaymentSession.transactionId}
+            onInvalidClick={onInvalidClick}
+            onLoadingChange={onLoadingChange}
+          />
+        </div>
+      </>
     );
   }
 
@@ -730,17 +770,25 @@ export default function UniversalPaymentCheckout(props: Props) {
     // Show helpful error message if we have clientSecret but missing publishableKey
     if (effectivePaymentSession.clientSecret && !stripePublishableKey) {
       return (
-        <div className="bg-destructive/10 border border-destructive rounded-lg p-4">
-          <p className="text-destructive font-semibold mb-2">Payment Configuration Error</p>
-          <p className="text-sm text-muted-foreground">
-            Payment session initialized but Stripe publishable key is missing. Please contact support.
-          </p>
-          {process.env.NODE_ENV === 'development' && (
-            <p className="text-xs mt-2 text-gray-500">
-              Debug: transactionId={effectivePaymentSession.transactionId}, providerType={effectiveProviderType}
+        <>
+          <ErrorDialog
+            isOpen={true}
+            onClose={handleCloseErrorDialog}
+            title="Payment Configuration Error"
+            message="Payment session initialized but Stripe publishable key is missing. Please contact support."
+          />
+          <div className="bg-destructive/10 border border-destructive rounded-lg p-4">
+            <p className="text-destructive font-semibold mb-2">Payment Configuration Error</p>
+            <p className="text-sm text-muted-foreground">
+              Payment session initialized but Stripe publishable key is missing. Please contact support.
             </p>
-          )}
-        </div>
+            {process.env.NODE_ENV === 'development' && (
+              <p className="text-xs mt-2 text-gray-500">
+                Debug: transactionId={effectivePaymentSession.transactionId}, providerType={effectiveProviderType}
+              </p>
+            )}
+          </div>
+        </>
       );
     }
   }
@@ -785,7 +833,14 @@ export default function UniversalPaymentCheckout(props: Props) {
   // Render Stripe Instant Checkout (ACP) button
   if (providerType === ProviderType.STRIPE && paymentSession.sessionUrl) {
     return (
-      <div className="space-y-4">
+      <>
+        <ErrorDialog
+          isOpen={!!initializationError}
+          onClose={handleCloseErrorDialog}
+          title="Payment Unavailable"
+          message={initializationError || "The payment option is not available right now. Please try again later or contact support if the problem persists."}
+        />
+        <div className="space-y-4">
         <button
           onClick={handleInstantCheckout}
           disabled={isOpeningAcp}
@@ -812,25 +867,41 @@ export default function UniversalPaymentCheckout(props: Props) {
           </p>
         )}
       </div>
+      </>
     );
   }
 
   // Render PayPal button (will be implemented in Task 5)
   if (providerType === ProviderType.PAYPAL) {
     return (
-      <div className="space-y-4">
-        <div id="paypal-button-container" className="w-full"></div>
-        <p className="text-xs text-muted-foreground text-center">
-          PayPal checkout will be available here
-        </p>
-      </div>
+      <>
+        <ErrorDialog
+          isOpen={!!initializationError}
+          onClose={handleCloseErrorDialog}
+          title="Payment Unavailable"
+          message={initializationError || "The payment option is not available right now. Please try again later or contact support if the problem persists."}
+        />
+        <div className="space-y-4">
+          <div id="paypal-button-container" className="w-full"></div>
+          <p className="text-xs text-muted-foreground text-center">
+            PayPal checkout will be available here
+          </p>
+        </div>
+      </>
     );
   }
 
   // Render Revolut redirect button (will be implemented in Task 6)
   if (providerType === ProviderType.REVOLUT && paymentSession.sessionUrl) {
     return (
-      <div className="space-y-4">
+      <>
+        <ErrorDialog
+          isOpen={!!initializationError}
+          onClose={handleCloseErrorDialog}
+          title="Payment Unavailable"
+          message={initializationError || "The payment option is not available right now. Please try again later or contact support if the problem persists."}
+        />
+        <div className="space-y-4">
         <button
           onClick={() => {
             if (paymentSession.sessionUrl) {
@@ -845,25 +916,41 @@ export default function UniversalPaymentCheckout(props: Props) {
           You will be redirected to Revolut to complete your payment
         </p>
       </div>
+      </>
     );
   }
 
   // Render Zeffy embed (will be implemented in Task 7)
   if (providerType === ProviderType.ZEFFY) {
     return (
-      <div className="space-y-4">
+      <>
+        <ErrorDialog
+          isOpen={!!initializationError}
+          onClose={handleCloseErrorDialog}
+          title="Payment Unavailable"
+          message={initializationError || "The payment option is not available right now. Please try again later or contact support if the problem persists."}
+        />
+        <div className="space-y-4">
         <div id="zeffy-embed-container" className="w-full"></div>
         <p className="text-xs text-muted-foreground text-center">
           Zeffy donation widget will be available here
         </p>
       </div>
+      </>
     );
   }
 
   // Render Givebutter redirect button (for fundraiser events)
   if (providerType === ProviderType.GIVEBUTTER && paymentSession.sessionUrl) {
     return (
-      <div className="space-y-4">
+      <>
+        <ErrorDialog
+          isOpen={!!initializationError}
+          onClose={handleCloseErrorDialog}
+          title="Payment Unavailable"
+          message={initializationError || "The payment option is not available right now. Please try again later or contact support if the problem persists."}
+        />
+        <div className="space-y-4">
         <button
           onClick={() => {
             if (paymentSession.sessionUrl) {
@@ -881,6 +968,7 @@ export default function UniversalPaymentCheckout(props: Props) {
           ✨ Zero-fee payment processing
         </p>
       </div>
+      </>
     );
   }
 
@@ -916,24 +1004,40 @@ export default function UniversalPaymentCheckout(props: Props) {
     };
 
     return (
-      <ZelleManualPayment
-        paymentSession={paymentSession}
-        amount={amountCents / 100}
-        currency="USD" // TODO: Get from tenant settings
-        onConfirm={handleZelleConfirm}
-        onCancel={onInvalidClick}
-      />
+      <>
+        <ErrorDialog
+          isOpen={!!initializationError}
+          onClose={handleCloseErrorDialog}
+          title="Payment Unavailable"
+          message={initializationError || "The payment option is not available right now. Please try again later or contact support if the problem persists."}
+        />
+        <ZelleManualPayment
+          paymentSession={paymentSession}
+          amount={amountCents / 100}
+          currency="USD" // TODO: Get from tenant settings
+          onConfirm={handleZelleConfirm}
+          onCancel={onInvalidClick}
+        />
+      </>
     );
   }
 
   // Fallback for unknown provider
   return (
-    <div className="bg-warning/10 border border-warning rounded-lg p-4">
-      <p className="text-warning font-semibold">Unsupported Payment Provider</p>
-      <p className="text-sm text-muted-foreground mt-2">
-        Provider type: {providerType}
-      </p>
-    </div>
+    <>
+      <ErrorDialog
+        isOpen={!!initializationError}
+        onClose={handleCloseErrorDialog}
+        title="Payment Unavailable"
+        message={initializationError || "The payment option is not available right now. Please try again later or contact support if the problem persists."}
+      />
+      <div className="bg-warning/10 border border-warning rounded-lg p-4">
+        <p className="text-warning font-semibold">Unsupported Payment Provider</p>
+        <p className="text-sm text-muted-foreground mt-2">
+          Provider type: {providerType}
+        </p>
+      </div>
+    </>
   );
 }
 
