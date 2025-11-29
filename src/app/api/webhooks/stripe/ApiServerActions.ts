@@ -2,12 +2,13 @@
 
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import { EventTicketTransactionDTO, EventTicketTypeDTO } from '@/types';
+import { getTenantId } from '@/lib/env';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export async function createEventTicketTransactionServer(transaction: Omit<EventTicketTransactionDTO, 'id'>): Promise<EventTicketTransactionDTO> {
   const url = `${API_BASE_URL}/api/event-ticket-transactions`;
-  
+
   // Enhanced debugging for webhook transaction creation
   console.log('[WEBHOOK DEBUG] Creating transaction with payload:', {
     url,
@@ -35,11 +36,11 @@ export async function createEventTicketTransactionServer(transaction: Omit<Event
       errorBody,
       transactionPayload: transaction
     });
-    
+
     // Don't throw error - let webhook succeed even if backend transaction creation fails
     // This prevents Stripe from retrying the webhook indefinitely
     console.warn('[WEBHOOK WARN] Webhook will succeed despite transaction creation failure');
-    
+
     // Return a minimal transaction object to prevent downstream errors
     return {
       id: -1, // Indicates failed creation
@@ -56,27 +57,41 @@ export async function createEventTicketTransactionServer(transaction: Omit<Event
 // Helper to bulk create transaction items
 export async function createTransactionItemsBulkServer(items: any[]): Promise<any[]> {
   const url = `${API_BASE_URL}/api/event-ticket-transaction-items/bulk`;
-  
+
+  // Get tenantId from environment
+  const tenantId = getTenantId();
+
   // Validate all items have required non-null fields before sending to backend
   const validatedItems = items.map(item => {
-    if (!item.transactionId || !item.ticketTypeId || 
+    if (!item.transactionId || !item.ticketTypeId ||
         typeof item.quantity !== 'number' || typeof item.pricePerUnit !== 'number' ||
         typeof item.totalAmount !== 'number') {
       throw new Error(`Invalid transaction item: ${JSON.stringify(item)}`);
     }
-    
-    return {
+
+    // CRITICAL: Explicitly preserve tenantId - ensure it's always present
+    const validatedItem = {
       ...item,
+      tenantId: item.tenantId || tenantId, // Use item's tenantId if present, otherwise use default
       // Ensure BigDecimal-compatible numbers (backend expects precision)
       pricePerUnit: Number(item.pricePerUnit.toFixed(2)),
       totalAmount: Number(item.totalAmount.toFixed(2))
     };
+
+    // Validate tenantId is present
+    if (!validatedItem.tenantId) {
+      throw new Error(`Missing tenantId in transaction item: ${JSON.stringify(validatedItem)}`);
+    }
+
+    return validatedItem;
   });
-  
+
   console.log('[WEBHOOK DEBUG] Creating bulk transaction items:', {
     url,
+    tenantId,
     itemCount: validatedItems.length,
     items: validatedItems.map(item => ({
+      tenantId: item.tenantId,
       transactionId: item.transactionId,
       ticketTypeId: item.ticketTypeId,
       quantity: item.quantity,
