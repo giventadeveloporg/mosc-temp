@@ -368,17 +368,22 @@ export default function TicketQrClient({ initialPi, initialSessionId }: TicketQr
     }
 
     let cancelled = false;
-    async function fetchTransactionData() {
+    const MAX_POLL_ATTEMPTS = 15; // Limited polling as per mobile payment flow rules
+    const POLL_INTERVAL_MS = 2000; // 2 seconds between polls
+    let pollAttempt = 0;
+
+    async function pollTransactionData() {
       try {
-        console.log('[TicketQrClient] ===== STARTING TRANSACTION FETCH =====');
+        console.log('[TicketQrClient] ===== STARTING TRANSACTION POLLING =====');
         console.log('[TicketQrClient] identifier:', identifier);
         console.log('[TicketQrClient] session_id:', session_id);
         console.log('[TicketQrClient] payment_intent:', payment_intent);
         console.log('[TicketQrClient] URL:', window.location.href);
 
-        addApiLog('Starting transaction fetch');
-        addApiLog(`Fetching for identifier: ${identifier}`);
+        addApiLog('Starting transaction polling (NO POST requests - backend webhook creates transaction)');
+        addApiLog(`Polling for identifier: ${identifier}`);
         addApiLog(`session_id: ${session_id}, payment_intent: ${payment_intent}`);
+        addApiLog(`Max polling attempts: ${MAX_POLL_ATTEMPTS}`);
 
         // Build the appropriate query parameters
         const queryParams = new URLSearchParams();
@@ -394,135 +399,146 @@ export default function TicketQrClient({ initialPi, initialSessionId }: TicketQr
         queryParams.set('skip_qr', 'true'); // Prevent duplicate emails
         queryParams.set('_t', Date.now().toString());
 
-        // Allow server to also fetch QR code (may send duplicate email, accepted for now)
         const apiUrl = `/api/event/success/process?${queryParams.toString()}`;
-        console.log('[TicketQrClient] Making GET request to:', apiUrl);
-        addApiLog(`Making GET request to: ${apiUrl}`);
 
-        // Try to GET the transaction
-        const getRes = await fetch(apiUrl, {
-          cache: 'no-store'
-        });
+        // Polling loop - NEVER POST, only poll
+        while (pollAttempt < MAX_POLL_ATTEMPTS && !cancelled) {
+          pollAttempt++;
+          console.log(`[MOBILE QR DEBUG] Poll attempt ${pollAttempt}/${MAX_POLL_ATTEMPTS}`);
+          addApiLog(`Poll attempt ${pollAttempt}/${MAX_POLL_ATTEMPTS}`);
 
-        console.log('[MOBILE QR DEBUG] GET response status:', getRes.status);
-        addApiLog(`GET response status: ${getRes.status}`);
+          try {
+            const getRes = await fetch(`${apiUrl}&_poll=${pollAttempt}`, {
+              cache: 'no-store'
+            });
 
-        if (getRes.ok) {
-          const data = await getRes.json();
-          console.log('[MOBILE QR DEBUG] ✅ GET response data:', data);
-          console.log('[MOBILE QR DEBUG] ✅ Transaction found:', !!data.transaction);
-          console.log('[MOBILE QR DEBUG] ✅ Transaction ID:', data.transaction?.id);
-          addApiLog(`GET response received: ${JSON.stringify({
-            hasTransaction: !!data.transaction,
-            transactionId: data.transaction?.id,
-            error: data.error
-          })}`);
+            console.log(`[MOBILE QR DEBUG] GET response status (attempt ${pollAttempt}):`, getRes.status);
+            addApiLog(`GET response status: ${getRes.status}`);
 
-          if (data.transaction && !cancelled) {
-            console.log('[MOBILE QR DEBUG] ✅✅✅ SUCCESS! Transaction data loaded:', data.transaction.id);
-            console.log('[MOBILE QR DEBUG] ✅ Setting result and stopping loading...');
-            addApiLog(`Transaction data loaded successfully: ID ${data.transaction.id}`);
-            setResult(data);
-            setLoading(false);
-            console.log('[MOBILE QR DEBUG] ✅ Loading set to false, page should show success UI now');
+            if (getRes.ok) {
+              const data = await getRes.json();
+              console.log(`[MOBILE QR DEBUG] ✅ GET response data (attempt ${pollAttempt}):`, data);
+              console.log(`[MOBILE QR DEBUG] ✅ Transaction found:`, !!data.transaction);
+              console.log(`[MOBILE QR DEBUG] ✅ Transaction ID:`, data.transaction?.id);
+              console.log(`[MOBILE QR DEBUG] ✅ QR Code URL:`, data.transaction?.qrCodeImageUrl || 'NOT AVAILABLE');
 
-            // Immediately fetch QR code using singleton - NO useEffect, NO setTimeout
-            // This is the ONLY place QR code should be fetched in mobile flow to prevent duplicate emails
-            addApiLog('Mobile client will now fetch QR code (this is the ONLY QR fetch for mobile)');
-            console.log('[MOBILE QR DEBUG] ✅ About to fetch QR code via singleton...');
-            fetchQrCodeViaSingleton(data);
-            return;
-          } else {
-            console.log('[MOBILE QR DEBUG] No transaction in GET response, will try POST');
-            addApiLog('No transaction in GET response, attempting POST');
-            addApiLog(`GET response was: ${JSON.stringify(data).substring(0, 500)}`);
+              addApiLog(`GET response received: ${JSON.stringify({
+                hasTransaction: !!data.transaction,
+                transactionId: data.transaction?.id,
+                hasQrCodeUrl: !!data.transaction?.qrCodeImageUrl,
+                error: data.error
+              })}`);
+
+              // CRITICAL: Only proceed if transaction exists AND has QR code URL
+              // Per mobile payment flow rules: "treat empty QR as not-ready"
+              if (data.transaction && !cancelled) {
+                const hasQrCodeUrl = data.transaction.qrCodeImageUrl &&
+                                     data.transaction.qrCodeImageUrl.trim().length > 0;
+
+                if (hasQrCodeUrl) {
+                  // Transaction exists AND QR code URL is available - SUCCESS!
+                  console.log('[MOBILE QR DEBUG] ✅✅✅ SUCCESS! Transaction with QR code loaded:', data.transaction.id);
+                  console.log('[MOBILE QR DEBUG] ✅ QR Code URL:', data.transaction.qrCodeImageUrl);
+                  addApiLog(`Transaction data loaded successfully: ID ${data.transaction.id}`);
+                  addApiLog(`QR Code URL is available - proceeding`);
+                  setResult(data);
+                  setLoading(false);
+                  console.log('[MOBILE QR DEBUG] ✅ Loading set to false, page should show success UI now');
+
+                  // Immediately fetch QR code using singleton - NO useEffect, NO setTimeout
+                  // This is the ONLY place QR code should be fetched in mobile flow to prevent duplicate emails
+                  addApiLog('Mobile client will now fetch QR code (this is the ONLY QR fetch for mobile)');
+                  console.log('[MOBILE QR DEBUG] ✅ About to fetch QR code via singleton...');
+                  fetchQrCodeViaSingleton(data);
+                  return; // Exit polling loop - success!
+                } else {
+                  // Transaction exists but QR code URL not ready yet - continue polling
+                  console.log(`[MOBILE QR DEBUG] Transaction found but QR code URL not available yet (attempt ${pollAttempt})`);
+                  addApiLog(`Transaction found but QR code URL not available - continuing to poll...`);
+
+                  if (pollAttempt < MAX_POLL_ATTEMPTS) {
+                    // Wait before next poll attempt
+                    await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
+                    continue; // Continue polling
+                  } else {
+                    // Max attempts reached - show error
+                    console.error('[MOBILE QR DEBUG] Max polling attempts reached - QR code URL still not available');
+                    addApiLog(`Max polling attempts (${MAX_POLL_ATTEMPTS}) reached - QR code URL still not available`);
+                    throw new Error('Transaction found but QR code URL not available after maximum polling attempts. Please check your email or refresh the page.');
+                  }
+                }
+              } else {
+                // No transaction found yet - continue polling
+                console.log(`[MOBILE QR DEBUG] No transaction found yet (attempt ${pollAttempt}/${MAX_POLL_ATTEMPTS})`);
+                addApiLog(`No transaction found yet - backend webhook may still be processing`);
+
+                if (pollAttempt < MAX_POLL_ATTEMPTS) {
+                  // Wait before next poll attempt
+                  await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
+                  continue; // Continue polling
+                } else {
+                  // Max attempts reached - show error
+                  console.error('[MOBILE QR DEBUG] Max polling attempts reached - transaction still not found');
+                  addApiLog(`Max polling attempts (${MAX_POLL_ATTEMPTS}) reached - transaction still not found`);
+                  throw new Error('Transaction not found after maximum polling attempts. The backend webhook may still be processing. Please refresh the page in a moment.');
+                }
+              }
+            } else {
+              // GET request failed - continue polling (may be temporary)
+              const errorText = await getRes.text();
+              console.error(`[MOBILE QR DEBUG] GET request failed (attempt ${pollAttempt}):`, getRes.status, errorText);
+              addApiLog(`GET request failed: ${getRes.status} - ${errorText.substring(0, 200)}`);
+
+              if (pollAttempt < MAX_POLL_ATTEMPTS) {
+                // Wait before next poll attempt
+                await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
+                continue; // Continue polling
+              } else {
+                // Max attempts reached - show error
+                throw new Error(`Failed to fetch transaction after ${MAX_POLL_ATTEMPTS} attempts. Status: ${getRes.status}`);
+              }
+            }
+          } catch (fetchError: any) {
+            // Network or parsing error - continue polling if attempts remain
+            console.error(`[MOBILE QR DEBUG] Fetch error (attempt ${pollAttempt}):`, fetchError);
+            addApiLog(`Fetch error: ${fetchError?.message || 'Unknown error'}`);
+
+            if (pollAttempt < MAX_POLL_ATTEMPTS) {
+              // Wait before next poll attempt
+              await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
+              continue; // Continue polling
+            } else {
+              // Max attempts reached - show error
+              throw fetchError;
+            }
           }
-        } else {
-          const errorText = await getRes.text();
-          console.error('[MOBILE QR DEBUG] GET request failed:', getRes.status, errorText);
-          addApiLog(`GET request failed: ${getRes.status} - ${errorText.substring(0, 200)}`);
-          addApiLog('Will attempt POST to create transaction');
         }
 
-        // If not found, POST to create it
-        // IMPORTANT: keep skip_qr=true to prevent server route from fetching and emailing
-        const postBody: any = {};
-        if (session_id) {
-          postBody.session_id = session_id;
-          postBody.skip_qr = true; // Prevent duplicate emails
-          console.log('[TicketQrClient] POST body with session_id:', postBody);
-          addApiLog(`POST body prepared with session_id: ${session_id}`);
-        } else if (payment_intent) {
-          postBody.pi = payment_intent;
-          postBody.skip_qr = true; // Prevent duplicate emails
-          console.log('[TicketQrClient] POST body with pi:', postBody);
-          addApiLog(`POST body prepared with payment_intent: ${payment_intent}`);
-        }
-
-        console.log('[TicketQrClient] ===== MAKING POST REQUEST =====');
-        console.log('[TicketQrClient] POST body:', postBody);
-        addApiLog('Making POST request to create transaction');
-        addApiLog(`POST body: ${JSON.stringify(postBody)}`);
-
-        const postRes = await fetch("/api/event/success/process", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(postBody),
-        });
-
-        console.log('[TicketQrClient] POST response status:', postRes.status);
-        addApiLog(`POST response status: ${postRes.status}`);
-
-        if (!postRes.ok) {
-          const errorText = await postRes.text();
-          console.error('[TicketQrClient] POST failed:', errorText);
-          addApiLog(`POST request failed: ${postRes.status} - ${errorText.substring(0, 500)}`);
-          throw new Error(errorText);
-        }
-
-        const postData = await postRes.json();
-        console.log('[TicketQrClient] POST response data:', postData);
-        addApiLog(`POST response received: ${JSON.stringify({
-          hasTransaction: !!postData.transaction,
-          transactionId: postData.transaction?.id,
-          error: postData.error
-        })}`);
-
-        if (postData.transaction && !cancelled) {
-          console.log('[MOBILE QR DEBUG] Transaction created:', postData.transaction.id);
-          addApiLog(`Transaction created successfully: ID ${postData.transaction.id}`);
-          setResult(postData);
-          setLoading(false);
-          // Trigger the single QR fetch after POST success (credit card / fallback)
-          // Guard with small delay to give backend a moment to finish QR prereqs
-          setTimeout(() => {
-            addApiLog('Mobile client will now fetch QR code after POST (credit card flow)');
-            fetchQrCodeViaSingleton(postData);
-          }, 300);
-        } else {
-          console.error('[TicketQrClient] POST succeeded but no transaction in response');
-          addApiLog(`POST succeeded but no transaction! Full response: ${JSON.stringify(postData).substring(0, 500)}`);
-          throw new Error('Transaction creation failed - no transaction in response');
+        // Should never reach here, but handle just in case
+        if (!cancelled) {
+          throw new Error('Polling completed without finding transaction');
         }
       } catch (err: any) {
         if (!cancelled) {
-          console.error('[MOBILE QR DEBUG] Error loading transaction:', err);
+          console.error('[MOBILE QR DEBUG] Error polling transaction:', err);
           console.error('[MOBILE QR DEBUG] Error details:', {
             message: err?.message,
             stack: err?.stack,
             identifier,
             session_id,
-            payment_intent
+            payment_intent,
+            pollAttempt
           });
           addApiLog(`ERROR: ${err?.message || 'Unknown error occurred'}`);
           addApiLog(`Error details: ${err?.stack ? err.stack.substring(0, 200) : 'No stack trace'}`);
-          setError(err?.message || "Failed to load transaction");
+          addApiLog(`CRITICAL: Never attempted POST - backend webhook must create transaction`);
+          setError(err?.message || "Failed to load transaction after polling");
           setLoading(false);
         }
       }
     }
 
-    fetchTransactionData();
+    pollTransactionData();
     return () => { cancelled = true; };
   }, [identifier, session_id, payment_intent]);
 
