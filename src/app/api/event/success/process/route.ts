@@ -202,44 +202,142 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // FALLBACK: Check if transaction exists (backend webhook should have created it)
-    // CRITICAL: DO NOT create transactions here - backend webhook handles all transaction creation
-    // This prevents duplicate transactions and ensures firstName, lastName, phone are captured correctly
+    // CLIENT-SIDE TRANSACTION CREATION: Create transaction from Stripe data if not found
+    // This follows the legacy pattern where browser acts as listener and creates transactions
     if (!result && paymentIntentId) {
-      console.log('[API POST FALLBACK] Checking for existing transaction created by backend webhook:', paymentIntentId);
+      console.log('[API POST CLIENT-CREATE] No transaction found, creating from Payment Intent:', paymentIntentId);
 
-      // CRITICAL: Only look up existing transaction, do NOT create
-      // Backend webhook (src/app/api/webhooks/stripe/route.ts) handles all transaction creation
-      // Frontend should only look up existing transactions to avoid duplicates
-      const { findTransactionByPaymentIntentId } = await import('@/app/event/success/ApiServerActions');
-      const existingTransaction = await findTransactionByPaymentIntentId(paymentIntentId);
-
-      if (existingTransaction) {
-        console.log('[API POST FALLBACK] Found existing transaction created by backend webhook:', {
-          paymentIntentId,
-          existingTransactionId: existingTransaction.id,
-          existingQrCodeUrl: existingTransaction.qrCodeImageUrl || 'NULL',
-          hasFirstName: !!existingTransaction.firstName,
-          hasLastName: !!existingTransaction.lastName,
-          hasPhone: !!existingTransaction.phone,
-          timestamp: new Date().toISOString()
+      try {
+        // Retrieve Payment Intent from Stripe
+        const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId, {
+          expand: ['charges.data.balance_transaction']
         });
 
-        // Use existing transaction from backend webhook
-        result = { transaction: existingTransaction, userProfile: null };
-      } else {
-        // Transaction not found - backend webhook may still be processing
-        // Return null transaction instead of creating duplicate
-        console.log('[API POST FALLBACK] Transaction not found yet - backend webhook may still be processing:', {
+        // Check if payment is successful
+        if (paymentIntent.status !== 'succeeded') {
+          console.log('[API POST CLIENT-CREATE] Payment Intent not succeeded:', paymentIntent.status);
+          return NextResponse.json({
+            transaction: null,
+            message: `Payment not completed yet. Status: ${paymentIntent.status}`
+          }, { status: 200 });
+        }
+
+        // Extract metadata
+        const metadata = paymentIntent.metadata || {};
+        const cartJson = metadata.cart;
+        const eventIdRaw = metadata.eventId;
+        const discountCodeId = metadata.discountCodeId ? parseInt(metadata.discountCodeId, 10) : undefined;
+
+        if (!cartJson || !eventIdRaw) {
+          console.error('[API POST CLIENT-CREATE] Missing cart or eventId in Payment Intent metadata');
+          return NextResponse.json({
+            transaction: null,
+            message: 'Missing cart or eventId in payment metadata'
+          }, { status: 200 });
+        }
+
+        const cart = JSON.parse(cartJson);
+        const eventId = parseInt(eventIdRaw, 10);
+        const email = paymentIntent.receipt_email || metadata.customerEmail || '';
+        const customerName = metadata.customerName || '';
+        const customerPhone = metadata.customerPhone || '';
+
+        // Extract name parts
+        const nameParts = customerName.trim().split(/\s+/).filter(part => part.length > 0);
+        const firstName = nameParts.length > 0 ? nameParts[0] : '';
+        const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+
+        // Calculate totals
+        const totalQuantity = Array.isArray(cart)
+          ? cart.reduce((sum: number, item: any) => sum + (Number(item.quantity) || 0), 0)
+          : 0;
+        const amountTotal = typeof paymentIntent.amount_received === 'number'
+          ? paymentIntent.amount_received / 100
+          : (typeof paymentIntent.amount === 'number' ? paymentIntent.amount / 100 : 0);
+
+        // Extract payment method type
+        let paymentMethodType = 'card';
+        if (paymentIntent.payment_method_types && paymentIntent.payment_method_types.length > 0) {
+          paymentMethodType = paymentIntent.payment_method_types[0];
+        }
+
+        // Get Stripe fee if available
+        let stripeFeeAmount: number | undefined = undefined;
+        try {
+          if (paymentIntent.charges && Array.isArray(paymentIntent.charges.data) && paymentIntent.charges.data.length > 0) {
+            const charge = paymentIntent.charges.data[0];
+            if (charge.balance_transaction) {
+              const balanceTx = typeof charge.balance_transaction === 'string'
+                ? await stripe.balanceTransactions.retrieve(charge.balance_transaction)
+                : charge.balance_transaction;
+              if (balanceTx && typeof balanceTx.fee === 'number') {
+                stripeFeeAmount = balanceTx.fee / 100;
+              }
+            }
+          }
+        } catch (feeErr) {
+          console.warn('[API POST CLIENT-CREATE] Could not fetch Stripe fee:', feeErr);
+        }
+
+        // Import server actions for transaction creation
+        const { createTransactionFromPaymentIntent } = await import('@/app/event/success/ApiServerActions');
+
+        // Create transaction with cart items
+        const cartItems = Array.isArray(cart) ? cart.map((item: any) => ({
+          ticketTypeId: item.ticketTypeId || item.ticketType?.id,
+          quantity: Number(item.quantity) || 0
+        })).filter((item: any) => item.ticketTypeId && item.quantity > 0) : [];
+
+        const createdTransaction = await createTransactionFromPaymentIntent(
           paymentIntentId,
-          message: 'Returning null transaction - backend webhook will create it'
-        });
-        // Don't create transaction here - let backend webhook handle it
-        // Frontend should retry or wait for webhook to complete
+          eventId,
+          email,
+          cartItems,
+          amountTotal,
+          firstName,
+          lastName,
+          customerPhone
+        );
+
+        console.log('[API POST CLIENT-CREATE] Successfully created transaction:', createdTransaction.id);
+
+        // Use the created transaction
+        result = { transaction: createdTransaction, userProfile: null };
+      } catch (createErr: any) {
+        console.error('[API POST CLIENT-CREATE] Error creating transaction:', createErr);
         return NextResponse.json({
           transaction: null,
-          message: 'Transaction not found - backend webhook may still be processing. Please refresh in a moment.'
+          error: createErr?.message || 'Failed to create transaction',
+          message: 'Could not create transaction from payment data'
         }, { status: 200 });
+      }
+    }
+
+    // FALLBACK: If still no result and we have session_id (not payment intent), try to create from session
+    if (!result && session_id && !session_id.startsWith('pi_')) {
+      console.log('[API POST CLIENT-CREATE] No result from session processing, attempting direct session creation:', session_id);
+      try {
+        // Retrieve session from Stripe
+        const session = await stripe.checkout.sessions.retrieve(session_id, {
+          expand: ['line_items.data.price.product', 'customer']
+        });
+
+        if (session.payment_status !== 'paid') {
+          console.log('[API POST CLIENT-CREATE] Session not paid:', session.payment_status);
+          return NextResponse.json({
+            transaction: null,
+            message: `Payment not completed yet. Status: ${session.payment_status}`
+          }, { status: 200 });
+        }
+
+        // Process session to create transaction
+        result = await processStripeSessionServer(session_id);
+        if (result) {
+          console.log('[API POST CLIENT-CREATE] Successfully created transaction from session:', result.transaction?.id);
+        }
+      } catch (sessionErr: any) {
+        console.error('[API POST CLIENT-CREATE] Error processing session:', sessionErr);
+        // Continue to return null if creation fails
       }
     }
     const transaction = result?.transaction;

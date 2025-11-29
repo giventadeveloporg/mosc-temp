@@ -720,15 +720,18 @@ export async function getEventAttendeeGuests(attendeeId: number): Promise<EventA
 }
 
 /**
- * Create transaction directly from payment intent (fallback when webhook fails)
- * This handles mobile payments where webhook signature verification fails on AWS Lambda
+ * Create transaction directly from payment intent (client-side creation)
+ * This handles browser-based transaction creation where browser acts as listener
  */
 export async function createTransactionFromPaymentIntent(
   paymentIntentId: string,
   eventId: number,
   customerEmail: string,
   cart: { ticketTypeId: number; quantity: number }[],
-  amountPaid: number
+  amountPaid: number,
+  firstName?: string,
+  lastName?: string,
+  phone?: string
 ): Promise<EventTicketTransactionDTO> {
   console.log('[createTransactionFromPaymentIntent] Creating transaction:', {
     paymentIntentId,
@@ -766,9 +769,9 @@ export async function createTransactionFromPaymentIntent(
   // Build transaction data
   const transactionData: Omit<EventTicketTransactionDTO, 'id'> = withTenantId({
     email: customerEmail,
-    firstName: '',
-    lastName: '',
-    phone: '',
+    firstName: firstName || '',
+    lastName: lastName || '',
+    phone: phone || '',
     quantity: totalQuantity,
     pricePerUnit: totalQuantity > 0 ? amountPaid / totalQuantity : 0,
     totalAmount: amountPaid,
