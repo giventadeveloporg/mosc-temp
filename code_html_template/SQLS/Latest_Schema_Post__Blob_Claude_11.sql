@@ -1752,7 +1752,8 @@ CONSTRAINT check_email_format_transaction CHECK (((email)::text ~* '^[A-Za-z0-9.
     CONSTRAINT check_transaction_amounts CHECK (((total_amount >= (0)::numeric) AND (tax_amount >= (0)::numeric) AND (discount_amount >= (0)::numeric) AND (refund_amount >= (0)::numeric) AND (final_amount >= (0)::numeric))),
     CONSTRAINT fk_event FOREIGN KEY (event_id) REFERENCES public.event_details(id) ON DELETE CASCADE,
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES public.user_profile(id) ON DELETE SET null,
-    CONSTRAINT event_ticket_transaction_pkey PRIMARY KEY (id)
+    CONSTRAINT event_ticket_transaction_pkey PRIMARY KEY (id),
+    CONSTRAINT unique_stripe_payment_intent UNIQUE (stripe_payment_intent_id)
 );
 
 
@@ -1832,7 +1833,8 @@ CREATE TABLE public.event_ticket_transaction_item (
                                                       total_amount NUMERIC(21,2) NOT NULL,
     -- Optionally: discount_amount, fee_amount, etc.
                                                       created_at TIMESTAMP DEFAULT now() NOT NULL,
-                                                      updated_at TIMESTAMP DEFAULT now() NOT NULL
+                                                      updated_at TIMESTAMP DEFAULT now() NOT NULL,
+                                                      CONSTRAINT unique_transaction_ticket_type_tenant UNIQUE (transaction_id, ticket_type_id, tenant_id)
 );
 --
 -- TOC entry 232 (class 1259 OID 82832)

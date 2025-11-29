@@ -1218,17 +1218,23 @@ export interface PaymentRefundRequest {
 }
 
 /**
- * Membership Plan DTO
+ * Membership Plan DTO - Matches backend schema from PRD
  */
 export interface MembershipPlanDTO {
   id?: number;
   tenantId: string;
-  name: string;
+  planName: string;
+  planCode: string;
   description?: string;
-  billingInterval: 'MONTHLY' | 'YEARLY';
-  amount: number;
+  planType: 'SUBSCRIPTION' | 'ONE_TIME' | 'FREEMIUM';
+  billingInterval: 'MONTHLY' | 'QUARTERLY' | 'YEARLY' | 'ONE_TIME';
+  price: number;
   currency: string;
+  trialDays?: number;
   isActive: boolean;
+  maxEventsPerMonth?: number;
+  maxAttendeesPerEvent?: number;
+  featuresJson?: Record<string, any>;
   stripePriceId?: string;
   stripeProductId?: string;
   createdAt?: string;
@@ -1236,24 +1242,28 @@ export interface MembershipPlanDTO {
 }
 
 /**
- * Membership Subscription DTO
+ * Membership Subscription DTO - Matches backend schema from PRD
  */
 export interface MembershipSubscriptionDTO {
   id?: number;
   tenantId: string;
-  userId: number;
+  userProfileId: number;
   membershipPlanId: number;
-  status: 'ACTIVE' | 'CANCELLED' | 'PAST_DUE' | 'UNPAID';
-  currentPeriodStart: string;
-  currentPeriodEnd: string;
+  subscriptionStatus: 'ACTIVE' | 'TRIAL' | 'CANCELLED' | 'PAST_DUE' | 'EXPIRED' | 'SUSPENDED';
+  currentPeriodStart: string; // ISO date string (YYYY-MM-DD)
+  currentPeriodEnd: string; // ISO date string (YYYY-MM-DD)
+  trialStart?: string; // ISO date string (YYYY-MM-DD)
+  trialEnd?: string; // ISO date string (YYYY-MM-DD)
   cancelAtPeriodEnd: boolean;
-  cancelledAt?: string;
-  providerSubscriptionId?: string; // Stripe subscription ID, PayPal subscription ID, etc.
-  providerCustomerId?: string;
+  cancelledAt?: string; // ISO timestamp string
+  cancellationReason?: string;
+  stripeSubscriptionId?: string;
+  stripeCustomerId?: string;
+  paymentProviderConfigId?: number;
   createdAt?: string;
   updatedAt?: string;
-  // Relations
-  user?: UserProfileDTO;
+  // Relations (optional, for expanded responses)
+  userProfile?: UserProfileDTO;
   membershipPlan?: MembershipPlanDTO;
 }
 

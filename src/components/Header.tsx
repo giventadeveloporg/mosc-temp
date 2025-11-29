@@ -23,9 +23,15 @@ const navItems = [
     active: false
   },
   {
-    name: 'Focus Groups',
-    href: '/focus-groups',
-    active: false
+    name: 'Features',
+    href: '#',
+    active: false,
+    dropdown: [
+      { name: 'Polls', href: '/polls' },
+      { name: 'Focus Groups', href: '/focus-groups' },
+      { name: 'Profile', href: '/profile', requiresAuth: true },
+      { name: 'Membership', href: '/membership' }
+    ]
   },
   {
     name: 'Calendar',
@@ -35,11 +41,6 @@ const navItems = [
   {
     name: 'Gallery',
     href: '/gallery',
-    active: false
-  },
-  {
-    name: 'Polls',
-    href: '/polls',
     active: false
   },
   {
@@ -63,6 +64,14 @@ const adminSubmenuItems = [
   { name: 'Registrations', href: '/admin/events/registrations' },
   { name: 'Poll Management', href: '/admin/polls' },
   { name: 'Focus Groups', href: '/admin/focus-groups' },
+  {
+    name: 'Membership',
+    href: '#',
+    dropdown: [
+      { name: 'Plans', href: '/admin/membership/plans' },
+      { name: 'Subscriptions', href: '/admin/membership/subscriptions' }
+    ]
+  },
   { name: 'Promotion Emails', href: '/admin/promotion-emails' },
   { name: 'Test Stripe', href: '/admin/test-stripe' },
   { name: 'Media Management', href: '/admin/media' },
@@ -113,6 +122,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
   const [isAdmin, setIsAdmin] = useState(!!isTenantAdmin);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const [openMobileDropdowns, setOpenMobileDropdowns] = useState<Record<string, boolean>>({});
 
   // CRITICAL: Check for sign-out flag IMMEDIATELY on mount, before Clerk loads
   useEffect(() => {
@@ -267,29 +277,96 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
               {/* Navigation Menu Items */}
               {!hideMenuItems && (
                 <nav className="flex items-center space-x-1" role="navigation" aria-label="Main navigation">
-                  {updatedNavItems.map((item) => (
-                    <div key={item.name} className="relative group">
-                      <Link
-                        href={item.href}
-                        className={`
-                          relative flex items-center space-x-1 font-inter
-                          text-base lg:text-base font-medium tracking-wide
-                          px-3 py-2 mx-1
-                          transition-all duration-300 ease-in-out
-                          focus:outline-none
-                          ${item.active
-                            ? 'text-blue-400 font-semibold border-b-2 border-blue-400'
-                            : 'text-blue-400 font-medium hover:text-blue-500 hover:font-semibold border-b-2 border-transparent hover:border-blue-400'
-                          }
-                        `}
-                        onClick={(e) => handleSmoothScroll(e, item.href)}
-                        aria-label={`Navigate to ${item.name}`}
-                        aria-current={item.active ? 'page' : undefined}
-                      >
-                        <span className="tracking-[0.025em]">{item.name}</span>
-                      </Link>
-                    </div>
-                  ))}
+                  {updatedNavItems.map((item) => {
+                    const hasDropdown = item.dropdown && Array.isArray(item.dropdown);
+                    const isFeaturesActive = hasDropdown && item.dropdown.some(
+                      (subItem: any) => subItem.href === pathname ||
+                        (subItem.href === '/profile' && pathname === '/profile') ||
+                        (subItem.href === '/membership' && pathname?.startsWith('/membership'))
+                    );
+
+                    return (
+                      <div key={item.name} className="relative group">
+                        {hasDropdown ? (
+                          <>
+                            <div
+                              className={`
+                                relative flex items-center space-x-1 font-inter
+                                text-base lg:text-base font-medium tracking-wide
+                                px-3 py-2 mx-1
+                                transition-all duration-300 ease-in-out
+                                focus:outline-none cursor-pointer
+                                ${isFeaturesActive
+                                  ? 'text-blue-400 font-semibold border-b-2 border-blue-400'
+                                  : 'text-blue-400 font-medium hover:text-blue-500 hover:font-semibold border-b-2 border-transparent hover:border-blue-400'
+                                }
+                              `}
+                            >
+                              <span className="tracking-[0.025em]">{item.name}</span>
+                              <ChevronDown
+                                size={16}
+                                className="text-blue-400 transition-transform duration-300 group-hover:rotate-180"
+                                aria-hidden="true"
+                              />
+                            </div>
+                            {/* Features Dropdown */}
+                            <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50">
+                              <div className="py-3">
+                                {item.dropdown.map((subItem: any) => {
+                                  // Skip Profile if user is not authenticated
+                                  if (subItem.requiresAuth && !userId) return null;
+
+                                  const isSubItemActive = subItem.href === pathname ||
+                                    (subItem.href === '/membership' && pathname?.startsWith('/membership'));
+
+                                  return (
+                                    <Link
+                                      key={subItem.name}
+                                      href={subItem.href}
+                                      className={`
+                                        block px-4 py-2 mx-1 rounded-lg
+                                        text-sm font-medium tracking-[0.025em]
+                                        focus:outline-none
+                                        transition-all duration-300 ease-in-out
+                                        ${isSubItemActive
+                                          ? 'text-blue-500 font-semibold bg-blue-50'
+                                          : 'text-blue-400 hover:text-blue-500 hover:font-semibold hover:bg-blue-50'
+                                        }
+                                      `}
+                                      role="menuitem"
+                                      aria-label={`Navigate to ${subItem.name}`}
+                                    >
+                                      {subItem.name}
+                                    </Link>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          </>
+                        ) : (
+                          <Link
+                            href={item.href}
+                            className={`
+                              relative flex items-center space-x-1 font-inter
+                              text-base lg:text-base font-medium tracking-wide
+                              px-3 py-2 mx-1
+                              transition-all duration-300 ease-in-out
+                              focus:outline-none
+                              ${item.active
+                                ? 'text-blue-400 font-semibold border-b-2 border-blue-400'
+                                : 'text-blue-400 font-medium hover:text-blue-500 hover:font-semibold border-b-2 border-transparent hover:border-blue-400'
+                              }
+                            `}
+                            onClick={(e) => handleSmoothScroll(e, item.href)}
+                            aria-label={`Navigate to ${item.name}`}
+                            aria-current={item.active ? 'page' : undefined}
+                          >
+                            <span className="tracking-[0.025em]">{item.name}</span>
+                          </Link>
+                        )}
+                      </div>
+                    );
+                  })}
                 </nav>
               )}
 
@@ -326,23 +403,6 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                   </>
                 ) : (
                   <>
-                    <Link
-                      href="/profile"
-                      className={`
-                        relative flex items-center font-inter
-                        text-base font-medium tracking-wide
-                        px-3 py-2 mx-1
-                        transition-all duration-300 ease-in-out
-                        focus:outline-none
-                        ${pathname === "/profile"
-                          ? 'text-blue-400 font-semibold border-b-2 border-blue-400'
-                          : 'text-blue-400 font-medium hover:text-blue-500 hover:font-semibold border-b-2 border-transparent hover:border-blue-400'
-                        }
-                      `}
-                    >
-                      <span className="tracking-[0.025em]">Profile</span>
-                    </Link>
-
                     <button
                       onClick={handleSignOut}
                       disabled={isSigningOut}
@@ -393,23 +453,88 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                         {/* Admin Submenu */}
                         <div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50">
                           <div className="py-3">
-                            {adminSubmenuItems.map(subItem => (
-                              <Link
-                                key={subItem.name}
-                                href={subItem.href}
-                                className="
-                                  block px-4 py-2 mx-1 rounded-lg
-                                  text-sm font-medium text-blue-400 tracking-[0.025em]
-                                  hover:text-blue-500 hover:font-semibold hover:bg-blue-50
-                                  focus:outline-none
-                                  transition-all duration-300 ease-in-out
-                                "
-                                role="menuitem"
-                                aria-label={`Navigate to ${subItem.name}`}
-                              >
-                                {subItem.name}
-                              </Link>
-                            ))}
+                            {adminSubmenuItems.map(subItem => {
+                              const hasDropdown = subItem.dropdown && Array.isArray(subItem.dropdown);
+                              const isMembershipActive = hasDropdown && subItem.dropdown.some(
+                                (subSubItem: any) => pathname?.startsWith(subSubItem.href)
+                              );
+
+                              if (hasDropdown) {
+                                return (
+                                  <div key={subItem.name} className="relative group/membership">
+                                    <div
+                                      className={`
+                                        block px-4 py-2 mx-1 rounded-lg
+                                        text-sm font-medium tracking-[0.025em]
+                                        focus:outline-none
+                                        transition-all duration-300 ease-in-out
+                                        flex items-center justify-between
+                                        ${isMembershipActive
+                                          ? 'text-blue-500 font-semibold bg-blue-50'
+                                          : 'text-blue-400 hover:text-blue-500 hover:font-semibold hover:bg-blue-50'
+                                        }
+                                      `}
+                                    >
+                                      <span>{subItem.name}</span>
+                                      <ChevronDown
+                                        size={14}
+                                        className="text-blue-400 transition-transform duration-300 group-hover/membership:rotate-180"
+                                        aria-hidden="true"
+                                      />
+                                    </div>
+                                    {/* Membership Submenu */}
+                                    <div className="absolute top-0 left-full ml-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover/membership:opacity-100 group-hover/membership:visible transition-all duration-300 transform translate-x-2 group-hover/membership:translate-x-0 z-50">
+                                      <div className="py-2">
+                                        {subItem.dropdown.map((subSubItem: any) => {
+                                          const isSubSubItemActive = pathname?.startsWith(subSubItem.href);
+                                          return (
+                                            <Link
+                                              key={subSubItem.name}
+                                              href={subSubItem.href}
+                                              className={`
+                                                block px-4 py-2 mx-1 rounded-lg
+                                                text-sm font-medium tracking-[0.025em]
+                                                focus:outline-none
+                                                transition-all duration-300 ease-in-out
+                                                ${isSubSubItemActive
+                                                  ? 'text-blue-500 font-semibold bg-blue-50'
+                                                  : 'text-blue-400 hover:text-blue-500 hover:font-semibold hover:bg-blue-50'
+                                                }
+                                              `}
+                                              role="menuitem"
+                                              aria-label={`Navigate to ${subSubItem.name}`}
+                                            >
+                                              {subSubItem.name}
+                                            </Link>
+                                          );
+                                        })}
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              }
+
+                              return (
+                                <Link
+                                  key={subItem.name}
+                                  href={subItem.href}
+                                  className={`
+                                    block px-4 py-2 mx-1 rounded-lg
+                                    text-sm font-medium tracking-[0.025em]
+                                    focus:outline-none
+                                    transition-all duration-300 ease-in-out
+                                    ${pathname?.startsWith(subItem.href)
+                                      ? 'text-blue-500 font-semibold bg-blue-50'
+                                      : 'text-blue-400 hover:text-blue-500 hover:font-semibold hover:bg-blue-50'
+                                    }
+                                  `}
+                                  role="menuitem"
+                                  aria-label={`Navigate to ${subItem.name}`}
+                                >
+                                  {subItem.name}
+                                </Link>
+                              );
+                            })}
                           </div>
                         </div>
                       </div>
@@ -542,31 +667,97 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
           {/* Mobile Menu Navigation */}
           <nav className="flex-1 overflow-y-auto py-6" role="navigation" aria-label="Mobile navigation">
             <ul className="space-y-1 px-6">
-              {!hideMenuItems && updatedNavItems.map((item) => (
-                <li key={item.name}>
-                  <Link
-                    href={item.href}
-                    className={`
-                      block py-4 px-4 min-h-[44px] rounded-xl
-                      font-inter text-base font-medium tracking-[0.025em]
-                      focus:outline-none
-                      transition-all duration-300 ease-in-out
-                      ${item.active
-                        ? 'text-blue-400 font-semibold border-l-4 border-blue-400'
-                        : 'text-blue-400 font-medium hover:text-blue-500 hover:font-semibold border-l-4 border-transparent hover:border-blue-400'
-                      }
-                    `}
-                    onClick={(e) => {
-                      closeMobileMenu();
-                      handleSmoothScroll(e, item.href);
-                    }}
-                    aria-label={`Navigate to ${item.name}`}
-                    aria-current={item.active ? 'page' : undefined}
-                  >
-                    {item.name}
-                  </Link>
-                </li>
-              ))}
+              {!hideMenuItems && updatedNavItems.map((item) => {
+                const hasDropdown = item.dropdown && Array.isArray(item.dropdown);
+                const isDropdownOpen = openMobileDropdowns[item.name] || false;
+
+                if (hasDropdown) {
+                  return (
+                    <li key={item.name}>
+                      <button
+                        onClick={() => setOpenMobileDropdowns(prev => ({ ...prev, [item.name]: !prev[item.name] }))}
+                        className={`
+                          w-full flex items-center justify-between py-4 px-4 min-h-[44px] rounded-xl
+                          font-inter text-base font-medium tracking-[0.025em]
+                          focus:outline-none
+                          transition-all duration-300 ease-in-out
+                          text-blue-400 font-medium hover:text-blue-500 hover:font-semibold border-l-4 border-transparent hover:border-blue-400
+                        `}
+                        aria-label={`Toggle ${item.name} submenu`}
+                        aria-expanded={isDropdownOpen}
+                      >
+                        <span>{item.name}</span>
+                        <ChevronDown
+                          size={16}
+                          className={`text-blue-400 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`}
+                          aria-hidden="true"
+                        />
+                      </button>
+                      {isDropdownOpen && (
+                        <ul className="pl-4 mt-1 space-y-1">
+                          {item.dropdown.map((subItem: any) => {
+                            // Skip Profile if user is not authenticated
+                            if (subItem.requiresAuth && !userId) return null;
+
+                            const isSubItemActive = subItem.href === pathname ||
+                              (subItem.href === '/membership' && pathname?.startsWith('/membership'));
+
+                            return (
+                              <li key={subItem.name}>
+                                <Link
+                                  href={subItem.href}
+                                  className={`
+                                    block py-3 px-4 min-h-[44px] rounded-xl
+                                    font-inter text-sm font-medium tracking-[0.025em]
+                                    focus:outline-none
+                                    transition-all duration-300 ease-in-out
+                                    ${isSubItemActive
+                                      ? 'text-blue-500 font-semibold border-l-4 border-blue-400 bg-blue-50'
+                                      : 'text-blue-400 font-medium hover:text-blue-500 hover:font-semibold border-l-4 border-transparent hover:border-blue-400'
+                                    }
+                                  `}
+                                  onClick={() => {
+                                    closeMobileMenu();
+                                  }}
+                                  aria-label={`Navigate to ${subItem.name}`}
+                                >
+                                  {subItem.name}
+                                </Link>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
+                    </li>
+                  );
+                }
+
+                return (
+                  <li key={item.name}>
+                    <Link
+                      href={item.href}
+                      className={`
+                        block py-4 px-4 min-h-[44px] rounded-xl
+                        font-inter text-base font-medium tracking-[0.025em]
+                        focus:outline-none
+                        transition-all duration-300 ease-in-out
+                        ${item.active
+                          ? 'text-blue-400 font-semibold border-l-4 border-blue-400'
+                          : 'text-blue-400 font-medium hover:text-blue-500 hover:font-semibold border-l-4 border-transparent hover:border-blue-400'
+                        }
+                      `}
+                      onClick={(e) => {
+                        closeMobileMenu();
+                        handleSmoothScroll(e, item.href);
+                      }}
+                      aria-label={`Navigate to ${item.name}`}
+                      aria-current={item.active ? 'page' : undefined}
+                    >
+                      {item.name}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
 
             {/* Mobile Menu Auth Section */}
@@ -605,23 +796,6 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                 </>
               ) : (
                 <>
-                  <Link
-                    href="/profile"
-                    className={`
-                      block w-full py-4 px-6 min-h-[44px] rounded-xl
-                      font-inter font-medium text-base tracking-[0.025em]
-                      text-center border-2 border-blue-200 text-blue-600 hover:text-blue-700
-                      hover:bg-blue-50 hover:border-blue-300 hover:font-semibold
-                      focus:outline-none
-                      transition-all duration-300 ease-in-out
-                      active:scale-98
-                      ${pathname === "/profile" ? "border-blue-400 bg-blue-50 font-semibold" : ""}
-                    `}
-                    onClick={closeMobileMenu}
-                  >
-                    Profile
-                  </Link>
-
                   <button
                     onClick={() => {
                       closeMobileMenu();
@@ -654,24 +828,87 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                         <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3 px-2">
                           Admin Panel
                         </div>
-                        {adminSubmenuItems.map(subItem => (
-                          <Link
-                            key={subItem.name}
-                            href={subItem.href}
-                            className="
-                              block py-3 px-4 min-h-[44px] rounded-lg
-                              font-inter text-sm font-medium text-blue-400 tracking-[0.025em]
-                              hover:text-blue-500 hover:font-semibold hover:bg-blue-50
-                              focus:outline-none
-                              transition-all duration-300 ease-in-out
-                            "
-                            onClick={closeMobileMenu}
-                            role="menuitem"
-                            aria-label={`Navigate to ${subItem.name}`}
-                          >
-                            {subItem.name}
-                          </Link>
-                        ))}
+                        {adminSubmenuItems.map(subItem => {
+                          const hasDropdown = subItem.dropdown && Array.isArray(subItem.dropdown);
+                          const isDropdownOpen = openMobileDropdowns[`admin-${subItem.name}`] || false;
+
+                          if (hasDropdown) {
+                            return (
+                              <div key={subItem.name}>
+                                <button
+                                  onClick={() => setOpenMobileDropdowns(prev => ({ ...prev, [`admin-${subItem.name}`]: !prev[`admin-${subItem.name}`] }))}
+                                  className="
+                                    w-full flex items-center justify-between py-3 px-4 min-h-[44px] rounded-lg
+                                    font-inter text-sm font-medium text-blue-400 tracking-[0.025em]
+                                    hover:text-blue-500 hover:font-semibold hover:bg-blue-50
+                                    focus:outline-none
+                                    transition-all duration-300 ease-in-out
+                                  "
+                                  aria-label={`Toggle ${subItem.name} submenu`}
+                                  aria-expanded={isDropdownOpen}
+                                >
+                                  <span>{subItem.name}</span>
+                                  <ChevronDown
+                                    size={14}
+                                    className={`text-blue-400 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`}
+                                    aria-hidden="true"
+                                  />
+                                </button>
+                                {isDropdownOpen && (
+                                  <ul className="pl-4 mt-1 space-y-1">
+                                    {subItem.dropdown.map((subSubItem: any) => {
+                                      const isSubSubItemActive = pathname?.startsWith(subSubItem.href);
+                                      return (
+                                        <li key={subSubItem.name}>
+                                          <Link
+                                            href={subSubItem.href}
+                                            className={`
+                                              block py-2 px-4 min-h-[44px] rounded-lg
+                                              font-inter text-xs font-medium tracking-[0.025em]
+                                              focus:outline-none
+                                              transition-all duration-300 ease-in-out
+                                              ${isSubSubItemActive
+                                                ? 'text-blue-500 font-semibold bg-blue-50'
+                                                : 'text-blue-400 hover:text-blue-500 hover:font-semibold hover:bg-blue-50'
+                                              }
+                                            `}
+                                            onClick={closeMobileMenu}
+                                            role="menuitem"
+                                            aria-label={`Navigate to ${subSubItem.name}`}
+                                          >
+                                            {subSubItem.name}
+                                          </Link>
+                                        </li>
+                                      );
+                                    })}
+                                  </ul>
+                                )}
+                              </div>
+                            );
+                          }
+
+                          return (
+                            <Link
+                              key={subItem.name}
+                              href={subItem.href}
+                              className={`
+                                block py-3 px-4 min-h-[44px] rounded-lg
+                                font-inter text-sm font-medium tracking-[0.025em]
+                                focus:outline-none
+                                transition-all duration-300 ease-in-out
+                                ${pathname?.startsWith(subItem.href)
+                                  ? 'text-blue-500 font-semibold bg-blue-50'
+                                  : 'text-blue-400 hover:text-blue-500 hover:font-semibold hover:bg-blue-50'
+                                }
+                              `}
+                              onClick={closeMobileMenu}
+                              role="menuitem"
+                              aria-label={`Navigate to ${subItem.name}`}
+                            >
+                              {subItem.name}
+                            </Link>
+                          );
+                        })}
                       </div>
                     </>
                   )}

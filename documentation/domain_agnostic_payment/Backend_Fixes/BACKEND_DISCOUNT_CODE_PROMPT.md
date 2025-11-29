@@ -221,3 +221,6 @@ CREATE TABLE public.event_ticket_transaction (
 - Follow existing patterns for Payment Intent metadata extraction (similar to `customerName`/`customerPhone`)
 
 
+
+
+

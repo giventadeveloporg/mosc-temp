@@ -6,7 +6,6 @@ import Link from "next/link";
 import type { EventWithMedia, EventDetailsDTO } from "@/types";
 import { formatInTimeZone } from 'date-fns-tz';
 import LocationDisplay from '@/components/LocationDisplay';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { isRecurringEvent, getNextOccurrenceDate } from '@/lib/eventUtils';
 // import { formatInTimeZone } from 'date-fns-tz';
 
@@ -768,34 +767,38 @@ export default function EventsPage() {
                 <button
                   onClick={handleSearch}
                   disabled={loading || isSearching}
-                  className="px-2 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 w-fit"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-xl border-2 border-blue-400 transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 w-fit"
+                  aria-label="Search events"
                 >
                   {loading || isSearching ? (
                     <>
-                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
-                      Searching...
+                      <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                      </div>
+                      <span className="text-lg">Searching...</span>
                     </>
                   ) : (
                     <>
-                      <div className="flex-shrink-0 w-5 h-5 flex items-center justify-center">
-                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                       </div>
-                      Search Events
+                      <span className="text-lg">Search Events</span>
                     </>
                   )}
                 </button>
                 <button
                   onClick={clearSearch}
-                  className="px-2 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-sm font-semibold rounded-lg transition-all duration-200 shadow-md hover:shadow-lg flex items-center gap-1.5 w-fit"
+                  className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-medium py-3 px-6 rounded-xl border-2 border-emerald-400 transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-3 w-fit"
+                  aria-label="Clear search filters"
                 >
-                  <div className="flex-shrink-0 w-5 h-5 flex items-center justify-center">
-                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                   </div>
-                  Clear Search
+                  <span className="text-lg">Clear Search</span>
                 </button>
               </div>
             </div>
@@ -1020,8 +1023,9 @@ export default function EventsPage() {
                                       navigator.clipboard.writeText(event.location || '');
                                       alert('Address copied to clipboard!');
                                     }}
-                                    className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-colors group-hover:scale-110 transition-transform duration-300"
+                                    className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-colors"
                                     title="Copy Address"
+                                    aria-label="Copy address to clipboard"
                                   >
                                     <svg className="w-6 h-6 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -1031,8 +1035,9 @@ export default function EventsPage() {
                                     href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location || '')}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 hover:bg-green-200 flex items-center justify-center transition-colors group-hover:scale-110 transition-transform duration-300"
+                                    className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 hover:bg-green-200 flex items-center justify-center transition-colors"
                                     title="Open in Google Maps"
+                                    aria-label="Open location in Google Maps"
                                   >
                                     <svg className="w-6 h-6 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
@@ -1159,9 +1164,12 @@ export default function EventsPage() {
                     onClick={() => setPage((p) => Math.max(0, p - 1))}
                     disabled={page === 0}
                     className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+                    aria-label="Previous page"
                   >
-                    <FaChevronLeft />
-                    Previous
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                    <span>Previous</span>
                   </button>
                   <div className="text-sm font-semibold text-gray-700">
                     Page {page + 1} of {totalPages}
@@ -1170,9 +1178,12 @@ export default function EventsPage() {
                     onClick={() => setPage((p) => (p + 1 < totalPages ? p + 1 : p))}
                     disabled={page >= totalPages - 1}
                     className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+                    aria-label="Next page"
                   >
-                    Next
-                    <FaChevronRight />
+                    <span>Next</span>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
                   </button>
                 </div>
                 <div className="text-center text-sm text-gray-600 mt-2">
