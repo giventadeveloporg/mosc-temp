@@ -69,14 +69,25 @@ export async function createTransactionItemsBulkServer(items: any[]): Promise<an
       throw new Error(`Invalid transaction item: ${JSON.stringify(item)}`);
     }
 
-    // CRITICAL: Explicitly preserve tenantId - ensure it's always present
+    // CRITICAL: ALWAYS use tenantId from environment variable - NEVER trust tenantId from item
+    // This prevents duplicate calls with wrong tenant IDs from other tenants' webhook events
     const validatedItem = {
       ...item,
-      tenantId: item.tenantId || tenantId, // Use item's tenantId if present, otherwise use default
+      tenantId: tenantId, // ALWAYS use environment tenant ID - ignore any tenantId from item
       // Ensure BigDecimal-compatible numbers (backend expects precision)
       pricePerUnit: Number(item.pricePerUnit.toFixed(2)),
       totalAmount: Number(item.totalAmount.toFixed(2))
     };
+
+    // Log if item had a different tenantId (potential security issue)
+    if (item.tenantId && item.tenantId !== tenantId) {
+      console.warn('[WEBHOOK SECURITY] Transaction item had different tenantId - ignoring:', {
+        itemTenantId: item.tenantId,
+        configuredTenantId: tenantId,
+        transactionId: item.transactionId,
+        ticketTypeId: item.ticketTypeId
+      });
+    }
 
     // Validate tenantId is present
     if (!validatedItem.tenantId) {

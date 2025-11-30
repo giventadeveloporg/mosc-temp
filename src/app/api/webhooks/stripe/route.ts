@@ -749,11 +749,26 @@ export async function POST(req: NextRequest) {
       return new NextResponse('Error reading request body', { status: 400 });
     }
 
+    // CRITICAL: Get configured tenant ID early for logging and filtering
+    const configuredTenantId = getTenantId();
+    console.log('[STRIPE-WEBHOOK] Configured tenant ID:', configuredTenantId);
+
+    // CRITICAL: Stripe webhook architecture explanation:
+    // - If you have multiple webhook endpoints in Stripe Dashboard pointing to the same URL,
+    //   Stripe will send the SAME event to ALL endpoints (fan-out behavior)
+    // - Each webhook endpoint has its own unique webhook secret
+    // - We need to try multiple secrets to identify which tenant the event belongs to
+    // - Currently using single secret from environment variable (legacy approach)
     const webhookSecret = getStripeEnvVar('STRIPE_WEBHOOK_SECRET');
     if (!webhookSecret) {
       console.error('[STRIPE-WEBHOOK] Stripe webhook secret is not configured');
       return new NextResponse('Stripe webhook secret not configured', { status: 500 });
     }
+
+    console.log('[STRIPE-WEBHOOK] Using webhook secret from environment variable (single secret mode)');
+    console.log('[STRIPE-WEBHOOK] ⚠️ NOTE: If you have multiple webhook endpoints in Stripe Dashboard,');
+    console.log('[STRIPE-WEBHOOK]    Stripe will send events to ALL endpoints (fan-out behavior).');
+    console.log('[STRIPE-WEBHOOK]    Events from other tenants may fail signature verification.');
 
     // Initialize Stripe with environment variable checks
     const stripe = initStripeConfig();
@@ -762,12 +777,15 @@ export async function POST(req: NextRequest) {
     }
 
     let event: Stripe.Event;
+    let signatureVerified = false;
     try {
       // Verify webhook signature using raw body Buffer
       event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
+      signatureVerified = true;
       console.log('[STRIPE-WEBHOOK] ✅ Successfully verified webhook signature');
       console.log('[STRIPE-WEBHOOK] Event type:', event.type);
       console.log('[STRIPE-WEBHOOK] Event ID:', event.id);
+      console.log('[STRIPE-WEBHOOK] Webhook secret matched: Environment variable secret');
     } catch (err: any) {
       console.error('[STRIPE-WEBHOOK] ❌ Error verifying webhook signature:', err);
       console.error('[STRIPE-WEBHOOK] Error type:', err?.type);
@@ -777,13 +795,18 @@ export async function POST(req: NextRequest) {
       if (err?.type === 'StripeSignatureVerificationError') {
         const bodyText = rawBody.toString('utf8');
         console.error('[STRIPE-WEBHOOK] Signature verification failed - possible causes:');
-        console.error('[STRIPE-WEBHOOK] 1. Webhook secret mismatch');
-        console.error('[STRIPE-WEBHOOK] 2. Body was modified before reaching handler');
-        console.error('[STRIPE-WEBHOOK] 3. Signature header was modified');
-        console.error('[STRIPE-WEBHOOK] 4. Body encoding mismatch');
+        console.error('[STRIPE-WEBHOOK] 1. Webhook secret mismatch (most likely if you have multiple webhook endpoints)');
+        console.error('[STRIPE-WEBHOOK] 2. This event may belong to a different tenant with a different webhook secret');
+        console.error('[STRIPE-WEBHOOK] 3. Body was modified before reaching handler');
+        console.error('[STRIPE-WEBHOOK] 4. Signature header was modified');
+        console.error('[STRIPE-WEBHOOK] 5. Body encoding mismatch');
         console.error('[STRIPE-WEBHOOK] Body preview (first 200 chars):', bodyText.substring(0, 200));
         console.error('[STRIPE-WEBHOOK] Body length:', rawBody.length);
         console.error('[STRIPE-WEBHOOK] Signature received:', signature?.substring(0, 50));
+        console.error('[STRIPE-WEBHOOK] ⚠️ ARCHITECTURE NOTE: If you have multiple webhook endpoints in Stripe Dashboard');
+        console.error('[STRIPE-WEBHOOK]    pointing to the same URL, Stripe sends events to ALL endpoints.');
+        console.error('[STRIPE-WEBHOOK]    Events from other tenants will fail signature verification with this secret.');
+        console.error('[STRIPE-WEBHOOK]    This is EXPECTED behavior - reject these events.');
       }
 
       return new NextResponse(
@@ -799,11 +822,86 @@ export async function POST(req: NextRequest) {
     }
 
     // Get baseUrl for proxy API calls
-    const { getAppUrl } = await import('@/lib/env');
+    const { getAppUrl, getTenantId } = await import('@/lib/env');
     const baseUrl = getAppUrl();
 
     // Get backend API base URL for direct calls
     const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+    // CRITICAL: Get configured tenant ID from environment variable
+    const configuredTenantId = getTenantId();
+    console.log('[STRIPE-WEBHOOK] Configured tenant ID:', configuredTenantId);
+
+    // CRITICAL: Filter webhook events by tenant ID BEFORE making any backend API calls
+    // This prevents processing webhook events from other tenants when multiple domains share the same Stripe account
+    //
+    // ARCHITECTURE EXPLANATION:
+    // - Stripe sends webhook events to ALL configured webhook endpoints (fan-out behavior)
+    // - If you have multiple webhook endpoints pointing to the same URL, you'll receive multiple copies
+    // - Each webhook endpoint has its own secret, so signature verification filters most events
+    // - However, if events pass signature verification but have wrong tenant IDs in metadata, filter them here
+    // - CRITICAL: This filtering happens BEFORE any backend API calls to prevent duplicate transactions
+
+    // Extract tenant ID from event based on event type
+    let eventTenantId: string | null = null;
+
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object as Stripe.Checkout.Session;
+      eventTenantId = session.metadata?.tenantId || null;
+    } else if (event.type === 'payment_intent.succeeded') {
+      const pi = event.data.object as Stripe.PaymentIntent;
+      eventTenantId = pi.metadata?.tenantId || null;
+    } else if (event.type === 'charge.succeeded' || event.type === 'charge.refunded') {
+      const charge = event.data.object as Stripe.Charge;
+      eventTenantId = charge.metadata?.tenantId || null;
+    } else {
+      // For other event types, check generic metadata location
+      eventTenantId = (event.data?.object as any)?.metadata?.tenantId || null;
+    }
+
+    console.log('[STRIPE-WEBHOOK] Tenant ID check:', {
+      eventType: event.type,
+      eventTenantId,
+      configuredTenantId,
+      hasTenantId: !!eventTenantId
+    });
+
+    // CRITICAL: If tenant ID is present and doesn't match, REJECT the event BEFORE any backend calls
+    if (eventTenantId && eventTenantId !== configuredTenantId) {
+      console.warn('[STRIPE-WEBHOOK] ⚠️ REJECTING webhook event - tenant ID mismatch (NO backend calls will be made):', {
+        eventTenantId,
+        configuredTenantId,
+        eventType: event.type,
+        eventId: event.id,
+        message: 'This webhook event belongs to a different tenant and will be ignored',
+        note: 'This can happen if Stripe sends events to multiple webhook endpoints (fan-out behavior)',
+        action: 'Event rejected BEFORE any backend API calls'
+      });
+      // Return success to prevent Stripe from retrying, but don't process the event
+      // CRITICAL: This return happens BEFORE the switch statement, so NO backend calls are made
+      return new NextResponse(
+        JSON.stringify({
+          received: true,
+          message: 'Webhook event ignored - tenant ID mismatch',
+          configuredTenantId,
+          eventTenantId,
+          note: 'Event passed signature verification but belongs to different tenant. No backend calls made.'
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // CRITICAL: If tenant ID is missing, log warning but allow processing (legacy behavior)
+    // TODO: Consider rejecting events without tenant ID in production for better security
+    if (!eventTenantId) {
+      console.warn('[STRIPE-WEBHOOK] ⚠️ No tenant ID in event metadata - processing event (may belong to any tenant)', {
+        eventType: event.type,
+        eventId: event.id,
+        note: 'Consider adding tenant ID to Stripe metadata for better filtering'
+      });
+    } else {
+      console.log('[STRIPE-WEBHOOK] ✅ Tenant ID matches configured tenant - proceeding with event processing');
+    }
 
     // Process the event
     switch (event.type as string) {
@@ -853,9 +951,19 @@ export async function POST(req: NextRequest) {
                 user: userProfile,
               };
 
+              // CRITICAL: Always use withTenantId() to ensure ONLY configured tenant ID is used
+              // NEVER trust tenantId from Stripe metadata or session
+              const tenantId = getTenantId();
+              console.log('[STRIPE-WEBHOOK] Creating transaction with tenant ID:', tenantId);
               console.log('[STRIPE-WEBHOOK] Creating transaction with finalAmount:', transaction.finalAmount);
               console.log('[STRIPE-WEBHOOK] NOTE: Backend may recalculate finalAmount. If this happens, the backend needs to be updated to preserve the Stripe finalAmount.');
-              const createdTransaction = await createEventTicketTransactionServer(transaction);
+              const createdTransaction = await createEventTicketTransactionServer(withTenantId(transaction as any) as any);
+              console.log('[STRIPE-WEBHOOK] Created transaction:', {
+                transactionId: createdTransaction?.id,
+                tenantId: createdTransaction?.tenantId,
+                configuredTenantId: tenantId,
+                sessionId: session.id
+              });
               console.log('[STRIPE-WEBHOOK] Successfully created transaction:', createdTransaction.id);
               console.log('[STRIPE-WEBHOOK] Transaction finalAmount after creation:', createdTransaction.finalAmount);
 
@@ -1360,7 +1468,10 @@ export async function POST(req: NextRequest) {
               if (Array.isArray(cart) && cart.length > 0) {
                 try {
                   // Check if transaction items exist by fetching them
-                  const itemsCheckUrl = `${API_BASE_URL}/api/event-ticket-transaction-items?transactionId.equals=${existingTransaction.id}&tenantId.equals=${getTenantId()}`;
+                  // CRITICAL: Always use configured tenant ID from environment variable
+                  const tenantId = getTenantId();
+                  const itemsCheckUrl = `${API_BASE_URL}/api/event-ticket-transaction-items?transactionId.equals=${existingTransaction.id}&tenantId.equals=${tenantId}`;
+                  console.log('[STRIPE-WEBHOOK] Checking existing items with tenant ID:', tenantId);
                   const itemsCheckRes = await fetchWithJwtRetry(itemsCheckUrl, {
                     method: 'GET',
                     headers: { 'Content-Type': 'application/json' },
@@ -1536,8 +1647,17 @@ export async function POST(req: NextRequest) {
               updatedAt: now as any,
             };
 
+            // CRITICAL: Always use withTenantId() to ensure ONLY configured tenant ID is used
+            // NEVER trust tenantId from Stripe metadata or payment intent
+            const tenantId = getTenantId();
+            console.log('[STRIPE-WEBHOOK] Creating transaction with tenant ID:', tenantId);
             const created = await createEventTicketTransactionServer(withTenantId(txPayload as any) as any);
-            console.log('[STRIPE-WEBHOOK] Created PI-based ticket transaction:', created?.id);
+            console.log('[STRIPE-WEBHOOK] Created PI-based ticket transaction:', {
+              transactionId: created?.id,
+              tenantId: created?.tenantId,
+              configuredTenantId: tenantId,
+              paymentIntentId: pi.id
+            });
 
             // If transaction creation failed (id = -1), log but continue
             if (created?.id === -1) {
@@ -1550,7 +1670,10 @@ export async function POST(req: NextRequest) {
               try {
                 // CRITICAL: Enhanced idempotency check - verify items don't exist for this transaction
                 // Check each item individually to prevent duplicates even if partial items exist
-                const itemsCheckUrl = `${API_BASE_URL}/api/event-ticket-transaction-items?transactionId.equals=${created.id}&tenantId.equals=${getTenantId()}`;
+                // CRITICAL: Always use configured tenant ID from environment variable
+                const tenantId = getTenantId();
+                const itemsCheckUrl = `${API_BASE_URL}/api/event-ticket-transaction-items?transactionId.equals=${created.id}&tenantId.equals=${tenantId}`;
+                console.log('[STRIPE-WEBHOOK] Checking existing items with tenant ID:', tenantId);
                 const itemsCheckRes = await fetchWithJwtRetry(itemsCheckUrl, {
                   method: 'GET',
                   headers: { 'Content-Type': 'application/json' },
