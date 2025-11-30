@@ -9,6 +9,24 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 export async function createEventTicketTransactionServer(transaction: Omit<EventTicketTransactionDTO, 'id'>): Promise<EventTicketTransactionDTO> {
   const url = `${API_BASE_URL}/api/event-ticket-transactions`;
 
+  // CRITICAL: Verify tenant ID before sending to backend
+  const expectedTenantId = getTenantId();
+  const transactionTenantId = transaction.tenantId;
+
+  console.log('[WEBHOOK DEBUG] ============================================');
+  console.log('[WEBHOOK DEBUG] TRANSACTION CREATION - TENANT ID VERIFICATION');
+  console.log('[WEBHOOK DEBUG] Expected tenant ID (from env):', expectedTenantId);
+  console.log('[WEBHOOK DEBUG] Transaction tenant ID (in payload):', transactionTenantId);
+  console.log('[WEBHOOK DEBUG] NEXT_PUBLIC_TENANT_ID env var:', process.env.NEXT_PUBLIC_TENANT_ID);
+  console.log('[WEBHOOK DEBUG] Tenant ID match:', transactionTenantId === expectedTenantId);
+
+  if (transactionTenantId !== expectedTenantId) {
+    console.error('[WEBHOOK DEBUG] ⚠️⚠️⚠️ CRITICAL ERROR: Transaction payload has WRONG tenant ID!');
+    console.error('[WEBHOOK DEBUG] Expected:', expectedTenantId);
+    console.error('[WEBHOOK DEBUG] Got:', transactionTenantId);
+    console.error('[WEBHOOK DEBUG] This indicates withTenantId() is not working correctly or tenant ID is being overridden');
+  }
+
   // Enhanced debugging for webhook transaction creation
   console.log('[WEBHOOK DEBUG] Creating transaction with payload:', {
     url,
@@ -18,8 +36,10 @@ export async function createEventTicketTransactionServer(transaction: Omit<Event
     eventId: transaction.eventId,
     totalAmount: transaction.totalAmount,
     finalAmount: transaction.finalAmount,
-    tenantId: transaction.tenantId
+    tenantId: transaction.tenantId,
+    expectedTenantId
   });
+  console.log('[WEBHOOK DEBUG] ============================================');
 
   const res = await fetchWithJwtRetry(url, {
     method: 'POST',

@@ -70,16 +70,51 @@ export async function findTransactionByPaymentIntentId(
   paymentIntentId: string,
 ): Promise<EventTicketTransactionDTO | null> {
   const tenantId = getTenantId();
-  const params = new URLSearchParams({
+
+  // CRITICAL: First check with tenant filter (preferred - same tenant)
+  const tenantParams = new URLSearchParams({
     'stripePaymentIntentId.equals': paymentIntentId,
     'tenantId.equals': tenantId,
   });
-  const response = await fetchWithJwtRetry(
-    `${getAppUrl()}/api/proxy/event-ticket-transactions?${params.toString()}`,
+  const tenantResponse = await fetchWithJwtRetry(
+    `${getAppUrl()}/api/proxy/event-ticket-transactions?${tenantParams.toString()}`,
   );
-  if (!response.ok) return null;
-  const items: EventTicketTransactionDTO[] = await response.json();
-  return items.length > 0 ? items[0] : null;
+  if (tenantResponse.ok) {
+    const tenantItems: EventTicketTransactionDTO[] = await tenantResponse.json();
+    if (tenantItems.length > 0) {
+      return tenantItems[0];
+    }
+  }
+
+  // CRITICAL: If not found with tenant filter, check WITHOUT tenant filter
+  // This detects cross-tenant duplicates caused by database constraint violations
+  // The database constraint 'unique_stripe_payment_intent' is global (not per-tenant)
+  // So if a transaction exists for another tenant, we need to detect it
+  const globalParams = new URLSearchParams({
+    'stripePaymentIntentId.equals': paymentIntentId,
+  });
+  const globalResponse = await fetchWithJwtRetry(
+    `${getAppUrl()}/api/proxy/event-ticket-transactions?${globalParams.toString()}`,
+  );
+  if (globalResponse.ok) {
+    const globalItems: EventTicketTransactionDTO[] = await globalResponse.json();
+    if (globalItems.length > 0) {
+      const existingTransaction = globalItems[0];
+      console.warn('[findTransactionByPaymentIntentId] ⚠️ Found transaction for different tenant:', {
+        paymentIntentId,
+        configuredTenantId: tenantId,
+        existingTransactionTenantId: existingTransaction.tenantId,
+        existingTransactionId: existingTransaction.id,
+        message: 'Transaction exists for different tenant - database constraint will prevent duplicate creation',
+        note: 'This indicates a webhook may have created transaction for wrong tenant, or cross-tenant payment intent reuse'
+      });
+      // Return the existing transaction to prevent duplicate creation attempt
+      // The database constraint will fail anyway, so return existing to avoid error
+      return existingTransaction;
+    }
+  }
+
+  return null;
 }
 
 // Create a new transaction (POST)

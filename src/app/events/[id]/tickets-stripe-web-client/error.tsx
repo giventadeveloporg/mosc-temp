@@ -8,16 +8,16 @@ interface ErrorProps {
 }
 
 /**
- * Next.js Error Boundary for Tickets-New Page
+ * Next.js Error Boundary for Tickets Stripe Web Client Page
  * Catches any errors during rendering and displays a friendly message
  * This prevents users from seeing stack traces
  */
-export default function TicketsNewError({ error, reset }: ErrorProps) {
+export default function TicketsStripeWebClientError({ error, reset }: ErrorProps) {
   useEffect(() => {
     // Log error for debugging
-    console.error('[Tickets-New Error Boundary] Error caught:', error);
-    console.error('[Tickets-New Error Boundary] Error message:', error.message);
-    console.error('[Tickets-New Error Boundary] Error stack:', error.stack);
+    console.error('[Tickets-Stripe-Web-Client Error Boundary] Error caught:', error);
+    console.error('[Tickets-Stripe-Web-Client Error Boundary] Error message:', error.message);
+    console.error('[Tickets-Stripe-Web-Client Error Boundary] Error stack:', error.stack);
   }, [error]);
 
   // Determine user-friendly error message based on error type
@@ -121,5 +121,4 @@ export default function TicketsNewError({ error, reset }: ErrorProps) {
     </div>
   );
 }
-
 
