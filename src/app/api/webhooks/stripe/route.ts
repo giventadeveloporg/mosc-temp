@@ -822,15 +822,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Get baseUrl for proxy API calls
-    const { getAppUrl, getTenantId } = await import('@/lib/env');
+    const { getAppUrl } = await import('@/lib/env');
     const baseUrl = getAppUrl();
 
     // Get backend API base URL for direct calls
     const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-    // CRITICAL: Get configured tenant ID from environment variable
-    const configuredTenantId = getTenantId();
-    console.log('[STRIPE-WEBHOOK] Configured tenant ID:', configuredTenantId);
+    // CRITICAL: configuredTenantId is already declared at line 753 (before signature verification)
+    // Reusing it here for tenant ID filtering after signature verification
 
     // CRITICAL: Filter webhook events by tenant ID BEFORE making any backend API calls
     // This prevents processing webhook events from other tenants when multiple domains share the same Stripe account
