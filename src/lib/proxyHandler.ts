@@ -165,12 +165,36 @@ export function createProxyHandler({ injectTenantId = true, allowedMethods = ['G
           if (injectTenantId && payload && typeof payload === 'object') {
             if (Array.isArray(payload)) {
               // For arrays, inject tenantId into each array item if they are objects
-              payload = payload.map(item =>
-                typeof item === 'object' && item !== null ? withTenantId(item) : item
-              );
+              payload = payload.map(item => {
+                if (typeof item === 'object' && item !== null) {
+                  const itemWithTenantId = withTenantId(item);
+                  // Special logging for event-ticket-transaction-items
+                  if (path.includes('event-ticket-transaction-items')) {
+                    console.log('[PROXY DEBUG] Injected tenantId into transaction item:', {
+                      before: { tenantId: item.tenantId },
+                      after: { tenantId: itemWithTenantId.tenantId },
+                      transactionId: item.transactionId,
+                      ticketTypeId: item.ticketTypeId
+                    });
+                  }
+                  return itemWithTenantId;
+                }
+                return item;
+              });
             } else {
               // For single objects, inject tenantId normally
+              const beforeTenantId = payload.tenantId;
               payload = withTenantId(payload);
+              // Special logging for event-ticket-transaction-items
+              if (path.includes('event-ticket-transaction-items')) {
+                console.log('[PROXY DEBUG] Injected tenantId into transaction item (single):', {
+                  before: { tenantId: beforeTenantId },
+                  after: { tenantId: payload.tenantId },
+                  transactionId: payload.transactionId,
+                  ticketTypeId: payload.ticketTypeId,
+                  method
+                });
+              }
             }
           }
 
@@ -181,6 +205,30 @@ export function createProxyHandler({ injectTenantId = true, allowedMethods = ['G
             console.log('[PROXY DEBUG] Promotion email request - typeof payload.isTestEmail:', typeof payload?.isTestEmail);
             console.log('[PROXY DEBUG] Promotion email request - JSON.stringify(payload):', JSON.stringify(payload));
           }
+
+          // CRITICAL: Validate tenantId is present for event-ticket-transaction-items POST/PUT
+          if (path.includes('event-ticket-transaction-items') && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
+            if (Array.isArray(payload)) {
+              const missingTenantId = payload.find((item: any) => !item.tenantId);
+              if (missingTenantId) {
+                console.error('[PROXY ERROR] Missing tenantId in transaction item array:', {
+                  method,
+                  path,
+                  missingItem: missingTenantId,
+                  allItems: payload.map((item: any) => ({ tenantId: item.tenantId, transactionId: item.transactionId }))
+                });
+                throw new Error(`Missing tenantId in transaction item: ${JSON.stringify(missingTenantId)}`);
+              }
+            } else if (!payload.tenantId) {
+              console.error('[PROXY ERROR] Missing tenantId in transaction item:', {
+                method,
+                path,
+                payload
+              });
+              throw new Error(`Missing tenantId in transaction item: ${JSON.stringify(payload)}`);
+            }
+          }
+
           bodyToSend = JSON.stringify(payload);
         }
         // Log the outgoing payload for all non-GET/DELETE
