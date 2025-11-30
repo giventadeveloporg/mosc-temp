@@ -14,6 +14,7 @@ interface ValidationErrors {
   description?: string;
   price?: string;
   availableQuantity?: string;
+  maxQuantityPerOrder?: string;
 }
 
 // DetailsTooltip component following the UI style guide
@@ -191,6 +192,27 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
     const checked = isCheckbox ? (e.target as HTMLInputElement).checked : undefined;
 
     setFormData(prev => ({ ...prev, [name]: isCheckbox ? checked : value }));
+
+    // Clear validation errors when user starts typing
+    if (validationErrors[name as keyof ValidationErrors]) {
+      setValidationErrors(prev => ({ ...prev, [name]: undefined }));
+    }
+
+    // Real-time validation for maxQuantityPerOrder vs availableQuantity
+    if (name === 'maxQuantityPerOrder' || name === 'availableQuantity') {
+      const availableQty = Number(name === 'availableQuantity' ? value : formData.availableQuantity);
+      const maxQtyPerOrder = Number(name === 'maxQuantityPerOrder' ? value : formData.maxQuantityPerOrder);
+
+      if (availableQty > 0 && maxQtyPerOrder > 0 && maxQtyPerOrder > availableQty) {
+        setValidationErrors(prev => ({
+          ...prev,
+          maxQuantityPerOrder: `Maximum quantity per order (${maxQtyPerOrder}) cannot exceed available quantity (${availableQty}).`
+        }));
+      } else if (validationErrors.maxQuantityPerOrder?.includes('cannot exceed')) {
+        // Clear the error if it's now valid
+        setValidationErrors(prev => ({ ...prev, maxQuantityPerOrder: undefined }));
+      }
+    }
   };
 
   const handleModalClose = () => {
@@ -271,7 +293,20 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
     if (!formData.code?.trim()) newErrors.code = 'Code is required.';
     if (!formData.description?.trim()) newErrors.description = 'Description is required.';
     if (Number(formData.price) <= 0) newErrors.price = 'Price must be greater than zero.';
-    if (Number(formData.availableQuantity) <= 0) newErrors.availableQuantity = 'Available quantity must be greater than zero.';
+
+    // Available Quantity: Required and must be greater than zero
+    const availableQty = Number(formData.availableQuantity);
+    if (!formData.availableQuantity || availableQty <= 0) {
+      newErrors.availableQuantity = 'Available quantity is required and must be greater than zero.';
+    }
+
+    // Maximum Quantity Per Order: Required and must be less than available quantity
+    const maxQtyPerOrder = Number(formData.maxQuantityPerOrder);
+    if (!formData.maxQuantityPerOrder || maxQtyPerOrder <= 0) {
+      newErrors.maxQuantityPerOrder = 'Maximum quantity per order is required and must be greater than zero.';
+    } else if (availableQty > 0 && maxQtyPerOrder > availableQty) {
+      newErrors.maxQuantityPerOrder = `Maximum quantity per order (${maxQtyPerOrder}) cannot exceed available quantity (${availableQty}).`;
+    }
 
     // Check for duplicate name
     if (formData.name?.trim()) {
@@ -652,14 +687,14 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
               {validationErrors.price && <p className="text-red-500 text-xs mt-1">{validationErrors.price}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Available Quantity</label>
+              <label className="block text-sm font-medium text-gray-700">Available Quantity <span className="text-red-500">*</span></label>
               <input
                 type="number"
                 name="availableQuantity"
-                value={formData.availableQuantity || 0}
+                value={formData.availableQuantity || ''}
                 onChange={handleInputChange}
                 className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
-                min="0"
+                min="1"
                 required
               />
               {validationErrors.availableQuantity && <p className="text-red-500 text-xs mt-1">{validationErrors.availableQuantity}</p>}
@@ -711,11 +746,11 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
               {validationErrors.minQuantityPerOrder && <p className="text-red-500 text-xs mt-1">{validationErrors.minQuantityPerOrder}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Maximum Quantity Per Order</label>
+              <label className="block text-sm font-medium text-gray-700">Maximum Quantity Per Order <span className="text-red-500">*</span></label>
               <input
                 type="number"
                 name="maxQuantityPerOrder"
-                value={formData.maxQuantityPerOrder ?? 10}
+                value={formData.maxQuantityPerOrder ?? ''}
                 onChange={handleInputChange}
                 className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
                 min="1"
