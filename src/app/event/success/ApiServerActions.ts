@@ -869,6 +869,65 @@ export async function createTransactionFromPaymentIntent(
     amountPaid
   });
 
+  // CRITICAL: Retrieve PaymentIntent from Stripe to validate metadata
+  const { getTenantId, getPaymentMethodDomainId } = await import('@/lib/env');
+  const { stripe } = await import('@/lib/stripe');
+
+  let paymentIntent;
+  try {
+    paymentIntent = await stripe().paymentIntents.retrieve(paymentIntentId);
+  } catch (err) {
+    console.error('[createTransactionFromPaymentIntent] Failed to retrieve PaymentIntent:', err);
+    throw new Error(`Failed to retrieve PaymentIntent: ${err instanceof Error ? err.message : String(err)}`);
+  }
+
+  // CRITICAL: Extract tenantId and paymentMethodDomainId from PaymentIntent metadata
+  const metadata = paymentIntent.metadata || {};
+  const metadataTenantId = metadata.tenantId || metadata.tenant_id;
+  const metadataPaymentMethodDomainId = metadata.paymentMethodDomainId || metadata.payment_method_domain_id;
+
+  // Get expected values from environment variables
+  const expectedTenantId = getTenantId();
+  const expectedPaymentMethodDomainId = getPaymentMethodDomainId();
+
+  // CRITICAL: Validate metadata matches environment variables BEFORE making backend calls
+  if (metadataTenantId && metadataTenantId !== expectedTenantId) {
+    console.error('[createTransactionFromPaymentIntent] ⚠️⚠️⚠️ TENANT ID MISMATCH - Rejecting request:', {
+      metadataTenantId,
+      expectedTenantId,
+      paymentIntentId,
+      timestamp: new Date().toISOString()
+    });
+    throw new Error(`Tenant ID mismatch: Payment Intent tenant ID (${metadataTenantId}) does not match configured tenant ID (${expectedTenantId}). Request rejected.`);
+  }
+
+  if (metadataPaymentMethodDomainId && metadataPaymentMethodDomainId !== expectedPaymentMethodDomainId) {
+    console.error('[createTransactionFromPaymentIntent] ⚠️⚠️⚠️ PAYMENT METHOD DOMAIN ID MISMATCH - Rejecting request:', {
+      metadataPaymentMethodDomainId,
+      expectedPaymentMethodDomainId,
+      paymentIntentId,
+      timestamp: new Date().toISOString()
+    });
+    throw new Error(`Payment Method Domain ID mismatch: Payment Intent Payment Method Domain ID (${metadataPaymentMethodDomainId}) does not match configured Payment Method Domain ID (${expectedPaymentMethodDomainId}). Request rejected.`);
+  }
+
+  // Log successful validation
+  if (metadataTenantId && metadataPaymentMethodDomainId) {
+    console.log('[createTransactionFromPaymentIntent] ✅ Triple validation passed:', {
+      tenantId: metadataTenantId,
+      paymentMethodDomainId: metadataPaymentMethodDomainId,
+      paymentIntentId,
+      timestamp: new Date().toISOString()
+    });
+  } else {
+    console.warn('[createTransactionFromPaymentIntent] ⚠️ Missing metadata fields (will use environment variables):', {
+      hasTenantId: !!metadataTenantId,
+      hasPaymentMethodDomainId: !!metadataPaymentMethodDomainId,
+      paymentIntentId,
+      timestamp: new Date().toISOString()
+    });
+  }
+
   // CRITICAL: Check if transaction already exists before creating (prevent duplicates)
   const existingTransaction = await findTransactionByPaymentIntentId(paymentIntentId);
   if (existingTransaction) {

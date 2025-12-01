@@ -117,8 +117,29 @@ export async function POST(req: NextRequest) {
     });
 
     // Get tenant ID and Payment Method Domain ID from environment variables
-    const tenantId = getTenantId();
-    const paymentMethodDomainId = getPaymentMethodDomainId();
+    // CRITICAL: These must be set in production environment variables
+    let tenantId: string;
+    let paymentMethodDomainId: string;
+
+    try {
+      tenantId = getTenantId();
+    } catch (error) {
+      console.error('[PI] Missing NEXT_PUBLIC_TENANT_ID environment variable:', error);
+      return NextResponse.json({
+        error: 'Server configuration error: Tenant ID not configured',
+        details: 'NEXT_PUBLIC_TENANT_ID environment variable is required'
+      }, { status: 500 });
+    }
+
+    try {
+      paymentMethodDomainId = getPaymentMethodDomainId();
+    } catch (error) {
+      console.error('[PI] Missing NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID environment variable:', error);
+      return NextResponse.json({
+        error: 'Server configuration error: Payment Method Domain ID not configured',
+        details: 'NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID environment variable is required'
+      }, { status: 500 });
+    }
 
     // Create PaymentIntent with automatic payment methods (enables wallets)
     const pi = await stripe().paymentIntents.create({
