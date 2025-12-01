@@ -2,7 +2,7 @@ import { stripe } from '@/lib/stripe';
 import type { UserProfileDTO, EventTicketTypeDTO } from '@/types';
 import { fetchDiscountCodeByIdServer } from '@/app/admin/events/[id]/discount-codes/list/ApiServerActions';
 import Stripe from 'stripe';
-import { getTenantId, getAppUrl } from '@/lib/env';
+import { getTenantId, getPaymentMethodDomainId, getAppUrl } from '@/lib/env';
 
 interface CartItem {
   ticketType: EventTicketTypeDTO;
@@ -38,6 +38,10 @@ export async function createStripeCheckoutSession(
     ? ['card', 'link', 'cashapp'] // Add more options for production
     : ['card', 'link']; // Keep it simple for local development
 
+  // Get tenant ID and Payment Method Domain ID from environment variables
+  const tenantId = getTenantId();
+  const paymentMethodDomainId = getPaymentMethodDomainId();
+
   const sessionParams: Stripe.Checkout.SessionCreateParams = {
     payment_method_types: paymentMethods,
     line_items,
@@ -49,6 +53,8 @@ export async function createStripeCheckoutSession(
       ...(user.userId && { userId: user.userId }),
       eventId: String(eventId),
       ticketTypeId: String(ticketTypeId),
+      tenantId: tenantId, // CRITICAL: Add tenant ID to metadata for webhook tenant identification
+      paymentMethodDomainId: paymentMethodDomainId, // CRITICAL: Add Payment Method Domain ID for triple validation
       cart: JSON.stringify(
         cart.map(item => ({
           ticketTypeId: item.ticketType.id,
@@ -64,6 +70,8 @@ export async function createStripeCheckoutSession(
         ...(user.userId && { userId: user.userId }),
         eventId: String(eventId),
         ticketTypeId: String(ticketTypeId),
+        tenantId: tenantId, // CRITICAL: Add tenant ID to PaymentIntent metadata for webhook tenant identification
+        paymentMethodDomainId: paymentMethodDomainId, // CRITICAL: Add Payment Method Domain ID for triple validation
         cart: JSON.stringify(
           cart.map(item => ({
             ticketTypeId: item.ticketType.id,

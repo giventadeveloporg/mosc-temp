@@ -340,9 +340,9 @@ export async function POST(req: NextRequest) {
 
       // Forward raw body and signature to backend
       const backendResponse = await fetch(backendWebhookUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
           'Stripe-Signature': signature, // Forward Stripe signature header
         },
         body: rawBody, // Send raw body as-is (Buffer)
@@ -358,8 +358,8 @@ export async function POST(req: NextRequest) {
         status: backendResponse.status,
         headers: {
           'Content-Type': 'application/json',
-        },
-      });
+                },
+              });
     } catch (error: any) {
       console.error('[STRIPE-WEBHOOK] Error forwarding webhook to backend:', error);
       return new NextResponse(
@@ -369,7 +369,7 @@ export async function POST(req: NextRequest) {
         }),
         {
           status: 500,
-          headers: { 'Content-Type': 'application/json' }
+                        headers: { 'Content-Type': 'application/json' }
         }
       );
     }

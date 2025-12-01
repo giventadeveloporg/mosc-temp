@@ -2,7 +2,7 @@
 
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import { EventTicketTransactionDTO, EventTicketTypeDTO } from '@/types';
-import { getTenantId } from '@/lib/env';
+import { getTenantId, getPaymentMethodDomainId } from '@/lib/env';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -20,31 +20,48 @@ export async function createEventTicketTransactionServer(transaction: Omit<Event
   console.log('[WEBHOOK DEBUG] NEXT_PUBLIC_TENANT_ID env var:', process.env.NEXT_PUBLIC_TENANT_ID);
   console.log('[WEBHOOK DEBUG] Tenant ID match:', transactionTenantId === expectedTenantId);
 
-  if (transactionTenantId !== expectedTenantId) {
-    console.error('[WEBHOOK DEBUG] ⚠️⚠️⚠️ CRITICAL ERROR: Transaction payload has WRONG tenant ID!');
-    console.error('[WEBHOOK DEBUG] Expected:', expectedTenantId);
-    console.error('[WEBHOOK DEBUG] Got:', transactionTenantId);
-    console.error('[WEBHOOK DEBUG] This indicates withTenantId() is not working correctly or tenant ID is being overridden');
+  // Get triple validation values from environment variables
+  const expectedPaymentMethodDomainId = getPaymentMethodDomainId();
+
+  // CRITICAL: Validate transaction tenantId matches environment variable BEFORE backend call
+  if (transactionTenantId && transactionTenantId !== expectedTenantId) {
+    console.error('[WEBHOOK DEBUG] ⚠️⚠️⚠️ TENANT ID MISMATCH - Rejecting request:', {
+      transactionTenantId,
+      expectedTenantId,
+      timestamp: new Date().toISOString()
+    });
+    throw new Error(`Tenant ID mismatch: Transaction has tenantId=${transactionTenantId} but environment is configured for tenantId=${expectedTenantId}. Request rejected.`);
   }
 
-  // Enhanced debugging for webhook transaction creation
-  console.log('[WEBHOOK DEBUG] Creating transaction with payload:', {
-    url,
-    hasApiBaseUrl: !!API_BASE_URL,
-    transactionKeys: Object.keys(transaction),
-    email: transaction.email,
-    eventId: transaction.eventId,
-    totalAmount: transaction.totalAmount,
-    finalAmount: transaction.finalAmount,
-    tenantId: transaction.tenantId,
-    expectedTenantId
+  // CRITICAL: Validate transaction paymentMethodDomainId matches environment variable BEFORE backend call
+  const transactionPaymentMethodDomainId = transaction.paymentMethodDomainId;
+  if (transactionPaymentMethodDomainId && transactionPaymentMethodDomainId !== expectedPaymentMethodDomainId) {
+    console.error('[WEBHOOK DEBUG] ⚠️⚠️⚠️ PAYMENT METHOD DOMAIN ID MISMATCH - Rejecting request:', {
+      transactionPaymentMethodDomainId,
+      expectedPaymentMethodDomainId,
+      timestamp: new Date().toISOString()
+    });
+    throw new Error(`Payment Method Domain ID mismatch: Transaction has paymentMethodDomainId=${transactionPaymentMethodDomainId} but environment is configured for paymentMethodDomainId=${expectedPaymentMethodDomainId}. Request rejected.`);
+  }
+
+  // Add triple validation fields to payload (use environment variables, not transaction values)
+  // Backend will validate the combination (tenantId, paymentMethodDomainId, webhookSecret) exists
+  const payload = {
+    ...transaction,
+    tenantId: expectedTenantId, // ALWAYS use environment tenant ID - ignore any tenantId from transaction
+    paymentMethodDomainId: expectedPaymentMethodDomainId, // ALWAYS use environment Payment Method Domain ID
+  };
+
+  console.log('[WEBHOOK DEBUG] ✅ Triple validation passed, adding validated fields:', {
+    tenantId: payload.tenantId,
+    paymentMethodDomainId: payload.paymentMethodDomainId,
+    hasWebhookSecret: false, // Not passed from frontend - backend looks it up
   });
-  console.log('[WEBHOOK DEBUG] ============================================');
 
   const res = await fetchWithJwtRetry(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(transaction),
+    body: JSON.stringify(payload),
   });
 
   if (!res.ok) {
@@ -78,8 +95,9 @@ export async function createEventTicketTransactionServer(transaction: Omit<Event
 export async function createTransactionItemsBulkServer(items: any[]): Promise<any[]> {
   const url = `${API_BASE_URL}/api/event-ticket-transaction-items/bulk`;
 
-  // Get tenantId from environment
-  const tenantId = getTenantId();
+  // Get triple validation values from environment variables
+  const expectedTenantId = getTenantId();
+  const expectedPaymentMethodDomainId = getPaymentMethodDomainId();
 
   // Validate all items have required non-null fields before sending to backend
   const validatedItems = items.map(item => {
@@ -89,21 +107,48 @@ export async function createTransactionItemsBulkServer(items: any[]): Promise<an
       throw new Error(`Invalid transaction item: ${JSON.stringify(item)}`);
     }
 
+    // CRITICAL: Validate item tenantId matches environment variable BEFORE backend call
+    const itemTenantId = item.tenantId;
+    if (itemTenantId && itemTenantId !== expectedTenantId) {
+      console.error('[WEBHOOK DEBUG] ⚠️⚠️⚠️ TENANT ID MISMATCH in item - Rejecting request:', {
+        itemTenantId,
+        expectedTenantId,
+        transactionId: item.transactionId,
+        ticketTypeId: item.ticketTypeId,
+        timestamp: new Date().toISOString()
+      });
+      throw new Error(`Tenant ID mismatch: Item has tenantId=${itemTenantId} but environment is configured for tenantId=${expectedTenantId}. Request rejected.`);
+    }
+
+    // CRITICAL: Validate item paymentMethodDomainId matches environment variable BEFORE backend call
+    const itemPaymentMethodDomainId = item.paymentMethodDomainId;
+    if (itemPaymentMethodDomainId && itemPaymentMethodDomainId !== expectedPaymentMethodDomainId) {
+      console.error('[WEBHOOK DEBUG] ⚠️⚠️⚠️ PAYMENT METHOD DOMAIN ID MISMATCH in item - Rejecting request:', {
+        itemPaymentMethodDomainId,
+        expectedPaymentMethodDomainId,
+        transactionId: item.transactionId,
+        ticketTypeId: item.ticketTypeId,
+        timestamp: new Date().toISOString()
+      });
+      throw new Error(`Payment Method Domain ID mismatch: Item has paymentMethodDomainId=${itemPaymentMethodDomainId} but environment is configured for paymentMethodDomainId=${expectedPaymentMethodDomainId}. Request rejected.`);
+    }
+
     // CRITICAL: ALWAYS use tenantId from environment variable - NEVER trust tenantId from item
     // This prevents duplicate calls with wrong tenant IDs from other tenants' webhook events
     const validatedItem = {
       ...item,
-      tenantId: tenantId, // ALWAYS use environment tenant ID - ignore any tenantId from item
+      tenantId: expectedTenantId, // ALWAYS use environment tenant ID - ignore any tenantId from item
+      paymentMethodDomainId: expectedPaymentMethodDomainId, // ALWAYS use environment Payment Method Domain ID
       // Ensure BigDecimal-compatible numbers (backend expects precision)
       pricePerUnit: Number(item.pricePerUnit.toFixed(2)),
       totalAmount: Number(item.totalAmount.toFixed(2))
     };
 
     // Log if item had a different tenantId (potential security issue)
-    if (item.tenantId && item.tenantId !== tenantId) {
+    if (item.tenantId && item.tenantId !== expectedTenantId) {
       console.warn('[WEBHOOK SECURITY] Transaction item had different tenantId - ignoring:', {
         itemTenantId: item.tenantId,
-        configuredTenantId: tenantId,
+        configuredTenantId: expectedTenantId,
         transactionId: item.transactionId,
         ticketTypeId: item.ticketTypeId
       });
@@ -117,9 +162,10 @@ export async function createTransactionItemsBulkServer(items: any[]): Promise<an
     return validatedItem;
   });
 
-  console.log('[WEBHOOK DEBUG] Creating bulk transaction items:', {
+  console.log('[WEBHOOK DEBUG] ✅ Triple validation passed, creating bulk transaction items:', {
     url,
-    tenantId,
+    tenantId: expectedTenantId,
+    paymentMethodDomainId: expectedPaymentMethodDomainId,
     itemCount: validatedItems.length,
     items: validatedItems.map(item => ({
       tenantId: item.tenantId,

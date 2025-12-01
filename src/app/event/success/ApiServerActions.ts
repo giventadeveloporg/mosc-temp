@@ -119,12 +119,55 @@ export async function findTransactionByPaymentIntentId(
 
 // Create a new transaction (POST)
 async function createTransaction(transactionData: Omit<EventTicketTransactionDTO, 'id'>): Promise<EventTicketTransactionDTO> {
+  // Import environment variable helpers
+  const { getTenantId, getPaymentMethodDomainId } = await import('@/lib/env');
+
+  // Get triple validation values from environment variables
+  const expectedTenantId = getTenantId();
+  const expectedPaymentMethodDomainId = getPaymentMethodDomainId();
+
+  // CRITICAL: Validate transactionData tenantId matches environment variable BEFORE backend call
+  const transactionTenantId = transactionData.tenantId;
+  if (transactionTenantId && transactionTenantId !== expectedTenantId) {
+    console.error('[createTransaction] ⚠️⚠️⚠️ TENANT ID MISMATCH - Rejecting request:', {
+      transactionTenantId,
+      expectedTenantId,
+      timestamp: new Date().toISOString()
+    });
+    throw new Error(`Tenant ID mismatch: Transaction has tenantId=${transactionTenantId} but environment is configured for tenantId=${expectedTenantId}. Request rejected.`);
+  }
+
+  // CRITICAL: Validate transactionData paymentMethodDomainId matches environment variable BEFORE backend call
+  const transactionPaymentMethodDomainId = transactionData.paymentMethodDomainId;
+  if (transactionPaymentMethodDomainId && transactionPaymentMethodDomainId !== expectedPaymentMethodDomainId) {
+    console.error('[createTransaction] ⚠️⚠️⚠️ PAYMENT METHOD DOMAIN ID MISMATCH - Rejecting request:', {
+      transactionPaymentMethodDomainId,
+      expectedPaymentMethodDomainId,
+      timestamp: new Date().toISOString()
+    });
+    throw new Error(`Payment Method Domain ID mismatch: Transaction has paymentMethodDomainId=${transactionPaymentMethodDomainId} but environment is configured for paymentMethodDomainId=${expectedPaymentMethodDomainId}. Request rejected.`);
+  }
+
+  // Add triple validation fields to payload (use environment variables, not transactionData values)
+  // Backend will validate the combination (tenantId, paymentMethodDomainId, webhookSecret) exists
+  const payload = {
+    ...transactionData,
+    tenantId: expectedTenantId, // ALWAYS use environment tenant ID - ignore any tenantId from transactionData
+    paymentMethodDomainId: expectedPaymentMethodDomainId, // ALWAYS use environment Payment Method Domain ID
+  };
+
+  console.log('[createTransaction] ✅ Triple validation passed, sending transaction with validated fields:', {
+    tenantId: payload.tenantId,
+    paymentMethodDomainId: payload.paymentMethodDomainId,
+    hasWebhookSecret: false, // Not passed from frontend - backend looks it up
+  });
+
   const response = await fetchWithJwtRetry(
     `${getAppUrl()}/api/proxy/event-ticket-transactions`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(transactionData),
+      body: JSON.stringify(payload),
     },
   );
 
@@ -140,12 +183,62 @@ async function createTransaction(transactionData: Omit<EventTicketTransactionDTO
 // Helper to bulk create transaction items
 async function createTransactionItemsBulk(items: any[]): Promise<any[]> {
   const baseUrl = getAppUrl();
+
+  // Import environment variable helpers
+  const { getTenantId, getPaymentMethodDomainId } = await import('@/lib/env');
+
+  // Get triple validation values from environment variables
+  const expectedTenantId = getTenantId();
+  const expectedPaymentMethodDomainId = getPaymentMethodDomainId();
+
+  // CRITICAL: Validate each item's tenantId and paymentMethodDomainId match environment variables BEFORE backend call
+  for (const item of items) {
+    const itemTenantId = item.tenantId;
+    if (itemTenantId && itemTenantId !== expectedTenantId) {
+      console.error('[createTransactionItemsBulk] ⚠️⚠️⚠️ TENANT ID MISMATCH in item - Rejecting request:', {
+        itemTenantId,
+        expectedTenantId,
+        transactionId: item.transactionId,
+        ticketTypeId: item.ticketTypeId,
+        timestamp: new Date().toISOString()
+      });
+      throw new Error(`Tenant ID mismatch: Item has tenantId=${itemTenantId} but environment is configured for tenantId=${expectedTenantId}. Request rejected.`);
+    }
+
+    const itemPaymentMethodDomainId = item.paymentMethodDomainId;
+    if (itemPaymentMethodDomainId && itemPaymentMethodDomainId !== expectedPaymentMethodDomainId) {
+      console.error('[createTransactionItemsBulk] ⚠️⚠️⚠️ PAYMENT METHOD DOMAIN ID MISMATCH in item - Rejecting request:', {
+        itemPaymentMethodDomainId,
+        expectedPaymentMethodDomainId,
+        transactionId: item.transactionId,
+        ticketTypeId: item.ticketTypeId,
+        timestamp: new Date().toISOString()
+      });
+      throw new Error(`Payment Method Domain ID mismatch: Item has paymentMethodDomainId=${itemPaymentMethodDomainId} but environment is configured for paymentMethodDomainId=${expectedPaymentMethodDomainId}. Request rejected.`);
+    }
+  }
+
+  // Add triple validation fields to each item (use environment variables, not item values)
+  // Backend will validate the combination (tenantId, paymentMethodDomainId, webhookSecret) exists
+  const payload = items.map(item => ({
+    ...item,
+    tenantId: expectedTenantId, // ALWAYS use environment tenant ID - ignore any tenantId from item
+    paymentMethodDomainId: expectedPaymentMethodDomainId, // ALWAYS use environment Payment Method Domain ID
+  }));
+
+  console.log('[createTransactionItemsBulk] ✅ Triple validation passed, sending transaction items with validated fields:', {
+    itemCount: payload.length,
+    tenantId: payload[0]?.tenantId,
+    paymentMethodDomainId: payload[0]?.paymentMethodDomainId,
+    hasWebhookSecret: false, // Not passed from frontend - backend looks it up
+  });
+
   const response = await fetchWithJwtRetry(
     `${baseUrl}/api/proxy/event-ticket-transaction-items/bulk`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(items),
+      body: JSON.stringify(payload), // Use payload with triple validation fields
     }
   );
   if (!response.ok) {

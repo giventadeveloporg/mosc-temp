@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
-import { getAppUrl } from '@/lib/env';
+import { getAppUrl, getTenantId, getPaymentMethodDomainId } from '@/lib/env';
 import crypto from 'crypto';
 
 type CartItem = {
@@ -116,6 +116,10 @@ export async function POST(req: NextRequest) {
       timestamp: new Date().toISOString()
     });
 
+    // Get tenant ID and Payment Method Domain ID from environment variables
+    const tenantId = getTenantId();
+    const paymentMethodDomainId = getPaymentMethodDomainId();
+
     // Create PaymentIntent with automatic payment methods (enables wallets)
     const pi = await stripe().paymentIntents.create({
       amount: totalCents,
@@ -125,6 +129,8 @@ export async function POST(req: NextRequest) {
       metadata: {
         eventId: String(eventIdRaw ?? ''),
         cart: JSON.stringify(cartMetadata),
+        tenantId: tenantId, // CRITICAL: Add tenant ID to metadata for webhook tenant identification
+        paymentMethodDomainId: paymentMethodDomainId, // CRITICAL: Add Payment Method Domain ID for triple validation
         ...(discountCodeId ? { discountCodeId: String(discountCodeId) } : {}),
         // Enhanced metadata for user profile creation
         customerEmail: email || '',

@@ -765,6 +765,7 @@ let signature = HMAC_SHA256(signed_payload, webhook_secret);
 | Method | Contains Tenant Info? | How Tenant is Identified |
 |--------|----------------------|-------------------------|
 | **Webhook Signature** | ❌ No (just hash) | Indirectly via secret verification → lookup tenant from `payment_provider_config` |
+| **Payment Method Domain ID Metadata** | ✅ Yes (if added) (`pmd_1SWrMSK5BrggeAHMmHxUd9F2`) | Extract from `metadata.paymentMethodDomainId` → lookup tenant from `payment_provider_config` |
 | **Domain/Subdomain** | ✅ Yes (`tenant1.payments.example.com`) | Directly from `Host` header → map to tenant ID |
 | **X-Tenant-ID Header** | ✅ Yes (`tenant_demo_001`) | Directly from header value (must be validated) |
 | **JWT Token Claims** | ✅ Yes (if included) | Directly from JWT `tenant_id` claim |
@@ -776,6 +777,594 @@ let signature = HMAC_SHA256(signed_payload, webhook_secret);
   - Webhooks don't include JWT tokens or custom headers
   - The signature is the **only** authentication mechanism for webhooks
 - The signature verification **IS** the tenant identification mechanism (via secret matching)
+
+---
+
+#### **CRITICAL: Triple Validation Approach (Tenant ID + Payment Method Domain ID + Webhook Secret)**
+
+**Question**: Can we add tenant ID and Payment Method Domain ID directly to metadata when creating PaymentIntents/Checkout Sessions and validate the combination in the backend?
+
+**Answer**: **YES** - This is the **most secure approach**. You add both `tenantId` and `paymentMethodDomainId` to metadata when creating PaymentIntents/Checkout Sessions. The backend then performs **triple validation** by verifying that the combination of (tenantId, paymentMethodDomainId, webhookSecret) exists in the `payment_provider_config` table. If the combination doesn't match, the request is rejected.
+
+**How It Works:**
+
+1. **Add tenant ID and Payment Method Domain ID to metadata** when creating PaymentIntents/Checkout Sessions (frontend)
+2. **Stripe includes this metadata** in all webhook events automatically
+3. **Extract tenant ID and Payment Method Domain ID from metadata** in webhook events (backend)
+4. **Verify webhook signature** to identify the webhook secret used (backend)
+5. **Query database** to verify the combination (tenantId, paymentMethodDomainId, webhookSecret) exists (backend)
+6. **Reject request** if combination doesn't match (backend)
+
+**Security Benefits:**
+
+- ✅ **Triple Validation**: Requires matching tenantId, paymentMethodDomainId, AND webhookSecret
+- ✅ **Prevents Cross-Tenant Attacks**: Even if metadata is modified, webhook secret must match
+- ✅ **Database-Backed**: All valid combinations stored in `payment_provider_config` table
+- ✅ **Reject Invalid Requests**: Any request with non-matching combination is immediately rejected
+
+**Frontend Implementation** (Already Updated):
+
+**Environment Variables Required:**
+```bash
+NEXT_PUBLIC_TENANT_ID=tenant_demo_002
+NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID=pmd_1SWrMSK5BrggeAHMmHxUd9F2
+```
+
+**Checkout Session** (`src/lib/stripe/checkout.ts`):
+```typescript
+const tenantId = getTenantId();
+const paymentMethodDomainId = getPaymentMethodDomainId();
+
+const sessionParams: Stripe.Checkout.SessionCreateParams = {
+  // ... other params ...
+  metadata: {
+    // ... existing metadata ...
+    tenantId: tenantId, // ✅ Added tenant ID to metadata
+    paymentMethodDomainId: paymentMethodDomainId, // ✅ Added Payment Method Domain ID for triple validation
+  },
+  payment_intent_data: {
+    metadata: {
+      // ... existing metadata ...
+      tenantId: tenantId, // ✅ Added tenant ID to PaymentIntent metadata
+      paymentMethodDomainId: paymentMethodDomainId, // ✅ Added Payment Method Domain ID for triple validation
+    },
+  },
+};
+```
+
+**Payment Intent** (`src/app/api/stripe/payment-intent/route.ts`):
+```typescript
+const tenantId = getTenantId();
+const paymentMethodDomainId = getPaymentMethodDomainId();
+
+const pi = await stripe().paymentIntents.create({
+  // ... other params ...
+  metadata: {
+    // ... existing metadata ...
+    tenantId: tenantId, // ✅ Added tenant ID to metadata
+    paymentMethodDomainId: paymentMethodDomainId, // ✅ Added Payment Method Domain ID for triple validation
+  },
+});
+```
+
+**Backend Implementation** (Rust) - **CRITICAL: Triple Validation**:
+
+```rust
+#[post("/api/webhooks/stripe")]
+async fn handle_stripe_webhook(
+    req: HttpRequest,
+    body: web::Bytes,
+) -> Result<HttpResponse, Error> {
+    // 1. Extract signature and raw body
+    let signature = req.headers().get("Stripe-Signature")?;
+    let raw_body = body.as_ref();
+
+    // 2. Parse Stripe event
+    let event: StripeEvent = serde_json::from_slice(raw_body)?;
+
+    // 3. Extract tenant ID and Payment Method Domain ID from metadata
+    let (tenant_id_from_metadata, payment_method_domain_id_from_metadata) =
+        extract_tenant_and_payment_method_domain_id_from_metadata(&event);
+
+    // 4. Verify webhook signature and identify webhook secret used
+    let webhook_secret_used = verify_webhook_signature_and_get_secret(raw_body, signature)?;
+
+    // 5. CRITICAL: Triple Validation - Verify combination exists in database
+    let validation_result = validate_triple_combination(
+        &tenant_id_from_metadata,
+        &payment_method_domain_id_from_metadata,
+        &webhook_secret_used
+    ).await?;
+
+    // 6. REJECT if combination doesn't match
+    if !validation_result.is_valid {
+        log::error!(
+            "TRIPLE VALIDATION FAILED: tenantId={}, paymentMethodDomainId={}, webhookSecret={}",
+            tenant_id_from_metadata.as_deref().unwrap_or("MISSING"),
+            payment_method_domain_id_from_metadata.as_deref().unwrap_or("MISSING"),
+            webhook_secret_used
+        );
+        return Err(Error::new(
+            StatusCode::FORBIDDEN,
+            "Invalid tenant/payment method domain/webhook secret combination"
+        ));
+    }
+
+    // 7. Use validated tenant ID from database (most secure)
+    let tenant_id = validation_result.tenant_id.expect("Tenant ID should be present after validation");
+
+    log::info!(
+        "TRIPLE VALIDATION SUCCESS: tenantId={}, paymentMethodDomainId={}, webhookSecret={}",
+        tenant_id,
+        payment_method_domain_id_from_metadata.as_deref().unwrap_or("MISSING"),
+        webhook_secret_used
+    );
+
+    // 8. Process event with validated tenant ID
+    match event.type_.as_str() {
+        "checkout.session.completed" => {
+            process_checkout_session_completed(&event, &tenant_id).await?;
+        }
+        "payment_intent.succeeded" => {
+            process_payment_intent_succeeded(&event, &tenant_id).await?;
+        }
+        "charge.refunded" => {
+            process_charge_refunded(&event, &tenant_id).await?;
+        }
+        "charge.succeeded" | "charge.updated" => {
+            process_charge_fee_update(&event, &tenant_id).await?;
+        }
+        _ => {
+            log::info!("Unhandled event type: {}", event.type_);
+        }
+    }
+
+    Ok(HttpResponse::Ok().json(json!({"received": true})))
+}
+
+/// Extract tenant ID and Payment Method Domain ID from event metadata
+fn extract_tenant_and_payment_method_domain_id_from_metadata(
+    event: &StripeEvent
+) -> (Option<String>, Option<String>) {
+    match &event.data.object {
+        StripeEventObject::PaymentIntent(pi) => {
+            let tenant_id = pi.metadata.get("tenantId")
+                .or_else(|| pi.metadata.get("tenant_id"))
+                .cloned();
+            let payment_method_domain_id = pi.metadata.get("paymentMethodDomainId")
+                .or_else(|| pi.metadata.get("payment_method_domain_id"))
+                .cloned();
+            (tenant_id, payment_method_domain_id)
+        }
+        StripeEventObject::CheckoutSession(cs) => {
+            let tenant_id = cs.metadata.get("tenantId")
+                .or_else(|| cs.metadata.get("tenant_id"))
+                .cloned();
+            let payment_method_domain_id = cs.metadata.get("paymentMethodDomainId")
+                .or_else(|| cs.metadata.get("payment_method_domain_id"))
+                .cloned();
+            (tenant_id, payment_method_domain_id)
+        }
+        StripeEventObject::Charge(charge) => {
+            // Charge events might reference PaymentIntent
+            // Would need to fetch PaymentIntent to get metadata
+            // For now, return None - signature verification will handle it
+            (None, None)
+        }
+        _ => (None, None),
+    }
+}
+
+/// Verify webhook signature and return the webhook secret that was used
+fn verify_webhook_signature_and_get_secret(
+    raw_body: &[u8],
+    signature_header: &str
+) -> Result<String, Error> {
+    // Query all webhook secrets from payment_provider_config
+    let all_secrets = payment_provider_config_repository
+        .find_all_webhook_secrets()
+        .await?;
+
+    // Try each secret until one matches
+    for secret_config in all_secrets {
+        if verify_stripe_signature(raw_body, signature_header, &secret_config.webhook_secret_decrypted) {
+            return Ok(secret_config.webhook_secret_decrypted);
+        }
+    }
+
+    Err(Error::new(
+        StatusCode::UNAUTHORIZED,
+        "Webhook signature verification failed"
+    ))
+}
+
+/// CRITICAL: Validate that the combination (tenantId, paymentMethodDomainId, webhookSecret) exists in database
+async fn validate_triple_combination(
+    tenant_id: &Option<String>,
+    payment_method_domain_id: &Option<String>,
+    webhook_secret: &str
+) -> Result<ValidationResult, Error> {
+    // Check if all three values are present
+    let tenant_id = match tenant_id {
+        Some(id) => id,
+        None => {
+            log::warn!("Tenant ID missing from metadata");
+            return Ok(ValidationResult {
+                is_valid: false,
+                tenant_id: None,
+            });
+        }
+    };
+
+    let payment_method_domain_id = match payment_method_domain_id {
+        Some(id) => id,
+        None => {
+            log::warn!("Payment Method Domain ID missing from metadata");
+            return Ok(ValidationResult {
+                is_valid: false,
+                tenant_id: None,
+            });
+        }
+    };
+
+    // Query database for matching combination
+    let config = payment_provider_config_repository
+        .find_by_triple_combination(tenant_id, payment_method_domain_id, webhook_secret)
+        .await?;
+
+    if let Some(c) = config {
+        // Combination exists - validation successful
+        Ok(ValidationResult {
+            is_valid: true,
+            tenant_id: Some(c.tenant_id),
+        })
+    } else {
+        // Combination doesn't exist - validation failed
+        log::error!(
+            "Triple combination not found: tenantId={}, paymentMethodDomainId={}, webhookSecret={}",
+            tenant_id, payment_method_domain_id, webhook_secret
+        );
+        Ok(ValidationResult {
+            is_valid: false,
+            tenant_id: None,
+        })
+    }
+}
+
+struct ValidationResult {
+    is_valid: bool,
+    tenant_id: Option<String>,
+}
+```
+
+**Backend Database Schema Update Required:**
+
+**Option 1: Full DDL (for new tables)**
+
+See `payment_provider_config_ddl.sql` for the complete table definition with all constraints.
+
+**Option 2: Migration Script (for existing tables)**
+
+See `payment_provider_config_migration.sql` for the migration script that:
+1. Adds `payment_method_domain_id` column if it doesn't exist
+2. Updates existing records with Payment Method Domain IDs
+3. Adds the triple validation unique constraint
+4. Creates an index for faster lookups
+5. Adds documentation comments
+
+**Quick Migration (if column already exists):**
+
+```sql
+-- Step 1: Update existing records with Payment Method Domain IDs
+UPDATE payment_provider_config
+SET payment_method_domain_id = 'pmd_1SWrMSK5BrggeAHMmHxUd9F2'
+WHERE tenant_id = 'tenant_demo_001'
+  AND provider_name = 'STRIPE'
+  AND payment_method_domain_id IS NULL;
+
+UPDATE payment_provider_config
+SET payment_method_domain_id = 'pmd_1RuQeUK5BrggeAHMnD3Jejvh'
+WHERE tenant_id = 'tenant_demo_002'
+  AND provider_name = 'STRIPE'
+  AND payment_method_domain_id IS NULL;
+
+-- Step 2: Add triple validation unique constraint
+ALTER TABLE payment_provider_config
+ADD CONSTRAINT unique_tenant_payment_domain_webhook
+UNIQUE (tenant_id, payment_method_domain_id, webhook_secret_encrypted);
+
+-- Step 3: Create index for faster lookups (optional but recommended)
+CREATE INDEX idx_payment_provider_config_triple_validation
+ON payment_provider_config (tenant_id, payment_method_domain_id, webhook_secret_encrypted);
+```
+
+**Important Notes:**
+
+- ⚠️ **Ensure all records have `payment_method_domain_id` set** before adding the constraint
+- ⚠️ **Check for duplicate combinations** before adding the constraint (constraint will fail if duplicates exist)
+- ✅ **Use the migration script** (`payment_provider_config_migration.sql`) for safe migration with validation checks
+
+**Backend Repository Method Required:**
+
+```rust
+/// Find payment_provider_config by triple combination
+async fn find_by_triple_combination(
+    &self,
+    tenant_id: &str,
+    payment_method_domain_id: &str,
+    webhook_secret: &str
+) -> Result<Option<PaymentProviderConfig>, Error> {
+    // Decrypt webhook_secret_encrypted for comparison
+    // Query database for matching combination
+    // Return matching config if found
+}
+```
+
+**Benefits:**
+
+1. ✅ **Simplest Implementation**: Just add `tenantId` to metadata - no database lookups needed
+2. ✅ **Fast Tenant Identification**: Direct extraction from metadata - no need to try all webhook secrets
+3. ✅ **Available in All Events**: Works for `checkout.session.completed`, `payment_intent.succeeded`, etc.
+4. ✅ **Better Debugging**: Tenant ID visible in Stripe Dashboard and webhook logs
+5. ✅ **Redundancy**: Provides backup tenant identification if signature verification fails
+
+**Security Considerations:**
+
+- ⚠️ **Always verify signature**: Metadata is not cryptographically protected - can be modified
+- ✅ **Cross-validate**: Metadata tenant ID must match signature verification tenant ID
+- ✅ **Trust signature over metadata**: If they don't match, use signature result
+- ✅ **Log mismatches**: Alert on tenant ID mismatches for security monitoring
+
+---
+
+#### **Alternative Approach: Payment Method Domain ID in Metadata**
+
+**Question**: Can we extract Payment Method Domain ID (`pmd_1SWrMSK5BrggeAHMmHxUd9F2`) from webhook events to identify tenant?
+
+**Answer**: **Stripe does NOT automatically include Payment Method Domain ID in webhook events**, but you **CAN add it as custom metadata** when creating PaymentIntents/Checkout Sessions. However, **adding tenant ID directly is simpler** - Payment Method Domain ID requires an additional database lookup to map to tenant ID.
+
+**How Payment Method Domain ID Works:**
+
+1. **Each Payment Method Domain has a unique ID** (e.g., `pmd_1SWrMSK5BrggeAHMmHxUd9F2`)
+2. **Each Payment Method Domain maps to a tenant** (via `payment_provider_config.payment_method_domain`)
+3. **You can add Payment Method Domain ID to metadata** when creating PaymentIntents/Checkout Sessions
+4. **Webhook events will include this metadata**, allowing tenant identification without signature verification
+
+**Implementation Strategy:**
+
+**Step 1: Store Payment Method Domain ID in Database**
+
+Add `payment_method_domain_id` column to `payment_provider_config`:
+
+```sql
+ALTER TABLE payment_provider_config
+ADD COLUMN payment_method_domain_id VARCHAR;
+
+-- Update existing records with Payment Method Domain IDs from Stripe Dashboard
+UPDATE payment_provider_config
+SET payment_method_domain_id = 'pmd_1SWrMSK5BrggeAHMmHxUd9F2'
+WHERE tenant_id = 'tenant_demo_001' AND payment_method_domain = 'www.mosc-temp.com';
+
+UPDATE payment_provider_config
+SET payment_method_domain_id = 'pmd_1RuQeUK5BrggeAHMnD3Jejvh'
+WHERE tenant_id = 'tenant_demo_002' AND payment_method_domain = 'adwiise.com';
+```
+
+**Step 2: Add Payment Method Domain ID to Metadata When Creating PaymentIntents/Checkout Sessions**
+
+**Frontend Implementation** (`src/lib/stripe/checkout.ts`):
+
+```typescript
+export async function createStripeCheckoutSession(
+  cart: CartItem[],
+  user: { email: string; userId?: string; phone?: string; ... },
+  discountCodeId: number | null | undefined,
+  eventId: number
+) {
+  // Get tenant ID and Payment Method Domain ID
+  const tenantId = getTenantId();
+
+  // Query backend for Payment Method Domain ID (or cache it)
+  const paymentMethodDomainId = await getPaymentMethodDomainId(tenantId);
+
+  const sessionParams: Stripe.Checkout.SessionCreateParams = {
+    // ... existing params ...
+    metadata: {
+      // ... existing metadata ...
+      tenantId: tenantId, // Add tenant ID to metadata
+      paymentMethodDomainId: paymentMethodDomainId, // Add Payment Method Domain ID
+    },
+    payment_intent_data: {
+      metadata: {
+        // ... existing metadata ...
+        tenantId: tenantId, // Add tenant ID to PaymentIntent metadata
+        paymentMethodDomainId: paymentMethodDomainId, // Add Payment Method Domain ID
+      },
+    },
+  };
+
+  // ... rest of function
+}
+```
+
+**Frontend Implementation** (`src/app/api/stripe/payment-intent/route.ts`):
+
+```typescript
+// Create PaymentIntent with Payment Method Domain ID in metadata
+const pi = await stripe().paymentIntents.create({
+  amount: totalCents,
+  currency: 'usd',
+  receipt_email: email,
+  automatic_payment_methods: { enabled: true },
+  metadata: {
+    // ... existing metadata ...
+    tenantId: getTenantId(), // Add tenant ID
+    paymentMethodDomainId: await getPaymentMethodDomainId(getTenantId()), // Add Payment Method Domain ID
+  },
+});
+```
+
+**Step 3: Extract Tenant ID from Webhook Events (Simpler Approach)**
+
+**Backend Implementation** (Rust):
+
+```rust
+#[post("/api/webhooks/stripe")]
+async fn handle_stripe_webhook(
+    req: HttpRequest,
+    body: web::Bytes,
+) -> Result<HttpResponse, Error> {
+    // 1. Extract signature and raw body
+    let signature = req.headers().get("Stripe-Signature")?;
+    let raw_body = body.as_ref();
+
+    // 2. Parse Stripe event
+    let event: StripeEvent = serde_json::from_slice(raw_body)?;
+
+    // 3. Try to extract tenant ID directly from metadata (FAST PATH)
+    let tenant_id_from_metadata = extract_tenant_id_from_metadata(&event);
+
+    // 4. Verify signature and get tenant ID (SECURITY CHECK)
+    let tenant_id_from_signature = verify_webhook_signature(raw_body, signature)?;
+
+    // 5. Cross-validate: metadata tenant ID must match signature tenant ID
+    let tenant_id = if let Some(metadata_tenant_id) = tenant_id_from_metadata {
+        if metadata_tenant_id != tenant_id_from_signature {
+            log::warn!(
+                "Tenant ID mismatch: metadata says {}, signature says {}. Using signature.",
+                metadata_tenant_id, tenant_id_from_signature
+            );
+            tenant_id_from_signature // Trust signature over metadata
+        } else {
+            log::info!("Tenant ID verified from both metadata and signature: {}", metadata_tenant_id);
+            metadata_tenant_id // Both match - use metadata (faster)
+        }
+    } else {
+        log::info!("No tenant ID in metadata, using signature verification: {}", tenant_id_from_signature);
+        tenant_id_from_signature // No metadata - use signature verification
+    };
+
+    // 6. Process event with identified tenant ID
+    match event.type_.as_str() {
+        "checkout.session.completed" => {
+            process_checkout_session_completed(&event, &tenant_id).await?;
+        }
+        "payment_intent.succeeded" => {
+            process_payment_intent_succeeded(&event, &tenant_id).await?;
+        }
+        "charge.refunded" => {
+            process_charge_refunded(&event, &tenant_id).await?;
+        }
+        "charge.succeeded" | "charge.updated" => {
+            process_charge_fee_update(&event, &tenant_id).await?;
+        }
+        _ => {
+            log::info!("Unhandled event type: {}", event.type_);
+        }
+    }
+
+    Ok(HttpResponse::Ok().json(json!({"received": true})))
+}
+
+/// Extract tenant ID directly from event metadata (SIMPLER - no database lookup needed)
+fn extract_tenant_id_from_metadata(event: &StripeEvent) -> Option<String> {
+    match &event.data.object {
+        StripeEventObject::PaymentIntent(pi) => {
+            // Try both camelCase and snake_case variants
+            pi.metadata.get("tenantId")
+                .or_else(|| pi.metadata.get("tenant_id"))
+                .cloned()
+        }
+        StripeEventObject::CheckoutSession(cs) => {
+            // Try both camelCase and snake_case variants
+            cs.metadata.get("tenantId")
+                .or_else(|| cs.metadata.get("tenant_id"))
+                .cloned()
+        }
+        StripeEventObject::Charge(charge) => {
+            // Charge events might reference PaymentIntent
+            // Would need to fetch PaymentIntent to get metadata
+            // For now, return None - signature verification will handle it
+            None
+        }
+        _ => None,
+    }
+}
+```
+
+**Alternative: Extract Tenant ID from Payment Method Domain ID** (if you prefer this approach):
+
+```rust
+/// Extract tenant ID from Payment Method Domain ID in event metadata
+/// Requires database lookup to map Payment Method Domain ID to tenant ID
+async fn extract_tenant_from_payment_method_domain_id(
+    event: &StripeEvent
+) -> Result<Option<String>, Error> {
+    // Extract Payment Method Domain ID from event data
+    let payment_method_domain_id = match &event.data.object {
+        StripeEventObject::PaymentIntent(pi) => {
+            pi.metadata.get("paymentMethodDomainId")
+                .or_else(|| pi.metadata.get("payment_method_domain_id"))
+        }
+        StripeEventObject::CheckoutSession(cs) => {
+            cs.metadata.get("paymentMethodDomainId")
+                .or_else(|| cs.metadata.get("payment_method_domain_id"))
+        }
+        _ => None,
+    };
+
+    if let Some(pmd_id) = payment_method_domain_id {
+        // Query payment_provider_config for tenant ID
+        let config = payment_provider_config_repository
+            .find_by_payment_method_domain_id(pmd_id)
+            .await?;
+
+        if let Some(c) = config {
+            return Ok(Some(c.tenant_id));
+        }
+    }
+
+    Ok(None)
+}
+```
+
+**Benefits of Using Tenant ID Metadata (Recommended Approach):**
+
+1. ✅ **Simplest Implementation**: Just add `tenantId` to metadata - no database lookups needed
+2. ✅ **Fast Tenant Identification**: Direct extraction from metadata - no need to try all webhook secrets
+3. ✅ **Available in All Events**: Works for `checkout.session.completed`, `payment_intent.succeeded`, etc.
+4. ✅ **Better Debugging**: Tenant ID visible in Stripe Dashboard and webhook logs
+5. ✅ **Redundancy**: Provides backup tenant identification if signature verification fails
+6. ✅ **Additional Validation**: Can cross-validate metadata tenant ID against signature verification
+
+**Benefits of Using Payment Method Domain ID Metadata (Alternative):**
+
+1. **Faster Tenant Identification**: No need to try all webhook secrets - direct lookup from metadata
+2. **Additional Validation**: Can cross-validate metadata tenant ID against signature verification
+3. **Better Debugging**: Payment Method Domain ID in metadata helps trace which domain initiated payment
+4. **Redundancy**: Provides backup tenant identification if signature verification fails
+
+**Limitations:**
+
+1. **Requires Frontend Changes**: Must add tenant ID (or Payment Method Domain ID) to metadata when creating PaymentIntents/Checkout Sessions
+2. **Metadata Can Be Modified**: Unlike signature verification, metadata is not cryptographically protected
+3. **Not Available for All Events**: Some events (like `charge.succeeded`) might not have PaymentIntent metadata directly accessible
+4. **Still Requires Signature Verification**: Should always verify signature for security, even if metadata is present
+
+**Recommended Approach: Hybrid Method**
+
+Use **both** Payment Method Domain ID metadata **and** signature verification:
+
+1. **Primary**: Extract tenant ID from Payment Method Domain ID metadata (fast)
+2. **Validation**: Verify signature matches the same tenant (secure)
+3. **Fallback**: If metadata not available, use signature verification only (existing logic)
+
+**Security Considerations:**
+
+- ✅ **Always verify signature** - even if metadata is present
+- ✅ **Cross-validate** - metadata tenant ID must match signature verification tenant ID
+- ✅ **Trust signature over metadata** - if they don't match, use signature result
+- ⚠️ **Metadata is not secure** - can be modified by frontend, so signature verification is still required
 
 ### 2. Frontend API Requests (`POST /api/event-ticket-transactions`, etc.)
 

@@ -4165,15 +4165,25 @@ CREATE TABLE public.payment_provider_config (
                                                 provider_api_key_encrypted text,
                                                 provider_secret_key_encrypted text,
                                                 webhook_secret_encrypted text,
+                                                payment_method_domain_id varchar,
                                                 publishable_key character varying(500),
                                                 fallback_order integer DEFAULT 0,
-                                                configuration_json jsonb,
+                                                configuration_json text,
                                                 created_at timestamp without time zone DEFAULT now() NOT NULL,
                                                 updated_at timestamp without time zone DEFAULT now() NOT NULL,
+
+    -- Primary key constraint
                                                 CONSTRAINT payment_provider_config_pkey PRIMARY KEY (id),
+
+    -- Check constraints
                                                 CONSTRAINT check_provider_name CHECK ((provider_name IN ('STRIPE', 'PAYPAL', 'ZEFFY', 'ZELLE_MANUAL', 'REVOLUT', 'CEFI_CHARITY', 'GIVEBUTTER'))),
                                                 CONSTRAINT check_payment_use_case CHECK ((payment_use_case IS NULL OR payment_use_case IN ('TICKET_SALE', 'DONATION', 'DONATION_CEFI', 'DONATION_ZERO_FEE', 'OFFERING', 'MEMBERSHIP_SUBSCRIPTION'))),
-                                                CONSTRAINT unique_tenant_provider UNIQUE (tenant_id, provider_name)
+
+    -- Unique constraints
+                                                CONSTRAINT unique_tenant_provider UNIQUE (tenant_id, provider_name),
+
+    -- CRITICAL: Triple validation unique constraint
+                                                CONSTRAINT unique_tenant_payment_domain_webhook UNIQUE (tenant_id, payment_method_domain_id, webhook_secret_encrypted)
 );
 
 COMMENT ON TABLE public.payment_provider_config IS 'Stores tenant-level payment provider configurations and feature flags';
@@ -4285,7 +4295,7 @@ CREATE TABLE public.membership_plan (
                                         is_active boolean DEFAULT true NOT NULL,
                                         max_events_per_month integer,
                                         max_attendees_per_event integer,
-                                        features_json jsonb,
+                                        features_json text,
                                         stripe_price_id character varying(255),
                                         stripe_product_id character varying(255),
                                         created_at timestamp without time zone DEFAULT now() NOT NULL,

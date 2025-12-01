@@ -470,6 +470,8 @@ export interface EventTicketTransactionDTO {
   numberOfGuestsCheckedIn?: number;
   checkInTime?: string;
   checkOutTime?: string;
+  /** Triple validation fields - backend will validate combination exists in payment_provider_config */
+  paymentMethodDomainId?: string; // Stripe Payment Method Domain ID (pmd_*) - used for triple validation
 }
 
 export interface EventTicketTransactionItemDTO {
@@ -486,6 +488,8 @@ export interface EventTicketTransactionItemDTO {
   updatedAt: string;
   transaction?: EventTicketTransactionDTO;
   ticketType?: EventTicketTypeDTO;
+  /** Triple validation fields - backend will validate combination exists in payment_provider_config */
+  paymentMethodDomainId?: string; // Stripe Payment Method Domain ID (pmd_*) - used for triple validation
 }
 
 /**

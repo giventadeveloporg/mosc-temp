@@ -33,6 +33,19 @@ export function getTenantId() {
 }
 
 /**
+ * Lazily loads Payment Method Domain ID from environment variables (NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID).
+ * Throws an error if not set.
+ * This is used to identify the Stripe Payment Method Domain (pmd_*) associated with this tenant.
+ */
+export function getPaymentMethodDomainId() {
+  const paymentMethodDomainId = process.env.NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID;
+  if (!paymentMethodDomainId) {
+    throw new Error('NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID is not set in environment variables');
+  }
+  return paymentMethodDomainId;
+}
+
+/**
  * Get the app URL for port-agnostic configuration
  * This is used for server-side API calls to ensure the application works on any port
  * Returns the full URL including protocol (e.g., "http://localhost:3000" or "https://mcefee.org")
