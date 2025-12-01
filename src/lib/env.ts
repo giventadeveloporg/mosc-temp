@@ -21,26 +21,30 @@ export function getApiJwtPass() {
 }
 
 /**
- * Lazily loads tenant ID from environment variables (NEXT_PUBLIC_TENANT_ID).
+ * Lazily loads tenant ID from environment variables, prioritizing AMPLIFY_ prefix for AWS Amplify.
  * Throws an error if not set.
  */
 export function getTenantId() {
-  const tenantId = process.env.NEXT_PUBLIC_TENANT_ID;
+  const tenantId =
+    process.env.AMPLIFY_NEXT_PUBLIC_TENANT_ID ||
+    process.env.NEXT_PUBLIC_TENANT_ID;
   if (!tenantId) {
-    throw new Error('NEXT_PUBLIC_TENANT_ID is not set in environment variables');
+    throw new Error('NEXT_PUBLIC_TENANT_ID is not set in environment variables. Check AMPLIFY_NEXT_PUBLIC_TENANT_ID or NEXT_PUBLIC_TENANT_ID');
   }
   return tenantId;
 }
 
 /**
- * Lazily loads Payment Method Domain ID from environment variables (NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID).
+ * Lazily loads Payment Method Domain ID from environment variables, prioritizing AMPLIFY_ prefix for AWS Amplify.
  * Throws an error if not set.
  * This is used to identify the Stripe Payment Method Domain (pmd_*) associated with this tenant.
  */
 export function getPaymentMethodDomainId() {
-  const paymentMethodDomainId = process.env.NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID;
+  const paymentMethodDomainId =
+    process.env.AMPLIFY_NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID ||
+    process.env.NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID;
   if (!paymentMethodDomainId) {
-    throw new Error('NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID is not set in environment variables');
+    throw new Error('NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID is not set in environment variables. Check AMPLIFY_NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID or NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID');
   }
   return paymentMethodDomainId;
 }
