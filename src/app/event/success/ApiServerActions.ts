@@ -123,8 +123,25 @@ async function createTransaction(transactionData: Omit<EventTicketTransactionDTO
   const { getTenantId, getPaymentMethodDomainId } = await import('@/lib/env');
 
   // Get triple validation values from environment variables
+  // CRITICAL: getPaymentMethodDomainId() throws if not set - this ensures we fail fast
   const expectedTenantId = getTenantId();
-  const expectedPaymentMethodDomainId = getPaymentMethodDomainId();
+  let expectedPaymentMethodDomainId: string;
+  try {
+    expectedPaymentMethodDomainId = getPaymentMethodDomainId();
+    console.log('[createTransaction] ✅ Payment Method Domain ID retrieved:', {
+      paymentMethodDomainId: expectedPaymentMethodDomainId,
+      hasValue: !!expectedPaymentMethodDomainId,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('[createTransaction] ⚠️⚠️⚠️ CRITICAL ERROR: NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID is not set:', error);
+    console.error('[createTransaction] Environment check:', {
+      NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID: process.env.NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID ? 'SET' : 'NOT SET',
+      NEXT_PUBLIC_TENANT_ID: process.env.NEXT_PUBLIC_TENANT_ID ? 'SET' : 'NOT SET',
+      timestamp: new Date().toISOString()
+    });
+    throw new Error(`NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID is not set in environment variables. Cannot create transaction without Payment Method Domain ID.`);
+  }
 
   // CRITICAL: Validate transactionData tenantId matches environment variable BEFORE backend call
   const transactionTenantId = transactionData.tenantId;
@@ -150,11 +167,22 @@ async function createTransaction(transactionData: Omit<EventTicketTransactionDTO
 
   // Add triple validation fields to payload (use environment variables, not transactionData values)
   // Backend will validate the combination (tenantId, paymentMethodDomainId, webhookSecret) exists
+  // CRITICAL: Explicitly set paymentMethodDomainId to ensure it's never null or undefined
   const payload = {
     ...transactionData,
     tenantId: expectedTenantId, // ALWAYS use environment tenant ID - ignore any tenantId from transactionData
-    paymentMethodDomainId: expectedPaymentMethodDomainId, // ALWAYS use environment Payment Method Domain ID
+    paymentMethodDomainId: expectedPaymentMethodDomainId, // ALWAYS use environment Payment Method Domain ID - NEVER null/undefined
   };
+
+  // CRITICAL: Double-check that paymentMethodDomainId is set before sending
+  if (!payload.paymentMethodDomainId) {
+    console.error('[createTransaction] ⚠️⚠️⚠️ CRITICAL ERROR: paymentMethodDomainId is missing from payload:', {
+      payload,
+      expectedPaymentMethodDomainId,
+      timestamp: new Date().toISOString()
+    });
+    throw new Error(`Payment Method Domain ID is missing from payload. Cannot create transaction without Payment Method Domain ID.`);
+  }
 
   console.log('[createTransaction] ✅ Triple validation passed, sending transaction with validated fields:', {
     tenantId: payload.tenantId,
@@ -188,8 +216,25 @@ async function createTransactionItemsBulk(items: any[]): Promise<any[]> {
   const { getTenantId, getPaymentMethodDomainId } = await import('@/lib/env');
 
   // Get triple validation values from environment variables
+  // CRITICAL: getPaymentMethodDomainId() throws if not set - this ensures we fail fast
   const expectedTenantId = getTenantId();
-  const expectedPaymentMethodDomainId = getPaymentMethodDomainId();
+  let expectedPaymentMethodDomainId: string;
+  try {
+    expectedPaymentMethodDomainId = getPaymentMethodDomainId();
+    console.log('[createTransactionItemsBulk] ✅ Payment Method Domain ID retrieved:', {
+      paymentMethodDomainId: expectedPaymentMethodDomainId,
+      hasValue: !!expectedPaymentMethodDomainId,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('[createTransactionItemsBulk] ⚠️⚠️⚠️ CRITICAL ERROR: NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID is not set:', error);
+    console.error('[createTransactionItemsBulk] Environment check:', {
+      NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID: process.env.NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID ? 'SET' : 'NOT SET',
+      NEXT_PUBLIC_TENANT_ID: process.env.NEXT_PUBLIC_TENANT_ID ? 'SET' : 'NOT SET',
+      timestamp: new Date().toISOString()
+    });
+    throw new Error(`NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID is not set in environment variables. Cannot create transaction items without Payment Method Domain ID.`);
+  }
 
   // CRITICAL: Validate each item's tenantId and paymentMethodDomainId match environment variables BEFORE backend call
   for (const item of items) {
@@ -220,11 +265,24 @@ async function createTransactionItemsBulk(items: any[]): Promise<any[]> {
 
   // Add triple validation fields to each item (use environment variables, not item values)
   // Backend will validate the combination (tenantId, paymentMethodDomainId, webhookSecret) exists
+  // CRITICAL: Explicitly set paymentMethodDomainId to ensure it's never null or undefined
   const payload = items.map(item => ({
     ...item,
     tenantId: expectedTenantId, // ALWAYS use environment tenant ID - ignore any tenantId from item
-    paymentMethodDomainId: expectedPaymentMethodDomainId, // ALWAYS use environment Payment Method Domain ID
+    paymentMethodDomainId: expectedPaymentMethodDomainId, // ALWAYS use environment Payment Method Domain ID - NEVER null/undefined
   }));
+
+  // CRITICAL: Double-check that paymentMethodDomainId is set in all items before sending
+  for (const item of payload) {
+    if (!item.paymentMethodDomainId) {
+      console.error('[createTransactionItemsBulk] ⚠️⚠️⚠️ CRITICAL ERROR: paymentMethodDomainId is missing from item:', {
+        item,
+        expectedPaymentMethodDomainId,
+        timestamp: new Date().toISOString()
+      });
+      throw new Error(`Payment Method Domain ID is missing from transaction item. Cannot create transaction items without Payment Method Domain ID.`);
+    }
+  }
 
   console.log('[createTransactionItemsBulk] ✅ Triple validation passed, sending transaction items with validated fields:', {
     itemCount: payload.length,
@@ -886,9 +944,26 @@ export async function createTransactionFromPaymentIntent(
   const metadataTenantId = metadata.tenantId || metadata.tenant_id;
   const metadataPaymentMethodDomainId = metadata.paymentMethodDomainId || metadata.payment_method_domain_id;
 
-  // Get expected values from environment variables
+  // Get triple validation values from environment variables
+  // CRITICAL: getPaymentMethodDomainId() throws if not set - this ensures we fail fast
   const expectedTenantId = getTenantId();
-  const expectedPaymentMethodDomainId = getPaymentMethodDomainId();
+  let expectedPaymentMethodDomainId: string;
+  try {
+    expectedPaymentMethodDomainId = getPaymentMethodDomainId();
+    console.log('[createTransactionFromPaymentIntent] ✅ Payment Method Domain ID retrieved:', {
+      paymentMethodDomainId: expectedPaymentMethodDomainId,
+      hasValue: !!expectedPaymentMethodDomainId,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('[createTransactionFromPaymentIntent] ⚠️⚠️⚠️ CRITICAL ERROR: NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID is not set:', error);
+    console.error('[createTransactionFromPaymentIntent] Environment check:', {
+      NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID: process.env.NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID ? 'SET' : 'NOT SET',
+      NEXT_PUBLIC_TENANT_ID: process.env.NEXT_PUBLIC_TENANT_ID ? 'SET' : 'NOT SET',
+      timestamp: new Date().toISOString()
+    });
+    throw new Error(`NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID is not set in environment variables. Cannot create transaction without Payment Method Domain ID.`);
+  }
 
   // CRITICAL: Validate metadata matches environment variables BEFORE making backend calls
   if (metadataTenantId && metadataTenantId !== expectedTenantId) {
