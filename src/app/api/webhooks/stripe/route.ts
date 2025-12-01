@@ -9,7 +9,7 @@ import getRawBody from 'raw-body';
 import { fetchUserProfileServer } from '@/app/admin/ApiServerActions';
 import { createEventTicketTransactionServer, updateTicketTypeInventoryServer } from './ApiServerActions';
 import { getCachedApiJwt, generateApiJwt } from '@/lib/api/jwt';
-import { getTenantId } from '@/lib/env';
+import { getTenantId, getPaymentMethodDomainId } from '@/lib/env';
 import { withTenantId } from '@/lib/withTenantId';
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 
@@ -124,6 +124,53 @@ async function handleChargeFeeUpdate(charge: Stripe.Charge) {
         const eventIdRaw = md.eventId;
         const discountCodeId = md.discountCodeId ? Number(md.discountCodeId) : undefined;
         const email = (pi.receipt_email as string) || '';
+
+        // CRITICAL: Extract tenantId and paymentMethodDomainId from PaymentIntent metadata
+        const metadataTenantId = md.tenantId || md.tenant_id;
+        const metadataPaymentMethodDomainId = md.paymentMethodDomainId || md.payment_method_domain_id;
+
+        // Get expected values from environment variables
+        const expectedTenantId = getTenantId();
+        const expectedPaymentMethodDomainId = getPaymentMethodDomainId();
+
+        // CRITICAL: Validate metadata matches environment variables BEFORE creating transaction
+        if (metadataTenantId && metadataTenantId !== expectedTenantId) {
+          console.error('[STRIPE-WEBHOOK] ⚠️⚠️⚠️ TENANT ID MISMATCH - Rejecting transaction creation:', {
+            metadataTenantId,
+            expectedTenantId,
+            paymentIntentId,
+            timestamp: new Date().toISOString()
+          });
+          return new NextResponse(`Tenant ID mismatch: Payment Intent tenant ID (${metadataTenantId}) does not match configured tenant ID (${expectedTenantId}). Request rejected.`, { status: 403 });
+        }
+
+        if (metadataPaymentMethodDomainId && metadataPaymentMethodDomainId !== expectedPaymentMethodDomainId) {
+          console.error('[STRIPE-WEBHOOK] ⚠️⚠️⚠️ PAYMENT METHOD DOMAIN ID MISMATCH - Rejecting transaction creation:', {
+            metadataPaymentMethodDomainId,
+            expectedPaymentMethodDomainId,
+            paymentIntentId,
+            timestamp: new Date().toISOString()
+          });
+          return new NextResponse(`Payment Method Domain ID mismatch: Payment Intent Payment Method Domain ID (${metadataPaymentMethodDomainId}) does not match configured Payment Method Domain ID (${expectedPaymentMethodDomainId}). Request rejected.`, { status: 403 });
+        }
+
+        // Log successful validation
+        if (metadataTenantId && metadataPaymentMethodDomainId) {
+          console.log('[STRIPE-WEBHOOK] ✅ Triple validation passed:', {
+            tenantId: metadataTenantId,
+            paymentMethodDomainId: metadataPaymentMethodDomainId,
+            paymentIntentId,
+            timestamp: new Date().toISOString()
+          });
+        } else {
+          console.warn('[STRIPE-WEBHOOK] ⚠️ Missing metadata fields (will use environment variables):', {
+            hasTenantId: !!metadataTenantId,
+            hasPaymentMethodDomainId: !!metadataPaymentMethodDomainId,
+            paymentIntentId,
+            timestamp: new Date().toISOString()
+          });
+        }
+
         if (cartJson && eventIdRaw) {
           const cart = JSON.parse(cartJson);
           const now = new Date().toISOString();

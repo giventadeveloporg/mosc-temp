@@ -21,7 +21,24 @@ export async function createEventTicketTransactionServer(transaction: Omit<Event
   console.log('[WEBHOOK DEBUG] Tenant ID match:', transactionTenantId === expectedTenantId);
 
   // Get triple validation values from environment variables
-  const expectedPaymentMethodDomainId = getPaymentMethodDomainId();
+  // CRITICAL: getPaymentMethodDomainId() throws if not set - this ensures we fail fast
+  let expectedPaymentMethodDomainId: string;
+  try {
+    expectedPaymentMethodDomainId = getPaymentMethodDomainId();
+    console.log('[WEBHOOK DEBUG] ✅ Payment Method Domain ID retrieved:', {
+      paymentMethodDomainId: expectedPaymentMethodDomainId,
+      hasValue: !!expectedPaymentMethodDomainId,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('[WEBHOOK DEBUG] ⚠️⚠️⚠️ CRITICAL ERROR: NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID is not set:', error);
+    console.error('[WEBHOOK DEBUG] Environment check:', {
+      NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID: process.env.NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID ? 'SET' : 'NOT SET',
+      NEXT_PUBLIC_TENANT_ID: process.env.NEXT_PUBLIC_TENANT_ID ? 'SET' : 'NOT SET',
+      timestamp: new Date().toISOString()
+    });
+    throw new Error(`NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID is not set in environment variables. Cannot create transaction without Payment Method Domain ID.`);
+  }
 
   // CRITICAL: Validate transaction tenantId matches environment variable BEFORE backend call
   if (transactionTenantId && transactionTenantId !== expectedTenantId) {
