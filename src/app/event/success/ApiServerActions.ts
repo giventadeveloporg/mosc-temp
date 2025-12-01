@@ -1029,6 +1029,18 @@ export async function createTransactionFromPaymentIntent(
   }
 
   // Build transaction data
+  // CRITICAL: Use paymentMethodDomainId from metadata if available, otherwise use environment variable
+  // This ensures mobile workflow always has paymentMethodDomainId set
+  const finalPaymentMethodDomainId = metadataPaymentMethodDomainId || expectedPaymentMethodDomainId;
+
+  console.log('[createTransactionFromPaymentIntent] Setting paymentMethodDomainId:', {
+    fromMetadata: metadataPaymentMethodDomainId,
+    fromEnvironment: expectedPaymentMethodDomainId,
+    finalValue: finalPaymentMethodDomainId,
+    paymentIntentId,
+    timestamp: new Date().toISOString()
+  });
+
   const transactionData: Omit<EventTicketTransactionDTO, 'id'> = withTenantId({
     email: customerEmail,
     firstName: firstName || '',
@@ -1063,6 +1075,8 @@ export async function createTransactionFromPaymentIntent(
     userId: undefined,
     createdAt: now,
     updatedAt: now,
+    // CRITICAL: Always set paymentMethodDomainId - use metadata if available, otherwise use environment variable
+    paymentMethodDomainId: finalPaymentMethodDomainId,
   });
 
   console.log('[createTransactionFromPaymentIntent] Transaction data prepared:', transactionData);
@@ -1090,6 +1104,8 @@ export async function createTransactionFromPaymentIntent(
       ticketTypeName: ticketType.name,
       createdAt: now,
       updatedAt: now,
+      // CRITICAL: Always set paymentMethodDomainId - use metadata if available, otherwise use environment variable
+      paymentMethodDomainId: finalPaymentMethodDomainId,
     });
 
     transactionItems.push(itemData);
