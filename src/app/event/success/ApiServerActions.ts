@@ -1029,17 +1029,31 @@ export async function createTransactionFromPaymentIntent(
   }
 
   // Build transaction data
-  // CRITICAL: Use paymentMethodDomainId from metadata if available, otherwise use environment variable
-  // This ensures mobile workflow always has paymentMethodDomainId set
-  const finalPaymentMethodDomainId = metadataPaymentMethodDomainId || expectedPaymentMethodDomainId;
+  // CRITICAL: ALWAYS use environment variable for paymentMethodDomainId (never use metadata)
+  // This ensures consistent tenant filtering - reject if metadata doesn't match, but always use environment variable
+  // If metadata doesn't match, we've already rejected above, so we can safely use environment variable here
+  const finalPaymentMethodDomainId = expectedPaymentMethodDomainId;
 
-  console.log('[createTransactionFromPaymentIntent] Setting paymentMethodDomainId:', {
+  console.log('[createTransactionFromPaymentIntent] Setting paymentMethodDomainId (ALWAYS from environment):', {
     fromMetadata: metadataPaymentMethodDomainId,
     fromEnvironment: expectedPaymentMethodDomainId,
     finalValue: finalPaymentMethodDomainId,
+    usingEnvironmentVariable: true, // Always use environment variable for consistency
     paymentIntentId,
     timestamp: new Date().toISOString()
   });
+
+  // CRITICAL: Verify withTenantId() returns the correct tenant ID from environment variable
+  const tenantIdFromHelper = getTenantId();
+  if (tenantIdFromHelper !== expectedTenantId) {
+    console.error('[createTransactionFromPaymentIntent] ⚠️⚠️⚠️ CRITICAL ERROR: getTenantId() returned wrong tenant ID:', {
+      tenantIdFromHelper,
+      expectedTenantId,
+      paymentIntentId,
+      timestamp: new Date().toISOString()
+    });
+    throw new Error(`Tenant ID mismatch: getTenantId() returned ${tenantIdFromHelper} but expected ${expectedTenantId}. Environment variable mismatch.`);
+  }
 
   const transactionData: Omit<EventTicketTransactionDTO, 'id'> = withTenantId({
     email: customerEmail,
@@ -1075,9 +1089,32 @@ export async function createTransactionFromPaymentIntent(
     userId: undefined,
     createdAt: now,
     updatedAt: now,
-    // CRITICAL: Always set paymentMethodDomainId - use metadata if available, otherwise use environment variable
+    // CRITICAL: Always set paymentMethodDomainId - ALWAYS use environment variable (never use metadata)
+    // Metadata is validated above, but we always use environment variable for consistency
     paymentMethodDomainId: finalPaymentMethodDomainId,
   });
+
+  // CRITICAL: Verify transactionData has correct tenant ID (from withTenantId)
+  if (transactionData.tenantId !== expectedTenantId) {
+    console.error('[createTransactionFromPaymentIntent] ⚠️⚠️⚠️ CRITICAL ERROR: transactionData has wrong tenant ID:', {
+      transactionDataTenantId: transactionData.tenantId,
+      expectedTenantId,
+      paymentIntentId,
+      timestamp: new Date().toISOString()
+    });
+    throw new Error(`Tenant ID mismatch: transactionData has tenantId=${transactionData.tenantId} but expected ${expectedTenantId}. withTenantId() returned wrong value.`);
+  }
+
+  // CRITICAL: Verify transactionData has paymentMethodDomainId set
+  if (!transactionData.paymentMethodDomainId) {
+    console.error('[createTransactionFromPaymentIntent] ⚠️⚠️⚠️ CRITICAL ERROR: transactionData missing paymentMethodDomainId:', {
+      transactionData,
+      expectedPaymentMethodDomainId,
+      paymentIntentId,
+      timestamp: new Date().toISOString()
+    });
+    throw new Error(`Payment Method Domain ID is missing from transactionData. Cannot create transaction without Payment Method Domain ID.`);
+  }
 
   console.log('[createTransactionFromPaymentIntent] Transaction data prepared:', transactionData);
 

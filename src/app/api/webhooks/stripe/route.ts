@@ -176,6 +176,21 @@ async function handleChargeFeeUpdate(charge: Stripe.Charge) {
           const now = new Date().toISOString();
           const totalQuantity = Array.isArray(cart) ? cart.reduce((s: number, it: any) => s + (it.quantity || 0), 0) : 0;
           const amountTotal = typeof pi.amount_received === 'number' ? pi.amount_received / 100 : (typeof pi.amount === 'number' ? pi.amount / 100 : 0);
+
+          // CRITICAL: ALWAYS use environment variable for paymentMethodDomainId (never use metadata)
+          // This ensures consistent tenant filtering - reject if metadata doesn't match, but always use environment variable
+          // If metadata doesn't match, we've already rejected above, so we can safely use environment variable here
+          const finalPaymentMethodDomainId = expectedPaymentMethodDomainId;
+
+          console.log('[STRIPE-WEBHOOK] Setting paymentMethodDomainId (ALWAYS from environment):', {
+            fromMetadata: metadataPaymentMethodDomainId,
+            fromEnvironment: expectedPaymentMethodDomainId,
+            finalValue: finalPaymentMethodDomainId,
+            usingEnvironmentVariable: true, // Always use environment variable for consistency
+            paymentIntentId,
+            timestamp: new Date().toISOString()
+          });
+
           const txPayload: Omit<EventTicketTransactionDTO, 'id'> = {
             email,
             firstName: '',
@@ -210,6 +225,8 @@ async function handleChargeFeeUpdate(charge: Stripe.Charge) {
             userId: undefined as any,
             createdAt: now as any,
             updatedAt: now as any,
+            // CRITICAL: Always set paymentMethodDomainId - use metadata if available, otherwise use environment variable
+            paymentMethodDomainId: finalPaymentMethodDomainId,
           };
           const created = await createEventTicketTransactionServer(withTenantId(txPayload as any) as any);
           console.log('[STRIPE-WEBHOOK] Created missing PI transaction:', created?.id);
