@@ -88,11 +88,49 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { session_id, pi, skip_qr } = body;
 
+    // CRITICAL: Server-side mobile detection for CloudWatch logging
+    const userAgent = req.headers.get('user-agent') || 'unknown';
+    const cloudfrontMobile = req.headers.get('cloudfront-is-mobile-viewer') === 'true';
+    const cloudfrontAndroid = req.headers.get('cloudfront-is-android-viewer') === 'true';
+    const cloudfrontIOS = req.headers.get('cloudfront-is-ios-viewer') === 'true';
+
+    // Enhanced mobile detection (same logic as client-side)
+    const mobileRegexMatch = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS|FxiOS|EdgiOS/i.test(userAgent);
+    const platformMatch = /iPhone|iPad|iPod|Android|BlackBerry|Windows Phone/i.test(userAgent);
+    const isMobile = mobileRegexMatch || platformMatch || cloudfrontMobile || cloudfrontAndroid || cloudfrontIOS;
+
+    console.log('[MOBILE-DETECTION] [SERVER-SIDE] ============================================');
+    console.log('[MOBILE-DETECTION] [SERVER-SIDE] API POST /api/event/success/process');
+    console.log('[MOBILE-DETECTION] [SERVER-SIDE] ============================================');
+    console.log('[MOBILE-DETECTION] [SERVER-SIDE] User-Agent:', userAgent.substring(0, 150));
+    console.log('[MOBILE-DETECTION] [SERVER-SIDE] CloudFront Headers:', {
+      cloudfrontMobile,
+      cloudfrontAndroid,
+      cloudfrontIOS,
+    });
+    console.log('[MOBILE-DETECTION] [SERVER-SIDE] Detection Methods:', {
+      mobileRegexMatch,
+      platformMatch,
+      cloudfrontMobile,
+      cloudfrontAndroid,
+      cloudfrontIOS,
+    });
+    console.log('[MOBILE-DETECTION] [SERVER-SIDE] FINAL RESULT:', {
+      isMobile,
+      session_id,
+      pi,
+      skip_qr,
+      timestamp: new Date().toISOString(),
+    });
+    console.log('[MOBILE-DETECTION] [SERVER-SIDE] ============================================');
+
     console.log('[API POST] Received body:', {
       session_id,
       pi,
       skip_qr,
-      body
+      body,
+      isMobile, // Include mobile detection result
+      userAgent: userAgent.substring(0, 100),
     });
 
     if (!session_id && !pi) {
@@ -489,11 +527,49 @@ export async function GET(req: NextRequest) {
     const session_id = searchParams.get('session_id');
     const pi = searchParams.get('pi');
 
+    // CRITICAL: Server-side mobile detection for CloudWatch logging
+    const userAgent = req.headers.get('user-agent') || 'unknown';
+    const cloudfrontMobile = req.headers.get('cloudfront-is-mobile-viewer') === 'true';
+    const cloudfrontAndroid = req.headers.get('cloudfront-is-android-viewer') === 'true';
+    const cloudfrontIOS = req.headers.get('cloudfront-is-ios-viewer') === 'true';
+
+    // Enhanced mobile detection (same logic as client-side)
+    const mobileRegexMatch = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS|FxiOS|EdgiOS/i.test(userAgent);
+    const platformMatch = /iPhone|iPad|iPod|Android|BlackBerry|Windows Phone/i.test(userAgent);
+    const isMobile = mobileRegexMatch || platformMatch || cloudfrontMobile || cloudfrontAndroid || cloudfrontIOS;
+
+    console.log('[MOBILE-DETECTION] [SERVER-SIDE] ============================================');
+    console.log('[MOBILE-DETECTION] [SERVER-SIDE] API GET /api/event/success/process');
+    console.log('[MOBILE-DETECTION] [SERVER-SIDE] ============================================');
+    console.log('[MOBILE-DETECTION] [SERVER-SIDE] User-Agent:', userAgent.substring(0, 150));
+    console.log('[MOBILE-DETECTION] [SERVER-SIDE] CloudFront Headers:', {
+      cloudfrontMobile,
+      cloudfrontAndroid,
+      cloudfrontIOS,
+    });
+    console.log('[MOBILE-DETECTION] [SERVER-SIDE] Detection Methods:', {
+      mobileRegexMatch,
+      platformMatch,
+      cloudfrontMobile,
+      cloudfrontAndroid,
+      cloudfrontIOS,
+    });
+    console.log('[MOBILE-DETECTION] [SERVER-SIDE] FINAL RESULT:', {
+      isMobile,
+      session_id,
+      pi,
+      url: req.url,
+      timestamp: new Date().toISOString(),
+    });
+    console.log('[MOBILE-DETECTION] [SERVER-SIDE] ============================================');
+
     console.log('[API GET] Received parameters:', {
       session_id,
       pi,
       url: req.url,
-      searchParams: Object.fromEntries(searchParams.entries())
+      searchParams: Object.fromEntries(searchParams.entries()),
+      isMobile, // Include mobile detection result
+      userAgent: userAgent.substring(0, 100),
     });
 
     if (!session_id && !pi) {

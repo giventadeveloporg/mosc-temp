@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import MobileDebugConsole from '@/components/MobileDebugConsole';
 
 interface ErrorProps {
   error: Error & { digest?: string };
@@ -111,6 +112,9 @@ export default function CheckoutError({ error, reset }: ErrorProps) {
           </div>
         )}
       </div>
+
+      {/* Mobile Debug Console - Always visible on error pages for log copying */}
+      <MobileDebugConsole />
     </div>
   );
 }
