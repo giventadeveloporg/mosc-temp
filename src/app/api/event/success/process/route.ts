@@ -336,24 +336,55 @@ export async function POST(req: NextRequest) {
         // Import server actions for transaction creation
         const { createTransactionFromPaymentIntent } = await import('@/app/event/success/ApiServerActions');
 
+        console.log('[MOBILE-WORKFLOW] [API POST CLIENT-CREATE] About to call createTransactionFromPaymentIntent:', {
+          paymentIntentId,
+          eventId,
+          email,
+          cartItemsCount: cart?.length || 0,
+          amountTotal,
+          firstName,
+          lastName,
+          customerPhone,
+          timestamp: new Date().toISOString()
+        });
+
         // Create transaction with cart items
         const cartItems = Array.isArray(cart) ? cart.map((item: any) => ({
           ticketTypeId: item.ticketTypeId || item.ticketType?.id,
           quantity: Number(item.quantity) || 0
         })).filter((item: any) => item.ticketTypeId && item.quantity > 0) : [];
 
-        const createdTransaction = await createTransactionFromPaymentIntent(
-          paymentIntentId,
-          eventId,
-          email,
-          cartItems,
-          amountTotal,
-          firstName,
-          lastName,
-          customerPhone
-        );
+        console.log('[MOBILE-WORKFLOW] [API POST CLIENT-CREATE] Cart items prepared:', cartItems);
 
-        console.log('[API POST CLIENT-CREATE] Successfully created transaction:', createdTransaction.id);
+        let createdTransaction;
+        try {
+          createdTransaction = await createTransactionFromPaymentIntent(
+            paymentIntentId,
+            eventId,
+            email,
+            cartItems,
+            amountTotal,
+            firstName,
+            lastName,
+            customerPhone
+          );
+
+          console.log('[MOBILE-WORKFLOW] [API POST CLIENT-CREATE] ✅ Successfully created transaction:', {
+            transactionId: createdTransaction.id,
+            tenantId: createdTransaction.tenantId,
+            paymentMethodDomainId: createdTransaction.paymentMethodDomainId,
+            timestamp: new Date().toISOString()
+          });
+        } catch (createErr: any) {
+          console.error('[MOBILE-WORKFLOW] [API POST CLIENT-CREATE] ⚠️⚠️⚠️ CRITICAL ERROR: createTransactionFromPaymentIntent failed:', {
+            error: createErr?.message || String(createErr),
+            stack: createErr?.stack,
+            paymentIntentId,
+            eventId,
+            timestamp: new Date().toISOString()
+          });
+          throw createErr;
+        }
 
         // Use the created transaction
         result = { transaction: createdTransaction, userProfile: null };

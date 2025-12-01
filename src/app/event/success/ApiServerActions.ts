@@ -124,18 +124,41 @@ async function createTransaction(transactionData: Omit<EventTicketTransactionDTO
 
   // Get triple validation values from environment variables
   // CRITICAL: getPaymentMethodDomainId() throws if not set - this ensures we fail fast
-  const expectedTenantId = getTenantId();
-  let expectedPaymentMethodDomainId: string;
+  console.log('[MOBILE-WORKFLOW] [createTransaction] Reading environment variables...');
+  console.log('[MOBILE-WORKFLOW] [createTransaction] Environment check BEFORE reading:', {
+    AMPLIFY_NEXT_PUBLIC_TENANT_ID: process.env.AMPLIFY_NEXT_PUBLIC_TENANT_ID ? `SET (${process.env.AMPLIFY_NEXT_PUBLIC_TENANT_ID.substring(0, 20)}...)` : 'NOT SET',
+    NEXT_PUBLIC_TENANT_ID: process.env.NEXT_PUBLIC_TENANT_ID ? `SET (${process.env.NEXT_PUBLIC_TENANT_ID.substring(0, 20)}...)` : 'NOT SET',
+    AMPLIFY_NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID: process.env.AMPLIFY_NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID ? `SET (${process.env.AMPLIFY_NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID.substring(0, 20)}...)` : 'NOT SET',
+    NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID: process.env.NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID ? `SET (${process.env.NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID.substring(0, 20)}...)` : 'NOT SET',
+    timestamp: new Date().toISOString()
+  });
+
+  let expectedTenantId: string;
   try {
-    expectedPaymentMethodDomainId = getPaymentMethodDomainId();
-    console.log('[createTransaction] ✅ Payment Method Domain ID retrieved:', {
-      paymentMethodDomainId: expectedPaymentMethodDomainId,
-      hasValue: !!expectedPaymentMethodDomainId,
+    expectedTenantId = getTenantId();
+    console.log('[MOBILE-WORKFLOW] [createTransaction] ✅ Tenant ID retrieved:', {
+      tenantId: expectedTenantId,
+      hasValue: !!expectedTenantId,
+      length: expectedTenantId?.length,
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    console.error('[createTransaction] ⚠️⚠️⚠️ CRITICAL ERROR: NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID is not set:', error);
-    console.error('[createTransaction] Environment check:', {
+    console.error('[MOBILE-WORKFLOW] [createTransaction] ⚠️⚠️⚠️ CRITICAL ERROR: getTenantId() failed:', error);
+    throw error;
+  }
+
+  let expectedPaymentMethodDomainId: string;
+  try {
+    expectedPaymentMethodDomainId = getPaymentMethodDomainId();
+    console.log('[MOBILE-WORKFLOW] [createTransaction] ✅ Payment Method Domain ID retrieved:', {
+      paymentMethodDomainId: expectedPaymentMethodDomainId,
+      hasValue: !!expectedPaymentMethodDomainId,
+      length: expectedPaymentMethodDomainId?.length,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('[MOBILE-WORKFLOW] [createTransaction] ⚠️⚠️⚠️ CRITICAL ERROR: NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID is not set:', error);
+    console.error('[MOBILE-WORKFLOW] [createTransaction] Environment check:', {
       AMPLIFY_NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID: process.env.AMPLIFY_NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID ? 'SET' : 'NOT SET',
       NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID: process.env.NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID ? 'SET' : 'NOT SET',
       AMPLIFY_NEXT_PUBLIC_TENANT_ID: process.env.AMPLIFY_NEXT_PUBLIC_TENANT_ID ? 'SET' : 'NOT SET',
@@ -146,9 +169,15 @@ async function createTransaction(transactionData: Omit<EventTicketTransactionDTO
   }
 
   // CRITICAL: Validate transactionData tenantId matches environment variable BEFORE backend call
+  console.log('[MOBILE-WORKFLOW] [createTransaction] Validating transactionData tenant ID:', {
+    transactionDataTenantId: transactionData.tenantId,
+    expectedTenantId,
+    match: transactionData.tenantId === expectedTenantId,
+    timestamp: new Date().toISOString()
+  });
   const transactionTenantId = transactionData.tenantId;
   if (transactionTenantId && transactionTenantId !== expectedTenantId) {
-    console.error('[createTransaction] ⚠️⚠️⚠️ TENANT ID MISMATCH - Rejecting request:', {
+    console.error('[MOBILE-WORKFLOW] [createTransaction] ⚠️⚠️⚠️ TENANT ID MISMATCH - Rejecting request:', {
       transactionTenantId,
       expectedTenantId,
       timestamp: new Date().toISOString()
@@ -157,9 +186,15 @@ async function createTransaction(transactionData: Omit<EventTicketTransactionDTO
   }
 
   // CRITICAL: Validate transactionData paymentMethodDomainId matches environment variable BEFORE backend call
+  console.log('[MOBILE-WORKFLOW] [createTransaction] Validating transactionData paymentMethodDomainId:', {
+    transactionDataPaymentMethodDomainId: transactionData.paymentMethodDomainId,
+    expectedPaymentMethodDomainId,
+    match: transactionData.paymentMethodDomainId === expectedPaymentMethodDomainId,
+    timestamp: new Date().toISOString()
+  });
   const transactionPaymentMethodDomainId = transactionData.paymentMethodDomainId;
   if (transactionPaymentMethodDomainId && transactionPaymentMethodDomainId !== expectedPaymentMethodDomainId) {
-    console.error('[createTransaction] ⚠️⚠️⚠️ PAYMENT METHOD DOMAIN ID MISMATCH - Rejecting request:', {
+    console.error('[MOBILE-WORKFLOW] [createTransaction] ⚠️⚠️⚠️ PAYMENT METHOD DOMAIN ID MISMATCH - Rejecting request:', {
       transactionPaymentMethodDomainId,
       expectedPaymentMethodDomainId,
       timestamp: new Date().toISOString()
@@ -170,30 +205,68 @@ async function createTransaction(transactionData: Omit<EventTicketTransactionDTO
   // Add triple validation fields to payload (use environment variables, not transactionData values)
   // Backend will validate the combination (tenantId, paymentMethodDomainId, webhookSecret) exists
   // CRITICAL: Explicitly set paymentMethodDomainId to ensure it's never null or undefined
+  console.log('[MOBILE-WORKFLOW] [createTransaction] Building final payload with environment variables...');
   const payload = {
     ...transactionData,
     tenantId: expectedTenantId, // ALWAYS use environment tenant ID - ignore any tenantId from transactionData
     paymentMethodDomainId: expectedPaymentMethodDomainId, // ALWAYS use environment Payment Method Domain ID - NEVER null/undefined
   };
 
+  console.log('[MOBILE-WORKFLOW] [createTransaction] Final payload built:', {
+    tenantId: payload.tenantId,
+    paymentMethodDomainId: payload.paymentMethodDomainId,
+    email: payload.email,
+    stripePaymentIntentId: payload.stripePaymentIntentId,
+    eventId: payload.eventId,
+    timestamp: new Date().toISOString()
+  });
+
   // CRITICAL: Double-check that paymentMethodDomainId is set before sending
   if (!payload.paymentMethodDomainId) {
-    console.error('[createTransaction] ⚠️⚠️⚠️ CRITICAL ERROR: paymentMethodDomainId is missing from payload:', {
-      payload,
+    console.error('[MOBILE-WORKFLOW] [createTransaction] ⚠️⚠️⚠️ CRITICAL ERROR: paymentMethodDomainId is missing from payload:', {
+      payloadTenantId: payload.tenantId,
+      payloadPaymentMethodDomainId: payload.paymentMethodDomainId,
       expectedPaymentMethodDomainId,
+      payloadKeys: Object.keys(payload),
       timestamp: new Date().toISOString()
     });
     throw new Error(`Payment Method Domain ID is missing from payload. Cannot create transaction without Payment Method Domain ID.`);
   }
 
-  console.log('[createTransaction] ✅ Triple validation passed, sending transaction with validated fields:', {
+  // CRITICAL: Double-check that tenantId is set correctly
+  if (payload.tenantId !== expectedTenantId) {
+    console.error('[MOBILE-WORKFLOW] [createTransaction] ⚠️⚠️⚠️ CRITICAL ERROR: payload tenantId does not match expected:', {
+      payloadTenantId: payload.tenantId,
+      expectedTenantId,
+      timestamp: new Date().toISOString()
+    });
+    throw new Error(`Tenant ID mismatch: Payload has tenantId=${payload.tenantId} but expected ${expectedTenantId}.`);
+  }
+
+  console.log('[MOBILE-WORKFLOW] [createTransaction] ✅ Triple validation passed, sending transaction with validated fields:', {
     tenantId: payload.tenantId,
     paymentMethodDomainId: payload.paymentMethodDomainId,
     hasWebhookSecret: false, // Not passed from frontend - backend looks it up
+    timestamp: new Date().toISOString()
   });
 
+  console.log('[MOBILE-WORKFLOW] [createTransaction] Full payload being sent to backend:', JSON.stringify({
+    tenantId: payload.tenantId,
+    paymentMethodDomainId: payload.paymentMethodDomainId,
+    email: payload.email,
+    stripePaymentIntentId: payload.stripePaymentIntentId,
+    eventId: payload.eventId,
+    totalAmount: payload.totalAmount,
+    status: payload.status,
+    // Include all other fields but truncate long values
+  }, null, 2));
+
+  const backendUrl = `${getAppUrl()}/api/proxy/event-ticket-transactions`;
+  console.log('[MOBILE-WORKFLOW] [createTransaction] Backend URL:', backendUrl);
+  console.log('[MOBILE-WORKFLOW] [createTransaction] About to call fetchWithJwtRetry...');
+
   const response = await fetchWithJwtRetry(
-    `${getAppUrl()}/api/proxy/event-ticket-transactions`,
+    backendUrl,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -201,13 +274,34 @@ async function createTransaction(transactionData: Omit<EventTicketTransactionDTO
     },
   );
 
+  console.log('[MOBILE-WORKFLOW] [createTransaction] Response received:', {
+    status: response.status,
+    statusText: response.statusText,
+    ok: response.ok,
+    timestamp: new Date().toISOString()
+  });
+
   if (!response.ok) {
     const errorBody = await response.text();
-    console.error('Failed to create transaction:', response.status, errorBody);
+    console.error('[MOBILE-WORKFLOW] [createTransaction] ⚠️⚠️⚠️ Failed to create transaction:', {
+      status: response.status,
+      statusText: response.statusText,
+      errorBody,
+      payloadTenantId: payload.tenantId,
+      payloadPaymentMethodDomainId: payload.paymentMethodDomainId,
+      timestamp: new Date().toISOString()
+    });
     throw new Error(`Failed to create transaction: ${errorBody}`);
   }
 
-  return response.json();
+  const result = await response.json();
+  console.log('[MOBILE-WORKFLOW] [createTransaction] ✅ Transaction created successfully, response:', {
+    transactionId: result.id,
+    tenantId: result.tenantId,
+    paymentMethodDomainId: result.paymentMethodDomainId,
+    timestamp: new Date().toISOString()
+  });
+  return result;
 }
 
 // Helper to bulk create transaction items
@@ -923,12 +1017,19 @@ export async function createTransactionFromPaymentIntent(
   lastName?: string,
   phone?: string
 ): Promise<EventTicketTransactionDTO> {
-  console.log('[createTransactionFromPaymentIntent] Creating transaction:', {
+  console.log('[MOBILE-WORKFLOW] ============================================');
+  console.log('[MOBILE-WORKFLOW] createTransactionFromPaymentIntent CALLED');
+  console.log('[MOBILE-WORKFLOW] ============================================');
+  console.log('[MOBILE-WORKFLOW] Input parameters:', {
     paymentIntentId,
     eventId,
     customerEmail,
     cart,
-    amountPaid
+    amountPaid,
+    firstName,
+    lastName,
+    phone,
+    timestamp: new Date().toISOString()
   });
 
   // CRITICAL: Retrieve PaymentIntent from Stripe to validate metadata
@@ -950,13 +1051,41 @@ export async function createTransactionFromPaymentIntent(
 
   // Get triple validation values from environment variables
   // CRITICAL: getPaymentMethodDomainId() throws if not set - this ensures we fail fast
-  const expectedTenantId = getTenantId();
+  console.log('[MOBILE-WORKFLOW] Reading environment variables...');
+  console.log('[MOBILE-WORKFLOW] Environment variable check BEFORE reading:', {
+    AMPLIFY_NEXT_PUBLIC_TENANT_ID: process.env.AMPLIFY_NEXT_PUBLIC_TENANT_ID ? `SET (${process.env.AMPLIFY_NEXT_PUBLIC_TENANT_ID.substring(0, 20)}...)` : 'NOT SET',
+    NEXT_PUBLIC_TENANT_ID: process.env.NEXT_PUBLIC_TENANT_ID ? `SET (${process.env.NEXT_PUBLIC_TENANT_ID.substring(0, 20)}...)` : 'NOT SET',
+    AMPLIFY_NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID: process.env.AMPLIFY_NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID ? `SET (${process.env.AMPLIFY_NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID.substring(0, 20)}...)` : 'NOT SET',
+    NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID: process.env.NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID ? `SET (${process.env.NEXT_PUBLIC_PAYMENT_METHOD_DOMAIN_ID.substring(0, 20)}...)` : 'NOT SET',
+    timestamp: new Date().toISOString()
+  });
+
+  let expectedTenantId: string;
+  try {
+    expectedTenantId = getTenantId();
+    console.log('[MOBILE-WORKFLOW] ✅ Tenant ID retrieved from environment:', {
+      tenantId: expectedTenantId,
+      hasValue: !!expectedTenantId,
+      length: expectedTenantId?.length,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('[MOBILE-WORKFLOW] ⚠️⚠️⚠️ CRITICAL ERROR: getTenantId() failed:', error);
+    console.error('[MOBILE-WORKFLOW] Environment check:', {
+      AMPLIFY_NEXT_PUBLIC_TENANT_ID: process.env.AMPLIFY_NEXT_PUBLIC_TENANT_ID ? 'SET' : 'NOT SET',
+      NEXT_PUBLIC_TENANT_ID: process.env.NEXT_PUBLIC_TENANT_ID ? 'SET' : 'NOT SET',
+      timestamp: new Date().toISOString()
+    });
+    throw new Error(`NEXT_PUBLIC_TENANT_ID is not set in environment variables. Check AMPLIFY_NEXT_PUBLIC_TENANT_ID or NEXT_PUBLIC_TENANT_ID. Cannot create transaction without Tenant ID.`);
+  }
+
   let expectedPaymentMethodDomainId: string;
   try {
     expectedPaymentMethodDomainId = getPaymentMethodDomainId();
-    console.log('[createTransactionFromPaymentIntent] ✅ Payment Method Domain ID retrieved:', {
+    console.log('[MOBILE-WORKFLOW] ✅ Payment Method Domain ID retrieved from environment:', {
       paymentMethodDomainId: expectedPaymentMethodDomainId,
       hasValue: !!expectedPaymentMethodDomainId,
+      length: expectedPaymentMethodDomainId?.length,
       timestamp: new Date().toISOString()
     });
   } catch (error) {
@@ -1101,8 +1230,14 @@ export async function createTransactionFromPaymentIntent(
   });
 
   // CRITICAL: Verify transactionData has correct tenant ID (from withTenantId)
+  console.log('[MOBILE-WORKFLOW] Verifying transactionData tenant ID:', {
+    transactionDataTenantId: transactionData.tenantId,
+    expectedTenantId,
+    match: transactionData.tenantId === expectedTenantId,
+    timestamp: new Date().toISOString()
+  });
   if (transactionData.tenantId !== expectedTenantId) {
-    console.error('[createTransactionFromPaymentIntent] ⚠️⚠️⚠️ CRITICAL ERROR: transactionData has wrong tenant ID:', {
+    console.error('[MOBILE-WORKFLOW] ⚠️⚠️⚠️ CRITICAL ERROR: transactionData has wrong tenant ID:', {
       transactionDataTenantId: transactionData.tenantId,
       expectedTenantId,
       paymentIntentId,
@@ -1112,9 +1247,17 @@ export async function createTransactionFromPaymentIntent(
   }
 
   // CRITICAL: Verify transactionData has paymentMethodDomainId set
+  console.log('[MOBILE-WORKFLOW] Verifying transactionData paymentMethodDomainId:', {
+    transactionDataPaymentMethodDomainId: transactionData.paymentMethodDomainId,
+    expectedPaymentMethodDomainId,
+    hasValue: !!transactionData.paymentMethodDomainId,
+    match: transactionData.paymentMethodDomainId === expectedPaymentMethodDomainId,
+    timestamp: new Date().toISOString()
+  });
   if (!transactionData.paymentMethodDomainId) {
-    console.error('[createTransactionFromPaymentIntent] ⚠️⚠️⚠️ CRITICAL ERROR: transactionData missing paymentMethodDomainId:', {
-      transactionData,
+    console.error('[MOBILE-WORKFLOW] ⚠️⚠️⚠️ CRITICAL ERROR: transactionData missing paymentMethodDomainId:', {
+      transactionDataKeys: Object.keys(transactionData),
+      transactionDataTenantId: transactionData.tenantId,
       expectedPaymentMethodDomainId,
       paymentIntentId,
       timestamp: new Date().toISOString()
@@ -1122,11 +1265,40 @@ export async function createTransactionFromPaymentIntent(
     throw new Error(`Payment Method Domain ID is missing from transactionData. Cannot create transaction without Payment Method Domain ID.`);
   }
 
-  console.log('[createTransactionFromPaymentIntent] Transaction data prepared:', transactionData);
+  console.log('[MOBILE-WORKFLOW] Transaction data prepared BEFORE calling createTransaction():', {
+    tenantId: transactionData.tenantId,
+    paymentMethodDomainId: transactionData.paymentMethodDomainId,
+    email: transactionData.email,
+    stripePaymentIntentId: transactionData.stripePaymentIntentId,
+    eventId: transactionData.eventId,
+    totalAmount: transactionData.totalAmount,
+    timestamp: new Date().toISOString()
+  });
+
+  console.log('[MOBILE-WORKFLOW] Calling createTransaction() with transactionData...');
+  console.log('[MOBILE-WORKFLOW] Full transactionData object:', JSON.stringify(transactionData, null, 2));
 
   // Create transaction
-  const transaction = await createTransaction(transactionData);
-  console.log('[createTransactionFromPaymentIntent] Transaction created:', transaction.id);
+  let transaction: EventTicketTransactionDTO;
+  try {
+    transaction = await createTransaction(transactionData);
+    console.log('[MOBILE-WORKFLOW] ✅ Transaction created successfully:', {
+      transactionId: transaction.id,
+      tenantId: transaction.tenantId,
+      paymentMethodDomainId: transaction.paymentMethodDomainId,
+      timestamp: new Date().toISOString()
+    });
+  } catch (createError) {
+    console.error('[MOBILE-WORKFLOW] ⚠️⚠️⚠️ CRITICAL ERROR: createTransaction() failed:', createError);
+    console.error('[MOBILE-WORKFLOW] Error details:', {
+      message: createError instanceof Error ? createError.message : String(createError),
+      stack: createError instanceof Error ? createError.stack : undefined,
+      transactionDataTenantId: transactionData.tenantId,
+      transactionDataPaymentMethodDomainId: transactionData.paymentMethodDomainId,
+      timestamp: new Date().toISOString()
+    });
+    throw createError;
+  }
 
   // Create transaction items
   const transactionItems = [];
