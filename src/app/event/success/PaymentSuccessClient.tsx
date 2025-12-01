@@ -60,6 +60,66 @@ interface PaymentSuccessClientProps {
 export default function PaymentSuccessClient({ transactionId, eventId: eventIdParam }: PaymentSuccessClientProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [isMobileDevice, setIsMobileDevice] = useState<boolean | null>(null);
+
+  // Mobile detection and redirect logic - CRITICAL for mobile payment flows
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    console.log('[MOBILE-DETECTION] [PaymentSuccessClient] ============================================');
+    console.log('[MOBILE-DETECTION] [PaymentSuccessClient] Component mounted');
+    console.log('[MOBILE-DETECTION] [PaymentSuccessClient] ============================================');
+    console.log('[MOBILE-DETECTION] [PaymentSuccessClient] Transaction ID:', transactionId);
+    console.log('[MOBILE-DETECTION] [PaymentSuccessClient] User Agent:', navigator.userAgent);
+    console.log('[MOBILE-DETECTION] [PaymentSuccessClient] URL:', window.location.href);
+
+    // Enhanced mobile detection with multiple methods (same as SuccessClient)
+    const userAgent = navigator.userAgent || '';
+    const platform = navigator.platform || '';
+
+    const mobileRegexMatch = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS|FxiOS|EdgiOS/i.test(userAgent);
+    const platformMatch = /iPhone|iPad|iPod|Android|BlackBerry|Windows Phone/i.test(platform);
+    const narrowScreenMatch = window.innerWidth <= 768;
+    const hasTouchScreen = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const userAgentData = (navigator as any).userAgentData;
+    const isMobileFromUA = userAgentData?.mobile || false;
+
+    const isMobile = mobileRegexMatch || platformMatch || narrowScreenMatch || (hasTouchScreen && narrowScreenMatch) || isMobileFromUA;
+
+    console.log('[MOBILE-DETECTION] [PaymentSuccessClient] Detection result:', {
+      isMobile,
+      mobileRegexMatch,
+      platformMatch,
+      narrowScreenMatch,
+      hasTouchScreen,
+      isMobileFromUA,
+      userAgent: userAgent.substring(0, 100),
+    });
+
+    setIsMobileDevice(isMobile);
+
+    if (isMobile) {
+      console.log('[MOBILE-DETECTION] [PaymentSuccessClient] ✅✅✅ MOBILE DETECTED - Redirecting to /event/ticket-qr');
+      // For PaymentSuccessClient, we need to redirect to ticket-qr with transactionId
+      // But ticket-qr expects pi or session_id, not transactionId
+      // So we need to extract pi from URL or use a different approach
+      const urlParams = new URLSearchParams(window.location.search);
+      const pi = urlParams.get('pi');
+
+      if (pi) {
+        const redirectUrl = `/event/ticket-qr?pi=${encodeURIComponent(pi)}`;
+        console.log('[MOBILE-DETECTION] [PaymentSuccessClient] ✅ Redirecting with pi:', redirectUrl);
+        setTimeout(() => {
+          router.replace(redirectUrl);
+        }, 2000);
+        return;
+      } else {
+        console.warn('[MOBILE-DETECTION] [PaymentSuccessClient] ⚠️ Mobile detected but no pi parameter - cannot redirect');
+      }
+    } else {
+      console.log('[MOBILE-DETECTION] [PaymentSuccessClient] ❌ DESKTOP DETECTED - Staying on page');
+    }
+  }, [transactionId, router]);
 
   // Log safety guarantee on mount (always log for mobile debugging)
   useEffect(() => {

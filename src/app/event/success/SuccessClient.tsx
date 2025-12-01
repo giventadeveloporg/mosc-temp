@@ -42,34 +42,96 @@ export default function SuccessClient({ session_id, payment_intent }: SuccessCli
     if (typeof window === 'undefined') return;
 
     // Enhanced debug logging - now inside useEffect
-    console.log('[DESKTOP SUCCESS DEBUG] SuccessClient component mounted');
-    console.log('[DESKTOP SUCCESS DEBUG] Props:', { session_id, payment_intent });
-    console.log('[DESKTOP SUCCESS DEBUG] User Agent:', navigator.userAgent);
-    console.log('[DESKTOP SUCCESS DEBUG] URL:', window.location.href);
-    console.log('[DESKTOP SUCCESS DEBUG] Referrer:', document.referrer);
-    console.log('[SuccessClient] Component initialized with props:', {
-      session_id,
-      payment_intent
+    console.log('[MOBILE-DETECTION] ============================================');
+    console.log('[MOBILE-DETECTION] SuccessClient component mounted');
+    console.log('[MOBILE-DETECTION] ============================================');
+    console.log('[MOBILE-DETECTION] Props:', { session_id, payment_intent });
+    console.log('[MOBILE-DETECTION] User Agent:', navigator.userAgent);
+    console.log('[MOBILE-DETECTION] URL:', window.location.href);
+    console.log('[MOBILE-DETECTION] Referrer:', document.referrer);
+    console.log('[MOBILE-DETECTION] Window dimensions:', {
+      innerWidth: window.innerWidth,
+      innerHeight: window.innerHeight,
+      outerWidth: window.outerWidth,
+      outerHeight: window.outerHeight,
+      screenWidth: window.screen?.width,
+      screenHeight: window.screen?.height,
+    });
+    console.log('[MOBILE-DETECTION] Platform:', {
+      platform: navigator.platform,
+      userAgentData: (navigator as any).userAgentData,
     });
 
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-      window.innerWidth <= 768;
+    // Enhanced mobile detection with multiple methods
+    const userAgent = navigator.userAgent || '';
+    const platform = navigator.platform || '';
 
-    console.log('[DESKTOP SUCCESS DEBUG] Mobile detection result:', {
+    // Method 1: User agent regex (primary method) - ENHANCED with more patterns
+    const mobileRegexMatch = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS|FxiOS|EdgiOS/i.test(userAgent);
+
+    // Method 2: Platform detection
+    const platformMatch = /iPhone|iPad|iPod|Android|BlackBerry|Windows Phone/i.test(platform);
+
+    // Method 3: Screen width detection
+    const narrowScreenMatch = window.innerWidth <= 768;
+
+    // Method 4: Touch capability (if available)
+    const hasTouchScreen = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+    // Method 5: User agent data API (if available)
+    const userAgentData = (navigator as any).userAgentData;
+    const isMobileFromUA = userAgentData?.mobile || false;
+
+    // Combined detection: Mobile if ANY method indicates mobile
+    const isMobile = mobileRegexMatch || platformMatch || narrowScreenMatch || (hasTouchScreen && narrowScreenMatch) || isMobileFromUA;
+
+    console.log('[MOBILE-DETECTION] ============================================');
+    console.log('[MOBILE-DETECTION] Mobile Detection Analysis:');
+    console.log('[MOBILE-DETECTION] ============================================');
+    console.log('[MOBILE-DETECTION] Method 1 - User Agent Regex:', {
+      match: mobileRegexMatch,
+      userAgent: userAgent.substring(0, 100),
+      matchedPattern: mobileRegexMatch ? userAgent.match(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile/i)?.[0] : null,
+    });
+    console.log('[MOBILE-DETECTION] Method 2 - Platform Detection:', {
+      match: platformMatch,
+      platform: platform,
+    });
+    console.log('[MOBILE-DETECTION] Method 3 - Screen Width:', {
+      match: narrowScreenMatch,
+      innerWidth: window.innerWidth,
+      threshold: 768,
+    });
+    console.log('[MOBILE-DETECTION] Method 4 - Touch Capability:', {
+      hasTouchScreen,
+      maxTouchPoints: navigator.maxTouchPoints,
+    });
+    console.log('[MOBILE-DETECTION] Method 5 - User Agent Data API:', {
+      available: !!userAgentData,
+      isMobileFromUA,
+      userAgentData: userAgentData ? JSON.stringify(userAgentData) : 'N/A',
+    });
+    console.log('[MOBILE-DETECTION] ============================================');
+    console.log('[MOBILE-DETECTION] FINAL RESULT:', {
       isMobile,
-      userAgent: navigator.userAgent,
-      windowWidth: window.innerWidth,
+      detectionMethods: {
+        userAgentRegex: mobileRegexMatch,
+        platformMatch: platformMatch,
+        narrowScreen: narrowScreenMatch,
+        touchScreen: hasTouchScreen && narrowScreenMatch,
+        userAgentData: isMobileFromUA,
+      },
       session_id,
       payment_intent,
-      mobileRegexMatch: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
-      narrowScreenMatch: window.innerWidth <= 768
+      timestamp: new Date().toISOString(),
     });
+    console.log('[MOBILE-DETECTION] ============================================');
 
     // Set mobile detection state immediately to prevent desktop data fetching
     setIsMobileDevice(isMobile);
 
     if (isMobile) {
-      console.log('[SuccessClient] Mobile browser detected - will show brief success then redirect');
+      console.log('[MOBILE-DETECTION] ✅✅✅ MOBILE BROWSER DETECTED - Will redirect to /event/ticket-qr');
 
       // Determine which identifier to use and store, with robust URL/sessionStorage fallbacks
       let identifier: string | null = session_id || payment_intent || null;
@@ -104,37 +166,76 @@ export default function SuccessClient({ session_id, payment_intent }: SuccessCli
       });
 
       setTimeout(() => {
+        console.log('[MOBILE-DETECTION] ============================================');
+        console.log('[MOBILE-DETECTION] About to redirect to /event/ticket-qr');
+        console.log('[MOBILE-DETECTION] ============================================');
+        console.log('[MOBILE-DETECTION] Redirect preparation:', {
+          session_id,
+          payment_intent,
+          identifier,
+          currentUrl: window.location.href,
+          timestamp: new Date().toISOString(),
+        });
+
         // Store the identifier in sessionStorage for QR page
         if (session_id || (identifier && (identifier as string).startsWith('cs_'))) {
           const sid = session_id || (identifier as string);
           const redirectUrl = `/event/ticket-qr?session_id=${encodeURIComponent(sid)}`;
-          console.log('[SuccessClient] Redirecting with session_id:', {
+          console.log('[MOBILE-DETECTION] ✅ Redirecting with session_id:', {
             session_id: sid,
             redirectUrl,
-            currentUrl: window.location.href
+            currentUrl: window.location.href,
+            timestamp: new Date().toISOString(),
           });
-          sessionStorage.setItem('stripe_session_id', sid);
+          try {
+            sessionStorage.setItem('stripe_session_id', sid);
+            console.log('[MOBILE-DETECTION] ✅ Stored session_id in sessionStorage');
+          } catch (e) {
+            console.error('[MOBILE-DETECTION] ⚠️ Failed to store in sessionStorage:', e);
+          }
+          console.log('[MOBILE-DETECTION] ✅ Calling router.replace()...');
           router.replace(redirectUrl);
+          console.log('[MOBILE-DETECTION] ✅ router.replace() called - redirect should happen now');
         } else if (payment_intent || (identifier && (identifier as string).startsWith('pi_'))) {
           const pid = payment_intent || (identifier as string);
           const redirectUrl = `/event/ticket-qr?pi=${encodeURIComponent(pid)}`;
-          console.log('[SuccessClient] Redirecting with payment_intent:', {
+          console.log('[MOBILE-DETECTION] ✅ Redirecting with payment_intent:', {
             payment_intent: pid,
             redirectUrl,
-            currentUrl: window.location.href
+            currentUrl: window.location.href,
+            timestamp: new Date().toISOString(),
           });
-          sessionStorage.setItem('stripe_payment_intent', pid);
+          try {
+            sessionStorage.setItem('stripe_payment_intent', pid);
+            console.log('[MOBILE-DETECTION] ✅ Stored payment_intent in sessionStorage');
+          } catch (e) {
+            console.error('[MOBILE-DETECTION] ⚠️ Failed to store in sessionStorage:', e);
+          }
+          console.log('[MOBILE-DETECTION] ✅ Calling router.replace()...');
           router.replace(redirectUrl);
+          console.log('[MOBILE-DETECTION] ✅ router.replace() called - redirect should happen now');
         } else {
-          console.error('[SuccessClient] ERROR: No session_id or payment_intent to redirect with!');
+          console.error('[MOBILE-DETECTION] ⚠️⚠️⚠️ ERROR: No session_id or payment_intent to redirect with!', {
+            session_id,
+            payment_intent,
+            identifier,
+            currentUrl: window.location.href,
+            timestamp: new Date().toISOString(),
+          });
         }
+        console.log('[MOBILE-DETECTION] ============================================');
       }, 2000);
 
       return;
     }
 
     // Desktop flow - continue with normal success page
-    console.log('[SuccessClient] Desktop browser detected - staying on success page');
+    console.log('[MOBILE-DETECTION] ============================================');
+    console.log('[MOBILE-DETECTION] ❌ DESKTOP BROWSER DETECTED - Staying on success page');
+    console.log('[MOBILE-DETECTION] ============================================');
+    console.log('[MOBILE-DETECTION] Desktop flow will continue with normal success page');
+    console.log('[MOBILE-DETECTION] No redirect to /event/ticket-qr');
+    console.log('[MOBILE-DETECTION] ============================================');
   }, [session_id, payment_intent, router]);
 
   // Email sending effect for desktop flow - trigger when QR code is successfully loaded
