@@ -16,6 +16,12 @@ export default function MobileDebugConsole() {
   const [copySuccess, setCopySuccess] = useState(false);
   const logsEndRef = useRef<HTMLDivElement>(null);
 
+  // Calculate counts safely (with fallbacks for SSR)
+  const errorCount = (logs || []).filter(l => l.level === 'error').length;
+  const warnCount = (logs || []).filter(l => l.level === 'warn').length;
+  const mobileDetectionCount = (logs || []).filter(l => l.message?.includes('[MOBILE-DETECTION]')).length;
+  const mobileWorkflowCount = (logs || []).filter(l => l.message?.includes('[MOBILE-WORKFLOW]')).length;
+
   // Intercept console methods
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -76,6 +82,12 @@ export default function MobileDebugConsole() {
   }, [logs, isExpanded]);
 
   const copyLogsToClipboard = async () => {
+    // Safety check for SSR
+    if (!logs || logs.length === 0) {
+      alert('No logs to copy yet.');
+      return;
+    }
+
     // Enhanced log formatting with better structure for mobile detection logs
     const logsText = logs.map(log => {
       const timestamp = new Date(log.timestamp).toISOString();
@@ -160,9 +172,14 @@ Mobile Workflow Logs: ${logs.filter(l => l.message.includes('[MOBILE-WORKFLOW]')
     console.log('[MobileDebugConsole] Logs cleared');
   };
 
+  // Don't render during SSR - only render on client
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
   const getLogColor = (level: string, message: string) => {
     // Highlight mobile detection logs
-    if (message.includes('[MOBILE-DETECTION]')) {
+    if (message?.includes('[MOBILE-DETECTION]')) {
       if (message.includes('✅✅✅') || message.includes('MOBILE BROWSER DETECTED')) {
         return 'text-green-700 bg-green-50 border-green-300 font-semibold';
       }
@@ -173,7 +190,7 @@ Mobile Workflow Logs: ${logs.filter(l => l.message.includes('[MOBILE-WORKFLOW]')
     }
 
     // Highlight mobile workflow logs
-    if (message.includes('[MOBILE-WORKFLOW]')) {
+    if (message?.includes('[MOBILE-WORKFLOW]')) {
       return 'text-indigo-600 bg-indigo-50 border-indigo-200';
     }
 
@@ -185,9 +202,6 @@ Mobile Workflow Logs: ${logs.filter(l => l.message.includes('[MOBILE-WORKFLOW]')
       default: return 'text-gray-600 bg-gray-50 border-gray-200';
     }
   };
-
-  const errorCount = logs.filter(l => l.level === 'error').length;
-  const warnCount = logs.filter(l => l.level === 'warn').length;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-[9999] bg-white border-t-2 border-gray-300 shadow-2xl">

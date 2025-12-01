@@ -8,6 +8,7 @@ import Script from "next/script";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import ConditionalLayout from "../components/ConditionalLayout";
+import MobileDebugConsole from "../components/MobileDebugConsole";
 import { headers } from "next/headers";
 import { auth, currentUser } from "@clerk/nextjs";
 import { getAppUrl, getTenantId } from "@/lib/env";
@@ -202,6 +203,8 @@ export default async function RootLayout({
               `,
             }}
           />
+          {/* Mobile Debug Console - Always available for log copying, even on error pages */}
+          <MobileDebugConsole />
         </body>
       </html>
     </ClerkProvider>

@@ -402,12 +402,23 @@ export async function POST(req: NextRequest) {
       console.log('[STRIPE-WEBHOOK] Body length:', rawBody.length);
       console.log('[STRIPE-WEBHOOK] Signature:', signature?.substring(0, 50) + '...');
 
-      // Forward raw body and signature to backend
+      // CRITICAL: Get JWT token for backend authentication
+      // According to cursor rules: Webhooks must use JWT for backend calls
+      let jwt = await getCachedApiJwt();
+      if (!jwt) {
+        console.log('[STRIPE-WEBHOOK] No cached JWT, generating new one...');
+        jwt = await generateApiJwt();
+      }
+      console.log('[STRIPE-WEBHOOK] Using JWT for backend authentication:', jwt ? 'JWT obtained' : 'FAILED');
+
+      // Forward raw body and signature to backend with JWT authentication
+      // CRITICAL: Backend requires JWT authentication (per cursor rules)
       const backendResponse = await fetch(backendWebhookUrl, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-          'Stripe-Signature': signature, // Forward Stripe signature header
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Stripe-Signature': signature || '', // Forward Stripe signature header
+          'Authorization': `Bearer ${jwt}`, // CRITICAL: JWT authentication required
         },
         body: rawBody, // Send raw body as-is (Buffer)
       });
