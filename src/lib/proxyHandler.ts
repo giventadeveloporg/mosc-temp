@@ -160,7 +160,29 @@ export function createProxyHandler({ injectTenantId = true, allowedMethods = ['G
             headers: { ...req.headers, ...extraHeaders },
             payload: json
           });
-        } else if (method !== 'GET' && method !== 'DELETE') {
+        } else if (method === 'POST' || method === 'PUT') {
+          // CRITICAL: Read raw body for POST/PUT when bodyParser is disabled
+          // If req.body is undefined (bodyParser: false), read raw body
+          if (!payload) {
+            console.log('[PROXY] Reading raw body for POST/PUT request (bodyParser disabled)');
+            try {
+              const rawBody = (await getRawBody(req)).toString('utf-8');
+              console.log('[PROXY] Raw POST/PUT body:', rawBody);
+
+              if (rawBody) {
+                try {
+                  payload = JSON.parse(rawBody);
+                  console.log('[PROXY] Parsed POST/PUT body:', payload);
+                } catch (e) {
+                  console.error('[PROXY] Failed to parse POST/PUT body:', e);
+                  throw new Error(`Invalid JSON in request body: ${e}`);
+                }
+              }
+            } catch (e) {
+              console.error('[PROXY] Failed to read raw body:', e);
+              return res.status(400).json({ error: 'Failed to read request body', details: String(e) });
+            }
+          }
           // Apply tenantId injection for POST/PUT requests if needed
           if (injectTenantId && payload && typeof payload === 'object') {
             if (Array.isArray(payload)) {
@@ -207,7 +229,7 @@ export function createProxyHandler({ injectTenantId = true, allowedMethods = ['G
           }
 
           // CRITICAL: Validate tenantId is present for event-ticket-transaction-items POST/PUT
-          if (path.includes('event-ticket-transaction-items') && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
+          if (path.includes('event-ticket-transaction-items')) {
             if (Array.isArray(payload)) {
               const missingTenantId = payload.find((item: any) => !item.tenantId);
               if (missingTenantId) {
@@ -228,6 +250,15 @@ export function createProxyHandler({ injectTenantId = true, allowedMethods = ['G
               throw new Error(`Missing tenantId in transaction item: ${JSON.stringify(payload)}`);
             }
           }
+
+          // Log payload before sending for POST/PUT
+          console.log('[PROXY OUTGOING] POST/PUT request details:', {
+            method,
+            path,
+            apiUrl,
+            headers: { 'Content-Type': contentType, ...extraHeaders },
+            payload: payload
+          });
 
           bodyToSend = JSON.stringify(payload);
         }
@@ -351,12 +382,15 @@ function buildQueryString(query: Record<string, any>) {
 export async function fetchWithJwtRetry(apiUrl: string, options: any = {}, debugLabel = '') {
   console.log('[fetchWithJwtRetry] Called with URL:', apiUrl);
   let token = await getCachedApiJwt();
+  const tenantId = getTenantId();
   console.log('[fetchWithJwtRetry] Using JWT:', token);
+  console.log('[fetchWithJwtRetry] Using Tenant ID:', tenantId);
   let response = await fetch(apiUrl, {
     ...options,
     headers: {
       ...options.headers,
       Authorization: `Bearer ${token}`,
+      'X-Tenant-ID': tenantId, // CRITICAL: Backend TenantContextFilter expects this header
     },
   });
   console.log('[fetchWithJwtRetry] Response status:', response.status);
@@ -368,6 +402,7 @@ export async function fetchWithJwtRetry(apiUrl: string, options: any = {}, debug
       headers: {
         ...options.headers,
         Authorization: `Bearer ${token}`,
+        'X-Tenant-ID': tenantId, // CRITICAL: Backend TenantContextFilter expects this header
       },
     });
     console.log('[fetchWithJwtRetry] Response status (after retry):', response.status);

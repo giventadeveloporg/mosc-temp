@@ -118,26 +118,14 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
     );
   }
 
-  // If pi (Payment Intent ID) is present, look up the backend transaction ID first
-  if (pi && pi.startsWith('pi_')) {
-    const backendTransactionId = await findPaymentTransactionByPaymentIntentId(pi);
-    if (backendTransactionId) {
-      // Redirect to use transactionId instead of pi
-      return (
-        <Suspense fallback={<LoadingSkeleton />}>
-          <PaymentSuccessClient
-            transactionId={backendTransactionId}
-            eventId={eventId}
-          />
-        </Suspense>
-      );
-    }
-    // If lookup fails, fall through to legacy flow
-    console.warn('[SuccessPage] Could not find payment transaction for Payment Intent ID:', pi);
-  }
-
-  // If session_id or pi parameters are present, use SuccessClient (legacy Stripe flow)
+  // CRITICAL: For desktop flow with Payment Intent ID, do NOT look up transaction server-side
+  // Desktop flow uses SuccessClient which handles GET-only lookup and polling
+  // Server-side lookup would fail if webhook hasn't processed yet, causing errors
+  // If session_id or pi parameters are present, use SuccessClient (Stripe flow)
   if (session_id || pi) {
+    // Desktop flow: SuccessClient will handle GET-only lookup and polling
+    // Mobile flow: SuccessClient will detect mobile and redirect to ticket-qr page
+    // Do NOT try to look up transaction server-side - let client component handle it
     return (
       <Suspense fallback={<LoadingSkeleton />}>
         <SuccessClient

@@ -139,7 +139,13 @@ export function AdminMembershipPlansClient({ plans: initialPlans, error }: Admin
           </Button>
         </div>
       ) : (
-        <MembershipPlanList plans={plans} onEdit={handleEdit} />
+        <MembershipPlanList
+          plans={plans}
+          onEdit={handleEdit}
+          onPlanUpdate={(updatedPlan) => {
+            setPlans((prev) => prev.map((p) => (p.id === updatedPlan.id ? updatedPlan : p)));
+          }}
+        />
       )}
 
       {isModalOpen && (

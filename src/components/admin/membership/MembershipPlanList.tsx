@@ -12,9 +12,10 @@ import { useRouter } from 'next/navigation';
 interface MembershipPlanListProps {
   plans: MembershipPlanDTO[];
   onEdit: (plan: MembershipPlanDTO) => void;
+  onPlanUpdate?: (updatedPlan: MembershipPlanDTO) => void;
 }
 
-export function MembershipPlanList({ plans, onEdit }: MembershipPlanListProps) {
+export function MembershipPlanList({ plans, onEdit, onPlanUpdate }: MembershipPlanListProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<number | null>(null);
 
@@ -34,9 +35,31 @@ export function MembershipPlanList({ plans, onEdit }: MembershipPlanListProps) {
   const handleToggleActive = async (planId: number, currentStatus: boolean) => {
     try {
       setIsLoading(planId);
-      await togglePlanActiveStatusServer(planId, !currentStatus);
+      const newStatus = !currentStatus;
+
+      // Optimistically update the UI immediately
+      const plan = plans.find(p => p.id === planId);
+      if (plan && onPlanUpdate) {
+        const updatedPlan = { ...plan, isActive: newStatus };
+        onPlanUpdate(updatedPlan);
+      }
+
+      // Then update on the server
+      const updatedPlan = await togglePlanActiveStatusServer(planId, newStatus);
+
+      // Update with server response to ensure consistency
+      if (onPlanUpdate) {
+        onPlanUpdate(updatedPlan);
+      }
+
+      // Refresh router to sync with server
       router.refresh();
     } catch (err) {
+      // Revert optimistic update on error
+      const plan = plans.find(p => p.id === planId);
+      if (plan && onPlanUpdate) {
+        onPlanUpdate(plan); // Revert to original state
+      }
       alert(err instanceof Error ? err.message : 'Failed to update plan status');
     } finally {
       setIsLoading(null);
@@ -92,8 +115,8 @@ export function MembershipPlanList({ plans, onEdit }: MembershipPlanListProps) {
                     onClick={() => handleToggleActive(plan.id!, plan.isActive)}
                     disabled={isLoading === plan.id}
                     className={`flex-shrink-0 w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed ${
-                      plan.isActive 
-                        ? 'bg-green-100 hover:bg-green-200' 
+                      plan.isActive
+                        ? 'bg-green-100 hover:bg-green-200'
                         : 'bg-gray-100 hover:bg-gray-200'
                     }`}
                     title={plan.isActive ? 'Deactivate' : 'Activate'}

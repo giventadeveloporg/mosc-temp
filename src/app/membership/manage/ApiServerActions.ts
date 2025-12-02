@@ -23,7 +23,8 @@ export async function fetchUserSubscriptionServer(
   const params = new URLSearchParams();
   params.append('userProfileId.equals', String(userProfileId));
   params.append('tenantId.equals', getTenantId());
-  params.append('subscriptionStatus.in', 'ACTIVE,TRIAL');
+  // Include ACTIVE, TRIAL, and CANCELLED subscriptions (CANCELLED for subscriptions scheduled to cancel)
+  params.append('subscriptionStatus.in', 'ACTIVE,TRIAL,CANCELLED');
   params.append('sort', 'createdAt,desc');
   params.append('size', '1');
 
@@ -64,7 +65,8 @@ export async function updateSubscriptionServer(
     id: subscriptionId,
   });
 
-  const url = `${API_BASE_URL}/api/membership-subscriptions/${subscriptionId}`;
+  // Use proxy API route instead of direct backend call
+  const url = `${getAppUrl()}/api/proxy/membership-subscriptions/${subscriptionId}`;
   const res = await fetchWithJwtRetry(url, {
     method: 'PATCH',
     headers: {
@@ -93,6 +95,8 @@ export async function cancelSubscriptionServer(
   return updateSubscriptionServer(subscriptionId, {
     cancelAtPeriodEnd: true,
     cancellationReason,
+    subscriptionStatus: 'CANCELLED',
+    cancelledAt: new Date().toISOString(),
   });
 }
 

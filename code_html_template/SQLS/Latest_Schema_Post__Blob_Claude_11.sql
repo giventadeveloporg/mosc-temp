@@ -1450,6 +1450,7 @@ CREATE TABLE public.event_media (
                                     file_size int8 NULL,
                                     is_public bool DEFAULT true NULL,
                                     event_flyer bool DEFAULT false NULL,
+                                    is_email_header_image bool DEFAULT false NULL,
                                     is_event_management_official_document bool DEFAULT false NULL,
                                     pre_signed_url varchar(2048) NULL,
                                     pre_signed_url_expires_at timestamp NULL,

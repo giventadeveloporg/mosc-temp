@@ -7,7 +7,7 @@ import {
   EventAttendeeDTO,
   EventAttendeeGuestDTO,
 } from '@/types';
-import { getTenantId, getAppUrl, getEmailHostUrlPrefix } from '@/lib/env';
+import { getTenantId, getPaymentMethodDomainId, getAppUrl, getEmailHostUrlPrefix } from '@/lib/env';
 import { withTenantId } from '@/lib/withTenantId';
 import Stripe from 'stripe';
 import { getTenantSettings } from '@/lib/tenantSettingsCache';
@@ -70,34 +70,90 @@ export async function findTransactionByPaymentIntentId(
   paymentIntentId: string,
 ): Promise<EventTicketTransactionDTO | null> {
   const tenantId = getTenantId();
+  const paymentMethodDomainId = getPaymentMethodDomainId();
 
-  // CRITICAL: First check with tenant filter (preferred - same tenant)
+  console.log('[findTransactionByPaymentIntentId] Starting lookup:', {
+    paymentIntentId,
+    tenantId,
+    paymentMethodDomainId,
+    timestamp: new Date().toISOString()
+  });
+
+  // CRITICAL: Query with both tenantId and paymentMethodDomainId (backend requires both for triple validation)
   const tenantParams = new URLSearchParams({
     'stripePaymentIntentId.equals': paymentIntentId,
     'tenantId.equals': tenantId,
+    'paymentMethodDomainId.equals': paymentMethodDomainId, // CRITICAL: Backend requires this for lookup
   });
-  const tenantResponse = await fetchWithJwtRetry(
-    `${getAppUrl()}/api/proxy/event-ticket-transactions?${tenantParams.toString()}`,
-  );
+  const tenantUrl = `${getAppUrl()}/api/proxy/event-ticket-transactions?${tenantParams.toString()}`;
+  console.log('[findTransactionByPaymentIntentId] Querying with tenant and paymentMethodDomainId filter:', {
+    url: tenantUrl,
+    paymentIntentId,
+    tenantId,
+    paymentMethodDomainId
+  });
+
+  const tenantResponse = await fetchWithJwtRetry(tenantUrl);
+  console.log('[findTransactionByPaymentIntentId] Tenant filter response:', {
+    status: tenantResponse.status,
+    ok: tenantResponse.ok,
+    timestamp: new Date().toISOString()
+  });
+
   if (tenantResponse.ok) {
     const tenantItems: EventTicketTransactionDTO[] = await tenantResponse.json();
+    console.log('[findTransactionByPaymentIntentId] Tenant filter results:', {
+      itemCount: tenantItems.length,
+      hasItems: tenantItems.length > 0,
+      firstItemId: tenantItems[0]?.id,
+      timestamp: new Date().toISOString()
+    });
     if (tenantItems.length > 0) {
+      console.log('[findTransactionByPaymentIntentId] ✅ Found transaction with tenant filter:', tenantItems[0].id);
       return tenantItems[0];
     }
+  } else {
+    const errorText = await tenantResponse.text();
+    console.warn('[findTransactionByPaymentIntentId] Tenant filter query failed:', {
+      status: tenantResponse.status,
+      errorText,
+      timestamp: new Date().toISOString()
+    });
   }
 
-  // CRITICAL: If not found with tenant filter, check WITHOUT tenant filter
+  // CRITICAL: If not found with tenant filter, check WITHOUT tenant filter but WITH paymentMethodDomainId
   // This detects cross-tenant duplicates caused by database constraint violations
   // The database constraint 'unique_stripe_payment_intent' is global (not per-tenant)
   // So if a transaction exists for another tenant, we need to detect it
+  // However, we still include paymentMethodDomainId to ensure we're looking at the correct payment method domain
   const globalParams = new URLSearchParams({
     'stripePaymentIntentId.equals': paymentIntentId,
+    'paymentMethodDomainId.equals': paymentMethodDomainId, // Include paymentMethodDomainId even for global check
   });
-  const globalResponse = await fetchWithJwtRetry(
-    `${getAppUrl()}/api/proxy/event-ticket-transactions?${globalParams.toString()}`,
-  );
+  const globalUrl = `${getAppUrl()}/api/proxy/event-ticket-transactions?${globalParams.toString()}`;
+  console.log('[findTransactionByPaymentIntentId] Querying without tenant filter but with paymentMethodDomainId (global check):', {
+    url: globalUrl,
+    paymentIntentId,
+    paymentMethodDomainId,
+    note: 'Checking for cross-tenant duplicates within same payment method domain'
+  });
+
+  const globalResponse = await fetchWithJwtRetry(globalUrl);
+  console.log('[findTransactionByPaymentIntentId] Global filter response:', {
+    status: globalResponse.status,
+    ok: globalResponse.ok,
+    timestamp: new Date().toISOString()
+  });
+
   if (globalResponse.ok) {
     const globalItems: EventTicketTransactionDTO[] = await globalResponse.json();
+    console.log('[findTransactionByPaymentIntentId] Global filter results:', {
+      itemCount: globalItems.length,
+      hasItems: globalItems.length > 0,
+      firstItemId: globalItems[0]?.id,
+      firstItemTenantId: globalItems[0]?.tenantId,
+      timestamp: new Date().toISOString()
+    });
     if (globalItems.length > 0) {
       const existingTransaction = globalItems[0];
       console.warn('[findTransactionByPaymentIntentId] ⚠️ Found transaction for different tenant:', {
@@ -112,8 +168,21 @@ export async function findTransactionByPaymentIntentId(
       // The database constraint will fail anyway, so return existing to avoid error
       return existingTransaction;
     }
+  } else {
+    const errorText = await globalResponse.text();
+    console.warn('[findTransactionByPaymentIntentId] Global filter query failed:', {
+      status: globalResponse.status,
+      errorText,
+      timestamp: new Date().toISOString()
+    });
   }
 
+  console.log('[findTransactionByPaymentIntentId] ❌ No transaction found:', {
+    paymentIntentId,
+    tenantId,
+    timestamp: new Date().toISOString(),
+    note: 'Transaction may not exist yet (webhook may still be processing)'
+  });
   return null;
 }
 
@@ -1396,15 +1465,46 @@ export async function createTransactionFromPaymentIntent(
       // Only create items that don't already exist
       if (itemsToCreate.length > 0) {
         console.log('[createTransactionFromPaymentIntent] Creating transaction items (none exist yet for these ticket types):', itemsToCreate.length);
-        await createTransactionItemsBulk(itemsToCreate);
-        console.log('[createTransactionFromPaymentIntent] Successfully created transaction items:', itemsToCreate.length);
+        console.log('[createTransactionFromPaymentIntent] Items to create:', itemsToCreate.map(item => ({
+          transactionId: item.transactionId,
+          ticketTypeId: item.ticketTypeId,
+          quantity: item.quantity,
+          tenantId: item.tenantId,
+          paymentMethodDomainId: item.paymentMethodDomainId
+        })));
+        try {
+          const createdItems = await createTransactionItemsBulk(itemsToCreate);
+          console.log('[createTransactionFromPaymentIntent] ✅ Successfully created transaction items:', {
+            itemsCreated: createdItems?.length || itemsToCreate.length,
+            transactionId: transaction.id,
+            timestamp: new Date().toISOString()
+          });
+          console.log('[createTransactionFromPaymentIntent] Created items response:', createdItems);
+        } catch (bulkErr: any) {
+          console.error('[createTransactionFromPaymentIntent] ⚠️⚠️⚠️ CRITICAL ERROR: Failed to create transaction items:', {
+            error: bulkErr?.message || String(bulkErr),
+            stack: bulkErr?.stack,
+            itemsToCreateCount: itemsToCreate.length,
+            transactionId: transaction.id,
+            timestamp: new Date().toISOString()
+          });
+          // Re-throw to surface the error (transaction items are critical)
+          throw new Error(`Failed to create transaction items: ${bulkErr?.message || String(bulkErr)}`);
+        }
       } else if (existingItems.length > 0) {
         console.log('[createTransactionFromPaymentIntent] All transaction items already exist - skipping creation to prevent duplicates');
       } else {
-        console.log('[createTransactionFromPaymentIntent] No transaction items to create');
+        console.log('[createTransactionFromPaymentIntent] No transaction items to create (transactionItems.length === 0)');
       }
     } catch (err) {
-      console.error('[createTransactionFromPaymentIntent] Failed to create transaction items:', err);
+      console.error('[createTransactionFromPaymentIntent] ⚠️⚠️⚠️ CRITICAL ERROR: Failed to create transaction items:', {
+        error: err instanceof Error ? err.message : String(err),
+        stack: err instanceof Error ? err.stack : undefined,
+        transactionId: transaction.id,
+        timestamp: new Date().toISOString()
+      });
+      // Re-throw to surface the error (transaction items are critical)
+      throw err;
     }
   }
 

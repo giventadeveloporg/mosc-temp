@@ -206,6 +206,36 @@ Redirect to /event/ticket-qr?pi=pi_xxx →
 Dedicated QR page with singleton fetch
 ```
 
+**CRITICAL Mobile Redirection Path**:
+- **Entry Point**: `/event/success?pi=pi_xxx` (from Stripe payment completion)
+- **Mobile Detection**: Client-side detection in `SuccessClient.tsx` using user agent + screen width
+- **Redirect Target**: `/event/ticket-qr?pi=pi_xxx` (dedicated mobile QR page)
+- **Redirect Timing**: 2 seconds delay to show brief success message
+- **Redirect Method**: `router.replace()` (not `push`) to prevent back button issues
+- **Session Storage**: Payment Intent ID stored in `sessionStorage` as fallback if URL params lost
+
+**Implementation** (`src/app/event/success/SuccessClient.tsx`):
+```typescript
+// Mobile detection and redirect logic
+const [isMobileDevice, setIsMobileDevice] = useState<boolean | null>(null);
+
+useEffect(() => {
+  const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent) ||
+                   window.innerWidth <= 768;
+  setIsMobileDevice(isMobile);
+
+  if (isMobile && payment_intent) {
+    // Store in sessionStorage as fallback
+    sessionStorage.setItem('stripe_payment_intent', payment_intent);
+
+    // Show brief success, then redirect
+    setTimeout(() => {
+      router.replace(`/event/ticket-qr?pi=${payment_intent}`);
+    }, 2000);
+  }
+}, [payment_intent]);
+```
+
 ## Critical Mobile Optimizations
 
 ### 1. Duplicate Email Prevention
@@ -559,6 +589,99 @@ export async function findTransactionByPaymentIntentId(
 - Log existing transaction details for debugging
 - Handle QR code NULL scenarios without creating duplicates
 
+## Webhook Backend Forwarding with JWT Authentication
+
+### CRITICAL: Webhook Route Must Include JWT Authentication
+
+**Problem**: Stripe webhook forwarding to backend was getting `401 Unauthorized` errors because webhook route was forwarding requests **without JWT authentication**.
+
+**Solution**: Webhook route (`src/app/api/webhooks/stripe/route.ts`) **MUST** include JWT token in Authorization header when forwarding to backend.
+
+**Implementation**:
+```typescript
+import { getCachedApiJwt, generateApiJwt } from '@/lib/api/jwt';
+
+// CRITICAL: Get JWT token for backend authentication
+// According to cursor rules: Webhooks must use JWT for backend calls
+let jwt = await getCachedApiJwt();
+if (!jwt) {
+  console.log('[STRIPE-WEBHOOK] No cached JWT, generating new one...');
+  jwt = await generateApiJwt();
+}
+
+// Forward raw body and signature to backend with JWT authentication
+// CRITICAL: Backend requires JWT authentication (per cursor rules)
+const backendResponse = await fetch(backendWebhookUrl, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Stripe-Signature': signature || '', // Forward Stripe signature header
+    'Authorization': `Bearer ${jwt}`, // CRITICAL: JWT authentication required
+  },
+  body: rawBody, // Send raw body as-is (Buffer)
+});
+```
+
+**Why This Is Required**:
+- Backend API requires JWT authentication for all requests
+- Webhook forwarding is a backend API call (not a proxy route)
+- Without JWT, backend returns `401 Unauthorized`
+- Webhook processing fails, transactions never created
+
+**Cursor Rule Compliance**: See `.cursor/rules/nextjs_api_routes.mdc` lines 440-449 for webhook REST API call pattern requiring JWT authentication.
+
+## Mobile Transaction Polling with POST Fallback
+
+### CRITICAL: POST Fallback Must Trigger on Final Attempt
+
+**Problem**: Mobile payment flow was polling 15 times but **never attempting POST fallback** to create transaction, resulting in "Transaction not found after maximum polling attempts" error.
+
+**Root Cause**: POST fallback condition was inside an `else` block that only executes when `pollAttempt >= MAX_POLL_ATTEMPTS`, but the condition required `pollAttempt < MAX_POLL_ATTEMPTS`, so POST fallback **never triggered** on final attempt.
+
+**Solution**: POST fallback must trigger:
+- After 3 attempts (attempts 3-14): Try POST fallback
+- On final attempt (attempt 15): **ALSO try POST fallback** (critical fix)
+
+**Implementation** (`src/app/event/ticket-qr/TicketQrClient.tsx`):
+```typescript
+// CRITICAL: Try POST fallback after 3 attempts OR on final attempt
+// This ensures we attempt transaction creation even if webhook failed
+const shouldTryPost = (pollAttempt >= 3 && pollAttempt < MAX_POLL_ATTEMPTS) || pollAttempt === MAX_POLL_ATTEMPTS;
+
+if (shouldTryPost && !cancelled) {
+  console.log('[MOBILE QR DEBUG] Transaction not found after polling, attempting POST to create transaction');
+
+  const postBody = session_id ? { session_id, skip_qr: true } : { pi: payment_intent, skip_qr: true };
+  const postRes = await fetch('/api/event/success/process', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(postBody),
+  });
+
+  if (postRes.ok) {
+    const postData = await postRes.json();
+    if (postData.transaction) {
+      // Transaction created successfully - exit polling loop
+      setResult(postData);
+      setLoading(false);
+      fetchQrCodeViaSingleton(postData);
+      return; // Success!
+    }
+  }
+}
+```
+
+**Polling Flow**:
+1. **Attempts 1-2**: Poll GET endpoint only (wait for webhook to process)
+2. **Attempts 3-14**: Poll GET, then try POST fallback if no transaction found
+3. **Attempt 15**: Poll GET, then try POST fallback (final attempt)
+
+**Why POST Fallback Is Critical**:
+- Webhook may fail (network issues, backend errors, JWT issues)
+- POST fallback ensures transaction is created even if webhook fails
+- Final attempt coverage ensures transaction creation is attempted even on last poll
+- Better UX: Users get their tickets even if webhook processing fails
+
 ## Best Practices for Mobile Implementation
 
 ### 1. Always Use Payment Intent for Mobile Wallets
@@ -595,6 +718,8 @@ export async function findTransactionByPaymentIntentId(
 - Validate session persistence across mobile browser behavior
 - Verify no 401 errors on payment success routes
 - Check for duplicate transactions in database
+- **CRITICAL**: Verify webhook forwarding includes JWT authentication
+- **CRITICAL**: Verify POST fallback triggers on final polling attempt
 
 ## React Hydration Issues and Solutions
 
@@ -758,5 +883,124 @@ npm run build && npm start
 - `src/app/event/ticket-qr/TicketQrClient.tsx` - Added mount guard, enhanced logging
 - `src/app/event/success/SuccessClient.tsx` - Fixed desktop/mobile fetch coordination
 - `src/components/MobileDebugConsole.tsx` - On-screen console for mobile debugging
+
+## Lessons Learned and Critical Fixes
+
+### 1. Webhook 401 Unauthorized Error Fix
+
+**Issue**: Webhook forwarding to backend was getting `401 Unauthorized` errors.
+
+**Root Cause**: Webhook route (`src/app/api/webhooks/stripe/route.ts`) was forwarding requests without JWT authentication.
+
+**Fix**: Added JWT authentication to webhook forwarding request:
+```typescript
+// Get JWT token for backend authentication
+let jwt = await getCachedApiJwt();
+if (!jwt) {
+  jwt = await generateApiJwt();
+}
+
+// Forward webhook with JWT authentication
+const backendResponse = await fetch(backendWebhookUrl, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Stripe-Signature': signature || '',
+    'Authorization': `Bearer ${jwt}`, // CRITICAL: Required for backend authentication
+  },
+  body: rawBody,
+});
+```
+
+**Lesson**: All backend API calls (including webhook forwarding) require JWT authentication. Never forward webhook events without JWT token. See `.cursor/rules/nextjs_api_routes.mdc` lines 440-449 for webhook REST API call pattern.
+
+### 2. Mobile Polling POST Fallback Logic Bug Fix
+
+**Issue**: Mobile payment flow was polling 15 times but never attempting POST fallback, resulting in "Transaction not found after maximum polling attempts" error.
+
+**Root Cause**: POST fallback condition was inside an `else` block that only executes when `pollAttempt >= MAX_POLL_ATTEMPTS`, but the condition required `pollAttempt < MAX_POLL_ATTEMPTS`, so POST fallback never triggered on final attempt.
+
+**Fix**: Changed POST fallback to trigger:
+- After 3 attempts (attempts 3-14): Try POST fallback
+- On final attempt (attempt 15): **ALSO try POST fallback**
+
+```typescript
+// CRITICAL: Try POST fallback after 3 attempts OR on final attempt
+const shouldTryPost = (pollAttempt >= 3 && pollAttempt < MAX_POLL_ATTEMPTS) || pollAttempt === MAX_POLL_ATTEMPTS;
+
+if (shouldTryPost && !cancelled) {
+  const postBody = session_id ? { session_id, skip_qr: true } : { pi: payment_intent, skip_qr: true };
+  const postRes = await fetch('/api/event/success/process', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(postBody),
+  });
+  // Handle response...
+}
+```
+
+**Lesson**: Always test edge cases (final attempt, max attempts) to ensure fallback logic triggers correctly. Use inclusive conditions (`|| pollAttempt === MAX_POLL_ATTEMPTS`) to ensure final attempt coverage.
+
+### 3. Mobile Redirection Path Verification
+
+**Critical Path**:
+1. Payment completion → `/event/success?pi=pi_xxx`
+2. Mobile detection → `SuccessClient.tsx` detects mobile device (user agent + screen width)
+3. Brief success display → 2 seconds delay
+4. Redirect → `/event/ticket-qr?pi=pi_xxx` using `router.replace()` (not `push`)
+5. Transaction polling → `TicketQrClient.tsx` polls for transaction (15 attempts, 2s intervals)
+6. POST fallback → If polling fails, attempt POST to create transaction
+
+**Key Points**:
+- Use `router.replace()` (not `push`) to prevent back button issues
+- Store Payment Intent ID in `sessionStorage` as fallback if URL params lost
+- Mobile detection must happen immediately on mount
+- Redirect timing: 2 seconds delay for better UX
+- Redirect URL format: `/event/ticket-qr?pi=pi_xxx` or `/event/ticket-qr?session_id=cs_xxx`
+
+**Implementation** (`src/app/event/success/SuccessClient.tsx`):
+```typescript
+// Mobile detection and redirect logic
+const [isMobileDevice, setIsMobileDevice] = useState<boolean | null>(null);
+
+useEffect(() => {
+  const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent) ||
+                   window.innerWidth <= 768;
+  setIsMobileDevice(isMobile);
+
+  if (isMobile && payment_intent) {
+    // Store in sessionStorage as fallback
+    sessionStorage.setItem('stripe_payment_intent', payment_intent);
+
+    // Show brief success, then redirect
+    setTimeout(() => {
+      router.replace(`/event/ticket-qr?pi=${payment_intent}`);
+    }, 2000);
+  }
+}, [payment_intent]);
+```
+
+### 4. Webhook vs POST Fallback Architecture
+
+**Primary Path**: Webhook creates transaction
+- Stripe sends webhook event → Frontend forwards to backend with JWT → Backend creates transaction
+- Fastest path, happens automatically
+- Requires JWT authentication in webhook forwarding
+
+**Fallback Path**: POST creates transaction if webhook fails
+- Frontend polls for transaction → If not found after 3 attempts → POST to create
+- Ensures transaction is created even if webhook fails
+- Critical for mobile flows where webhook may be delayed or fail
+
+**Best Practice**: Always implement both paths:
+1. Webhook handler (primary, automatic) - **MUST include JWT authentication**
+2. POST fallback (secondary, manual trigger) - **MUST trigger on final polling attempt**
+3. Idempotency checks (prevent duplicates) - **MUST check before creating**
+
+**Why Both Paths Are Critical**:
+- Webhook may fail (network issues, backend errors, JWT issues)
+- POST fallback ensures transaction is created even if webhook fails
+- Final attempt coverage ensures transaction creation is attempted even on last poll
+- Better UX: Users get their tickets even if webhook processing fails
 
 This architecture ensures optimal mobile payment experience while maintaining security, reliability, and proper email delivery for the MCEFEE event management system.

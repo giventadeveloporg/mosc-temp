@@ -1,0 +1,234 @@
+"use client";
+import { useEffect, useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import type { MembershipSubscriptionDTO, MembershipPlanDTO } from '@/types';
+
+interface MembershipQrClientProps {
+  session_id?: string;
+  payment_intent?: string;
+}
+
+const MAX_POLL_ATTEMPTS = 15;
+const POLL_INTERVAL_MS = 2000;
+
+export function MembershipQrClient({ session_id, payment_intent }: MembershipQrClientProps) {
+  const [loading, setLoading] = useState(true);
+  const [subscription, setSubscription] = useState<MembershipSubscriptionDTO | null>(null);
+  const [plan, setPlan] = useState<MembershipPlanDTO | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const pollAttemptRef = useRef(0);
+  const cancelledRef = useRef(false);
+  const fetchedIdentifierRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      cancelledRef.current = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    // Get identifier from URL or sessionStorage
+    let identifier: string | null = session_id || payment_intent || null;
+    if (!identifier) {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        identifier = urlParams.get('session_id') || urlParams.get('pi') || null;
+      } catch { }
+    }
+    if (!identifier) {
+      try {
+        identifier = sessionStorage.getItem('membership_session_id') || sessionStorage.getItem('membership_payment_intent') || null;
+      } catch { }
+    }
+
+    if (!identifier) {
+      console.error('[MEMBERSHIP-QR] No identifier found');
+      setError('Missing payment information');
+      setLoading(false);
+      return;
+    }
+
+    // Prevent duplicate fetches
+    if (fetchedIdentifierRef.current === identifier) {
+      console.log('[MEMBERSHIP-QR] Already fetched for this identifier, skipping');
+      return;
+    }
+
+    fetchedIdentifierRef.current = identifier;
+
+    // Poll for subscription data
+    const pollForSubscription = async () => {
+      if (cancelledRef.current) return;
+
+      pollAttemptRef.current += 1;
+      const attempt = pollAttemptRef.current;
+
+      console.log(`[MEMBERSHIP-QR] ✅ Poll attempt ${attempt}/${MAX_POLL_ATTEMPTS}`);
+
+      try {
+        // Build query params
+        const params = new URLSearchParams();
+        if (payment_intent || identifier?.startsWith('pi_')) {
+          params.append('pi', payment_intent || identifier || '');
+        } else if (session_id || identifier?.startsWith('cs_')) {
+          params.append('session_id', session_id || identifier || '');
+        }
+
+        // Poll GET endpoint for existing subscription
+        const response = await fetch(`/api/membership/success/process?${params.toString()}`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.subscription) {
+            console.log('[MEMBERSHIP-QR] ✅✅✅ SUCCESS! Subscription found:', data.subscription.id);
+            setSubscription(data.subscription);
+            setPlan(data.plan || null);
+            setLoading(false);
+            return; // Success - exit polling
+          }
+        }
+
+        // CRITICAL: Try POST fallback after 3 attempts OR on final attempt
+        // This ensures we attempt subscription creation even if webhook failed
+        const shouldTryPost = (pollAttemptRef.current >= 3 && pollAttemptRef.current < MAX_POLL_ATTEMPTS) || pollAttemptRef.current === MAX_POLL_ATTEMPTS;
+
+        if (shouldTryPost && !cancelledRef.current) {
+          console.log('[MEMBERSHIP-QR] Transaction not found after polling, attempting POST to create subscription');
+
+          const postBody = session_id ? { session_id, skip_qr: true } : { pi: payment_intent || identifier, skip_qr: true };
+          const postRes = await fetch('/api/membership/success/process', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(postBody),
+            cache: 'no-store',
+          });
+
+          if (postRes.ok) {
+            const postData = await postRes.json();
+            if (postData.subscription) {
+              console.log('[MEMBERSHIP-QR] ✅✅✅ POST FALLBACK SUCCESS! Subscription created:', postData.subscription.id);
+              setSubscription(postData.subscription);
+              setPlan(postData.plan || null);
+              setLoading(false);
+              return; // Success - exit polling
+            }
+          } else {
+            console.error('[MEMBERSHIP-QR] POST fallback failed:', postRes.status);
+          }
+        }
+
+        // If not found and we haven't reached max attempts, continue polling
+        if (attempt < MAX_POLL_ATTEMPTS) {
+          setTimeout(pollForSubscription, POLL_INTERVAL_MS);
+        } else {
+          console.error('[MEMBERSHIP-QR] Subscription not found after maximum polling attempts');
+          setError('Subscription not found. Please contact support if payment was successful.');
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error('[MEMBERSHIP-QR] Poll error:', err);
+        if (attempt < MAX_POLL_ATTEMPTS) {
+          setTimeout(pollForSubscription, POLL_INTERVAL_MS);
+        } else {
+          setError('Failed to load subscription. Please try again later.');
+          setLoading(false);
+        }
+      }
+    };
+
+    // Start polling
+    pollForSubscription();
+  }, [session_id, payment_intent]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading your membership...</p>
+          <p className="text-sm text-muted-foreground mt-2">Please wait while we process your subscription...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+        <div className="max-w-md w-full text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-heading font-semibold text-foreground mb-2">Error</h1>
+          <p className="text-muted-foreground mb-6">{error}</p>
+          <button
+            onClick={() => router.push('/membership')}
+            className="px-6 py-2 bg-primary text-white rounded-lg hover:opacity-90 transition-opacity"
+          >
+            Back to Membership
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-100 p-4">
+      <div className="max-w-md mx-auto">
+        <div className="bg-white rounded-lg shadow-lg p-8 text-center">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-heading font-semibold text-foreground mb-2">
+            Membership Activated!
+          </h1>
+          <p className="text-muted-foreground mb-6">
+            Your subscription has been successfully activated.
+          </p>
+          {subscription && plan && (
+            <div className="mt-6 space-y-3 text-left bg-gray-50 rounded-lg p-4">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Plan:</span>
+                <span className="font-semibold text-foreground">{plan.planName}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Status:</span>
+                <span className={`font-semibold ${subscription.subscriptionStatus === 'ACTIVE' || subscription.subscriptionStatus === 'TRIAL'
+                    ? 'text-green-600'
+                    : 'text-gray-600'
+                  }`}>
+                  {subscription.subscriptionStatus}
+                </span>
+              </div>
+              {subscription.currentPeriodEnd && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Renews:</span>
+                  <span className="font-semibold text-foreground">
+                    {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+          <button
+            onClick={() => router.push('/membership/manage')}
+            className="mt-6 px-6 py-2 bg-primary text-white rounded-lg hover:opacity-90 transition-opacity w-full"
+          >
+            Manage Membership
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

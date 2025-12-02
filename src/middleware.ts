@@ -38,6 +38,9 @@ export default authMiddleware({
     '/api/public(.*)',
     '/api/proxy(.*)',  // Public API proxy routes for public data (events, etc.)
     '/api/event/success(.*)',  // Public payment success processing (no auth required - uses Payment Intent/Session ID)
+    '/api/membership/success(.*)',  // Public membership success processing (no auth required - uses Payment Intent/Session ID)
+    '/membership/success(.*)',  // Membership success page (public - uses Payment Intent/Session ID)
+    '/membership/qr(.*)',  // Membership QR page (public - uses Payment Intent/Session ID)
     '/api/diagnostic(.*)',  // Diagnostic endpoints for debugging
     '/api/logs(.*)',  // Client log forwarding endpoint
     '/mosc(.*)',
@@ -68,7 +71,11 @@ export default authMiddleware({
     '/api/webhooks/(.*)',
     '/api/proxy/(.*)',
     '/api/event/success/(.*)',  // CRITICAL: Ignore payment success processing (mobile browser compatibility)
-    '/api/stripe/(.*)',
+    '/api/membership/success/(.*)',  // CRITICAL: Ignore membership success processing (mobile browser compatibility)
+    '/api/stripe/payment-intent(.*)',  // Ignore payment intent route (mobile wallet)
+    '/api/stripe/event-checkout(.*)',  // Ignore event checkout route
+    '/api/stripe/membership-payment-intent(.*)',  // Ignore membership payment intent route (mobile wallet)
+    // NOTE: /api/stripe/membership-checkout is NOT ignored - it needs Clerk middleware for auth()
     '/api/payment/(.*)',
     '/api/billing/(.*)',
     '/api/checkout/(.*)',

@@ -65,20 +65,26 @@ export async function createMembershipPlanServer(
     updatedAt: new Date().toISOString(),
   });
 
+  // CRITICAL: Ensure body is stringified
+  const body = JSON.stringify(payload);
+
+  console.log('[SERVER ACTION] Creating membership plan with payload:', payload);
+  console.log('[SERVER ACTION] Body stringified:', body);
+
   const url = `${getAppUrl()}/api/proxy/membership-plans`;
   const res = await fetchWithJwtRetry(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(payload),
+    body: body, // CRITICAL: Must include body
     cache: 'no-store',
   });
 
   if (!res.ok) {
     const errorBody = await res.text();
-    console.error('Failed to create membership plan:', res.status, errorBody);
-    throw new Error('Failed to create membership plan');
+    console.error('[SERVER ACTION] Failed to create membership plan:', res.status, errorBody);
+    throw new Error(`Failed to create membership plan: ${errorBody}`);
   }
 
   const createdPlan = await res.json();

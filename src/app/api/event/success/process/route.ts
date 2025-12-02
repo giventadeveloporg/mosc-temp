@@ -582,24 +582,211 @@ export async function GET(req: NextRequest) {
 
     // Only look up existing transactions, do not create
     let transaction = null;
-    if (session_id) {
-      // Check if session_id is actually a payment intent ID (starts with 'pi_')
-      if (session_id.startsWith('pi_')) {
-        console.log('[API GET] session_id parameter is actually a payment intent ID:', session_id);
-        console.log('[API GET] Looking up transaction by payment_intent instead of session_id');
-        transaction = await findTransactionByPaymentIntentId(session_id);
-      } else {
-        console.log('[API GET] Looking up transaction by session_id:', session_id);
-        transaction = await findTransactionBySessionId(session_id);
+    let lookupError: string | null = null;
+
+    try {
+      if (session_id) {
+        // Check if session_id is actually a payment intent ID (starts with 'pi_')
+        if (session_id.startsWith('pi_')) {
+          console.log('[API GET] session_id parameter is actually a payment intent ID:', session_id);
+          console.log('[API GET] Looking up transaction by payment_intent instead of session_id');
+          transaction = await findTransactionByPaymentIntentId(session_id);
+        } else {
+          console.log('[API GET] Looking up transaction by session_id:', session_id);
+          transaction = await findTransactionBySessionId(session_id);
+        }
+      } else if (pi) {
+        console.log('[API GET] Looking up transaction by payment_intent:', pi);
+        transaction = await findTransactionByPaymentIntentId(pi);
       }
-    } else if (pi) {
-      console.log('[API GET] Looking up transaction by payment_intent:', pi);
-      transaction = await findTransactionByPaymentIntentId(pi);
+    } catch (err: any) {
+      console.error('[API GET] Error during transaction lookup:', {
+        error: err?.message || String(err),
+        stack: err?.stack,
+        session_id,
+        pi,
+        timestamp: new Date().toISOString()
+      });
+      lookupError = err?.message || 'Transaction lookup failed';
     }
 
     if (!transaction) {
-      console.log('[API GET] No existing transaction found');
-      return NextResponse.json({ transaction: null }, { status: 200 });
+      console.log('[API GET] No existing transaction found', {
+        session_id,
+        pi,
+        lookupError,
+        isMobile,
+        timestamp: new Date().toISOString(),
+        note: isMobile ? 'Mobile flow will handle transaction creation via POST' : 'Desktop flow will create transaction if payment succeeded'
+      });
+
+      // CRITICAL: Desktop flow - create transaction immediately if payment succeeded
+      // This is separate from mobile workflow (which uses POST endpoint)
+      // Desktop flow persists transaction from frontend when webhook hasn't processed yet
+      if (!isMobile && pi) {
+        console.log('[API GET] [DESKTOP FLOW] No transaction found - attempting to create from Payment Intent:', pi);
+        try {
+          // Retrieve Payment Intent from Stripe to validate payment succeeded
+          const paymentIntent = await stripe.paymentIntents.retrieve(pi, {
+            expand: ['charges.data.balance_transaction']
+          });
+
+          // Only create transaction if payment succeeded
+          if (paymentIntent.status !== 'succeeded') {
+            console.log('[API GET] [DESKTOP FLOW] Payment Intent not succeeded:', paymentIntent.status);
+            return NextResponse.json({
+              transaction: null,
+              error: 'Transaction not found',
+              message: `Payment not completed yet. Status: ${paymentIntent.status}`,
+              hasTransaction: false
+            }, { status: 200 });
+          }
+
+          // Extract metadata from Payment Intent
+          const metadata = paymentIntent.metadata || {};
+          const cartJson = metadata.cart;
+          const eventIdRaw = metadata.eventId;
+          const customerEmail = paymentIntent.receipt_email || metadata.customerEmail || '';
+          const customerName = metadata.customerName || '';
+          const customerPhone = metadata.customerPhone || '';
+
+          // Extract name parts
+          const nameParts = customerName.trim().split(/\s+/).filter(part => part.length > 0);
+          const firstName = nameParts.length > 0 ? nameParts[0] : '';
+          const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+
+          // Validate metadata matches environment variables
+          const metadataTenantId = metadata.tenantId || metadata.tenant_id;
+          const metadataPaymentMethodDomainId = metadata.paymentMethodDomainId || metadata.payment_method_domain_id;
+          const expectedTenantId = getTenantId();
+          const expectedPaymentMethodDomainId = getPaymentMethodDomainId();
+
+          if (metadataTenantId && metadataTenantId !== expectedTenantId) {
+            console.error('[API GET] [DESKTOP FLOW] ⚠️⚠️⚠️ TENANT ID MISMATCH:', {
+              metadataTenantId,
+              expectedTenantId,
+              paymentIntentId: pi
+            });
+            return NextResponse.json({
+              transaction: null,
+              error: 'Tenant ID mismatch',
+              message: `Payment Intent tenant ID (${metadataTenantId}) does not match configured tenant ID (${expectedTenantId}).`
+            }, { status: 403 });
+          }
+
+          if (metadataPaymentMethodDomainId && metadataPaymentMethodDomainId !== expectedPaymentMethodDomainId) {
+            console.error('[API GET] [DESKTOP FLOW] ⚠️⚠️⚠️ PAYMENT METHOD DOMAIN ID MISMATCH:', {
+              metadataPaymentMethodDomainId,
+              expectedPaymentMethodDomainId,
+              paymentIntentId: pi
+            });
+            return NextResponse.json({
+              transaction: null,
+              error: 'Payment Method Domain ID mismatch',
+              message: `Payment Intent Payment Method Domain ID (${metadataPaymentMethodDomainId}) does not match configured Payment Method Domain ID (${expectedPaymentMethodDomainId}).`
+            }, { status: 403 });
+          }
+
+          if (!cartJson || !eventIdRaw) {
+            console.error('[API GET] [DESKTOP FLOW] Missing cart or eventId in Payment Intent metadata');
+            return NextResponse.json({
+              transaction: null,
+              error: 'Transaction not found',
+              message: 'Missing cart or eventId in payment metadata'
+            }, { status: 200 });
+          }
+
+          const cart = JSON.parse(cartJson);
+          const eventId = parseInt(eventIdRaw, 10);
+
+          // Calculate totals
+          const totalQuantity = Array.isArray(cart)
+            ? cart.reduce((sum: number, item: any) => sum + (Number(item.quantity) || 0), 0)
+            : 0;
+          const amountTotal = typeof paymentIntent.amount_received === 'number'
+            ? paymentIntent.amount_received / 100
+            : (typeof paymentIntent.amount === 'number' ? paymentIntent.amount / 100 : 0);
+
+          // Import server actions for transaction creation
+          const { createTransactionFromPaymentIntent } = await import('@/app/event/success/ApiServerActions');
+
+          console.log('[API GET] [DESKTOP FLOW] Creating transaction from Payment Intent:', {
+            paymentIntentId: pi,
+            eventId,
+            email: customerEmail,
+            cartItemsCount: cart?.length || 0,
+            amountTotal,
+            firstName,
+            lastName,
+            customerPhone,
+            timestamp: new Date().toISOString()
+          });
+
+          // Create transaction with cart items
+          const cartItems = Array.isArray(cart) ? cart.map((item: any) => ({
+            ticketTypeId: item.ticketTypeId || item.ticketType?.id,
+            quantity: Number(item.quantity) || 0
+          })).filter((item: any) => item.ticketTypeId && item.quantity > 0) : [];
+
+          console.log('[API GET] [DESKTOP FLOW] Cart items prepared:', cartItems);
+
+          let createdTransaction;
+          try {
+            createdTransaction = await createTransactionFromPaymentIntent(
+              pi,
+              eventId,
+              customerEmail,
+              cartItems,
+              amountTotal,
+              firstName,
+              lastName,
+              customerPhone
+            );
+
+            console.log('[API GET] [DESKTOP FLOW] ✅ Successfully created transaction:', {
+              transactionId: createdTransaction.id,
+              tenantId: createdTransaction.tenantId,
+              paymentMethodDomainId: createdTransaction.paymentMethodDomainId,
+              timestamp: new Date().toISOString()
+            });
+
+            // Use the created transaction
+            transaction = createdTransaction;
+          } catch (createErr: any) {
+            console.error('[API GET] [DESKTOP FLOW] ⚠️⚠️⚠️ CRITICAL ERROR: createTransactionFromPaymentIntent failed:', {
+              error: createErr?.message || String(createErr),
+              stack: createErr?.stack,
+              paymentIntentId: pi,
+              eventId,
+              timestamp: new Date().toISOString()
+            });
+            // Return error but don't throw - let polling continue
+            return NextResponse.json({
+              transaction: null,
+              error: 'Transaction creation failed',
+              message: createErr?.message || 'Could not create transaction from payment data',
+              hasTransaction: false
+            }, { status: 200 });
+          }
+        } catch (createErr: any) {
+          console.error('[API GET] [DESKTOP FLOW] Error creating transaction:', createErr);
+          // Return error but don't throw - let polling continue
+          return NextResponse.json({
+            transaction: null,
+            error: 'Transaction creation failed',
+            message: createErr?.message || 'Could not create transaction from payment data',
+            hasTransaction: false
+          }, { status: 200 });
+        }
+      } else {
+        // Mobile flow or no payment intent - return not found (mobile will use POST)
+        return NextResponse.json({
+          transaction: null,
+          error: lookupError || 'Transaction not found',
+          message: lookupError ? `Lookup failed: ${lookupError}` : 'Transaction not found. Webhook may still be processing.',
+          hasTransaction: false
+        }, { status: 200 });
+      }
     }
 
     console.log('[API GET] Found existing transaction:', {

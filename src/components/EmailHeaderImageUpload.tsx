@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { FaUpload, FaImage, FaTimes, FaSpinner, FaCheck, FaEnvelope } from 'react-icons/fa';
+import ErrorDialog from './ErrorDialog';
 
 interface EmailHeaderImageUploadProps {
   eventId: number;
@@ -23,6 +24,11 @@ export default function EmailHeaderImageUpload({
   const [isUploading, setIsUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [errorDialog, setErrorDialog] = useState<{ isOpen: boolean; title: string; message: string }>({
+    isOpen: false,
+    title: '',
+    message: ''
+  });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Auto-hide success message after 3 seconds
@@ -40,13 +46,25 @@ export default function EmailHeaderImageUpload({
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      onError('Please select an image file (JPEG, PNG, GIF, etc.)');
+      const errorMessage = 'Unsupported file type. Please upload a JPEG, PNG, or GIF image.';
+      setErrorDialog({
+        isOpen: true,
+        title: 'Invalid File Type',
+        message: errorMessage
+      });
+      onError(errorMessage);
       return;
     }
 
     // Validate file size (10MB limit)
     if (file.size > 10 * 1024 * 1024) {
-      onError('File size must be less than 10MB');
+      const errorMessage = 'File size is too large. Please upload an image smaller than 10MB.';
+      setErrorDialog({
+        isOpen: true,
+        title: 'File Too Large',
+        message: errorMessage
+      });
+      onError(errorMessage);
       return;
     }
 
@@ -70,9 +88,60 @@ export default function EmailHeaderImageUpload({
       console.log('📧 EmailHeaderImageUpload: Response status:', response.status);
 
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('📧 EmailHeaderImageUpload: Upload failed:', errorText);
-        throw new Error(`Upload failed: ${errorText}`);
+        let errorMessage = 'Failed to upload email header image';
+        let errorDetails = '';
+
+        // Read response body as text first (can always read as text)
+        try {
+          const responseText = await response.text();
+
+          // Try to parse as JSON if it looks like JSON
+          if (responseText.trim().startsWith('{') || responseText.trim().startsWith('[')) {
+            try {
+              const errorData = JSON.parse(responseText);
+              // Handle different error formats from backend
+              if (errorData.error) {
+                errorMessage = errorData.error;
+              }
+              if (errorData.details) {
+                errorDetails = errorData.details;
+              }
+              if (errorData.message) {
+                errorMessage = errorData.message;
+              }
+            } catch {
+              // If JSON parsing fails, use the text as-is
+              if (responseText.trim()) {
+                errorMessage = responseText.trim();
+              }
+            }
+          } else {
+            // Not JSON, use text directly
+            if (responseText.trim()) {
+              errorMessage = responseText.trim();
+            }
+          }
+        } catch (parseError) {
+          // If reading response fails, use default error message
+          console.error('Failed to read error response:', parseError);
+        }
+
+        // Create user-friendly error message
+        const userFriendlyMessage = formatErrorMessage(errorMessage, errorDetails, response.status);
+
+        console.error('📧 EmailHeaderImageUpload: Upload failed:', errorMessage);
+
+        // Show error dialog
+        setErrorDialog({
+          isOpen: true,
+          title: 'Upload Failed',
+          message: userFriendlyMessage
+        });
+
+        // Also call onError callback for backward compatibility
+        onError(userFriendlyMessage);
+
+        return;
       }
 
       const result = await response.json();
@@ -89,10 +158,67 @@ export default function EmailHeaderImageUpload({
       setShowSuccess(true);
     } catch (error: any) {
       console.error('Email header image upload error:', error);
-      onError(error.message || 'Failed to upload email header image');
+      const errorMessage = error.message || 'Failed to upload email header image';
+      const userFriendlyMessage = formatErrorMessage(errorMessage, '', 0);
+
+      // Show error dialog
+      setErrorDialog({
+        isOpen: true,
+        title: 'Upload Failed',
+        message: userFriendlyMessage
+      });
+
+      // Also call onError callback for backward compatibility
+      onError(userFriendlyMessage);
     } finally {
       setIsUploading(false);
     }
+  };
+
+  // Helper function to format error messages in a user-friendly way
+  const formatErrorMessage = (error: string, details: string, statusCode: number): string => {
+    // Handle common HTTP status codes
+    if (statusCode === 400) {
+      return 'Invalid request. Please check that the file is a valid image and try again.';
+    }
+    if (statusCode === 401) {
+      return 'Authentication failed. Please refresh the page and try again.';
+    }
+    if (statusCode === 403) {
+      return 'You do not have permission to upload images. Please contact an administrator.';
+    }
+    if (statusCode === 413) {
+      return 'File size is too large. Please upload an image smaller than 10MB.';
+    }
+    if (statusCode === 415) {
+      return 'Unsupported file type. Please upload a JPEG, PNG, or GIF image.';
+    }
+    if (statusCode === 500) {
+      return 'Server error occurred. Please try again later or contact support if the problem persists.';
+    }
+
+    // Try to extract user-friendly messages from error strings
+    const lowerError = error.toLowerCase();
+    if (lowerError.includes('file size') || lowerError.includes('too large')) {
+      return 'File size is too large. Please upload an image smaller than 10MB.';
+    }
+    if (lowerError.includes('file type') || lowerError.includes('unsupported') || lowerError.includes('invalid format')) {
+      return 'Unsupported file type. Please upload a JPEG, PNG, or GIF image.';
+    }
+    if (lowerError.includes('permission') || lowerError.includes('unauthorized') || lowerError.includes('forbidden')) {
+      return 'You do not have permission to upload images. Please contact an administrator.';
+    }
+    if (lowerError.includes('network') || lowerError.includes('fetch') || lowerError.includes('connection')) {
+      return 'Network error occurred. Please check your internet connection and try again.';
+    }
+
+    // If we have details, include them
+    if (details) {
+      return `${error}\n\nDetails: ${details}`;
+    }
+
+    // Return the error message as-is if we can't format it
+    return error || 'An unexpected error occurred. Please try again.';
   };
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -129,15 +255,23 @@ export default function EmailHeaderImageUpload({
   };
 
   return (
-    <div className={`relative ${className}`}>
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        onChange={handleFileInputChange}
-        className="hidden"
-        disabled={disabled || isUploading}
+    <>
+      <ErrorDialog
+        isOpen={errorDialog.isOpen}
+        onClose={() => setErrorDialog({ isOpen: false, title: '', message: '' })}
+        title={errorDialog.title}
+        message={errorDialog.message}
       />
+
+      <div className={`relative ${className}`}>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFileInputChange}
+          className="hidden"
+          disabled={disabled || isUploading}
+        />
 
       <div
         onClick={handleClick}
@@ -188,7 +322,8 @@ export default function EmailHeaderImageUpload({
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </>
   );
 }
 

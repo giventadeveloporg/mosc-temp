@@ -38,7 +38,7 @@ export default async function RootLayout({
 
   // Detect if this is a satellite domain (check if hostname matches satellite domain or APP_URL)
   const isSatellite = hostname.includes('mosc-temp.com') ||
-                      (satelliteDomain && hostname.includes(satelliteDomain.replace('www.', '')));
+    (satelliteDomain && hostname.includes(satelliteDomain.replace('www.', '')));
 
   // Satellite domains must redirect to primary domain for authentication
   const clerkProps = isSatellite
@@ -54,9 +54,45 @@ export default async function RootLayout({
     };
 
   // Determine tenant-scoped admin flag on the server
+  // CRITICAL: Next.js 15+ requires headers() to be awaited before any function that uses it
+  // Both auth() and currentUser() internally use headers(), so we must ensure headers() is awaited first
+  // We've already awaited headers() at line 29, but Next.js 15+ is strict about sequential async calls
   let isTenantAdmin = false;
   try {
-    const { userId } = await auth();
+    // CRITICAL: Call auth() immediately after awaiting headers() to ensure proper async context
+    // Do not call any other async functions before auth() completes
+    let userId: string | null = null;
+    let currentUserData: any = null;
+    try {
+      // Call auth() first - it internally uses headers() which we've already awaited
+      const authResult = await auth();
+      userId = authResult?.userId || null;
+
+      // CRITICAL: Only call currentUser() after auth() completes successfully
+      // This ensures headers() async context is properly maintained
+      if (userId) {
+        try {
+          currentUserData = await currentUser();
+        } catch (currentUserError: any) {
+          // Handle currentUser() errors gracefully - it also uses headers() internally
+          if (currentUserError?.message?.includes('headers()') || currentUserError?.message?.includes('sync-dynamic-apis')) {
+            console.warn('[Layout] currentUser() skipped due to Next.js 15+ headers() async requirement:', currentUserError.message);
+            currentUserData = null;
+          } else {
+            throw currentUserError;
+          }
+        }
+      }
+    } catch (authError: any) {
+      // Handle Next.js 15+ headers() await error gracefully
+      if (authError?.message?.includes('headers()') || authError?.message?.includes('sync-dynamic-apis')) {
+        console.warn('[Layout] Auth check skipped due to Next.js 15+ headers() async requirement:', authError.message);
+        userId = null;
+        currentUserData = null;
+      } else {
+        throw authError;
+      }
+    }
     if (userId) {
       const baseUrl = getAppUrl();
       const tenantId = getTenantId();
@@ -72,8 +108,10 @@ export default async function RootLayout({
         if (!p) {
           // Step 2: Profile not found by userId + tenantId
           // Check if email + tenantId combination exists (different userId case)
+          // CRITICAL: Use currentUserData from above instead of calling currentUser() again
+          // This prevents multiple headers() calls in Next.js 15+
           try {
-            const u = await currentUser();
+            const u = currentUserData; // Use already-fetched currentUser data
             const userEmail = u?.emailAddresses?.[0]?.emailAddress || '';
 
             if (userEmail) {
