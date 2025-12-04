@@ -1,14 +1,15 @@
 # Task ID: 13
-# Title: Implement currency and date localization
+# Title: Integrate Discount Code Selector
 # Status: pending
-# Dependencies: 2 ⏱️
-# Priority: low
-# Description: Add support for localized currency and date formats based on tenant settings.
+# Dependencies: 8 ⏱️, 12 ⏱️
+# Priority: high
+# Description: Integrate discount code selection functionality with the template form.
 # Details:
-- Create utility functions for currency formatting (GBP/EUR support for UK/EU tenants)
-- Implement date formatting based on locale
-- Update all price and date displays to use these utilities
-- Ensure proper number formatting for different currencies
+Integrate discount code selector with the template form:
+- Use fetchDiscountCodesForEvent from discount code API
+- Update dropdown when event changes
+- Display code, type, value, validity
+- Option to create new discount code (link to discount code page)
 
 # Test Strategy:
-Test with different tenant locales to ensure correct formatting of currencies and dates.
+Test discount code selection with various events. Test that the dropdown updates correctly when event changes.

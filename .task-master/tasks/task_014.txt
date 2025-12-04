@@ -1,15 +1,16 @@
 # Task ID: 14
-# Title: Implement accessibility enhancements
+# Title: Integrate Rich Text Editor
 # Status: pending
-# Dependencies: 3 ⏱️, 4 ⏱️, 5 ⏱️, 6 ⏱️, 7 ⏱️, 8 ⏱️, 9 ⏱️
+# Dependencies: 8 ⏱️
 # Priority: medium
-# Description: Ensure all payment components meet accessibility requirements.
+# Description: Integrate a rich text editor for the email body HTML field.
 # Details:
-- Verify all buttons meet contrast requirements
-- Add clear loading and success messaging for hosted flows
-- Ensure keyboard navigation works across all payment components
-- Implement screen-reader announcements when switching providers
-- Test with screen readers and keyboard navigation
+Integrate rich text editor for HTML body:
+- Use React Quill, TinyMCE, or similar library
+- Support HTML editing
+- Preview mode
+- Sanitize HTML output
+- Handle content changes in form state
 
 # Test Strategy:
-Test with accessibility tools to ensure WCAG compliance and proper keyboard/screen reader support.
+Test rich text editor functionality including formatting, HTML editing, and preview. Test that content is correctly saved in form state.

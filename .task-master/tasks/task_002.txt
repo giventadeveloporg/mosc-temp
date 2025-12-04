@@ -1,13 +1,15 @@
 # Task ID: 2
-# Title: Create TypeScript interfaces from Swagger API docs
+# Title: Create Template List/Create Proxy
 # Status: pending
-# Dependencies: None
+# Dependencies: 1 ⏱️
 # Priority: high
-# Description: Generate TypeScript interfaces for payment-related data structures based on the Swagger API documentation.
+# Description: Create proxy handler for GET (list) and POST (create) operations for promotion email templates.
 # Details:
-- Extract and define interfaces for `PaymentSession`, `PaymentStatusResponse`, and other relevant types from `documentation/Swagger_API_Docs/api-docs.json`
-- Create shared type definitions for payment provider configurations
-- Define enums for payment provider types (STRIPE, PAYPAL, REVOLUT, ZEFFY, ZELLE)
+Create proxy handler in src/pages/api/proxy/promotion-email-templates/index.ts:
+- Use createProxyHandler from @/lib/proxyHandler
+- Set backendPath: '/api/promotion-email-templates'
+- Support query parameters: eventId.equals, isActive.equals, sort, page, size
+- Follow cursor rules: no local DTO declarations, use fetchWithJwtRetry
 
 # Test Strategy:
-Ensure TypeScript compiler validates the interfaces against sample data from the API documentation.
+Test the proxy by making GET and POST requests and verifying the correct responses. Test with various query parameters.

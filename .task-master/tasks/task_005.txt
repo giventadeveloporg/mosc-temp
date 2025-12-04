@@ -1,15 +1,15 @@
 # Task ID: 5
-# Title: Implement PayPal checkout integration
+# Title: Create Email Log Proxy
 # Status: pending
-# Dependencies: 1 ⏱️, 2 ⏱️, 3 ⏱️
+# Dependencies: 1 ⏱️
 # Priority: medium
-# Description: Add support for PayPal as a payment method with embedded buttons and redirect fallback.
+# Description: Create proxy handler for querying email logs with filtering and pagination.
 # Details:
-- Add PayPal SDK integration
-- Implement PayPal Buttons component
-- Handle success, cancel, and error flows
-- Add redirect fallback mechanism
-- Integrate with UniversalPaymentCheckout component
+Create proxy handler in src/pages/api/proxy/promotion-email-sent-logs/index.ts:
+- Use createProxyHandler
+- Set backendPath: '/api/promotion-email-sent-logs'
+- Support filtering: eventId.equals, templateId.equals, sentAt.greaterThanOrEqual, sentAt.lessThanOrEqual, emailStatus.equals
+- Support pagination: sort, page, size
 
 # Test Strategy:
-Test PayPal checkout flow in both button and redirect modes, verifying successful payments and proper error handling.
+Test the proxy with various filter combinations and pagination parameters. Verify correct data is returned.

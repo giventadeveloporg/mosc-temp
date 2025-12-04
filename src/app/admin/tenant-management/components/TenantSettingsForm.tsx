@@ -1,9 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
-import { FaSave, FaBan, FaCode, FaCog } from 'react-icons/fa';
+import { FaSave, FaBan, FaCode, FaCog, FaUpload, FaTimes } from 'react-icons/fa';
 import type { TenantSettingsDTO, TenantSettingsFormDTO, TenantOrganizationDTO } from '@/app/admin/tenant-management/types';
+import { uploadEmailFooterHtmlClient, uploadTenantLogoClient } from '@/app/admin/tenant-management/settings/ApiServerActions';
+import { patchTenantSetting } from '@/app/admin/tenant-management/settings/ApiServerActions';
+import SaveStatusDialog, { type SaveStatus } from '@/components/SaveStatusDialog';
 
 interface TenantSettingsFormProps {
   initialData?: TenantSettingsDTO;
@@ -12,6 +15,7 @@ interface TenantSettingsFormProps {
   loading?: boolean;
   mode: 'create' | 'edit';
   availableOrganizations?: TenantOrganizationDTO[];
+  settingsId?: number; // Pass settingsId explicitly for uploads
 }
 
 export default function TenantSettingsForm({
@@ -20,9 +24,20 @@ export default function TenantSettingsForm({
   onCancel,
   loading = false,
   mode,
-  availableOrganizations = []
+  availableOrganizations = [],
+  settingsId: propSettingsId
 }: TenantSettingsFormProps) {
   const [activeTab, setActiveTab] = useState<'general' | 'integrations' | 'limits' | 'customization'>('general');
+  const [uploadingFooterHtml, setUploadingFooterHtml] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [isDraggingFooterHtml, setIsDraggingFooterHtml] = useState(false);
+  const [isDraggingLogo, setIsDraggingLogo] = useState(false);
+  const [footerHtmlUploadStatus, setFooterHtmlUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
+  const [footerHtmlUploadMessage, setFooterHtmlUploadMessage] = useState<string>('');
+  const [logoUploadStatus, setLogoUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
+  const [logoUploadMessage, setLogoUploadMessage] = useState<string>('');
+  const footerHtmlFileInputRef = useRef<HTMLInputElement>(null);
+  const logoFileInputRef = useRef<HTMLInputElement>(null);
 
   const {
     register,
@@ -61,12 +76,27 @@ export default function TenantSettingsForm({
       whatsappMaxMessagesPerDay: initialData?.whatsappMaxMessagesPerDay || 1000,
       whatsappRateLimit: initialData?.whatsappRateLimit || 10,
       whatsappWebhookUrl: initialData?.whatsappWebhookUrl || '',
-      whatsappWebhookToken: initialData?.whatsappWebhookToken || ''
+      whatsappWebhookToken: initialData?.whatsappWebhookToken || '',
+      emailFooterHtmlUrl: initialData?.emailFooterHtmlUrl || '',
+      logoImageUrl: initialData?.logoImageUrl || '',
+      // Contact and Address Fields
+      addressLine1: initialData?.addressLine1 || '',
+      addressLine2: initialData?.addressLine2 || '',
+      phoneNumber: initialData?.phoneNumber || '',
+      zipCode: initialData?.zipCode || '',
+      country: initialData?.country || '',
+      stateProvince: initialData?.stateProvince || '',
+      email: initialData?.email || ''
     }
   });
 
+  // Get settings ID from prop or initialData (for edit mode)
+  const settingsId = propSettingsId || initialData?.id;
+
   // Watch form values for real-time updates
   const watchedValues = watch();
+  const emailFooterHtmlUrl = watch('emailFooterHtmlUrl');
+  const logoImageUrl = watch('logoImageUrl');
 
   // Handle form submission
   const onFormSubmit = async (data: TenantSettingsFormDTO) => {
@@ -74,6 +104,203 @@ export default function TenantSettingsForm({
       await onSubmit(data);
     } catch (error) {
       console.error('Form submission error:', error);
+    }
+  };
+
+  // Process email footer HTML upload
+  const processFooterHtmlUpload = async (file: File) => {
+    if (!file || !settingsId) return;
+
+    setUploadingFooterHtml(true);
+    setFooterHtmlUploadStatus('uploading');
+    setFooterHtmlUploadMessage('Uploading email footer HTML file...');
+
+    try {
+      const result = await uploadEmailFooterHtmlClient(file);
+
+      setValue('emailFooterHtmlUrl', result.url);
+
+      // Automatically update the settings with the new URL
+      if (settingsId) {
+        await patchTenantSetting(settingsId, {
+          emailFooterHtmlUrl: result.url,
+        });
+      }
+
+      setFooterHtmlUploadStatus('success');
+      setFooterHtmlUploadMessage('Email footer HTML uploaded and saved successfully!');
+
+      // Auto-close success dialog after 2 seconds
+      setTimeout(() => {
+        setFooterHtmlUploadStatus('idle');
+        setFooterHtmlUploadMessage('');
+      }, 2000);
+    } catch (err: any) {
+      setFooterHtmlUploadStatus('error');
+      setFooterHtmlUploadMessage(err.message || 'Failed to upload email footer HTML');
+    } finally {
+      setUploadingFooterHtml(false);
+      if (footerHtmlFileInputRef.current) {
+        footerHtmlFileInputRef.current.value = '';
+      }
+    }
+  };
+
+  // Process tenant logo upload
+  const processLogoUpload = async (file: File) => {
+    if (!file || !settingsId) return;
+
+    setUploadingLogo(true);
+    setLogoUploadStatus('uploading');
+    setLogoUploadMessage('Uploading logo image...');
+
+    try {
+      const result = await uploadTenantLogoClient(file);
+
+      setValue('logoImageUrl', result.url);
+
+      // Automatically update the settings with the new URL
+      if (settingsId) {
+        await patchTenantSetting(settingsId, {
+          logoImageUrl: result.url,
+        });
+      }
+
+      setLogoUploadStatus('success');
+      setLogoUploadMessage('Logo image uploaded and saved successfully!');
+
+      // Auto-close success dialog after 2 seconds
+      setTimeout(() => {
+        setLogoUploadStatus('idle');
+        setLogoUploadMessage('');
+      }, 2000);
+    } catch (err: any) {
+      setLogoUploadStatus('error');
+      setLogoUploadMessage(err.message || 'Failed to upload logo image');
+    } finally {
+      setUploadingLogo(false);
+      if (logoFileInputRef.current) {
+        logoFileInputRef.current.value = '';
+      }
+    }
+  };
+
+  // Footer HTML upload handlers
+  const handleFooterHtmlUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      await processFooterHtmlUpload(file);
+    }
+  };
+
+  const handleFooterHtmlDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!uploadingFooterHtml && settingsId) {
+      setIsDraggingFooterHtml(true);
+    }
+  };
+
+  const handleFooterHtmlDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingFooterHtml(false);
+  };
+
+  const handleFooterHtmlDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingFooterHtml(false);
+
+    if (uploadingFooterHtml || !settingsId) return;
+
+    const file = e.dataTransfer.files?.[0];
+    if (file && (file.type === 'text/html' || file.name.endsWith('.html'))) {
+      await processFooterHtmlUpload(file);
+    } else {
+      setFooterHtmlUploadStatus('error');
+      setFooterHtmlUploadMessage('Please drop a valid HTML file');
+    }
+  };
+
+  // Logo upload handlers
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      await processLogoUpload(file);
+    }
+  };
+
+  const handleLogoDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!uploadingLogo && settingsId) {
+      setIsDraggingLogo(true);
+    }
+  };
+
+  const handleLogoDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingLogo(false);
+  };
+
+  const handleLogoDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingLogo(false);
+
+    if (uploadingLogo || !settingsId) return;
+
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      await processLogoUpload(file);
+    } else {
+      setLogoUploadStatus('error');
+      setLogoUploadMessage('Please drop a valid image file');
+    }
+  };
+
+  // Remove handlers
+  const handleRemoveFooterHtml = async () => {
+    if (!settingsId) return;
+    setValue('emailFooterHtmlUrl', '');
+    setFooterHtmlUploadStatus('uploading');
+    setFooterHtmlUploadMessage('Removing email footer HTML...');
+    try {
+      await patchTenantSetting(settingsId, {
+        emailFooterHtmlUrl: '',
+      });
+      setFooterHtmlUploadStatus('success');
+      setFooterHtmlUploadMessage('Email footer HTML removed successfully!');
+      setTimeout(() => {
+        setFooterHtmlUploadStatus('idle');
+        setFooterHtmlUploadMessage('');
+      }, 2000);
+    } catch (err: any) {
+      setFooterHtmlUploadStatus('error');
+      setFooterHtmlUploadMessage(err.message || 'Failed to remove email footer HTML');
+    }
+  };
+
+  const handleRemoveLogo = async () => {
+    if (!settingsId) return;
+    setValue('logoImageUrl', '');
+    setLogoUploadStatus('uploading');
+    setLogoUploadMessage('Removing logo image...');
+    try {
+      await patchTenantSetting(settingsId, {
+        logoImageUrl: '',
+      });
+      setLogoUploadStatus('success');
+      setLogoUploadMessage('Logo image removed successfully!');
+      setTimeout(() => {
+        setLogoUploadStatus('idle');
+        setLogoUploadMessage('');
+      }, 2000);
+    } catch (err: any) {
+      setLogoUploadStatus('error');
+      setLogoUploadMessage(err.message || 'Failed to remove logo image');
     }
   };
 
@@ -172,6 +399,158 @@ export default function TenantSettingsForm({
                 )}
               </div>
             )}
+
+            {/* Contact Information Section */}
+            <div className="space-y-4">
+              <h4 className="text-md font-medium text-gray-900">Contact Information</h4>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  {...register('email', {
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: 'Invalid email address'
+                    }
+                  })}
+                  className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
+                  placeholder="contact@example.com"
+                />
+                {errors.email && (
+                  <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  {...register('phoneNumber', {
+                    maxLength: {
+                      value: 50,
+                      message: 'Phone number must be 50 characters or less'
+                    }
+                  })}
+                  className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
+                  placeholder="+1 (555) 123-4567"
+                />
+                {errors.phoneNumber && (
+                  <p className="mt-1 text-sm text-red-600">{errors.phoneNumber.message}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Address Information Section */}
+            <div className="space-y-4">
+              <h4 className="text-md font-medium text-gray-900">Address Information</h4>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Address Line 1
+                </label>
+                <input
+                  type="text"
+                  {...register('addressLine1', {
+                    maxLength: {
+                      value: 255,
+                      message: 'Address line 1 must be 255 characters or less'
+                    }
+                  })}
+                  className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
+                  placeholder="123 Main Street"
+                />
+                {errors.addressLine1 && (
+                  <p className="mt-1 text-sm text-red-600">{errors.addressLine1.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Address Line 2
+                </label>
+                <input
+                  type="text"
+                  {...register('addressLine2', {
+                    maxLength: {
+                      value: 255,
+                      message: 'Address line 2 must be 255 characters or less'
+                    }
+                  })}
+                  className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
+                  placeholder="Suite 100 (optional)"
+                />
+                {errors.addressLine2 && (
+                  <p className="mt-1 text-sm text-red-600">{errors.addressLine2.message}</p>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    City / State / Province
+                  </label>
+                  <input
+                    type="text"
+                    {...register('stateProvince', {
+                      maxLength: {
+                        value: 100,
+                        message: 'State/Province must be 100 characters or less'
+                      }
+                    })}
+                    className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
+                    placeholder="California"
+                  />
+                  {errors.stateProvince && (
+                    <p className="mt-1 text-sm text-red-600">{errors.stateProvince.message}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Zip / Postal Code
+                  </label>
+                  <input
+                    type="text"
+                    {...register('zipCode', {
+                      maxLength: {
+                        value: 20,
+                        message: 'Zip code must be 20 characters or less'
+                      }
+                    })}
+                    className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
+                    placeholder="90210"
+                  />
+                  {errors.zipCode && (
+                    <p className="mt-1 text-sm text-red-600">{errors.zipCode.message}</p>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Country
+                </label>
+                <input
+                  type="text"
+                  {...register('country', {
+                    maxLength: {
+                      value: 100,
+                      message: 'Country must be 100 characters or less'
+                    }
+                  })}
+                  className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
+                  placeholder="United States"
+                />
+                {errors.country && (
+                  <p className="mt-1 text-sm text-red-600">{errors.country.message}</p>
+                )}
+              </div>
+            </div>
 
             {/* User Registration Settings */}
             <div className="space-y-4">
@@ -730,6 +1109,142 @@ export default function TenantSettingsForm({
                 Custom JavaScript will be loaded on all pages. Use with extreme caution.
               </p>
             </div>
+
+
+            {/* Email Footer HTML Upload */}
+            <div className="border-t border-gray-200 pt-6">
+              <h4 className="text-md font-medium text-gray-900 mb-4">Email Footer HTML</h4>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email Footer HTML File
+                </label>
+                {emailFooterHtmlUrl ? (
+                  <div className="relative inline-block">
+                    <div className="p-4 bg-gray-50 border border-gray-300 rounded-lg">
+                      <p className="text-sm text-gray-700 mb-2">Current file:</p>
+                      <a
+                        href={emailFooterHtmlUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 underline text-sm"
+                      >
+                        {emailFooterHtmlUrl}
+                      </a>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleRemoveFooterHtml}
+                      className="mt-2 bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm flex items-center gap-2"
+                    >
+                      <FaTimes className="w-3 h-3" />
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <div>
+                    <input
+                      ref={footerHtmlFileInputRef}
+                      type="file"
+                      accept=".html,text/html"
+                      onChange={handleFooterHtmlUpload}
+                      disabled={uploadingFooterHtml || !settingsId}
+                      className="hidden"
+                    />
+                    <div
+                      onDragOver={handleFooterHtmlDragOver}
+                      onDragLeave={handleFooterHtmlDragLeave}
+                      onDrop={handleFooterHtmlDrop}
+                      onClick={() => !uploadingFooterHtml && settingsId && footerHtmlFileInputRef.current?.click()}
+                      className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-full ${
+                        isDraggingFooterHtml
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-gray-300 hover:border-blue-500'
+                      } ${uploadingFooterHtml || !settingsId ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                      <FaUpload className={`mx-auto h-12 w-12 mb-2 ${
+                        isDraggingFooterHtml ? 'text-blue-500' : 'text-gray-400'
+                      }`} />
+                      <p className={`text-sm ${
+                        isDraggingFooterHtml ? 'text-blue-600 font-semibold' : 'text-gray-600'
+                      }`}>
+                        {uploadingFooterHtml
+                          ? 'Uploading...'
+                          : isDraggingFooterHtml
+                            ? 'Drop HTML file here'
+                            : 'Click to upload or drag and drop email footer HTML file'}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        HTML files only (.html)
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Tenant Logo Upload */}
+            <div className="border-t border-gray-200 pt-6">
+              <h4 className="text-md font-medium text-gray-900 mb-4">Tenant Logo</h4>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Logo Image
+                </label>
+                {logoImageUrl ? (
+                  <div className="relative inline-block">
+                    <img
+                      src={logoImageUrl}
+                      alt="Tenant logo"
+                      className="max-w-full h-auto max-h-48 rounded-lg border border-gray-300"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleRemoveLogo}
+                      className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-lg"
+                    >
+                      <FaTimes className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div>
+                    <input
+                      ref={logoFileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      disabled={uploadingLogo || !settingsId}
+                      className="hidden"
+                    />
+                    <div
+                      onDragOver={handleLogoDragOver}
+                      onDragLeave={handleLogoDragLeave}
+                      onDrop={handleLogoDrop}
+                      onClick={() => !uploadingLogo && settingsId && logoFileInputRef.current?.click()}
+                      className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-full ${
+                        isDraggingLogo
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-gray-300 hover:border-blue-500'
+                      } ${uploadingLogo || !settingsId ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                      <FaUpload className={`mx-auto h-12 w-12 mb-2 ${
+                        isDraggingLogo ? 'text-blue-500' : 'text-gray-400'
+                      }`} />
+                      <p className={`text-sm ${
+                        isDraggingLogo ? 'text-blue-600 font-semibold' : 'text-gray-600'
+                      }`}>
+                        {uploadingLogo
+                          ? 'Uploading...'
+                          : isDraggingLogo
+                            ? 'Drop image here'
+                            : 'Click to upload or drag and drop tenant logo image'}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        PNG, JPG, GIF up to 5MB
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
@@ -753,6 +1268,46 @@ export default function TenantSettingsForm({
           </button>
         </div>
       </form>
+
+      {/* Email Footer HTML Upload Status Dialog */}
+      <SaveStatusDialog
+        isOpen={footerHtmlUploadStatus !== 'idle'}
+        status={footerHtmlUploadStatus === 'uploading' ? 'saving' : footerHtmlUploadStatus === 'success' ? 'success' : 'error'}
+        title={
+          footerHtmlUploadStatus === 'uploading'
+            ? 'Uploading...'
+            : footerHtmlUploadStatus === 'success'
+            ? 'Uploaded Successfully!'
+            : 'Upload Failed'
+        }
+        message={footerHtmlUploadMessage}
+        onClose={() => {
+          if (footerHtmlUploadStatus === 'error') {
+            setFooterHtmlUploadStatus('idle');
+            setFooterHtmlUploadMessage('');
+          }
+        }}
+      />
+
+      {/* Logo Upload Status Dialog */}
+      <SaveStatusDialog
+        isOpen={logoUploadStatus !== 'idle'}
+        status={logoUploadStatus === 'uploading' ? 'saving' : logoUploadStatus === 'success' ? 'success' : 'error'}
+        title={
+          logoUploadStatus === 'uploading'
+            ? 'Uploading...'
+            : logoUploadStatus === 'success'
+            ? 'Uploaded Successfully!'
+            : 'Upload Failed'
+        }
+        message={logoUploadMessage}
+        onClose={() => {
+          if (logoUploadStatus === 'error') {
+            setLogoUploadStatus('idle');
+            setLogoUploadMessage('');
+          }
+        }}
+      />
     </div>
   );
 }

@@ -41,6 +41,7 @@ export const defaultEvent: EventDetailsDTO = {
   isFeaturedEvent: false,
   featuredEventPriorityRanking: 0,
   liveEventPriorityRanking: 0,
+  fromEmail: '',
   createdBy: undefined,
   createdAt: '',
   updatedAt: '',
@@ -225,6 +226,13 @@ export function EventForm({ event, eventTypes, onSubmit, loading }: EventFormPro
     if (!form.endTime) errs.endTime = 'End time is required';
     if (!form.admissionType) errs.admissionType = 'Admission type is required';
     if (!form.timezone) errs.timezone = 'Timezone is required';
+
+    // Validate fromEmail
+    if (!form.fromEmail || !form.fromEmail.trim()) {
+      errs.fromEmail = 'From email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.fromEmail.trim())) {
+      errs.fromEmail = 'Please enter a valid email address';
+    }
 
     // Validate Givebutter configuration
     if (useZeroFeeProvider) {
@@ -1579,6 +1587,55 @@ export function EventForm({ event, eventTypes, onSubmit, loading }: EventFormPro
           )}
         </div>
       )}
+
+      {/* From Email Field */}
+      <div className="mb-4">
+        <label htmlFor="fromEmail" className="block text-sm font-medium text-gray-700 mb-1">
+          From Email <span className="text-red-500">*</span>
+        </label>
+        <input
+          type="email"
+          id="fromEmail"
+          name="fromEmail"
+          value={form.fromEmail || ''}
+          onChange={(e) => {
+            const value = e.target.value;
+            setForm(prev => ({ ...prev, fromEmail: value }));
+            // Clear error when user starts typing
+            if (errors.fromEmail) {
+              setErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors.fromEmail;
+                return newErrors;
+              });
+            }
+          }}
+          onBlur={() => {
+            // Validate email format on blur
+            const email = form.fromEmail || '';
+            if (!email.trim()) {
+              setErrors(prev => ({ ...prev, fromEmail: 'From email is required' }));
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+              setErrors(prev => ({ ...prev, fromEmail: 'Please enter a valid email address' }));
+            }
+          }}
+          required
+          className={`mt-1 block w-full border rounded-md px-3 py-2 text-base ${
+            errors.fromEmail
+              ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
+              : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
+          }`}
+          placeholder="e.g., events@example.com"
+          pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+          title="Please enter a valid email address"
+        />
+        {errors.fromEmail && (
+          <p className="mt-1 text-sm text-red-600">{errors.fromEmail}</p>
+        )}
+        <p className="mt-1 text-sm text-gray-500">
+          The email address that will appear as the sender of event-related emails (ticket confirmations, etc.).
+        </p>
+      </div>
 
       {/* Error Summary Display - Above the save button */}
       {showErrors && getErrorCount() > 0 && (

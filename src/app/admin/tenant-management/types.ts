@@ -58,6 +58,16 @@ export interface TenantSettingsDTO {
   whatsappRateLimit?: number;
   whatsappWebhookUrl?: string;
   whatsappWebhookToken?: string;
+  emailFooterHtmlUrl?: string; // S3 URL for email footer HTML file
+  logoImageUrl?: string; // S3 URL for tenant logo image
+  // Contact and Address Fields
+  addressLine1?: string;
+  addressLine2?: string;
+  phoneNumber?: string;
+  zipCode?: string;
+  country?: string;
+  stateProvince?: string;
+  email?: string;
   createdAt: string; // ISO date-time
   updatedAt: string; // ISO date-time
   tenantOrganization?: TenantOrganizationDTO;

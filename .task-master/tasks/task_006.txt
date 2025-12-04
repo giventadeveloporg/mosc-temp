@@ -1,15 +1,21 @@
 # Task ID: 6
-# Title: Implement Revolut checkout integration
+# Title: Create ApiServerActions.ts
 # Status: pending
-# Dependencies: 1 ⏱️, 2 ⏱️, 3 ⏱️
-# Priority: medium
-# Description: Add support for Revolut as a payment method with redirect to hosted page for SCA and polling for completion.
+# Dependencies: 2 ⏱️, 3 ⏱️, 4 ⏱️, 5 ⏱️
+# Priority: high
+# Description: Create server actions for all API calls related to promotion email templates.
 # Details:
-- Create "Pay with Revolut" button component
-- Implement redirect to Revolut hosted page
-- Add polling mechanism to check transaction status
-- Handle PSD2/SCA requirements
-- Integrate with UniversalPaymentCheckout component
+Create server actions in src/app/admin/promotion-emails/ApiServerActions.ts with functions:
+- fetchPromotionEmailTemplatesServer(params)
+- fetchPromotionEmailTemplateServer(id)
+- createPromotionEmailTemplateServer(formData)
+- updatePromotionEmailTemplateServer(id, formData)
+- deletePromotionEmailTemplateServer(id)
+- sendTestEmailServer(templateId, recipientEmail)
+- sendBulkEmailServer(templateId, recipientEmails?)
+- fetchPromotionEmailSentLogsServer(params)
+
+All functions must use fetchWithJwtRetry, getAppUrl for absolute URLs, handle errors with try-catch, return typed responses, and use withTenantId for DTOs.
 
 # Test Strategy:
-Test the complete Revolut flow including redirect, SCA handling, and successful return to the application.
+Test each server action with valid and invalid inputs. Verify correct error handling and response types.

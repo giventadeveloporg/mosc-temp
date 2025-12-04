@@ -1,14 +1,24 @@
 # Task ID: 7
-# Title: Implement Zeffy donation integration
+# Title: Create PromotionEmailTemplateList Component
 # Status: pending
-# Dependencies: 1 ⏱️, 2 ⏱️, 3 ⏱️
-# Priority: medium
-# Description: Add support for Zeffy donations for events flagged as zero-fee fundraisers.
+# Dependencies: 6 ⏱️
+# Priority: high
+# Description: Build a component to display a list of email templates with filtering, sorting, and pagination.
 # Details:
-- Create Zeffy embed component
-- Implement detection of `DONATION_ZERO_FEE` flag
-- Add fallback mechanism if Zeffy fails
-- Integrate with UniversalPaymentCheckout component
+Create component in src/app/admin/promotion-emails/components/PromotionEmailTemplateList.tsx with features:
+- Display template name, event, subject, status
+- Filter by event (dropdown)
+- Search by template name
+- Sort by created date, name
+- Pagination
+- Actions: Edit, Duplicate, Delete, Send Test, Send Bulk
+
+UI Requirements:
+- Responsive design (mobile-friendly)
+- Loading states
+- Empty state message
+- Error handling display
+- Confirmation dialogs for delete
 
 # Test Strategy:
-Test Zeffy integration with both successful donation flows and fallback scenarios.
+Test component rendering with various data sets. Test filtering, sorting, pagination, and all action buttons.

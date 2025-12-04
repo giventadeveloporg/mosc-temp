@@ -57,8 +57,26 @@ function main() {
 
   console.log(`📁 Reading input file: ${INPUT_FILE}`);
 
-  // Read the input file
-  const sql = fs.readFileSync(INPUT_FILE, 'utf8');
+  // Read the file as buffer first to detect encoding
+  const buffer = fs.readFileSync(INPUT_FILE);
+
+  // Check for UTF-16 LE BOM (FF FE)
+  let sql;
+  if (buffer.length >= 2 && buffer[0] === 0xFF && buffer[1] === 0xFE) {
+    // UTF-16 LE encoding
+    sql = buffer.toString('utf16le').slice(1); // Remove BOM
+  } else if (buffer.length >= 3 && buffer[0] === 0xEF && buffer[1] === 0xBB && buffer[2] === 0xBF) {
+    // UTF-8 BOM
+    sql = buffer.toString('utf8').slice(1);
+  } else {
+    // Try UTF-8 first, fallback to UTF-16 LE if it looks like UTF-16
+    sql = buffer.toString('utf8');
+    // Check if it looks like UTF-16 (every other byte is 0)
+    if (sql.length > 0 && sql.charCodeAt(0) === 0 && sql.charCodeAt(1) !== 0) {
+      sql = buffer.toString('utf16le');
+    }
+  }
+
   const lines = sql.split(/\r?\n/);
 
   // Parse complete INSERT statements (multi-line)
@@ -67,10 +85,12 @@ function main() {
   let inInsertStatement = false;
 
   for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
+    // Remove \r characters that might interfere with matching
+    let line = lines[i].replace(/\r/g, '');
 
     // Check if this line starts an INSERT statement
-    if (line.match(/^INSERT INTO public\.([a-zA-Z0-9_]+) /)) {
+    const insertMatch = line.match(/^INSERT INTO public\.([a-zA-Z0-9_]+) /);
+    if (insertMatch) {
       // If we were already building a statement, save it
       if (currentStatement.trim()) {
         insertStatements.push(currentStatement.trim());
@@ -79,6 +99,13 @@ function main() {
       // Start new INSERT statement
       currentStatement = line;
       inInsertStatement = true;
+
+      // Check if this single-line INSERT statement ends with semicolon
+      if (line.trim().endsWith(';')) {
+        insertStatements.push(currentStatement.trim());
+        currentStatement = '';
+        inInsertStatement = false;
+      }
     } else if (inInsertStatement) {
       // Continue building the current INSERT statement
       currentStatement += '\n' + line;

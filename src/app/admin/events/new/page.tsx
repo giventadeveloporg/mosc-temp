@@ -150,11 +150,11 @@ export default function CreateEventPage() {
 
       // Show success message
       setSaveStatus('success');
-      setSaveMessage('Your event has been created successfully. Redirecting to admin home...');
+      setSaveMessage('Your event has been created successfully. Redirecting to manage events...');
 
       // Redirect after a brief delay
       setTimeout(() => {
-        router.push('/admin');
+        router.push('/admin/manage-events');
       }, 1500);
     } catch (e: any) {
       setSaveStatus('error');

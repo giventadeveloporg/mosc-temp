@@ -1,16 +1,37 @@
 # Task ID: 11
-# Title: Create Admin Tenant Settings UI for payment options
+# Title: Redesign Promotion Emails Page
 # Status: pending
-# Dependencies: 1 ⏱️, 2 ⏱️
-# Priority: medium
-# Description: Add toggles in the admin tenant settings for various payment options.
+# Dependencies: 7 ⏱️, 8 ⏱️, 10 ⏱️
+# Priority: high
+# Description: Implement the main promotion emails page with all components integrated.
 # Details:
-- Add toggle for "Instant Checkout beta"
-- Add toggle for "Enable Zeffy for fundraisers"
-- Add toggle for "Enable Zelle manual payments"
-- Add toggle for "Enable Revolut checkout"
-- Connect form to new proxy endpoints
-- Follow UI style guide for layout
+Redesign page in src/app/admin/promotion-emails/page.tsx with structure:
+
+1. Header Section
+   - Page title: "Promotion Email Management"
+   - Create New Template button
+   - Admin Navigation component
+
+2. Template Management Section
+   - Template list component
+   - Filters and search
+   - Template actions
+
+3. Template Form Section
+   - Show/hide based on create/edit mode
+   - Template form component
+   - Form actions
+
+4. Email History Section
+   - Tab or accordion for history
+   - Email history component
+
+State Management:
+- Selected template (for edit mode)
+- Form mode (create/edit/view)
+- Loading states
+- Error messages
+- Success messages
 
 # Test Strategy:
-Test that toggles correctly update backend settings and persist between sessions.
+Test the complete page flow including creating, editing, and deleting templates. Test navigation between different sections.

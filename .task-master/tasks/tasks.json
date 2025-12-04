@@ -2,267 +2,271 @@
   "meta": {
     "projectName": "nextjs-template",
     "version": "1.5.0",
-    "source": ".task-master/PRD_frontend.html",
+    "source": ".task-master/FRONTEND_PRD.html",
     "description": "Tasks generated from PRD",
-    "totalTasksGenerated": 18,
-    "tasksIncluded": 18
+    "totalTasksGenerated": 20,
+    "tasksIncluded": 20
   },
   "tasks": [
     {
       "id": 1,
-      "title": "Set up API proxy endpoints structure",
-      "description": "Create the necessary proxy endpoint structure following the required patterns for REST API calls.",
+      "title": "Add DTOs to TypeScript Types",
+      "description": "Create TypeScript interfaces matching backend DTOs for the promotion email management system.",
       "status": "pending",
       "dependencies": [],
       "priority": "high",
-      "details": "- Create proxy routes under `src/pages/api/proxy`\n- Implement proxy pattern according to `cursor_rules/nextjs_api_routes.mdc`\n- Set up `/api/proxy/payments/initialize` endpoint\n- Set up `/api/proxy/payments/{transactionId}` endpoint for polling\n- Set up `/api/proxy/memberships/subscriptions` endpoint",
-      "testStrategy": "Verify that all proxy endpoints correctly forward requests to the backend and handle responses appropriately."
+      "details": "Add TypeScript interfaces to src/types/index.ts:\n- PromotionEmailTemplateDTO - Full template data\n- PromotionEmailTemplateFormDTO - Form data for create/update\n- SendPromotionEmailDTO - Email sending request\n- PromotionEmailSentLogDTO - Sent email log entry\n\nEnsure interfaces match backend OpenAPI schema exactly, include optional fields with proper types, add JSDoc comments, and export all interfaces.",
+      "testStrategy": "Verify that all TypeScript interfaces match the backend OpenAPI schema exactly. Test with sample data to ensure type safety."
     },
     {
       "id": 2,
-      "title": "Create TypeScript interfaces from Swagger API docs",
-      "description": "Generate TypeScript interfaces for payment-related data structures based on the Swagger API documentation.",
+      "title": "Create Template List/Create Proxy",
+      "description": "Create proxy handler for GET (list) and POST (create) operations for promotion email templates.",
       "status": "pending",
-      "dependencies": [],
+      "dependencies": [
+        1
+      ],
       "priority": "high",
-      "details": "- Extract and define interfaces for `PaymentSession`, `PaymentStatusResponse`, and other relevant types from `documentation/Swagger_API_Docs/api-docs.json`\n- Create shared type definitions for payment provider configurations\n- Define enums for payment provider types (STRIPE, PAYPAL, REVOLUT, ZEFFY, ZELLE)",
-      "testStrategy": "Ensure TypeScript compiler validates the interfaces against sample data from the API documentation."
+      "details": "Create proxy handler in src/pages/api/proxy/promotion-email-templates/index.ts:\n- Use createProxyHandler from @/lib/proxyHandler\n- Set backendPath: '/api/promotion-email-templates'\n- Support query parameters: eventId.equals, isActive.equals, sort, page, size\n- Follow cursor rules: no local DTO declarations, use fetchWithJwtRetry",
+      "testStrategy": "Test the proxy by making GET and POST requests and verifying the correct responses. Test with various query parameters."
     },
     {
       "id": 3,
-      "title": "Implement UniversalPaymentCheckout component",
-      "description": "Create a client component that renders different payment UIs based on the provider type determined by the backend.",
+      "title": "Create Template Get/Update/Delete Proxy",
+      "description": "Create proxy handler for single template operations (GET, PATCH, DELETE).",
       "status": "pending",
       "dependencies": [
-        1,
-        2
+        1
       ],
       "priority": "high",
-      "details": "- Create a new React component `UniversalPaymentCheckout`\n- Add logic to determine which provider-specific UI to render based on backend response\n- Implement loading states and error handling\n- Ensure the component can be easily integrated into the checkout flow",
-      "testStrategy": "Test with mock responses for different provider types to ensure correct UI rendering and behavior."
+      "details": "Create proxy handler in src/pages/api/proxy/promotion-email-templates/[...slug].ts:\n- Use createProxyHandler from @/lib/proxyHandler\n- Set backendPath: '/api/promotion-email-templates'\n- Support GET (by ID), PATCH (update), DELETE operations\n- Handle slug pattern: ['id'] or ['id', 'send-test'] or ['id', 'send-bulk']",
+      "testStrategy": "Test GET, PATCH, and DELETE operations with valid and invalid IDs. Verify correct handling of different slug patterns."
     },
     {
       "id": 4,
-      "title": "Refactor Stripe Elements integration",
-      "description": "Update the existing Stripe integration to use backend-provided publishable keys instead of hardcoded ones.",
+      "title": "Create Email Sending Proxy Routes",
+      "description": "Create proxy handlers for test and bulk email sending endpoints.",
       "status": "pending",
       "dependencies": [
-        1,
-        2,
-        3
+        1
       ],
       "priority": "high",
-      "details": "- Remove embedded Stripe publishable keys from frontend code\n- Update Stripe Elements initialization to use keys provided by backend\n- Ensure wallet buttons (Apple Pay, Google Pay) continue to function\n- Integrate with the UniversalPaymentCheckout component",
-      "testStrategy": "Test the complete Stripe checkout flow with backend-provided keys to ensure payments process correctly."
+      "details": "Create proxy handlers for email sending:\n- src/pages/api/proxy/promotion-email-templates/[id]/send-test.ts\n- src/pages/api/proxy/promotion-email-templates/[id]/send-bulk.ts\n\nRequirements:\n- Use createProxyHandler or custom handler\n- POST method only\n- Forward request body to backend\n- Handle errors gracefully",
+      "testStrategy": "Test sending test and bulk emails with valid and invalid data. Verify error handling for various scenarios."
     },
     {
       "id": 5,
-      "title": "Implement PayPal checkout integration",
-      "description": "Add support for PayPal as a payment method with embedded buttons and redirect fallback.",
+      "title": "Create Email Log Proxy",
+      "description": "Create proxy handler for querying email logs with filtering and pagination.",
       "status": "pending",
       "dependencies": [
-        1,
-        2,
-        3
+        1
       ],
       "priority": "medium",
-      "details": "- Add PayPal SDK integration\n- Implement PayPal Buttons component\n- Handle success, cancel, and error flows\n- Add redirect fallback mechanism\n- Integrate with UniversalPaymentCheckout component",
-      "testStrategy": "Test PayPal checkout flow in both button and redirect modes, verifying successful payments and proper error handling."
+      "details": "Create proxy handler in src/pages/api/proxy/promotion-email-sent-logs/index.ts:\n- Use createProxyHandler\n- Set backendPath: '/api/promotion-email-sent-logs'\n- Support filtering: eventId.equals, templateId.equals, sentAt.greaterThanOrEqual, sentAt.lessThanOrEqual, emailStatus.equals\n- Support pagination: sort, page, size",
+      "testStrategy": "Test the proxy with various filter combinations and pagination parameters. Verify correct data is returned."
     },
     {
       "id": 6,
-      "title": "Implement Revolut checkout integration",
-      "description": "Add support for Revolut as a payment method with redirect to hosted page for SCA and polling for completion.",
+      "title": "Create ApiServerActions.ts",
+      "description": "Create server actions for all API calls related to promotion email templates.",
       "status": "pending",
       "dependencies": [
-        1,
         2,
-        3
+        3,
+        4,
+        5
       ],
-      "priority": "medium",
-      "details": "- Create \"Pay with Revolut\" button component\n- Implement redirect to Revolut hosted page\n- Add polling mechanism to check transaction status\n- Handle PSD2/SCA requirements\n- Integrate with UniversalPaymentCheckout component",
-      "testStrategy": "Test the complete Revolut flow including redirect, SCA handling, and successful return to the application."
+      "priority": "high",
+      "details": "Create server actions in src/app/admin/promotion-emails/ApiServerActions.ts with functions:\n- fetchPromotionEmailTemplatesServer(params)\n- fetchPromotionEmailTemplateServer(id)\n- createPromotionEmailTemplateServer(formData)\n- updatePromotionEmailTemplateServer(id, formData)\n- deletePromotionEmailTemplateServer(id)\n- sendTestEmailServer(templateId, recipientEmail)\n- sendBulkEmailServer(templateId, recipientEmails?)\n- fetchPromotionEmailSentLogsServer(params)\n\nAll functions must use fetchWithJwtRetry, getAppUrl for absolute URLs, handle errors with try-catch, return typed responses, and use withTenantId for DTOs.",
+      "testStrategy": "Test each server action with valid and invalid inputs. Verify correct error handling and response types."
     },
     {
       "id": 7,
-      "title": "Implement Zeffy donation integration",
-      "description": "Add support for Zeffy donations for events flagged as zero-fee fundraisers.",
+      "title": "Create PromotionEmailTemplateList Component",
+      "description": "Build a component to display a list of email templates with filtering, sorting, and pagination.",
       "status": "pending",
       "dependencies": [
-        1,
-        2,
-        3
+        6
       ],
-      "priority": "medium",
-      "details": "- Create Zeffy embed component\n- Implement detection of `DONATION_ZERO_FEE` flag\n- Add fallback mechanism if Zeffy fails\n- Integrate with UniversalPaymentCheckout component",
-      "testStrategy": "Test Zeffy integration with both successful donation flows and fallback scenarios."
+      "priority": "high",
+      "details": "Create component in src/app/admin/promotion-emails/components/PromotionEmailTemplateList.tsx with features:\n- Display template name, event, subject, status\n- Filter by event (dropdown)\n- Search by template name\n- Sort by created date, name\n- Pagination\n- Actions: Edit, Duplicate, Delete, Send Test, Send Bulk\n\nUI Requirements:\n- Responsive design (mobile-friendly)\n- Loading states\n- Empty state message\n- Error handling display\n- Confirmation dialogs for delete",
+      "testStrategy": "Test component rendering with various data sets. Test filtering, sorting, pagination, and all action buttons."
     },
     {
       "id": 8,
-      "title": "Implement Zelle manual payment flow",
-      "description": "Add support for Zelle manual payments with instructions and pending status messaging.",
+      "title": "Create PromotionEmailTemplateForm Component",
+      "description": "Build a form component for creating and editing email templates with all required fields.",
       "status": "pending",
       "dependencies": [
-        1,
-        2,
-        3
+        6
       ],
-      "priority": "medium",
-      "details": "- Create Zelle instructions component\n- Implement confirmation dialog\n- Add backend call to create pending transaction\n- Display \"Awaiting confirmation\" status\n- Integrate with UniversalPaymentCheckout component",
-      "testStrategy": "Test the Zelle manual flow including instructions display, confirmation, and pending status updates."
+      "priority": "high",
+      "details": "Create component in src/app/admin/promotion-emails/components/PromotionEmailTemplateForm.tsx with fields:\n- Event (Select, required)\n- Template Name (Text Input, required)\n- Subject (Text Input, required)\n- Discount Code (Select, optional)\n- Header Image (Image Upload, optional)\n- Footer Image (Image Upload, optional)\n- Body HTML (Rich Text Editor, required)\n- Active Status (Toggle, optional)\n\nRequirements:\n- Form validation\n- Event selector loads events from API\n- Discount code selector updates when event changes\n- Option to create new discount code inline\n- Image upload with drag-and-drop\n- Image preview before saving\n- Rich text editor for HTML body\n- Live preview of email template\n- Save, Cancel, Send Test buttons",
+      "testStrategy": "Test form submission with valid and invalid data. Test field validation, image uploads, and dynamic field updates."
     },
     {
       "id": 9,
-      "title": "Implement Instant Checkout (ACP) support",
-      "description": "Add support for Stripe Instant Checkout when flagged as available by the backend.",
+      "title": "Create ImageUpload Component",
+      "description": "Build a reusable component for image uploading with drag-and-drop and preview functionality.",
       "status": "pending",
-      "dependencies": [
-        1,
-        2,
-        3,
-        4
-      ],
-      "priority": "medium",
-      "details": "- Detect when backend returns `{ providerType: \"STRIPE\", sessionUrl }`\n- Add \"Instant Checkout (Beta)\" button\n- Implement modal with hosted checkout\n- Handle success redirect\n- Ensure proper loading and error states",
-      "testStrategy": "Test the complete ACP flow from button click to hosted checkout to successful return."
+      "dependencies": [],
+      "priority": "high",
+      "details": "Create component in src/app/admin/promotion-emails/components/ImageUpload.tsx with features:\n- Drag-and-drop file upload\n- File selection via button\n- Image preview\n- Image validation (size, format)\n- Upload progress indicator\n- Error handling\n- Remove/replace image\n\nIntegration:\n- Use existing media upload API or S3 upload service\n- Return S3 URL after upload\n- Store URL in form state",
+      "testStrategy": "Test image uploads with various file types and sizes. Test drag-and-drop, file selection, preview, and error handling."
     },
     {
       "id": 10,
-      "title": "Update Event Page to display payment method badges",
-      "description": "Update the Upcoming Events section to show badges for supported payment methods based on event metadata.",
+      "title": "Create PromotionEmailHistory Component",
+      "description": "Build a component to display sent email logs with filtering and details view.",
       "status": "pending",
       "dependencies": [
-        2
+        6
       ],
-      "priority": "low",
-      "details": "- Create payment method badge components\n- Fetch and display supported payment methods from backend event metadata\n- Ensure badges follow design guidelines\n- Maintain existing hero image logic",
-      "testStrategy": "Verify badges display correctly for events with different payment method configurations."
+      "priority": "medium",
+      "details": "Create component in src/app/admin/promotion-emails/components/PromotionEmailHistory.tsx with features:\n- Table showing: recipient, subject, sent date, status\n- Filter by event, date range, status\n- Search by recipient email\n- Pagination\n- View email details modal\n- Resend failed emails\n\nStatus Indicators:\n- SENT - Green badge\n- FAILED - Red badge\n- BOUNCED - Orange badge",
+      "testStrategy": "Test component with various log data. Test filtering, pagination, details view, and resend functionality."
     },
     {
       "id": 11,
-      "title": "Create Admin Tenant Settings UI for payment options",
-      "description": "Add toggles in the admin tenant settings for various payment options.",
+      "title": "Redesign Promotion Emails Page",
+      "description": "Implement the main promotion emails page with all components integrated.",
       "status": "pending",
       "dependencies": [
-        1,
-        2
+        7,
+        8,
+        10
       ],
-      "priority": "medium",
-      "details": "- Add toggle for \"Instant Checkout beta\"\n- Add toggle for \"Enable Zeffy for fundraisers\"\n- Add toggle for \"Enable Zelle manual payments\"\n- Add toggle for \"Enable Revolut checkout\"\n- Connect form to new proxy endpoints\n- Follow UI style guide for layout",
-      "testStrategy": "Test that toggles correctly update backend settings and persist between sessions."
+      "priority": "high",
+      "details": "Redesign page in src/app/admin/promotion-emails/page.tsx with structure:\n\n1. Header Section\n   - Page title: \"Promotion Email Management\"\n   - Create New Template button\n   - Admin Navigation component\n\n2. Template Management Section\n   - Template list component\n   - Filters and search\n   - Template actions\n\n3. Template Form Section\n   - Show/hide based on create/edit mode\n   - Template form component\n   - Form actions\n\n4. Email History Section\n   - Tab or accordion for history\n   - Email history component\n\nState Management:\n- Selected template (for edit mode)\n- Form mode (create/edit/view)\n- Loading states\n- Error messages\n- Success messages",
+      "testStrategy": "Test the complete page flow including creating, editing, and deleting templates. Test navigation between different sections."
     },
     {
       "id": 12,
-      "title": "Implement Membership Portal subscription UI",
-      "description": "Add support for subscription plan selection and management in the Membership Portal.",
+      "title": "Integrate Event Selector",
+      "description": "Integrate existing event selection functionality with the template form.",
       "status": "pending",
       "dependencies": [
-        1,
-        2
+        8
       ],
-      "priority": "medium",
-      "details": "- Create subscription plan selection UI (monthly/yearly)\n- Implement integration with `/api/proxy/memberships/subscriptions` endpoints\n- Display current subscription status and renewal date\n- Add cancellation request functionality\n- Ensure proper loading and error states",
-      "testStrategy": "Test the complete subscription lifecycle including selection, payment, status viewing, and cancellation."
+      "priority": "high",
+      "details": "Integrate event selector with the template form:\n- Reuse fetchEventsFilteredServer from admin API\n- Filter events by tenant\n- Display event title and date\n- Handle event selection\n- Update dependent fields when event changes",
+      "testStrategy": "Test event selection with various tenant filters. Test that dependent fields update correctly when event changes."
     },
     {
       "id": 13,
-      "title": "Implement currency and date localization",
-      "description": "Add support for localized currency and date formats based on tenant settings.",
+      "title": "Integrate Discount Code Selector",
+      "description": "Integrate discount code selection functionality with the template form.",
       "status": "pending",
       "dependencies": [
-        2
+        8,
+        12
       ],
-      "priority": "low",
-      "details": "- Create utility functions for currency formatting (GBP/EUR support for UK/EU tenants)\n- Implement date formatting based on locale\n- Update all price and date displays to use these utilities\n- Ensure proper number formatting for different currencies",
-      "testStrategy": "Test with different tenant locales to ensure correct formatting of currencies and dates."
+      "priority": "high",
+      "details": "Integrate discount code selector with the template form:\n- Use fetchDiscountCodesForEvent from discount code API\n- Update dropdown when event changes\n- Display code, type, value, validity\n- Option to create new discount code (link to discount code page)",
+      "testStrategy": "Test discount code selection with various events. Test that the dropdown updates correctly when event changes."
     },
     {
       "id": 14,
-      "title": "Implement accessibility enhancements",
-      "description": "Ensure all payment components meet accessibility requirements.",
+      "title": "Integrate Rich Text Editor",
+      "description": "Integrate a rich text editor for the email body HTML field.",
       "status": "pending",
       "dependencies": [
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9
+        8
       ],
       "priority": "medium",
-      "details": "- Verify all buttons meet contrast requirements\n- Add clear loading and success messaging for hosted flows\n- Ensure keyboard navigation works across all payment components\n- Implement screen-reader announcements when switching providers\n- Test with screen readers and keyboard navigation",
-      "testStrategy": "Test with accessibility tools to ensure WCAG compliance and proper keyboard/screen reader support."
+      "details": "Integrate rich text editor for HTML body:\n- Use React Quill, TinyMCE, or similar library\n- Support HTML editing\n- Preview mode\n- Sanitize HTML output\n- Handle content changes in form state",
+      "testStrategy": "Test rich text editor functionality including formatting, HTML editing, and preview. Test that content is correctly saved in form state."
     },
     {
       "id": 15,
-      "title": "Create mock responses for development",
-      "description": "Implement mock responses based on Swagger schema to enable frontend development before backend completion.",
+      "title": "Add Loading States",
+      "description": "Implement loading states for all asynchronous operations.",
       "status": "pending",
       "dependencies": [
-        2
+        7,
+        8,
+        10,
+        11
       ],
       "priority": "medium",
-      "details": "- Create mock response data for all payment endpoints\n- Implement mock server or MSW setup for local development\n- Ensure mock data covers all provider types and edge cases\n- Add toggle to switch between mock and real backend",
-      "testStrategy": "Verify that mock responses match the expected schema and enable proper frontend testing."
+      "details": "Add loading states throughout the application:\n- Loading spinners for API calls\n- Skeleton loaders for lists\n- Disabled buttons during operations\n- Implement consistent loading state management",
+      "testStrategy": "Test loading states by simulating slow network responses. Verify that UI elements are appropriately disabled during loading."
     },
     {
       "id": 16,
-      "title": "Implement error handling and logging",
-      "description": "Add comprehensive error handling and logging for all payment-related operations.",
+      "title": "Add Error Handling",
+      "description": "Implement comprehensive error handling for all operations.",
       "status": "pending",
       "dependencies": [
-        1,
-        3,
-        4,
-        5,
         6,
         7,
         8,
-        9
+        10,
+        11
       ],
-      "priority": "high",
-      "details": "- Implement error boundaries around payment components\n- Add detailed error logging for API failures\n- Create user-friendly error messages for different failure scenarios\n- Implement retry mechanisms where appropriate\n- Ensure errors are properly reported to monitoring systems",
-      "testStrategy": "Test with various error scenarios to ensure proper handling, messaging, and logging."
+      "priority": "medium",
+      "details": "Add error handling throughout the application:\n- Display error messages clearly\n- Handle validation errors\n- Handle network errors\n- Implement retry mechanisms\n- Show user-friendly error messages",
+      "testStrategy": "Test error handling by simulating various error conditions including validation errors, network errors, and server errors."
     },
     {
       "id": 17,
-      "title": "Integrate and test complete checkout flow",
-      "description": "Integrate all payment components into the checkout flow and test end-to-end.",
+      "title": "Add Success Feedback",
+      "description": "Implement success feedback for all user actions.",
       "status": "pending",
       "dependencies": [
-        3,
-        4,
-        5,
-        6,
         7,
         8,
-        9,
-        16
+        10,
+        11
       ],
-      "priority": "high",
-      "details": "- Ensure seamless integration of UniversalPaymentCheckout into existing checkout flow\n- Test complete purchase flow with all payment providers\n- Verify success, cancel, and error paths for each provider\n- Test with various product and tenant configurations",
-      "testStrategy": "Perform end-to-end testing of the complete checkout flow with each payment provider."
+      "priority": "low",
+      "details": "Add success feedback throughout the application:\n- Success toast notifications\n- Confirmation messages\n- Auto-refresh lists after operations\n- Clear feedback for completed actions",
+      "testStrategy": "Test success feedback for all user actions including create, update, delete, and send operations."
     },
     {
       "id": 18,
-      "title": "Create documentation for payment integration",
-      "description": "Document the payment integration for developers and testers.",
+      "title": "Add Form Validation",
+      "description": "Implement comprehensive form validation for the template form.",
       "status": "pending",
       "dependencies": [
-        3,
-        4,
-        5,
-        6,
+        8
+      ],
+      "priority": "high",
+      "details": "Add form validation to the template form:\n- Client-side validation\n- Real-time error messages\n- Required field indicators\n- Format validation (email, URLs)\n- Prevent submission of invalid forms",
+      "testStrategy": "Test form validation with various invalid inputs. Test that submission is prevented for invalid forms and that error messages are displayed correctly."
+    },
+    {
+      "id": 19,
+      "title": "Implement Responsive Design",
+      "description": "Ensure all components are responsive across different screen sizes.",
+      "status": "pending",
+      "dependencies": [
         7,
         8,
         9,
-        11,
-        12
+        10,
+        11
       ],
-      "priority": "low",
-      "details": "- Document the UniversalPaymentCheckout component API\n- Create usage examples for each payment provider\n- Document admin configuration options\n- Add troubleshooting guides for common issues\n- Include testing instructions for QA team",
-      "testStrategy": "Review documentation for completeness and accuracy with team members."
+      "priority": "medium",
+      "details": "Implement responsive design throughout the application:\n- Mobile-first approach\n- Support breakpoints: sm (640px), md (768px), lg (1024px), xl (1280px)\n- Table should scroll horizontally on mobile\n- Form should stack vertically on mobile\n- Buttons should be full-width on mobile\n- Image upload should work on touch devices",
+      "testStrategy": "Test the application at various screen sizes and breakpoints. Verify that all components are usable on mobile devices."
+    },
+    {
+      "id": 20,
+      "title": "Implement Accessibility Features",
+      "description": "Ensure the application meets accessibility standards.",
+      "status": "pending",
+      "dependencies": [
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "priority": "medium",
+      "details": "Implement accessibility features throughout the application:\n- Proper ARIA labels on all interactive elements\n- Keyboard navigation support\n- Focus indicators\n- Screen reader support\n- Color contrast compliance (WCAG AA)\n- Alt text for images",
+      "testStrategy": "Test accessibility using screen readers and keyboard navigation. Verify color contrast compliance with WCAG AA standards."
     }
   ]
 }

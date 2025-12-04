@@ -1,14 +1,15 @@
 # Task ID: 3
-# Title: Implement UniversalPaymentCheckout component
+# Title: Create Template Get/Update/Delete Proxy
 # Status: pending
-# Dependencies: 1 ⏱️, 2 ⏱️
+# Dependencies: 1 ⏱️
 # Priority: high
-# Description: Create a client component that renders different payment UIs based on the provider type determined by the backend.
+# Description: Create proxy handler for single template operations (GET, PATCH, DELETE).
 # Details:
-- Create a new React component `UniversalPaymentCheckout`
-- Add logic to determine which provider-specific UI to render based on backend response
-- Implement loading states and error handling
-- Ensure the component can be easily integrated into the checkout flow
+Create proxy handler in src/pages/api/proxy/promotion-email-templates/[...slug].ts:
+- Use createProxyHandler from @/lib/proxyHandler
+- Set backendPath: '/api/promotion-email-templates'
+- Support GET (by ID), PATCH (update), DELETE operations
+- Handle slug pattern: ['id'] or ['id', 'send-test'] or ['id', 'send-bulk']
 
 # Test Strategy:
-Test with mock responses for different provider types to ensure correct UI rendering and behavior.
+Test GET, PATCH, and DELETE operations with valid and invalid IDs. Verify correct handling of different slug patterns.

@@ -133,6 +133,8 @@ export interface EventDetailsDTO {
   recurrenceSeriesId?: number;
   /** Email header image URL for ticket confirmation emails */
   emailHeaderImageUrl?: string;
+  /** From email address for event-related emails */
+  fromEmail?: string;
   /** Created at (ISO date-time) */
   createdAt: string;
   /** Updated at (ISO date-time) */
@@ -560,6 +562,14 @@ export interface TenantSettingsDTO {
   showEventsSectionInHomePage?: boolean;
   showTeamMembersSectionInHomePage?: boolean;
   showSponsorsSectionInHomePage?: boolean;
+  // Contact and Address Fields
+  addressLine1?: string;
+  addressLine2?: string;
+  phoneNumber?: string;
+  zipCode?: string;
+  country?: string;
+  stateProvince?: string;
+  email?: string;
   createdAt: string; // date-time
   updatedAt: string; // date-time
   tenantOrganization?: TenantOrganizationDTO;
@@ -709,6 +719,80 @@ export interface PromotionEmailRequestDTO {
   footerPath?: string;
   /** Email host URL prefix for email context */
   emailHostUrlPrefix?: string;
+}
+
+/**
+ * DTO for promotion email template, matches backend OpenAPI schema.
+ */
+export interface PromotionEmailTemplateDTO {
+  id?: number;
+  tenantId: string;
+  eventId: number;
+  templateName: string;
+  subject: string;
+  fromEmail: string;
+  bodyHtml: string;
+  footerHtml: string;
+  headerImageUrl?: string;
+  footerImageUrl?: string;
+  promotionCode?: string;
+  discountCodeId?: number;
+  isActive?: boolean;
+  createdById?: number;
+  createdAt: string;
+  updatedAt: string;
+  event?: EventDetailsDTO;
+  discountCode?: DiscountCodeDTO;
+  createdBy?: UserProfileDTO;
+}
+
+/**
+ * DTO for creating/updating promotion email template.
+ */
+export interface PromotionEmailTemplateFormDTO {
+  eventId: number;
+  templateName: string;
+  subject: string;
+  fromEmail: string;
+  bodyHtml: string;
+  footerHtml: string;
+  headerImageUrl?: string;
+  footerImageUrl?: string;
+  discountCodeId?: number;
+  isActive?: boolean;
+}
+
+/**
+ * DTO for sending promotion email (bulk or test).
+ */
+export interface SendPromotionEmailDTO {
+  templateId: number;
+  recipientEmail?: string; // Required for test emails
+  isTestEmail: boolean;
+  // Optional overrides
+  subjectOverride?: string;
+  bodyHtmlOverride?: string;
+}
+
+/**
+ * DTO for promotion email sent log entry.
+ */
+export interface PromotionEmailSentLogDTO {
+  id?: number;
+  tenantId: string;
+  templateId: number;
+  eventId: number;
+  recipientEmail: string;
+  subject: string;
+  promotionCode?: string;
+  discountCodeId?: number;
+  sentAt: string;
+  isTestEmail: boolean;
+  emailStatus: 'SENT' | 'FAILED' | 'BOUNCED';
+  errorMessage?: string;
+  sentById?: number;
+  template?: PromotionEmailTemplateDTO;
+  event?: EventDetailsDTO;
 }
 
 /**

@@ -244,23 +244,30 @@ export function EventList({
     return null; // Don't show anything during transition
   }
 
-  if (!events.length) return <div>No events found.</div>;
+  // EventList uses 1-based page indexing by default, but manage-events uses 0-based
+  // Convert to 0-based for calculations if page is 0 (indicating 0-based indexing)
+  const isZeroBased = page === 0;
+  const currentPageZeroBased = isZeroBased ? page : page - 1;
+  const displayPage = isZeroBased ? page + 1 : page; // Display as 1-based
 
-  const totalPages = Math.ceil(totalCount / pageSize);
-  const hasPrevPage = page > 1;
-  const hasNextPage = page < totalPages;
+  const totalPages = Math.ceil(totalCount / pageSize) || 1;
+  const isPrevDisabled = currentPageZeroBased === 0 || loading;
+  const isNextDisabled = currentPageZeroBased >= totalPages - 1 || loading;
 
-  const startItem = totalCount > 0 ? (page - 1) * pageSize + 1 : 0;
-  const endItem = (page - 1) * pageSize + events.length;
+  const startItem = totalCount > 0 ? currentPageZeroBased * pageSize + 1 : 0;
+  const endItem = totalCount > 0 ? currentPageZeroBased * pageSize + Math.min(pageSize, totalCount - currentPageZeroBased * pageSize) : 0;
 
   const handleTooltipClose = () => setTooltipEvent(null);
 
   return (
     <>
-      <div className="mb-2 text-sm text-blue-700 bg-blue-50 border border-blue-200 rounded px-4 py-2">
-        Mouse over the first 3 columns to see the full details about the event. Use the × button to close the tooltip once you have viewed the details.
-      </div>
-      <table
+      {events.length > 0 && (
+        <div className="mb-2 text-sm text-blue-700 bg-blue-50 border border-blue-200 rounded px-4 py-2">
+          Mouse over the first 3 columns to see the full details about the event. Use the × button to close the tooltip once you have viewed the details.
+        </div>
+      )}
+      {events.length > 0 ? (
+        <table
         className="w-full border text-sm relative bg-white rounded shadow-md"
       >
         <thead>
@@ -547,31 +554,47 @@ export function EventList({
           })}
         </tbody>
       </table>
+      ) : (
+        <div className="text-center py-8 text-gray-500">
+          <p className="text-lg font-medium mb-2">No events found</p>
+          <p className="text-sm">No events match your current search criteria.</p>
+        </div>
+      )}
 
-      <div className="mt-4">
+      {/* Pagination Controls - Always visible, matching admin page style */}
+      <div className="mt-8">
         <div className="flex justify-between items-center">
           <button
             onClick={onPrevPage}
-            disabled={!hasPrevPage}
+            disabled={isPrevDisabled}
             className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
           >
-            <FaChevronLeft />
+            <FaChevronLeft className="h-5 w-5" />
             Previous
           </button>
-          <div className="text-sm font-semibold">
-            Page {page} of {totalPages}
+          <div className="text-sm font-semibold text-gray-700">
+            Page {displayPage} of {totalPages}
           </div>
           <button
             onClick={onNextPage}
-            disabled={!hasNextPage}
+            disabled={isNextDisabled}
             className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
           >
             Next
-            <FaChevronRight />
+            <FaChevronRight className="h-5 w-5" />
           </button>
         </div>
         <div className="text-center text-sm text-gray-600 mt-2">
-          Showing {startItem} to {endItem} of {totalCount} events
+          {totalCount > 0 ? (
+            <>Showing <span className="font-medium">{startItem}</span> to <span className="font-medium">{endItem}</span> of <span className="font-medium">{totalCount}</span> events</>
+          ) : (
+            <div className="flex items-center justify-center gap-2">
+              <span>No events found</span>
+              <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-sm font-medium">
+                [No events match your criteria]
+              </span>
+            </div>
+          )}
         </div>
       </div>
 

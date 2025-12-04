@@ -1,7 +1,5 @@
 "use server";
-import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import { getAppUrl, getTenantId } from '@/lib/env';
-import { withTenantId } from '@/lib/withTenantId';
 import type { MembershipPlanDTO } from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -18,8 +16,9 @@ export async function fetchAllMembershipPlansServer(): Promise<MembershipPlanDTO
   params.append('tenantId.equals', getTenantId());
   params.append('sort', 'createdAt,desc');
 
+  // Use regular fetch for proxy endpoints (proxy handler handles JWT)
   const url = `${getAppUrl()}/api/proxy/membership-plans?${params.toString()}`;
-  const res = await fetchWithJwtRetry(url, {
+  const res = await fetch(url, {
     method: 'GET',
     cache: 'no-store',
   });
@@ -58,26 +57,27 @@ export async function createMembershipPlanServer(
     ? planWithoutId.featuresJson
     : JSON.stringify(planWithoutId.featuresJson || {});
 
-  const payload = withTenantId({
+  // Build payload - proxy handler will inject tenantId automatically via withTenantId
+  // Do NOT call withTenantId here - proxy handler does it
+  const payload = {
     ...planWithoutId,
     featuresJson: featuresJsonString,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-  });
-
-  // CRITICAL: Ensure body is stringified
-  const body = JSON.stringify(payload);
+  };
 
   console.log('[SERVER ACTION] Creating membership plan with payload:', payload);
-  console.log('[SERVER ACTION] Body stringified:', body);
+  console.log('[SERVER ACTION] Payload keys:', Object.keys(payload));
 
+  // Use regular fetch for proxy endpoints (proxy handler handles JWT and tenantId)
+  // fetchWithJwtRetry is only for direct backend API calls
   const url = `${getAppUrl()}/api/proxy/membership-plans`;
-  const res = await fetchWithJwtRetry(url, {
+  const res = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: body, // CRITICAL: Must include body
+    body: JSON.stringify(payload), // CRITICAL: Must include body
     cache: 'no-store',
   });
 
@@ -116,15 +116,18 @@ export async function updateMembershipPlanServer(
         : JSON.stringify(plan.featuresJson))
     : undefined;
 
-  const finalPayload = withTenantId({
+  // Build payload - proxy handler will inject tenantId automatically via withTenantId
+  // Do NOT call withTenantId here - proxy handler does it
+  const finalPayload = {
     ...plan,
     ...(featuresJsonString !== undefined && { featuresJson: featuresJsonString }),
     id: planId,
     updatedAt: new Date().toISOString(),
-  });
+  };
 
+  // Use regular fetch for proxy endpoints (proxy handler handles JWT and tenantId)
   const url = `${getAppUrl()}/api/proxy/membership-plans/${planId}`;
-  const res = await fetchWithJwtRetry(url, {
+  const res = await fetch(url, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/merge-patch+json',
@@ -158,8 +161,9 @@ export async function deleteMembershipPlanServer(planId: number): Promise<void> 
     throw new Error('API base URL not configured');
   }
 
+  // Use regular fetch for proxy endpoints (proxy handler handles JWT)
   const url = `${getAppUrl()}/api/proxy/membership-plans/${planId}`;
-  const res = await fetchWithJwtRetry(url, {
+  const res = await fetch(url, {
     method: 'DELETE',
     cache: 'no-store',
   });

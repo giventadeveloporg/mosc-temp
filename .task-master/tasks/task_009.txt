@@ -1,15 +1,23 @@
 # Task ID: 9
-# Title: Implement Instant Checkout (ACP) support
+# Title: Create ImageUpload Component
 # Status: pending
-# Dependencies: 1 ⏱️, 2 ⏱️, 3 ⏱️, 4 ⏱️
-# Priority: medium
-# Description: Add support for Stripe Instant Checkout when flagged as available by the backend.
+# Dependencies: None
+# Priority: high
+# Description: Build a reusable component for image uploading with drag-and-drop and preview functionality.
 # Details:
-- Detect when backend returns `{ providerType: "STRIPE", sessionUrl }`
-- Add "Instant Checkout (Beta)" button
-- Implement modal with hosted checkout
-- Handle success redirect
-- Ensure proper loading and error states
+Create component in src/app/admin/promotion-emails/components/ImageUpload.tsx with features:
+- Drag-and-drop file upload
+- File selection via button
+- Image preview
+- Image validation (size, format)
+- Upload progress indicator
+- Error handling
+- Remove/replace image
+
+Integration:
+- Use existing media upload API or S3 upload service
+- Return S3 URL after upload
+- Store URL in form state
 
 # Test Strategy:
-Test the complete ACP flow from button click to hosted checkout to successful return.
+Test image uploads with various file types and sizes. Test drag-and-drop, file selection, preview, and error handling.

@@ -162,25 +162,49 @@ export function createProxyHandler({ injectTenantId = true, allowedMethods = ['G
           });
         } else if (method === 'POST' || method === 'PUT') {
           // CRITICAL: Read raw body for POST/PUT when bodyParser is disabled
-          // If req.body is undefined (bodyParser: false), read raw body
-          if (!payload) {
-            console.log('[PROXY] Reading raw body for POST/PUT request (bodyParser disabled)');
+          // If req.body exists (bodyParser enabled), use it; otherwise read raw body
+          if (body && typeof body === 'object' && Object.keys(body).length > 0) {
+            // Body already parsed by Next.js bodyParser - use it directly
+            console.log('[PROXY] Using req.body (already parsed by bodyParser):', body);
+            payload = body;
+          } else {
+            // BodyParser is disabled or body is empty - read raw body
+            console.log('[PROXY] Reading raw body for POST/PUT request (bodyParser disabled or empty)');
             try {
-              const rawBody = (await getRawBody(req)).toString('utf-8');
+              // Add timeout to prevent hanging
+              const rawBodyPromise = getRawBody(req);
+              const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Raw body read timeout after 5 seconds')), 5000)
+              );
+
+              const rawBodyBuffer = await Promise.race([rawBodyPromise, timeoutPromise]) as Buffer;
+              const rawBody = rawBodyBuffer.toString('utf-8');
               console.log('[PROXY] Raw POST/PUT body:', rawBody);
 
               if (rawBody) {
                 try {
                   payload = JSON.parse(rawBody);
                   console.log('[PROXY] Parsed POST/PUT body:', payload);
+                  console.log('[PROXY] Parsed POST/PUT body keys:', Object.keys(payload || {}));
+                  // Special check for promotion email templates
+                  if (path.includes('promotion-email-templates')) {
+                    console.log('[PROXY DEBUG] Promotion email template - fromEmail in parsed body:', 'fromEmail' in (payload || {}));
+                    console.log('[PROXY DEBUG] Promotion email template - fromEmail value:', payload?.fromEmail);
+                  }
                 } catch (e) {
                   console.error('[PROXY] Failed to parse POST/PUT body:', e);
                   throw new Error(`Invalid JSON in request body: ${e}`);
                 }
+              } else {
+                // Fallback to req.body if raw body is empty
+                console.log('[PROXY] Raw body is empty, using req.body as fallback');
+                payload = body;
               }
             } catch (e) {
               console.error('[PROXY] Failed to read raw body:', e);
-              return res.status(400).json({ error: 'Failed to read request body', details: String(e) });
+              // Fallback to req.body if raw body read fails
+              console.log('[PROXY] Falling back to req.body due to raw body read error:', e);
+              payload = body;
             }
           }
           // Apply tenantId injection for POST/PUT requests if needed
@@ -189,7 +213,17 @@ export function createProxyHandler({ injectTenantId = true, allowedMethods = ['G
               // For arrays, inject tenantId into each array item if they are objects
               payload = payload.map(item => {
                 if (typeof item === 'object' && item !== null) {
+                  // CRITICAL: Log before withTenantId to verify fromEmail exists
+                  if (path.includes('promotion-email-templates')) {
+                    console.log('[PROXY DEBUG] Before withTenantId - fromEmail:', item.fromEmail);
+                    console.log('[PROXY DEBUG] Before withTenantId - keys:', Object.keys(item));
+                  }
                   const itemWithTenantId = withTenantId(item);
+                  // CRITICAL: Log after withTenantId to verify fromEmail is preserved
+                  if (path.includes('promotion-email-templates')) {
+                    console.log('[PROXY DEBUG] After withTenantId - fromEmail:', itemWithTenantId.fromEmail);
+                    console.log('[PROXY DEBUG] After withTenantId - keys:', Object.keys(itemWithTenantId));
+                  }
                   // Special logging for event-ticket-transaction-items
                   if (path.includes('event-ticket-transaction-items')) {
                     console.log('[PROXY DEBUG] Injected tenantId into transaction item:', {
@@ -205,8 +239,20 @@ export function createProxyHandler({ injectTenantId = true, allowedMethods = ['G
               });
             } else {
               // For single objects, inject tenantId normally
+              // CRITICAL: Log before withTenantId to verify fromEmail exists
+              if (path.includes('promotion-email-templates')) {
+                console.log('[PROXY DEBUG] Before withTenantId - payload:', payload);
+                console.log('[PROXY DEBUG] Before withTenantId - fromEmail:', payload.fromEmail);
+                console.log('[PROXY DEBUG] Before withTenantId - keys:', Object.keys(payload || {}));
+              }
               const beforeTenantId = payload.tenantId;
               payload = withTenantId(payload);
+              // CRITICAL: Log after withTenantId to verify fromEmail is preserved
+              if (path.includes('promotion-email-templates')) {
+                console.log('[PROXY DEBUG] After withTenantId - payload:', payload);
+                console.log('[PROXY DEBUG] After withTenantId - fromEmail:', payload.fromEmail);
+                console.log('[PROXY DEBUG] After withTenantId - keys:', Object.keys(payload || {}));
+              }
               // Special logging for event-ticket-transaction-items
               if (path.includes('event-ticket-transaction-items')) {
                 console.log('[PROXY DEBUG] Injected tenantId into transaction item (single):', {
@@ -226,6 +272,15 @@ export function createProxyHandler({ injectTenantId = true, allowedMethods = ['G
             console.log('[PROXY DEBUG] Promotion email request - payload.isTestEmail:', payload?.isTestEmail);
             console.log('[PROXY DEBUG] Promotion email request - typeof payload.isTestEmail:', typeof payload?.isTestEmail);
             console.log('[PROXY DEBUG] Promotion email request - JSON.stringify(payload):', JSON.stringify(payload));
+          }
+
+          // Special debugging for promotion email templates
+          if (path.includes('promotion-email-templates') && (method === 'POST' || method === 'PATCH' || method === 'PUT')) {
+            console.log('[PROXY DEBUG] Promotion email template - payload after tenantId injection:', payload);
+            console.log('[PROXY DEBUG] Promotion email template - payload.fromEmail:', payload?.fromEmail);
+            console.log('[PROXY DEBUG] Promotion email template - typeof payload.fromEmail:', typeof payload?.fromEmail);
+            console.log('[PROXY DEBUG] Promotion email template - payload keys:', Object.keys(payload || {}));
+            console.log('[PROXY DEBUG] Promotion email template - has fromEmail:', 'fromEmail' in (payload || {}));
           }
 
           // CRITICAL: Validate tenantId is present for event-ticket-transaction-items POST/PUT
@@ -260,7 +315,46 @@ export function createProxyHandler({ injectTenantId = true, allowedMethods = ['G
             payload: payload
           });
 
-          bodyToSend = JSON.stringify(payload);
+          // CRITICAL: Verify fromEmail is in payload before stringifying
+          if (path.includes('promotion-email-templates') && (method === 'POST' || method === 'PUT')) {
+            console.log('[PROXY CRITICAL] Final payload before stringify - fromEmail:', payload?.fromEmail);
+            console.log('[PROXY CRITICAL] Final payload before stringify - keys:', Object.keys(payload || {}));
+            console.log('[PROXY CRITICAL] Final payload before stringify - JSON:', JSON.stringify(payload));
+            if (!payload?.fromEmail) {
+              console.error('[PROXY ERROR] fromEmail is MISSING from payload before sending to backend!');
+              console.error('[PROXY ERROR] Payload:', payload);
+            }
+          }
+
+          // CRITICAL: For promotion email templates, ensure fromEmail is sent in both camelCase and snake_case
+          // Some Spring Boot configurations might expect snake_case
+          if (path.includes('promotion-email-templates') && (method === 'POST' || method === 'PUT') && payload?.fromEmail) {
+            // Ensure both formats are present for compatibility
+            const enhancedPayload = {
+              ...payload,
+              fromEmail: payload.fromEmail, // camelCase (standard)
+              from_email: payload.fromEmail, // snake_case (for Spring Boot snake_case naming strategy)
+            };
+            bodyToSend = JSON.stringify(enhancedPayload);
+            console.log('[PROXY CRITICAL] Enhanced payload with both fromEmail and from_email:', {
+              fromEmail: enhancedPayload.fromEmail,
+              from_email: enhancedPayload.from_email,
+            });
+          } else {
+            bodyToSend = JSON.stringify(payload);
+          }
+
+          // CRITICAL: Verify fromEmail is in stringified body
+          if (path.includes('promotion-email-templates') && (method === 'POST' || method === 'PUT')) {
+            const stringifiedBody = bodyToSend;
+            const parsedCheck = JSON.parse(stringifiedBody);
+            console.log('[PROXY CRITICAL] After stringify - fromEmail in parsed check:', parsedCheck?.fromEmail);
+            console.log('[PROXY CRITICAL] After stringify - from_email in parsed check:', parsedCheck?.from_email);
+            if (!parsedCheck?.fromEmail && !parsedCheck?.from_email) {
+              console.error('[PROXY ERROR] Both fromEmail and from_email are MISSING from stringified body!');
+              console.error('[PROXY ERROR] Stringified body:', stringifiedBody);
+            }
+          }
         }
         // Log the outgoing payload for all non-GET/DELETE
         if (method !== 'GET' && method !== 'DELETE') {
@@ -308,6 +402,32 @@ export function createProxyHandler({ injectTenantId = true, allowedMethods = ['G
             console.log('[PROXY FINAL] isTestEmail in final payload:', parsedBody.isTestEmail);
           } catch (e) {
             console.log('[PROXY FINAL] Could not parse body:', e);
+          }
+        }
+
+        // CRITICAL: Special logging for promotion email templates - verify fromEmail is in final body
+        if (path.includes('promotion-email-templates') && bodyToSend && (method === 'POST' || method === 'PUT')) {
+          console.log('[PROXY FINAL] About to send promotion email template to backend API:', {
+            url: apiUrl,
+            method: method,
+            headers: { 'Content-Type': contentType, ...extraHeaders },
+            bodyLength: bodyToSend.length
+          });
+          try {
+            const parsedBody = JSON.parse(bodyToSend);
+            console.log('[PROXY FINAL] Parsed body being sent to backend:', parsedBody);
+            console.log('[PROXY FINAL] fromEmail in final payload:', parsedBody.fromEmail);
+            console.log('[PROXY FINAL] fromEmail type:', typeof parsedBody.fromEmail);
+            console.log('[PROXY FINAL] All keys in final payload:', Object.keys(parsedBody));
+            if (!parsedBody.fromEmail) {
+              console.error('[PROXY FINAL ERROR] fromEmail is MISSING from final payload being sent to backend!');
+              console.error('[PROXY FINAL ERROR] Full payload:', JSON.stringify(parsedBody, null, 2));
+            }
+            // Also log the raw body string to see exact JSON
+            console.log('[PROXY FINAL] Raw JSON body string:', bodyToSend.substring(0, 500)); // First 500 chars
+          } catch (e) {
+            console.error('[PROXY FINAL] Could not parse body:', e);
+            console.error('[PROXY FINAL] Raw body:', bodyToSend);
           }
         }
 

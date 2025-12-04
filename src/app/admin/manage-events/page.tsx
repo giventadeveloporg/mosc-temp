@@ -486,7 +486,7 @@ export default function ManageEventsPage() {
         onActivate={(event) => handleActivateClick(event)}
         onPrevPage={handlePrevPage}
         onNextPage={handleNextPage}
-        currentPage={page}
+        page={page}
         totalCount={totalCount}
         pageSize={pageSize}
         showPastEvents={showPastEvents}
