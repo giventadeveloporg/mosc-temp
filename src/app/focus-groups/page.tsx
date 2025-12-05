@@ -4,6 +4,18 @@ function toInt(v: string | undefined, d: number) {
   const n = Number(v); return Number.isFinite(n) && n >= 0 ? n : d;
 }
 
+async function fetchEventsForGroup(baseUrl: string, groupId: number) {
+  try {
+    // Fetch only events associated with this focus group
+    const res = await fetch(`${baseUrl}/api/proxy/event-details?focusGroupId.equals=${groupId}&isActive.equals=true&sort=startDate,asc&size=3`, { cache: 'no-store' });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
+}
+
 export default async function FocusGroupsPage({ searchParams }: { searchParams?: { [k: string]: string | string[] | undefined } }) {
   const baseUrl = getAppUrl();
   const page = toInt(typeof searchParams?.page === 'string' ? searchParams?.page : undefined, 0);
@@ -22,6 +34,14 @@ export default async function FocusGroupsPage({ searchParams }: { searchParams?:
     }
   } catch { }
 
+  // Fetch events for each focus group
+  const groupsWithEvents = await Promise.all(
+    groups.map(async (group) => {
+      const events = group?.id ? await fetchEventsForGroup(baseUrl, group.id) : [];
+      return { ...group, events };
+    })
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50">
       <div className="max-w-5xl mx-auto px-8 pt-24 pb-8">
@@ -36,12 +56,46 @@ export default async function FocusGroupsPage({ searchParams }: { searchParams?:
 
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {groups.map(g => (
-              <a key={g.id} href={`/focus-groups/${encodeURIComponent(g.slug)}`} className="group block bg-white rounded-xl shadow p-6 hover:shadow-md transition">
-                <div className="h-36 rounded-lg mb-4 bg-cover bg-center" style={{ backgroundImage: g.coverImageUrl ? `url(${g.coverImageUrl})` : undefined, backgroundColor: '#f3f4f6' }} />
-                <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">{g.name}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">{g.description || 'No description provided.'}</p>
-              </a>
+            {groupsWithEvents.map(g => (
+              <div key={g.id} className="group block bg-white rounded-xl shadow p-6 hover:shadow-md transition">
+                <a href={`/focus-groups/${encodeURIComponent(g.slug)}`} className="block">
+                  <div className="h-36 rounded-lg mb-4 bg-cover bg-center" style={{ backgroundImage: g.coverImageUrl ? `url(${g.coverImageUrl})` : undefined, backgroundColor: '#f3f4f6' }} />
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">{g.name}</h3>
+                  <p className="text-gray-600 text-sm leading-relaxed line-clamp-3 mb-4">{g.description || 'No description provided.'}</p>
+                </a>
+
+                {/* Show events associated with this focus group */}
+                {g.events && g.events.length > 0 && (
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <h4 className="text-sm font-semibold text-gray-700 mb-2">Upcoming Events</h4>
+                    <div className="space-y-2">
+                      {g.events.slice(0, 3).map((event: any) => (
+                        <a
+                          key={event.id}
+                          href={`/event/${event.id}`}
+                          className="block p-2 rounded hover:bg-gray-50 transition-colors"
+                        >
+                          <div className="text-xs text-gray-500">{event.startDate} • {event.startTime}</div>
+                          <div className="text-sm font-medium text-gray-900 mt-1 line-clamp-1">{event.title}</div>
+                        </a>
+                      ))}
+                      {g.events.length > 3 && (
+                        <a
+                          href={`/focus-groups/${encodeURIComponent(g.slug)}`}
+                          className="block text-xs text-blue-600 hover:text-blue-800 mt-2 font-medium"
+                        >
+                          View all {g.events.length} events →
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                )}
+                {g.events && g.events.length === 0 && (
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <p className="text-xs text-gray-500">No upcoming events</p>
+                  </div>
+                )}
+              </div>
             ))}
             {groups.length === 0 && (
               <div className="col-span-full text-center text-gray-500">No focus groups found.</div>

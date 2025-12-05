@@ -362,14 +362,19 @@ export function EventList({
                 >
                   {(() => {
                     // Format date to show first 3 letters of month (e.g., "Nov 20, 2025")
+                    // Parse date string directly to avoid timezone conversion issues
                     const formatShortDate = (dateStr: string) => {
                       if (!dateStr) return '';
-                      const date = new Date(dateStr);
+                      // Parse YYYY-MM-DD format directly without timezone conversion
+                      const [year, month, day] = dateStr.split('-').map(Number);
+                      if (!year || !month || !day) return dateStr;
+                      // Create date in local timezone to avoid UTC conversion
+                      const date = new Date(year, month - 1, day);
                       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                      const month = months[date.getMonth()];
-                      const day = date.getDate();
-                      const year = date.getFullYear();
-                      return `${month} ${day}, ${year}`;
+                      const monthName = months[date.getMonth()];
+                      const dayNum = date.getDate();
+                      const yearNum = date.getFullYear();
+                      return `${monthName} ${dayNum}, ${yearNum}`;
                     };
                     return (
                       <>

@@ -161,7 +161,7 @@ export default async function TicketListPage({ params, searchParams }: { params:
             <FaPhotoVideo className="text-xs sm:text-base mb-0.5 sm:mb-1" />
             <span className="font-medium text-center leading-tight text-[8px] sm:text-xs">Manage Media Files</span>
           </Link>
-          <Link href="/admin" className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-lg shadow-sm hover:shadow-md p-1.5 sm:p-3 text-xs transition-all duration-200 min-h-[60px] sm:min-h-[80px]">
+          <Link href="/admin/manage-events" className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-lg shadow-sm hover:shadow-md p-1.5 sm:p-3 text-xs transition-all duration-200 min-h-[60px] sm:min-h-[80px]">
             <FaCalendarAlt className="text-xs sm:text-base mb-0.5 sm:mb-1" />
             <span className="font-medium text-center leading-tight text-[8px] sm:text-xs">Manage Events</span>
           </Link>

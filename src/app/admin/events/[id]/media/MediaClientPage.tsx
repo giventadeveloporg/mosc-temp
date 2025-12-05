@@ -644,7 +644,7 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
               <FaUsers className="text-3xl mb-2" />
               <span>Manage Users [Usage]</span>
             </Link>
-            <Link href="/admin" className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-lg p-4 transition duration-300 font-semibold">
+            <Link href="/admin/manage-events" className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-lg p-4 transition duration-300 font-semibold">
               <FaCalendarAlt className="text-3xl mb-2" />
               <span>Manage Events</span>
             </Link>

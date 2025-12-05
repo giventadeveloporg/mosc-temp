@@ -49,6 +49,8 @@ export function MonthView({ events, year, month }: { events: CalendarEvent[]; ye
       ))}
       {cells.map((c, idx) => {
         const evs = c.day ? (eventsByDay.get(c.day) || []) : [];
+        // Build date string for day view link (YYYY-MM-DD format)
+        const dateStr = c.day ? `${year}-${String(month).padStart(2, '0')}-${String(c.day).padStart(2, '0')}` : null;
         return (
           <div key={idx} className="min-h-[100px] border rounded-lg p-2 bg-white">
             <div className="text-xs font-semibold text-gray-700">{c.day ?? ''}</div>
@@ -64,8 +66,13 @@ export function MonthView({ events, year, month }: { events: CalendarEvent[]; ye
                   {event.title}
                 </Link>
               ))}
-              {evs.length > 3 && (
-                <div className="text-[10px] text-gray-500">+ {evs.length - 3} more</div>
+              {evs.length > 3 && dateStr && (
+                <Link
+                  href={`/calendar?view=day&date=${dateStr}`}
+                  className="text-[10px] text-blue-600 hover:text-blue-800 hover:underline transition-colors cursor-pointer"
+                >
+                  + {evs.length - 3} more
+                </Link>
               )}
             </div>
           </div>

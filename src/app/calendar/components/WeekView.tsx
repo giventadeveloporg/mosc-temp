@@ -39,6 +39,8 @@ export function WeekView({ events, anchorDate }: { events: CalendarEvent[]; anch
       {days.map((d, idx) => {
         const day = d.getDate();
         const evs = eventsByDay.get(day) || [];
+        // Build date string for day view link (YYYY-MM-DD format)
+        const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         return (
           <div key={idx} className="min-h-[140px] border rounded-lg p-2 bg-white">
             <div className="text-xs font-semibold text-gray-700">{d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}</div>
@@ -55,7 +57,12 @@ export function WeekView({ events, anchorDate }: { events: CalendarEvent[]; anch
                 </Link>
               ))}
               {evs.length > 5 && (
-                <div className="text-[10px] text-gray-500">+ {evs.length - 5} more</div>
+                <Link
+                  href={`/calendar?view=day&date=${dateStr}`}
+                  className="text-[10px] text-blue-600 hover:text-blue-800 hover:underline transition-colors cursor-pointer"
+                >
+                  + {evs.length - 5} more
+                </Link>
               )}
             </div>
           </div>

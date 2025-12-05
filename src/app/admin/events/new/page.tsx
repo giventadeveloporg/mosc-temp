@@ -36,25 +36,14 @@ export default function CreateEventPage() {
           return res.json();
         })
         .then((event: EventDetailsDTO) => {
-          // Create a copy of the event with updated dates
-          const today = new Date();
-          const tomorrow = new Date(today);
-          tomorrow.setDate(tomorrow.getDate() + 1);
-
-          // Format dates as YYYY-MM-DD (EventForm expects this format internally)
-          const formatDate = (date: Date) => {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-          };
-
+          // Create a copy of the event retaining original dates
           const copiedEvent: EventDetailsDTO = {
             ...event,
             id: undefined, // Remove ID so it's treated as a new event
             title: event.title ? `${event.title} (Copy)` : '',
-            startDate: formatDate(today), // YYYY-MM-DD format - EventForm will convert to MM/DD/YYYY for display
-            endDate: formatDate(tomorrow), // YYYY-MM-DD format - EventForm will convert to MM/DD/YYYY for display
+            // Retain original start and end dates
+            startDate: event.startDate || '', // YYYY-MM-DD format - EventForm will convert to MM/DD/YYYY for display
+            endDate: event.endDate || '', // YYYY-MM-DD format - EventForm will convert to MM/DD/YYYY for display
             createdAt: '',
             updatedAt: '',
             createdBy: undefined,
@@ -176,7 +165,7 @@ export default function CreateEventPage() {
               <span>Manage Usage</span>
               <span className="text-xs text-blue-500 mt-1">[Users]</span>
             </Link>
-            <Link href="/admin" className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-700 rounded-lg shadow-sm px-4 py-4 transition font-semibold text-sm">
+            <Link href="/admin/manage-events" className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-700 rounded-lg shadow-sm px-4 py-4 transition font-semibold text-sm">
               <FaCalendarAlt className="mb-2 text-2xl" />
               Manage Events
             </Link>

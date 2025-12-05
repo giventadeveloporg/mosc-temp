@@ -119,7 +119,7 @@ export default function EditEventPage() {
               <FaPhotoVideo className="mb-2 text-2xl" />
               Manage Media Files
             </Link>
-            <Link href="/admin" className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-700 rounded-lg shadow-sm px-4 py-4 transition font-semibold text-sm">
+            <Link href="/admin/manage-events" className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-700 rounded-lg shadow-sm px-4 py-4 transition font-semibold text-sm">
               <FaCalendarAlt className="mb-2 text-2xl" />
               Manage Events
             </Link>

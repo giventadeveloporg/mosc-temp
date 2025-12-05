@@ -8,9 +8,11 @@ interface EventTooltipProps {
   event: CalendarEvent | null;
   anchorRect: DOMRect | null;
   onClose: () => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 }
 
-export function EventTooltip({ event, anchorRect, onClose }: EventTooltipProps) {
+export function EventTooltip({ event, anchorRect, onClose, onMouseEnter, onMouseLeave }: EventTooltipProps) {
   if (!event || !anchorRect) return null;
   if (typeof window === 'undefined' || !document.body) return null;
 
@@ -74,7 +76,12 @@ export function EventTooltip({ event, anchorRect, onClose }: EventTooltipProps) 
   };
 
   return createPortal(
-    <div style={style} className="event-tooltip" onMouseLeave={onClose}>
+    <div
+      style={style}
+      className="event-tooltip"
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave || onClose}
+    >
       {/* Close button */}
       <div className="sticky top-0 right-0 z-10 bg-white flex justify-end mb-2">
         <button

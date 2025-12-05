@@ -674,7 +674,7 @@ export default function EventMediaListPage() {
               <FaUsers className="text-lg sm:text-xl mb-2" />
               <span className="font-semibold text-center leading-tight">Manage Users [Usage]</span>
             </Link>
-            <Link href="/admin" className="w-full max-w-xs flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-lg shadow-sm hover:shadow-md p-3 sm:p-4 text-xs sm:text-sm transition-all duration-200">
+            <Link href="/admin/manage-events" className="w-full max-w-xs flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-lg shadow-sm hover:shadow-md p-3 sm:p-4 text-xs sm:text-sm transition-all duration-200">
               <FaCalendarAlt className="text-lg sm:text-xl mb-2" />
               <span className="font-semibold text-center leading-tight">Manage Events</span>
             </Link>

@@ -8,12 +8,14 @@ import RecurrenceConfigSection from '@/components/RecurrenceConfigSection';
 import RecurrencePreview from '@/components/RecurrencePreview';
 import type { RecurrencePattern, RecurrenceEndType } from '@/lib/recurrenceUtils';
 import { validateRecurrenceEndDate, generateOccurrenceDates } from '@/lib/recurrenceUtils';
+import { useRouter } from 'next/navigation';
 
 interface EventFormProps {
   event?: EventDetailsDTO;
   eventTypes: EventTypeDetailsDTO[];
   onSubmit: (event: EventDetailsDTO) => void;
   loading?: boolean;
+  onCancel?: () => void;
 }
 
 export const defaultEvent: EventDetailsDTO = {
@@ -47,7 +49,8 @@ export const defaultEvent: EventDetailsDTO = {
   updatedAt: '',
 };
 
-export function EventForm({ event, eventTypes, onSubmit, loading }: EventFormProps) {
+export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: EventFormProps) {
+  const router = useRouter();
   const [form, setForm] = useState<EventDetailsDTO>({ ...defaultEvent, ...event });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showErrors, setShowErrors] = useState(false);
@@ -1590,6 +1593,12 @@ export function EventForm({ event, eventTypes, onSubmit, loading }: EventFormPro
 
       {/* From Email Field */}
       <div className="mb-4">
+        {/* AWS SES Verification Note */}
+        <div className="mb-3 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+          <p className="text-sm text-yellow-800">
+            <strong>From Email Field:</strong> The email address used in the "From Email" field must be registered and verified with AWS SES (Amazon Simple Email Service). Contact your administrator for help.
+          </p>
+        </div>
         <label htmlFor="fromEmail" className="block text-sm font-medium text-gray-700 mb-1">
           From Email <span className="text-red-500">*</span>
         </label>
@@ -1669,6 +1678,19 @@ export function EventForm({ event, eventTypes, onSubmit, loading }: EventFormPro
           {loading ? 'Saving...' : 'Save Event'}
         </button>
         <button type="button" className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2" onClick={handleReset}>Reset</button>
+        <button
+          type="button"
+          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+          onClick={() => {
+            if (onCancel) {
+              onCancel();
+            } else {
+              router.push('/admin/manage-events');
+            }
+          }}
+        >
+          Cancel
+        </button>
       </div>
     </form>
   );

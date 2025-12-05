@@ -3,9 +3,26 @@ import CalendarClient from './CalendarClient';
 
 export default async function CalendarPage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
   const today = new Date();
-  const year = today.getFullYear();
-  const month = today.getMonth() + 1;
+  let year = today.getFullYear();
+  let month = today.getMonth() + 1;
+
+  // Parse date from query params if provided
+  const dateParam = typeof searchParams?.date === 'string' ? searchParams.date : undefined;
+  if (dateParam) {
+    try {
+      const date = new Date(dateParam);
+      if (!isNaN(date.getTime())) {
+        year = date.getFullYear();
+        month = date.getMonth() + 1;
+      }
+    } catch (e) {
+      // Invalid date, use today
+    }
+  }
+
   const focusGroup = typeof searchParams?.focusGroup === 'string' ? searchParams?.focusGroup : undefined;
+  const initialView = typeof searchParams?.view === 'string' ? searchParams.view : 'month';
+  const initialDate = dateParam ? new Date(dateParam) : today;
   const initialEvents = await fetchEventsForMonthServer(year, month, focusGroup);
 
   return (
@@ -25,7 +42,14 @@ export default async function CalendarPage({ searchParams }: { searchParams?: { 
         </div>
 
         <div className="bg-white rounded-xl shadow p-6">
-          <CalendarClient initialEvents={initialEvents} initialYear={year} initialMonth={month} focusGroup={focusGroup} />
+          <CalendarClient
+            initialEvents={initialEvents}
+            initialYear={year}
+            initialMonth={month}
+            focusGroup={focusGroup}
+            initialView={initialView as 'month' | 'week' | 'day'}
+            initialDate={initialDate}
+          />
         </div>
       </div>
     </div>
