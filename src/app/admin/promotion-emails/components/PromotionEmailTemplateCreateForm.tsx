@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import type {
   PromotionEmailTemplateFormDTO,
   DiscountCodeDTO,
@@ -11,6 +12,7 @@ import {
 } from '../ApiServerActions';
 import { fetchDiscountCodesForEvent } from '@/app/admin/events/[id]/discount-codes/list/ApiServerActions';
 import EventSearchSelect from './EventSearchSelect';
+import SaveStatusDialog, { type SaveStatus } from '@/components/SaveStatusDialog';
 
 interface PromotionEmailTemplateCreateFormProps {
   onSave: (templateId: number) => void;
