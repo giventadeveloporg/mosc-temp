@@ -14,7 +14,7 @@ import OurSponsorsSection from '../components/OurSponsorsSection';
 import ProjectsSection from '../components/ProjectsSection';
 import TestimonialsSection from '../components/TestimonialsSection';
 import ErrorBoundary from '@/components/ErrorBoundary';
-import { TenantSettingsProvider, useTenantSettings } from '@/components/TenantSettingsProvider';
+import { useTenantSettings } from '@/components/TenantSettingsProvider';
 
 // Fallback components for when data is not available
 const EventsFallback = () => (
@@ -361,11 +361,8 @@ function HomePageContent() {
   );
 }
 
-// Main HomePage component that provides tenant settings context
+// Main HomePage component
+// Note: TenantSettingsProvider is now in root layout, so no need to wrap here
 export default function HomePage() {
-  return (
-    <TenantSettingsProvider>
-      <HomePageContent />
-    </TenantSettingsProvider>
-  );
+  return <HomePageContent />;
 }
