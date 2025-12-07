@@ -396,6 +396,36 @@ export default function TenantSettingsViewClient({ settings, settingsId, organiz
             </dl>
           </div>
 
+          {/* Email Header Image */}
+          <div className="border-t border-gray-200 pt-6">
+            <h4 className="text-md font-medium text-gray-900 mb-4">Email Header Image</h4>
+            {settings?.emailHeaderImageUrl ? (
+              <div className="p-4 bg-gray-50 border border-gray-300 rounded-lg">
+                <div className="relative inline-block mb-2">
+                  <Image
+                    src={settings.emailHeaderImageUrl}
+                    alt="Email header image"
+                    width={400}
+                    height={200}
+                    className="max-w-full h-auto max-h-48 rounded-lg border border-gray-300 object-contain"
+                  />
+                </div>
+                <p className="text-sm text-gray-700 mb-2">Email Header Image URL:</p>
+                <a
+                  href={settings.emailHeaderImageUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 underline text-sm flex items-center gap-2"
+                >
+                  {settings.emailHeaderImageUrl}
+                  <FaExternalLinkAlt className="w-3 h-3" />
+                </a>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500">No email header image uploaded</p>
+            )}
+          </div>
+
           {/* Email Footer HTML */}
           <div className="border-t border-gray-200 pt-6">
             <h4 className="text-md font-medium text-gray-900 mb-4">Email Footer HTML</h4>

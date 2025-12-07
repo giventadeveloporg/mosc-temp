@@ -15,13 +15,28 @@ async function createFocusGroup(formData: FormData) {
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   } as any;
-  await fetch(`${baseUrl}/api/proxy/focus-groups`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-    cache: 'no-store',
-  });
-  redirect('/admin/focus-groups');
+
+  try {
+    const response = await fetch(`${baseUrl}/api/proxy/focus-groups`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      cache: 'no-store',
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Failed to create focus group:', response.status, errorText);
+      throw new Error(`Failed to create focus group: ${response.status} ${errorText}`);
+    }
+
+    // Success - redirect to list page
+    redirect('/admin/focus-groups');
+  } catch (error) {
+    console.error('Error creating focus group:', error);
+    // Re-throw to show error to user (Next.js will handle this)
+    throw error;
+  }
 }
 
 export default function NewFocusGroupPage() {

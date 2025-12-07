@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaSave, FaBan, FaCode, FaCog, FaUpload, FaTimes } from 'react-icons/fa';
 import type { TenantSettingsDTO, TenantSettingsFormDTO, TenantOrganizationDTO } from '@/app/admin/tenant-management/types';
-import { uploadEmailFooterHtmlClient, uploadTenantLogoClient } from '@/app/admin/tenant-management/settings/ApiServerActions';
+import { uploadEmailFooterHtmlClient, uploadTenantLogoClient, uploadEmailHeaderImageClient } from '@/app/admin/tenant-management/settings/ApiServerActions';
 import { patchTenantSetting } from '@/app/admin/tenant-management/settings/ApiServerActions';
 import SaveStatusDialog, { type SaveStatus } from '@/components/SaveStatusDialog';
 
@@ -30,14 +30,19 @@ export default function TenantSettingsForm({
   const [activeTab, setActiveTab] = useState<'general' | 'integrations' | 'limits' | 'customization'>('general');
   const [uploadingFooterHtml, setUploadingFooterHtml] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadingHeaderImage, setUploadingHeaderImage] = useState(false);
   const [isDraggingFooterHtml, setIsDraggingFooterHtml] = useState(false);
   const [isDraggingLogo, setIsDraggingLogo] = useState(false);
+  const [isDraggingHeaderImage, setIsDraggingHeaderImage] = useState(false);
   const [footerHtmlUploadStatus, setFooterHtmlUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
   const [footerHtmlUploadMessage, setFooterHtmlUploadMessage] = useState<string>('');
   const [logoUploadStatus, setLogoUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
   const [logoUploadMessage, setLogoUploadMessage] = useState<string>('');
+  const [headerImageUploadStatus, setHeaderImageUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
+  const [headerImageUploadMessage, setHeaderImageUploadMessage] = useState<string>('');
   const footerHtmlFileInputRef = useRef<HTMLInputElement>(null);
   const logoFileInputRef = useRef<HTMLInputElement>(null);
+  const headerImageFileInputRef = useRef<HTMLInputElement>(null);
 
   const {
     register,
@@ -79,6 +84,7 @@ export default function TenantSettingsForm({
       whatsappWebhookUrl: initialData?.whatsappWebhookUrl || '',
       whatsappWebhookToken: initialData?.whatsappWebhookToken || '',
       emailFooterHtmlUrl: initialData?.emailFooterHtmlUrl || '',
+      emailHeaderImageUrl: initialData?.emailHeaderImageUrl || '',
       logoImageUrl: initialData?.logoImageUrl || '',
       // Contact and Address Fields
       addressLine1: initialData?.addressLine1 || '',
@@ -97,6 +103,7 @@ export default function TenantSettingsForm({
   // Watch form values for real-time updates
   const watchedValues = watch();
   const emailFooterHtmlUrl = watch('emailFooterHtmlUrl');
+  const emailHeaderImageUrl = watch('emailHeaderImageUrl');
   const logoImageUrl = watch('logoImageUrl');
 
   // Handle form submission
@@ -143,6 +150,45 @@ export default function TenantSettingsForm({
       setUploadingFooterHtml(false);
       if (footerHtmlFileInputRef.current) {
         footerHtmlFileInputRef.current.value = '';
+      }
+    }
+  };
+
+  // Process email header image upload
+  const processHeaderImageUpload = async (file: File) => {
+    if (!file || !settingsId) return;
+
+    setUploadingHeaderImage(true);
+    setHeaderImageUploadStatus('uploading');
+    setHeaderImageUploadMessage('Uploading email header image...');
+
+    try {
+      const result = await uploadEmailHeaderImageClient(file);
+
+      setValue('emailHeaderImageUrl', result.url);
+
+      // Automatically update the settings with the new URL
+      if (settingsId) {
+        await patchTenantSetting(settingsId, {
+          emailHeaderImageUrl: result.url,
+        });
+      }
+
+      setHeaderImageUploadStatus('success');
+      setHeaderImageUploadMessage('Email header image uploaded and saved successfully!');
+
+      // Auto-close success dialog after 2 seconds
+      setTimeout(() => {
+        setHeaderImageUploadStatus('idle');
+        setHeaderImageUploadMessage('');
+      }, 2000);
+    } catch (err: any) {
+      setHeaderImageUploadStatus('error');
+      setHeaderImageUploadMessage(err.message || 'Failed to upload email header image');
+    } finally {
+      setUploadingHeaderImage(false);
+      if (headerImageFileInputRef.current) {
+        headerImageFileInputRef.current.value = '';
       }
     }
   };
@@ -221,6 +267,44 @@ export default function TenantSettingsForm({
     } else {
       setFooterHtmlUploadStatus('error');
       setFooterHtmlUploadMessage('Please drop a valid HTML file');
+    }
+  };
+
+  // Header image upload handlers
+  const handleHeaderImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      await processHeaderImageUpload(file);
+    }
+  };
+
+  const handleHeaderImageDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!uploadingHeaderImage && settingsId) {
+      setIsDraggingHeaderImage(true);
+    }
+  };
+
+  const handleHeaderImageDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingHeaderImage(false);
+  };
+
+  const handleHeaderImageDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingHeaderImage(false);
+
+    if (uploadingHeaderImage || !settingsId) return;
+
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      await processHeaderImageUpload(file);
+    } else {
+      setHeaderImageUploadStatus('error');
+      setHeaderImageUploadMessage('Please drop a valid image file');
     }
   };
 
@@ -1121,6 +1205,90 @@ export default function TenantSettingsForm({
               </p>
             </div>
 
+            {/* Email Header Image Upload */}
+            <div className="border-t border-gray-200 pt-6">
+              <h4 className="text-md font-medium text-gray-900 mb-4">Email Header Image</h4>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email Header Image File
+                </label>
+                {emailHeaderImageUrl ? (
+                  <div className="relative inline-block">
+                    <div className="p-4 bg-gray-50 border border-gray-300 rounded-lg">
+                      <img
+                        src={emailHeaderImageUrl}
+                        alt="Email header image"
+                        className="max-w-full h-auto max-h-48 rounded-lg border border-gray-300 object-contain"
+                      />
+                      <p className="text-sm text-gray-700 mt-2 mb-2">Current image:</p>
+                      <a
+                        href={emailHeaderImageUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 underline text-sm"
+                      >
+                        {emailHeaderImageUrl}
+                      </a>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleRemoveHeaderImage}
+                      className="mt-2 bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm flex items-center gap-2"
+                    >
+                      <FaTimes className="w-3 h-3" />
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <div>
+                    <input
+                      ref={headerImageFileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleHeaderImageUpload}
+                      disabled={uploadingHeaderImage || !settingsId}
+                      className="hidden"
+                    />
+                    <div
+                      onDragOver={handleHeaderImageDragOver}
+                      onDragLeave={handleHeaderImageDragLeave}
+                      onDrop={handleHeaderImageDrop}
+                      onClick={() => !uploadingHeaderImage && settingsId && headerImageFileInputRef.current?.click()}
+                      className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-full ${
+                        isDraggingHeaderImage
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-gray-300 hover:border-blue-500'
+                      } ${uploadingHeaderImage || !settingsId ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                      <FaUpload className={`mx-auto h-12 w-12 mb-2 ${
+                        isDraggingHeaderImage ? 'text-blue-500' : 'text-gray-400'
+                      }`} />
+                      <p className={`text-sm ${
+                        isDraggingHeaderImage ? 'text-blue-600 font-semibold' : 'text-gray-600'
+                      }`}>
+                        {uploadingHeaderImage
+                          ? 'Uploading...'
+                          : isDraggingHeaderImage
+                            ? 'Drop image here'
+                            : 'Click to upload or drag and drop email header image'}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Image files only (PNG, JPG, GIF, etc.)
+                      </p>
+                    </div>
+                  </div>
+                )}
+                {headerImageUploadStatus !== 'idle' && (
+                  <div className={`mt-2 p-2 rounded text-sm ${
+                    headerImageUploadStatus === 'success' ? 'bg-green-100 text-green-800' :
+                    headerImageUploadStatus === 'error' ? 'bg-red-100 text-red-800' :
+                    'bg-blue-100 text-blue-800'
+                  }`}>
+                    {headerImageUploadMessage}
+                  </div>
+                )}
+              </div>
+            </div>
 
             {/* Email Footer HTML Upload */}
             <div className="border-t border-gray-200 pt-6">
@@ -1316,6 +1484,26 @@ export default function TenantSettingsForm({
           if (logoUploadStatus === 'error') {
             setLogoUploadStatus('idle');
             setLogoUploadMessage('');
+          }
+        }}
+      />
+
+      {/* Email Header Image Upload Status Dialog */}
+      <SaveStatusDialog
+        isOpen={headerImageUploadStatus !== 'idle'}
+        status={headerImageUploadStatus === 'uploading' ? 'saving' : headerImageUploadStatus === 'success' ? 'success' : 'error'}
+        title={
+          headerImageUploadStatus === 'uploading'
+            ? 'Uploading...'
+            : headerImageUploadStatus === 'success'
+            ? 'Uploaded Successfully!'
+            : 'Upload Failed'
+        }
+        message={headerImageUploadMessage}
+        onClose={() => {
+          if (headerImageUploadStatus === 'error') {
+            setHeaderImageUploadStatus('idle');
+            setHeaderImageUploadMessage('');
           }
         }}
       />

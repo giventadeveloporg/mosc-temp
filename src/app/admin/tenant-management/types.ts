@@ -60,6 +60,7 @@ export interface TenantSettingsDTO {
   whatsappWebhookUrl?: string;
   whatsappWebhookToken?: string;
   emailFooterHtmlUrl?: string; // S3 URL for email footer HTML file
+  emailHeaderImageUrl?: string; // S3 URL for email header image
   logoImageUrl?: string; // S3 URL for tenant logo image
   // Contact and Address Fields
   addressLine1?: string;

@@ -386,3 +386,34 @@ export async function uploadTenantLogoClient(
     url: result.logoImageUrl || result.url || '',
   };
 }
+
+/**
+ * Upload email header image (client-side function)
+ * Note: This must be called from client components, not server actions
+ */
+export async function uploadEmailHeaderImageClient(
+  file: File
+): Promise<{ url: string }> {
+  const baseUrl = getAppUrl();
+  const formData = new FormData();
+
+  formData.append('file', file);
+
+  const url = `${baseUrl}/api/proxy/tenant-settings/upload/email-header-image`;
+
+  const response = await fetch(url, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    console.error(`[Client] Error uploading email header image: ${response.status} ${response.statusText}`, errorBody);
+    throw new Error(`Failed to upload email header image. Status: ${response.status}`);
+  }
+
+  const result = await response.json();
+  return {
+    url: result.emailHeaderImageUrl || result.url || '',
+  };
+}

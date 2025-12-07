@@ -563,6 +563,7 @@ export interface TenantSettingsDTO {
   showTeamMembersSectionInHomePage?: boolean;
   showSponsorsSectionInHomePage?: boolean;
   isMembershipSubscriptionEnabled?: boolean;
+  emailHeaderImageUrl?: string; // S3 URL for email header image
   // Contact and Address Fields
   addressLine1?: string;
   addressLine2?: string;

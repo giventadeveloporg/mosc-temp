@@ -5,22 +5,70 @@ function toInt(v: string | undefined, d: number) {
   const n = Number(v); return Number.isFinite(n) && n >= 0 ? n : d;
 }
 
-export default async function AdminFocusGroupsPage({ searchParams }: { searchParams?: { [k: string]: string | string[] | undefined } }) {
+export default async function AdminFocusGroupsPage({ searchParams }: { searchParams?: { [k: string]: string | string[] | undefined } | Promise<{ [k: string]: string | string[] | undefined }> }) {
+  // Await searchParams if it's a promise (Next.js 15+ requirement)
+  const resolvedSearchParams = typeof searchParams?.then === 'function' ? await searchParams : searchParams;
+
   const baseUrl = getAppUrl();
-  const page = toInt(typeof searchParams?.page === 'string' ? searchParams?.page : undefined, 0);
-  const size = toInt(typeof searchParams?.size === 'string' ? searchParams?.size : undefined, 10);
-  const sort = typeof searchParams?.sort === 'string' ? searchParams?.sort : 'createdAt,desc';
+  const page = toInt(typeof resolvedSearchParams?.page === 'string' ? resolvedSearchParams?.page : undefined, 0);
+  const size = toInt(typeof resolvedSearchParams?.size === 'string' ? resolvedSearchParams?.size : undefined, 10);
+  const sort = typeof resolvedSearchParams?.sort === 'string' ? resolvedSearchParams?.sort : 'createdAt,desc';
 
   let groups: any[] = [];
   let total = 0;
   try {
-    const res = await fetch(`${baseUrl}/api/proxy/focus-groups?page=${page}&size=${size}&sort=${encodeURIComponent(sort)}`, { cache: 'no-store' });
+    const url = `${baseUrl}/api/proxy/focus-groups?page=${page}&size=${size}&sort=${encodeURIComponent(sort)}`;
+    console.log('[FocusGroups] Fetching from:', url);
+
+    const res = await fetch(url, { cache: 'no-store' });
+    console.log('[FocusGroups] Response status:', res.status, res.statusText);
+
     if (res.ok) {
       const data = await res.json();
-      groups = Array.isArray(data) ? data : [];
-      total = Number(res.headers.get('X-Total-Count') || groups.length || 0);
+      console.log('[FocusGroups] Response data type:', typeof data, 'Is array:', Array.isArray(data), 'Has content:', data?.content);
+
+      // Handle different response formats:
+      // 1. Direct array
+      // 2. Paginated response with content array (Spring Data REST)
+      // 3. Single object (wrap in array)
+      if (Array.isArray(data)) {
+        groups = data;
+        console.log('[FocusGroups] Using direct array format, count:', groups.length);
+      } else if (data && typeof data === 'object' && Array.isArray(data.content)) {
+        // Spring Data REST paginated response
+        groups = data.content;
+        console.log('[FocusGroups] Using paginated content array format, count:', groups.length);
+      } else if (data && typeof data === 'object' && data.id) {
+        // Single object - wrap in array
+        groups = [data];
+        console.log('[FocusGroups] Using single object format, wrapped in array');
+      } else {
+        groups = [];
+        console.log('[FocusGroups] Unknown format, defaulting to empty array');
+      }
+
+      // Get total count from header (preferred) or from response
+      const totalCountHeader = res.headers.get('x-total-count') || res.headers.get('X-Total-Count');
+      if (totalCountHeader) {
+        total = Number(totalCountHeader);
+        console.log('[FocusGroups] Total from header:', total);
+      } else if (data && typeof data === 'object' && typeof data.totalElements === 'number') {
+        // Spring Data REST paginated response total
+        total = data.totalElements;
+        console.log('[FocusGroups] Total from totalElements:', total);
+      } else {
+        total = groups.length;
+        console.log('[FocusGroups] Total from groups length:', total);
+      }
+
+      console.log('[FocusGroups] Final result - groups:', groups.length, 'total:', total);
+    } else {
+      const errorText = await res.text();
+      console.error('[FocusGroups] API error:', res.status, errorText);
     }
-  } catch { }
+  } catch (err) {
+    console.error('[FocusGroups] Error fetching focus groups:', err);
+  }
 
   return (
     <div className="px-8 pt-24 pb-8 max-w-5xl mx-auto">

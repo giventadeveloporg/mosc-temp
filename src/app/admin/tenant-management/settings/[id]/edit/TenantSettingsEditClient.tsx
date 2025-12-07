@@ -78,6 +78,7 @@ export default function TenantSettingsEditClient({
           showSponsorsSectionInHomePage: settings?.showSponsorsSectionInHomePage ?? true,
           isMembershipSubscriptionEnabled: settings?.isMembershipSubscriptionEnabled ?? false,
           emailFooterHtmlUrl: settings?.emailFooterHtmlUrl || '',
+          emailHeaderImageUrl: settings?.emailHeaderImageUrl || '',
           logoImageUrl: settings?.logoImageUrl || '',
           // Contact and Address Fields
           addressLine1: settings?.addressLine1 || '',
