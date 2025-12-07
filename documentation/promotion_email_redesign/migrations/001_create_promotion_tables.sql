@@ -95,3 +95,5 @@ CREATE INDEX IF NOT EXISTS idx_promotion_log_tenant ON public.promotion_email_se
 
 
 
+
+

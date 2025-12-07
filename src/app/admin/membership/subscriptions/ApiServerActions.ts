@@ -113,8 +113,10 @@ export async function cancelUserSubscriptionServer(
 
   const payload = withTenantId({
     id: subscriptionId,
+    subscriptionStatus: 'CANCELLED',
     cancelAtPeriodEnd: true,
     cancellationReason: cancellationReason || 'Cancelled by admin',
+    cancelledAt: new Date().toISOString(),
   });
 
   const url = `${API_BASE_URL}/api/membership-subscriptions/${subscriptionId}`;
