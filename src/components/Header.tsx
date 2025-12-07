@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Search, ChevronDown, X, Menu, LogOut } from 'lucide-react';
 import { useAuth, useClerk, useUser } from '@clerk/nextjs';
+import { useTenantSettings } from '@/components/TenantSettingsProvider';
 
 const navItems = [
   {
@@ -15,7 +16,8 @@ const navItems = [
   {
     name: 'About',
     href: '/#about-us',
-    active: false
+    active: false,
+    dropdown: [] // Will be populated dynamically based on tenant settings
   },
   {
     name: 'Events',
@@ -41,11 +43,6 @@ const navItems = [
   {
     name: 'Gallery',
     href: '/gallery',
-    active: false
-  },
-  {
-    name: 'Team',
-    href: '/#team-section',
     active: false
   },
   {
@@ -119,6 +116,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
   const { userId, isLoaded } = useAuth();
   const { user } = useUser();
   const { signOut } = useClerk();
+  const { showTeamSection, loading: settingsLoading, settings } = useTenantSettings();
   const [isAdmin, setIsAdmin] = useState(!!isTenantAdmin);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
@@ -247,8 +245,33 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
     return () => window.removeEventListener('hashchange', onHashChange);
   }, [pathname]);
 
+  // Build About dropdown dynamically based on tenant settings
+  // Only show Team when settings are loaded AND showTeamSection is explicitly true
+  const aboutDropdown = [
+    { name: 'About us', href: '/#about-us' }
+  ];
+  // Only add Team if:
+  // 1. Settings are loaded (not loading)
+  // 2. Settings exist (not null)
+  // 3. showTeamSection is explicitly true
+  if (!settingsLoading && settings && showTeamSection) {
+    aboutDropdown.push({ name: 'Team', href: '/#team-section' });
+  }
+
+  // Update nav items with dynamic About dropdown
+  // About always has a dropdown now (at minimum "About us")
+  const navItemsWithDropdown = navItems.map(item => {
+    if (item.name === 'About') {
+      return {
+        ...item,
+        dropdown: aboutDropdown
+      };
+    }
+    return item;
+  });
+
   // Update active state based on current route
-  const updatedNavItems = navItems.map(item => ({
+  const updatedNavItems = navItemsWithDropdown.map(item => ({
     ...item,
     active: item.href === pathname || (item.href === '/' && (pathname === '/charity-theme' || pathname === '/'))
   }));
@@ -278,11 +301,16 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
               {!hideMenuItems && (
                 <nav className="flex items-center space-x-1" role="navigation" aria-label="Main navigation">
                   {updatedNavItems.map((item) => {
-                    const hasDropdown = item.dropdown && Array.isArray(item.dropdown);
+                    const hasDropdown = item.dropdown && Array.isArray(item.dropdown) && item.dropdown.length > 0;
                     const isFeaturesActive = hasDropdown && item.dropdown.some(
                       (subItem: any) => subItem.href === pathname ||
                         (subItem.href === '/profile' && pathname === '/profile') ||
                         (subItem.href === '/membership' && pathname?.startsWith('/membership'))
+                    );
+                    const isAboutActive = hasDropdown && item.name === 'About' && item.dropdown.some(
+                      (subItem: any) => subItem.href === pathname || 
+                        (subItem.href === '/#about-us' && typeof window !== 'undefined' && window.location.hash === '#about-us') ||
+                        (subItem.href === '/#team-section' && typeof window !== 'undefined' && window.location.hash === '#team-section')
                     );
 
                     return (
@@ -296,7 +324,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                                 px-3 py-2 mx-1
                                 transition-all duration-300 ease-in-out
                                 focus:outline-none cursor-pointer
-                                ${isFeaturesActive
+                                ${isFeaturesActive || isAboutActive
                                   ? 'text-blue-400 font-semibold border-b-2 border-blue-400'
                                   : 'text-blue-400 font-medium hover:text-blue-500 hover:font-semibold border-b-2 border-transparent hover:border-blue-400'
                                 }
@@ -309,7 +337,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                                 aria-hidden="true"
                               />
                             </div>
-                            {/* Features Dropdown */}
+                            {/* Dropdown Menu */}
                             <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50">
                               <div className="py-3">
                                 {item.dropdown.map((subItem: any) => {
@@ -317,12 +345,15 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                                   if (subItem.requiresAuth && !userId) return null;
 
                                   const isSubItemActive = subItem.href === pathname ||
-                                    (subItem.href === '/membership' && pathname?.startsWith('/membership'));
+                                    (subItem.href === '/membership' && pathname?.startsWith('/membership')) ||
+                                    (subItem.href === '/#about-us' && typeof window !== 'undefined' && window.location.hash === '#about-us') ||
+                                    (subItem.href === '/#team-section' && typeof window !== 'undefined' && window.location.hash === '#team-section');
 
                                   return (
                                     <Link
                                       key={subItem.name}
                                       href={subItem.href}
+                                      onClick={(e) => handleSmoothScroll(e, subItem.href)}
                                       className={`
                                         block px-4 py-2 mx-1 rounded-lg
                                         text-sm font-medium tracking-[0.025em]
@@ -668,7 +699,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
           <nav className="flex-1 overflow-y-auto py-6" role="navigation" aria-label="Mobile navigation">
             <ul className="space-y-1 px-6">
               {!hideMenuItems && updatedNavItems.map((item) => {
-                const hasDropdown = item.dropdown && Array.isArray(item.dropdown);
+                const hasDropdown = item.dropdown && Array.isArray(item.dropdown) && item.dropdown.length > 0;
                 const isDropdownOpen = openMobileDropdowns[item.name] || false;
 
                 if (hasDropdown) {
@@ -700,7 +731,9 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                             if (subItem.requiresAuth && !userId) return null;
 
                             const isSubItemActive = subItem.href === pathname ||
-                              (subItem.href === '/membership' && pathname?.startsWith('/membership'));
+                              (subItem.href === '/membership' && pathname?.startsWith('/membership')) ||
+                              (subItem.href === '/#about-us' && typeof window !== 'undefined' && window.location.hash === '#about-us') ||
+                              (subItem.href === '/#team-section' && typeof window !== 'undefined' && window.location.hash === '#team-section');
 
                             return (
                               <li key={subItem.name}>
@@ -716,8 +749,9 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                                       : 'text-blue-400 font-medium hover:text-blue-500 hover:font-semibold border-l-4 border-transparent hover:border-blue-400'
                                     }
                                   `}
-                                  onClick={() => {
+                                  onClick={(e) => {
                                     closeMobileMenu();
+                                    handleSmoothScroll(e, subItem.href);
                                   }}
                                   aria-label={`Navigate to ${subItem.name}`}
                                 >

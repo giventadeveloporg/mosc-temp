@@ -9,6 +9,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import ConditionalLayout from "../components/ConditionalLayout";
 import MobileDebugConsole from "../components/MobileDebugConsole";
+import { TenantSettingsProvider } from "../components/TenantSettingsProvider";
 import { headers } from "next/headers";
 import { auth, currentUser } from "@clerk/nextjs";
 import { getAppUrl, getTenantId } from "@/lib/env";
@@ -222,12 +223,14 @@ export default async function RootLayout({
         </head>
         <body className={inter.className + " flex flex-col min-h-screen"} suppressHydrationWarning>
           <TrpcProvider>
-            <ConditionalLayout
-              header={<Header hideMenuItems={false} isTenantAdmin={isTenantAdmin} />}
-              footer={<Footer />}
-            >
-              {children}
-            </ConditionalLayout>
+            <TenantSettingsProvider>
+              <ConditionalLayout
+                header={<Header hideMenuItems={false} isTenantAdmin={isTenantAdmin} />}
+                footer={<Footer />}
+              >
+                {children}
+              </ConditionalLayout>
+            </TenantSettingsProvider>
           </TrpcProvider>
           <Script
             id="hcaptcha-config"
