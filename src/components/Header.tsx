@@ -46,6 +46,11 @@ const navItems = [
     active: false
   },
   {
+    name: 'Team',
+    href: '/#team-section',
+    active: false
+  },
+  {
     name: 'Contact',
     href: '/#contact',
     active: false
@@ -116,7 +121,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
   const { userId, isLoaded } = useAuth();
   const { user } = useUser();
   const { signOut } = useClerk();
-  const { showTeamSection, loading: settingsLoading, settings } = useTenantSettings();
+  const { settings, showTeamSection, loading: settingsLoading } = useTenantSettings();
   const [isAdmin, setIsAdmin] = useState(!!isTenantAdmin);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
@@ -248,7 +253,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
   // Build About dropdown dynamically based on tenant settings
   // Only show Team when settings are loaded AND showTeamSection is explicitly true
   const aboutDropdown = [
-    { name: 'About us', href: '/#about-us' }
+    { name: 'About Us', href: '/#about-us' }
   ];
   // Only add Team if:
   // 1. Settings are loaded (not loading)
@@ -259,7 +264,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
   }
 
   // Update nav items with dynamic About dropdown
-  // About always has a dropdown now (at minimum "About us")
+  // About always has a dropdown now (at minimum "About Us")
   const navItemsWithDropdown = navItems.map(item => {
     if (item.name === 'About') {
       return {
@@ -302,15 +307,15 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                 <nav className="flex items-center space-x-1" role="navigation" aria-label="Main navigation">
                   {updatedNavItems.map((item) => {
                     const hasDropdown = item.dropdown && Array.isArray(item.dropdown) && item.dropdown.length > 0;
-                    const isFeaturesActive = hasDropdown && item.dropdown.some(
+                    const isAboutActive = hasDropdown && item.name === 'About' && item.dropdown.some(
+                      (subItem: any) => subItem.href === pathname ||
+                        (subItem.href === '/#about-us' && typeof window !== 'undefined' && window.location.hash === '#about-us') ||
+                        (subItem.href === '/#team-section' && typeof window !== 'undefined' && window.location.hash === '#team-section')
+                    );
+                    const isFeaturesActive = hasDropdown && item.name === 'Features' && item.dropdown.some(
                       (subItem: any) => subItem.href === pathname ||
                         (subItem.href === '/profile' && pathname === '/profile') ||
                         (subItem.href === '/membership' && pathname?.startsWith('/membership'))
-                    );
-                    const isAboutActive = hasDropdown && item.name === 'About' && item.dropdown.some(
-                      (subItem: any) => subItem.href === pathname || 
-                        (subItem.href === '/#about-us' && typeof window !== 'undefined' && window.location.hash === '#about-us') ||
-                        (subItem.href === '/#team-section' && typeof window !== 'undefined' && window.location.hash === '#team-section')
                     );
 
                     return (
@@ -324,7 +329,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                                 px-3 py-2 mx-1
                                 transition-all duration-300 ease-in-out
                                 focus:outline-none cursor-pointer
-                                ${isFeaturesActive || isAboutActive
+                                ${(item.name === 'About' && isAboutActive) || (item.name === 'Features' && isFeaturesActive)
                                   ? 'text-blue-400 font-semibold border-b-2 border-blue-400'
                                   : 'text-blue-400 font-medium hover:text-blue-500 hover:font-semibold border-b-2 border-transparent hover:border-blue-400'
                                 }
@@ -344,6 +349,9 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                                   // Skip Profile if user is not authenticated
                                   if (subItem.requiresAuth && !userId) return null;
 
+                                  // Skip Membership if membership subscription is not enabled
+                                  if (subItem.href === '/membership' && !settings?.isMembershipSubscriptionEnabled) return null;
+
                                   const isSubItemActive = subItem.href === pathname ||
                                     (subItem.href === '/membership' && pathname?.startsWith('/membership')) ||
                                     (subItem.href === '/#about-us' && typeof window !== 'undefined' && window.location.hash === '#about-us') ||
@@ -353,7 +361,12 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                                     <Link
                                       key={subItem.name}
                                       href={subItem.href}
-                                      onClick={(e) => handleSmoothScroll(e, subItem.href)}
+                                      onClick={(e) => {
+                                        // Handle smooth scroll for hash links
+                                        if (subItem.href.startsWith('/#')) {
+                                          handleSmoothScroll(e, subItem.href);
+                                        }
+                                      }}
                                       className={`
                                         block px-4 py-2 mx-1 rounded-lg
                                         text-sm font-medium tracking-[0.025em]
@@ -730,6 +743,9 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                             // Skip Profile if user is not authenticated
                             if (subItem.requiresAuth && !userId) return null;
 
+                            // Skip Membership if membership subscription is not enabled
+                            if (subItem.href === '/membership' && !settings?.isMembershipSubscriptionEnabled) return null;
+
                             const isSubItemActive = subItem.href === pathname ||
                               (subItem.href === '/membership' && pathname?.startsWith('/membership')) ||
                               (subItem.href === '/#about-us' && typeof window !== 'undefined' && window.location.hash === '#about-us') ||
@@ -739,6 +755,13 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                               <li key={subItem.name}>
                                 <Link
                                   href={subItem.href}
+                                  onClick={(e) => {
+                                    // Handle smooth scroll for hash links
+                                    if (subItem.href.startsWith('/#')) {
+                                      handleSmoothScroll(e, subItem.href);
+                                    }
+                                    closeMobileMenu();
+                                  }}
                                   className={`
                                     block py-3 px-4 min-h-[44px] rounded-xl
                                     font-inter text-sm font-medium tracking-[0.025em]
@@ -749,10 +772,6 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                                       : 'text-blue-400 font-medium hover:text-blue-500 hover:font-semibold border-l-4 border-transparent hover:border-blue-400'
                                     }
                                   `}
-                                  onClick={(e) => {
-                                    closeMobileMenu();
-                                    handleSmoothScroll(e, subItem.href);
-                                  }}
                                   aria-label={`Navigate to ${subItem.name}`}
                                 >
                                   {subItem.name}

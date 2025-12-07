@@ -562,6 +562,7 @@ export interface TenantSettingsDTO {
   showEventsSectionInHomePage?: boolean;
   showTeamMembersSectionInHomePage?: boolean;
   showSponsorsSectionInHomePage?: boolean;
+  isMembershipSubscriptionEnabled?: boolean;
   // Contact and Address Fields
   addressLine1?: string;
   addressLine2?: string;

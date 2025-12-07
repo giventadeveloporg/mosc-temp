@@ -66,6 +66,7 @@ export default function TenantSettingsForm({
       showEventsSectionInHomePage: initialData?.showEventsSectionInHomePage ?? true,
       showTeamMembersSectionInHomePage: initialData?.showTeamMembersSectionInHomePage ?? true,
       showSponsorsSectionInHomePage: initialData?.showSponsorsSectionInHomePage ?? true,
+      isMembershipSubscriptionEnabled: initialData?.isMembershipSubscriptionEnabled ?? false,
       // Enhanced WhatsApp Integration Fields
       whatsappPhoneNumber: initialData?.whatsappPhoneNumber || '',
       twilioAccountSid: initialData?.twilioAccountSid || '',
@@ -643,6 +644,16 @@ export default function TenantSettingsForm({
                   description="Display the sponsors section on the homepage"
                   checked={watchedValues.showSponsorsSectionInHomePage || false}
                   onChange={(checked) => setValue('showSponsorsSectionInHomePage', checked)}
+                />
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <ToggleSwitch
+                  name="isMembershipSubscriptionEnabled"
+                  label="Enable Membership Subscription"
+                  description="Enable membership subscription functionality"
+                  checked={watchedValues.isMembershipSubscriptionEnabled || false}
+                  onChange={(checked) => setValue('isMembershipSubscriptionEnabled', checked)}
                 />
               </div>
             </div>

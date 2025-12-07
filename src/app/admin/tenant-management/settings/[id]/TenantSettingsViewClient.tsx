@@ -119,6 +119,22 @@ export default function TenantSettingsViewClient({ settings, settingsId, organiz
               </dd>
             </div>
             <div>
+              <dt className="text-sm font-medium text-gray-500">Membership Subscription Enabled</dt>
+              <dd className="mt-1">
+                {settings?.isMembershipSubscriptionEnabled ? (
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    <FaToggleOn className="w-3 h-3 mr-1" />
+                    Enabled
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                    <FaToggleOff className="w-3 h-3 mr-1" />
+                    Disabled
+                  </span>
+                )}
+              </dd>
+            </div>
+            <div>
               <dt className="text-sm font-medium text-gray-500">Max Guests Per Attendee</dt>
               <dd className="mt-1 text-sm text-gray-900">
                 {settings?.maxGuestsPerAttendee || 'Not set'}
@@ -357,6 +373,22 @@ export default function TenantSettingsViewClient({ settings, settingsId, organiz
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                       <FaToggleOff className="w-3 h-3 mr-1" />
                       Hidden
+                    </span>
+                  )}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-gray-500">Membership Subscription Enabled</dt>
+                <dd className="mt-1">
+                  {settings?.isMembershipSubscriptionEnabled ? (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      <FaToggleOn className="w-3 h-3 mr-1" />
+                      Enabled
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                      <FaToggleOff className="w-3 h-3 mr-1" />
+                      Disabled
                     </span>
                   )}
                 </dd>
