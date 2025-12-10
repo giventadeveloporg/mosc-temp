@@ -46,11 +46,6 @@ const navItems = [
     active: false
   },
   {
-    name: 'Team',
-    href: '/#team-section',
-    active: false
-  },
-  {
     name: 'Contact',
     href: '/#contact',
     active: false
@@ -92,27 +87,47 @@ type HeaderProps = {
 const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
   console.log('[Header] handleSmoothScroll called with:', href);
 
-  if (!href.startsWith('#')) return;
+  // Handle both '#section' and '/#section' formats
+  if (!href.startsWith('#') && !href.startsWith('/#')) return;
 
   e.preventDefault();
   console.log('[Header] Preventing default and handling hash navigation');
 
+  // Extract the hash part (handle both '#section' and '/#section')
+  const hashPart = href.startsWith('/#') ? href.substring(1) : href; // '/#team-section' -> '#team-section'
+  const targetId = hashPart.substring(1); // '#team-section' -> 'team-section'
+
   // If we're not on the home page, navigate there first
   if (typeof window !== 'undefined' && window.location.pathname !== '/') {
-    console.log('[Header] Not on home page, navigating to:', `/${href}`);
+    console.log('[Header] Not on home page, navigating to:', `/${hashPart}`);
     // Navigate to home page with hash
-    window.location.href = `/${href}`;
+    window.location.href = `/${hashPart}`;
     return;
   }
 
-  // If we're on the home page, update the URL hash and let the page handle scrolling
-  const targetId = href.substring(1);
-  console.log('[Header] On home page, updating hash to:', targetId);
+  // If we're on the home page, update the URL hash and scroll
+  console.log('[Header] On home page, updating hash to:', hashPart);
 
   // Update the URL hash
-  window.history.pushState(null, '', href);
+  window.history.pushState(null, '', hashPart);
 
-  // Trigger a hashchange event to let the page component handle the scrolling
+  // Scroll to the target element with a small delay to ensure element exists
+  const headerHeight = 80;
+  const scrollToTarget = () => {
+    const targetElement = document.getElementById(targetId);
+    if (targetElement) {
+      const targetPosition = targetElement.offsetTop - headerHeight - 20;
+      window.scrollTo({ top: Math.max(0, targetPosition), behavior: 'smooth' });
+    }
+  };
+
+  // Try scrolling immediately
+  scrollToTarget();
+
+  // Also try after a short delay in case element is still rendering
+  setTimeout(scrollToTarget, 100);
+
+  // Also trigger a hashchange event to let the page component handle the scrolling
   window.dispatchEvent(new HashChangeEvent('hashchange'));
 };
 
