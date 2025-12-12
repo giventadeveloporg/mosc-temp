@@ -10,8 +10,8 @@ const HolySynodPage = () => {
   const synodMembers = [
     {
       name: 'H.H. Baselios Marthoma Mathews III',
-      title: 'The Ninth Catholicos of the East in Malankara',
       href: '/mosc/holy-synod/his-holiness-baselios-marthoma-mathews-iii',
+      title: 'The Ninth Catholicos of the East in Malankara',
       special: true
     },
     {
@@ -202,13 +202,17 @@ const HolySynodPage = () => {
                 The Ninth Catholicos of the East in Malankara
               </p>
               <div className="flex flex-wrap justify-center gap-4">
+              {synodMembers.slice(0).filter(member => member.special).map((member) => (
                 <Link
-                  href="/mosc/holy-synod/his-holiness-baselios-marthoma-mathews-iii"
+                key={member.name}
+                href={member.href}
+                  // href="/mosc/holy-synod/his-holiness-baselios-marthoma-mathews-iii"
                   className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 reverent-transition"
                 >
                   <span className="mr-2" role="img" aria-label="Biography">📋</span>
                   Biography
                 </Link>
+                ))}
                 <Link
                   href="/mosc/photo-gallery/reception-to-his-holiness-baselios-marthoma-mathews-iii"
                   className="inline-flex items-center px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 reverent-transition"

@@ -80,16 +80,122 @@ function HomePageContent() {
     const handleHashNavigation = () => {
       const hash = window.location.hash;
       if (hash) {
-        const element = document.getElementById(hash.substring(1));
-        if (element) {
-          // Small delay to ensure the page is fully loaded
-          setTimeout(() => {
-            element.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start'
-            });
-          }, 100);
+        const targetId = hash.substring(1);
+        
+        // Show loading indicator for team section
+        if (targetId === 'team-section') {
+          showNavigationLoading();
         }
+
+        // Wait for element to exist before scrolling (especially important for dynamically loaded sections)
+        const maxWaitTime = 10000; // 10 seconds max wait
+        const pollInterval = 100; // Check every 100ms
+        const startTime = Date.now();
+        const headerHeight = 80;
+
+        const waitForElementAndScroll = () => {
+          const element = document.getElementById(targetId);
+          
+          if (element) {
+            // Element exists, scroll to it
+            const targetPosition = element.offsetTop - headerHeight - 20;
+            window.scrollTo({ 
+              top: Math.max(0, targetPosition), 
+              behavior: 'smooth' 
+            });
+            hideNavigationLoading();
+            console.log('[HomePage] Successfully scrolled to:', targetId);
+            return;
+          }
+
+          // Element doesn't exist yet
+          const elapsed = Date.now() - startTime;
+          if (elapsed < maxWaitTime) {
+            // Keep waiting
+            setTimeout(waitForElementAndScroll, pollInterval);
+          } else {
+            // Timeout reached
+            console.warn('[HomePage] Timeout waiting for element:', targetId);
+            hideNavigationLoading();
+          }
+        };
+
+        // Start waiting for element
+        waitForElementAndScroll();
+      } else {
+        // No hash, hide any existing loading indicator
+        hideNavigationLoading();
+      }
+    };
+
+    // Helper functions for loading indicator
+    const showNavigationLoading = () => {
+      if (typeof window === 'undefined') return;
+      
+      // Remove existing indicator if any
+      hideNavigationLoading();
+
+      // Create loading indicator
+      const loadingIndicator = document.createElement('div');
+      loadingIndicator.id = 'navigation-loading-indicator';
+      loadingIndicator.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.9);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        backdrop-filter: blur(4px);
+      `;
+
+      // Create spinner
+      const spinner = document.createElement('div');
+      spinner.style.cssText = `
+        width: 48px;
+        height: 48px;
+        border: 4px solid #e5e7eb;
+        border-top-color: #3b82f6;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      `;
+
+      // Add keyframes if not already present
+      if (!document.getElementById('navigation-loading-styles')) {
+        const style = document.createElement('style');
+        style.id = 'navigation-loading-styles';
+        style.textContent = `
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+        `;
+        document.head.appendChild(style);
+      }
+
+      // Create text
+      const text = document.createElement('div');
+      text.textContent = 'Loading team section...';
+      text.style.cssText = `
+        margin-top: 16px;
+        font-size: 16px;
+        font-weight: 500;
+        color: #3b82f6;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      `;
+
+      loadingIndicator.appendChild(spinner);
+      loadingIndicator.appendChild(text);
+      document.body.appendChild(loadingIndicator);
+    };
+
+    const hideNavigationLoading = () => {
+      const indicator = document.getElementById('navigation-loading-indicator');
+      if (indicator && indicator.parentNode) {
+        indicator.parentNode.removeChild(indicator);
       }
     };
 
@@ -101,6 +207,7 @@ function HomePageContent() {
 
     return () => {
       window.removeEventListener('hashchange', handleHashNavigation);
+      hideNavigationLoading();
     };
   }, []);
 
