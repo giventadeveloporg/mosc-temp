@@ -7,7 +7,7 @@ export const metadata = {
   description: 'Biography and information about H. G. Dr. Thomas Mar Athanasius Metropolitan.',
 };
 
-const hisgracedrthomasmarathanasiusPage = () => {
+const HisGraceDrThomasMarAthanasiusPage = () => {
   return (
     <div className="bg-background">
       {/* Hero Section */}
@@ -37,11 +37,11 @@ const hisgracedrthomasmarathanasiusPage = () => {
                 {/* Featured Image */}
                 <div className="mb-8">
                   <Image
-                    src="/images/holy-synod/thomas-mar-athanasius.jpg"
+                    src="/images/holy-synod/ath.jpg"
                     alt="H. G. Dr. Thomas Mar Athanasius Metropolitan"
                     width={500}
                     height={300}
-                    className="rounded-lg sacred-shadow w-full h-auto"
+                    className="rounded-lg sacred-shadow w-full h-auto object-contain"
                     priority
                   />
                 </div>
@@ -53,29 +53,36 @@ const hisgracedrthomasmarathanasiusPage = () => {
                   </h2>
 
                   <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      His Grace was born on 28 June 1952 at Arikuzha, Thodupuzha, to Rev. Fr Yohannan Puttanil and Mrs Mariam.
-He did his schooling at Government UPS School Arikuzha and NSS High School, Manakad. Thereupon he joined New Man College, Thodupuzha and passed out his Pre-degree and Degree from there. He did his MA from St John's College, Agra.
-                    </p>
+                    His Grace was born on 28 June 1952 at Arikuzha, Thodupuzha, to Rev. Fr Yohannan Puttanil and Mrs Mariam. He did his schooling at Government UPS School Arikuzha and NSS High School, Manakad. Thereupon he joined New Man College, Thodupuzha and passed out his Pre-degree and Degree from there. He did his MA from St John’s College, Agra.
+                  </p>
+
                   <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      In the theological front, he took his BD degree from Serampore College and United Theological College, Bangalore. And went for his DTh from Protestant Faculty, University of Munich.
-                    </p>
+                    In the theological front, he took his BD degree from Serampore College and United Theological College, Bangalore. And went for his DTh from Protestant Faculty, University of Munich.
+                  </p>
+
                   <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      He was ordained a priest in 1990 and the very same year was consecrated as Bishop and was given the charge of Kandanad Diocese.
-He was a teacher at Syrian Orthodox Theological Seminary at Vettickal during 1990-95.  From 1992, His Grace was the President of Kerala Council of Churches till 1998.
-                    </p>
+                    He was ordained a priest in 1990 and the very same year was consecrated as Bishop and was given the charge of Kandanad Diocese. He was a teacher at Syrian Orthodox Theological Seminary at Vettickal during 1990-95. From 1992, His Grace was the President of Kerala Council of Churches till 1998.
+                  </p>
+
                   <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      Dr Athanasius is a known social worker and a philanthropist. He runs Swasraya Rehabilitation & Training Centre at Vettickal, Mulanthuruthy; Trinity Retirement Home, Kolenchery; Samanvaya Study and Dialogue Centre, Pampakuda; Sukhada Retreat Centre, Kolenchery; Santhula Hospital and Deaddiction Centre, Vadakara; and Giliyad, Retreat Centre & Orphanage, Vadkara.
-                    </p>
+                    Dr Athanasius is a known social worker and a philanthropist. He runs Swasraya Rehabilitation & Training Centre at Vettickal, Mulanthuruthy; Trinity Retirement Home, Kolenchery; Samanvaya Study and Dialogue Centre, Pampakuda; Sukhada Retreat Centre, Kolenchery; Santhula Hospital and Deaddiction Centre, Vadakara; and Giliyad, Retreat Centre & Orphanage, Vadkara.
+                  </p>
+
                   <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      His Grace is an author of few well-known books. A Comparative Study of Theological Methodologies of Irenaeus and Sri Sankara (1990); Church and Society (1992); Neethi Samooham; and Anthyokya Malankara Bandham: Oru Punarchintanam are the main titles.
+                    His Grace is an author of few well-known books. A Comparative Study of Theological Methodologies of Irenaeus and Sri Sankara (1990); Church and Society (1992); Neethi Samooham; and Anthyokya Malankara Bandham: Oru Punarchintanam are the main titles.
+                  </p>
+
+                  <div className="mt-8 pt-6 border-t border-border">
+                    <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
+                      Contact Information
+                    </h3>
+                    <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                      Address: Bishop’s House, Cathedral Road, Moovattupuzha,Kerala – 686 661 ph : 0485 2833401 Cell: 9447083340
                     </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      Address: Bishop's House, Cathedral Road, Moovattupuzha,Kerala – 686 661
-ph : 0485 2833401 Cell: 9447083340
-                    </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                    <p className="font-body text-muted-foreground leading-relaxed mb-2">
                       Email: thomasmarathanasius@gmail.com
                     </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -98,12 +105,6 @@ ph : 0485 2833401 Cell: 9447083340
                     className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
                   >
                     His Holiness the Catholicos
-                  </Link>
-                  <Link 
-                    href="/mosc/holy-synod/his-grace-dr-thomas-mar-athanasius" 
-                    className="block px-3 py-2 bg-primary text-primary-foreground rounded-md font-body text-sm reverent-transition"
-                  >
-                    H. G. Dr. Thomas Mar Athanasius Metropolitan
                   </Link>
                 </nav>
               </div>
@@ -190,4 +191,4 @@ ph : 0485 2833401 Cell: 9447083340
   );
 };
 
-export default hisgracedrthomasmarathanasiusPage;
+export default HisGraceDrThomasMarAthanasiusPage;

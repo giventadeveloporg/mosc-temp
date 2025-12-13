@@ -7,7 +7,7 @@ export const metadata = {
   description: 'Biography and information about H.G. Yakob Mar Elias Metropolitan.',
 };
 
-const hgyakoobmareliasmetropolitanPage = () => {
+const HGYakoobMarEliasMetropolitanPage = () => {
   return (
     <div className="bg-background">
       {/* Hero Section */}
@@ -37,11 +37,11 @@ const hgyakoobmareliasmetropolitanPage = () => {
                 {/* Featured Image */}
                 <div className="mb-8">
                   <Image
-                    src="/images/holy-synod/yakob-mar-elias.jpg"
+                    src="/images/holy-synod/mar-eliyas.jpg"
                     alt="H.G. Yakob Mar Elias Metropolitan"
                     width={500}
                     height={300}
-                    className="rounded-lg sacred-shadow w-full h-auto"
+                    className="rounded-lg sacred-shadow w-full h-auto object-contain"
                     priority
                   />
                 </div>
@@ -52,7 +52,21 @@ const hgyakoobmareliasmetropolitanPage = () => {
                     Biography
                   </h2>
 
+                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                    He is elected as the Metropolitan candidate on 17th February at the Malankara Association held at Sasthamkotta. He is consecrated as Metropolitan on 12th May 2010 at Mar Elia Cathedral, Kottayam.His Grace is serving the Brahmavar Diocese as its Metropolitan.
+                  </p>
 
+                  <div className="mt-8 pt-6 border-t border-border">
+                    <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
+                      Contact Information
+                    </h3>
+                    <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                      Address: Mount Horeb Bishop\'s House, Balikashram Road, Kankanady, Mangalore - 575 002, Karnataka, India
+                    </p>
+                    <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                      Email: metropolitanelias@yahoo.com Ph: 0824- 2013157, 09483530018
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -75,12 +89,6 @@ const hgyakoobmareliasmetropolitanPage = () => {
                     className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
                   >
                     His Holiness the Catholicos
-                  </Link>
-                  <Link 
-                    href="/mosc/holy-synod/h-g-yakoob-mar-elias-metropolitan" 
-                    className="block px-3 py-2 bg-primary text-primary-foreground rounded-md font-body text-sm reverent-transition"
-                  >
-                    H.G. Yakob Mar Elias Metropolitan
                   </Link>
                 </nav>
               </div>
@@ -167,4 +175,4 @@ const hgyakoobmareliasmetropolitanPage = () => {
   );
 };
 
-export default hgyakoobmareliasmetropolitanPage;
+export default HGYakoobMarEliasMetropolitanPage;

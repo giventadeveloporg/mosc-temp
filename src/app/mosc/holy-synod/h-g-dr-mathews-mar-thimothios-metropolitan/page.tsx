@@ -7,7 +7,7 @@ export const metadata = {
   description: 'Biography and information about H. G. Dr. Mathews Mar Thimothios Metropolitan.',
 };
 
-const hgdrmathewsmarthimothiosmetropolitanPage = () => {
+const HGDrMathewsMarThimothiosMetropolitanPage = () => {
   return (
     <div className="bg-background">
       {/* Hero Section */}
@@ -37,11 +37,11 @@ const hgdrmathewsmarthimothiosmetropolitanPage = () => {
                 {/* Featured Image */}
                 <div className="mb-8">
                   <Image
-                    src="/images/holy-synod/mathews-mar-thimothios.jpg"
+                    src="/images/holy-synod/thimothios.jpg"
                     alt="H. G. Dr. Mathews Mar Thimothios Metropolitan"
                     width={500}
                     height={300}
-                    className="rounded-lg sacred-shadow w-full h-auto"
+                    className="rounded-lg sacred-shadow w-full h-auto object-contain"
                     priority
                   />
                 </div>
@@ -52,7 +52,25 @@ const hgdrmathewsmarthimothiosmetropolitanPage = () => {
                     Biography
                   </h2>
 
+                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                    His Grace has served as assistant vicar and vicar in eight parishes in Kollam and Mavelikkara Dioceses. His Grace has prepared O. V. B. S text books, teacher\'s guide and a study based on the 24th Psalm.
+                  </p>
 
+                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                    Mob: 9447718511
+                  </p>
+
+                  <div className="mt-8 pt-6 border-t border-border">
+                    <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
+                      Contact Information
+                    </h3>
+                    <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                      Address: Bethel Mar Gregorios Aramana, Chengannur, P.O- 689121
+                    </p>
+                    <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                      Email: thimothiosmathews@gmail.com
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -75,12 +93,6 @@ const hgdrmathewsmarthimothiosmetropolitanPage = () => {
                     className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
                   >
                     His Holiness the Catholicos
-                  </Link>
-                  <Link 
-                    href="/mosc/holy-synod/h-g-dr-mathews-mar-thimothios-metropolitan" 
-                    className="block px-3 py-2 bg-primary text-primary-foreground rounded-md font-body text-sm reverent-transition"
-                  >
-                    H. G. Dr. Mathews Mar Thimothios Metropolitan
                   </Link>
                 </nav>
               </div>
@@ -167,4 +179,4 @@ const hgdrmathewsmarthimothiosmetropolitanPage = () => {
   );
 };
 
-export default hgdrmathewsmarthimothiosmetropolitanPage;
+export default HGDrMathewsMarThimothiosMetropolitanPage;

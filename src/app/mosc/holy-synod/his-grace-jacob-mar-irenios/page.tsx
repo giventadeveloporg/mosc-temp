@@ -7,7 +7,7 @@ export const metadata = {
   description: 'Biography and information about H.G. Dr. Yakoob Mar Irenaios Metropolitan.',
 };
 
-const hisgracejacobmarireniosPage = () => {
+const HisGraceJacobMarIreniosPage = () => {
   return (
     <div className="bg-background">
       {/* Hero Section */}
@@ -37,11 +37,11 @@ const hisgracejacobmarireniosPage = () => {
                 {/* Featured Image */}
                 <div className="mb-8">
                   <Image
-                    src="/images/holy-synod/yakoob-mar-irenaios.jpg"
+                    src="/images/holy-synod/irne.jpg"
                     alt="H.G. Dr. Yakoob Mar Irenaios Metropolitan"
                     width={500}
                     height={300}
-                    className="rounded-lg sacred-shadow w-full h-auto"
+                    className="rounded-lg sacred-shadow w-full h-auto object-contain"
                     priority
                   />
                 </div>
@@ -51,6 +51,8 @@ const hisgracejacobmarireniosPage = () => {
                   <h2 className="font-heading font-semibold text-2xl text-foreground mb-6">
                     Biography
                   </h2>
+
+
 
 
                 </div>
@@ -75,12 +77,6 @@ const hisgracejacobmarireniosPage = () => {
                     className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
                   >
                     His Holiness the Catholicos
-                  </Link>
-                  <Link 
-                    href="/mosc/holy-synod/his-grace-jacob-mar-irenios" 
-                    className="block px-3 py-2 bg-primary text-primary-foreground rounded-md font-body text-sm reverent-transition"
-                  >
-                    H.G. Dr. Yakoob Mar Irenaios Metropolitan
                   </Link>
                 </nav>
               </div>
@@ -167,4 +163,4 @@ const hisgracejacobmarireniosPage = () => {
   );
 };
 
-export default hisgracejacobmarireniosPage;
+export default HisGraceJacobMarIreniosPage;

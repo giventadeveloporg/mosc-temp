@@ -7,7 +7,7 @@ export const metadata = {
   description: 'Biography and information about H. G. Abraham Mar Epiphanios Metropolitan.',
 };
 
-const hgabrahammarepiphaniosPage = () => {
+const HGAbrahamMarEpiphaniosPage = () => {
   return (
     <div className="bg-background">
       {/* Hero Section */}
@@ -37,11 +37,11 @@ const hgabrahammarepiphaniosPage = () => {
                 {/* Featured Image */}
                 <div className="mb-8">
                   <Image
-                    src="/images/holy-synod/abraham-mar-epiphanios.jpg"
+                    src="/images/holy-synod/mar-ephipanios.jpg"
                     alt="H. G. Abraham Mar Epiphanios Metropolitan"
                     width={500}
                     height={300}
-                    className="rounded-lg sacred-shadow w-full h-auto"
+                    className="rounded-lg sacred-shadow w-full h-auto object-contain"
                     priority
                   />
                 </div>
@@ -51,6 +51,8 @@ const hgabrahammarepiphaniosPage = () => {
                   <h2 className="font-heading font-semibold text-2xl text-foreground mb-6">
                     Biography
                   </h2>
+
+
 
 
                 </div>
@@ -75,12 +77,6 @@ const hgabrahammarepiphaniosPage = () => {
                     className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
                   >
                     His Holiness the Catholicos
-                  </Link>
-                  <Link 
-                    href="/mosc/holy-synod/h-g-abraham-mar-epiphanios" 
-                    className="block px-3 py-2 bg-primary text-primary-foreground rounded-md font-body text-sm reverent-transition"
-                  >
-                    H. G. Abraham Mar Epiphanios Metropolitan
                   </Link>
                 </nav>
               </div>
@@ -167,4 +163,4 @@ const hgabrahammarepiphaniosPage = () => {
   );
 };
 
-export default hgabrahammarepiphaniosPage;
+export default HGAbrahamMarEpiphaniosPage;

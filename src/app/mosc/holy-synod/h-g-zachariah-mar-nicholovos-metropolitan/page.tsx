@@ -7,7 +7,7 @@ export const metadata = {
   description: 'Biography and information about H.G. Zachariah Mar Nicholovos Metropolitan.',
 };
 
-const hgzachariahmarnicholovosmetropolitanPage = () => {
+const HGZachariahMarNicholovosMetropolitanPage = () => {
   return (
     <div className="bg-background">
       {/* Hero Section */}
@@ -37,11 +37,11 @@ const hgzachariahmarnicholovosmetropolitanPage = () => {
                 {/* Featured Image */}
                 <div className="mb-8">
                   <Image
-                    src="/images/holy-synod/zachariah-mar-nicholovos.jpg"
+                    src="/images/holy-synod/nico.png"
                     alt="H.G. Zachariah Mar Nicholovos Metropolitan"
                     width={500}
                     height={300}
-                    className="rounded-lg sacred-shadow w-full h-auto"
+                    className="rounded-lg sacred-shadow w-full h-auto object-contain"
                     priority
                   />
                 </div>
@@ -51,6 +51,8 @@ const hgzachariahmarnicholovosmetropolitanPage = () => {
                   <h2 className="font-heading font-semibold text-2xl text-foreground mb-6">
                     Biography
                   </h2>
+
+
 
 
                 </div>
@@ -75,12 +77,6 @@ const hgzachariahmarnicholovosmetropolitanPage = () => {
                     className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
                   >
                     His Holiness the Catholicos
-                  </Link>
-                  <Link 
-                    href="/mosc/holy-synod/h-g-zachariah-mar-nicholovos-metropolitan" 
-                    className="block px-3 py-2 bg-primary text-primary-foreground rounded-md font-body text-sm reverent-transition"
-                  >
-                    H.G. Zachariah Mar Nicholovos Metropolitan
                   </Link>
                 </nav>
               </div>
@@ -167,4 +163,4 @@ const hgzachariahmarnicholovosmetropolitanPage = () => {
   );
 };
 
-export default hgzachariahmarnicholovosmetropolitanPage;
+export default HGZachariahMarNicholovosMetropolitanPage;

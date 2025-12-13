@@ -7,7 +7,7 @@ export const metadata = {
   description: 'Biography and information about H.G.Geevarghese Mar Coorilos Metropolitan.',
 };
 
-const hisgracegeevarghesemarcoorilosemetropolitanPage = () => {
+const HisGraceGeevargheseMarCooriloseMetropolitanPage = () => {
   return (
     <div className="bg-background">
       {/* Hero Section */}
@@ -37,11 +37,11 @@ const hisgracegeevarghesemarcoorilosemetropolitanPage = () => {
                 {/* Featured Image */}
                 <div className="mb-8">
                   <Image
-                    src="/images/holy-synod/geevarghese-mar-coorilos.jpg"
+                    src="/images/holy-synod/coor.jpg"
                     alt="H.G.Geevarghese Mar Coorilos Metropolitan"
                     width={500}
                     height={300}
-                    className="rounded-lg sacred-shadow w-full h-auto"
+                    className="rounded-lg sacred-shadow w-full h-auto object-contain"
                     priority
                   />
                 </div>
@@ -53,22 +53,28 @@ const hisgracegeevarghesemarcoorilosemetropolitanPage = () => {
                   </h2>
 
                   <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      His Grace was born on 7 October 1949 at Kollad, near Kottayam, to Mr PK Kurian and Mrs Mary Kurian of the Puliyeril family. After his schooling, young George had his pre-degree studies at CMS College Kottayam. He took his bachelors in arts from the Calicut University and MA from Sree Venkateshwara University. He did his BD from Orthodox Theological Seminary, Kottayam, and got post-graduate diploma in Pastoral Theology from Heythrop College London University and post-graduate diploma in Theology and Mission from Urban Theology Unit, Shefield, UK.
-                    </p>
+                    His Grace was born on 7 October 1949 at Kollad, near Kottayam, to Mr PK Kurian and Mrs Mary Kurian of the Puliyeril family. After his schooling, young George had his pre-degree studies at CMS College Kottayam. He took his bachelors in arts from the Calicut University and MA from Sree Venkateshwara University. He did his BD from Orthodox Theological Seminary, Kottayam, and got post-graduate diploma in Pastoral Theology from Heythrop College London University and post-graduate diploma in Theology and Mission from Urban Theology Unit, Shefield, UK.
+                  </p>
+
                   <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                    He was elected to the Episcopal rank in 1989 and thus became a monk in 1990 and was subsequently ordained in 1991. Soon, he was appointed as the Assistant Metropolitan, Mumbai Dioceses, and worked steadfast with late Dr Philipose Mar Theophilus for the progress of the Mumbai Diocese.
+                  </p>
+
+                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                    His Grace has held many positions in the church and other Christian societies. He had attended many international conferences and interacted with many communities such as NCCI, CASA, WCC, and CMAI.
+                  </p>
+
+                  <div className="mt-8 pt-6 border-t border-border">
+                    <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
+                      Contact Information
+                    </h3>
+                    <p className="font-body text-muted-foreground leading-relaxed mb-2">
                       He was ordained a sub-deacon in 1970 and a deacon in 1974 by Catholicos HH Baselios Mathews I. Dn George became a priest in 1975 and served as Vicar, St Gregorios Church, London. He is known for his works among students and thus was serving the MGOCSM as general secretary for almost a decade. This paved way for Fr George to visit many foreign countries.
                     </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      He was elected to the Episcopal rank in 1989 and thus became a monk in 1990 and was subsequently ordained in 1991. Soon, he was appointed as the Assistant Metropolitan, Mumbai Dioceses, and worked steadfast with late Dr Philipose Mar Theophilus for the progress of the Mumbai Diocese.
+                    <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                      Present Address: Bombay Orthodox Church Centre, Dr.Mar Theophilus Marg, Sector X-A, Vashi, Juhu Nagar, Navi Mumbai - 400 703 Tel.: 022-27669850, 022-27801427 , Mob: 09820333379 E-mail: orthodox77@hotmail.com, marcoorilos@yahoo.com
                     </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      His Grace has held many positions in the church and other Christian societies. He had attended many international conferences and interacted with many communities such as NCCI, CASA, WCC, and CMAI.
-                    </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      Present Address: Bombay Orthodox Church Centre, Dr.Mar Theophilus Marg, Sector X-A, Vashi, Juhu Nagar,  Navi Mumbai - 400 703
-Tel.: 022-27669850, 022-27801427 ,  Mob: 09820333379
-E-mail: orthodox77@hotmail.com, marcoorilos@yahoo.com
-                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -91,12 +97,6 @@ E-mail: orthodox77@hotmail.com, marcoorilos@yahoo.com
                     className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
                   >
                     His Holiness the Catholicos
-                  </Link>
-                  <Link 
-                    href="/mosc/holy-synod/his-grace-geevarghese-mar-coorilose-metropolitan" 
-                    className="block px-3 py-2 bg-primary text-primary-foreground rounded-md font-body text-sm reverent-transition"
-                  >
-                    H.G.Geevarghese Mar Coorilos Metropolitan
                   </Link>
                 </nav>
               </div>
@@ -183,4 +183,4 @@ E-mail: orthodox77@hotmail.com, marcoorilos@yahoo.com
   );
 };
 
-export default hisgracegeevarghesemarcoorilosemetropolitanPage;
+export default HisGraceGeevargheseMarCooriloseMetropolitanPage;

@@ -7,7 +7,7 @@ export const metadata = {
   description: 'Biography and information about H.G. Dr. Zacharias Mar Aprem Metropolitan.',
 };
 
-const hgdrzachariasmarapremmetropolitanPage = () => {
+const HGDrZachariasMarApremMetropolitanPage = () => {
   return (
     <div className="bg-background">
       {/* Hero Section */}
@@ -37,11 +37,11 @@ const hgdrzachariasmarapremmetropolitanPage = () => {
                 {/* Featured Image */}
                 <div className="mb-8">
                   <Image
-                    src="/images/holy-synod/zacharias-mar-aprem.jpg"
+                    src="/images/holy-synod/mar-aprem.jpg"
                     alt="H.G. Dr. Zacharias Mar Aprem Metropolitan"
                     width={500}
                     height={300}
-                    className="rounded-lg sacred-shadow w-full h-auto"
+                    className="rounded-lg sacred-shadow w-full h-auto object-contain"
                     priority
                   />
                 </div>
@@ -52,7 +52,24 @@ const hgdrzachariasmarapremmetropolitanPage = () => {
                     Biography
                   </h2>
 
+                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                    He is elected as the Metropolitan candidate on 17th February 2010 at the Malankara Association held at Sasthamkotta. He is consecrated Metropolitan on 12th May 2010 at Mar Elia Cathedral Kottayam by H H Baselios Marthoma Didymus I . His Grace is serving the Adoor - Kadampanad Diocese as its Metropolitan.
+                  </p>
 
+                  <div className="mt-8 pt-6 border-t border-border">
+                    <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
+                      Contact Information
+                    </h3>
+                    <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                      Address: Sreyas Aramana, Mar Epiphanios Centre, Kannamkodu, Adoor P.O Pathanamthitta- 691523
+                    </p>
+                    <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                      Telephone No:9447184303, 04734 227117
+                    </p>
+                    <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                      Email: 2010aprem@gmail.com
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -75,12 +92,6 @@ const hgdrzachariasmarapremmetropolitanPage = () => {
                     className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
                   >
                     His Holiness the Catholicos
-                  </Link>
-                  <Link 
-                    href="/mosc/holy-synod/h-g-dr-zacharias-mar-aprem-metropolitan" 
-                    className="block px-3 py-2 bg-primary text-primary-foreground rounded-md font-body text-sm reverent-transition"
-                  >
-                    H.G. Dr. Zacharias Mar Aprem Metropolitan
                   </Link>
                 </nav>
               </div>
@@ -167,4 +178,4 @@ const hgdrzachariasmarapremmetropolitanPage = () => {
   );
 };
 
-export default hgdrzachariasmarapremmetropolitanPage;
+export default HGDrZachariasMarApremMetropolitanPage;

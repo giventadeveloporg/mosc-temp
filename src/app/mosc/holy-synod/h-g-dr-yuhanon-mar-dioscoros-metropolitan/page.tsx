@@ -7,7 +7,7 @@ export const metadata = {
   description: 'Biography and information about H.G. Dr. Yuhanon Mar Diascoros Metropolitan.',
 };
 
-const hgdryuhanonmardioscorosmetropolitanPage = () => {
+const HGDrYuhanonMarDioscorosMetropolitanPage = () => {
   return (
     <div className="bg-background">
       {/* Hero Section */}
@@ -37,11 +37,11 @@ const hgdryuhanonmardioscorosmetropolitanPage = () => {
                 {/* Featured Image */}
                 <div className="mb-8">
                   <Image
-                    src="/images/holy-synod/yuhanon-mar-diascoros.jpg"
+                    src="/images/holy-synod/pani.jpg"
                     alt="H.G. Dr. Yuhanon Mar Diascoros Metropolitan"
                     width={500}
                     height={300}
-                    className="rounded-lg sacred-shadow w-full h-auto"
+                    className="rounded-lg sacred-shadow w-full h-auto object-contain"
                     priority
                   />
                 </div>
@@ -51,6 +51,8 @@ const hgdryuhanonmardioscorosmetropolitanPage = () => {
                   <h2 className="font-heading font-semibold text-2xl text-foreground mb-6">
                     Biography
                   </h2>
+
+
 
 
                 </div>
@@ -75,12 +77,6 @@ const hgdryuhanonmardioscorosmetropolitanPage = () => {
                     className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
                   >
                     His Holiness the Catholicos
-                  </Link>
-                  <Link 
-                    href="/mosc/holy-synod/h-g-dr-yuhanon-mar-dioscoros-metropolitan" 
-                    className="block px-3 py-2 bg-primary text-primary-foreground rounded-md font-body text-sm reverent-transition"
-                  >
-                    H.G. Dr. Yuhanon Mar Diascoros Metropolitan
                   </Link>
                 </nav>
               </div>
@@ -167,4 +163,4 @@ const hgdryuhanonmardioscorosmetropolitanPage = () => {
   );
 };
 
-export default hgdryuhanonmardioscorosmetropolitanPage;
+export default HGDrYuhanonMarDioscorosMetropolitanPage;

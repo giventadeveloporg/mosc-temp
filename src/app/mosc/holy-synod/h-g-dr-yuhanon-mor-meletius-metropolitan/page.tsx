@@ -7,7 +7,7 @@ export const metadata = {
   description: 'Biography and information about H.G. Dr. Yuhanon Mar Meletius Metropolitan.',
 };
 
-const hgdryuhanonmormeletiusmetropolitanPage = () => {
+const HGDrYuhanonMorMeletiusMetropolitanPage = () => {
   return (
     <div className="bg-background">
       {/* Hero Section */}
@@ -37,11 +37,11 @@ const hgdryuhanonmormeletiusmetropolitanPage = () => {
                 {/* Featured Image */}
                 <div className="mb-8">
                   <Image
-                    src="/images/holy-synod/yuhanon-mar-meletius.jpg"
+                    src="/images/holy-synod/milithios.jpg"
                     alt="H.G. Dr. Yuhanon Mar Meletius Metropolitan"
                     width={500}
                     height={300}
-                    className="rounded-lg sacred-shadow w-full h-auto"
+                    className="rounded-lg sacred-shadow w-full h-auto object-contain"
                     priority
                   />
                 </div>
@@ -53,30 +53,35 @@ const hgdryuhanonmormeletiusmetropolitanPage = () => {
                   </h2>
 
                   <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      His Grace was born at Elakkaranadu, a typical village in the Ernakulam District of Kerala, to a social worker Mr Markose and Mrs Saramma, Murimakkil.
-He had his primary education from the Government School at Maneed. After his schooling, His Grace studied at St Peter's College, Kolencherry, and passed out with his bachelors in Malayalam.
-                    </p>
+                    His Grace was born at Elakkaranadu, a typical village in the Ernakulam District of Kerala, to a social worker Mr Markose and Mrs Saramma, Murimakkil. He had his primary education from the Government School at Maneed. After his schooling, His Grace studied at St Peter’s College, Kolencherry, and passed out with his bachelors in Malayalam.
+                  </p>
+
                   <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      Coming to the theological studies, he did his BD and MTh degrees from the United Theological College, Bangalore. Thereupon, he took ThM and PhD qualify (old testament theology) from Lutheran School of Theology, Chicago. His Grace has submitted his PhD paper to Dharmaram Vidyashektram, Bangalore. Meanwhile, he studied syriac at St Aphrem's Seminary, Damascus.
-                    </p>
+                    Coming to the theological studies, he did his BD and MTh degrees from the United Theological College, Bangalore. Thereupon, he took ThM and PhD qualify (old testament theology) from Lutheran School of Theology, Chicago. His Grace has submitted his PhD paper to Dharmaram Vidyashektram, Bangalore. Meanwhile, he studied syriac at St Aphrem’s Seminary, Damascus.
+                  </p>
+
                   <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      Mar Meletius got into the services of Our Lord being ordained a deacon in 1973 by His Grace Paulose Mar Phelexinos, the then metropolitan of Kandanad Diocese. He was ordained a priest in 1986 by His Beatitude Catholicos Baselios Paulose II. HH Patriarc Ignatius Zakka I, ordained him as Ramban on 22 December 1990 and as Bishop on 23 December 1990 in Damascus. Since then, he is serving the Trissur Diocese as its Metropolitan.
-                    </p>
+                    Mar Meletius got into the services of Our Lord being ordained a deacon in 1973 by His Grace Paulose Mar Phelexinos, the then metropolitan of Kandanad Diocese. He was ordained a priest in 1986 by His Beatitude Catholicos Baselios Paulose II. HH Patriarc Ignatius Zakka I, ordained him as Ramban on 22 December 1990 and as Bishop on 23 December 1990 in Damascus. Since then, he is serving the Trissur Diocese as its Metropolitan.
+                  </p>
+
                   <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      As a priest, he was teaching at MSOT Seminary, Udaigiri. He was also serving as the vicar of St Mary's Church, Valampur, for about four years.  His Grace is also served as the president of Orthodox Christian Youth Movement.
-                    </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                    As a priest, he was teaching at MSOT Seminary, Udaigiri. He was also serving as the vicar of St Mary’s Church, Valampur, for about four years. His Grace is also served as the president of Orthodox Christian Youth Movement.
+                  </p>
+
+                  <div className="mt-8 pt-6 border-t border-border">
+                    <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
+                      Contact Information
+                    </h3>
+                    <p className="font-body text-muted-foreground leading-relaxed mb-2">
                       A scholar, His Grace is a visiting professor to the Orthodox seminaries at Nagpur and Kottayam. An accomplished writer, Mar Meletius has few books—Verukal Thedi, Manavikathayude Kazhchapadukal, Swatantravum Swayam Paryapthathayum—to his credit.
                     </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      This widely travelled Bishop has also published numerous articles in different publications.Visit the new website of H.G.Mar Meletius Metropolitan:  www.yuhanonmeletius.org
+                    <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                      This widely travelled Bishop has also published numerous articles in different publications.Visit the new website of H.G.Mar Meletius Metropolitan: www.yuhanonmeletius.org
                     </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      Address:Gedseemon Seminary , Mannuthy, Thrissur,
-Kerala, India.- 680651
-Phone: 0487 2371039, 2371748, 9447037174
-Email: yuhanonmilitos@hotmail.com / mormilitos@gmail.com
+                    <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                      Address:Gedseemon Seminary , Mannuthy, Thrissur, Kerala, India.- 680651 Phone: 0487 2371039, 2371748, 9447037174 Email: yuhanonmilitos@hotmail.com / mormilitos@gmail.com
                     </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -99,12 +104,6 @@ Email: yuhanonmilitos@hotmail.com / mormilitos@gmail.com
                     className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
                   >
                     His Holiness the Catholicos
-                  </Link>
-                  <Link 
-                    href="/mosc/holy-synod/h-g-dr-yuhanon-mor-meletius-metropolitan" 
-                    className="block px-3 py-2 bg-primary text-primary-foreground rounded-md font-body text-sm reverent-transition"
-                  >
-                    H.G. Dr. Yuhanon Mar Meletius Metropolitan
                   </Link>
                 </nav>
               </div>
@@ -191,4 +190,4 @@ Email: yuhanonmilitos@hotmail.com / mormilitos@gmail.com
   );
 };
 
-export default hgdryuhanonmormeletiusmetropolitanPage;
+export default HGDrYuhanonMorMeletiusMetropolitanPage;

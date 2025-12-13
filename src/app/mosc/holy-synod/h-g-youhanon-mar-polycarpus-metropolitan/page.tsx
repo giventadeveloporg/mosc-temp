@@ -7,7 +7,7 @@ export const metadata = {
   description: 'Biography and information about H.G.Yuhanon Mar Policarpos Metropolitan.',
 };
 
-const hgyouhanonmarpolycarpusmetropolitanPage = () => {
+const HGYouhanonMarPolycarpusMetropolitanPage = () => {
   return (
     <div className="bg-background">
       {/* Hero Section */}
@@ -37,11 +37,11 @@ const hgyouhanonmarpolycarpusmetropolitanPage = () => {
                 {/* Featured Image */}
                 <div className="mb-8">
                   <Image
-                    src="/images/holy-synod/yuhanon-mar-policarpos.jpg"
+                    src="/images/holy-synod/poly.jpg"
                     alt="H.G.Yuhanon Mar Policarpos Metropolitan"
                     width={500}
                     height={300}
-                    className="rounded-lg sacred-shadow w-full h-auto"
+                    className="rounded-lg sacred-shadow w-full h-auto object-contain"
                     priority
                   />
                 </div>
@@ -53,24 +53,27 @@ const hgyouhanonmarpolycarpusmetropolitanPage = () => {
                   </h2>
 
                   <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      His Grace was born on 30th March 1955 as the son of Mr.P.V.Zachariah and Mrs.Annamma Zachariah of Panniyankara Parakunnil family in Vadakkanchery, Palakkad. His Grace is a member of Mar.Gregorios Church, Thenidukku. His Grace had his schooling in AbhayakkadChami Iyer High School, and graduated from S.N.College Alathoor. His Grace took his Masters degree in Sociology from the University of Kerala. His Grace learned Syriac from Very Rev.Thomas Ramban during the period 1973 – 1974. His Grace passed G.S.T in 1978 and B D in 1979 from the Orthodox Theological Seminary. His Grace ordained sub-deacon on 25th March 1977, deacon on 8th December and priest on 7th January 1980. His Grace was ordained as Ramban by his Holiness Baselius Marthoma Didimus Catholicos. His Grace received a diploma in 1990 from Geneeva.
-                    </p>
+                    His Grace was born on 30th March 1955 as the son of Mr.P.V.Zachariah and Mrs.Annamma Zachariah of Panniyankara Parakunnil family in Vadakkanchery, Palakkad. His Grace is a member of Mar.Gregorios Church, Thenidukku. His Grace had his schooling in AbhayakkadChami Iyer High School, and graduated from S.N.College Alathoor. His Grace took his Masters degree in Sociology from the University of Kerala. His Grace learned Syriac from Very Rev.Thomas Ramban during the period 1973 – 1974. His Grace passed G.S.T in 1978 and B D in 1979 from the Orthodox Theological Seminary. His Grace ordained sub-deacon on 25th March 1977, deacon on 8th December and priest on 7th January 1980. His Grace was ordained as Ramban by his Holiness Baselius Marthoma Didimus Catholicos. His Grace received a diploma in 1990 from Geneeva.
+                  </p>
+
                   <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      His Grace served the church in several capacities – Sunday School Director; Cochin Diocese, Koratty Sion Seminary Manager, Parumala Seminary Manager, C.M.I Kerala Region Chaplain,Vettikal Health centre Director, Thalakkod St.Mary's Boy's Home Director & Board Member, Kolenchery Medical College Chaplain and Governing Body Member, Founder and Principal of Baselius Vidya Nikethan till 2006.He is serving the Ankamaly Diocese as its Metropolitan.
+                    His Grace served the church in several capacities – Sunday School Director; Cochin Diocese, Koratty Sion Seminary Manager, Parumala Seminary Manager, C.M.I Kerala Region Chaplain,Vettikal Health centre Director, Thalakkod St.Mary’s Boy’s Home Director & Board Member, Kolenchery Medical College Chaplain and Governing Body Member, Founder and Principal of Baselius Vidya Nikethan till 2006.He is serving the Ankamaly Diocese as its Metropolitan.
+                  </p>
+
+                  <div className="mt-8 pt-6 border-t border-border">
+                    <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
+                      Contact Information
+                    </h3>
+                    <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                      Address: Thrikkunnathu Seminary PB NO.61, Aluva-683101.
                     </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      Address:
-Thrikkunnathu Seminary
-PB NO.61,
-Aluva-683101.
+                    <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                      ph: 0484 2622339 Mob: 94474 75544
                     </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      ph: 0484 2622339
-Mob: 94474 75544
-                    </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                    <p className="font-body text-muted-foreground leading-relaxed mb-2">
                       email: marpolicarpos@yahoo.com
                     </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -93,12 +96,6 @@ Mob: 94474 75544
                     className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
                   >
                     His Holiness the Catholicos
-                  </Link>
-                  <Link 
-                    href="/mosc/holy-synod/h-g-youhanon-mar-polycarpus-metropolitan" 
-                    className="block px-3 py-2 bg-primary text-primary-foreground rounded-md font-body text-sm reverent-transition"
-                  >
-                    H.G.Yuhanon Mar Policarpos Metropolitan
                   </Link>
                 </nav>
               </div>
@@ -185,4 +182,4 @@ Mob: 94474 75544
   );
 };
 
-export default hgyouhanonmarpolycarpusmetropolitanPage;
+export default HGYouhanonMarPolycarpusMetropolitanPage;

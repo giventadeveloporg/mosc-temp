@@ -7,7 +7,7 @@ export const metadata = {
   description: 'Biography and information about H.G. Kuriakose Mar Clemis Metropolitan.',
 };
 
-const hisgracekuriakosemarclemisPage = () => {
+const HisGraceKuriakoseMarClemisPage = () => {
   return (
     <div className="bg-background">
       {/* Hero Section */}
@@ -37,11 +37,11 @@ const hisgracekuriakosemarclemisPage = () => {
                 {/* Featured Image */}
                 <div className="mb-8">
                   <Image
-                    src="/images/holy-synod/kuriakose-mar-clemis.jpg"
+                    src="/images/holy-synod/mar-clemis.jpg"
                     alt="H.G. Kuriakose Mar Clemis Metropolitan"
                     width={500}
                     height={300}
-                    className="rounded-lg sacred-shadow w-full h-auto"
+                    className="rounded-lg sacred-shadow w-full h-auto object-contain"
                     priority
                   />
                 </div>
@@ -53,27 +53,36 @@ const hisgracekuriakosemarclemisPage = () => {
                   </h2>
 
                   <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      His Grace was born in 1936 at Nellikkal, Koipram Village in Thiruvalla Taluk as the second son to Perumethmannil Mr PK Mathai and Mrs Sosamma.  He has one brother and two sisters.  He belongs to Koorthamala St.Mary's Orthodox Church in Chengannur  Diocese.
-                    </p>
+                    His Grace was born in 1936 at Nellikkal, Koipram Village in Thiruvalla Taluk as the second son to Perumethmannil Mr PK Mathai and Mrs Sosamma. He has one brother and two sisters. He belongs to Koorthamala St.Mary\'s Orthodox Church in Chengannur Diocese.
+                  </p>
+
                   <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      After his schooling, he joined Kerala University and did his graduation, post graduation in Science and  B.Ed from Catholicate College, Pathanahitta and Mount Tabore Training College Pathanapuram respectively. Thereupon His Grace was teaching Botany at Catholicate College, Pathanamthitta, until he was elected to the Episcopal order.
-                    </p>
+                    After his schooling, he joined Kerala University and did his graduation, post graduation in Science and B.Ed from Catholicate College, Pathanahitta and Mount Tabore Training College Pathanapuram respectively. Thereupon His Grace was teaching Botany at Catholicate College, Pathanamthitta, until he was elected to the Episcopal order.
+                  </p>
+
                   <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      He became a priest in 1964 after his studies at Orthodox Theological Seminary, Kottayam. He was also a member of St Basil Daya, Pathanamthitta. His Grace also served the Thumpamon Diocese as Secretary of Priests, Thumpamon Diocese. He was ordained a Bishop in 1991 and was given charge of the newly formulated Sultan Battery Diocese.  And is serving it with all vigour and enthusiasm. His spiritual strength has helped the diocese to grow in all aspects within a short span of time.
-                    </p>
+                    He became a priest in 1964 after his studies at Orthodox Theological Seminary, Kottayam. He was also a member of St Basil Daya, Pathanamthitta. His Grace also served the Thumpamon Diocese as Secretary of Priests, Thumpamon Diocese. He was ordained a Bishop in 1991 and was given charge of the newly formulated Sultan Battery Diocese. And is serving it with all vigour and enthusiasm. His spiritual strength has helped the diocese to grow in all aspects within a short span of time.
+                  </p>
+
                   <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      His Grace is actively involved in many social activities. He is the President of a special school for mentally challenged children--Olivemala and Baselious Gregorios Mercy Home.  He has so far extended helping hands  poor  and  also runs a secret fund and educational fund for the economically weaker sections.
-                    </p>
+                    His Grace is actively involved in many social activities. He is the President of a special school for mentally challenged children--Olivemala and Baselious Gregorios Mercy Home. He has so far extended helping hands poor and also runs a secret fund and educational fund for the economically weaker sections.
+                  </p>
+
                   <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      His Grace has many published articles to his credit. He is known for his simplicity and sweet voice.
+                    His Grace has many published articles to his credit. He is known for his simplicity and sweet voice.
+                  </p>
+
+                  <div className="mt-8 pt-6 border-t border-border">
+                    <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
+                      Contact Information
+                    </h3>
+                    <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                      Address: Basil Aramana ,Pathanamthitta -689 645 Tel.: 0468-2222243 /9495694429
                     </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      Address: Basil Aramana ,Pathanamthitta -689 645
-Tel.: 0468-2222243 /9495694429
-                    </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                    <p className="font-body text-muted-foreground leading-relaxed mb-2">
                       Email: hgmarclemis@gmail.com
                     </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -96,12 +105,6 @@ Tel.: 0468-2222243 /9495694429
                     className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
                   >
                     His Holiness the Catholicos
-                  </Link>
-                  <Link 
-                    href="/mosc/holy-synod/his-grace-kuriakose-mar-clemis" 
-                    className="block px-3 py-2 bg-primary text-primary-foreground rounded-md font-body text-sm reverent-transition"
-                  >
-                    H.G. Kuriakose Mar Clemis Metropolitan
                   </Link>
                 </nav>
               </div>
@@ -188,4 +191,4 @@ Tel.: 0468-2222243 /9495694429
   );
 };
 
-export default hisgracekuriakosemarclemisPage;
+export default HisGraceKuriakoseMarClemisPage;

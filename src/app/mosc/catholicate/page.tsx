@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import CatholicateEmblem from './CatholicateEmblem';
 
 export const metadata = {
   title: 'The Catholicate',
@@ -69,68 +70,52 @@ const CatholicatePage = () => {
 
   return (
     <div className="bg-background">
-      {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-br from-background to-muted">
+      {/* The Catholicate Section */}
+      <section className="py-16 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-primary rounded-lg flex items-center justify-center mx-auto mb-6 sacred-shadow-lg">
-              <span className="text-primary-foreground text-4xl font-bold" role="img" aria-label="Crown">👑</span>
-            </div>
-            <h1 className="font-heading font-semibold text-4xl text-foreground mb-4">
-              The Catholicate of the Malankara Orthodox Syrian Church
+          {/* Main Heading - Centered */}
+          <div className="text-center mb-8">
+            <h1 className="font-heading font-semibold text-4xl md:text-5xl text-foreground mb-8">
+              The Catholicate
             </h1>
-            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              The Catholicate represents the highest spiritual and administrative authority in the Malankara Orthodox Syrian Church,
-              embodying the apostolic succession and ecclesiastical governance of our ancient tradition.
+          </div>
+          
+          {/* Emblem/Logo - Centered */}
+          <div className="flex justify-center mb-8">
+            <CatholicateEmblem />
+          </div>
+
+          {/* Descriptive Text - Left Aligned */}
+          <div className="max-w-4xl mx-auto mb-8">
+            <p className="font-body text-base md:text-lg text-foreground leading-relaxed text-left mb-4">
+              <span className="font-semibold text-foreground">Introduction</span> The word 'Catholicos' means "the general head" or "general bishop". It can be considered as equivalent to "universal Bishop". This title and rank is much more ancient than the title Patriarch in the church.
+            </p>
+            <p className="font-body text-base md:text-lg text-foreground leading-relaxed text-left">
+              In the ministry of the early church there were only three ranks namely; Episcopos (Bishop), Priest and Deacon. By the end of the third century or by the beginning of the fourth century certain bishops of certain important cities or provincial capitals in the Roman empire gained pre-eminence than other bishops and they came to be known as Metropolitans. The Ecumenical councils of the fourth century recognized the authority of these Metropolitans.
             </p>
           </div>
-        </div>
-      </section>
 
-      {/* Current Catholicos */}
-      <section className="py-16 bg-card">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="font-heading font-semibold text-3xl text-foreground mb-4">
-              Current Catholicos
-            </h2>
-          </div>
-
-          <div className="bg-background rounded-lg sacred-shadow p-8 max-w-4xl mx-auto">
-            <div className="text-center">
-              <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="text-4xl" role="img" aria-label="Current Catholicos">👑</span>
-              </div>
-              <h3 className="font-heading font-semibold text-2xl text-foreground mb-2">
-                H.H. Baselios Marthoma Mathews III
-              </h3>
-              <p className="font-body text-lg text-primary mb-4">
-                The Ninth Catholicos of the East in Malankara
-              </p>
-              <div className="flex flex-wrap justify-center gap-4">
-                <Link
-                  href="/mosc/holy-synod/his-holiness-baselios-marthoma-mathews-iii"
-                  className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 reverent-transition"
-                >
-                  <span className="mr-2" role="img" aria-label="Biography">📋</span>
-                  Biography
-                </Link>
-                <Link
-                  href="/mosc/photo-gallery/reception-to-his-holiness-baselios-marthoma-mathews-iii"
-                  className="inline-flex items-center px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 reverent-transition"
-                >
-                  <span className="mr-2" role="img" aria-label="Photos">📸</span>
-                  Photos
-                </Link>
-                <Link
-                  href="/mosc/speeches"
-                  className="inline-flex items-center px-4 py-2 bg-accent text-accent-foreground rounded-lg hover:bg-accent/90 reverent-transition"
-                >
-                  <span className="mr-2" role="img" aria-label="Speeches">🎤</span>
-                  Speeches
-                </Link>
-              </div>
-            </div>
+          {/* Read More Button - Left Aligned */}
+          <div className="flex justify-start max-w-4xl mx-auto">
+            <Link
+              href="/mosc/catholicate/catholicate"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg border border-gray-200 reverent-transition group"
+            >
+              <svg
+                className="w-4 h-4 text-foreground"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+              <span className="font-body text-foreground font-medium">Read More</span>
+            </Link>
           </div>
         </div>
       </section>
@@ -177,59 +162,6 @@ const CatholicatePage = () => {
                 </div>
               </Link>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Catholicate Information */}
-      <section className="py-16 bg-card">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            <div>
-              <h2 className="font-heading font-semibold text-3xl text-foreground mb-6">
-                About the Catholicate
-              </h2>
-              <div className="space-y-4 font-body text-muted-foreground leading-relaxed">
-                <p>
-                  The Catholicate of the East in Malankara represents the highest ecclesiastical authority
-                  in the Malankara Orthodox Syrian Church. Established in 1912, it serves as the spiritual
-                  and administrative center of our ancient apostolic tradition.
-                </p>
-                <p>
-                  The Catholicos, as the supreme head of the church, holds the responsibility for spiritual
-                  guidance, ecclesiastical governance, and the preservation of our rich Orthodox heritage.
-                  This office embodies the apostolic succession and maintains the unity of our church.
-                </p>
-                <p>
-                  Through the centuries, our Catholicos have guided the church through various challenges,
-                  preserving the faith while adapting to the needs of our community. Their leadership
-                  continues to inspire and guide millions of faithful worldwide.
-                </p>
-              </div>
-            </div>
-
-            <div className="bg-background rounded-lg sacred-shadow p-6">
-              <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
-                Catholicate Palace
-              </h3>
-              <div className="space-y-3 font-body text-muted-foreground">
-                <p>
-                  <span className="font-medium text-foreground">Location:</span><br />
-                  Devalokam, Kottayam<br />
-                  Kerala, India
-                </p>
-                <p>
-                  <span className="font-medium text-foreground">Established:</span> 1912
-                </p>
-                <p>
-                  <span className="font-medium text-foreground">Current Catholicos:</span><br />
-                  H.H. Baselios Marthoma Mathews III
-                </p>
-                <p>
-                  <span className="font-medium text-foreground">Succession:</span> Ninth Catholicos of the East
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </section>

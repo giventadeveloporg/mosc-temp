@@ -7,7 +7,7 @@ export const metadata = {
   description: 'Biography and information about H.G. Dr.Yuhanon Mar Thevodoros Metropolitan.',
 };
 
-const hgyuhanonmartheodorusmetropolitanPage = () => {
+const HGYuhanonMarTheodorusMetropolitanPage = () => {
   return (
     <div className="bg-background">
       {/* Hero Section */}
@@ -37,11 +37,11 @@ const hgyuhanonmartheodorusmetropolitanPage = () => {
                 {/* Featured Image */}
                 <div className="mb-8">
                   <Image
-                    src="/images/holy-synod/yuhanon-mar-thevodoros.jpg"
+                    src="/images/holy-synod/mar-thevodoros.jpg"
                     alt="H.G. Dr.Yuhanon Mar Thevodoros Metropolitan"
                     width={500}
                     height={300}
-                    className="rounded-lg sacred-shadow w-full h-auto"
+                    className="rounded-lg sacred-shadow w-full h-auto object-contain"
                     priority
                   />
                 </div>
@@ -52,7 +52,21 @@ const hgyuhanonmartheodorusmetropolitanPage = () => {
                     Biography
                   </h2>
 
+                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                    He is elected as the Metropolitan candidate on 17th February at the Malankara Association held at Sasthamkotta. He is consecrated as Metropolitan on 12th May 2010 at Mar Elia Cathedral, Kottayam.His Grace is serving the Kottarakara - Punalur Diocese as its Metropolitan.
+                  </p>
 
+                  <div className="mt-8 pt-6 border-t border-border">
+                    <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
+                      Contact Information
+                    </h3>
+                    <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                      Address: Kottapuram Seminary, Pulamon P.O., Kottarakara Mob: 9447471408
+                    </p>
+                    <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                      Email: stpaulsmtc@yahoo.com
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -75,12 +89,6 @@ const hgyuhanonmartheodorusmetropolitanPage = () => {
                     className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
                   >
                     His Holiness the Catholicos
-                  </Link>
-                  <Link 
-                    href="/mosc/holy-synod/h-g-yuhanon-mar-theodorus-metropolitan" 
-                    className="block px-3 py-2 bg-primary text-primary-foreground rounded-md font-body text-sm reverent-transition"
-                  >
-                    H.G. Dr.Yuhanon Mar Thevodoros Metropolitan
                   </Link>
                 </nav>
               </div>
@@ -167,4 +175,4 @@ const hgyuhanonmartheodorusmetropolitanPage = () => {
   );
 };
 
-export default hgyuhanonmartheodorusmetropolitanPage;
+export default HGYuhanonMarTheodorusMetropolitanPage;

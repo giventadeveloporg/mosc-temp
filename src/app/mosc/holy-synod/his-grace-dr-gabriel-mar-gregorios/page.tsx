@@ -7,7 +7,7 @@ export const metadata = {
   description: 'Biography and information about H.G. Dr. Gabriel Mar Gregorios Metropolitan.',
 };
 
-const hisgracedrgabrielmargregoriosPage = () => {
+const HisGraceDrGabrielMarGregoriosPage = () => {
   return (
     <div className="bg-background">
       {/* Hero Section */}
@@ -37,11 +37,11 @@ const hisgracedrgabrielmargregoriosPage = () => {
                 {/* Featured Image */}
                 <div className="mb-8">
                   <Image
-                    src="/images/holy-synod/gabriel-mar-gregorios.jpg"
+                    src="/images/holy-synod/mar-gregorios.jpg"
                     alt="H.G. Dr. Gabriel Mar Gregorios Metropolitan"
                     width={500}
                     height={300}
-                    className="rounded-lg sacred-shadow w-full h-auto"
+                    className="rounded-lg sacred-shadow w-full h-auto object-contain"
                     priority
                   />
                 </div>
@@ -53,16 +53,17 @@ const hisgracedrgabrielmargregoriosPage = () => {
                   </h2>
 
                   <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      His Grace  was born on 10 February 1948 to Mr CM John and Mrs Aleyamma John, Vadakethazhethil, Kanjickal. He did schooling at St Stephen's High School, Pathanapuram. He persued his BA from Kerala University in English Literature. Subsequent to that, he joined the Serampore University and took his BD degree in 1974. He did his MTh from the Catholic University, Paris.  His Grace persued successfully a three-year Diploma Course in Biblical Hebrew, a two-year certificate course in Aramic and advanced course in Biblical Greek at the Catholic University, Paris.  His Grace also did Doctoral Research at the Lutharance School of Theology at Chicago on the topic "The Glory of God in St Paul" and took his PhD in New Testament from the Serampore University. He further did his Doctoral Research at the University of Cambridge.
-His Grace was ordained a deacon on 4 November 1969 by HH Mar Baselios Augen I.  HH Baselious Mathews I ordained Dn Gabriel as priest on 8 January 1974. He distinctly served as vicar of many parishes such as Chenganachery, Jaipur, Dehuroad, Kuzhimattom, Mundakayam, Kanakappalam, Odanavattom Nellikunnam, and Pooyapally. He was a Professor at Orthodox Seminary, Kottayam. He was professed as a Monk on 7 August 2004 by HH Baselios Mathews II.  The Malankara Syrian Christian Association met on 10 June 2004 at the Parumala Seminary, elected Fr Gabriel as a candidate to be ordained to the Episcopal Order and was ordained on 5 March 2005 by HH Baselios Mathews II. At present, His Grace is looking after the Trivandrum Diocese, which is very critical to the church in many ways.
+                    His Grace was born on 10 February 1948 to Mr CM John and Mrs Aleyamma John, Vadakethazhethil, Kanjickal. He did schooling at St Stephen’s High School, Pathanapuram. He persued his BA from Kerala University in English Literature. Subsequent to that, he joined the Serampore University and took his BD degree in 1974. He did his MTh from the Catholic University, Paris. His Grace persued successfully a three-year Diploma Course in Biblical Hebrew, a two-year certificate course in Aramic and advanced course in Biblical Greek at the Catholic University, Paris. His Grace also did Doctoral Research at the Lutharance School of Theology at Chicago on the topic “The Glory of God in St Paul” and took his PhD in New Testament from the Serampore University. He further did his Doctoral Research at the University of Cambridge. His Grace was ordained a deacon on 4 November 1969 by HH Mar Baselios Augen I. HH Baselious Mathews I ordained Dn Gabriel as priest on 8 January 1974. He distinctly served as vicar of many parishes such as Chenganachery, Jaipur, Dehuroad, Kuzhimattom, Mundakayam, Kanakappalam, Odanavattom Nellikunnam, and Pooyapally. He was a Professor at Orthodox Seminary, Kottayam. He was professed as a Monk on 7 August 2004 by HH Baselios Mathews II. The Malankara Syrian Christian Association met on 10 June 2004 at the Parumala Seminary, elected Fr Gabriel as a candidate to be ordained to the Episcopal Order and was ordained on 5 March 2005 by HH Baselios Mathews II. At present, His Grace is looking after the Trivandrum Diocese, which is very critical to the church in many ways.
+                  </p>
+
+                  <div className="mt-8 pt-6 border-t border-border">
+                    <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
+                      Contact Information
+                    </h3>
+                    <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                      Present Address: Orthodox Church Centre, Ulloor, Trivandrum, Kerala – 695 011 Tel.: 0471-2442509/2552509 Fax: 0471-2442509 Cell: 9447166857 E-mail: gabrielmargregorios@gmail.com
                     </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      Present Address: Orthodox Church Centre, Ulloor, Trivandrum, Kerala – 695 011
-Tel.: 0471-2442509/2552509
-Fax: 0471-2442509
-Cell: 9447166857
-E-mail: gabrielmargregorios@gmail.com
-                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -85,12 +86,6 @@ E-mail: gabrielmargregorios@gmail.com
                     className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
                   >
                     His Holiness the Catholicos
-                  </Link>
-                  <Link 
-                    href="/mosc/holy-synod/his-grace-dr-gabriel-mar-gregorios" 
-                    className="block px-3 py-2 bg-primary text-primary-foreground rounded-md font-body text-sm reverent-transition"
-                  >
-                    H.G. Dr. Gabriel Mar Gregorios Metropolitan
                   </Link>
                 </nav>
               </div>
@@ -177,4 +172,4 @@ E-mail: gabrielmargregorios@gmail.com
   );
 };
 
-export default hisgracedrgabrielmargregoriosPage;
+export default HisGraceDrGabrielMarGregoriosPage;
