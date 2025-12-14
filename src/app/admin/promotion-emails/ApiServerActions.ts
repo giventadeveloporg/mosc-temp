@@ -251,7 +251,7 @@ export async function sendTestEmailServer(
 export async function sendBulkEmailServer(
   templateId: number,
   recipientEmails?: string[]
-): Promise<{ success: boolean; sentCount: number; failedCount: number; error?: string; totalCount?: number }> {
+): Promise<{ success: boolean; sentCount: number; failedCount: number }> {
   const baseUrl = getAppUrl();
   const url = `${baseUrl}/api/proxy/promotion-email-templates/${templateId}/send-bulk`;
 
@@ -272,16 +272,7 @@ export async function sendBulkEmailServer(
     throw new Error(`Failed to send bulk email. Status: ${response.status}`);
   }
 
-  const result = await response.json();
-
-  // Check the success field in the response body, not just HTTP status
-  if (result.success === false) {
-    const errorMessage = result.error || 'Failed to send bulk email';
-    console.error(`[Server] Backend returned success=false:`, result);
-    throw new Error(errorMessage);
-  }
-
-  return result;
+  return await response.json();
 }
 
 /**
@@ -289,7 +280,7 @@ export async function sendBulkEmailServer(
  */
 export async function sendBulkEmailToSubscribedMembersServer(
   templateId: number
-): Promise<{ success: boolean; sentCount?: number; failedCount?: number; error?: string; totalCount?: number }> {
+): Promise<{ success: boolean; sentCount?: number; failedCount?: number }> {
   const baseUrl = getAppUrl();
   const url = `${baseUrl}/api/proxy/promotion-email-templates/${templateId}/send-to-subscribed`;
 
@@ -305,16 +296,7 @@ export async function sendBulkEmailToSubscribedMembersServer(
     throw new Error(`Failed to send email to subscribed members. Status: ${response.status}`);
   }
 
-  const result = await response.json();
-
-  // Check the success field in the response body, not just HTTP status
-  if (result.success === false) {
-    const errorMessage = result.error || 'Failed to send email to subscribed members';
-    console.error(`[Server] Backend returned success=false:`, result);
-    throw new Error(errorMessage);
-  }
-
-  return result;
+  return await response.json();
 }
 
 /**

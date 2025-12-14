@@ -179,19 +179,10 @@ export default function PromotionEmailsPage() {
       const result = await sendBulkEmailServer(selectedTemplate.id);
       setShowBulkEmailDialog(false);
 
-      // Double-check success field (should have thrown if false, but be defensive)
-      if (result.success === false) {
-        const errorMessage = result.error || 'Failed to send bulk email';
-        setEmailSendStatus('error');
-        setEmailSendMessage(errorMessage);
-        setError(errorMessage);
-        return;
-      }
-
       // Show success dialog
       setEmailSendStatus('success');
       setEmailSendMessage(
-        `Bulk email sent successfully! Sent: ${result.sentCount}, Failed: ${result.failedCount > 0 ? result.failedCount : 0}`
+        `Bulk email sent successfully! Sent: ${result.sentCount}, Failed: ${result.failedCount}`
       );
 
       // Clear after showing success
@@ -201,7 +192,6 @@ export default function PromotionEmailsPage() {
         setSelectedTemplate(null);
       }, 2000);
     } catch (err: any) {
-      setShowBulkEmailDialog(false);
       setEmailSendStatus('error');
       const errorMessage = err.message || 'Failed to send bulk email';
       setEmailSendMessage(errorMessage);
@@ -229,19 +219,10 @@ export default function PromotionEmailsPage() {
       const result = await sendBulkEmailToSubscribedMembersServer(selectedTemplate.id);
       setShowSubscribedEmailDialog(false);
 
-      // Double-check success field (should have thrown if false, but be defensive)
-      if (result.success === false) {
-        const errorMessage = result.error || 'Failed to send email to subscribed members';
-        setEmailSendStatus('error');
-        setEmailSendMessage(errorMessage);
-        setError(errorMessage);
-        return;
-      }
-
       // Show success dialog
       setEmailSendStatus('success');
       setEmailSendMessage(
-        `Email sent successfully to all subscribed members!${result.sentCount !== undefined ? ` Sent: ${result.sentCount}` : ''}${result.failedCount !== undefined && result.failedCount > 0 ? `, Failed: ${result.failedCount}` : ''}`
+        `Email sent successfully to all subscribed members!${result.sentCount !== undefined ? ` Sent: ${result.sentCount}` : ''}${result.failedCount !== undefined ? `, Failed: ${result.failedCount}` : ''}`
       );
 
       // Clear after showing success
@@ -251,7 +232,6 @@ export default function PromotionEmailsPage() {
         setSelectedTemplate(null);
       }, 2000);
     } catch (err: any) {
-      setShowSubscribedEmailDialog(false);
       setEmailSendStatus('error');
       const errorMessage = err.message || 'Failed to send email to subscribed members';
       setEmailSendMessage(errorMessage);
