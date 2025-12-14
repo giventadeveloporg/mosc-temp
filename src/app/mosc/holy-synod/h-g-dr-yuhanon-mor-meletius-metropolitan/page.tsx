@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import SynodMembersSidebar from '@/components/holy-synod/SynodMembersSidebar';
+import QuickLinks from '@/components/holy-synod/QuickLinks';
 
 export const metadata = {
   title: 'H.G. Dr. Yuhanon Mar Meletius Metropolitan',
@@ -10,23 +11,6 @@ export const metadata = {
 const HGDrYuhanonMorMeletiusMetropolitanPage = () => {
   return (
     <div className="bg-background">
-      {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-br from-background to-muted">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-primary rounded-lg flex items-center justify-center mx-auto mb-6 sacred-shadow-lg">
-              <span className="text-primary-foreground text-4xl font-bold" role="img" aria-label="Metropolitan">👨‍💼</span>
-            </div>
-            <h1 className="font-heading font-semibold text-4xl text-foreground mb-4">
-              H.G. Dr. Yuhanon Mar Meletius Metropolitan
-            </h1>
-            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Metropolitan of the Malankara Orthodox Syrian Church
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* Main Content */}
       <section className="py-16 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -34,154 +18,69 @@ const HGDrYuhanonMorMeletiusMetropolitanPage = () => {
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-background rounded-lg sacred-shadow p-8">
-                {/* Featured Image */}
-                <div className="mb-8">
-                  <Image
-                    src="/images/holy-synod/milithios.jpg"
-                    alt="H.G. Dr. Yuhanon Mar Meletius Metropolitan"
-                    width={500}
-                    height={300}
-                    className="rounded-lg sacred-shadow w-full h-auto object-contain"
-                    priority
-                  />
-                </div>
+                <div className="flex flex-col md:flex-row gap-8">
+                  {/* Featured Image - Left Side */}
+                  <div className="flex-shrink-0">
+                    <div className="w-64 h-auto">
+                      <Image
+                        src="/images/holy-synod/milithios.jpg"
+                        alt="H.G. Dr. Yuhanon Mar Meletius Metropolitan"
+                        width={300}
+                        height={193}
+                        className="rounded-lg sacred-shadow w-full h-auto object-contain"
+                        priority
+                      />
+                    </div>
+                  </div>
 
-                {/* Content */}
-                <div className="prose prose-lg max-w-none">
-                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-6">
-                    Biography
-                  </h2>
-
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    His Grace was born at Elakkaranadu, a typical village in the Ernakulam District of Kerala, to a social worker Mr Markose and Mrs Saramma, Murimakkil. He had his primary education from the Government School at Maneed. After his schooling, His Grace studied at St Peter’s College, Kolencherry, and passed out with his bachelors in Malayalam.
-                  </p>
-
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    Coming to the theological studies, he did his BD and MTh degrees from the United Theological College, Bangalore. Thereupon, he took ThM and PhD qualify (old testament theology) from Lutheran School of Theology, Chicago. His Grace has submitted his PhD paper to Dharmaram Vidyashektram, Bangalore. Meanwhile, he studied syriac at St Aphrem’s Seminary, Damascus.
-                  </p>
-
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    Mar Meletius got into the services of Our Lord being ordained a deacon in 1973 by His Grace Paulose Mar Phelexinos, the then metropolitan of Kandanad Diocese. He was ordained a priest in 1986 by His Beatitude Catholicos Baselios Paulose II. HH Patriarc Ignatius Zakka I, ordained him as Ramban on 22 December 1990 and as Bishop on 23 December 1990 in Damascus. Since then, he is serving the Trissur Diocese as its Metropolitan.
-                  </p>
-
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    As a priest, he was teaching at MSOT Seminary, Udaigiri. He was also serving as the vicar of St Mary’s Church, Valampur, for about four years. His Grace is also served as the president of Orthodox Christian Youth Movement.
-                  </p>
-
-                  <div className="mt-8 pt-6 border-t border-border">
-                    <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
-                      Contact Information
+                  {/* Content - Right Side of Image */}
+                  <div className="flex-1">
+                    <h3 className="font-heading font-semibold text-2xl text-foreground mb-6">
+                      H.G. Dr. Yuhanon Mar Meletius Metropolitan
                     </h3>
-                    <p className="font-body text-muted-foreground leading-relaxed mb-2">
-                      A scholar, His Grace is a visiting professor to the Orthodox seminaries at Nagpur and Kottayam. An accomplished writer, Mar Meletius has few books—Verukal Thedi, Manavikathayude Kazhchapadukal, Swatantravum Swayam Paryapthathayum—to his credit.
-                    </p>
-                    <p className="font-body text-muted-foreground leading-relaxed mb-2">
-                      This widely travelled Bishop has also published numerous articles in different publications.Visit the new website of H.G.Mar Meletius Metropolitan: www.yuhanonmeletius.org
-                    </p>
-                    <p className="font-body text-muted-foreground leading-relaxed mb-2">
-                      Address:Gedseemon Seminary , Mannuthy, Thrissur, Kerala, India.- 680651 Phone: 0487 2371039, 2371748, 9447037174 Email: yuhanonmilitos@hotmail.com / mormilitos@gmail.com
-                    </p>
+
+                    <div className="prose prose-lg max-w-none">
+                      <p className="font-body text-muted-foreground leading-relaxed mb-4">
+                        His Grace was born at Elakkaranadu, a typical village in the Ernakulam District of Kerala, to a social worker Mr Markose and Mrs Saramma, Murimakkil. He had his primary education from the Government School at Maneed. After his schooling, His Grace studied at St Peter’s College, Kolencherry, and passed out with his bachelors in Malayalam.
+                      </p>
+
+                      <p className="font-body text-muted-foreground leading-relaxed mb-4">
+                        Coming to the theological studies, he did his BD and MTh degrees from the United Theological College, Bangalore. Thereupon, he took ThM and PhD qualify (old testament theology) from Lutheran School of Theology, Chicago. His Grace has submitted his PhD paper to Dharmaram Vidyashektram, Bangalore. Meanwhile, he studied syriac at St Aphrem’s Seminary, Damascus.
+                      </p>
+
+                      <p className="font-body text-muted-foreground leading-relaxed mb-4">
+                        Mar Meletius got into the services of Our Lord being ordained a deacon in 1973 by His Grace Paulose Mar Phelexinos, the then metropolitan of Kandanad Diocese. He was ordained a priest in 1986 by His Beatitude Catholicos Baselios Paulose II. HH Patriarc Ignatius Zakka I, ordained him as Ramban on 22 December 1990 and as Bishop on 23 December 1990 in Damascus. Since then, he is serving the Trissur Diocese as its Metropolitan.
+                      </p>
+
+                      <p className="font-body text-muted-foreground leading-relaxed mb-4">
+                        As a priest, he was teaching at MSOT Seminary, Udaigiri. He was also serving as the vicar of St Mary’s Church, Valampur, for about four years. His Grace is also served as the president of Orthodox Christian Youth Movement.
+                      </p>
+
+                      <div className="mt-6 pt-6 border-t border-border">
+                        <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                          A scholar, His Grace is a visiting professor to the Orthodox seminaries at Nagpur and Kottayam. An accomplished writer, Mar Meletius has few books—Verukal Thedi, Manavikathayude Kazhchapadukal, Swatantravum Swayam Paryapthathayum—to his credit.
+                        </p>
+                        <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                          This widely travelled Bishop has also published numerous articles in different publications.Visit the new website of H.G.Mar Meletius Metropolitan: www.yuhanonmeletius.org
+                        </p>
+                        <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                          Address:Gedseemon Seminary , Mannuthy, Thrissur, Kerala, India.- 680651 Phone: 0487 2371039, 2371748, 9447037174 Email: yuhanonmilitos@hotmail.com / mormilitos@gmail.com
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
+              </div>
+
+              {/* Quick Links - Horizontal Below Main Content */}
+              <div className="mt-8">
+                <QuickLinks />
               </div>
             </div>
 
             {/* Sidebar */}
             <div className="lg:col-span-1">
-              <div className="bg-background rounded-lg sacred-shadow p-6 mb-6">
-                <h3 className="font-heading font-semibold text-lg text-foreground mb-4">
-                  Holy Synod
-                </h3>
-                <nav className="space-y-2">
-                  <Link 
-                    href="/mosc/holy-synod" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Holy Synod Overview
-                  </Link>
-                  <Link 
-                    href="/mosc/holy-synod/his-holiness-baselios-marthoma-mathews-iii" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    His Holiness the Catholicos
-                  </Link>
-                </nav>
-              </div>
-
-              {/* Quick Links */}
-              <div className="bg-background rounded-lg sacred-shadow p-6">
-                <h3 className="font-heading font-semibold text-lg text-foreground mb-4">
-                  Quick Links
-                </h3>
-                <nav className="space-y-2">
-                  <Link 
-                    href="/mosc/downloads/kalpana" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Kalpana
-                  </Link>
-                  <Link 
-                    href="/mosc/downloads" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Downloads
-                  </Link>
-                  <Link 
-                    href="/mosc/institutions" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Institutions
-                  </Link>
-                  <Link 
-                    href="/mosc/training" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Training
-                  </Link>
-                  <Link 
-                    href="/mosc/publications" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Publications
-                  </Link>
-                  <Link 
-                    href="/mosc/spiritual" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Spiritual Organisations
-                  </Link>
-                  <Link 
-                    href="/mosc/theological" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Theological Seminaries
-                  </Link>
-                  <Link 
-                    href="/mosc/lectionary" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Lectionary
-                  </Link>
-                  <Link 
-                    href="/mosc/photo-gallery" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Gallery
-                  </Link>
-                  <Link 
-                    href="/mosc/contact-info" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Contact Info
-                  </Link>
-                  <Link 
-                    href="/mosc/faqs" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    FAQs
-                  </Link>
-                </nav>
-              </div>
+              <SynodMembersSidebar />
             </div>
           </div>
         </div>

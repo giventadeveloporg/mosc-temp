@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import SynodMembersSidebar from '@/components/holy-synod/SynodMembersSidebar';
+import QuickLinks from '@/components/holy-synod/QuickLinks';
 
 export const metadata = {
   title: 'H.G. Dr. Geevarghese Mar Barnabas Metropolitan',
@@ -10,23 +11,6 @@ export const metadata = {
 const HGDrGeevargheseMarBarnabasMetropolitanPage = () => {
   return (
     <div className="bg-background">
-      {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-br from-background to-muted">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-primary rounded-lg flex items-center justify-center mx-auto mb-6 sacred-shadow-lg">
-              <span className="text-primary-foreground text-4xl font-bold" role="img" aria-label="Metropolitan">👨‍💼</span>
-            </div>
-            <h1 className="font-heading font-semibold text-4xl text-foreground mb-4">
-              H.G. Dr. Geevarghese Mar Barnabas Metropolitan
-            </h1>
-            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Metropolitan of the Malankara Orthodox Syrian Church
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* Main Content */}
       <section className="py-16 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -34,127 +18,54 @@ const HGDrGeevargheseMarBarnabasMetropolitanPage = () => {
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-background rounded-lg sacred-shadow p-8">
-                {/* Featured Image */}
-                <div className="mb-8">
-                  <Image
-                    src="/images/holy-synod/Geevarghese-Mar-Barnabas.png"
-                    alt="H.G. Dr. Geevarghese Mar Barnabas Metropolitan"
-                    width={500}
-                    height={300}
-                    className="rounded-lg sacred-shadow w-full h-auto object-contain"
-                    priority
-                  />
+                <div className="flex flex-col md:flex-row gap-8">
+                  {/* Featured Image - Left Side */}
+                  <div className="flex-shrink-0">
+                    <div className="w-64 h-auto">
+                      <Image
+                        src="/images/holy-synod/Geevarghese-Mar-Barnabas.png"
+                        alt="H.G. Dr. Geevarghese Mar Barnabas Metropolitan"
+                        width={300}
+                        height={193}
+                        className="rounded-lg sacred-shadow w-full h-auto object-contain"
+                        priority
+                      />
+                    </div>
+                  </div>
+
+                  {/* Content - Right Side of Image */}
+                  <div className="flex-1">
+                    <h3 className="font-heading font-semibold text-2xl text-foreground mb-6">
+                      H.G. Dr. Geevarghese Mar Barnabas Metropolitan
+                    </h3>
+
+                    <div className="prose prose-lg max-w-none">
+                      <p className="font-body text-muted-foreground leading-relaxed mb-4">
+                        Born to Mr. Kochupappi and Mrs. Ammini in Kattuparambil House on April 10, 1973, His Grace belongs to the parish of St. Mary’s Orthodox Church, Muttam under Mavelikkara diocese. His Grace completed his primary education from NSS High School, Pallipad, Naduvattam (1983-88), and completed higher studies from T. K. Madhava Memorial College (1988-90) and Kerala University (1990-93). He joined Kottayam Old Seminary and completed GST (1994-98). He also pursued BD (1994-98) and M.Th (2001- 03) from Serampore University. H. G. did LSD (2004-06) and DTh (2006-09) from the Pontifical Academy of St. Thomas Aquinas, Rome. And his diploma from Serampore University in 2019. He was ordained sub-deaconship (1997) by H.G. Dr. Geevarghese Mar Osthathios Metropolitan at St. Peter’s and St. Paul’s church, Parumala. He was ordained deaconship (2003) by H. G. Dr. Stephanos Mar Theodosius Metropolitan, and priesthood by H.G. Dr. Geevarghese Mar Osthathios Metropolitan in 2004 . H. G. was chosen as a Metropolitan in the Malankara Syrian Christian Association held at Kolencherry on 25 th February 2022 . H. G. received the status of Ramban at the Parumala Seminary on 2 nd June 2022 . He was ordained as Metropolitan by the name ‘Mar Barnabas’ by H.H. Baselios Mar Thoma Mathews III Catholicos at St. Mary’s Cathedral, Pazhanji on 28 th July 2022 . H.G. has taken charge of Sultan Bathery diocese since 3 rd November 2022.
+                      </p>
+
+                      <div className="mt-6 pt-6 border-t border-border">
+                        <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                          Address Nirmalagiri Aramana, Poomala, S. Bathery P.O., Wayanad - 673 592
+                        </p>
+                        <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                          Mob: +91 9495912473
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+              </div>
 
-                {/* Content */}
-                <div className="prose prose-lg max-w-none">
-                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-6">
-                    Biography
-                  </h2>
-
-
-
-
-                </div>
+              {/* Quick Links - Horizontal Below Main Content */}
+              <div className="mt-8">
+                <QuickLinks />
               </div>
             </div>
 
             {/* Sidebar */}
             <div className="lg:col-span-1">
-              <div className="bg-background rounded-lg sacred-shadow p-6 mb-6">
-                <h3 className="font-heading font-semibold text-lg text-foreground mb-4">
-                  Holy Synod
-                </h3>
-                <nav className="space-y-2">
-                  <Link 
-                    href="/mosc/holy-synod" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Holy Synod Overview
-                  </Link>
-                  <Link 
-                    href="/mosc/holy-synod/his-holiness-baselios-marthoma-mathews-iii" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    His Holiness the Catholicos
-                  </Link>
-                </nav>
-              </div>
-
-              {/* Quick Links */}
-              <div className="bg-background rounded-lg sacred-shadow p-6">
-                <h3 className="font-heading font-semibold text-lg text-foreground mb-4">
-                  Quick Links
-                </h3>
-                <nav className="space-y-2">
-                  <Link 
-                    href="/mosc/downloads/kalpana" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Kalpana
-                  </Link>
-                  <Link 
-                    href="/mosc/downloads" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Downloads
-                  </Link>
-                  <Link 
-                    href="/mosc/institutions" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Institutions
-                  </Link>
-                  <Link 
-                    href="/mosc/training" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Training
-                  </Link>
-                  <Link 
-                    href="/mosc/publications" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Publications
-                  </Link>
-                  <Link 
-                    href="/mosc/spiritual" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Spiritual Organisations
-                  </Link>
-                  <Link 
-                    href="/mosc/theological" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Theological Seminaries
-                  </Link>
-                  <Link 
-                    href="/mosc/lectionary" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Lectionary
-                  </Link>
-                  <Link 
-                    href="/mosc/photo-gallery" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Gallery
-                  </Link>
-                  <Link 
-                    href="/mosc/contact-info" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Contact Info
-                  </Link>
-                  <Link 
-                    href="/mosc/faqs" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    FAQs
-                  </Link>
-                </nav>
-              </div>
+              <SynodMembersSidebar />
             </div>
           </div>
         </div>

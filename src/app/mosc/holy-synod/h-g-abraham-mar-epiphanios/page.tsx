@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import SynodMembersSidebar from '@/components/holy-synod/SynodMembersSidebar';
+import QuickLinks from '@/components/holy-synod/QuickLinks';
 
 export const metadata = {
   title: 'H. G. Abraham Mar Epiphanios Metropolitan',
@@ -10,23 +11,6 @@ export const metadata = {
 const HGAbrahamMarEpiphaniosPage = () => {
   return (
     <div className="bg-background">
-      {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-br from-background to-muted">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-primary rounded-lg flex items-center justify-center mx-auto mb-6 sacred-shadow-lg">
-              <span className="text-primary-foreground text-4xl font-bold" role="img" aria-label="Metropolitan">👨‍💼</span>
-            </div>
-            <h1 className="font-heading font-semibold text-4xl text-foreground mb-4">
-              H. G. Abraham Mar Epiphanios Metropolitan
-            </h1>
-            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Metropolitan of the Malankara Orthodox Syrian Church
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* Main Content */}
       <section className="py-16 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -34,127 +18,67 @@ const HGAbrahamMarEpiphaniosPage = () => {
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-background rounded-lg sacred-shadow p-8">
-                {/* Featured Image */}
-                <div className="mb-8">
-                  <Image
-                    src="/images/holy-synod/mar-ephipanios.jpg"
-                    alt="H. G. Abraham Mar Epiphanios Metropolitan"
-                    width={500}
-                    height={300}
-                    className="rounded-lg sacred-shadow w-full h-auto object-contain"
-                    priority
-                  />
+                <div className="flex flex-col md:flex-row gap-8">
+                  {/* Featured Image - Left Side */}
+                  <div className="flex-shrink-0">
+                    <div className="w-64 h-auto">
+                      <Image
+                        src="/images/holy-synod/mar-ephipanios.jpg"
+                        alt="H. G. Abraham Mar Epiphanios Metropolitan"
+                        width={300}
+                        height={193}
+                        className="rounded-lg sacred-shadow w-full h-auto object-contain"
+                        priority
+                      />
+                    </div>
+                  </div>
+
+                  {/* Content - Right Side of Image */}
+                  <div className="flex-1">
+                    <h3 className="font-heading font-semibold text-2xl text-foreground mb-6">
+                      H. G. Abraham Mar Epiphanios Metropolitan
+                    </h3>
+
+                    <div className="prose prose-lg max-w-none">
+                      <p className="font-body text-muted-foreground leading-relaxed mb-4">
+                        His Grace was born on 17th September 1960 as the son of Mr. V. A. Oommen and Mrs. Gracy Oommen. His Grace is a member of St. Mary\'s Cathedral, Malaysia. His Grace had his education in Pathanamthitta Catholicate School and College, the Orthodox Theological Seminary and stands with his M.Th. degree from Serampore University. His Grace was ordained as deacon and Priest in 1986 and 1987 respectively; on 31st March 2002 His Grace became Ramban. His Grace has spent a long time in the Ashrams in Parumala and Madras from 1990 to 1996. His Grace served as Vicar of St. Thomas Cathedral from 1996 to 2002. Thereafter His Grace served as the Manager of Bishop\'s House, Madras in 2003 From 2004-2006 His Grace was served as the Manager at Parumala Seminary and Devalokam Catholicate Aramana. His Grace is serving the Mavelikara Diocese as its Metropolitan.
+                      </p>
+
+                      <p className="font-body text-muted-foreground leading-relaxed mb-4">
+                        His Grace is serving the Mavelikara Diocese as its Metropolitan.
+                      </p>
+
+                      <div className="mt-6 pt-6 border-t border-border">
+                        <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                          Address: Theobhavan Aramana, Thazhakara – Post, Mavelikara, Kerala - 690102
+                        </p>
+                        <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                          Mob: 9447908814
+                        </p>
+                        <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                          Email: marepiphanios@gmail.com
+                        </p>
+                        <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                          Address: Theobhavan Aramana, Thazhakara – Post, Mavelikara, Kerala - 690102
+                        </p>
+                        <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                          Email: marepiphanios@gmail.com
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+              </div>
 
-                {/* Content */}
-                <div className="prose prose-lg max-w-none">
-                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-6">
-                    Biography
-                  </h2>
-
-
-
-
-                </div>
+              {/* Quick Links - Horizontal Below Main Content */}
+              <div className="mt-8">
+                <QuickLinks />
               </div>
             </div>
 
             {/* Sidebar */}
             <div className="lg:col-span-1">
-              <div className="bg-background rounded-lg sacred-shadow p-6 mb-6">
-                <h3 className="font-heading font-semibold text-lg text-foreground mb-4">
-                  Holy Synod
-                </h3>
-                <nav className="space-y-2">
-                  <Link 
-                    href="/mosc/holy-synod" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Holy Synod Overview
-                  </Link>
-                  <Link 
-                    href="/mosc/holy-synod/his-holiness-baselios-marthoma-mathews-iii" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    His Holiness the Catholicos
-                  </Link>
-                </nav>
-              </div>
-
-              {/* Quick Links */}
-              <div className="bg-background rounded-lg sacred-shadow p-6">
-                <h3 className="font-heading font-semibold text-lg text-foreground mb-4">
-                  Quick Links
-                </h3>
-                <nav className="space-y-2">
-                  <Link 
-                    href="/mosc/downloads/kalpana" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Kalpana
-                  </Link>
-                  <Link 
-                    href="/mosc/downloads" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Downloads
-                  </Link>
-                  <Link 
-                    href="/mosc/institutions" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Institutions
-                  </Link>
-                  <Link 
-                    href="/mosc/training" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Training
-                  </Link>
-                  <Link 
-                    href="/mosc/publications" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Publications
-                  </Link>
-                  <Link 
-                    href="/mosc/spiritual" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Spiritual Organisations
-                  </Link>
-                  <Link 
-                    href="/mosc/theological" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Theological Seminaries
-                  </Link>
-                  <Link 
-                    href="/mosc/lectionary" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Lectionary
-                  </Link>
-                  <Link 
-                    href="/mosc/photo-gallery" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Gallery
-                  </Link>
-                  <Link 
-                    href="/mosc/contact-info" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Contact Info
-                  </Link>
-                  <Link 
-                    href="/mosc/faqs" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    FAQs
-                  </Link>
-                </nav>
-              </div>
+              <SynodMembersSidebar />
             </div>
           </div>
         </div>

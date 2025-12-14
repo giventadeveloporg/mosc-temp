@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import SynodMembersSidebar from '@/components/holy-synod/SynodMembersSidebar';
+import QuickLinks from '@/components/holy-synod/QuickLinks';
 
 export const metadata = {
   title: 'H.G. Dr. Yuhanon Mar Diascoros Metropolitan',
@@ -10,23 +11,6 @@ export const metadata = {
 const HGDrYuhanonMarDioscorosMetropolitanPage = () => {
   return (
     <div className="bg-background">
-      {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-br from-background to-muted">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-primary rounded-lg flex items-center justify-center mx-auto mb-6 sacred-shadow-lg">
-              <span className="text-primary-foreground text-4xl font-bold" role="img" aria-label="Metropolitan">👨‍💼</span>
-            </div>
-            <h1 className="font-heading font-semibold text-4xl text-foreground mb-4">
-              H.G. Dr. Yuhanon Mar Diascoros Metropolitan
-            </h1>
-            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Metropolitan of the Malankara Orthodox Syrian Church
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* Main Content */}
       <section className="py-16 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -34,127 +18,74 @@ const HGDrYuhanonMarDioscorosMetropolitanPage = () => {
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-background rounded-lg sacred-shadow p-8">
-                {/* Featured Image */}
-                <div className="mb-8">
-                  <Image
-                    src="/images/holy-synod/pani.jpg"
-                    alt="H.G. Dr. Yuhanon Mar Diascoros Metropolitan"
-                    width={500}
-                    height={300}
-                    className="rounded-lg sacred-shadow w-full h-auto object-contain"
-                    priority
-                  />
+                <div className="flex flex-col md:flex-row gap-8">
+                  {/* Featured Image - Left Side */}
+                  <div className="flex-shrink-0">
+                    <div className="w-64 h-auto">
+                      <Image
+                        src="/images/holy-synod/pani.jpg"
+                        alt="H.G. Dr. Yuhanon Mar Diascoros Metropolitan"
+                        width={300}
+                        height={193}
+                        className="rounded-lg sacred-shadow w-full h-auto object-contain"
+                        priority
+                      />
+                    </div>
+                  </div>
+
+                  {/* Content - Right Side of Image */}
+                  <div className="flex-1">
+                    <h3 className="font-heading font-semibold text-2xl text-foreground mb-6">
+                      H.G. Dr. Yuhanon Mar Diascoros Metropolitan
+                    </h3>
+
+                    <div className="prose prose-lg max-w-none">
+                      <p className="font-body text-muted-foreground leading-relaxed mb-4">
+                        His Grace was born in Kallarackal Kaleelil family on 28 May 1964 as the son of Mr. P. T. Mathunny Panicker & Mrs. Kunjamma Panicker. He is a member of St. Thomas Orthodox Valiyapally, Kundara. He obtained his B.Sc degree from Kerala University(1984), theological diploma (GST) from Orthodox Seminary, Kottayam, Bachelor of Divinity (B.D) from Serampore University (1988), Master of Theology (1991) and Doctor of Theology (1995) from the Pontifical Oriental Institute in Rome. He also holds a certificate in Pastoral Counselling from Glasgow University, Scotland (1997). He was ordained as Sub-deacon on 13 June 1987 and Deacon on 15 May 1989 and on 3 June 1989 he was ordained to the Holy priesthood by the late H.G. Geevarghese Mar Dioscorus, Metropolitan of Trivandrum Diocese. He was the director of Holy Trinity Centre for Disabled Children, Trivandrum(1990-91), Professor and Registrar of the Holy Trinity Theological College, Addis Ababa of the Ethiopean Orthodox Church (1994-1997), and the Programme Secretary, Sophia Centre, Kottayam (1997-2006). He served as the vicar of Sreekaryam Mar Baselios Gregorios, TVM (1989-90), Makkulam St. George, TVM (1997-2000), Narickal St. Mary’s, TVM (2000-03), Valakam Mar Gregorios, TVM (2003-06), Koorthamala St. Mary’s, Chengannoor (Asst. Vicar, 1998-02), Kurichimuttom St. Stephen’s, Chengannoor (Vicar, 2002-04) Pullad St. George, Chengannoor (2004-06) and now serving a the Chaplain of Old Seminary, Kottayam and the Vicar of Kundara Kadeestha, TVM, from 2006 onwards.He is currently the Professor and Dean of Studies of Orthodox Theological Seminary, Kottayam, Registrar of Divyabodhanam-the laity theological training programme of the Church, Joint Secretary of St. Thomas Orthodox Vaidika Sanghom, Chief Editor of Malankara Sabha Monthly, Publisher of Purohithan Quarterly, Editorial Board Member of Bethel Pathrika, Editorial Board Member of St. Ephrem Theological Journal, (Satna), Executive Committee Member of TLC, Thiruvalla, Member of the Joint International Dialogue between Roman Catholic Church and Malankara Orthodox Syrian Church. He has authored five books and numerous articles and a good preacher, teacher and a retreat father. The Malankara Syrian Christian Association met on 11 Sep 2008 at Pampakuda elected him as the bsihop along with six others. On 4 Dec 2008 His Holiness Baselius Marthoma Didymus I professed him as Ramban. On 19 feb 2009 he was ordained as bishop by H.H.Baselius Marthoma Didymus I, at St. George Orthodox Church, Puthupally. His Grace is serving the Kottayam Diocese as its Metropolitan
+                      </p>
+
+                      <p className="font-body text-muted-foreground leading-relaxed mb-4">
+                        He was ordained as Sub-deacon on 13 June 1987 and Deacon on 15 May 1989 and on 3 June 1989 he was ordained to the Holy priesthood by the late H.G. Geevarghese Mar Dioscorus, Metropolitan of Trivandrum Diocese. He was the director of Holy Trinity Centre for Disabled Children, Trivandrum(1990-91), Professor and Registrar of the Holy Trinity Theological College, Addis Ababa of the Ethiopean Orthodox Church (1994-1997), and the Programme Secretary, Sophia Centre, Kottayam (1997-2006).
+                      </p>
+
+                      <p className="font-body text-muted-foreground leading-relaxed mb-4">
+                        He served as the vicar of Sreekaryam Mar Baselios Gregorios, TVM (1989-90), Makkulam St. George, TVM (1997-2000), Narickal St. Mary’s, TVM (2000-03), Valakam Mar Gregorios, TVM (2003-06), Koorthamala St. Mary’s, Chengannoor (Asst. Vicar, 1998-02), Kurichimuttom St. Stephen’s, Chengannoor (Vicar, 2002-04) Pullad St. George, Chengannoor (2004-06) and now serving a the Chaplain of Old Seminary, Kottayam and the Vicar of Kundara Kadeestha, TVM, from 2006 onwards.He is currently the Professor and Dean of Studies of Orthodox Theological Seminary, Kottayam, Registrar of Divyabodhanam-the laity theological training programme of the Church, Joint Secretary of St. Thomas Orthodox Vaidika Sanghom, Chief Editor of Malankara Sabha Monthly, Publisher of Purohithan Quarterly, Editorial Board Member of Bethel Pathrika, Editorial Board Member of St. Ephrem Theological Journal, (Satna), Executive Committee Member of TLC, Thiruvalla, Member of the Joint International Dialogue between Roman Catholic Church and Malankara Orthodox Syrian Church. He has authored five books and numerous articles and a good preacher, teacher and a retreat father.
+                      </p>
+
+                      <p className="font-body text-muted-foreground leading-relaxed mb-4">
+                        The Malankara Syrian Christian Association met on 11 Sep 2008 at Pampakuda elected him as the bsihop along with six others. On 4 Dec 2008 His Holiness Baselius Marthoma Didymus I professed him as Ramban. On 19 feb 2009 he was ordained as bishop by H.H.Baselius Marthoma Didymus I, at St. George Orthodox Church, Puthupally.
+                      </p>
+
+                      <p className="font-body text-muted-foreground leading-relaxed mb-4">
+                        His Grace is serving the Kottayam Diocese as its Metropolitan
+                      </p>
+
+                      <p className="font-body text-muted-foreground leading-relaxed mb-4">
+                        Mar Kuriakose Dayara, Pothenpuram P O, Pampady, Kottayam Dist, Kerala, India - 686502 : 0481 2505431
+                      </p>
+
+                      <div className="mt-6 pt-6 border-t border-border">
+                        <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                          Address Mar Kuriakose Dayara, Pothenpuram P O, Pampady, Kottayam Dist, Kerala, India - 686502: 0481 2505431
+                        </p>
+                        <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                          Mob ile:09791020730 E-mail: mardiascoros@yahoo.com
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+              </div>
 
-                {/* Content */}
-                <div className="prose prose-lg max-w-none">
-                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-6">
-                    Biography
-                  </h2>
-
-
-
-
-                </div>
+              {/* Quick Links - Horizontal Below Main Content */}
+              <div className="mt-8">
+                <QuickLinks />
               </div>
             </div>
 
             {/* Sidebar */}
             <div className="lg:col-span-1">
-              <div className="bg-background rounded-lg sacred-shadow p-6 mb-6">
-                <h3 className="font-heading font-semibold text-lg text-foreground mb-4">
-                  Holy Synod
-                </h3>
-                <nav className="space-y-2">
-                  <Link 
-                    href="/mosc/holy-synod" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Holy Synod Overview
-                  </Link>
-                  <Link 
-                    href="/mosc/holy-synod/his-holiness-baselios-marthoma-mathews-iii" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    His Holiness the Catholicos
-                  </Link>
-                </nav>
-              </div>
-
-              {/* Quick Links */}
-              <div className="bg-background rounded-lg sacred-shadow p-6">
-                <h3 className="font-heading font-semibold text-lg text-foreground mb-4">
-                  Quick Links
-                </h3>
-                <nav className="space-y-2">
-                  <Link 
-                    href="/mosc/downloads/kalpana" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Kalpana
-                  </Link>
-                  <Link 
-                    href="/mosc/downloads" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Downloads
-                  </Link>
-                  <Link 
-                    href="/mosc/institutions" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Institutions
-                  </Link>
-                  <Link 
-                    href="/mosc/training" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Training
-                  </Link>
-                  <Link 
-                    href="/mosc/publications" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Publications
-                  </Link>
-                  <Link 
-                    href="/mosc/spiritual" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Spiritual Organisations
-                  </Link>
-                  <Link 
-                    href="/mosc/theological" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Theological Seminaries
-                  </Link>
-                  <Link 
-                    href="/mosc/lectionary" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Lectionary
-                  </Link>
-                  <Link 
-                    href="/mosc/photo-gallery" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Gallery
-                  </Link>
-                  <Link 
-                    href="/mosc/contact-info" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Contact Info
-                  </Link>
-                  <Link 
-                    href="/mosc/faqs" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    FAQs
-                  </Link>
-                </nav>
-              </div>
+              <SynodMembersSidebar />
             </div>
           </div>
         </div>

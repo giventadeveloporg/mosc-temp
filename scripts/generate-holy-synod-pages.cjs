@@ -177,7 +177,7 @@ function extractContent(html) {
 
   const contentBox = contentBoxMatch[1];
 
-  // Extract all paragraphs from the content box
+  // First, try to extract content from p tags (older pages)
   const paragraphMatches = contentBox.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/g);
   for (const match of paragraphMatches) {
     let text = match[1]
@@ -214,6 +214,160 @@ function extractContent(html) {
     }
   }
 
+  // If no paragraphs found, extract plain text content (newer pages)
+  if (content.paragraphs.length === 0) {
+    // Remove image and h3 tags to get the remaining content
+    let textContent = contentBox
+      .replace(/<img[^>]*>/g, '') // Remove image tags
+      .replace(/<h3[^>]*>([^<]+)<\/h3>/g, '') // Remove h3 tags
+      .replace(/<strong[^>]*>/g, '\n<strong>') // Add line break before strong tags
+      .replace(/<\/strong>/g, '</strong>\n') // Add line break after strong tags
+      .replace(/<[^>]+>/g, ' ') // Replace other HTML tags with spaces
+      .replace(/&amp;/g, '&')
+      .replace(/&nbsp;/g, ' ') // Convert &nbsp; to spaces
+      .replace(/&quot;/g, '"')
+      .replace(/&#8217;/g, "'")
+      .replace(/&#8211;/g, '-')
+      .replace(/&#038;/g, '&')
+      .replace(/\s+/g, ' ') // Normalize whitespace
+      .trim();
+
+    // Extract email and phone links before removing HTML
+    const emailLinks = [];
+    const phoneLinks = [];
+    const webLinks = [];
+    contentBox.replace(/<a[^>]*href="mailto:([^"]+)"[^>]*>([^<]+)<\/a>/g, (match, email, text) => {
+      emailLinks.push(text || email);
+      return '';
+    });
+    contentBox.replace(/<a[^>]*href="tel:([^"]+)"[^>]*>([^<]+)<\/a>/g, (match, phone, text) => {
+      phoneLinks.push(text || phone);
+      return '';
+    });
+    contentBox.replace(/<a[^>]*href="([^"]+)"[^>]*>([^<]+)<\/a>/g, (match, url, text) => {
+      if (url && !url.startsWith('mailto:') && !url.startsWith('tel:')) {
+        webLinks.push({ text, url });
+      }
+      return '';
+    });
+
+    // Split by patterns that indicate paragraph breaks (multiple spaces, or specific keywords)
+    // Look for patterns like "Address", "Email", "Phone" that indicate contact section
+    const contactKeywords = /(Address|Email|Phone|Mob|Tel|Web|Urshlem)/i;
+    const parts = textContent.split(contactKeywords);
+    
+    let currentParagraph = '';
+    let inContactSection = false;
+    
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i].trim();
+      if (!part) continue;
+
+      // Check if this part is a contact keyword
+      if (part.match(/^(Address|Email|Phone|Mob|Tel|Web|Urshlem)$/i)) {
+        // Save current paragraph if exists
+        if (currentParagraph.trim().length > 20) {
+          content.paragraphs.push(currentParagraph.trim());
+          currentParagraph = '';
+        }
+        inContactSection = true;
+        // Add the keyword and next part as contact info
+        if (i + 1 < parts.length) {
+          const nextPart = parts[i + 1].trim();
+          if (nextPart) {
+            content.contactInfo.push(`${part} ${nextPart}`);
+            i++; // Skip next part as we've processed it
+          } else {
+            content.contactInfo.push(part);
+          }
+        } else {
+          content.contactInfo.push(part);
+        }
+        continue;
+      }
+
+      // If we're in contact section, add to contact info
+      if (inContactSection || part.match(/@|^\+\d|^\d{10,}/)) {
+        content.contactInfo.push(part);
+        continue;
+      }
+
+      // Otherwise, build paragraphs
+      if (part.length > 5) {
+        if (currentParagraph) {
+          currentParagraph += ' ' + part;
+        } else {
+          currentParagraph = part;
+        }
+        
+        // If paragraph is getting long (more than 300 chars) or ends with period, save it
+        if (currentParagraph.length > 300 || currentParagraph.match(/\.\s*$/)) {
+          content.paragraphs.push(currentParagraph.trim());
+          currentParagraph = '';
+        }
+      }
+    }
+
+    // Save any remaining paragraph
+    if (currentParagraph.trim().length > 20) {
+      content.paragraphs.push(currentParagraph.trim());
+    }
+
+    // Add extracted email/phone/web links to contact info
+    emailLinks.forEach(email => {
+      if (!content.contactInfo.some(info => info.includes(email))) {
+        content.contactInfo.push(`Email: ${email}`);
+      }
+    });
+    phoneLinks.forEach(phone => {
+      if (!content.contactInfo.some(info => info.includes(phone))) {
+        content.contactInfo.push(`Phone: ${phone}`);
+      }
+    });
+    webLinks.forEach(({ text, url }) => {
+      if (!content.contactInfo.some(info => info.includes(url))) {
+        content.contactInfo.push(`Web: ${text} (${url})`);
+      }
+    });
+
+    // Clean up contact info formatting
+    content.contactInfo = content.contactInfo.map(info => {
+      return info
+        .replace(/\s+([:\.])/g, '$1') // Remove space before colons and periods
+        .replace(/([:\.,])\s+/g, '$1 ') // Ensure single space after punctuation
+        .replace(/\s+/g, ' ') // Normalize whitespace
+        .trim();
+    });
+  }
+
+  // Also extract divs with content (some legacy pages use divs instead of p tags)
+  const divMatches = contentBox.matchAll(/<div[^>]*align="(?:center|left|justify)"[^>]*>([\s\S]*?)<\/div>/g);
+  for (const match of divMatches) {
+    let text = match[1]
+      .replace(/<p[^>]*>([\s\S]*?)<\/p>/g, '$1') // Extract p tags inside divs
+      .replace(/<[^>]+>/g, '') // Remove HTML tags
+      .replace(/&amp;/g, '&')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&quot;/g, '"')
+      .replace(/&#8217;/g, "'")
+      .replace(/&#8211;/g, '-')
+      .replace(/&#038;/g, '&')
+      .replace(/\s+/g, ' ') // Normalize whitespace
+      .trim();
+    
+    if (text && text.length > 20 && !text.match(/^\s*$/)) {
+      // Check if it's contact info
+      if (text.match(/Address|Email|Phone|ph\s*:|Cell:|Tel:|Facebook|Instagram|Visit|website/i)) {
+        content.contactInfo.push(text);
+      } else {
+        // Avoid duplicates
+        if (!content.paragraphs.some(p => p.substring(0, 50) === text.substring(0, 50))) {
+          content.paragraphs.push(text);
+        }
+      }
+    }
+  }
+
   // Extract address if present in <address> tags
   const addressMatches = contentBox.matchAll(/<address[^>]*>([\s\S]*?)<\/address>/g);
   for (const match of addressMatches) {
@@ -231,9 +385,11 @@ function extractContent(html) {
 
 // Function to generate page component
 function generatePage(route, memberData, content) {
+  const isCatholicos = route === 'his-holiness-baselios-marthoma-mathews-iii';
   const pageContent = `import React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import SynodMembersSidebar from '@/components/holy-synod/SynodMembersSidebar';
+import QuickLinks from '@/components/holy-synod/QuickLinks';
 
 export const metadata = {
   title: '${content.name}',
@@ -243,23 +399,6 @@ export const metadata = {
 const ${route.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('')}Page = () => {
   return (
     <div className="bg-background">
-      {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-br from-background to-muted">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-primary rounded-lg flex items-center justify-center mx-auto mb-6 sacred-shadow-lg">
-              <span className="text-primary-foreground text-4xl font-bold" role="img" aria-label="Metropolitan">👨‍💼</span>
-            </div>
-            <h1 className="font-heading font-semibold text-4xl text-foreground mb-4">
-              ${content.name}
-            </h1>
-            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              ${memberData.title || 'Metropolitan of the Malankara Orthodox Syrian Church'}
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* Main Content */}
       <section className="py-16 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -267,136 +406,55 @@ const ${route.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-background rounded-lg sacred-shadow p-8">
-                {/* Featured Image */}
-                <div className="mb-8">
-                  <Image
-                    src="/images/holy-synod/${memberData.image}"
-                    alt="${content.name}"
-                    width={500}
-                    height={300}
-                    className="rounded-lg sacred-shadow w-full h-auto object-contain"
-                    priority
-                  />
-                </div>
+                <div className="flex flex-col md:flex-row gap-8">
+                  {/* Featured Image - Left Side */}
+                  <div className="flex-shrink-0">
+                    <div className="w-64 h-auto">
+                      <Image
+                        src="/images/holy-synod/${memberData.image}"
+                        alt="${content.name}"
+                        width={300}
+                        height={${isCatholicos ? 400 : 193}}
+                        className="rounded-lg sacred-shadow w-full h-auto object-contain"
+                        priority
+                      />
+                    </div>
+                  </div>
 
-                {/* Content */}
-                <div className="prose prose-lg max-w-none">
-                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-6">
-                    Biography
-                  </h2>
-
-${content.paragraphs.map(p => `                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    ${p.replace(/'/g, "\\'")}
-                  </p>`).join('\n\n')}
-
-${content.contactInfo.length > 0 ? `                  <div className="mt-8 pt-6 border-t border-border">
-                    <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
-                      Contact Information
+                  {/* Content - Right Side of Image */}
+                  <div className="flex-1">
+                    <h3 className="font-heading font-semibold text-2xl text-foreground mb-6">
+                      ${content.name}
                     </h3>
-${content.contactInfo.map(info => `                    <p className="font-body text-muted-foreground leading-relaxed mb-2">
-                      ${info.replace(/'/g, "\\'")}
-                    </p>`).join('\n')}
-                  </div>` : ''}
+
+                    <div className="prose prose-lg max-w-none">
+${content.paragraphs.map(p => `                      <p className="font-body text-muted-foreground leading-relaxed mb-4">
+                        ${p.replace(/'/g, "\\'").replace(/\\n/g, ' ')}
+                      </p>`).join('\n\n')}
+
+${content.contactInfo.length > 0 ? `                      <div className="mt-6 pt-6 border-t border-border">
+${content.contactInfo.map(info => {
+  // Format contact info - split by line breaks if present
+  const cleanInfo = info.replace(/<[^>]+>/g, '').replace(/\\n/g, ' ').trim();
+  return `                        <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                          ${cleanInfo.replace(/'/g, "\\'")}
+                        </p>`;
+}).join('\n')}
+                      </div>` : ''}
+                    </div>
+                  </div>
                 </div>
+              </div>
+
+              {/* Quick Links - Horizontal Below Main Content */}
+              <div className="mt-8">
+                <QuickLinks />
               </div>
             </div>
 
             {/* Sidebar */}
             <div className="lg:col-span-1">
-              <div className="bg-background rounded-lg sacred-shadow p-6 mb-6">
-                <h3 className="font-heading font-semibold text-lg text-foreground mb-4">
-                  Holy Synod
-                </h3>
-                <nav className="space-y-2">
-                  <Link 
-                    href="/mosc/holy-synod" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Holy Synod Overview
-                  </Link>
-                  <Link 
-                    href="/mosc/holy-synod/his-holiness-baselios-marthoma-mathews-iii" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    His Holiness the Catholicos
-                  </Link>
-                </nav>
-              </div>
-
-              {/* Quick Links */}
-              <div className="bg-background rounded-lg sacred-shadow p-6">
-                <h3 className="font-heading font-semibold text-lg text-foreground mb-4">
-                  Quick Links
-                </h3>
-                <nav className="space-y-2">
-                  <Link 
-                    href="/mosc/downloads/kalpana" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Kalpana
-                  </Link>
-                  <Link 
-                    href="/mosc/downloads" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Downloads
-                  </Link>
-                  <Link 
-                    href="/mosc/institutions" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Institutions
-                  </Link>
-                  <Link 
-                    href="/mosc/training" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Training
-                  </Link>
-                  <Link 
-                    href="/mosc/publications" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Publications
-                  </Link>
-                  <Link 
-                    href="/mosc/spiritual" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Spiritual Organisations
-                  </Link>
-                  <Link 
-                    href="/mosc/theological" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Theological Seminaries
-                  </Link>
-                  <Link 
-                    href="/mosc/lectionary" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Lectionary
-                  </Link>
-                  <Link 
-                    href="/mosc/photo-gallery" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Gallery
-                  </Link>
-                  <Link 
-                    href="/mosc/contact-info" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Contact Info
-                  </Link>
-                  <Link 
-                    href="/mosc/faqs" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    FAQs
-                  </Link>
-                </nav>
-              </div>
+              <SynodMembersSidebar />
             </div>
           </div>
         </div>
