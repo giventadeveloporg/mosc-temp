@@ -125,6 +125,10 @@ DROP SEQUENCE IF EXISTS public.event_score_card_detail_id_seq CASCADE;
 DROP SEQUENCE IF EXISTS public.event_score_card_id_seq CASCADE;
 DROP SEQUENCE IF EXISTS public.event_live_update_attachment_id_seq  CASCADE;
 
+--spring batch job sequences
+DROP SEQUENCE IF EXISTS public.batch_job_seq CASCADE;
+DROP SEQUENCE IF EXISTS public.batch_job_execution_seq CASCADE;
+DROP SEQUENCE IF EXISTS public.batch_step_execution_seq CASCADE;
 
 -- ===================================================
 -- DROP EXISTING TABLES (in reverse dependency order)
@@ -4097,9 +4101,34 @@ CREATE INDEX IF NOT EXISTS idx_promotion_log_tenant ON public.promotion_email_se
 -- These tables are required for Spring Batch to track job executions
 -- Run this script if automatic schema initialization fails
 
+-- Create Spring Batch-specific sequences with the exact names Spring Batch expects
+-- These are separate from the main sequence_generator used by other application tables
+CREATE SEQUENCE IF NOT EXISTS public.batch_job_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.batch_job_execution_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE SEQUENCE IF NOT EXISTS public.batch_step_execution_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
 -- BATCH_JOB_INSTANCE
+-- Using BIGINT with explicit sequence (batch_job_seq) instead of BIGSERIAL
+-- This ensures Spring Batch can find the sequence with the expected name
 CREATE TABLE IF NOT EXISTS public.BATCH_JOB_INSTANCE (
-    JOB_INSTANCE_ID BIGSERIAL PRIMARY KEY,
+    JOB_INSTANCE_ID BIGINT DEFAULT nextval('public.batch_job_seq') PRIMARY KEY,
     VERSION BIGINT,
     JOB_NAME VARCHAR(100) NOT NULL,
     JOB_KEY VARCHAR(32) NOT NULL,
@@ -4107,8 +4136,9 @@ CREATE TABLE IF NOT EXISTS public.BATCH_JOB_INSTANCE (
 );
 
 -- BATCH_JOB_EXECUTION
+-- Using BIGINT with explicit sequence (batch_job_execution_seq) instead of BIGSERIAL
 CREATE TABLE IF NOT EXISTS public.BATCH_JOB_EXECUTION (
-    JOB_EXECUTION_ID BIGSERIAL PRIMARY KEY,
+    JOB_EXECUTION_ID BIGINT DEFAULT nextval('public.batch_job_execution_seq') PRIMARY KEY,
     VERSION BIGINT,
     JOB_INSTANCE_ID BIGINT NOT NULL,
     CREATE_TIME TIMESTAMP NOT NULL,
@@ -4134,8 +4164,9 @@ CREATE TABLE IF NOT EXISTS public.BATCH_JOB_EXECUTION_PARAMS (
 );
 
 -- BATCH_STEP_EXECUTION
+-- Using BIGINT with explicit sequence (batch_step_execution_seq) instead of BIGSERIAL
 CREATE TABLE IF NOT EXISTS public.BATCH_STEP_EXECUTION (
-    STEP_EXECUTION_ID BIGSERIAL PRIMARY KEY,
+    STEP_EXECUTION_ID BIGINT DEFAULT nextval('public.batch_step_execution_seq') PRIMARY KEY,
     VERSION BIGINT NOT NULL,
     STEP_NAME VARCHAR(100) NOT NULL,
     JOB_EXECUTION_ID BIGINT NOT NULL,
@@ -4180,7 +4211,8 @@ CREATE TABLE IF NOT EXISTS public.BATCH_JOB_EXECUTION_CONTEXT (
 -- This table is separate from Spring Batch's internal tables (BATCH_*)
 -- Used for custom tracking and auditing of batch job executions with additional metadata
 -- Note: This is NOT the same as BATCH_JOB_EXECUTION (Spring Batch framework table)
--- Using BIGSERIAL for auto-increment (JPA @GeneratedValue will work with this)
+-- Using BIGSERIAL for auto-increment (JPA @GeneratedValue with sequenceGenerator will work with this)
+-- This table uses the shared sequence_generator sequence (already exists in database)
 CREATE TABLE IF NOT EXISTS public.batch_job_execution_log (
     id BIGSERIAL PRIMARY KEY,
     job_name VARCHAR(100) NOT NULL,
@@ -4214,6 +4246,12 @@ CREATE INDEX IF NOT EXISTS idx_batch_job_execution_log_status
     ON public.batch_job_execution_log(status, started_at DESC);
 CREATE INDEX IF NOT EXISTS idx_batch_job_execution_log_tenant
     ON public.batch_job_execution_log(tenant_id, started_at DESC);
+
+-- Set sequence ownership to the columns (must be done after tables are created)
+-- This ensures sequences are dropped if columns/tables are dropped
+ALTER SEQUENCE public.batch_job_seq OWNED BY public.BATCH_JOB_INSTANCE.JOB_INSTANCE_ID;
+ALTER SEQUENCE public.batch_job_execution_seq OWNED BY public.BATCH_JOB_EXECUTION.JOB_EXECUTION_ID;
+ALTER SEQUENCE public.batch_step_execution_seq OWNED BY public.BATCH_STEP_EXECUTION.STEP_EXECUTION_ID;
 
 
 -- =====================================================
