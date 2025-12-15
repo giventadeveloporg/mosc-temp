@@ -22,6 +22,7 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const cancelledRef = useRef(false);
+  const isPostingRef = useRef(false); // CRITICAL: Prevent duplicate POST requests
 
   // Default hero image URL - same as event success page
   const defaultHeroImageUrl = '/images/default_placeholder_hero_image.jpeg';
@@ -30,6 +31,8 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
   useEffect(() => {
     // Reset cancelled flag at the start of each effect run
     cancelledRef.current = false;
+    // Reset posting flag at the start (but will be set during POST)
+    isPostingRef.current = false;
 
     if (typeof window === 'undefined') return;
 
@@ -163,71 +166,83 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
         }
 
         // 2. If not found, POST to create it (fallback if webhook failed)
+        // CRITICAL: Prevent duplicate POST requests (race condition fix)
+        if (isPostingRef.current) {
+          console.log('[MEMBERSHIP-SUCCESS] ⚠️ POST request already in progress, skipping duplicate');
+          return;
+        }
+
+        isPostingRef.current = true;
         console.log('[MEMBERSHIP-SUCCESS] Making POST request to create subscription');
         const postBody = session_id ? { session_id } : { pi: payment_intent };
         console.log('[MEMBERSHIP-SUCCESS] POST body:', postBody);
 
-        const postRes = await fetch('/api/membership/success/process', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(postBody),
-          cache: 'no-store',
-        });
+        try {
+          const postRes = await fetch('/api/membership/success/process', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(postBody),
+            cache: 'no-store',
+          });
 
-        console.log('[MEMBERSHIP-SUCCESS] POST response status:', postRes.status);
+          console.log('[MEMBERSHIP-SUCCESS] POST response status:', postRes.status);
 
-        if (!postRes.ok) {
-          const errorText = await postRes.text();
-          console.error('[MEMBERSHIP-SUCCESS] POST request failed:', postRes.status, errorText);
-          throw new Error(errorText || 'Failed to create subscription');
-        }
-
-        const postData = await postRes.json();
-        console.log('[MEMBERSHIP-SUCCESS] POST response data:', postData);
-        console.log('[MEMBERSHIP-SUCCESS] POST response has subscription?', !!postData.subscription);
-        console.log('[MEMBERSHIP-SUCCESS] POST response has plan?', !!postData.plan);
-        console.log('[MEMBERSHIP-SUCCESS] cancelledRef.current:', cancelledRef.current);
-
-        if (postData.subscription) {
-          console.log('[MEMBERSHIP-SUCCESS] ✅ Subscription found in POST response:', postData.subscription.id);
-          // Always update state if we have subscription data, regardless of cancelled flag
-          // The cancelled flag is only for preventing updates after unmount
-          if (!cancelledRef.current) {
-            setSubscriptionDetails({
-              plan: postData.plan,
-              amount: postData.amount || postData.plan?.price || null,
-              currency: postData.currency || postData.plan?.currency || 'USD',
-              subscription: postData.subscription,
-            });
-            console.log('[MEMBERSHIP-SUCCESS] ✅ Subscription details set');
-          } else {
-            console.log('[MEMBERSHIP-SUCCESS] ⚠️ Component cancelled, but subscription exists - will still set loading to false');
+          if (!postRes.ok) {
+            const errorText = await postRes.text();
+            console.error('[MEMBERSHIP-SUCCESS] POST request failed:', postRes.status, errorText);
+            throw new Error(errorText || 'Failed to create subscription');
           }
-          // Always set loading to false if we have subscription data
-          console.log('[MEMBERSHIP-SUCCESS] ✅ Setting loading to false after successful subscription creation');
-          setLoading(false);
-          return; // Exit early since we have the subscription
-        } else {
-          console.log('[MEMBERSHIP-SUCCESS] ⚠️ No subscription in POST response, trying fallback');
-          // Fallback: fetch plan details even if subscription creation failed
-          if (!cancelledRef.current) {
-            try {
-              const details = await fetchMembershipSubscriptionDetailsServer(session_id, payment_intent);
-              if (details) {
-                console.log('[MEMBERSHIP-SUCCESS] ✅ Fallback fetch succeeded');
-                setSubscriptionDetails({
-                  plan: details.plan,
-                  amount: details.amount || details.plan?.price || null,
-                  currency: details.currency || details.plan?.currency || 'USD',
-                  subscription: null,
-                });
-              } else {
-                console.log('[MEMBERSHIP-SUCCESS] ⚠️ Fallback fetch returned no details');
+
+          const postData = await postRes.json();
+          console.log('[MEMBERSHIP-SUCCESS] POST response data:', postData);
+          console.log('[MEMBERSHIP-SUCCESS] POST response has subscription?', !!postData.subscription);
+          console.log('[MEMBERSHIP-SUCCESS] POST response has plan?', !!postData.plan);
+          console.log('[MEMBERSHIP-SUCCESS] cancelledRef.current:', cancelledRef.current);
+
+          if (postData.subscription) {
+            console.log('[MEMBERSHIP-SUCCESS] ✅ Subscription found in POST response:', postData.subscription.id);
+            // Always update state if we have subscription data, regardless of cancelled flag
+            // The cancelled flag is only for preventing updates after unmount
+            if (!cancelledRef.current) {
+              setSubscriptionDetails({
+                plan: postData.plan,
+                amount: postData.amount || postData.plan?.price || null,
+                currency: postData.currency || postData.plan?.currency || 'USD',
+                subscription: postData.subscription,
+              });
+              console.log('[MEMBERSHIP-SUCCESS] ✅ Subscription details set');
+            } else {
+              console.log('[MEMBERSHIP-SUCCESS] ⚠️ Component cancelled, but subscription exists - will still set loading to false');
+            }
+            // Always set loading to false if we have subscription data
+            console.log('[MEMBERSHIP-SUCCESS] ✅ Setting loading to false after successful subscription creation');
+            setLoading(false);
+            return; // Exit early since we have the subscription
+          } else {
+            console.log('[MEMBERSHIP-SUCCESS] ⚠️ No subscription in POST response, trying fallback');
+            // Fallback: fetch plan details even if subscription creation failed
+            if (!cancelledRef.current) {
+              try {
+                const details = await fetchMembershipSubscriptionDetailsServer(session_id, payment_intent);
+                if (details) {
+                  console.log('[MEMBERSHIP-SUCCESS] ✅ Fallback fetch succeeded');
+                  setSubscriptionDetails({
+                    plan: details.plan,
+                    amount: details.amount || details.plan?.price || null,
+                    currency: details.currency || details.plan?.currency || 'USD',
+                    subscription: null,
+                  });
+                } else {
+                  console.log('[MEMBERSHIP-SUCCESS] ⚠️ Fallback fetch returned no details');
+                }
+              } catch (fallbackErr) {
+                console.error('[MEMBERSHIP-SUCCESS] ❌ Fallback fetch failed:', fallbackErr);
               }
-            } catch (fallbackErr) {
-              console.error('[MEMBERSHIP-SUCCESS] ❌ Fallback fetch failed:', fallbackErr);
             }
           }
+        } finally {
+          // Reset posting flag after POST completes (success or failure)
+          isPostingRef.current = false;
         }
       } catch (err: any) {
         if (!cancelledRef.current) {

@@ -198,6 +198,24 @@ export async function processMembershipSubscriptionSessionServer(
     const stripeSubscriptionId = stripeSubscription?.id || null;
     const stripeCustomerId = typeof session.customer === 'string' ? session.customer : (session.customer as any)?.id || null;
 
+    // CRITICAL: Double-check by stripeSubscriptionId before creating (race condition fix)
+    // This prevents duplicates when multiple requests come in simultaneously
+    if (stripeSubscriptionId) {
+      const existingByStripeId = await findSubscriptionByStripeSubscriptionId(stripeSubscriptionId);
+      if (existingByStripeId) {
+        console.log('[MEMBERSHIP-SUCCESS] Subscription already exists by Stripe subscription ID:', {
+          stripeSubscriptionId,
+          existingSubscriptionId: existingByStripeId.id,
+          timestamp: new Date().toISOString(),
+          message: 'Duplicate prevented - subscription already exists with this Stripe subscription ID'
+        });
+        // Fetch plan and user profile for return
+        const plan = existingByStripeId.membershipPlan || await fetchMembershipPlanById(existingByStripeId.membershipPlanId);
+        const userProfile = existingByStripeId.userProfile || await fetchUserProfileById(existingByStripeId.userProfileId);
+        return { subscription: existingByStripeId, plan, userProfile };
+      }
+    }
+
     // Calculate trial dates if applicable
     const trialStart = plan.trialDays && plan.trialDays > 0 ? new Date().toISOString() : undefined;
     const trialEnd = plan.trialDays && plan.trialDays > 0
