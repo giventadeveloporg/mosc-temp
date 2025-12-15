@@ -9,7 +9,6 @@ export const metadata: Metadata = {
 
 export default function RomeVisitPage() {
   const photos = [
-    { src: '/images/mosc/gallery/rome-visit/logodesktop.jpg', alt: 'Rome' },
     { src: '/images/mosc/gallery/rome-visit/IMG_1262.jpg', alt: 'Rome' },
     { src: '/images/mosc/gallery/rome-visit/IMG_1258.jpg', alt: 'Rome' },
     { src: '/images/mosc/gallery/rome-visit/IMG_1232.jpg', alt: 'Rome' },

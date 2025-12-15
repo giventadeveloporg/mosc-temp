@@ -44,7 +44,7 @@ const SitemapPage = () => {
         { name: 'Theological Seminaries', href: '/mosc/theological' },
         { name: 'Lectionary', href: '/mosc/lectionary' },
         { name: 'Downloads', href: '/mosc/downloads' },
-        { name: 'Gallery', href: '/mosc/photo-gallery' }
+        { name: 'Gallery', href: '/mosc/gallery' }
       ]
     },
     {

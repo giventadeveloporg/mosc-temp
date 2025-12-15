@@ -236,7 +236,7 @@ const BaseliosPaulosIPage = () => {
                   <Link href="/mosc/dioceses" className="block text-sm text-muted-foreground hover:text-primary reverent-transition">
                     Dioceses
                   </Link>
-                  <Link href="/mosc/photo-gallery" className="block text-sm text-muted-foreground hover:text-primary reverent-transition">
+                  <Link href="/mosc/gallery" className="block text-sm text-muted-foreground hover:text-primary reverent-transition">
                     Photo Gallery
                   </Link>
                 </div>

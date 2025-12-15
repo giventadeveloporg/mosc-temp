@@ -288,7 +288,7 @@ const HolySynodPage = () => {
                       Biography
                     </Link>
                     <Link
-                      href="/mosc/photo-gallery/reception-to-his-holiness-baselios-marthoma-mathews-iii"
+                      href="/mosc/gallery/reception-to-his-holiness-baselios-marthoma-mathews-iii"
                       className="inline-flex items-center px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 reverent-transition"
                     >
                       <span className="mr-2" role="img" aria-label="Photos">📸</span>

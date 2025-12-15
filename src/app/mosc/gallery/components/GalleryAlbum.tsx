@@ -87,16 +87,21 @@ export default function GalleryAlbum({ title, date, category, photos }: GalleryA
               <button
                 key={index}
                 onClick={() => openLightbox(index)}
-                className="group relative aspect-square overflow-hidden rounded-lg sacred-shadow hover:sacred-shadow-lg reverent-transition cursor-pointer bg-muted"
+                className="group relative w-full aspect-[4/3] overflow-hidden rounded-lg sacred-shadow hover:sacred-shadow-lg reverent-transition cursor-pointer bg-muted"
               >
                 <Image
                   src={photo.src}
                   alt={photo.alt || `Photo ${index + 1}`}
                   fill
-                  className="object-cover group-hover:scale-105 reverent-transition"
+                  className="object-contain object-center group-hover:scale-105 reverent-transition"
                   sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  quality={95}
+                  style={{ 
+                    objectFit: 'contain',
+                    objectPosition: 'center'
+                  }}
                 />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 reverent-transition flex items-center justify-center">
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 reverent-transition flex items-center justify-center pointer-events-none">
                   <svg className="w-12 h-12 text-white opacity-0 group-hover:opacity-100 reverent-transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
                   </svg>

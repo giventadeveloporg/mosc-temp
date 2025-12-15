@@ -164,13 +164,14 @@ const quickLinks: QuickLink[] = [
   },
   {
     name: 'Gallery',
-    href: '/mosc/photo-gallery',
+    href: '/mosc/gallery',
     icon: <PhotoIcon />
   },
   {
     name: 'Contact Info',
-    href: '/mosc/contact-info',
-    icon: <MailIcon />
+    href: 'https://mosc.in/contact-info/',
+    icon: <MailIcon />,
+    external: true
   },
   {
     name: 'FAQs',

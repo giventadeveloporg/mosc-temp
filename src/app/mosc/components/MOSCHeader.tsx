@@ -29,7 +29,7 @@ const MOSCHeader = () => {
     { name: 'Lectionary', href: '/mosc/lectionary' },
     { name: 'Downloads', href: '/mosc/downloads' },
     { name: 'Calendar', href: 'http://calendar.mosc.in/', external: true },
-    { name: 'Gallery', href: '/mosc/photo-gallery' },
+    { name: 'Gallery', href: '/mosc/gallery' },
   ];
 
   const isActive = (href: string) => {
