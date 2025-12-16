@@ -50,7 +50,7 @@ const SitemapPage = () => {
     {
       title: 'External Links',
       links: [
-        { name: 'Directory', href: 'http://directory.mosc.in/', external: true },
+        { name: 'Directory', href: '/mosc/directory' },
         { name: 'Calendar', href: 'http://calendar.mosc.in/', external: true },
         { name: 'E-mail', href: 'https://accounts.google.com/ServiceLogin', external: true }
       ]

@@ -55,7 +55,7 @@ const HGThomasMarIvaniosMetropolitanPage = () => {
                           Web: www.ds-wa.org
                         </p>
                         <p className="font-body text-muted-foreground leading-relaxed mb-2">
-                          Web: www.ds-wa.org (https://directory.mosc.in/dioceses/www.ds-wa.org)
+                          Web: www.ds-wa.org (/mosc/directory)
                         </p>
                       </div>
                     </div>

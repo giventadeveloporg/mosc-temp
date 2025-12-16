@@ -19,21 +19,21 @@ const MOSCHeader = () => {
     { name: 'SAINTS', href: '/mosc/saints' },
   ];
 
-  const quickLinks = [
+  const quickLinks: Array<{ name: string; href: string; external?: boolean }> = [
     { name: 'Spiritual Organisations', href: '/mosc/spiritual-organizations' },
     { name: 'Publications', href: '/mosc/publications' },
     { name: 'Institutions', href: '/mosc/institutions' },
-    { name: 'Directory', href: 'http://directory.mosc.in/', external: true },
+    { name: 'Directory', href: '/mosc/directory' },
     { name: 'Training', href: '/mosc/training' },
     { name: 'Theological Seminaries', href: '/mosc/theological-seminaries' },
     { name: 'Lectionary', href: '/mosc/lectionary' },
     { name: 'Downloads', href: '/mosc/downloads' },
-    { name: 'Calendar', href: 'http://calendar.mosc.in/', external: true },
+    { name: 'Calendar', href: '/mosc/calendar' },
     { name: 'Gallery', href: '/mosc/gallery' },
   ];
 
   const isActive = (href: string) => {
-    return pathname.startsWith(href);
+    return pathname?.startsWith(href) ?? false;
   };
 
   return (

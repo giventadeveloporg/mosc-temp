@@ -276,32 +276,9 @@ const HolySynodPage = () => {
                   <p className="font-body text-lg text-primary mb-4">
                     {member.title}
                   </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-body text-muted-foreground leading-relaxed">
                     {member.description}
                   </p>
-                  <div className="flex flex-wrap gap-4">
-                    <Link
-                      href={member.href}
-                      className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 reverent-transition"
-                    >
-                      <span className="mr-2" role="img" aria-label="Biography">📋</span>
-                      Biography
-                    </Link>
-                    <Link
-                      href="/mosc/gallery/reception-to-his-holiness-baselios-marthoma-mathews-iii"
-                      className="inline-flex items-center px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 reverent-transition"
-                    >
-                      <span className="mr-2" role="img" aria-label="Photos">📸</span>
-                      Photos
-                    </Link>
-                    <Link
-                      href="/mosc/speeches"
-                      className="inline-flex items-center px-4 py-2 bg-accent text-accent-foreground rounded-lg hover:bg-accent/90 reverent-transition"
-                    >
-                      <span className="mr-2" role="img" aria-label="Speeches">🎤</span>
-                      Speeches
-                    </Link>
-                  </div>
                 </div>
               </div>
             </div>

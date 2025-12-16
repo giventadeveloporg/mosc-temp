@@ -126,25 +126,23 @@ const quickLinks: QuickLink[] = [
   },
   {
     name: 'Directory',
-    href: 'http://directory.mosc.in/',
-    icon: <DirectoryIcon />,
-    external: true
+    href: '/mosc/directory',
+    icon: <DirectoryIcon />
   },
   {
     name: 'Spiritual Organisations',
-    href: '/mosc/spiritual',
+    href: '/mosc/spiritual-organizations',
     icon: <HeartIcon />
   },
   {
     name: 'Theological Seminaries',
-    href: '/mosc/theological',
+    href: '/mosc/theological-seminaries',
     icon: <ChurchIcon />
   },
   {
     name: 'Calendar',
-    href: 'http://calendar.mosc.in/',
-    icon: <CalendarIcon />,
-    external: true
+    href: '/mosc/calendar',
+    icon: <CalendarIcon />
   },
   {
     name: 'Lectionary',
@@ -169,9 +167,8 @@ const quickLinks: QuickLink[] = [
   },
   {
     name: 'Contact Info',
-    href: 'https://mosc.in/contact-info/',
-    icon: <MailIcon />,
-    external: true
+    href: '/mosc/contact-info',
+    icon: <MailIcon />
   },
   {
     name: 'FAQs',

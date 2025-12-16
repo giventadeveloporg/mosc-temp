@@ -8,13 +8,13 @@ const AboutOurChurchSection = () => {
   const router = useRouter();
 
   const mainNavigationLinks = [
-    { label: 'THE CATHOLICATE', href: '/mosc/catholicate', icon: 'Crown' },
-    { label: 'ADMINISTRATION', href: '/mosc/administration', icon: 'Building' },
-    { label: 'THE CHURCH', href: '/mosc/the-church', icon: 'Church' },
-    { label: 'HOLY SYNOD', href: '/mosc/holy-synod', icon: 'Users' },
-    { label: 'ECUMENICAL', href: '/mosc/ecumenical', icon: 'Globe' },
-    { label: 'DIOCESES', href: '/mosc/dioceses', icon: 'MapPin' },
-    { label: 'SAINTS', href: '/mosc/saints', icon: 'Star' }
+    { label: 'THE CATHOLICATE', href: '/mosc/catholicate', icon: 'Crown', isInternal: true },
+    { label: 'ADMINISTRATION', href: '/mosc/administration', icon: 'Building', isInternal: true },
+    { label: 'THE CHURCH', href: '/mosc/the-church', icon: 'Church', isInternal: true },
+    { label: 'HOLY SYNOD', href: '/mosc/holy-synod', icon: 'Users', isInternal: true },
+    { label: 'ECUMENICAL', href: '/mosc/ecumenical', icon: 'Globe', isInternal: true },
+    { label: 'DIOCESES', href: '/mosc/dioceses', icon: 'MapPin', isInternal: true },
+    { label: 'SAINTS', href: '/mosc/saints', icon: 'Star', isInternal: true }
   ];
 
   const quickLinks = [
@@ -206,7 +206,7 @@ const AboutOurChurchSection = () => {
           <div className="bg-muted/20 rounded-lg p-6">
             <div className="flex flex-wrap items-center justify-center gap-4 text-sm font-body text-muted-foreground">
               <button
-                onClick={() => handleLinkClick({ href: '/mosc/catholicate-news', label: 'CATHOLICATE NEWS' })}
+                onClick={() => handleLinkClick({ href: 'https://catholicatenews.in/', label: 'CATHOLICATE NEWS', external: true })}
                 className="hover:text-primary reverent-transition"
               >
                 CATHOLICATE NEWS
@@ -234,7 +234,7 @@ const AboutOurChurchSection = () => {
               </button>
               <span>•</span>
               <button
-                onClick={() => handleLinkClick({ href: 'https://mosc.in/contact-info/', label: 'CONTACT INFO', external: true })}
+                onClick={() => handleLinkClick({ href: '/mosc/contact-info', label: 'CONTACT INFO', isInternal: true })}
                 className="hover:text-primary reverent-transition"
               >
                 CONTACT INFO
