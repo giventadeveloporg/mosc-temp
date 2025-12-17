@@ -58,6 +58,7 @@ DROP TYPE IF EXISTS public.transaction_type CASCADE;
 DROP TYPE IF EXISTS public.transaction_status CASCADE;
 DROP TYPE IF EXISTS public.focus_group_member_role_type CASCADE;
 DROP TYPE IF EXISTS public.focus_group_member_status_type CASCADE;
+DROP TYPE IF EXISTS public.tenant_email_type CASCADE;
 
 
 -- Guest age group classifications
@@ -89,6 +90,9 @@ CREATE TYPE public.focus_group_member_role_type AS ENUM ('MEMBER', 'LEAD', 'ADMI
 
 -- Focus group membership status
 CREATE TYPE public.focus_group_member_status_type AS ENUM ('ACTIVE', 'INACTIVE', 'PENDING');
+
+-- Tenant email address types
+CREATE TYPE public.tenant_email_type AS ENUM ('INFO', 'SALES', 'TICKETS','CONTACT', 'SUPPORT', 'MARKETING', 'NOREPLY', 'ADMIN');
 
 -- Event admission types
 CREATE TYPE public.event_admission_type AS ENUM ('FREE', 'TICKETED', 'INVITATION_ONLY', 'DONATION_BASED');
@@ -205,6 +209,8 @@ DROP TABLE IF EXISTS public.BATCH_JOB_EXECUTION CASCADE;
 DROP TABLE IF EXISTS public.BATCH_JOB_INSTANCE CASCADE;
 -- Custom application table (independent, no dependencies)
 DROP TABLE IF EXISTS public.batch_job_execution_log CASCADE;
+
+DROP TABLE IF EXISTS public.tenant_email_addresses CASCADE;
 
 
 
@@ -2143,6 +2149,64 @@ COMMENT ON TABLE public.tenant_settings IS 'Tenant-specific configuration settin
 COMMENT ON COLUMN public.tenant_settings.tenant_organization_id IS 'Foreign key reference to tenant_organization.id for standard Long->Long relationship';
 
 --
+-- TOC entry (class 1259 OID)
+-- Name: tenant_email_addresses; Type: TABLE; Schema: public; Owner: giventa_event_management
+--
+
+
+
+CREATE TABLE public.tenant_email_addresses (
+                                        id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                        tenant_id character varying(255) NOT NULL,
+                                        email_address character varying(255) NOT NULL,
+                                        email_type character varying(255) NOT NULL,
+                                        display_name character varying(255),
+                                        is_active boolean DEFAULT true NOT NULL,
+                                        is_default boolean DEFAULT false NOT NULL,
+                                        description text,
+                                        created_at timestamp without time zone DEFAULT now() NOT NULL,
+                                        updated_at timestamp without time zone DEFAULT now() NOT NULL,
+                                        CONSTRAINT tenant_email_addresses_pkey PRIMARY KEY (id),
+                                        CONSTRAINT fk_tenant_email_addresses__tenant_id FOREIGN KEY (tenant_id) REFERENCES public.tenant_organization(tenant_id) ON DELETE CASCADE,
+                                        CONSTRAINT ux_tenant_email_addresses_tenant_type UNIQUE (tenant_id, email_type, email_address)
+);
+
+-- Index for tenant_id foreign key for better query performance
+CREATE INDEX idx_tenant_email_addresses_tenant_id ON public.tenant_email_addresses(tenant_id);
+
+-- Index for email_type for filtering by type
+CREATE INDEX idx_tenant_email_addresses_email_type ON public.tenant_email_addresses(email_type);
+
+-- Index for is_active and is_default for quick lookups
+CREATE INDEX idx_tenant_email_addresses_active_default ON public.tenant_email_addresses(tenant_id, is_active, is_default) WHERE is_active = true;
+
+-- Unique constraint: Only one default email per type per tenant
+CREATE UNIQUE INDEX IF NOT EXISTS unique_tenant_email_default_per_type
+    ON public.tenant_email_addresses(tenant_id, email_type)
+    WHERE is_default = true;
+
+--
+-- TOC entry (class 0 OID 0)
+-- Name: TABLE tenant_email_addresses; Type: COMMENT; Schema: public; Owner: giventa_event_management
+--
+
+COMMENT ON TABLE public.tenant_email_addresses IS 'Stores registered email addresses for tenants categorized by type (info, sales, contact, support, marketing, noreply, admin). Used as "from" email addresses when sending emails to clients/users.';
+
+COMMENT ON COLUMN public.tenant_email_addresses.tenant_id IS 'Foreign key reference to tenant_organization.tenant_id for multi-tenant isolation';
+
+COMMENT ON COLUMN public.tenant_email_addresses.email_address IS 'The email address (e.g., info@example.com, sales@example.com)';
+
+COMMENT ON COLUMN public.tenant_email_addresses.email_type IS 'Type of email address: INFO, SALES, CONTACT, SUPPORT, MARKETING, NOREPLY, ADMIN';
+
+COMMENT ON COLUMN public.tenant_email_addresses.display_name IS 'Display name for the email address (e.g., "Customer Support", "Sales Team")';
+
+COMMENT ON COLUMN public.tenant_email_addresses.is_active IS 'Whether this email address is currently active and can be used for sending emails';
+
+COMMENT ON COLUMN public.tenant_email_addresses.is_default IS 'Whether this is the default email address for this type (only one default per type per tenant)';
+
+COMMENT ON COLUMN public.tenant_email_addresses.description IS 'Optional description or notes about this email address';
+
+--
 -- TOC entry 3927 (class 0 OID 0)
 -- Dependencies: 228
 -- Name: TABLE discount_code; Type: COMMENT; Schema: public; Owner: giventa_event_management
@@ -2688,6 +2752,14 @@ CREATE TRIGGER update_tenant_organization_updated_at BEFORE UPDATE ON public.ten
 --
 
 CREATE TRIGGER update_tenant_settings_updated_at BEFORE UPDATE ON public.tenant_settings FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+
+--
+-- TOC entry (class 2620 OID)
+-- Name: tenant_email_addresses update_tenant_email_addresses_updated_at; Type: TRIGGER; Schema: public; Owner: giventa_event_management
+--
+
+CREATE TRIGGER update_tenant_email_addresses_updated_at BEFORE UPDATE ON public.tenant_email_addresses FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
 
 --
@@ -4008,6 +4080,7 @@ CREATE TABLE IF NOT EXISTS public.promotion_email_template (
     tenant_id VARCHAR(255) NOT NULL,
     event_id BIGINT NOT NULL,
     template_name VARCHAR(255) NOT NULL,
+    template_type VARCHAR(160) NOT NULL,
     subject VARCHAR(500) NOT NULL,
     from_email character varying(255) NOT NULL,
     body_html TEXT NOT NULL,

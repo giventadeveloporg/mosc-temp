@@ -389,6 +389,27 @@ export default function TenantSettingsForm({
     }
   };
 
+  const handleRemoveHeaderImage = async () => {
+    if (!settingsId) return;
+    setValue('emailHeaderImageUrl', '');
+    setHeaderImageUploadStatus('uploading');
+    setHeaderImageUploadMessage('Removing email header image...');
+    try {
+      await patchTenantSetting(settingsId, {
+        emailHeaderImageUrl: '',
+      });
+      setHeaderImageUploadStatus('success');
+      setHeaderImageUploadMessage('Email header image removed successfully!');
+      setTimeout(() => {
+        setHeaderImageUploadStatus('idle');
+        setHeaderImageUploadMessage('');
+      }, 2000);
+    } catch (err: any) {
+      setHeaderImageUploadStatus('error');
+      setHeaderImageUploadMessage(err.message || 'Failed to remove email header image');
+    }
+  };
+
   // Toggle switch component
   const ToggleSwitch = ({
     name,

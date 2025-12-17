@@ -14,7 +14,13 @@ export default function MobileDebugConsole() {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [isExpanded, setIsExpanded] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const logsEndRef = useRef<HTMLDivElement>(null);
+
+  // Ensure component only renders on client after hydration
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Calculate counts safely (with fallbacks for SSR)
   const errorCount = (logs || []).filter(l => l.level === 'error').length;
@@ -172,8 +178,8 @@ Mobile Workflow Logs: ${logs.filter(l => l.message.includes('[MOBILE-WORKFLOW]')
     console.log('[MobileDebugConsole] Logs cleared');
   };
 
-  // Don't render during SSR - only render on client
-  if (typeof window === 'undefined') {
+  // Don't render during SSR or before hydration - only render on client after mount
+  if (!isMounted) {
     return null;
   }
 

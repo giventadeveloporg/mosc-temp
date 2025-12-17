@@ -12,26 +12,26 @@ import Link from 'next/link';
 import AdminNavigation from '@/components/AdminNavigation';
 import SaveStatusDialog, { type SaveStatus } from '@/components/SaveStatusDialog';
 import {
-  updatePromotionEmailTemplateServer,
-  uploadPromotionalEmailHeaderImageClient,
-  uploadPromotionalEmailFooterImageClient,
+  updateNewsletterEmailTemplateServer,
+  uploadNewsletterEmailHeaderImageClient,
+  uploadNewsletterEmailFooterImageClient,
 } from '../ApiServerActions';
 import { fetchDiscountCodesForEvent } from '@/app/admin/events/[id]/discount-codes/list/ApiServerActions';
 import EventSearchSelect from '../components/EventSearchSelect';
 
-interface PromotionEmailTemplateEditClientProps {
+interface NewsletterEmailTemplateEditClientProps {
   template: PromotionEmailTemplateDTO | null;
   templateId: number;
 }
 
-export default function PromotionEmailTemplateEditClient({
+export default function NewsletterEmailTemplateEditClient({
   template,
   templateId,
-}: PromotionEmailTemplateEditClientProps) {
+}: NewsletterEmailTemplateEditClientProps) {
   const [formData, setFormData] = useState<PromotionEmailTemplateFormDTO>({
     eventId: 0,
     templateName: '',
-    templateType: 'EVENT_PROMOTION',
+    templateType: 'NEWS_LETTER',
     subject: '',
     fromEmail: '',
     bodyHtml: '',
@@ -62,7 +62,7 @@ export default function PromotionEmailTemplateEditClient({
       setFormData({
         eventId: template.eventId,
         templateName: template.templateName,
-        templateType: template.templateType || 'EVENT_PROMOTION',
+        templateType: template.templateType || 'NEWS_LETTER',
         subject: template.subject,
         fromEmail: template.fromEmail || '',
         bodyHtml: template.bodyHtml,
@@ -132,7 +132,7 @@ export default function PromotionEmailTemplateEditClient({
     setError(null);
 
     try {
-      const result = await uploadPromotionalEmailHeaderImageClient(
+      const result = await uploadNewsletterEmailHeaderImageClient(
         formData.eventId,
         templateId,
         file,
@@ -146,7 +146,7 @@ export default function PromotionEmailTemplateEditClient({
       }));
 
       // Automatically update the template with the new image URL
-      await updatePromotionEmailTemplateServer(templateId, {
+      await updateNewsletterEmailTemplateServer(templateId, {
         headerImageUrl: result.url,
       });
 
@@ -205,7 +205,7 @@ export default function PromotionEmailTemplateEditClient({
     setError(null);
 
     try {
-      const result = await uploadPromotionalEmailFooterImageClient(
+      const result = await uploadNewsletterEmailFooterImageClient(
         formData.eventId,
         templateId,
         file,
@@ -219,7 +219,7 @@ export default function PromotionEmailTemplateEditClient({
       }));
 
       // Automatically update the template with the new image URL
-      await updatePromotionEmailTemplateServer(templateId, {
+      await updateNewsletterEmailTemplateServer(templateId, {
         footerImageUrl: result.url,
       });
 
@@ -279,7 +279,7 @@ export default function PromotionEmailTemplateEditClient({
 
     // Update template to remove header image URL
     try {
-      await updatePromotionEmailTemplateServer(templateId, {
+      await updateNewsletterEmailTemplateServer(templateId, {
         headerImageUrl: '',
       });
       setSuccessMessage('Header image removed successfully!');
@@ -297,7 +297,7 @@ export default function PromotionEmailTemplateEditClient({
 
     // Update template to remove footer image URL
     try {
-      await updatePromotionEmailTemplateServer(templateId, {
+      await updateNewsletterEmailTemplateServer(templateId, {
         footerImageUrl: '',
       });
       setSuccessMessage('Footer image removed successfully!');
@@ -331,7 +331,7 @@ export default function PromotionEmailTemplateEditClient({
     setSaving(true);
 
     try {
-      await updatePromotionEmailTemplateServer(templateId, formData);
+      await updateNewsletterEmailTemplateServer(templateId, formData);
 
       // Show success message
       setSaveStatus('success');
@@ -406,7 +406,7 @@ export default function PromotionEmailTemplateEditClient({
             </svg>
             <div className="flex-1 space-y-2">
               <p className="text-sm text-blue-800">
-                <strong>Tip:</strong> You can now upload header and footer images for this promotional email template using the upload sections below.
+                <strong>Tip:</strong> You can now upload header and footer images for this newsletter email template using the upload sections below.
               </p>
               <p className="text-sm text-blue-800">
                 <strong>From Email Field:</strong> The email address used in the "From Email" field must be registered and verified with AWS SES (Amazon Simple Email Service). AWS SES requires the "From" address to be verified in SES for production use. <strong>Please contact your administrator</strong> - only verified emails can be used as the From email field.
@@ -486,7 +486,7 @@ export default function PromotionEmailTemplateEditClient({
               title="Please enter a valid email address"
             />
             <p className="mt-1 text-sm text-gray-500">
-              The email address that will appear as the sender of promotional emails.
+              The email address that will appear as the sender of newsletter emails.
             </p>
           </div>
 

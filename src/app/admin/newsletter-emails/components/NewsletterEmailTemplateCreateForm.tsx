@@ -8,25 +8,25 @@ import type {
 } from '@/types';
 import { FaSave, FaBan } from 'react-icons/fa';
 import {
-  createPromotionEmailTemplateServer,
+  createNewsletterEmailTemplateServer,
 } from '../ApiServerActions';
 import { fetchDiscountCodesForEvent } from '@/app/admin/events/[id]/discount-codes/list/ApiServerActions';
 import EventSearchSelect from './EventSearchSelect';
 import SaveStatusDialog, { type SaveStatus } from '@/components/SaveStatusDialog';
 
-interface PromotionEmailTemplateCreateFormProps {
+interface NewsletterEmailTemplateCreateFormProps {
   onSave: (templateId: number) => void;
   onCancel: () => void;
 }
 
-export default function PromotionEmailTemplateCreateForm({
+export default function NewsletterEmailTemplateCreateForm({
   onSave,
   onCancel,
-}: PromotionEmailTemplateCreateFormProps) {
+}: NewsletterEmailTemplateCreateFormProps) {
   const [formData, setFormData] = useState<PromotionEmailTemplateFormDTO>({
     eventId: 0,
     templateName: '',
-    templateType: 'EVENT_PROMOTION',
+    templateType: 'NEWS_LETTER',
     subject: '',
     fromEmail: '',
     bodyHtml: '',
@@ -124,7 +124,7 @@ export default function PromotionEmailTemplateCreateForm({
     setSaving(true);
 
     try {
-      const createdTemplate = await createPromotionEmailTemplateServer(formData);
+      const createdTemplate = await createNewsletterEmailTemplateServer(formData);
       if (createdTemplate.id) {
         // Show success message
         setSaveStatus('success');
@@ -167,7 +167,7 @@ export default function PromotionEmailTemplateCreateForm({
           </svg>
           <div className="flex-1 space-y-2">
             <p className="text-sm text-blue-800">
-              <strong>Tip:</strong> Email header images can only be added to a template after it has been created. Once you create the template, edit it to upload header and footer images for the promotional email.
+              <strong>Tip:</strong> Email header images can only be added to a template after it has been created. Once you create the template, edit it to upload header and footer images for the newsletter email.
             </p>
             <p className="text-sm text-blue-800">
               <strong>From Email Field:</strong> The email address used in the "From Email" field must be registered and verified with AWS SES (Amazon Simple Email Service). AWS SES requires the "From" address to be verified in SES for production use. <strong>Please contact your administrator</strong> - only verified emails can be used as the From email field.
@@ -251,7 +251,7 @@ export default function PromotionEmailTemplateCreateForm({
             title="Please enter a valid email address"
           />
           <p className="mt-1 text-sm text-gray-500">
-            The email address that will appear as the sender of promotional emails.
+            The email address that will appear as the sender of newsletter emails.
           </p>
         </div>
 

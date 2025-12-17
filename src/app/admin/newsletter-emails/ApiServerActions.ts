@@ -12,9 +12,9 @@ import type {
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 /**
- * Fetch promotion email templates with optional filtering
+ * Fetch newsletter email templates with optional filtering
  */
-export async function fetchPromotionEmailTemplatesServer(params?: {
+export async function fetchNewsletterEmailTemplatesServer(params?: {
   eventId?: number;
   isActive?: boolean;
   sort?: string;
@@ -24,8 +24,8 @@ export async function fetchPromotionEmailTemplatesServer(params?: {
   const baseUrl = getAppUrl();
   const queryParams = new URLSearchParams();
 
-  // Always scope promotion emails to EVENT_PROMOTION template type
-  queryParams.append('templateType.equals', 'EVENT_PROMOTION');
+  // Always scope newsletter templates to NEWS_LETTER template type
+  queryParams.append('templateType.equals', 'NEWS_LETTER');
 
   if (params?.eventId) {
     queryParams.append('eventId.equals', params.eventId.toString());
@@ -43,7 +43,10 @@ export async function fetchPromotionEmailTemplatesServer(params?: {
     queryParams.append('size', params.size.toString());
   }
 
-  const url = `${baseUrl}/api/proxy/promotion-email-templates${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+  // IMPORTANT: Use the same backend resource as promotional emails; only templateType differs
+  const url = `${baseUrl}/api/proxy/promotion-email-templates${
+    queryParams.toString() ? `?${queryParams.toString()}` : ''
+  }`;
 
   const response = await fetch(url, {
     method: 'GET',
@@ -57,7 +60,7 @@ export async function fetchPromotionEmailTemplatesServer(params?: {
       return { templates: [], totalCount: 0 };
     }
     const errorBody = await response.text();
-    console.error(`[Server] Error fetching promotion email templates: ${response.status} ${response.statusText}`, errorBody);
+    console.error(`[Server] Error fetching newsletter email templates: ${response.status} ${response.statusText}`, errorBody);
     throw new Error('Unable to load email templates. Please try again later.');
   }
 
@@ -69,10 +72,11 @@ export async function fetchPromotionEmailTemplatesServer(params?: {
 }
 
 /**
- * Fetch a single promotion email template by ID
+ * Fetch a single newsletter email template by ID
  */
-export async function fetchPromotionEmailTemplateServer(id: number): Promise<PromotionEmailTemplateDTO | null> {
+export async function fetchNewsletterEmailTemplateServer(id: number): Promise<PromotionEmailTemplateDTO | null> {
   const baseUrl = getAppUrl();
+  // Use the same backend resource as promotional emails
   const url = `${baseUrl}/api/proxy/promotion-email-templates/${id}`;
 
   const response = await fetch(url, {
@@ -86,30 +90,27 @@ export async function fetchPromotionEmailTemplateServer(id: number): Promise<Pro
       return null;
     }
     const errorBody = await response.text();
-    console.error(`[Server] Error fetching promotion email template ${id}: ${response.status} ${response.statusText}`, errorBody);
-    throw new Error(`Failed to fetch promotion email template. Status: ${response.status}`);
+    console.error(`[Server] Error fetching newsletter email template ${id}: ${response.status} ${response.statusText}`, errorBody);
+    throw new Error(`Failed to fetch newsletter email template. Status: ${response.status}`);
   }
 
   return await response.json();
 }
 
 /**
- * Create a new promotion email template
+ * Create a new newsletter email template
  */
-export async function createPromotionEmailTemplateServer(
+export async function createNewsletterEmailTemplateServer(
   formData: PromotionEmailTemplateFormDTO
 ): Promise<PromotionEmailTemplateDTO> {
   const baseUrl = getAppUrl();
+  // Use the same backend resource as promotional emails
   const url = `${baseUrl}/api/proxy/promotion-email-templates`;
 
   // Remove id, createdAt, updatedAt - backend will set these
-  // Only include fields from PromotionEmailTemplateFormDTO
   const { id, createdAt, updatedAt, tenantId, ...cleanFormData } = formData as any;
 
   // Build payload with all required fields
-  // Note: Proxy handler will inject tenantId automatically via withTenantId
-  // CRITICAL: Explicitly include fromEmail - backend requires this field (@NotNull @Size(max = 255))
-  // Ensure it's not empty string (backend validation requires non-empty)
   if (!formData.fromEmail || !formData.fromEmail.trim()) {
     throw new Error('fromEmail is required and cannot be empty');
   }
@@ -117,25 +118,17 @@ export async function createPromotionEmailTemplateServer(
   const payload = {
     eventId: formData.eventId,
     templateName: formData.templateName,
-    // Promotion emails are always EVENT_PROMOTION template type
-    templateType: formData.templateType || 'EVENT_PROMOTION',
+    // Newsletter templates are always NEWS_LETTER template type
+    templateType: formData.templateType || 'NEWS_LETTER',
     subject: formData.subject,
-    fromEmail: formData.fromEmail.trim(), // Explicitly include and trim
+    fromEmail: formData.fromEmail.trim(),
     bodyHtml: formData.bodyHtml,
-    footerHtml: null, // Footer HTML is hidden, pass as null
+    footerHtml: null,
     headerImageUrl: formData.headerImageUrl || '',
     footerImageUrl: formData.footerImageUrl || '',
     discountCodeId: formData.discountCodeId,
     isActive: formData.isActive !== undefined ? formData.isActive : true,
   };
-
-  console.log('[DEBUG] Creating promotion email template with payload:', payload);
-  console.log('[DEBUG] fromEmail value:', payload.fromEmail);
-  console.log('[DEBUG] fromEmail type:', typeof payload.fromEmail);
-  console.log('[DEBUG] fromEmail length:', payload.fromEmail?.length);
-  console.log('[DEBUG] Payload keys:', Object.keys(payload));
-  console.log('[DEBUG] Payload has fromEmail:', 'fromEmail' in payload);
-  console.log('[DEBUG] JSON stringified payload:', JSON.stringify(payload));
 
   const response = await fetch(url, {
     method: 'POST',
@@ -145,27 +138,25 @@ export async function createPromotionEmailTemplateServer(
 
   if (!response.ok) {
     const errorBody = await response.text();
-    console.error(`[Server] Error creating promotion email template: ${response.status} ${response.statusText}`, errorBody);
-
-    // Provide more helpful error message for 404
-    if (response.status === 404) {
-      throw new Error('Backend API endpoint not found. Please ensure the backend service is running and the promotion email template endpoints are implemented.');
-    }
-
-    throw new Error(`Failed to create promotion email template. Status: ${response.status}`);
+    console.error(
+      `[Server] Error creating newsletter email template: ${response.status} ${response.statusText}`,
+      errorBody
+    );
+    throw new Error(`Failed to create newsletter email template. Status: ${response.status}`);
   }
 
   return await response.json();
 }
 
 /**
- * Update an existing promotion email template
+ * Update an existing newsletter email template
  */
-export async function updatePromotionEmailTemplateServer(
+export async function updateNewsletterEmailTemplateServer(
   id: number,
   formData: Partial<PromotionEmailTemplateFormDTO>
 ): Promise<PromotionEmailTemplateDTO> {
   const baseUrl = getAppUrl();
+  // Use the same backend resource as promotional emails
   const url = `${baseUrl}/api/proxy/promotion-email-templates/${id}`;
 
   const now = new Date().toISOString();
@@ -173,15 +164,12 @@ export async function updatePromotionEmailTemplateServer(
     ...formData,
     id,
     updatedAt: now,
-    // Ensure templateType is always present for promotion emails
-    templateType: formData.templateType || 'EVENT_PROMOTION',
-    // Explicitly include fromEmail if provided to ensure it's sent to backend
+    // Ensure templateType is always present for newsletter templates
+    templateType: formData.templateType || 'NEWS_LETTER',
     ...(formData.fromEmail !== undefined && { fromEmail: formData.fromEmail }),
-    // Footer HTML is hidden, pass as null
     footerHtml: null,
   });
 
-  console.log('[DEBUG] Updating promotion email template with payload:', payload);
   if (!payload.tenantId) throw new Error('tenantId missing from payload');
 
   const response = await fetch(url, {
@@ -192,18 +180,19 @@ export async function updatePromotionEmailTemplateServer(
 
   if (!response.ok) {
     const errorBody = await response.text();
-    console.error(`[Server] Error updating promotion email template: ${response.status} ${response.statusText}`, errorBody);
-    throw new Error(`Failed to update promotion email template. Status: ${response.status}`);
+    console.error(`[Server] Error updating newsletter email template: ${response.status} ${response.statusText}`, errorBody);
+    throw new Error(`Failed to update newsletter email template. Status: ${response.status}`);
   }
 
   return await response.json();
 }
 
 /**
- * Delete a promotion email template
+ * Delete a newsletter email template
  */
-export async function deletePromotionEmailTemplateServer(id: number): Promise<void> {
+export async function deleteNewsletterEmailTemplateServer(id: number): Promise<void> {
   const baseUrl = getAppUrl();
+  // Use the same backend resource as promotional emails
   const url = `${baseUrl}/api/proxy/promotion-email-templates/${id}`;
 
   const response = await fetch(url, {
@@ -213,24 +202,24 @@ export async function deletePromotionEmailTemplateServer(id: number): Promise<vo
 
   if (!response.ok) {
     const errorBody = await response.text();
-    console.error(`[Server] Error deleting promotion email template: ${response.status} ${response.statusText}`, errorBody);
-    throw new Error(`Failed to delete promotion email template. Status: ${response.status}`);
+    console.error(`[Server] Error deleting newsletter email template: ${response.status} ${response.statusText}`, errorBody);
+    throw new Error(`Failed to delete newsletter email template. Status: ${response.status}`);
   }
 
-  // DELETE requests typically return 204 No Content, so no need to parse JSON
   if (response.status !== 204 && response.status !== 200) {
     throw new Error(`Unexpected response status: ${response.status}`);
   }
 }
 
 /**
- * Send a test email using a template
+ * Send a test newsletter email using a template
  */
-export async function sendTestEmailServer(
+export async function sendTestNewsletterEmailServer(
   templateId: number,
   recipientEmail: string
 ): Promise<{ success: boolean; messageId?: string }> {
   const baseUrl = getAppUrl();
+  // Use the same backend resource as promotional emails
   const url = `${baseUrl}/api/proxy/promotion-email-templates/${templateId}/send-test`;
 
   const payload = {
@@ -245,21 +234,22 @@ export async function sendTestEmailServer(
 
   if (!response.ok) {
     const errorBody = await response.text();
-    console.error(`[Server] Error sending test email: ${response.status} ${response.statusText}`, errorBody);
-    throw new Error(`Failed to send test email. Status: ${response.status}`);
+    console.error(`[Server] Error sending test newsletter email: ${response.status} ${response.statusText}`, errorBody);
+    throw new Error(`Failed to send test newsletter email. Status: ${response.status}`);
   }
 
   return await response.json();
 }
 
 /**
- * Send bulk emails using a template
+ * Send bulk newsletter emails using a template
  */
-export async function sendBulkEmailServer(
+export async function sendBulkNewsletterEmailServer(
   templateId: number,
   recipientEmails?: string[]
 ): Promise<{ success: boolean; sentCount: number; failedCount: number }> {
   const baseUrl = getAppUrl();
+  // Use the same backend resource as promotional emails
   const url = `${baseUrl}/api/proxy/promotion-email-templates/${templateId}/send-bulk`;
 
   const payload: any = {};
@@ -275,20 +265,21 @@ export async function sendBulkEmailServer(
 
   if (!response.ok) {
     const errorBody = await response.text();
-    console.error(`[Server] Error sending bulk email: ${response.status} ${response.statusText}`, errorBody);
-    throw new Error(`Failed to send bulk email. Status: ${response.status}`);
+    console.error(`[Server] Error sending bulk newsletter email: ${response.status} ${response.statusText}`, errorBody);
+    throw new Error(`Failed to send bulk newsletter email. Status: ${response.status}`);
   }
 
   return await response.json();
 }
 
 /**
- * Send emails to all subscribed members using a template
+ * Send newsletter emails to all subscribed members using a template
  */
-export async function sendBulkEmailToSubscribedMembersServer(
+export async function sendBulkNewsletterEmailToSubscribedMembersServer(
   templateId: number
 ): Promise<{ success: boolean; sentCount?: number; failedCount?: number }> {
   const baseUrl = getAppUrl();
+  // Use the same backend resource as promotional emails
   const url = `${baseUrl}/api/proxy/promotion-email-templates/${templateId}/send-to-subscribed`;
 
   const response = await fetch(url, {
@@ -299,81 +290,19 @@ export async function sendBulkEmailToSubscribedMembersServer(
 
   if (!response.ok) {
     const errorBody = await response.text();
-    console.error(`[Server] Error sending email to subscribed members: ${response.status} ${response.statusText}`, errorBody);
-    throw new Error(`Failed to send email to subscribed members. Status: ${response.status}`);
+    console.error(`[Server] Error sending newsletter email to subscribed members: ${response.status} ${response.statusText}`, errorBody);
+    throw new Error(`Failed to send newsletter email to subscribed members. Status: ${response.status}`);
   }
 
   return await response.json();
 }
 
 /**
- * Fetch promotion email sent logs with optional filtering
+ * Upload newsletter email header image (client-side function)
  */
-export async function fetchPromotionEmailSentLogsServer(params?: {
-  eventId?: number;
-  templateId?: number;
-  sentAtGreaterThanOrEqual?: string;
-  sentAtLessThanOrEqual?: string;
-  emailStatus?: 'SENT' | 'FAILED' | 'BOUNCED';
-  sort?: string;
-  page?: number;
-  size?: number;
-}): Promise<{ logs: PromotionEmailSentLogDTO[]; totalCount: number }> {
-  const baseUrl = getAppUrl();
-  const queryParams = new URLSearchParams();
-
-  if (params?.eventId) {
-    queryParams.append('eventId.equals', params.eventId.toString());
-  }
-  if (params?.templateId) {
-    queryParams.append('templateId.equals', params.templateId.toString());
-  }
-  if (params?.sentAtGreaterThanOrEqual) {
-    queryParams.append('sentAt.greaterThanOrEqual', params.sentAtGreaterThanOrEqual);
-  }
-  if (params?.sentAtLessThanOrEqual) {
-    queryParams.append('sentAt.lessThanOrEqual', params.sentAtLessThanOrEqual);
-  }
-  if (params?.emailStatus) {
-    queryParams.append('emailStatus.equals', params.emailStatus);
-  }
-  if (params?.sort) {
-    queryParams.append('sort', params.sort);
-  }
-  if (params?.page !== undefined) {
-    queryParams.append('page', params.page.toString());
-  }
-  if (params?.size !== undefined) {
-    queryParams.append('size', params.size.toString());
-  }
-
-  const url = `${baseUrl}/api/proxy/promotion-email-sent-logs${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-    cache: 'no-store',
-  });
-
-  if (!response.ok) {
-    const errorBody = await response.text();
-    console.error(`[Server] Error fetching promotion email sent logs: ${response.status} ${response.statusText}`, errorBody);
-    throw new Error(`Failed to fetch promotion email sent logs. Status: ${response.status}`);
-  }
-
-  const totalCount = parseInt(response.headers.get('x-total-count') || '0', 10);
-  const logs = await response.json();
-
-  return { logs, totalCount };
-}
-
-/**
- * Upload promotional email header image (client-side function)
- * Note: This must be called from client components, not server actions
- */
-export async function uploadPromotionalEmailHeaderImageClient(
+export async function uploadNewsletterEmailHeaderImageClient(
   eventId: number,
-  promotionId: number,
+  newsletterId: number,
   file: File,
   title?: string,
   description?: string
@@ -383,7 +312,7 @@ export async function uploadPromotionalEmailHeaderImageClient(
 
   formData.append('file', file);
   formData.append('eventId', eventId.toString());
-  formData.append('promotionId', promotionId.toString());
+  formData.append('newsletterId', newsletterId.toString());
 
   if (title) {
     formData.append('title', title);
@@ -392,6 +321,7 @@ export async function uploadPromotionalEmailHeaderImageClient(
     formData.append('description', description);
   }
 
+  // Reuse the promotional email header upload endpoint
   const url = `${baseUrl}/api/proxy/event-medias/upload/promotional-email-header-image`;
 
   const response = await fetch(url, {
@@ -401,8 +331,8 @@ export async function uploadPromotionalEmailHeaderImageClient(
 
   if (!response.ok) {
     const errorBody = await response.text();
-    console.error(`[Client] Error uploading header image: ${response.status} ${response.statusText}`, errorBody);
-    throw new Error(`Failed to upload header image. Status: ${response.status}`);
+    console.error(`[Client] Error uploading newsletter header image: ${response.status} ${response.statusText}`, errorBody);
+    throw new Error(`Failed to upload newsletter header image. Status: ${response.status}`);
   }
 
   const result = await response.json();
@@ -413,12 +343,11 @@ export async function uploadPromotionalEmailHeaderImageClient(
 }
 
 /**
- * Upload promotional email footer image (client-side function)
- * Note: This must be called from client components, not server actions
+ * Upload newsletter email footer image (client-side function)
  */
-export async function uploadPromotionalEmailFooterImageClient(
+export async function uploadNewsletterEmailFooterImageClient(
   eventId: number,
-  promotionId: number,
+  newsletterId: number,
   file: File,
   title?: string,
   description?: string
@@ -428,7 +357,7 @@ export async function uploadPromotionalEmailFooterImageClient(
 
   formData.append('file', file);
   formData.append('eventId', eventId.toString());
-  formData.append('promotionId', promotionId.toString());
+  formData.append('newsletterId', newsletterId.toString());
 
   if (title) {
     formData.append('title', title);
@@ -437,6 +366,7 @@ export async function uploadPromotionalEmailFooterImageClient(
     formData.append('description', description);
   }
 
+  // Reuse the promotional email footer upload endpoint
   const url = `${baseUrl}/api/proxy/event-medias/upload/promotional-email-footer-image`;
 
   const response = await fetch(url, {
@@ -446,8 +376,8 @@ export async function uploadPromotionalEmailFooterImageClient(
 
   if (!response.ok) {
     const errorBody = await response.text();
-    console.error(`[Client] Error uploading footer image: ${response.status} ${response.statusText}`, errorBody);
-    throw new Error(`Failed to upload footer image. Status: ${response.status}`);
+    console.error(`[Client] Error uploading newsletter footer image: ${response.status} ${response.statusText}`, errorBody);
+    throw new Error(`Failed to upload newsletter footer image. Status: ${response.status}`);
   }
 
   const result = await response.json();

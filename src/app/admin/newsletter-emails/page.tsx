@@ -8,21 +8,21 @@ import type {
 } from '@/types';
 import AdminNavigation from '@/components/AdminNavigation';
 import SaveStatusDialog, { type SaveStatus } from '@/components/SaveStatusDialog';
-import PromotionEmailTemplateList from './components/PromotionEmailTemplateList';
-import PromotionEmailTemplateCreateForm from './components/PromotionEmailTemplateCreateForm';
-import PromotionEmailHistory from './components/PromotionEmailHistory';
+import NewsletterEmailTemplateList from './components/NewsletterEmailTemplateList';
+import NewsletterEmailTemplateCreateForm from './components/NewsletterEmailTemplateCreateForm';
+import PromotionEmailHistory from '../promotion-emails/components/PromotionEmailHistory';
 import { FaPlus, FaHistory, FaEnvelope, FaBan, FaSave, FaUsers } from 'react-icons/fa';
 import {
-  fetchPromotionEmailTemplatesServer,
-  sendTestEmailServer,
-  sendBulkEmailServer,
-  sendBulkEmailToSubscribedMembersServer,
+  fetchNewsletterEmailTemplatesServer,
+  sendTestNewsletterEmailServer,
+  sendBulkNewsletterEmailServer,
+  sendBulkNewsletterEmailToSubscribedMembersServer,
 } from './ApiServerActions';
 import { fetchEventsFilteredServer } from '@/app/admin/ApiServerActions';
 
 type ViewMode = 'list' | 'form' | 'history';
 
-export default function PromotionEmailsPage() {
+export default function NewsletterEmailsPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [events, setEvents] = useState<EventDetailsDTO[]>([]);
   const [loading, setLoading] = useState(true);
@@ -67,7 +67,7 @@ export default function PromotionEmailsPage() {
 
   const handleEdit = (template: PromotionEmailTemplateDTO) => {
     if (template.id) {
-      window.location.href = `/admin/promotion-emails/${template.id}`;
+      window.location.href = `/admin/newsletter-emails/${template.id}`;
     }
   };
 
@@ -79,20 +79,20 @@ export default function PromotionEmailsPage() {
         eventId: template.eventId,
         templateName: `${template.templateName} (Copy)`,
         subject: template.subject,
-        fromEmail: template.fromEmail || '', // CRITICAL: Include fromEmail when duplicating
+        fromEmail: template.fromEmail || '',
         bodyHtml: template.bodyHtml,
         headerImageUrl: template.headerImageUrl || '',
         footerImageUrl: template.footerImageUrl || '',
         discountCodeId: template.discountCodeId,
         isActive: template.isActive !== undefined ? template.isActive : true,
       };
-      const { createPromotionEmailTemplateServer } = await import('./ApiServerActions');
-      const created = await createPromotionEmailTemplateServer(formData);
+      const { createNewsletterEmailTemplateServer } = await import('./ApiServerActions');
+      const created = await createNewsletterEmailTemplateServer(formData);
       if (created.id) {
         setSuccessMessage('Template duplicated successfully!');
         setRefreshKey(prev => prev + 1);
         setTimeout(() => {
-          window.location.href = `/admin/promotion-emails/${created.id}`;
+          window.location.href = `/admin/newsletter-emails/${created.id}`;
         }, 1500);
       }
     } catch (err: any) {
@@ -136,13 +136,12 @@ export default function PromotionEmailsPage() {
     setEmailSendMessage('Sending test email...');
 
     try {
-      await sendTestEmailServer(selectedTemplate.id, testEmailRecipient.trim());
+      await sendTestNewsletterEmailServer(selectedTemplate.id, testEmailRecipient.trim());
       setShowTestEmailDialog(false);
 
       // Show success dialog
       setEmailSendStatus('success');
       setEmailSendMessage(`Test email sent successfully to ${testEmailRecipient.trim()}`);
-      // Note: Title will be set in SaveStatusDialog component via title prop
 
       // Clear after showing success
       setTimeout(() => {
@@ -176,7 +175,7 @@ export default function PromotionEmailsPage() {
     setEmailSendMessage('Sending bulk email...');
 
     try {
-      const result = await sendBulkEmailServer(selectedTemplate.id);
+      const result = await sendBulkNewsletterEmailServer(selectedTemplate.id);
       setShowBulkEmailDialog(false);
 
       // Show success dialog
@@ -216,7 +215,7 @@ export default function PromotionEmailsPage() {
     setEmailSendMessage('Sending email to all subscribed members...');
 
     try {
-      const result = await sendBulkEmailToSubscribedMembersServer(selectedTemplate.id);
+      const result = await sendBulkNewsletterEmailToSubscribedMembersServer(selectedTemplate.id);
       setShowSubscribedEmailDialog(false);
 
       // Show success dialog
@@ -248,7 +247,7 @@ export default function PromotionEmailsPage() {
     setTimeout(() => {
       setSuccessMessage(null);
       // Navigate to edit page for image uploads
-      window.location.href = `/admin/promotion-emails/${templateId}`;
+      window.location.href = `/admin/newsletter-emails/${templateId}`;
     }, 1500);
   };
 
@@ -268,12 +267,12 @@ export default function PromotionEmailsPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-8 py-8" style={{ paddingTop: '180px' }}>
-      <AdminNavigation currentPage="promotion-emails" />
+      <AdminNavigation currentPage="newsletter-emails" />
 
       <div className="mb-6">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            Promotional Emails for Events
+            Newsletter Email Management
           </h1>
           <div className="flex gap-2">
             <button
@@ -331,14 +330,14 @@ export default function PromotionEmailsPage() {
       )}
 
       {viewMode === 'form' && (
-        <PromotionEmailTemplateCreateForm
+        <NewsletterEmailTemplateCreateForm
           onSave={handleFormSave}
           onCancel={handleFormCancel}
         />
       )}
 
       {viewMode === 'list' && (
-        <PromotionEmailTemplateList
+        <NewsletterEmailTemplateList
           onEdit={handleEdit}
           onDuplicate={handleDuplicate}
           onSendTest={handleSendTest}
@@ -455,7 +454,6 @@ function TestEmailDialog({
 
   useEffect(() => {
     if (isOpen) {
-      // Small delay to ensure dialog is fully rendered
       const timer = setTimeout(() => {
         setIsMounted(true);
       }, 50);
@@ -468,13 +466,11 @@ function TestEmailDialog({
   if (!isOpen) return null;
 
   const handleBackdropClick = (e: React.MouseEvent) => {
-    // Prevent closing during send operation or before mount
     if (sending || !isMounted) {
       e.preventDefault();
       e.stopPropagation();
       return;
     }
-    // Only close if clicking directly on backdrop, not on modal content
     if (e.target === e.currentTarget) {
       onClose();
     }
@@ -620,7 +616,7 @@ function BulkEmailDialog({
                 {templateName}
               </div>
               <p className="text-sm text-gray-600 mt-3">
-                This will send promotional emails to all eligible recipients. This action cannot be undone.
+                This will send newsletter emails to all eligible recipients. This action cannot be undone.
               </p>
             </div>
           </div>
@@ -700,7 +696,7 @@ function SubscribedEmailDialog({
                 {templateName}
               </div>
               <p className="text-sm text-gray-600 mt-3">
-                This will send promotional emails to all members who have subscribed to receive emails. This action cannot be undone.
+                This will send newsletter emails to all members who have subscribed to receive emails. This action cannot be undone.
               </p>
             </div>
           </div>
@@ -730,3 +726,4 @@ function SubscribedEmailDialog({
 
   return typeof window !== 'undefined' ? ReactDOM.createPortal(modalContent, document.body) : null;
 }
+

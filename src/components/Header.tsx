@@ -69,7 +69,7 @@ const adminSubmenuItems = [
       { name: 'Subscriptions', href: '/admin/membership/subscriptions' }
     ]
   },
-  { name: 'Promotion Emails', href: '/admin/promotion-emails' },
+  { name: 'Bulk Email', href: '/admin/bulk-email' },
   { name: 'Test Stripe', href: '/admin/test-stripe' },
   { name: 'Media Management', href: '/admin/media' },
   { name: 'Executive Committee', href: '/admin/executive-committee' },
@@ -128,7 +128,7 @@ const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string
 
   const waitForElementAndScroll = () => {
     const targetElement = document.getElementById(targetId);
-    
+
     if (targetElement) {
       // Element exists, scroll to it
       const targetPosition = targetElement.offsetTop - headerHeight - 20;
@@ -164,7 +164,7 @@ let loadingIndicator: HTMLElement | null = null;
 
 const showNavigationLoading = () => {
   if (typeof window === 'undefined') return;
-  
+
   // Remove existing indicator if any
   hideNavigationLoading();
 
@@ -349,7 +349,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
       const hash = window.location.hash;
       if (!hash || (window.location.pathname !== '/' && window.location.pathname !== '/charity-theme')) return;
       const targetId = hash.replace('#', '');
-      
+
       // Show loading indicator for team section
       if (targetId === 'team-section') {
         showNavigationLoading();
@@ -362,7 +362,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
 
       const waitForElementAndScroll = () => {
         const targetElement = document.getElementById(targetId);
-        
+
         if (targetElement) {
           // Element exists, scroll to it
           const targetPosition = targetElement.offsetTop - headerHeight - 20;
