@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch Job Debug Analysis: Why 0 Records Found</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #2D2A26;
+            background-color: #F5F1E8;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: #FFFFFF;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(139, 125, 107, 0.1);
+        }
+
+        h1 {
+            font-family: 'Crimson Text', serif;
+            font-size: 2.5em;
+            color: #8B7D6B;
+            margin-bottom: 10px;
+            border-bottom: 3px solid #8B7D6B;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            font-family: 'Crimson Text', serif;
+            font-size: 2em;
+            color: #6B4E3D;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #A0926B;
+            padding-bottom: 8px;
+        }
+
+        h3 {
+            font-family: 'Crimson Text', serif;
+            font-size: 1.5em;
+            color: #8B7D6B;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        h4 {
+            font-family: 'Crimson Text', serif;
+            font-size: 1.25em;
+            color: #6B4E3D;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        code {
+            background-color: #EDE7D3;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+            color: #6B4E3D;
+        }
+
+        pre {
+            background-color: #2D2A26;
+            color: #F5F1E8;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        pre code {
+            background-color: transparent;
+            color: #F5F1E8;
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #FFFFFF;
+        }
+
+        th, td {
+            border: 1px solid #A0926B;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #8B7D6B;
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #F5F1E8;
+        }
+
+        .info-box {
+            background-color: #EDE7D3;
+            border-left: 4px solid #8B7D6B;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .warning-box {
+            background-color: #FFF4E6;
+            border-left: 4px solid #A67C52;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .success-box {
+            background-color: #E8F5E9;
+            border-left: 4px solid #4A6741;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .critical-box {
+            background-color: #FFEBEE;
+            border-left: 4px solid #8B4A42;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .code-block-title {
+            background-color: #6B4E3D;
+            color: #FFFFFF;
+            padding: 8px 15px;
+            border-radius: 8px 8px 0 0;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-top: 20px;
+            margin-bottom: 0;
+        }
+
+        .code-block-title + pre {
+            margin-top: 0;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .badge-primary {
+            background-color: #8B7D6B;
+            color: #FFFFFF;
+        }
+
+        .badge-danger {
+            background-color: #8B4A42;
+            color: #FFFFFF;
+        }
+
+        .footer {
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 2px solid #A0926B;
+            text-align: center;
+            color: #8B7D6B;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Batch Job Debug Analysis: Why 0 Records Found <span class="badge badge-danger">v1.0</span></h1>
+
+        <div class="critical-box">
+            <p><strong>❌ Problem:</strong> Batch job loaded 0 subscriptions even though subscription exists in database</p>
+            <p style="margin-top: 10px;"><strong>Root Causes:</strong></p>
+            <ol style="margin-top: 10px;">
+                <li><strong>Backend NOT passing <code>stripeSubscriptionId</code> to batch job</strong> - Parameter received but not added to job parameters</li>
+                <li><strong>Batch job query using 7-day filter</strong> - Subscription expires in 29 days, not within 7 days</li>
+            </ol>
+        </div>
+
+        <h2>1. Request Flow Analysis</h2>
+
+        <h3>1.1 Frontend Request (✅ Correct)</h3>
+        <div class="code-block-title">Request Body Sent</div>
+        <pre><code>{
+  "tenantId": "tenant_demo_002",
+  "stripeSubscriptionId": "sub_1SeifsK5BrggeAHMBvg2XE93",
+  "batchSize": 10,
+  "maxSubscriptions": 100
+}</code></pre>
+        <p><strong>Status:</strong> ✅ Frontend correctly sends both <code>tenantId</code> and <code>stripeSubscriptionId</code></p>
+
+        <h3>1.2 Backend Receives Request (✅ Correct)</h3>
+        <div class="code-block-title">Backend Log</div>
+        <pre><code>REST request to trigger subscription renewal batch job:
+BatchJobRequest{
+  tenantId='tenant_demo_002',
+  stripeSubscriptionId='sub_1SeifsK5BrggeAHMBvg2XE93',
+  batchSize=10,
+  maxSubscriptions=100
+}</code></pre>
+        <p><strong>Status:</strong> ✅ Backend correctly receives both parameters</p>
+
+        <h3>1.3 Backend Warning (❌ Problem)</h3>
+        <div class="code-block-title">Backend Warning Log</div>
+        <pre><code>WARN: stripeSubscriptionId parameter is provided but not yet supported by batch job service.
+The batch job will process all subscriptions for the tenant.
+stripeSubscriptionId: sub_1SeifsK5BrggeAHMBvg2XE93</code></pre>
+        <div class="warning-box">
+            <p><strong>⚠️ Issue:</strong> Backend receives <code>stripeSubscriptionId</code> but doesn't pass it to batch job service</p>
+        </div>
+
+        <h3>1.4 Batch Job Receives Request (❌ Missing Parameter)</h3>
+        <div class="code-block-title">Batch Job Log</div>
+        <pre><code>Received request to trigger subscription renewal job for tenant: tenant_demo_002,
+stripeSubscriptionId: null</code></pre>
+        <div class="critical-box">
+            <p><strong>❌ CRITICAL:</strong> Batch job received <code>stripeSubscriptionId: null</code> even though backend received it!</p>
+        </div>
+
+        <h3>1.5 Batch Job Job Parameters (❌ Missing Parameter)</h3>
+        <div class="code-block-title">Job Parameters</div>
+        <pre><code>Job parameters: [
+  {'tenantId':'{value=tenant_demo_002, type=class java.lang.String, identifying=true}',
+   'jobId':'{value=99904a6d-df31-4a52-b004-a08c989680c6, type=class java.lang.String, identifying=true}',
+   'timestamp':'{value=1765903753856, type=class java.lang.Long, identifying=true}'}
+]
+
+❌ MISSING: No 'stripeSubscriptionId' parameter!</code></pre>
+
+        <h2>2. Query Analysis</h2>
+
+        <h3>2.1 Current Database Record</h3>
+        <div class="code-block-title">SQL - Current Subscription State</div>
+        <pre><code>SELECT
+    id,
+    tenant_id,
+    stripe_subscription_id,
+    subscription_status,
+    current_period_start,
+    current_period_end,
+    cancel_at_period_end
+FROM membership_subscription
+WHERE stripe_subscription_id = 'sub_1SeifsK5BrggeAHMBvg2XE93'
+  AND tenant_id = 'tenant_demo_002';
+
+-- Current values:
+-- tenant_id: 'tenant_demo_002'
+-- stripe_subscription_id: 'sub_1SeifsK5BrggeAHMBvg2XE93'
+-- subscription_status: 'ACTIVE'
+-- current_period_start: '2025-12-15'
+-- current_period_end: '2026-01-14'  -- ⚠️ 29 days away!
+-- cancel_at_period_end: false</code></pre>
+
+        <h3>2.2 Batch Job Query (What Actually Ran)</h3>
+        <p>Since <code>stripeSubscriptionId</code> was <code>null</code>, the batch job used the 7-day filter:</p>
+        <div class="code-block-title">SQL - Actual Query Executed</div>
+        <pre><code>SELECT * FROM membership_subscription
+WHERE tenant_id = 'tenant_demo_002'  -- ✅ Filter applied (from job parameters)
+AND subscription_status IN ('ACTIVE', 'TRIAL')  -- ✅ Matches (status = 'ACTIVE')
+AND current_period_end <= CURRENT_DATE + INTERVAL '7 days'  -- ❌ FAILS!
+-- Current date: 2025-12-16
+-- Period end: 2026-01-14
+-- Days until expiry: 29 days
+-- 29 > 7, so this condition FAILS
+AND cancel_at_period_end = false  -- ✅ Matches (false)
+ORDER BY current_period_end ASC
+
+-- Result: 0 rows (because current_period_end is 29 days away, not within 7 days)</code></pre>
+
+        <h3>2.3 What Query Should Have Run</h3>
+        <p>If <code>stripeSubscriptionId</code> had been passed correctly:</p>
+        <div class="code-block-title">SQL - Expected Query (If stripeSubscriptionId Was Passed)</div>
+        <pre><code>SELECT * FROM membership_subscription
+WHERE tenant_id = 'tenant_demo_002'  -- ✅ Filter applied
+AND stripe_subscription_id = 'sub_1SeifsK5BrggeAHMBvg2XE93'  -- ✅ Would bypass 7-day filter
+AND subscription_status IN ('ACTIVE', 'TRIAL')  -- ✅ Matches
+AND cancel_at_period_end = false  -- ✅ Matches
+ORDER BY current_period_end ASC
+
+-- Result: 1 row (would find the subscription)</code></pre>
+
+        <h2>3. Root Cause Summary</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Step</th>
+                    <th>Status</th>
+                    <th>Issue</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Frontend sends request</td>
+                    <td>✅ OK</td>
+                    <td>Correctly includes <code>stripeSubscriptionId</code></td>
+                </tr>
+                <tr>
+                    <td>Backend receives request</td>
+                    <td>✅ OK</td>
+                    <td>Correctly receives <code>stripeSubscriptionId</code></td>
+                </tr>
+                <tr>
+                    <td>Backend passes to batch job</td>
+                    <td>❌ FAILED</td>
+                    <td><strong>Does NOT add <code>stripeSubscriptionId</code> to job parameters</strong></td>
+                </tr>
+                <tr>
+                    <td>Batch job receives parameters</td>
+                    <td>❌ FAILED</td>
+                    <td><code>stripeSubscriptionId</code> is <code>null</code></td>
+                </tr>
+                <tr>
+                    <td>Batch job builds query</td>
+                    <td>❌ FAILED</td>
+                    <td>Uses 7-day filter (because <code>stripeSubscriptionId</code> is null)</td>
+                </tr>
+                <tr>
+                    <td>Query executes</td>
+                    <td>❌ FAILED</td>
+                    <td>Finds 0 records (subscription expires in 29 days, not 7)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>4. Fix Required</h2>
+
+        <h3>4.1 Backend Fix (CRITICAL)</h3>
+        <p><strong>Location:</strong> Backend Project (`E:\project_workspace\malayalees-us-site-boot`)</p>
+        <p><strong>File:</strong> <code>BatchJobService.java</code> (or similar)</p>
+
+        <div class="code-block-title">Java - Current Code (BROKEN)</div>
+        <pre><code>public BatchJobResponse submitSubscriptionRenewalJob(BatchJobRequest request) {
+    // Build job parameters
+    JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
+    jobParametersBuilder.addString("tenantId", request.getTenantId());
+    jobParametersBuilder.addLong("timestamp", System.currentTimeMillis());
+
+    // ❌ PROBLEM: stripeSubscriptionId is received but NOT added to job parameters
+    if (request.getStripeSubscriptionId() != null) {
+        log.warn("stripeSubscriptionId parameter is provided but not yet supported...");
+        // Missing: jobParametersBuilder.addString("stripeSubscriptionId", ...)
+    }
+
+    // Submit job - stripeSubscriptionId is lost!
+    JobExecution jobExecution = jobLauncher.run(
+        subscriptionRenewalJob,
+        jobParametersBuilder.toJobParameters()
+    );
+}</code></pre>
+
+        <div class="code-block-title">Java - Fixed Code</div>
+        <pre><code>public BatchJobResponse submitSubscriptionRenewalJob(BatchJobRequest request) {
+    // Build job parameters
+    JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
+    jobParametersBuilder.addString("tenantId", request.getTenantId());
+    jobParametersBuilder.addLong("timestamp", System.currentTimeMillis());
+
+    // ✅ FIX: Add stripeSubscriptionId to job parameters if provided
+    if (request.getStripeSubscriptionId() != null &&
+        !request.getStripeSubscriptionId().isEmpty()) {
+        jobParametersBuilder.addString("stripeSubscriptionId",
+            request.getStripeSubscriptionId());
+        log.info("Passing stripeSubscriptionId to batch job: {}",
+            request.getStripeSubscriptionId());
+    }
+
+    // Submit job - stripeSubscriptionId is now included!
+    JobExecution jobExecution = jobLauncher.run(
+        subscriptionRenewalJob,
+        jobParametersBuilder.toJobParameters()
+    );
+}</code></pre>
+
+        <h3>4.2 Batch Job Fix (Also Required)</h3>
+        <p><strong>Location:</strong> Batch Job Project (`E:\project_workspace\event-site-manager-batch-jobs`)</p>
+        <p><strong>File:</strong> <code>SubscriptionRenewalBatchJobConfig.java</code></p>
+
+        <p>See <code>BATCH_JOB_SUBSCRIPTION_FILTER_IMPLEMENTATION.html</code> for complete implementation details.</p>
+
+        <h2>5. Verification Steps After Fix</h2>
+
+        <ol>
+            <li><strong>Deploy backend fix</strong> - Add <code>stripeSubscriptionId</code> to job parameters</li>
+            <li><strong>Deploy batch job fix</strong> - Support <code>stripeSubscriptionId</code> filter in query</li>
+            <li><strong>Run test again:</strong>
+                <pre><code>node scripts/test-subscription-renewal/trigger-batch-job.js \
+  --tenant-id=tenant_demo_002 \
+  --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93</code></pre>
+            </li>
+            <li><strong>Check backend logs</strong> - Should see:
+                <pre><code>INFO: Passing stripeSubscriptionId to batch job: sub_1SeifsK5BrggeAHMBvg2XE93</code></pre>
+            </li>
+            <li><strong>Check batch job logs</strong> - Should see:
+                <pre><code>Received request to trigger subscription renewal job for tenant: tenant_demo_002,
+stripeSubscriptionId: sub_1SeifsK5BrggeAHMBvg2XE93
+
+Loaded 1 subscriptions for renewal processing  -- ✅ Should find the subscription</code></pre>
+            </li>
+            <li><strong>Verify database updated</strong> - Run verification script</li>
+        </ol>
+
+        <h2>6. Quick Test (Temporary Workaround)</h2>
+
+        <p>If you need to test immediately without implementing the fix, temporarily update the subscription's <code>current_period_end</code> to be within 7 days:</p>
+
+        <div class="code-block-title">SQL - Temporary Workaround</div>
+        <pre><code>-- Temporarily set period end to within 7 days for testing
+UPDATE membership_subscription
+SET current_period_end = CURRENT_DATE + INTERVAL '3 days'
+WHERE stripe_subscription_id = 'sub_1SeifsK5BrggeAHMBvg2XE93'
+  AND tenant_id = 'tenant_demo_002';
+
+-- Then run batch job again (without subscription-id filter)
+-- The batch job will find it and update it with correct Stripe value</code></pre>
+
+        <div class="warning-box">
+            <p><strong>⚠️ Note:</strong> This is only for testing. The batch job will update it with the correct value from Stripe after processing.</p>
+        </div>
+
+        <h2>7. Summary</h2>
+
+        <div class="critical-box">
+            <p><strong>Why 0 Records Were Found:</strong></p>
+            <ol>
+                <li><strong>Backend didn't pass <code>stripeSubscriptionId</code></strong> to batch job (even though it received it)</li>
+                <li><strong>Batch job used 7-day filter</strong> because <code>stripeSubscriptionId</code> was null</li>
+                <li><strong>Subscription expires in 29 days</strong>, not within 7 days, so query found nothing</li>
+            </ol>
+        </div>
+
+        <div class="success-box">
+            <p><strong>After Fix:</strong></p>
+            <ul>
+                <li>✅ Backend will pass <code>stripeSubscriptionId</code> to batch job</li>
+                <li>✅ Batch job will filter by subscription ID (bypasses 7-day restriction)</li>
+                <li>✅ Query will find the subscription regardless of expiration date</li>
+                <li>✅ Batch job will sync subscription from Stripe and update database</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <p><strong>Batch Job Debug Analysis: Why 0 Records Found</strong></p>
+            <p>Version 1.0 | Date: 2025-12-16</p>
+            <p><strong>Root Cause:</strong> Backend receives <code>stripeSubscriptionId</code> but doesn't pass it to batch job, causing batch job to use 7-day filter which excludes subscription expiring in 29 days.</p>
+        </div>
+    </div>
+</body>
+</html>
+
+

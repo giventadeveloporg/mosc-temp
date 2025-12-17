@@ -21,7 +21,9 @@ import {
   FaUserFriends,
   FaAddressCard,
   FaFileInvoice,
-  FaImage
+  FaImage,
+  FaCogs,
+  FaEnvelopeOpenText
 } from 'react-icons/fa';
 
 export default function AdminPage() {
@@ -97,6 +99,20 @@ export default function AdminPage() {
       label: 'Promotion Emails',
       color: 'yellow',
       key: 'promotion-emails'
+    },
+    {
+      href: '/admin/email-configuration',
+      icon: FaEnvelopeOpenText,
+      label: 'Email Configuration',
+      color: 'teal',
+      key: 'email-configuration'
+    },
+    {
+      href: '/admin/batch-jobs',
+      icon: FaCogs,
+      label: 'Batch Jobs',
+      color: 'slate',
+      key: 'batch-jobs'
     },
     {
       href: '/admin/test-stripe',

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { FaUsers, FaCalendarAlt, FaEnvelope, FaCreditCard, FaHome, FaUserTie, FaChartLine, FaBuilding, FaCog, FaMicrophone, FaPhone, FaHandshake, FaMailBulk, FaUserCheck } from 'react-icons/fa';
+import { FaUsers, FaCalendarAlt, FaEnvelope, FaCreditCard, FaHome, FaUserTie, FaChartLine, FaBuilding, FaCog, FaMicrophone, FaPhone, FaHandshake, FaMailBulk, FaUserCheck, FaCogs } from 'react-icons/fa';
 
 interface AdminNavigationProps {
   currentPage?: string;
@@ -57,6 +57,14 @@ export default function AdminNavigation({ currentPage, showHome = true }: AdminN
       color: 'yellow',
       active: currentPage === 'promotion-emails',
       key: 'promotion-emails'
+    },
+    {
+      href: '/admin/batch-jobs',
+      icon: FaCogs,
+      label: 'Batch Jobs',
+      color: 'slate',
+      active: currentPage === 'batch-jobs',
+      key: 'batch-jobs'
     },
     {
       href: '/admin/test-stripe',

@@ -577,6 +577,22 @@ export interface TenantSettingsDTO {
   tenantOrganization?: TenantOrganizationDTO;
 }
 
+// Changed from enum to string to match backend character varying type
+export type TenantEmailType = string;
+
+export interface TenantEmailAddressDTO {
+  id?: number;
+  tenantId: string;
+  emailAddress: string;
+  emailType: TenantEmailType;
+  displayName?: string;
+  isActive: boolean;
+  isDefault: boolean;
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface UserPaymentTransactionDTO {
   id?: number;
   tenantId: string;
