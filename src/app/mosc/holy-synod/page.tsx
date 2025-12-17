@@ -254,15 +254,18 @@ const HolySynodPage = () => {
           {synodMembers.filter(member => member.special).map((member) => (
             <div key={member.name} className="bg-background rounded-lg sacred-shadow p-8 max-w-4xl mx-auto">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {/* Image */}
+                {/* Image - Full display without cropping */}
                 <div className="flex justify-center md:justify-start">
-                  <div className="relative w-48 h-64 md:w-56 md:h-80 rounded-lg overflow-hidden sacred-shadow">
+                  <div className="relative w-48 h-72 md:w-56 md:h-96 rounded-lg overflow-hidden sacred-shadow">
                     <Image
                       src={member.image || '/images/holy-synod/hh-scaled.jpg'}
-                      alt={member.name}
-                      width={242}
-                      height={339}
-                      className="w-full h-full object-cover"
+                      alt={`Portrait of ${member.name}, ${member.title}`}
+                      fill
+                      sizes="(max-width: 768px) 192px, 224px"
+                      className="object-cover object-top"
+                      style={{
+                        objectPosition: 'center 15%'
+                      }}
                       priority
                     />
                   </div>
@@ -276,9 +279,32 @@ const HolySynodPage = () => {
                   <p className="font-body text-lg text-primary mb-4">
                     {member.title}
                   </p>
-                  <p className="font-body text-muted-foreground leading-relaxed">
+                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
                     {member.description}
                   </p>
+                  <div className="flex flex-wrap gap-4">
+                    <Link
+                      href={member.href}
+                      className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 reverent-transition"
+                    >
+                      <span className="mr-2" role="img" aria-label="Biography">📋</span>
+                      Biography
+                    </Link>
+                    <Link
+                      href="/mosc/photo-gallery/reception-to-his-holiness-baselios-marthoma-mathews-iii"
+                      className="inline-flex items-center px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 reverent-transition"
+                    >
+                      <span className="mr-2" role="img" aria-label="Photos">📸</span>
+                      Photos
+                    </Link>
+                    <Link
+                      href="/mosc/speeches"
+                      className="inline-flex items-center px-4 py-2 bg-accent text-accent-foreground rounded-lg hover:bg-accent/90 reverent-transition"
+                    >
+                      <span className="mr-2" role="img" aria-label="Speeches">🎤</span>
+                      Speeches
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
@@ -299,28 +325,33 @@ const HolySynodPage = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Centered Flex Grid - Cards expand from center outward, last row auto-centers */}
+          <div className="flex flex-wrap gap-6 justify-center items-start max-w-7xl mx-auto">
             {synodMembers.filter(member => !member.special).map((member) => (
               <Link
                 key={member.name}
                 href={member.href}
-                className="bg-card rounded-lg sacred-shadow p-6 hover:sacred-shadow-lg reverent-transition group"
+                className="bg-card rounded-lg sacred-shadow p-4 hover:sacred-shadow-lg reverent-transition group w-full sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] flex-shrink-0"
+                style={{ maxWidth: '400px' }}
               >
                 <div className="text-center">
-                  {/* Image */}
-                  <div className="w-full h-48 mx-auto mb-4 rounded-lg overflow-hidden sacred-shadow-sm group-hover:sacred-shadow reverent-transition">
+                  {/* Image Container - Full image display without cropping */}
+                  <div className="relative w-full aspect-[2/3] mx-auto mb-3 rounded-lg overflow-hidden sacred-shadow-sm group-hover:sacred-shadow reverent-transition">
                     <Image
                       src={member.image || '/images/holy-synod/placeholder.jpg'}
-                      alt={member.name}
-                      width={242}
-                      height={156}
-                      className="w-full h-full object-cover group-hover:scale-105 reverent-transition"
+                      alt={`Portrait of ${member.name}, ${member.title}`}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      className="object-cover object-top group-hover:scale-105 reverent-transition"
+                      style={{
+                        objectPosition: 'center 15%'
+                      }}
                     />
                   </div>
-                  <h3 className="font-heading font-semibold text-lg text-foreground mb-2 group-hover:text-primary reverent-transition">
+                  <h3 className="font-heading font-semibold text-lg text-foreground mb-1.5 group-hover:text-primary reverent-transition">
                     {member.name}
                   </h3>
-                  <p className="font-body text-sm text-primary font-medium mb-3">
+                  <p className="font-body text-sm text-primary font-medium mb-2">
                     {member.title}
                   </p>
                   <p className="font-body text-xs text-muted-foreground leading-relaxed line-clamp-3">

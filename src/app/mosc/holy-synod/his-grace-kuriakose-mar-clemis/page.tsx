@@ -19,15 +19,18 @@ const HisGraceKuriakoseMarClemisPage = () => {
             <div className="lg:col-span-3">
               <div className="bg-background rounded-lg sacred-shadow p-8">
                 <div className="flex flex-col md:flex-row gap-8">
-                  {/* Featured Image - Left Side */}
-                  <div className="flex-shrink-0">
-                    <div className="w-64 h-auto">
+                  {/* Featured Portrait - Left Side - Large Display */}
+                  <div className="flex-shrink-0 flex justify-center md:justify-start">
+                    <div className="relative w-72 h-[28rem] md:w-80 md:h-[32rem] lg:w-96 lg:h-[36rem] rounded-lg overflow-hidden sacred-shadow-lg">
                       <Image
                         src="/images/holy-synod/mar-clemis.jpg"
                         alt="H.G. Kuriakose Mar Clemis Metropolitan"
-                        width={300}
-                        height={193}
-                        className="rounded-lg sacred-shadow w-full h-auto object-contain"
+                        fill
+                        sizes="(max-width: 768px) 288px, (max-width: 1024px) 320px, 384px"
+                        className="object-cover object-top"
+                        style={{
+                          objectPosition: 'center 15%'
+                        }}
                         priority
                       />
                     </div>
