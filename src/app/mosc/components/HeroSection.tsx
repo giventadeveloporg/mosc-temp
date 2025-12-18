@@ -29,11 +29,11 @@ const HeroSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 mb-16">
           {/* Patriarch Image */}
           <div className="flex flex-col items-center">
-            <div className="w-48 h-48 lg:w-56 lg:h-56 rounded-full overflow-hidden sacred-shadow-lg bg-muted">
+            <div className="w-48 h-48 lg:w-56 lg:h-56 rounded-full overflow-hidden sacred-shadow-lg bg-muted flex items-center justify-center">
               <AppImage
-                src="https://images.pexels.com/photos/8363026/pexels-photo-8363026.jpeg"
-                alt="His Holiness Patriarch in traditional Orthodox robes"
-                className="w-full h-full object-cover"
+                src="/images/event_1/mosc_email/logo-mosc.png"
+                alt="Malankara Orthodox Syrian Church emblem"
+                className="max-w-full max-h-full object-contain"
               />
             </div>
             <h3 className="mt-4 font-heading font-medium text-lg text-foreground text-center">

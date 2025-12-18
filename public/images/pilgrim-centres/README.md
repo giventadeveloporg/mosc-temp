@@ -38,3 +38,4 @@ Until actual images are provided, you can use placeholder images from:
 These images are used in the Pilgrim Centres page at `/mosc/pilgrim-centres`.
 
 
+
