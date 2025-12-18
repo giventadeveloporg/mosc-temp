@@ -326,17 +326,17 @@ const HolySynodPage = () => {
           </div>
 
           {/* Centered Flex Grid - Cards expand from center outward, last row auto-centers */}
-          <div className="flex flex-wrap gap-6 justify-center items-start max-w-7xl mx-auto">
+          <div className="flex flex-wrap gap-6 justify-center items-stretch max-w-7xl mx-auto">
             {synodMembers.filter(member => !member.special).map((member) => (
               <Link
                 key={member.name}
                 href={member.href}
-                className="bg-card rounded-lg sacred-shadow p-4 hover:sacred-shadow-lg reverent-transition group w-full sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] flex-shrink-0"
+                className="bg-card rounded-lg sacred-shadow p-4 hover:sacred-shadow-lg reverent-transition group w-full sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)] flex-shrink-0 flex flex-col"
                 style={{ maxWidth: '400px' }}
               >
-                <div className="text-center">
+                <div className="text-center flex flex-col h-full">
                   {/* Image Container - Full image display without cropping */}
-                  <div className="relative w-full aspect-[2/3] mx-auto mb-3 rounded-lg overflow-hidden sacred-shadow-sm group-hover:sacred-shadow reverent-transition">
+                  <div className="relative w-full aspect-[3/4] mx-auto mb-3 rounded-lg overflow-hidden sacred-shadow-sm group-hover:sacred-shadow reverent-transition">
                     <Image
                       src={member.image || '/images/holy-synod/placeholder.jpg'}
                       alt={`Portrait of ${member.name}, ${member.title}`}
@@ -348,15 +348,19 @@ const HolySynodPage = () => {
                       }}
                     />
                   </div>
-                  <h3 className="font-heading font-semibold text-lg text-foreground mb-1.5 group-hover:text-primary reverent-transition">
-                    {member.name}
-                  </h3>
-                  <p className="font-body text-sm text-primary font-medium mb-2">
-                    {member.title}
-                  </p>
-                  <p className="font-body text-xs text-muted-foreground leading-relaxed line-clamp-3">
-                    {member.description}
-                  </p>
+                  
+                  {/* Content Section - Flex grow to fill remaining space */}
+                  <div className="flex flex-col flex-1">
+                    <h3 className="font-heading font-semibold text-base text-foreground mb-1.5 group-hover:text-primary reverent-transition">
+                      {member.name}
+                    </h3>
+                    <p className="font-body text-sm text-primary font-medium mb-2">
+                      {member.title}
+                    </p>
+                    <p className="font-body text-xs text-muted-foreground leading-relaxed line-clamp-3">
+                      {member.description}
+                    </p>
+                  </div>
                 </div>
               </Link>
             ))}

@@ -6,9 +6,9 @@ const MOSCFooter = () => {
   const currentYear = new Date().getFullYear();
 
   const footerLinks = [
-    { name: 'CATHOLICATE NEWS', href: 'https://catholicatenews.in/', external: true },
+    { name: 'CATHOLICATE NEWS', href: 'https://www.facebook.com/catholicatenews.in', external: true },
     { name: 'DOWNLOADS', href: '/mosc/downloads' },
-    { name: 'E-MAIL', href: 'https://accounts.google.com/ServiceLogin', external: true },
+    { name: 'E-MAIL', href: '/mosc/email' },
     { name: 'GALLERY', href: '/mosc/gallery' },
     { name: 'CONTACT INFO', href: '/mosc/contact-info' },
   ];

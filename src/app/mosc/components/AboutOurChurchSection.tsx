@@ -153,7 +153,7 @@ const AboutOurChurchSection = () => {
               <div className="bg-card rounded-lg sacred-shadow p-6">
                 <div className="space-y-3">
                   <button
-                    onClick={() => handleLinkClick({ href: 'https://mosc.in/pilgrimcentres/', label: 'PILGRIM CENTRES', external: true })}
+                    onClick={() => handleLinkClick({ href: '/mosc/pilgrim-centres', label: 'PILGRIM CENTRES', isInternal: true })}
                     className="w-full bg-warning text-warning-foreground rounded-md py-2 px-4 text-sm font-body font-medium hover:bg-warning/90 reverent-transition"
                   >
                     PILGRIM CENTRES
@@ -220,7 +220,7 @@ const AboutOurChurchSection = () => {
               </button>
               <span>•</span>
               <button
-                onClick={() => handleLinkClick({ href: '/mosc/email', label: 'E-MAIL' })}
+                onClick={() => handleLinkClick({ href: '/mosc/email', label: 'E-MAIL', isInternal: true })}
                 className="hover:text-primary reverent-transition"
               >
                 E-MAIL
