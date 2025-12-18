@@ -7,7 +7,7 @@ import type {
   PromotionEmailTemplateFormDTO,
   DiscountCodeDTO,
 } from '@/types';
-import { FaSave, FaBan, FaUpload, FaTimes } from 'react-icons/fa';
+import { FaSave, FaBan, FaUpload, FaTimes, FaCopy } from 'react-icons/fa';
 import Link from 'next/link';
 import AdminNavigation from '@/components/AdminNavigation';
 import SaveStatusDialog, { type SaveStatus } from '@/components/SaveStatusDialog';
@@ -17,7 +17,7 @@ import {
   uploadNewsletterEmailFooterImageClient,
 } from '../ApiServerActions';
 import { fetchDiscountCodesForEvent } from '@/app/admin/events/[id]/discount-codes/list/ApiServerActions';
-import EventSearchSelect from '../components/EventSearchSelect';
+// Event selection is no longer editable for newsletter templates.
 
 interface NewsletterEmailTemplateEditClientProps {
   template: PromotionEmailTemplateDTO | null;
@@ -50,6 +50,17 @@ export default function NewsletterEmailTemplateEditClient({
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
   const [saveMessage, setSaveMessage] = useState<string>('');
+  const EXAMPLE_BODY_HTML = `<div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; background: #f9f9f9; border-radius: 8px; padding: 24px; text-align: center;">
+
+  <h2 style="color: #1a237e; margin-bottom: 12px;">Special Offer Just for You!</h2>
+
+  <p style="font-size: 18px; color: #333; margin-bottom: 8px;">Use the code below to get an exclusive discount:</p>
+
+  <div style="font-size: 24px; font-weight: bold; color: #1565c0; background: #e3f2fd; border-radius: 6px; display: inline-block; padding: 12px 32px; margin-bottom: 12px;">SAVE20</div>
+
+  <p style="font-size: 16px; color: #444;">Enter this code at checkout to enjoy your savings!</p>
+
+</div>`;
   const [uploadingHeader, setUploadingHeader] = useState(false);
   const [uploadingFooter, setUploadingFooter] = useState(false);
   const [isDraggingHeader, setIsDraggingHeader] = useState(false);
@@ -115,6 +126,18 @@ export default function NewsletterEmailTemplateEditClient({
       ...prev,
       [name]: processedValue,
     }));
+  };
+
+  const handleCopyExampleHtml = async () => {
+    try {
+      await navigator.clipboard.writeText(EXAMPLE_BODY_HTML);
+      setFormData((prev) => ({
+        ...prev,
+        bodyHtml: EXAMPLE_BODY_HTML,
+      }));
+    } catch (err) {
+      console.error('Failed to copy example HTML:', err);
+    }
   };
 
   const handleEventChange = (eventId: number | undefined) => {
@@ -425,20 +448,6 @@ export default function NewsletterEmailTemplateEditClient({
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Event Selection (Editable) */}
-          <div>
-            <EventSearchSelect
-              value={formData.eventId}
-              onChange={handleEventChange}
-              required
-            />
-            <input
-              type="hidden"
-              name="eventId"
-              value={formData.eventId}
-            />
-          </div>
-
           {/* Template Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -666,17 +675,20 @@ export default function NewsletterEmailTemplateEditClient({
                   Click to see example HTML
                 </summary>
                 <div className="mt-3 p-3 bg-white border border-gray-300 rounded overflow-x-auto">
-                  <pre className="text-xs text-gray-800 whitespace-pre-wrap font-mono">{`<div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; background: #f9f9f9; border-radius: 8px; padding: 24px; text-align: center;">
-
-  <h2 style="color: #1a237e; margin-bottom: 12px;">Special Offer Just for You!</h2>
-
-  <p style="font-size: 18px; color: #333; margin-bottom: 8px;">Use the code below to get an exclusive discount:</p>
-
-  <div style="font-size: 24px; font-weight: bold; color: #1565c0; background: #e3f2fd; border-radius: 6px; display: inline-block; padding: 12px 32px; margin-bottom: 12px;">SAVE20</div>
-
-  <p style="font-size: 16px; color: #444;">Enter this code at checkout to enjoy your savings!</p>
-
-</div>`}</pre>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs text-gray-500">Example body HTML</span>
+                    <button
+                      type="button"
+                      onClick={handleCopyExampleHtml}
+                      className="inline-flex items-center gap-1 px-3 py-1 rounded-md text-xs bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-300"
+                    >
+                      <FaCopy className="w-3 h-3" />
+                      Copy to editor
+                    </button>
+                  </div>
+                  <pre className="text-xs text-gray-800 whitespace-pre-wrap font-mono">
+                    {EXAMPLE_BODY_HTML}
+                  </pre>
                 </div>
               </details>
             </div>

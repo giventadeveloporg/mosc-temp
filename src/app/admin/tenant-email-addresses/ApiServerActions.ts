@@ -74,6 +74,7 @@ export async function createTenantEmailAddressServer(
 
   const basePayload = {
     emailAddress: email.emailAddress.trim(),
+    copyToEmailAddress: email.copyToEmailAddress?.trim() || email.emailAddress.trim(),
     emailType: email.emailType,
     displayName: email.displayName?.trim() || undefined,
     isActive: email.isActive ?? true,
@@ -144,5 +145,6 @@ export async function deleteTenantEmailAddressServer(id: number): Promise<void> 
     throw new Error(`Failed to delete tenant email address: ${res.status} ${res.statusText} - ${body}`);
   }
 }
+
 
 

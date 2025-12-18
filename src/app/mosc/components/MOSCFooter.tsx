@@ -8,7 +8,7 @@ const MOSCFooter = () => {
   const footerLinks = [
     { name: 'CATHOLICATE NEWS', href: 'https://www.facebook.com/catholicatenews.in', external: true },
     { name: 'DOWNLOADS', href: '/mosc/downloads' },
-    { name: 'E-MAIL', href: '/mosc/email' },
+    { name: 'E-MAIL', href: '/mosc/contact-form-email' },
     { name: 'GALLERY', href: '/mosc/gallery' },
     { name: 'CONTACT INFO', href: '/mosc/contact-info' },
   ];

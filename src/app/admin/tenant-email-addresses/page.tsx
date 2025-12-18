@@ -32,6 +32,7 @@ export default function TenantEmailAddressesPage() {
 
   const [formData, setFormData] = useState<FormState>({
     emailAddress: '',
+    copyToEmailAddress: '',
     emailType: 'INFO',
     displayName: '',
     isActive: true,
@@ -44,6 +45,8 @@ export default function TenantEmailAddressesPage() {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   const [toastMessage, setToastMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [createFormMessage, setCreateFormMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [editFormMessage, setEditFormMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   useEffect(() => {
     if (userId) {
@@ -71,28 +74,46 @@ export default function TenantEmailAddressesPage() {
   const resetForm = () => {
     setFormData({
       emailAddress: '',
+      copyToEmailAddress: '',
       emailType: 'INFO',
       displayName: '',
       isActive: true,
       isDefault: false,
       description: '',
     });
+    setCreateFormMessage(null);
+    setEditFormMessage(null);
   };
 
   const handleCreate = async () => {
     try {
       if (!formData.emailAddress?.trim()) {
-        setToastMessage({ type: 'error', message: 'Email address is required' });
+        setCreateFormMessage({ type: 'error', message: 'Email address is required' });
+        return;
+      }
+      if (!formData.copyToEmailAddress?.trim()) {
+        setCreateFormMessage({ type: 'error', message: 'Copy-to email address is required' });
+        return;
+      }
+      if (
+        formData.emailAddress.trim().toLowerCase() ===
+        formData.copyToEmailAddress.trim().toLowerCase()
+      ) {
+        setCreateFormMessage({
+          type: 'error',
+          message: 'From email and Copy-To email address must be different',
+        });
         return;
       }
       if (!formData.emailType) {
-        setToastMessage({ type: 'error', message: 'Email type is required' });
+        setCreateFormMessage({ type: 'error', message: 'Email type is required' });
         return;
       }
 
       setLoading(true);
       const payload = {
         emailAddress: formData.emailAddress!.trim(),
+        copyToEmailAddress: formData.copyToEmailAddress!.trim(),
         emailType: formData.emailType! as TenantEmailAddressDTO['emailType'],
         displayName: formData.displayName?.trim() || undefined,
         isActive: formData.isActive ?? true,
@@ -107,7 +128,7 @@ export default function TenantEmailAddressesPage() {
       setToastMessage({ type: 'success', message: 'Email address created successfully' });
       void loadData();
     } catch (err: any) {
-      setToastMessage({ type: 'error', message: err.message || 'Failed to create email address' });
+      setCreateFormMessage({ type: 'error', message: err.message || 'Failed to create email address' });
     } finally {
       setLoading(false);
     }
@@ -118,17 +139,32 @@ export default function TenantEmailAddressesPage() {
 
     try {
       if (!formData.emailAddress?.trim()) {
-        setToastMessage({ type: 'error', message: 'Email address is required' });
+        setEditFormMessage({ type: 'error', message: 'Email address is required' });
+        return;
+      }
+      if (!formData.copyToEmailAddress?.trim()) {
+        setEditFormMessage({ type: 'error', message: 'Copy-to email address is required' });
+        return;
+      }
+      if (
+        formData.emailAddress.trim().toLowerCase() ===
+        formData.copyToEmailAddress.trim().toLowerCase()
+      ) {
+        setEditFormMessage({
+          type: 'error',
+          message: 'From email and Copy-To email address must be different',
+        });
         return;
       }
       if (!formData.emailType) {
-        setToastMessage({ type: 'error', message: 'Email type is required' });
+        setEditFormMessage({ type: 'error', message: 'Email type is required' });
         return;
       }
 
       setLoading(true);
       const patch: Partial<TenantEmailAddressDTO> = {
         emailAddress: formData.emailAddress!.trim(),
+        copyToEmailAddress: formData.copyToEmailAddress!.trim(),
         emailType: formData.emailType as TenantEmailAddressDTO['emailType'],
         displayName: formData.displayName?.trim() || undefined,
         isActive: formData.isActive ?? true,
@@ -144,7 +180,7 @@ export default function TenantEmailAddressesPage() {
       setToastMessage({ type: 'success', message: 'Email address updated successfully' });
       void loadData();
     } catch (err: any) {
-      setToastMessage({ type: 'error', message: err.message || 'Failed to update email address' });
+      setEditFormMessage({ type: 'error', message: err.message || 'Failed to update email address' });
     } finally {
       setLoading(false);
     }
@@ -171,6 +207,7 @@ export default function TenantEmailAddressesPage() {
   const openCreateModal = () => {
     resetForm();
     setSelectedItem(null);
+    setCreateFormMessage(null);
     setIsCreateModalOpen(true);
   };
 
@@ -178,12 +215,14 @@ export default function TenantEmailAddressesPage() {
     setSelectedItem(item);
     setFormData({
       emailAddress: item.emailAddress,
+      copyToEmailAddress: item.copyToEmailAddress,
       emailType: item.emailType,
       displayName: item.displayName,
       isActive: item.isActive,
       isDefault: item.isDefault,
       description: item.description,
     });
+    setEditFormMessage(null);
     setIsEditModalOpen(true);
   };
 
@@ -223,6 +262,7 @@ export default function TenantEmailAddressesPage() {
   const columns: Column<TenantEmailAddressDTO>[] = [
     { key: 'emailType', label: 'Type', sortable: true },
     { key: 'emailAddress', label: 'Email Address', sortable: true },
+    { key: 'copyToEmailAddress', label: 'Copy-To Address', sortable: true },
     { key: 'displayName', label: 'Display Name', sortable: true },
     {
       key: 'isActive',
@@ -279,6 +319,12 @@ export default function TenantEmailAddressesPage() {
             <p className="text-gray-600 mt-1 text-sm">
               Configure the verified “From” email addresses for this tenant, categorized by type (info, sales,
               support, noreply, etc.). These addresses are used when sending emails from the platform.
+            </p>
+            <p className="mt-2 rounded-md bg-blue-50 border border-blue-100 p-2 text-xs text-blue-800">
+              Please provide both a <span className="font-semibold">From</span> email and a{' '}
+              <span className="font-semibold">Copy-To</span> email address for each entry, and they must be
+              different. Both addresses should be AWS SES verified email addresses. Please contact the platform
+              administrator to have these addresses added or configured in SES.
             </p>
             {totalCount !== null && (
               <p className="text-gray-500 text-xs mt-1">Total addresses: {totalCount}</p>
@@ -355,6 +401,7 @@ export default function TenantEmailAddressesPage() {
           onSubmit={handleCreate}
           loading={loading}
           submitText="Create Email Address"
+          message={createFormMessage}
         />
       </Modal>
 
@@ -375,6 +422,7 @@ export default function TenantEmailAddressesPage() {
           onSubmit={handleEdit}
           loading={loading}
           submitText="Save Changes"
+          message={editFormMessage}
         />
       </Modal>
 
@@ -424,6 +472,7 @@ interface TenantEmailAddressFormProps {
   onSubmit: () => void;
   loading: boolean;
   submitText: string;
+  message: { type: 'success' | 'error'; message: string } | null;
 }
 
 function TenantEmailAddressForm({
@@ -432,6 +481,7 @@ function TenantEmailAddressForm({
   onSubmit,
   loading,
   submitText,
+  message,
 }: TenantEmailAddressFormProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, type, value, checked } = e.target as any;
@@ -469,6 +519,44 @@ function TenantEmailAddressForm({
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
+            Copy-To Email Address <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="email"
+            name="copyToEmailAddress"
+            value={formData.copyToEmailAddress || ''}
+            onChange={handleChange}
+            required
+            className="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Optional CC / copy-to address"
+          />
+        </div>
+      </div>
+
+      {message && (
+        <div
+          className={`mt-3 rounded-md border px-3 py-2 text-xs ${
+            message.type === 'success'
+              ? 'bg-green-50 border-green-200 text-green-800'
+              : 'bg-red-50 border-red-200 text-red-800'
+          }`}
+        >
+          {message.message}
+        </div>
+      )}
+
+      <div className="mt-2 rounded-md bg-blue-50 border border-blue-100 p-3">
+        <p className="text-xs text-blue-800">
+          Please provide both a <span className="font-semibold">From</span> email and a{' '}
+          <span className="font-semibold">Copy-To</span> email address, and they must be different.
+          Both addresses should be AWS SES verified email addresses. Please contact the platform
+          administrator to have these addresses added or configured in SES.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
             Email Type <span className="text-red-500">*</span>
           </label>
           <select
@@ -487,9 +575,6 @@ function TenantEmailAddressForm({
             <option value="ADMIN">ADMIN</option>
           </select>
         </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Display Name</label>
           <input
@@ -549,5 +634,6 @@ function TenantEmailAddressForm({
     </form>
   );
 }
+
 
 

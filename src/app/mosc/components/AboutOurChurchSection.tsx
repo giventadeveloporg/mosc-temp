@@ -220,7 +220,13 @@ const AboutOurChurchSection = () => {
               </button>
               <span>•</span>
               <button
-                onClick={() => handleLinkClick({ href: '/mosc/email', label: 'E-MAIL', isInternal: true })}
+                onClick={() =>
+                  handleLinkClick({
+                    href: '/mosc/contact-form-email',
+                    label: 'E-MAIL',
+                    isInternal: true,
+                  })
+                }
                 className="hover:text-primary reverent-transition"
               >
                 E-MAIL

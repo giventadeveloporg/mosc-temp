@@ -67,6 +67,11 @@ export default function ContactForm() {
         [name]: undefined,
       }));
     }
+    // If the user starts editing after a previous submission, clear global submit status/message
+    if (submitStatus !== 'idle') {
+      setSubmitStatus('idle');
+      setSubmitMessage('');
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -121,14 +126,28 @@ export default function ContactForm() {
           email: '',
           message: '',
         });
+        // After a short delay, reset the status so the form feels "ready" again
+        setTimeout(() => {
+          setSubmitStatus('idle');
+          setSubmitMessage('');
+        }, 5000);
       } else {
         setSubmitStatus('error');
         setSubmitMessage(data.error || 'Failed to send message. Please try again.');
+        // Auto-clear the banner after a short delay so the user can try again easily
+        setTimeout(() => {
+          setSubmitStatus('idle');
+          setSubmitMessage('');
+        }, 5000);
       }
     } catch (error) {
       setSubmitStatus('error');
       setSubmitMessage('An error occurred. Please try again later.');
       console.error('Contact form error:', error);
+      setTimeout(() => {
+        setSubmitStatus('idle');
+        setSubmitMessage('');
+      }, 5000);
     } finally {
       setIsSubmitting(false);
     }
@@ -154,7 +173,12 @@ export default function ContactForm() {
           disabled={isSubmitting}
         />
         {errors.name && (
-          <p className="mt-1 text-sm text-destructive font-body">{errors.name}</p>
+          <p className="mt-2 inline-flex items-center gap-2 rounded-md bg-red-50 px-4 py-2 text-sm font-body text-red-700 border border-red-300">
+            <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-white text-[11px] font-bold">
+              !
+            </span>
+            {errors.name}
+          </p>
         )}
       </div>
 
@@ -176,7 +200,12 @@ export default function ContactForm() {
           disabled={isSubmitting}
         />
         {errors.email && (
-          <p className="mt-1 text-sm text-destructive font-body">{errors.email}</p>
+          <p className="mt-2 inline-flex items-center gap-2 rounded-md bg-red-50 px-4 py-2 text-sm font-body text-red-700 border border-red-300">
+            <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-white text-[11px] font-bold">
+              !
+            </span>
+            {errors.email}
+          </p>
         )}
       </div>
 
@@ -198,30 +227,42 @@ export default function ContactForm() {
           disabled={isSubmitting}
         />
         {errors.message && (
-          <p className="mt-1 text-sm text-destructive font-body">{errors.message}</p>
+          <p className="mt-2 inline-flex items-center gap-2 rounded-md bg-red-50 px-4 py-2 text-sm font-body text-red-700 border border-red-300">
+            <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-white text-[11px] font-bold">
+              !
+            </span>
+            {errors.message}
+          </p>
         )}
       </div>
 
       {/* Submit Status Message */}
       {submitStatus !== 'idle' && (
-        <div className={`p-4 rounded-lg ${
-          submitStatus === 'success' 
-            ? 'bg-success/10 text-success border border-success/20' 
-            : 'bg-destructive/10 text-destructive border border-destructive/20'
-        }`}>
-          <div className="flex items-start space-x-3">
-            <div className="flex-shrink-0 mt-0.5">
+        <div
+          className={`rounded-lg border px-4 py-3 sacred-shadow-sm ${
+            submitStatus === 'success'
+              ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
+              : 'bg-red-50 border-red-300 text-red-700'
+          }`}
+        >
+          <div className="flex items-start gap-3">
+            <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 sacred-shadow-sm">
               {submitStatus === 'success' ? (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               ) : (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               )}
             </div>
-            <p className="font-body text-sm">{submitMessage}</p>
+            <div>
+              <p className="font-heading text-sm font-semibold">
+                {submitStatus === 'success' ? 'Message sent successfully' : 'There was a problem sending your message'}
+              </p>
+              <p className="mt-1 font-body text-sm text-muted-foreground">{submitMessage}</p>
+            </div>
           </div>
         </div>
       )}

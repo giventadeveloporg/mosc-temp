@@ -116,7 +116,8 @@ export async function createNewsletterEmailTemplateServer(
   }
 
   const payload = {
-    eventId: formData.eventId,
+    // Newsletter templates are not tied to a specific event; send null instead of 0/undefined
+    eventId: formData.eventId ?? null,
     templateName: formData.templateName,
     // Newsletter templates are always NEWS_LETTER template type
     templateType: formData.templateType || 'NEWS_LETTER',
@@ -166,6 +167,8 @@ export async function updateNewsletterEmailTemplateServer(
     updatedAt: now,
     // Ensure templateType is always present for newsletter templates
     templateType: formData.templateType || 'NEWS_LETTER',
+    // Always send eventId as null for newsletter templates (not event-scoped)
+    eventId: formData.eventId ?? null,
     ...(formData.fromEmail !== undefined && { fromEmail: formData.fromEmail }),
     footerHtml: null,
   });

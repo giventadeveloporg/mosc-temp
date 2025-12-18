@@ -2159,6 +2159,7 @@ CREATE TABLE public.tenant_email_addresses (
                                         id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
                                         tenant_id character varying(255) NOT NULL,
                                         email_address character varying(255) NOT NULL,
+                                        copy_to_email_address character varying(255) NOT NULL,
                                         email_type character varying(255) NOT NULL,
                                         display_name character varying(255),
                                         is_active boolean DEFAULT true NOT NULL,
@@ -4078,7 +4079,7 @@ CREATE INDEX IF NOT EXISTS idx_reconciliation_log_tenant
 CREATE TABLE IF NOT EXISTS public.promotion_email_template (
                                                                id BIGINT PRIMARY KEY DEFAULT nextval('public.sequence_generator'::regclass),
     tenant_id VARCHAR(255) NOT NULL,
-    event_id BIGINT NOT NULL,
+    event_id BIGINT ,
     template_name VARCHAR(255) NOT NULL,
     template_type VARCHAR(160) NOT NULL,
     subject VARCHAR(500) NOT NULL,

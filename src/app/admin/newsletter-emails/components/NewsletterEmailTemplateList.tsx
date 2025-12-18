@@ -199,9 +199,16 @@ export default function NewsletterEmailTemplateList({
       if (filterActive !== undefined) {
         params.isActive = filterActive;
       }
-      const { templates: templatesData, totalCount: fetchedTotalCount } = await fetchNewsletterEmailTemplatesServer(params);
-      setTemplates(templatesData);
-      setTotalCount(fetchedTotalCount);
+      const { templates: templatesData, totalCount: fetchedTotalCount } =
+        await fetchNewsletterEmailTemplatesServer(params);
+
+      // Defensive filter: ensure we only show NEWS_LETTER templates
+      const newsletterTemplates = templatesData.filter(
+        (t) => t.templateType === 'NEWS_LETTER'
+      );
+
+      setTemplates(newsletterTemplates);
+      setTotalCount(newsletterTemplates.length || fetchedTotalCount || 0);
     } catch (err: any) {
       // Only show error for non-404 errors (404 is handled as empty list)
       const errorMessage = err.message || 'Unable to load templates';

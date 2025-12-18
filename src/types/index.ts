@@ -819,6 +819,11 @@ export interface TenantEmailAddressDTO {
   tenantId: string;
   emailAddress: string;
   /**
+   * Optional copy-to address that will be placed in the CC header for outgoing emails.
+   * Maps to the `copy_to_email_address` column in the `tenant_email_addresses` table.
+   */
+  copyToEmailAddress: string;
+  /**
    * Email address type:
    * INFO, SALES, TICKETS, CONTACT, SUPPORT, MARKETING, NOREPLY, ADMIN.
    */
