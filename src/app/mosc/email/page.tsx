@@ -5,3 +5,5 @@ export default function LegacyEmailPageRedirect() {
   redirect('/mosc/contact-form-email');
 }
 
+
+
