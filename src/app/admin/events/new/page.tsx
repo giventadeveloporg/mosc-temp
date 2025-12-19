@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { EventForm, defaultEvent } from '@/components/EventForm';
 import type { EventDetailsDTO, EventTypeDetailsDTO, UserProfileDTO } from '@/types';
 import Link from 'next/link';
-import { FaUsers, FaPhotoVideo, FaCalendarAlt } from 'react-icons/fa';
+// Icons removed - using inline SVGs instead
 import { createCalendarEventServer } from '../../ApiServerActions';
 import { useAuth, useUser } from '@clerk/nextjs';
 import SaveStatusDialog, { type SaveStatus } from '@/components/SaveStatusDialog';
@@ -160,14 +160,22 @@ export default function CreateEventPage() {
       <div className="flex justify-center mb-8">
         <div className="bg-white rounded-xl shadow-lg p-6 w-full">
           <div className="flex justify-center gap-8">
-            <Link href="/admin/manage-usage" className="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg shadow-sm px-4 py-4 transition font-semibold text-sm">
-              <FaUsers className="mb-2 text-2xl" />
-              <span>Manage Usage</span>
+            <Link href="/admin/manage-usage" className="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg shadow-md px-6 py-6 transition-all group">
+              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              </div>
+              <span className="font-semibold text-sm">Manage Usage</span>
               <span className="text-xs text-blue-500 mt-1">[Users]</span>
             </Link>
-            <Link href="/admin/manage-events" className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-700 rounded-lg shadow-sm px-4 py-4 transition font-semibold text-sm">
-              <FaCalendarAlt className="mb-2 text-2xl" />
-              Manage Events
+            <Link href="/admin/manage-events" className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-700 rounded-lg shadow-md px-6 py-6 transition-all group">
+              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <span className="font-semibold text-sm">Manage Events</span>
             </Link>
           </div>
         </div>

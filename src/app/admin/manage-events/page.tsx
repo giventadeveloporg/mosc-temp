@@ -3,7 +3,7 @@ import { EventDetailsDTO, EventTypeDetailsDTO, UserProfileDTO, EventCalendarEntr
 import React, { useState, useEffect } from 'react';
 import { EventList } from '@/components/EventList';
 import { useAuth } from "@clerk/nextjs";
-import { FaUsers, FaCalendarAlt, FaPlus, FaEnvelope, FaCreditCard, FaArrowLeft } from 'react-icons/fa';
+// Icons removed - using inline SVGs instead
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import AdminNavigation from '@/components/AdminNavigation';
@@ -347,7 +347,9 @@ export default function ManageEventsPage() {
           href="/admin"
           className="flex items-center text-blue-600 hover:text-blue-800 mr-4"
         >
-          <FaArrowLeft className="mr-2" />
+          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
           Back to Admin
         </Link>
         <div>
@@ -367,28 +369,46 @@ export default function ManageEventsPage() {
           href="/admin/events/new"
           className="bg-blue-600 text-white px-4 py-2 rounded shadow font-bold flex items-center gap-2 hover:bg-blue-700 transition"
         >
-          <FaPlus />
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
           Create Event
         </Link>
       </div>
 
       {/* Quick Action Buttons */}
       <div className="w-full overflow-x-auto mb-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 justify-items-center mx-auto">
-          <Link href="/admin/events/new" className="w-48 max-w-xs mx-auto flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-md shadow p-1 sm:p-2 text-xs sm:text-xs transition-all">
-            <FaPlus className="text-base sm:text-lg mb-1 mx-auto" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 justify-items-center mx-auto">
+          <Link href="/admin/events/new" className="w-full max-w-xs mx-auto flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg shadow-md p-4 text-xs transition-all group">
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+            </div>
             <span className="font-semibold text-center leading-tight">Create New<br />Event</span>
           </Link>
-          <Link href="/admin/event-analytics" className="w-48 max-w-xs mx-auto flex flex-col items-center justify-center bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-md shadow p-1 sm:p-2 text-xs sm:text-xs transition-all">
-            <FaCalendarAlt className="text-base sm:text-lg mb-1 mx-auto" />
+          <Link href="/admin/event-analytics" className="w-full max-w-xs mx-auto flex flex-col items-center justify-center bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-lg shadow-md p-4 text-xs transition-all group">
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-teal-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-10 h-10 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
             <span className="font-semibold text-center leading-tight">Event Analytics<br />Dashboard</span>
           </Link>
-          <Link href="/admin/manage-usage" className="w-48 max-w-xs mx-auto flex flex-col items-center justify-center bg-purple-50 hover:bg-purple-100 text-purple-800 rounded-md shadow p-1 sm:p-2 text-xs sm:text-xs transition-all">
-            <FaUsers className="text-base sm:text-lg mb-1 mx-auto" />
+          <Link href="/admin/manage-usage" className="w-full max-w-xs mx-auto flex flex-col items-center justify-center bg-purple-50 hover:bg-purple-100 text-purple-800 rounded-lg shadow-md p-4 text-xs transition-all group">
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-10 h-10 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            </div>
             <span className="font-semibold text-center leading-tight">Manage Usage<br />[Users]</span>
           </Link>
-          <Link href="/admin/communication" className="w-48 max-w-xs mx-auto flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-md shadow p-1 sm:p-2 text-xs sm:text-xs transition-all">
-            <FaEnvelope className="text-base sm:text-lg mb-1 mx-auto" />
+          <Link href="/admin/communication" className="w-full max-w-xs mx-auto flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-lg shadow-md p-4 text-xs transition-all group">
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
             <span className="font-semibold text-center leading-tight">Communication<br />Center</span>
           </Link>
         </div>

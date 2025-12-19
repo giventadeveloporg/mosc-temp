@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Icon from './ui/Icon';
+import AppImage from './AppImage';
 
 const MOSCFooter = () => {
   const currentYear = new Date().getFullYear();
@@ -26,8 +27,12 @@ const MOSCFooter = () => {
           {/* Church Info */}
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center sacred-shadow">
-                <Icon name="cross" size={20} className="text-primary-foreground" />
+              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center sacred-shadow overflow-hidden p-2 flex-shrink-0">
+                <AppImage
+                  src="/images/event_1/mosc_email/logo-mosc.png"
+                  alt="Malankara Orthodox Syrian Church emblem"
+                  className="w-full h-full object-contain"
+                />
               </div>
               <div>
                 <h3 className="font-heading font-semibold text-lg text-foreground">Malankara Orthodox Syrian Church</h3>

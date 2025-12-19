@@ -2,7 +2,6 @@ import { Suspense } from 'react';
 import { fetchTenantSettings } from './ApiServerActions';
 import TenantSettingsList from '@/app/admin/tenant-management/components/TenantSettingsList';
 import Link from 'next/link';
-import { FaArrowLeft, FaPlus } from 'react-icons/fa';
 
 export default async function TenantSettingsPage() {
   // Fetch initial data for server-side rendering
@@ -32,7 +31,9 @@ export default async function TenantSettingsPage() {
               href="/admin"
               className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600"
             >
-              <FaArrowLeft className="w-4 h-4 mr-2" />
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
               Admin Dashboard
             </Link>
           </li>
@@ -90,7 +91,9 @@ export default async function TenantSettingsPage() {
             href="/admin/tenant-management/settings/new"
             className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2"
           >
-            <FaPlus />
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
             Create New Settings
           </Link>
         </div>
@@ -151,12 +154,12 @@ export default async function TenantSettingsPage() {
         <div className="bg-white overflow-hidden shadow rounded-lg">
           <div className="p-5">
             <div className="flex items-center">
-              <div className="flex-shrink-0">
+              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center">
                 <svg
-                  className="h-6 w-6 text-gray-400"
+                  className="w-10 h-10 text-blue-500"
                   fill="none"
-                  viewBox="0 0 24 24"
                   stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
                   <path
                     strokeLinecap="round"
@@ -183,12 +186,12 @@ export default async function TenantSettingsPage() {
         <div className="bg-white overflow-hidden shadow rounded-lg">
           <div className="p-5">
             <div className="flex items-center">
-              <div className="flex-shrink-0">
+              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center">
                 <svg
-                  className="h-6 w-6 text-green-400"
+                  className="w-10 h-10 text-green-500"
                   fill="none"
-                  viewBox="0 0 24 24"
                   stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
                   <path
                     strokeLinecap="round"
@@ -215,12 +218,12 @@ export default async function TenantSettingsPage() {
         <div className="bg-white overflow-hidden shadow rounded-lg">
           <div className="p-5">
             <div className="flex items-center">
-              <div className="flex-shrink-0">
+              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center">
                 <svg
-                  className="h-6 w-6 text-blue-400"
+                  className="w-10 h-10 text-purple-500"
                   fill="none"
-                  viewBox="0 0 24 24"
                   stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
                   <path
                     strokeLinecap="round"
@@ -247,12 +250,12 @@ export default async function TenantSettingsPage() {
         <div className="bg-white overflow-hidden shadow rounded-lg">
           <div className="p-5">
             <div className="flex items-center">
-              <div className="flex-shrink-0">
+              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-orange-100 flex items-center justify-center">
                 <svg
-                  className="h-6 w-6 text-purple-400"
+                  className="w-10 h-10 text-orange-500"
                   fill="none"
-                  viewBox="0 0 24 24"
                   stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
                   <path
                     strokeLinecap="round"

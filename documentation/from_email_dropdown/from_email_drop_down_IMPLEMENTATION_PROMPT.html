@@ -137,7 +137,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { TenantEmailAddressDTO } from '@/types';
 import { fetchTenantEmailAddressesServer } from '@/app/admin/tenant-email-addresses/ApiServerActions';
-import { FaSearch, FaEnvelope } from 'react-icons/fa';
+// Note: Using inline SVG icons instead of react-icons to follow icon standards
 
 interface FromEmailSelectProps {
   value?: string;
@@ -262,22 +262,42 @@ export default function FromEmailSelect({
   };
 
   return (
-    &lt;div ref={containerRef} className="relative"&gt;
+    &lt;div ref={containerRef} className="relative" style={{ isolation: 'isolate' }}&gt;
       &lt;label className="block text-sm font-medium text-gray-700 mb-1"&gt;
         From Email {required && &lt;span className="text-red-500"&gt;*&lt;/span&gt;}
       &lt;/label&gt;
 
       {/* Search Input */}
       &lt;div className="relative"&gt;
-        &lt;FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" /&gt;
+        &lt;svg
+          className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        &gt;
+          &lt;path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /&gt;
+        &lt;/svg&gt;
         &lt;input
-          type="email"
+          type="text"
           value={searchTerm}
           onChange={handleSearchChange}
           onFocus={() => setIsOpen(true)}
           placeholder="Search email addresses..."
           className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 pl-10 pr-10 px-4 py-2 text-base"
           required={required}
+          autoComplete="off"
+          autoCapitalize="off"
+          autoCorrect="off"
+          spellCheck="false"
+          data-form-type="other"
+          data-lpignore="true"
+          data-1p-ignore="true"
+          name="fromEmailSearch"
+          id="fromEmailSearch"
+          role="combobox"
+          aria-autocomplete="list"
+          aria-expanded={isOpen}
+          aria-haspopup="listbox"
         /&gt;
         {selectedEmail && (
           &lt;button
@@ -292,7 +312,14 @@ export default function FromEmailSelect({
 
       {/* Dropdown Results */}
       {isOpen && (filteredEmails.length &gt; 0 || loading) && (
-        &lt;div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg" style={{ maxHeight: 'calc(10 * 3.5rem)', overflowY: 'auto' }}&gt;
+        &lt;div 
+          className="absolute w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg" 
+          style={{ 
+            maxHeight: 'calc(10 * 3.5rem)', 
+            overflowY: 'auto',
+            zIndex: 9999
+          }}
+        &gt;
           {loading ? (
             &lt;div className="p-4 text-center text-gray-500"&gt;Loading email addresses...&lt;/div&gt;
           ) : filteredEmails.length === 0 ? (
@@ -308,7 +335,9 @@ export default function FromEmailSelect({
                   }`}
                 &gt;
                   &lt;div className="flex items-center gap-2"&gt;
-                    &lt;FaEnvelope className="text-gray-400 flex-shrink-0" /&gt;
+                    &lt;svg className="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"&gt;
+                      &lt;path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /&gt;
+                    &lt;/svg&gt;
                     &lt;div className="flex-1"&gt;
                       &lt;div className="font-medium text-gray-900"&gt;
                         {email.emailAddress}
@@ -542,6 +571,23 @@ import FromEmailSelect from '@/components/FromEmailSelect';
             <li>Hover: <code>hover:bg-blue-50</code></li>
         </ul>
 
+        <h2>Browser Autocomplete Prevention</h2>
+        <div class="warning">
+            <strong>Important:</strong> Browsers may show their own autocomplete dropdown (with saved email addresses) which can hide the custom tenant email dropdown. The component includes several techniques to prevent this:
+        </div>
+        <ul>
+            <li><strong>Input Type:</strong> Uses <code>type="text"</code> instead of <code>type="email"</code> to prevent browser email autocomplete</li>
+            <li><strong>Autocomplete Attributes:</strong> Uses <code>autoComplete="off"</code>, <code>autoCapitalize="off"</code>, <code>autoCorrect="off"</code>, and <code>spellCheck="false"</code></li>
+            <li><strong>Non-Standard Field Name:</strong> Uses <code>name="fromEmailSearch"</code> and <code>id="fromEmailSearch"</code> instead of standard email field names</li>
+            <li><strong>Password Manager Attributes:</strong> Includes <code>data-lpignore="true"</code> (LastPass), <code>data-1p-ignore="true"</code> (1Password), and <code>data-form-type="other"</code></li>
+            <li><strong>High Z-Index:</strong> Dropdown uses <code>z-index: 9999</code> to ensure it appears above browser autocomplete</li>
+            <li><strong>CSS Isolation:</strong> Container uses <code>isolation: 'isolate'</code> to create a new stacking context</li>
+            <li><strong>ARIA Attributes:</strong> Includes <code>role="combobox"</code>, <code>aria-autocomplete="list"</code>, <code>aria-expanded</code>, and <code>aria-haspopup="listbox"</code> for proper accessibility</li>
+        </ul>
+        <div class="note">
+            <strong>Note:</strong> If browser autocomplete still appears, it may be necessary to add a hidden fake email input that the browser can autocomplete instead, keeping the search input free from interference. However, the current implementation should work for most browsers.
+        </div>
+
         <h2>Error Handling</h2>
         <div class="warning">
             <strong>Important:</strong> The component handles API errors gracefully by:
@@ -564,6 +610,8 @@ import FromEmailSelect from '@/components/FromEmailSelect';
             <li>✅ Type filtering works when <code>filterByType</code> is provided</li>
             <li>✅ Component works in both create and edit forms</li>
             <li>✅ Required validation works correctly</li>
+            <li>✅ Browser autocomplete dropdown does not appear or hide the custom dropdown</li>
+            <li>✅ Custom dropdown is visible above any browser autocomplete suggestions</li>
         </ol>
 
         <h2>Migration Guide</h2>

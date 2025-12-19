@@ -9,6 +9,7 @@ import RecurrencePreview from '@/components/RecurrencePreview';
 import type { RecurrencePattern, RecurrenceEndType } from '@/lib/recurrenceUtils';
 import { validateRecurrenceEndDate, generateOccurrenceDates } from '@/lib/recurrenceUtils';
 import { useRouter } from 'next/navigation';
+import FromEmailSelect from '@/components/FromEmailSelect';
 
 interface EventFormProps {
   event?: EventDetailsDTO;
@@ -1599,18 +1600,11 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
             <strong>From Email Field:</strong> The email address used in the "From Email" field must be registered and verified with AWS SES (Amazon Simple Email Service). Contact your administrator for help.
           </p>
         </div>
-        <label htmlFor="fromEmail" className="block text-sm font-medium text-gray-700 mb-1">
-          From Email <span className="text-red-500">*</span>
-        </label>
-        <input
-          type="email"
-          id="fromEmail"
-          name="fromEmail"
-          value={form.fromEmail || ''}
-          onChange={(e) => {
-            const value = e.target.value;
-            setForm(prev => ({ ...prev, fromEmail: value }));
-            // Clear error when user starts typing
+        <FromEmailSelect
+          value={form.fromEmail}
+          onChange={(email) => {
+            setForm(prev => ({ ...prev, fromEmail: email || '' }));
+            // Clear error when user selects an email
             if (errors.fromEmail) {
               setErrors(prev => {
                 const newErrors = { ...prev };
@@ -1619,31 +1613,11 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
               });
             }
           }}
-          onBlur={() => {
-            // Validate email format on blur
-            const email = form.fromEmail || '';
-            if (!email.trim()) {
-              setErrors(prev => ({ ...prev, fromEmail: 'From email is required' }));
-            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-              setErrors(prev => ({ ...prev, fromEmail: 'Please enter a valid email address' }));
-            }
-          }}
           required
-          className={`mt-1 block w-full border rounded-md px-3 py-2 text-base ${
-            errors.fromEmail
-              ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-              : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
-          }`}
-          placeholder="e.g., events@example.com"
-          pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-          title="Please enter a valid email address"
         />
         {errors.fromEmail && (
           <p className="mt-1 text-sm text-red-600">{errors.fromEmail}</p>
         )}
-        <p className="mt-1 text-sm text-gray-500">
-          The email address that will appear as the sender of event-related emails (ticket confirmations, etc.).
-        </p>
       </div>
 
       {/* Error Summary Display - Above the save button */}
