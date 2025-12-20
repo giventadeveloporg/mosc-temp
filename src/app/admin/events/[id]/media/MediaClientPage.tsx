@@ -1,7 +1,7 @@
 "use client";
 import React, { useRef, useState, useEffect } from "react";
 import { EventMediaDTO, EventDetailsDTO } from "@/types";
-import { FaEdit, FaTrashAlt, FaUpload, FaFolderOpen, FaSpinner, FaUsers, FaPhotoVideo, FaCalendarAlt, FaBan, FaTicketAlt, FaTimes, FaCheckCircle } from 'react-icons/fa';
+import { FaEdit, FaTrashAlt, FaUpload, FaFolderOpen, FaSpinner, FaBan, FaTimes, FaCheckCircle } from 'react-icons/fa';
 import { deleteMediaServer, editMediaServer } from './ApiServerActions';
 import { createPortal } from "react-dom";
 import Link from 'next/link';
@@ -637,26 +637,100 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
 
   return (
     <div className="p-8 max-w-4xl mx-auto bg-white rounded shadow" style={{ paddingTop: '118px' }}>
-      <div className="mb-8">
-        <div className="bg-white rounded-lg shadow-md p-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Link href="/admin/manage-usage" className="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg p-4 transition duration-300 font-semibold">
-              <FaUsers className="text-3xl mb-2" />
-              <span>Manage Users [Usage]</span>
-            </Link>
-            <Link href="/admin/manage-events" className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-lg p-4 transition duration-300 font-semibold">
-              <FaCalendarAlt className="text-3xl mb-2" />
-              <span>Manage Events</span>
-            </Link>
-            <Link href={`/admin/events/${eventId}/ticket-types/list`} className="flex flex-col items-center justify-center bg-purple-50 hover:bg-purple-100 text-purple-800 rounded-lg p-4 transition duration-300 font-semibold">
-              <FaTicketAlt className="text-3xl mb-2" />
-              <span>Manage Ticket Types</span>
-            </Link>
-            <Link href={`/admin/events/${eventId}/media/list`} className="flex flex-col items-center justify-center bg-orange-50 hover:bg-orange-100 text-orange-800 rounded-lg p-4 transition duration-300 font-semibold">
-              <FaPhotoVideo className="text-3xl mb-2" />
-              <span>Manage Media Files</span>
-            </Link>
-          </div>
+      {/* Responsive Button Group */}
+      <div className="w-full mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <Link
+            href="/admin"
+            className="flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 text-gray-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+            title="Admin Home"
+            aria-label="Admin Home"
+          >
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-gray-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-10 h-10 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+            </div>
+            <span className="font-semibold text-center leading-tight">Admin Home</span>
+          </Link>
+          <Link
+            href="/admin/manage-usage"
+            className="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+            title="Manage Usage"
+            aria-label="Manage Usage"
+          >
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            </div>
+            <span className="font-semibold text-center leading-tight">Manage Usage</span>
+          </Link>
+          <Link
+            href={`/admin/events/${eventId}/media/list`}
+            className="flex flex-col items-center justify-center bg-yellow-50 hover:bg-yellow-100 text-yellow-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+            title="Manage Media Files"
+            aria-label="Manage Media Files"
+          >
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-yellow-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-10 h-10 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <span className="font-semibold text-center leading-tight">Manage Media Files</span>
+          </Link>
+          <Link
+            href="/admin/manage-events"
+            className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+            title="Manage Events"
+            aria-label="Manage Events"
+          >
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <span className="font-semibold text-center leading-tight">Manage Events</span>
+          </Link>
+          <Link
+            href={`/admin/events/${eventId}/ticket-types/list`}
+            className="flex flex-col items-center justify-center bg-purple-50 hover:bg-purple-100 text-purple-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+            title="Manage Ticket Types"
+            aria-label="Manage Ticket Types"
+          >
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-10 h-10 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+              </svg>
+            </div>
+            <span className="font-semibold text-center leading-tight">Manage Ticket Types</span>
+          </Link>
+          <Link
+            href={`/admin/events/${eventId}/tickets/list`}
+            className="flex flex-col items-center justify-center bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+            title="Manage Tickets"
+            aria-label="Manage Tickets"
+          >
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-teal-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-10 h-10 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4v-3a2 2 0 00-2-2H5z" />
+              </svg>
+            </div>
+            <span className="font-semibold text-center leading-tight">Manage Tickets</span>
+          </Link>
+          <Link
+            href={`/admin/events/${eventId}/discount-codes/list`}
+            className="flex flex-col items-center justify-center bg-pink-50 hover:bg-pink-100 text-pink-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+            title="Manage Discount Codes"
+            aria-label="Manage Discount Codes"
+          >
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-pink-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-10 h-10 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <span className="font-semibold text-center leading-tight">Manage Discount Codes</span>
+          </Link>
         </div>
       </div>
       {/* Upload Files and Go to Uploaded Media buttons at the top */}
@@ -1182,23 +1256,27 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
                       <td className="p-2 border align-middle">{media.createdAt ? new Date(media.createdAt).toLocaleString() : ''}</td>
                       <td className="p-2 border align-middle flex gap-2 items-center justify-center">
                         <button
-                          className="icon-btn icon-btn-edit flex flex-col items-center"
+                          className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
                           title="Edit"
+                          aria-label="Edit"
                           onClick={() => {
                             console.log('Edit icon clicked', media);
                             setEditMedia(media);
                           }}
                         >
-                          <FaEdit />
-                          <span className="text-[10px] text-gray-600 mt-1">Edit</span>
+                          <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
                         </button>
                         <button
-                          className="icon-btn icon-btn-delete flex flex-col items-center"
+                          className="flex-shrink-0 w-14 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
                           onClick={() => handleDelete(media.id!)}
                           title="Delete"
+                          aria-label="Delete"
                         >
-                          <FaTrashAlt />
-                          <span className="text-[10px] text-gray-600 mt-1">Delete</span>
+                          <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
                         </button>
                       </td>
                     </tr>
@@ -1305,23 +1383,29 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
                         </div>
                       </div>
                     </div>
-                    <div className="p-4 pt-0 flex justify-end space-x-2">
+                    <div className="p-4 pt-0 flex justify-end gap-2">
                       <button
                         onClick={() => {
                           console.log('Edit icon clicked', media);
                           setEditMedia(media);
                         }}
-                        className="text-blue-500 hover:text-blue-700 p-2 rounded-full"
+                        className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
                         title="Edit Media"
+                        aria-label="Edit Media"
                       >
-                        <FaEdit size={20} />
+                        <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
                       </button>
                       <button
                         onClick={() => handleDelete(media.id!)}
-                        className="text-red-500 hover:text-red-700 p-2 rounded-full"
+                        className="flex-shrink-0 w-14 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
                         title="Delete Media"
+                        aria-label="Delete Media"
                       >
-                        <FaTrashAlt size={20} />
+                        <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
                       </button>
                     </div>
                   </div>

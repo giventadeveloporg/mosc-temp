@@ -716,21 +716,29 @@ export default function PromotionEmailTemplateEditClient({
           </div>
 
           {/* Form Actions */}
-          <div className="flex gap-4 pt-4">
+          <div className="flex flex-row gap-3 pt-4">
             <button
               type="submit"
               disabled={saving}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 disabled:opacity-50"
+              className="flex-1 flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+              title={saving ? 'Saving...' : 'Update Template'}
+              aria-label={saving ? 'Saving...' : 'Update Template'}
             >
-              <FaSave />
-              {saving ? 'Saving...' : 'Update Template'}
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                <FaSave className="w-6 h-6 text-blue-600" />
+              </div>
+              <span className="font-semibold text-blue-700">{saving ? 'Saving...' : 'Update Template'}</span>
             </button>
             <Link
               href="/admin/promotion-emails"
-              className="bg-teal-100 hover:bg-teal-200 text-teal-800 px-4 py-2 rounded-md flex items-center gap-2"
+              className="flex-1 flex-shrink-0 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105"
+              title="Cancel"
+              aria-label="Cancel"
             >
-              <FaBan />
-              Cancel
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-200 flex items-center justify-center">
+                <FaBan className="w-6 h-6 text-red-600" />
+              </div>
+              <span className="font-semibold text-red-700">Cancel</span>
             </Link>
           </div>
         </form>

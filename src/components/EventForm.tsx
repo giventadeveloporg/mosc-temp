@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { flushSync } from 'react-dom';
 import type { EventDetailsDTO, EventTypeDetailsDTO } from '@/types';
 import timezones from '@/lib/timezones'; // (We'll create this file for the IANA timezone list)
 import { FaCalendarAlt, FaEnvelope } from 'react-icons/fa';
@@ -55,6 +56,7 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
   const [form, setForm] = useState<EventDetailsDTO>({ ...defaultEvent, ...event });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showErrors, setShowErrors] = useState(false);
+  const [isEmailListEmpty, setIsEmailListEmpty] = useState(false);
 
   // Fundraiser/Charity/Givebutter configuration state
   const [isFundraiserEvent, setIsFundraiserEvent] = useState(false);
@@ -172,17 +174,25 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
   }, [isFundraiserEvent, isCharityEvent]);
 
   // Function to scroll to the first error field
-  const scrollToFirstError = () => {
-    const firstErrorField = Object.keys(errors)[0];
+  const scrollToFirstError = (errorObj?: Record<string, string>) => {
+    // Use provided errors or fall back to state
+    const errorsToUse = errorObj || errors;
+    const firstErrorField = Object.keys(errorsToUse)[0];
     if (firstErrorField && fieldRefs.current[firstErrorField]) {
       const field = fieldRefs.current[firstErrorField];
+      // Scroll to field but DON'T focus it immediately
+      // This allows all fields to show red borders before focusing
       field.scrollIntoView({
         behavior: 'smooth',
         block: 'center',
         inline: 'nearest'
       });
-      // Focus the field for better UX
-      field.focus();
+      // Delay focus slightly to ensure all fields have rendered with red borders
+      setTimeout(() => {
+        if (fieldRefs.current[firstErrorField]) {
+          fieldRefs.current[firstErrorField]?.focus();
+        }
+      }, 100);
     }
   };
 
@@ -232,9 +242,23 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
     if (!form.timezone) errs.timezone = 'Timezone is required';
 
     // Validate fromEmail
-    if (!form.fromEmail || !form.fromEmail.trim()) {
-      errs.fromEmail = 'From email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.fromEmail.trim())) {
+    // First check: Is the email list empty?
+    if (isEmailListEmpty) {
+      errs.fromEmail = 'The from email list is empty. Please contact Admin to add the list of from email addresses.';
+    }
+    // Second check: Is the fromEmail field empty or just whitespace?
+    // CRITICAL: This must catch untouched fields (empty string), null, undefined, and whitespace-only
+    // The field is initialized as '' (empty string) in defaultEvent, so we need to check for that
+    const fromEmailValue = form.fromEmail;
+    const isFromEmailEmpty = !fromEmailValue ||
+                             fromEmailValue === '' ||
+                             (typeof fromEmailValue === 'string' && fromEmailValue.trim() === '');
+
+    if (isFromEmailEmpty) {
+      errs.fromEmail = 'Please enter from email address';
+    }
+    // Third check: Is the email format valid?
+    else if (typeof fromEmailValue === 'string' && fromEmailValue.trim() !== '' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fromEmailValue.trim())) {
       errs.fromEmail = 'Please enter a valid email address';
     }
 
@@ -339,18 +363,24 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
       }
     }
 
-    setErrors(errs);
+    // CRITICAL: Use flushSync to force immediate state update so red borders appear instantly
+    const hasErrors = Object.keys(errs).length > 0;
 
-    // If there are errors, show them and scroll to first error
-    if (Object.keys(errs).length > 0) {
-      setShowErrors(true);
-      // Use setTimeout to ensure state update completes before scrolling
-      setTimeout(() => {
-        scrollToFirstError();
-      }, 100);
+    if (hasErrors) {
+      // Force synchronous state updates so fields show red borders immediately
+      flushSync(() => {
+        setErrors(errs);
+        setShowErrors(true);
+      });
+
+      // DO NOT scroll to first error - let all fields show red borders without navigation
+      // This ensures users can see all validation errors at once
+    } else {
+      setErrors({});
+      setShowErrors(false);
     }
 
-    return Object.keys(errs).length === 0;
+    return !hasErrors;
   }
 
   // Helper to convert '06:00 PM' to '18:00' for Date parsing
@@ -718,6 +748,7 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    e.stopPropagation(); // Prevent browser default validation and scrolling
     if (!validate()) return;
 
     // Clear any previous errors and hide error display
@@ -857,7 +888,7 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
   const getErrorCount = () => Object.keys(errors).length;
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4" noValidate>
       <div>
         <label className="block font-medium">Title * <span className="text-sm text-gray-500">({(form.title || '').length}/250)</span></label>
         <input
@@ -1163,7 +1194,6 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
           value={form.timezone || ''}
           onChange={handleChange}
           className={`w-full border rounded p-2 ${errors.timezone ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'}`}
-          required
         >
           <option value="">Select timezone</option>
           {timezones.map((tz) => (
@@ -1613,10 +1643,29 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
               });
             }
           }}
+          onEmptyListChange={(isEmpty) => {
+            setIsEmailListEmpty(isEmpty);
+            // Clear error if list becomes non-empty
+            if (!isEmpty && errors.fromEmail && errors.fromEmail.includes('empty')) {
+              setErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors.fromEmail;
+                return newErrors;
+              });
+            }
+          }}
+          error={!!errors.fromEmail}
           required
         />
         {errors.fromEmail && (
-          <p className="mt-1 text-sm text-red-600">{errors.fromEmail}</p>
+          <div className="mt-2 p-3 bg-red-50 border border-red-300 rounded-lg">
+            <div className="flex items-start">
+              <svg className="w-5 h-5 text-red-600 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p className="text-sm font-medium text-red-700">{errors.fromEmail}</p>
+            </div>
+          </div>
         )}
       </div>
 
@@ -1647,14 +1696,38 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
         </div>
       )}
 
-      <div className="flex gap-2 mt-4">
-        <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2" disabled={loading}>
-          {loading ? 'Saving...' : 'Save Event'}
+      <div className="flex flex-row gap-3 mt-4">
+        <button
+          type="submit"
+          className="flex-1 flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={loading}
+          title={loading ? 'Saving...' : 'Save Event'}
+          aria-label={loading ? 'Saving...' : 'Save Event'}
+        >
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+            <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <span className="font-semibold text-green-700">{loading ? 'Saving...' : 'Save Event'}</span>
         </button>
-        <button type="button" className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2" onClick={handleReset}>Reset</button>
         <button
           type="button"
-          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+          className="flex-1 flex-shrink-0 h-14 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105"
+          onClick={handleReset}
+          title="Reset Form"
+          aria-label="Reset Form"
+        >
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center">
+            <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+          </div>
+          <span className="font-semibold text-gray-700">Reset</span>
+        </button>
+        <button
+          type="button"
+          className="flex-1 flex-shrink-0 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105"
           onClick={() => {
             if (onCancel) {
               onCancel();
@@ -1662,8 +1735,15 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
               router.push('/admin/manage-events');
             }
           }}
+          title="Cancel"
+          aria-label="Cancel"
         >
-          Cancel
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-200 flex items-center justify-center">
+            <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </div>
+          <span className="font-semibold text-red-700">Cancel</span>
         </button>
       </div>
     </form>

@@ -363,23 +363,32 @@ export default function ManageEventsPage() {
       {/* Admin Navigation */}
       <AdminNavigation currentPage="manage-events" />
 
-      {/* Create Event Button - Matching admin homepage style */}
+      {/* Create Event Button */}
       <div className="flex justify-end mb-6">
         <Link
           href="/admin/events/new"
-          className="bg-blue-600 text-white px-4 py-2 rounded shadow font-bold flex items-center gap-2 hover:bg-blue-700 transition"
+          className="flex items-center justify-center gap-3 px-6 py-3 rounded-xl bg-blue-100 hover:bg-blue-200 transition-all duration-300 hover:scale-105"
+          title="Create Event"
+          aria-label="Create Event"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Create Event
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+          </div>
+          <span className="font-semibold text-blue-700">Create Event</span>
         </Link>
       </div>
 
       {/* Quick Action Buttons */}
-      <div className="w-full overflow-x-auto mb-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 justify-items-center mx-auto">
-          <Link href="/admin/events/new" className="w-full max-w-xs mx-auto flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg shadow-md p-4 text-xs transition-all group">
+      <div className="w-full mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <Link
+            href="/admin/events/new"
+            className="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+            title="Create New Event"
+            aria-label="Create New Event"
+          >
             <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
               <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -387,7 +396,12 @@ export default function ManageEventsPage() {
             </div>
             <span className="font-semibold text-center leading-tight">Create New<br />Event</span>
           </Link>
-          <Link href="/admin/event-analytics" className="w-full max-w-xs mx-auto flex flex-col items-center justify-center bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-lg shadow-md p-4 text-xs transition-all group">
+          <Link
+            href="/admin/event-analytics"
+            className="flex flex-col items-center justify-center bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+            title="Event Analytics Dashboard"
+            aria-label="Event Analytics Dashboard"
+          >
             <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-teal-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
               <svg className="w-10 h-10 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -395,7 +409,12 @@ export default function ManageEventsPage() {
             </div>
             <span className="font-semibold text-center leading-tight">Event Analytics<br />Dashboard</span>
           </Link>
-          <Link href="/admin/manage-usage" className="w-full max-w-xs mx-auto flex flex-col items-center justify-center bg-purple-50 hover:bg-purple-100 text-purple-800 rounded-lg shadow-md p-4 text-xs transition-all group">
+          <Link
+            href="/admin/manage-usage"
+            className="flex flex-col items-center justify-center bg-purple-50 hover:bg-purple-100 text-purple-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+            title="Manage Usage"
+            aria-label="Manage Usage"
+          >
             <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
               <svg className="w-10 h-10 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -403,7 +422,12 @@ export default function ManageEventsPage() {
             </div>
             <span className="font-semibold text-center leading-tight">Manage Usage<br />[Users]</span>
           </Link>
-          <Link href="/admin/communication" className="w-full max-w-xs mx-auto flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-lg shadow-md p-4 text-xs transition-all group">
+          <Link
+            href="/admin/communication"
+            className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+            title="Communication Center"
+            aria-label="Communication Center"
+          >
             <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
               <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -471,19 +495,34 @@ export default function ManageEventsPage() {
 
           {/* Event Filter Toggle */}
           <div className="flex justify-center items-center gap-4 mt-6">
-            <span className={`text-lg font-medium ${!showPastEvents ? 'text-blue-600' : 'text-gray-500'}`}>
+            <span className={`text-lg font-semibold transition-colors duration-300 ${!showPastEvents ? 'text-purple-600' : 'text-purple-300'}`}>
               Future Events
             </span>
             <button
               onClick={() => setShowPastEvents(!showPastEvents)}
-              className="relative inline-flex h-8 w-14 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              style={{ backgroundColor: showPastEvents ? '#3b82f6' : '#d1d5db' }}
+              className={`relative inline-flex h-10 w-16 items-center rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 hover:scale-105 ${
+                showPastEvents
+                  ? 'bg-blue-500 focus:ring-blue-500'
+                  : 'bg-purple-500 focus:ring-purple-500'
+              }`}
+              title={showPastEvents ? 'Show Future Events' : 'Show Past Events'}
+              aria-label={showPastEvents ? 'Show Future Events' : 'Show Past Events'}
             >
               <span
-                className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${showPastEvents ? 'translate-x-7' : 'translate-x-1'}`}
-              />
+                className={`inline-flex items-center justify-center h-8 w-8 transform rounded-full bg-white transition-transform duration-300 shadow-md ${showPastEvents ? 'translate-x-7' : 'translate-x-1'}`}
+              >
+                {showPastEvents ? (
+                  <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                )}
+              </span>
             </button>
-            <span className={`text-lg font-medium ${showPastEvents ? 'text-blue-600' : 'text-gray-500'}`}>
+            <span className={`text-lg font-semibold transition-colors duration-300 ${showPastEvents ? 'text-blue-600' : 'text-blue-300'}`}>
               Past Events
             </span>
           </div>
