@@ -13,8 +13,6 @@ import {
   FaTrash,
   FaTrashAlt,
   FaEye,
-  FaChevronLeft,
-  FaChevronRight,
   FaUserFriends,
   FaCalendarAlt,
   FaEnvelope,
@@ -29,6 +27,7 @@ import {
   FaClock
 } from 'react-icons/fa';
 import Link from 'next/link';
+import AdminNavigation from '@/components/AdminNavigation';
 
 interface RegistrationManagementClientProps {
   data: RegistrationManagementData;
@@ -366,38 +365,102 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
   const cancelledCount = Math.round(totalCount * cancelledRatio);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-      {/* Header */}
-      <div className="mb-12 pt-16">
-        <h1 className="text-4xl font-bold text-gray-900 mb-6">
-          Registration Management
-        </h1>
-        <div className="pt-4">
-          <p className="text-xl font-semibold text-gray-700 leading-relaxed">
+    <div className="max-w-5xl mx-auto px-8 py-8" style={{ paddingTop: '180px' }}>
+      {/* Header with back button */}
+      <div className="flex items-center mb-8">
+        <Link
+          href="/admin"
+          className="flex items-center text-blue-600 hover:text-blue-800 mr-4"
+        >
+          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to Admin
+        </Link>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Registration Management</h1>
+          <p className="text-gray-600">
             {selectedEvent ? (
               <>
                 Manage registrations for{' '}
-                <span className="text-blue-600 font-bold">{selectedEvent.title}</span>
+                <span className="text-blue-600 font-semibold">{selectedEvent.title}</span>
               </>
             ) : (
-              <span className="text-gray-600">Search by event to view registrations</span>
+              'Search by event to view registrations'
             )}
-        </p>
+          </p>
+        </div>
+      </div>
+
+      {/* Admin Navigation */}
+      <AdminNavigation currentPage="event-registrations" />
+
+      {/* Quick Action Buttons */}
+      <div className="w-full mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <Link
+            href="/admin/manage-events"
+            className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+            title="Manage Events"
+            aria-label="Manage Events"
+          >
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <span className="font-semibold text-center leading-tight">Manage Events</span>
+          </Link>
+          <Link
+            href="/admin/manage-usage"
+            className="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+            title="Manage Usage"
+            aria-label="Manage Usage"
+          >
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            </div>
+            <span className="font-semibold text-center leading-tight">Manage Usage<br />[Users]</span>
+          </Link>
+          <Link
+            href="/admin/event-analytics"
+            className="flex flex-col items-center justify-center bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+            title="Event Analytics Dashboard"
+            aria-label="Event Analytics Dashboard"
+          >
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-teal-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-10 h-10 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <span className="font-semibold text-center leading-tight">Event Analytics<br />Dashboard</span>
+          </Link>
+          <Link
+            href="/admin/communication"
+            className="flex flex-col items-center justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+            title="Communication Center"
+            aria-label="Communication Center"
+          >
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-indigo-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-10 h-10 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <span className="font-semibold text-center leading-tight">Communication<br />Center</span>
+          </Link>
         </div>
       </div>
 
       {/* Event Search Section - Show when no event selected */}
       {!hasSelectedEvent && (
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <div className="flex items-center gap-2 mb-4">
-            <FaInfoCircle className="text-blue-600" />
-            <h2 className="text-xl font-semibold text-gray-900">
-              Search for an Event
-            </h2>
-          </div>
-          <p className="text-gray-600 mb-6">
-            Please search for an event by Event ID, Event Name, or Date Range to view its registrations.
-          </p>
+        <div className="mb-6">
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+            <div className="text-lg font-semibold text-blue-800 mb-4">Search for an Event</div>
+            <p className="text-gray-600 mb-6">
+              Please search for an event by Event ID, Event Name, or Date Range to view its registrations.
+            </p>
 
           {/* Event Search Type */}
           <div className="mb-4">
@@ -494,10 +557,14 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
               (eventSearchType === 'name' && (!eventSearchName || eventSearchName.trim() === '')) ||
               (eventSearchType === 'dateRange' && (!eventStartDate || !eventEndDate))
             }
-            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="flex items-center justify-center gap-3 px-6 py-3 rounded-xl bg-blue-100 hover:bg-blue-200 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            title="Search Events"
+            aria-label="Search Events"
           >
-            <FaSearch />
-            {isSearchingEvents ? 'Searching...' : 'Search Events'}
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+              <FaSearch className="w-6 h-6 text-blue-600" />
+            </div>
+            <span className="font-semibold text-blue-700">{isSearchingEvents ? 'Searching...' : 'Search Events'}</span>
           </button>
 
           {/* Search Results */}
@@ -555,11 +622,13 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
             </select>
           </div>
         </div>
+        </div>
       )}
 
       {/* Filters and Actions - Only show when event is selected */}
       {hasSelectedEvent && (
-        <div className="bg-white rounded-lg shadow p-3 sm:p-4 lg:p-6 mb-4 sm:mb-6 overflow-x-auto">
+        <div className="mb-6">
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2 sm:gap-3 lg:gap-4 mb-4 min-w-fit">
           {/* Search Type Dropdown */}
           <div className="relative">
@@ -631,31 +700,37 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
           {/* Export Button */}
           <button
             onClick={handleExportCSV}
-              className="flex items-center justify-center px-4 py-2.5 sm:py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors touch-manipulation text-sm sm:text-base"
+            className="flex items-center justify-center gap-3 px-4 py-2.5 rounded-xl bg-green-100 hover:bg-green-200 transition-all duration-300 hover:scale-105 touch-manipulation"
+            title="Export CSV"
+            aria-label="Export CSV"
           >
-              <FaDownload className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-            Export CSV
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+              <FaDownload className="w-6 h-6 text-green-600" />
+            </div>
+            <span className="font-semibold text-green-700 text-sm sm:text-base">Export CSV</span>
           </button>
         </div>
 
         {/* Results Summary */}
-        <div className="flex items-center justify-between text-sm text-gray-600">
+        <div className="flex items-center justify-between text-sm text-gray-600 mt-4">
           <span>
             Showing {attendees.length} of {totalCount} registrations
           </span>
           {selectedAttendees.length > 0 && (
-            <span className="text-blue-600">
+            <span className="text-blue-600 font-semibold">
               {selectedAttendees.length} selected
             </span>
           )}
         </div>
-      </div>
+          </div>
+        </div>
       )}
 
       {/* Event Analytics - Only show when event is selected */}
       {hasSelectedEvent && (
-        <div className="bg-white rounded-lg shadow px-1.5 py-2 sm:px-3 sm:py-3 lg:p-6 mb-4 sm:mb-6 w-full overflow-hidden">
-          <h2 className="text-xs sm:text-sm lg:text-lg font-semibold text-gray-900 mb-1.5 sm:mb-2 lg:mb-4 px-0.5 sm:px-1">Event Registration Analytics</h2>
+        <div className="mb-6">
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold text-blue-800 mb-4">Event Registration Analytics</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1 sm:gap-2 lg:gap-4 w-full">
             {/* Total People Registered */}
             <div className="bg-blue-50 rounded-md sm:rounded-lg p-1 sm:p-2 lg:p-4 min-w-0 flex flex-col">
@@ -711,6 +786,7 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
               <p className="text-xs sm:text-base lg:text-2xl font-bold text-gray-900 truncate">{cancelledCount.toLocaleString()}</p>
             </div>
           </div>
+        </div>
         </div>
       )}
 
@@ -910,30 +986,36 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
             </div>
         </div>
 
-          {/* Pagination - Matching admin home page style */}
+          {/* Pagination - Matching manage-events page style */}
           <div className="mt-4 px-2 sm:px-0">
             <div className="flex justify-between items-center flex-wrap gap-2">
               <button
+                type="button"
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="px-3 sm:px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors text-sm sm:text-base"
+                className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
               >
-                <FaChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
-                <span className="hidden sm:inline">Previous</span>
+                <svg className="w-5 h-5" fill="none" stroke="white" strokeWidth="3" viewBox="0 0 24 24" style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+                <span>Previous</span>
               </button>
-              <div className="text-xs sm:text-sm font-semibold text-gray-700 px-2">
+              <div className="text-sm font-semibold text-gray-700 px-2">
                 Page {currentPage} of {totalPages}
-            </div>
-                  <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                className="px-3 sm:px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors text-sm sm:text-base"
-                  >
-                <span className="hidden sm:inline">Next</span>
-                <FaChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
-                  </button>
               </div>
-            <div className="text-center text-xs sm:text-sm text-gray-600 mt-2">
+              <button
+                type="button"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+              >
+                <span>Next</span>
+                <svg className="w-5 h-5" fill="none" stroke="white" strokeWidth="3" viewBox="0 0 24 24" style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+            <div className="text-center text-sm text-gray-600 mt-2">
               Showing <span className="font-medium">{startItem}</span> to <span className="font-medium">{endItem}</span> of{' '}
               <span className="font-medium">{totalCount}</span> registrations
             </div>
@@ -944,16 +1026,30 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
       {/* Action Buttons */}
       <div className="mt-8 flex justify-center space-x-4">
         <Link
-          href="/admin/events/dashboard"
-          className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-md font-semibold"
+          href="/admin/manage-events"
+          className="flex items-center justify-center gap-3 px-6 py-3 rounded-xl bg-green-100 hover:bg-green-200 transition-all duration-300 hover:scale-105"
+          title="Back to Manage Events"
+          aria-label="Back to Manage Events"
         >
-          Back to Dashboard
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+            <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <span className="font-semibold text-green-700">Back to Manage Events</span>
         </Link>
         <Link
           href="/admin/event-analytics"
-          className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-md font-semibold"
+          className="flex items-center justify-center gap-3 px-6 py-3 rounded-xl bg-teal-100 hover:bg-teal-200 transition-all duration-300 hover:scale-105"
+          title="Event Analytics"
+          aria-label="Event Analytics"
         >
-          Event Analytics
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
+            <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </div>
+          <span className="font-semibold text-teal-700">Event Analytics</span>
         </Link>
       </div>
 

@@ -24,6 +24,9 @@ export async function fetchPromotionEmailTemplatesServer(params?: {
   const baseUrl = getAppUrl();
   const queryParams = new URLSearchParams();
 
+  // Always scope promotion emails to EVENT_PROMOTION template type
+  queryParams.append('templateType.equals', 'EVENT_PROMOTION');
+
   if (params?.eventId) {
     queryParams.append('eventId.equals', params.eventId.toString());
   }
@@ -114,6 +117,8 @@ export async function createPromotionEmailTemplateServer(
   const payload = {
     eventId: formData.eventId,
     templateName: formData.templateName,
+    // Promotion emails are always EVENT_PROMOTION template type
+    templateType: formData.templateType || 'EVENT_PROMOTION',
     subject: formData.subject,
     fromEmail: formData.fromEmail.trim(), // Explicitly include and trim
     bodyHtml: formData.bodyHtml,
@@ -168,6 +173,8 @@ export async function updatePromotionEmailTemplateServer(
     ...formData,
     id,
     updatedAt: now,
+    // Ensure templateType is always present for promotion emails
+    templateType: formData.templateType || 'EVENT_PROMOTION',
     // Explicitly include fromEmail if provided to ensure it's sent to backend
     ...(formData.fromEmail !== undefined && { fromEmail: formData.fromEmail }),
     // Footer HTML is hidden, pass as null

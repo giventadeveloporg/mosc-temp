@@ -46,11 +46,6 @@ const navItems = [
     active: false
   },
   {
-    name: 'Team',
-    href: '/#team-section',
-    active: false
-  },
-  {
     name: 'Contact',
     href: '/#contact',
     active: false
@@ -74,7 +69,7 @@ const adminSubmenuItems = [
       { name: 'Subscriptions', href: '/admin/membership/subscriptions' }
     ]
   },
-  { name: 'Promotion Emails', href: '/admin/promotion-emails' },
+  { name: 'Bulk Email', href: '/admin/bulk-email' },
   { name: 'Test Stripe', href: '/admin/test-stripe' },
   { name: 'Media Management', href: '/admin/media' },
   { name: 'Executive Committee', href: '/admin/executive-committee' },
@@ -92,28 +87,149 @@ type HeaderProps = {
 const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
   console.log('[Header] handleSmoothScroll called with:', href);
 
-  if (!href.startsWith('#')) return;
+  // Handle both '#section' and '/#section' formats
+  if (!href.startsWith('#') && !href.startsWith('/#')) return;
 
   e.preventDefault();
   console.log('[Header] Preventing default and handling hash navigation');
 
+  // Extract the hash part (handle both '#section' and '/#section')
+  const hashPart = href.startsWith('/#') ? href.substring(1) : href; // '/#team-section' -> '#team-section'
+  const targetId = hashPart.substring(1); // '#team-section' -> 'team-section'
+
   // If we're not on the home page, navigate there first
   if (typeof window !== 'undefined' && window.location.pathname !== '/') {
-    console.log('[Header] Not on home page, navigating to:', `/${href}`);
+    console.log('[Header] Not on home page, navigating to:', `/${hashPart}`);
+    // Show loading indicator for team section navigation
+    if (targetId === 'team-section') {
+      showNavigationLoading();
+    }
     // Navigate to home page with hash
-    window.location.href = `/${href}`;
+    window.location.href = `/${hashPart}`;
     return;
   }
 
-  // If we're on the home page, update the URL hash and let the page handle scrolling
-  const targetId = href.substring(1);
-  console.log('[Header] On home page, updating hash to:', targetId);
+  // If we're on the home page, update the URL hash and scroll
+  console.log('[Header] On home page, updating hash to:', hashPart);
+
+  // Show loading indicator for team section
+  if (targetId === 'team-section') {
+    showNavigationLoading();
+  }
 
   // Update the URL hash
-  window.history.pushState(null, '', href);
+  window.history.pushState(null, '', hashPart);
 
-  // Trigger a hashchange event to let the page component handle the scrolling
+  // Wait for element to exist before scrolling (especially important for dynamically loaded sections)
+  const headerHeight = 80;
+  const maxWaitTime = 10000; // 10 seconds max wait
+  const pollInterval = 100; // Check every 100ms
+  const startTime = Date.now();
+
+  const waitForElementAndScroll = () => {
+    const targetElement = document.getElementById(targetId);
+
+    if (targetElement) {
+      // Element exists, scroll to it
+      const targetPosition = targetElement.offsetTop - headerHeight - 20;
+      window.scrollTo({ top: Math.max(0, targetPosition), behavior: 'smooth' });
+      hideNavigationLoading();
+      console.log('[Header] Successfully scrolled to:', targetId);
+      return true;
+    }
+
+    // Element doesn't exist yet
+    const elapsed = Date.now() - startTime;
+    if (elapsed < maxWaitTime) {
+      // Keep waiting
+      setTimeout(waitForElementAndScroll, pollInterval);
+      return false;
+    } else {
+      // Timeout reached
+      console.warn('[Header] Timeout waiting for element:', targetId);
+      hideNavigationLoading();
+      return false;
+    }
+  };
+
+  // Start waiting for element
+  waitForElementAndScroll();
+
+  // Also trigger a hashchange event to let the page component handle the scrolling
   window.dispatchEvent(new HashChangeEvent('hashchange'));
+};
+
+// Loading indicator functions
+let loadingIndicator: HTMLElement | null = null;
+
+const showNavigationLoading = () => {
+  if (typeof window === 'undefined') return;
+
+  // Remove existing indicator if any
+  hideNavigationLoading();
+
+  // Create loading indicator
+  loadingIndicator = document.createElement('div');
+  loadingIndicator.id = 'navigation-loading-indicator';
+  loadingIndicator.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    backdrop-filter: blur(4px);
+  `;
+
+  // Create spinner
+  const spinner = document.createElement('div');
+  spinner.style.cssText = `
+    width: 48px;
+    height: 48px;
+    border: 4px solid #e5e7eb;
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  `;
+
+  // Add keyframes if not already present
+  if (!document.getElementById('navigation-loading-styles')) {
+    const style = document.createElement('style');
+    style.id = 'navigation-loading-styles';
+    style.textContent = `
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  // Create text
+  const text = document.createElement('div');
+  text.textContent = 'Loading team section...';
+  text.style.cssText = `
+    margin-top: 16px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #3b82f6;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  `;
+
+  loadingIndicator.appendChild(spinner);
+  loadingIndicator.appendChild(text);
+  document.body.appendChild(loadingIndicator);
+};
+
+const hideNavigationLoading = () => {
+  if (loadingIndicator && loadingIndicator.parentNode) {
+    loadingIndicator.parentNode.removeChild(loadingIndicator);
+    loadingIndicator = null;
+  }
 };
 
 export default function Header({ hideMenuItems = false, variant = 'charity', isTenantAdmin }: HeaderProps) {
@@ -233,10 +349,43 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
       const hash = window.location.hash;
       if (!hash || (window.location.pathname !== '/' && window.location.pathname !== '/charity-theme')) return;
       const targetId = hash.replace('#', '');
-      const targetElement = document.getElementById(targetId);
-      if (!targetElement) return;
-      const targetPosition = targetElement.offsetTop - headerHeight - 20;
-      window.scrollTo({ top: Math.max(0, targetPosition), behavior });
+
+      // Show loading indicator for team section
+      if (targetId === 'team-section') {
+        showNavigationLoading();
+      }
+
+      // Wait for element to exist before scrolling (especially important for dynamically loaded sections)
+      const maxWaitTime = 10000; // 10 seconds max wait
+      const pollInterval = 100; // Check every 100ms
+      const startTime = Date.now();
+
+      const waitForElementAndScroll = () => {
+        const targetElement = document.getElementById(targetId);
+
+        if (targetElement) {
+          // Element exists, scroll to it
+          const targetPosition = targetElement.offsetTop - headerHeight - 20;
+          window.scrollTo({ top: Math.max(0, targetPosition), behavior });
+          hideNavigationLoading();
+          console.log('[Header useEffect] Successfully scrolled to:', targetId);
+          return;
+        }
+
+        // Element doesn't exist yet
+        const elapsed = Date.now() - startTime;
+        if (elapsed < maxWaitTime) {
+          // Keep waiting
+          setTimeout(waitForElementAndScroll, pollInterval);
+        } else {
+          // Timeout reached
+          console.warn('[Header useEffect] Timeout waiting for element:', targetId);
+          hideNavigationLoading();
+        }
+      };
+
+      // Start waiting for element
+      waitForElementAndScroll();
     };
 
     if ((window.location.pathname === '/' || window.location.pathname === '/charity-theme') && window.location.hash) {
@@ -247,7 +396,10 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
 
     const onHashChange = () => scrollToHashWithOffset('smooth');
     window.addEventListener('hashchange', onHashChange);
-    return () => window.removeEventListener('hashchange', onHashChange);
+    return () => {
+      window.removeEventListener('hashchange', onHashChange);
+      hideNavigationLoading();
+    };
   }, [pathname]);
 
   // Build About dropdown dynamically based on tenant settings

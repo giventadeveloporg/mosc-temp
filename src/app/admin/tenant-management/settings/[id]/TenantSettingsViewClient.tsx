@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FaCog, FaCode, FaToggleOn, FaToggleOff, FaExternalLinkAlt } from 'react-icons/fa';
+import { FaCog, FaCode } from 'react-icons/fa';
 import { TenantSettingsDTO, TenantOrganizationDTO } from '@/app/admin/tenant-management/types';
 
 interface TenantSettingsViewClientProps {
@@ -15,33 +15,84 @@ interface TenantSettingsViewClientProps {
 export default function TenantSettingsViewClient({ settings, settingsId, organization }: TenantSettingsViewClientProps) {
   const [activeTab, setActiveTab] = useState<'general' | 'integrations' | 'limits' | 'customization'>('general');
 
-  // Tab navigation
+  // Tab navigation with colorful icons
   const tabs = [
-    { id: 'general' as const, label: 'General', icon: FaCog },
-    { id: 'integrations' as const, label: 'Integrations', icon: FaCode },
-    { id: 'limits' as const, label: 'Limits', icon: FaCog },
-    { id: 'customization' as const, label: 'Customization', icon: FaCode }
+    { id: 'general' as const, label: 'General', icon: FaCog, color: 'blue' },
+    { id: 'integrations' as const, label: 'Integrations', icon: FaCode, color: 'green' },
+    { id: 'limits' as const, label: 'Limits', icon: FaCog, color: 'purple' },
+    { id: 'customization' as const, label: 'Customization', icon: FaCode, color: 'orange' }
   ];
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       {/* Tab Navigation */}
       <div className="border-b border-gray-200 mb-6">
-        <nav className="-mb-px flex space-x-8">
+        <nav className="-mb-px flex space-x-4">
           {tabs.map((tab) => {
             const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            const getColorClasses = (color: string) => {
+              if (color === 'blue') {
+                return {
+                  active: 'bg-blue-100 text-blue-600 border-blue-500',
+                  inactive: 'bg-blue-50 text-blue-400 border-transparent hover:bg-blue-100 hover:text-blue-500',
+                  iconBgActive: 'bg-blue-100',
+                  iconBgInactive: 'bg-blue-50',
+                  iconTextActive: 'text-blue-600',
+                  iconTextInactive: 'text-blue-400',
+                  textActive: 'text-blue-700',
+                  textInactive: 'text-blue-500'
+                };
+              } else if (color === 'green') {
+                return {
+                  active: 'bg-green-100 text-green-600 border-green-500',
+                  inactive: 'bg-green-50 text-green-400 border-transparent hover:bg-green-100 hover:text-green-500',
+                  iconBgActive: 'bg-green-100',
+                  iconBgInactive: 'bg-green-50',
+                  iconTextActive: 'text-green-600',
+                  iconTextInactive: 'text-green-400',
+                  textActive: 'text-green-700',
+                  textInactive: 'text-green-500'
+                };
+              } else if (color === 'purple') {
+                return {
+                  active: 'bg-purple-100 text-purple-600 border-purple-500',
+                  inactive: 'bg-purple-50 text-purple-400 border-transparent hover:bg-purple-100 hover:text-purple-500',
+                  iconBgActive: 'bg-purple-100',
+                  iconBgInactive: 'bg-purple-50',
+                  iconTextActive: 'text-purple-600',
+                  iconTextInactive: 'text-purple-400',
+                  textActive: 'text-purple-700',
+                  textInactive: 'text-purple-500'
+                };
+              } else {
+                return {
+                  active: 'bg-orange-100 text-orange-600 border-orange-500',
+                  inactive: 'bg-orange-50 text-orange-400 border-transparent hover:bg-orange-100 hover:text-orange-500',
+                  iconBgActive: 'bg-orange-100',
+                  iconBgInactive: 'bg-orange-50',
+                  iconTextActive: 'text-orange-600',
+                  iconTextInactive: 'text-orange-400',
+                  textActive: 'text-orange-700',
+                  textInactive: 'text-orange-500'
+                };
+              }
+            };
+            const colors = getColorClasses(tab.color);
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
-                  activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                className={`py-3 px-4 border-b-2 font-semibold text-base flex items-center gap-3 rounded-t-lg transition-all duration-300 ${
+                  isActive ? colors.active : colors.inactive
                 }`}
               >
-                <Icon className="w-4 h-4" />
-                {tab.label}
+                <div className={`flex-shrink-0 w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 ${
+                  isActive ? colors.iconBgActive : colors.iconBgInactive
+                }`}>
+                  <Icon className={`w-10 h-10 ${isActive ? colors.iconTextActive : colors.iconTextInactive}`} />
+                </div>
+                <span className={isActive ? colors.textActive : colors.textInactive}>{tab.label}</span>
               </button>
             );
           })}
@@ -75,12 +126,16 @@ export default function TenantSettingsViewClient({ settings, settingsId, organiz
               <dd className="mt-1">
                 {settings?.allowUserRegistration ? (
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    <FaToggleOn className="w-3 h-3 mr-1" />
+                    <svg className="w-5 h-5 mr-1 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
                     Enabled
                   </span>
                 ) : (
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                    <FaToggleOff className="w-3 h-3 mr-1" />
+                    <svg className="w-5 h-5 mr-1 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                     Disabled
                   </span>
                 )}
@@ -91,12 +146,16 @@ export default function TenantSettingsViewClient({ settings, settingsId, organiz
               <dd className="mt-1">
                 {settings?.requireAdminApproval ? (
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    <FaToggleOn className="w-3 h-3 mr-1" />
+                    <svg className="w-5 h-5 mr-1 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
                     Yes
                   </span>
                 ) : (
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                    <FaToggleOff className="w-3 h-3 mr-1" />
+                    <svg className="w-5 h-5 mr-1 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                     No
                   </span>
                 )}
@@ -107,12 +166,16 @@ export default function TenantSettingsViewClient({ settings, settingsId, organiz
               <dd className="mt-1">
                 {settings?.enableGuestRegistration ? (
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    <FaToggleOn className="w-3 h-3 mr-1" />
+                    <svg className="w-5 h-5 mr-1 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
                     Enabled
                   </span>
                 ) : (
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                    <FaToggleOff className="w-3 h-3 mr-1" />
+                    <svg className="w-5 h-5 mr-1 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                     Disabled
                   </span>
                 )}
@@ -123,12 +186,16 @@ export default function TenantSettingsViewClient({ settings, settingsId, organiz
               <dd className="mt-1">
                 {settings?.isMembershipSubscriptionEnabled ? (
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    <FaToggleOn className="w-3 h-3 mr-1" />
+                    <svg className="w-5 h-5 mr-1 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
                     Enabled
                   </span>
                 ) : (
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                    <FaToggleOff className="w-3 h-3 mr-1" />
+                    <svg className="w-5 h-5 mr-1 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                     Disabled
                   </span>
                 )}
@@ -198,12 +265,16 @@ export default function TenantSettingsViewClient({ settings, settingsId, organiz
               <dd className="mt-1">
                 {settings?.enableWhatsappIntegration ? (
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    <FaToggleOn className="w-3 h-3 mr-1" />
+                    <svg className="w-5 h-5 mr-1 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
                     Enabled
                   </span>
                 ) : (
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                    <FaToggleOff className="w-3 h-3 mr-1" />
+                    <svg className="w-5 h-5 mr-1 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                     Disabled
                   </span>
                 )}
@@ -214,12 +285,16 @@ export default function TenantSettingsViewClient({ settings, settingsId, organiz
               <dd className="mt-1">
                 {settings?.enableEmailMarketing ? (
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    <FaToggleOn className="w-3 h-3 mr-1" />
+                    <svg className="w-5 h-5 mr-1 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
                     Enabled
                   </span>
                 ) : (
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                    <FaToggleOff className="w-3 h-3 mr-1" />
+                    <svg className="w-5 h-5 mr-1 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                     Disabled
                   </span>
                 )}
@@ -334,12 +409,16 @@ export default function TenantSettingsViewClient({ settings, settingsId, organiz
                 <dd className="mt-1">
                   {settings?.showEventsSectionInHomePage ? (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      <FaToggleOn className="w-3 h-3 mr-1" />
+                      <svg className="w-5 h-5 mr-1 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
                       Visible
                     </span>
                   ) : (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                      <FaToggleOff className="w-3 h-3 mr-1" />
+                      <svg className="w-5 h-5 mr-1 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
                       Hidden
                     </span>
                   )}
@@ -350,12 +429,16 @@ export default function TenantSettingsViewClient({ settings, settingsId, organiz
                 <dd className="mt-1">
                   {settings?.showTeamMembersSectionInHomePage ? (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      <FaToggleOn className="w-3 h-3 mr-1" />
+                      <svg className="w-5 h-5 mr-1 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
                       Visible
                     </span>
                   ) : (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                      <FaToggleOff className="w-3 h-3 mr-1" />
+                      <svg className="w-5 h-5 mr-1 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
                       Hidden
                     </span>
                   )}
@@ -366,12 +449,16 @@ export default function TenantSettingsViewClient({ settings, settingsId, organiz
                 <dd className="mt-1">
                   {settings?.showSponsorsSectionInHomePage ? (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      <FaToggleOn className="w-3 h-3 mr-1" />
+                      <svg className="w-5 h-5 mr-1 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
                       Visible
                     </span>
                   ) : (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                      <FaToggleOff className="w-3 h-3 mr-1" />
+                      <svg className="w-5 h-5 mr-1 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
                       Hidden
                     </span>
                   )}
@@ -382,12 +469,16 @@ export default function TenantSettingsViewClient({ settings, settingsId, organiz
                 <dd className="mt-1">
                   {settings?.isMembershipSubscriptionEnabled ? (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      <FaToggleOn className="w-3 h-3 mr-1" />
+                      <svg className="w-5 h-5 mr-1 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
                       Enabled
                     </span>
                   ) : (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                      <FaToggleOff className="w-3 h-3 mr-1" />
+                      <svg className="w-5 h-5 mr-1 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
                       Disabled
                     </span>
                   )}
@@ -418,7 +509,9 @@ export default function TenantSettingsViewClient({ settings, settingsId, organiz
                   className="text-blue-600 hover:text-blue-800 underline text-sm flex items-center gap-2"
                 >
                   {settings.emailHeaderImageUrl}
-                  <FaExternalLinkAlt className="w-3 h-3" />
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
                 </a>
               </div>
             ) : (
@@ -439,7 +532,9 @@ export default function TenantSettingsViewClient({ settings, settingsId, organiz
                   className="text-blue-600 hover:text-blue-800 underline text-sm flex items-center gap-2"
                 >
                   {settings.emailFooterHtmlUrl}
-                  <FaExternalLinkAlt className="w-3 h-3" />
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
                 </a>
               </div>
             ) : (

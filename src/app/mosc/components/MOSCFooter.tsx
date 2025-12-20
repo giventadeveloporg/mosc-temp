@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Icon from './ui/Icon';
+import AppImage from './AppImage';
 
 const MOSCFooter = () => {
   const currentYear = new Date().getFullYear();
@@ -8,21 +9,30 @@ const MOSCFooter = () => {
   const footerLinks = [
     { name: 'CATHOLICATE NEWS', href: 'https://www.facebook.com/catholicatenews.in', external: true },
     { name: 'DOWNLOADS', href: '/mosc/downloads' },
-    { name: 'E-MAIL', href: 'https://accounts.google.com/ServiceLogin', external: true },
-    { name: 'GALLERY', href: '/mosc/photo-gallery' },
+    { name: 'E-MAIL', href: '/mosc/contact-form-email' },
+    { name: 'GALLERY', href: '/mosc/gallery' },
     { name: 'CONTACT INFO', href: '/mosc/contact-info' },
+  ];
+
+  const siteToolsLinks = [
+    { name: 'SITEMAP', href: '/mosc/sitemap' },
+    { name: 'APPS', href: '/mosc/app' },
   ];
 
   return (
     <footer className="bg-card border-t border-border mt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 items-start">
           {/* Church Info */}
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center sacred-shadow">
-                <Icon name="cross" size={20} className="text-primary-foreground" />
+              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center sacred-shadow overflow-hidden p-2 flex-shrink-0">
+                <AppImage
+                  src="/images/event_1/mosc_email/logo-mosc.png"
+                  alt="Malankara Orthodox Syrian Church emblem"
+                  className="w-full h-full object-contain"
+                />
               </div>
               <div>
                 <h3 className="font-heading font-semibold text-lg text-foreground">Malankara Orthodox Syrian Church</h3>
@@ -63,6 +73,23 @@ const MOSCFooter = () => {
             </nav>
           </div>
 
+          {/* Site Tools (Sitemap / Apps) */}
+          <div className="space-y-4">
+            <h3 className="font-heading font-semibold text-lg text-foreground">Site Tools</h3>
+            <nav className="space-y-2" aria-label="Site tools navigation">
+              {siteToolsLinks.map((link) => (
+                <div key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-muted-foreground hover:text-primary reverent-transition"
+                  >
+                    {link.name}
+                  </Link>
+                </div>
+              ))}
+            </nav>
+          </div>
+
           {/* Contact Info */}
           <div className="space-y-4">
             <h3 className="font-heading font-semibold text-lg text-foreground">Contact Information</h3>
@@ -88,7 +115,7 @@ const MOSCFooter = () => {
               © {currentYear} The Malankara Orthodox Church. All rights reserved.
             </div>
             <div className="text-sm text-muted-foreground">
-              Created by: Ipsr Solutions Ltd
+              Giventa Inc. USA
             </div>
           </div>
         </div>

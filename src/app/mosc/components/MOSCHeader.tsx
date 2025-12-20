@@ -19,60 +19,25 @@ const MOSCHeader = () => {
     { name: 'SAINTS', href: '/mosc/saints' },
   ];
 
-  const quickLinks = [
+  const quickLinks: Array<{ name: string; href: string; external?: boolean }> = [
     { name: 'Spiritual Organisations', href: '/mosc/spiritual-organizations' },
     { name: 'Publications', href: '/mosc/publications' },
     { name: 'Institutions', href: '/mosc/institutions' },
-    { name: 'Directory', href: 'http://directory.mosc.in/', external: true },
+    { name: 'Directory', href: '/mosc/directory' },
     { name: 'Training', href: '/mosc/training' },
     { name: 'Theological Seminaries', href: '/mosc/theological-seminaries' },
     { name: 'Lectionary', href: '/mosc/lectionary' },
     { name: 'Downloads', href: '/mosc/downloads' },
-    { name: 'Calendar', href: 'http://calendar.mosc.in/', external: true },
-    { name: 'Gallery', href: '/mosc/photo-gallery' },
+    { name: 'Calendar', href: '/mosc/calendar' },
+    { name: 'Gallery', href: '/mosc/gallery' },
   ];
 
   const isActive = (href: string) => {
-    return pathname.startsWith(href);
+    return pathname?.startsWith(href) ?? false;
   };
 
   return (
     <header className="bg-card border-b border-border">
-      {/* Top Bar */}
-      <div className="bg-primary text-primary-foreground py-2">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center space-x-4">
-              <span className="font-heading">Malankara Orthodox Syrian Church</span>
-              <span className="hidden sm:inline text-primary-foreground/80">Saint Thomas Christian Community</span>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link
-                href="https://www.facebook.com/catholicatenews.in"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-primary-foreground/80 reverent-transition"
-                aria-label="Follow us on Facebook"
-              >
-                <Icon name="people" size={16} className="text-primary-foreground" />
-              </Link>
-              <Link
-                href="/mosc/sitemap"
-                className="hover:text-primary-foreground/80 reverent-transition"
-              >
-                SITEMAP
-              </Link>
-              <Link
-                href="/mosc/app"
-                className="hover:text-primary-foreground/80 reverent-transition"
-              >
-                APPS
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Main Header */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-6">
@@ -86,6 +51,16 @@ const MOSCHeader = () => {
                 <h1 className="font-heading font-semibold text-lg text-foreground">MOSC</h1>
                 <p className="text-sm text-muted-foreground">Malankara Orthodox Syrian Church</p>
               </div>
+            </Link>
+            {/* Desktop Facebook link (kept from legacy top bar) */}
+            <Link
+              href="https://www.facebook.com/catholicatenews.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden md:inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 sacred-shadow-sm reverent-transition"
+              aria-label="Follow Malankara Orthodox Syrian Church on Facebook"
+            >
+              <Icon name="people" size={18} className="text-primary" />
             </Link>
           </div>
 

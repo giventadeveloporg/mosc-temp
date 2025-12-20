@@ -1,5 +1,5 @@
 import { getAppUrl } from '@/lib/env';
-import { FaEdit, FaCalendarAlt, FaUsers } from 'react-icons/fa';
+// Icons removed - using inline SVGs instead
 
 function toInt(v: string | undefined, d: number) {
   const n = Number(v); return Number.isFinite(n) && n >= 0 ? n : d;
@@ -93,18 +93,21 @@ export default async function AdminFocusGroupsPage({ searchParams }: { searchPar
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{g.slug}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm">{g.isActive ? 'YES' : 'NO'}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                  <div className="flex items-center justify-end gap-4">
-                    <a className="text-blue-600 hover:text-blue-800 flex items-center gap-1" href={`/admin/focus-groups/${g.id}/edit`}>
-                      <FaEdit className="text-base" />
-                      <span>Edit</span>
+                  <div className="flex items-center justify-end gap-2">
+                    <a className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110" href={`/admin/focus-groups/${g.id}/edit`} title="Edit Focus Group" aria-label="Edit Focus Group">
+                      <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
                     </a>
-                    <a className="text-blue-600 hover:text-blue-800 flex items-center gap-1" href={`/admin/focus-groups/${g.id}/events`}>
-                      <FaCalendarAlt className="text-base" />
-                      <span>Events</span>
+                    <a className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center transition-all duration-300 hover:scale-110" href={`/admin/focus-groups/${g.id}/events`} title="Manage Events" aria-label="Manage Events">
+                      <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
                     </a>
-                    <a className="text-blue-600 hover:text-blue-800 flex items-center gap-1" href={`/admin/focus-groups/${g.id}/members`}>
-                      <FaUsers className="text-base" />
-                      <span>Members</span>
+                    <a className="flex-shrink-0 w-14 h-14 rounded-xl bg-purple-100 hover:bg-purple-200 flex items-center justify-center transition-all duration-300 hover:scale-110" href={`/admin/focus-groups/${g.id}/members`} title="Manage Members" aria-label="Manage Members">
+                      <svg className="w-10 h-10 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                      </svg>
                     </a>
                   </div>
                 </td>

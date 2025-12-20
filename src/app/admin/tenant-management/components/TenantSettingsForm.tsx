@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
-import { FaSave, FaBan, FaCode, FaCog, FaUpload, FaTimes } from 'react-icons/fa';
 import type { TenantSettingsDTO, TenantSettingsFormDTO, TenantOrganizationDTO } from '@/app/admin/tenant-management/types';
 import { uploadEmailFooterHtmlClient, uploadTenantLogoClient, uploadEmailHeaderImageClient } from '@/app/admin/tenant-management/settings/ApiServerActions';
 import { patchTenantSetting } from '@/app/admin/tenant-management/settings/ApiServerActions';
@@ -389,6 +388,27 @@ export default function TenantSettingsForm({
     }
   };
 
+  const handleRemoveHeaderImage = async () => {
+    if (!settingsId) return;
+    setValue('emailHeaderImageUrl', '');
+    setHeaderImageUploadStatus('uploading');
+    setHeaderImageUploadMessage('Removing email header image...');
+    try {
+      await patchTenantSetting(settingsId, {
+        emailHeaderImageUrl: '',
+      });
+      setHeaderImageUploadStatus('success');
+      setHeaderImageUploadMessage('Email header image removed successfully!');
+      setTimeout(() => {
+        setHeaderImageUploadStatus('idle');
+        setHeaderImageUploadMessage('');
+      }, 2000);
+    } catch (err: any) {
+      setHeaderImageUploadStatus('error');
+      setHeaderImageUploadMessage(err.message || 'Failed to remove email header image');
+    }
+  };
+
   // Toggle switch component
   const ToggleSwitch = ({
     name,
@@ -424,32 +444,109 @@ export default function TenantSettingsForm({
     </div>
   );
 
-  // Tab navigation
+  // Tab navigation with colorful icons
   const tabs = [
-    { id: 'general', label: 'General', icon: FaCog },
-    { id: 'integrations', label: 'Integrations', icon: FaCode },
-    { id: 'limits', label: 'Limits', icon: FaCog },
-    { id: 'customization', label: 'Customization', icon: FaCode }
+    { 
+      id: 'general', 
+      label: 'General', 
+      icon: 'cog', 
+      color: 'blue',
+      svgPath: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z'
+    },
+    { 
+      id: 'integrations', 
+      label: 'Integrations', 
+      icon: 'code', 
+      color: 'green',
+      svgPath: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4'
+    },
+    { 
+      id: 'limits', 
+      label: 'Limits', 
+      icon: 'chart', 
+      color: 'purple',
+      svgPath: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'
+    },
+    { 
+      id: 'customization', 
+      label: 'Customization', 
+      icon: 'paint', 
+      color: 'orange',
+      svgPath: 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01'
+    }
   ];
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       {/* Tab Navigation */}
       <div className="border-b border-gray-200 mb-6">
-        <nav className="-mb-px flex space-x-8">
+        <nav className="-mb-px flex space-x-4">
           {tabs.map((tab) => {
-            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            const getColorClasses = (color: string) => {
+              if (color === 'blue') {
+                return {
+                  active: 'bg-blue-100 text-blue-600 border-blue-500',
+                  inactive: 'bg-blue-50 text-blue-400 border-transparent hover:bg-blue-100 hover:text-blue-500',
+                  iconBgActive: 'bg-blue-100',
+                  iconBgInactive: 'bg-blue-50',
+                  iconTextActive: 'text-blue-500',
+                  iconTextInactive: 'text-blue-400',
+                  textActive: 'text-blue-700',
+                  textInactive: 'text-blue-500'
+                };
+              } else if (color === 'green') {
+                return {
+                  active: 'bg-green-100 text-green-600 border-green-500',
+                  inactive: 'bg-green-50 text-green-400 border-transparent hover:bg-green-100 hover:text-green-500',
+                  iconBgActive: 'bg-green-100',
+                  iconBgInactive: 'bg-green-50',
+                  iconTextActive: 'text-green-500',
+                  iconTextInactive: 'text-green-400',
+                  textActive: 'text-green-700',
+                  textInactive: 'text-green-500'
+                };
+              } else if (color === 'purple') {
+                return {
+                  active: 'bg-purple-100 text-purple-600 border-purple-500',
+                  inactive: 'bg-purple-50 text-purple-400 border-transparent hover:bg-purple-100 hover:text-purple-500',
+                  iconBgActive: 'bg-purple-100',
+                  iconBgInactive: 'bg-purple-50',
+                  iconTextActive: 'text-purple-500',
+                  iconTextInactive: 'text-purple-400',
+                  textActive: 'text-purple-700',
+                  textInactive: 'text-purple-500'
+                };
+              } else {
+                return {
+                  active: 'bg-orange-100 text-orange-600 border-orange-500',
+                  inactive: 'bg-orange-50 text-orange-400 border-transparent hover:bg-orange-100 hover:text-orange-500',
+                  iconBgActive: 'bg-orange-100',
+                  iconBgInactive: 'bg-orange-50',
+                  iconTextActive: 'text-orange-500',
+                  iconTextInactive: 'text-orange-400',
+                  textActive: 'text-orange-700',
+                  textInactive: 'text-orange-500'
+                };
+              }
+            };
+            const colors = getColorClasses(tab.color);
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${activeTab === tab.id
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                className={`py-3 px-4 border-b-2 font-semibold text-base flex items-center gap-3 rounded-t-lg transition-all duration-300 ${
+                  isActive ? colors.active : colors.inactive
+                }`}
               >
-                <Icon className="w-4 h-4" />
-                {tab.label}
+                <div className={`flex-shrink-0 w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 ${
+                  isActive ? colors.iconBgActive : colors.iconBgInactive
+                }`}>
+                  <svg className={`w-10 h-10 ${isActive ? colors.iconTextActive : colors.iconTextInactive}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={tab.svgPath} />
+                  </svg>
+                </div>
+                <span className={isActive ? colors.textActive : colors.textInactive}>{tab.label}</span>
               </button>
             );
           })}
@@ -1006,15 +1103,24 @@ export default function TenantSettingsForm({
                             // Test connection functionality would be implemented here
                             alert('Test connection functionality will be implemented');
                           }}
-                          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm font-medium"
+                          className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                          title="Test Connection"
+                          aria-label="Test Connection"
                         >
-                          🔗 Test Connection
+                          <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                          </svg>
                         </button>
                         <a
                           href="/admin/whatsapp-settings"
-                          className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm font-medium"
+                          className="flex-shrink-0 w-14 h-14 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                          title="Advanced Settings"
+                          aria-label="Advanced Settings"
                         >
-                          ⚙️ Advanced Settings
+                          <svg className="w-10 h-10 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
                         </a>
                       </div>
                     </div>
@@ -1233,10 +1339,13 @@ export default function TenantSettingsForm({
                     <button
                       type="button"
                       onClick={handleRemoveHeaderImage}
-                      className="mt-2 bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm flex items-center gap-2"
+                      className="mt-2 flex-shrink-0 w-14 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                      title="Remove header image"
+                      aria-label="Remove header image"
                     >
-                      <FaTimes className="w-3 h-3" />
-                      Remove
+                      <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
                     </button>
                   </div>
                 ) : (
@@ -1260,9 +1369,13 @@ export default function TenantSettingsForm({
                           : 'border-gray-300 hover:border-blue-500'
                       } ${uploadingHeaderImage || !settingsId ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
-                      <FaUpload className={`mx-auto h-12 w-12 mb-2 ${
-                        isDraggingHeaderImage ? 'text-blue-500' : 'text-gray-400'
-                      }`} />
+                      <div className={`flex-shrink-0 w-14 h-14 rounded-xl mx-auto mb-2 flex items-center justify-center transition-all duration-300 ${
+                        isDraggingHeaderImage ? 'bg-blue-100' : 'bg-gray-100'
+                      }`}>
+                        <svg className={`w-10 h-10 ${isDraggingHeaderImage ? 'text-blue-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                        </svg>
+                      </div>
                       <p className={`text-sm ${
                         isDraggingHeaderImage ? 'text-blue-600 font-semibold' : 'text-gray-600'
                       }`}>
@@ -1313,10 +1426,13 @@ export default function TenantSettingsForm({
                     <button
                       type="button"
                       onClick={handleRemoveFooterHtml}
-                      className="mt-2 bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm flex items-center gap-2"
+                      className="mt-2 flex-shrink-0 w-14 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                      title="Remove footer HTML"
+                      aria-label="Remove footer HTML"
                     >
-                      <FaTimes className="w-3 h-3" />
-                      Remove
+                      <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
                     </button>
                   </div>
                 ) : (
@@ -1340,9 +1456,13 @@ export default function TenantSettingsForm({
                           : 'border-gray-300 hover:border-blue-500'
                       } ${uploadingFooterHtml || !settingsId ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
-                      <FaUpload className={`mx-auto h-12 w-12 mb-2 ${
-                        isDraggingFooterHtml ? 'text-blue-500' : 'text-gray-400'
-                      }`} />
+                      <div className={`flex-shrink-0 w-14 h-14 rounded-xl mx-auto mb-2 flex items-center justify-center transition-all duration-300 ${
+                        isDraggingFooterHtml ? 'bg-blue-100' : 'bg-gray-100'
+                      }`}>
+                        <svg className={`w-10 h-10 ${isDraggingFooterHtml ? 'text-blue-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                        </svg>
+                      </div>
                       <p className={`text-sm ${
                         isDraggingFooterHtml ? 'text-blue-600 font-semibold' : 'text-gray-600'
                       }`}>
@@ -1378,9 +1498,13 @@ export default function TenantSettingsForm({
                     <button
                       type="button"
                       onClick={handleRemoveLogo}
-                      className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-lg"
+                      className="absolute top-2 right-2 flex-shrink-0 w-14 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-lg"
+                      title="Remove logo"
+                      aria-label="Remove logo"
                     >
-                      <FaTimes className="w-4 h-4" />
+                      <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
                     </button>
                   </div>
                 ) : (
@@ -1404,9 +1528,13 @@ export default function TenantSettingsForm({
                           : 'border-gray-300 hover:border-blue-500'
                       } ${uploadingLogo || !settingsId ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
-                      <FaUpload className={`mx-auto h-12 w-12 mb-2 ${
-                        isDraggingLogo ? 'text-blue-500' : 'text-gray-400'
-                      }`} />
+                      <div className={`flex-shrink-0 w-14 h-14 rounded-xl mx-auto mb-2 flex items-center justify-center transition-all duration-300 ${
+                        isDraggingLogo ? 'bg-blue-100' : 'bg-gray-100'
+                      }`}>
+                        <svg className={`w-10 h-10 ${isDraggingLogo ? 'text-blue-500' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                        </svg>
+                      </div>
                       <p className={`text-sm ${
                         isDraggingLogo ? 'text-blue-600 font-semibold' : 'text-gray-600'
                       }`}>
@@ -1432,18 +1560,24 @@ export default function TenantSettingsForm({
           <button
             type="button"
             onClick={onCancel}
-            className="bg-teal-100 hover:bg-teal-200 text-teal-800 px-4 py-2 rounded-md flex items-center gap-2"
+            className="flex-shrink-0 w-14 h-14 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+            title="Cancel"
+            aria-label="Cancel"
           >
-            <FaBan />
-            Cancel
+            <svg className="w-10 h-10 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
           <button
             type="submit"
             disabled={isSubmitting || loading}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+            title={isSubmitting || loading ? 'Saving...' : mode === 'create' ? 'Create Settings' : 'Update Settings'}
+            aria-label={isSubmitting || loading ? 'Saving...' : mode === 'create' ? 'Create Settings' : 'Update Settings'}
           >
-            <FaSave />
-            {isSubmitting || loading ? 'Saving...' : mode === 'create' ? 'Create Settings' : 'Update Settings'}
+            <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
           </button>
         </div>
       </form>

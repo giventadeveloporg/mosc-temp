@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from 'react';
 import type { UserProfileDTO } from '@/types';
 import Link from 'next/link';
 import ReactDOM from 'react-dom';
-import { FaEye, FaCheck, FaEdit, FaTimes, FaUsers, FaPhotoVideo, FaCalendarAlt, FaUpload, FaDownload, FaBan, FaChevronLeft, FaChevronRight, FaHome } from 'react-icons/fa';
+// Icons removed - using inline SVGs instead
 import * as XLSX from 'xlsx';
 import { getTenantId } from '@/lib/env';
 import { fetchUsersServer, patchUserProfileServer, bulkUploadUsersServer } from './ApiServerActions';
@@ -223,11 +223,15 @@ function EditUserModal({ user, open, onClose, onSave }: {
           </div>
           <div className="flex justify-end gap-2 mt-4">
             <button type="button" className="bg-teal-100 hover:bg-teal-200 text-teal-800 font-bold px-4 py-2 rounded-md flex items-center gap-2 transition-colors" onClick={onClose}>
-              <FaBan />
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
               Cancel
             </button>
             <button type="submit" className="px-4 py-2 rounded bg-blue-600 text-white font-bold hover:bg-blue-700 flex items-center gap-2 transition-colors">
-              <FaDownload />
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
               Save
             </button>
           </div>
@@ -545,12 +549,16 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Manage Users</h1>
         <div className="flex items-center gap-2">
           <button onClick={() => fileInputRef.current?.click()} disabled={bulkLoading} className="h-10 flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors disabled:opacity-50">
-            <FaUpload />
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
             {bulkLoading ? 'Uploading...' : 'Bulk Upload User List'}
           </button>
           <input type="file" ref={fileInputRef} onChange={handleBulkUpload} className="hidden" accept=".xlsx" />
           <a href="https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/media/users_profile_list_bulk_upload_template/users_profile_list_bulk_upload_template.xlsx" download="users_profile_list_bulk_upload_template.xlsx" className="h-10 flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
-            <FaDownload />
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
             Download Bulk Upload Template File
           </a>
         </div>
@@ -667,30 +675,44 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
                       <button
                         onClick={() => setEditUser(user)}
                         disabled={editLoading && editUser?.id === user.id}
-                        className="p-2 rounded-full text-blue-600 bg-blue-100 hover:bg-blue-200 disabled:opacity-50 transition-colors"
+                        className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-50"
                         aria-label="Edit User"
                         title="Edit User"
                       >
-                        <FaEdit />
+                        <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
                       </button>
 
                       <button
                         onClick={() => handleApprove(user)}
                         disabled={approvingId === user.id || user.userStatus === 'ACTIVE' || user.userStatus === 'APPROVED'}
-                        className="p-2 rounded-full text-green-600 bg-green-100 hover:bg-green-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="Approve User"
                         title="Approve User"
                       >
-                        {approvingId === user.id ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600"></div> : <FaCheck />}
+                        {approvingId === user.id ? (
+                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-600"></div>
+                        ) : (
+                          <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
                       </button>
                       <button
                         onClick={() => handleReject(user)}
                         disabled={rejectingId === user.id || user.userStatus === 'REJECTED'}
-                        className="p-2 rounded-full text-red-600 bg-red-100 hover:bg-red-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="flex-shrink-0 w-14 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="Reject User"
                         title="Reject User"
                       >
-                        {rejectingId === user.id ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div> : <FaTimes />}
+                        {rejectingId === user.id ? (
+                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-red-600"></div>
+                        ) : (
+                          <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        )}
                       </button>
 
                     </div>
@@ -708,7 +730,9 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
               disabled={page <= 1}
               className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
             >
-              <FaChevronLeft />
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
               Previous
             </button>
             <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">
@@ -720,7 +744,9 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
               className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
             >
               Next
-              <FaChevronRight />
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
             </button>
           </div>
           <div className="text-center text-sm text-gray-600 dark:text-gray-400 mt-2">

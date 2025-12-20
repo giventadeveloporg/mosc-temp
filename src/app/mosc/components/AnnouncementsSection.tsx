@@ -1,11 +1,31 @@
 'use client';
 
-import React from 'react';
-import Link from 'next/link';
+import React, { useState, useEffect } from 'react';
 import AppIcon from './AppIcon';
 import Button from './ui/Button';
 
 const AnnouncementsSection = () => {
+  const [showIframe, setShowIframe] = useState(false);
+
+  // Close iframe on Escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showIframe) {
+        setShowIframe(false);
+      }
+    };
+
+    if (showIframe) {
+      document.addEventListener('keydown', handleEscape);
+      // Prevent body scroll when modal is open
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
+    };
+  }, [showIframe]);
   const announcements = [
     {
       id: 1,
@@ -63,11 +83,14 @@ const AnnouncementsSection = () => {
               Stay updated with the latest news and events from our church community
             </p>
           </div>
-          <Link href="/mosc/news-and-announcements">
-            <Button variant="outline" iconName="ArrowRight" iconPosition="right">
-              View All News
-            </Button>
-          </Link>
+          <Button 
+            variant="outline" 
+            iconName="ArrowRight" 
+            iconPosition="right"
+            onClick={() => setShowIframe(true)}
+          >
+            View All News
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -111,6 +134,39 @@ const AnnouncementsSection = () => {
           ))}
         </div>
       </div>
+
+      {/* Iframe Modal for Catholicate News */}
+      {showIframe && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+          onClick={() => setShowIframe(false)}
+        >
+          <div 
+            className="relative w-full h-full max-w-7xl mx-auto p-4 md:p-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setShowIframe(false)}
+              className="absolute top-6 right-6 z-10 w-10 h-10 bg-card rounded-full flex items-center justify-center hover:bg-card/80 transition-colors shadow-lg"
+              aria-label="Close"
+            >
+              <AppIcon name="X" size={20} className="text-foreground" />
+            </button>
+
+            {/* Iframe Container */}
+            <div className="w-full h-full bg-card rounded-lg shadow-2xl overflow-hidden">
+              <iframe
+                src="https://catholicatenews.in"
+                className="w-full h-full border-0"
+                title="Catholicate News"
+                allow="fullscreen"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };

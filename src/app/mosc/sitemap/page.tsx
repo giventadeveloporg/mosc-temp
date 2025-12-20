@@ -44,13 +44,13 @@ const SitemapPage = () => {
         { name: 'Theological Seminaries', href: '/mosc/theological' },
         { name: 'Lectionary', href: '/mosc/lectionary' },
         { name: 'Downloads', href: '/mosc/downloads' },
-        { name: 'Gallery', href: '/mosc/photo-gallery' }
+        { name: 'Gallery', href: '/mosc/gallery' }
       ]
     },
     {
       title: 'External Links',
       links: [
-        { name: 'Directory', href: 'http://directory.mosc.in/', external: true },
+        { name: 'Directory', href: '/mosc/directory' },
         { name: 'Calendar', href: 'http://calendar.mosc.in/', external: true },
         { name: 'E-mail', href: 'https://accounts.google.com/ServiceLogin', external: true }
       ]

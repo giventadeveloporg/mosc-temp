@@ -8,13 +8,13 @@ const AboutOurChurchSection = () => {
   const router = useRouter();
 
   const mainNavigationLinks = [
-    { label: 'THE CATHOLICATE', href: '/mosc/catholicate', icon: 'Crown' },
-    { label: 'ADMINISTRATION', href: '/mosc/administration', icon: 'Building' },
-    { label: 'THE CHURCH', href: '/mosc/the-church', icon: 'Church' },
-    { label: 'HOLY SYNOD', href: '/mosc/holy-synod', icon: 'Users' },
-    { label: 'ECUMENICAL', href: '/mosc/ecumenical', icon: 'Globe' },
-    { label: 'DIOCESES', href: '/mosc/dioceses', icon: 'MapPin' },
-    { label: 'SAINTS', href: '/mosc/saints', icon: 'Star' }
+    { label: 'THE CATHOLICATE', href: '/mosc/catholicate', icon: 'Crown', isInternal: true },
+    { label: 'ADMINISTRATION', href: '/mosc/administration', icon: 'Building', isInternal: true },
+    { label: 'THE CHURCH', href: '/mosc/the-church', icon: 'Church', isInternal: true },
+    { label: 'HOLY SYNOD', href: '/mosc/holy-synod', icon: 'Users', isInternal: true },
+    { label: 'ECUMENICAL', href: '/mosc/ecumenical', icon: 'Globe', isInternal: true },
+    { label: 'DIOCESES', href: '/mosc/dioceses', icon: 'MapPin', isInternal: true },
+    { label: 'SAINTS', href: '/mosc/saints', icon: 'Star', isInternal: true }
   ];
 
   const quickLinks = [
@@ -153,7 +153,7 @@ const AboutOurChurchSection = () => {
               <div className="bg-card rounded-lg sacred-shadow p-6">
                 <div className="space-y-3">
                   <button
-                    onClick={() => handleLinkClick({ href: '/mosc/pilgrim-centres', label: 'PILGRIM CENTRES' })}
+                    onClick={() => handleLinkClick({ href: '/mosc/pilgrim-centres', label: 'PILGRIM CENTRES', isInternal: true })}
                     className="w-full bg-warning text-warning-foreground rounded-md py-2 px-4 text-sm font-body font-medium hover:bg-warning/90 reverent-transition"
                   >
                     PILGRIM CENTRES
@@ -184,11 +184,9 @@ const AboutOurChurchSection = () => {
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
               {quickLinks.map((link, index) => (
-                <a
+                <button
                   key={index}
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  onClick={() => handleLinkClick(link)}
                   className="flex flex-col items-center space-y-2 p-4 rounded-lg border border-border hover:border-primary hover:bg-muted/20 reverent-transition group cursor-pointer"
                 >
                   <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center group-hover:bg-primary/20 reverent-transition">
@@ -197,7 +195,7 @@ const AboutOurChurchSection = () => {
                   <span className="font-body text-xs font-medium text-foreground group-hover:text-primary reverent-transition text-center leading-tight">
                     {link.label}
                   </span>
-                </a>
+                </button>
               ))}
             </div>
           </div>
@@ -208,35 +206,41 @@ const AboutOurChurchSection = () => {
           <div className="bg-muted/20 rounded-lg p-6">
             <div className="flex flex-wrap items-center justify-center gap-4 text-sm font-body text-muted-foreground">
               <button
-                onClick={() => handleLinkClick({ href: '/mosc/catholicate-news', label: 'CATHOLICATE NEWS' })}
+                onClick={() => handleLinkClick({ href: 'https://catholicatenews.in/', label: 'CATHOLICATE NEWS', external: true })}
                 className="hover:text-primary reverent-transition"
               >
                 CATHOLICATE NEWS
               </button>
               <span>•</span>
               <button
-                onClick={() => handleLinkClick({ href: '/mosc/downloads', label: 'DOWNLOADS' })}
+                onClick={() => handleLinkClick({ href: '/mosc/downloads', label: 'DOWNLOADS', isInternal: true })}
                 className="hover:text-primary reverent-transition"
               >
                 DOWNLOADS
               </button>
               <span>•</span>
               <button
-                onClick={() => handleLinkClick({ href: '/mosc/email', label: 'E-MAIL' })}
+                onClick={() =>
+                  handleLinkClick({
+                    href: '/mosc/contact-form-email',
+                    label: 'E-MAIL',
+                    isInternal: true,
+                  })
+                }
                 className="hover:text-primary reverent-transition"
               >
                 E-MAIL
               </button>
               <span>•</span>
               <button
-                onClick={() => handleLinkClick({ href: '/mosc/gallery', label: 'GALLERY' })}
+                onClick={() => handleLinkClick({ href: '/mosc/gallery', label: 'GALLERY', isInternal: true })}
                 className="hover:text-primary reverent-transition"
               >
                 GALLERY
               </button>
               <span>•</span>
               <button
-                onClick={() => handleLinkClick({ href: '/mosc/contact-info', label: 'CONTACT INFO' })}
+                onClick={() => handleLinkClick({ href: '/mosc/contact-info', label: 'CONTACT INFO', isInternal: true })}
                 className="hover:text-primary reverent-transition"
               >
                 CONTACT INFO

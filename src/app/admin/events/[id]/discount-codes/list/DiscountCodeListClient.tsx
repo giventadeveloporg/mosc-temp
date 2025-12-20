@@ -141,17 +141,38 @@ export default function DiscountCodeListClient({
       )}
       <div className="flex justify-center mb-8">
         <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-4xl">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 justify-items-center mx-auto">
-            <Link href={`/admin/events/${eventId}/media/list`} className="w-48 max-w-xs mx-auto flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-md shadow p-1 sm:p-2 text-xs sm:text-xs transition-all">
-              <FaPhotoVideo className="text-base sm:text-lg mb-1 mx-auto" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <Link
+              href={`/admin/events/${eventId}/media/list`}
+              className="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+              title="Manage Media Files"
+              aria-label="Manage Media Files"
+            >
+              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <FaPhotoVideo className="w-10 h-10 text-blue-500" />
+              </div>
               <span className="font-semibold text-center leading-tight">Manage Media Files</span>
             </Link>
-            <Link href={`/admin/events/${eventId}/ticket-types/list`} className="w-48 max-w-xs mx-auto flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-700 rounded-md shadow p-1 sm:p-2 text-xs sm:text-xs transition-all">
-              <FaTicketAlt className="text-base sm:text-lg mb-1 mx-auto" />
+            <Link
+              href={`/admin/events/${eventId}/ticket-types/list`}
+              className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+              title="Manage Ticket Types"
+              aria-label="Manage Ticket Types"
+            >
+              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <FaTicketAlt className="w-10 h-10 text-green-500" />
+              </div>
               <span className="font-semibold text-center leading-tight">Manage Ticket Types</span>
             </Link>
-            <Link href={`/admin/events/${eventId}/discount-codes/list`} className="w-48 max-w-xs mx-auto flex flex-col items-center justify-center bg-yellow-50 hover:bg-yellow-100 text-yellow-700 rounded-md shadow p-1 sm:p-2 text-xs sm:text-xs transition-all">
-              <FaTags className="text-base sm:text-lg mb-1 mx-auto" />
+            <Link
+              href={`/admin/events/${eventId}/discount-codes/list`}
+              className="flex flex-col items-center justify-center bg-yellow-50 hover:bg-yellow-100 text-yellow-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+              title="Manage Discount Codes"
+              aria-label="Manage Discount Codes"
+            >
+              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-yellow-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <FaTags className="w-10 h-10 text-yellow-500" />
+              </div>
               <span className="font-semibold text-center leading-tight">Manage Discount Codes</span>
             </Link>
           </div>
@@ -534,21 +555,27 @@ function DiscountCodeModal({ open, onClose, onSave, code, isPending, error }: {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+        <div className="flex flex-wrap justify-end gap-3 pt-4 border-t border-gray-200">
           <button
             type="button"
             onClick={onClose}
             disabled={isPending}
-            className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-md flex items-center gap-2 transition-colors disabled:opacity-50"
+            className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 text-base font-medium shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Cancel"
+            aria-label="Cancel"
           >
-            <FaBan /> Cancel
+            <FaBan className="mr-2" />
+            Cancel
           </button>
           <button
             type="submit"
             disabled={isPending}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md flex items-center gap-2 transition-colors disabled:opacity-50"
+            className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-green-600 hover:bg-green-700 text-white text-base font-medium shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            title={isPending ? 'Saving...' : 'Save'}
+            aria-label={isPending ? 'Saving...' : 'Save'}
           >
-            {isPending ? 'Saving...' : 'Save'} <FaSave />
+            <FaSave className="mr-2" />
+            {isPending ? 'Saving...' : 'Save'}
           </button>
         </div>
       </form>

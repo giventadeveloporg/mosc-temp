@@ -14,7 +14,7 @@ const ResourcesServicesSection = () => {
     { name: 'Sunday School', icon: 'book', href: '/mosc/sunday-school' },
     { name: 'Women\'s Fellowship', icon: 'people', href: '/mosc/womens-fellowship' },
     { name: 'Charity & Outreach', icon: 'heart', href: '/mosc/charity' },
-    { name: 'Media Gallery', icon: 'gallery', href: '/mosc/photo-gallery' },
+    { name: 'Media Gallery', icon: 'gallery', href: '/mosc/gallery' },
     { name: 'Contact Us', icon: 'phone', href: '/mosc/contact-info' },
   ];
 

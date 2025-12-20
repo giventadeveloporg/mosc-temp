@@ -169,7 +169,10 @@ export default function GlobalEventEmailsPage() {
   if (loading && emails.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+          style={{ paddingTop: '180px' }}
+        >
           <AdminNavigation currentPage="event-emails" />
           <div className="flex justify-center items-center h-64">
             <div className="text-center">
@@ -184,7 +187,10 @@ export default function GlobalEventEmailsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+        style={{ paddingTop: '180px' }}
+      >
         <AdminNavigation currentPage="event-emails" />
 
         <div className="bg-white rounded-lg shadow">

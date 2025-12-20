@@ -273,7 +273,7 @@ export default function PromotionEmailsPage() {
       <div className="mb-6">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            Promotion Email Management
+            Promotional Emails for Events
           </h1>
           <div className="flex gap-2">
             <button

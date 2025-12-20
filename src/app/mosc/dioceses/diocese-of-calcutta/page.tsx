@@ -191,7 +191,7 @@ In2009 it was decided to further reorganize the outside Kerala Dioceses into Nin
                     Lectionary
                   </Link>
                   <Link 
-                    href="/mosc/photo-gallery" 
+                    href="/mosc/gallery" 
                     className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
                   >
                     Gallery

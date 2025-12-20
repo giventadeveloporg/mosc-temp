@@ -563,7 +563,6 @@ export interface TenantSettingsDTO {
   showTeamMembersSectionInHomePage?: boolean;
   showSponsorsSectionInHomePage?: boolean;
   isMembershipSubscriptionEnabled?: boolean;
-  emailHeaderImageUrl?: string; // S3 URL for email header image
   // Contact and Address Fields
   addressLine1?: string;
   addressLine2?: string;
@@ -731,6 +730,12 @@ export interface PromotionEmailTemplateDTO {
   tenantId: string;
   eventId: number;
   templateName: string;
+  /**
+   * Template type discriminator.
+   * EVENT_PROMOTION = event-specific promotional emails
+   * NEWS_LETTER = general/newsletter emails
+   */
+  templateType: 'EVENT_PROMOTION' | 'NEWS_LETTER';
   subject: string;
   fromEmail: string;
   bodyHtml: string;
@@ -754,6 +759,14 @@ export interface PromotionEmailTemplateDTO {
 export interface PromotionEmailTemplateFormDTO {
   eventId: number;
   templateName: string;
+  /**
+   * Template type discriminator used by the backend to distinguish between
+   * event promotion emails and newsletter emails.
+   *
+   * - EVENT_PROMOTION → used on `/admin/promotion-emails`
+   * - NEWS_LETTER     → used on `/admin/newsletter-emails`
+   */
+  templateType?: 'EVENT_PROMOTION' | 'NEWS_LETTER';
   subject: string;
   fromEmail: string;
   bodyHtml: string;
@@ -795,6 +808,32 @@ export interface PromotionEmailSentLogDTO {
   sentById?: number;
   template?: PromotionEmailTemplateDTO;
   event?: EventDetailsDTO;
+}
+
+/**
+ * DTO for tenant email addresses, matching `tenant_email_addresses` table / backend schema.
+ * Stores per-tenant "from" addresses categorized by type (INFO, SALES, TICKETS, CONTACT, etc.).
+ */
+export interface TenantEmailAddressDTO {
+  id?: number;
+  tenantId: string;
+  emailAddress: string;
+  /**
+   * Optional copy-to address that will be placed in the CC header for outgoing emails.
+   * Maps to the `copy_to_email_address` column in the `tenant_email_addresses` table.
+   */
+  copyToEmailAddress: string;
+  /**
+   * Email address type:
+   * INFO, SALES, TICKETS, CONTACT, SUPPORT, MARKETING, NOREPLY, ADMIN.
+   */
+  emailType: 'INFO' | 'SALES' | 'TICKETS' | 'CONTACT' | 'SUPPORT' | 'MARKETING' | 'NOREPLY' | 'ADMIN';
+  displayName?: string;
+  isActive: boolean;
+  isDefault: boolean;
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 /**

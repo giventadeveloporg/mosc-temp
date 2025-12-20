@@ -30,9 +30,7 @@ export default function DirectoryPage() {
               Access the comprehensive directory of the Malankara Orthodox Syrian Church including parishes, priests, dioceses, and church officials.
             </p>
             <a
-              href="http://directory.mosc.in/"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/mosc/directory"
               className="inline-flex items-center px-8 py-4 bg-primary text-primary-foreground font-body font-semibold text-lg rounded-lg hover:bg-primary/90 reverent-transition sacred-shadow hover:sacred-shadow-lg"
             >
               <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -203,15 +201,13 @@ export default function DirectoryPage() {
               The official directory is maintained on a dedicated platform for easy searching and regular updates. Click below to access the complete, searchable directory of the Malankara Orthodox Syrian Church.
             </p>
             <a
-              href="http://directory.mosc.in/"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/mosc/directory"
               className="inline-flex items-center px-8 py-4 bg-primary text-primary-foreground font-body font-semibold text-lg rounded-lg hover:bg-primary/90 reverent-transition sacred-shadow hover:sacred-shadow-lg"
             >
               <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
-              Visit directory.mosc.in
+              Visit Church Directory
               <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>

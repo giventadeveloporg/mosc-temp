@@ -2,27 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useAuth } from "@clerk/nextjs";
-import {
-  FaHome,
-  FaUsers,
-  FaCalendarAlt,
-  FaChartLine,
-  FaEnvelope,
-  FaCreditCard,
-  FaUserTie,
-  FaBuilding,
-  FaCog,
-  FaMicrophone,
-  FaPhone,
-  FaHandshake,
-  FaMailBulk,
-  FaUserCheck,
-  FaChartBar,
-  FaUserFriends,
-  FaAddressCard,
-  FaFileInvoice,
-  FaImage
-} from 'react-icons/fa';
+// Icons removed - using inline SVGs instead
 
 export default function AdminPage() {
   const { userId } = useAuth();
@@ -30,147 +10,154 @@ export default function AdminPage() {
   const adminButtons = [
     {
       href: '/admin',
-      icon: FaHome,
+      icon: 'home',
       label: 'Admin Home',
       color: 'gray',
       key: 'admin-home'
     },
     {
       href: '/admin/manage-usage',
-      icon: FaUsers,
+      icon: 'users',
       label: 'Manage Users',
       color: 'blue',
       key: 'manage-usage'
     },
     {
       href: '/admin/manage-events',
-      icon: FaCalendarAlt,
+      icon: 'calendar',
       label: 'Manage Events',
       color: 'green',
       key: 'manage-events'
     },
     {
       href: '/admin/events/dashboard',
-      icon: FaChartLine,
+      icon: 'chart',
       label: 'Event Analytics',
       color: 'teal',
       key: 'event-analytics'
     },
     {
       href: '/admin/events/registrations',
-      icon: FaUsers,
+      icon: 'users',
       label: 'Registrations',
       color: 'indigo',
       key: 'event-registrations'
     },
     {
       href: '/admin/polls',
-      icon: FaChartBar,
+      icon: 'chartBar',
       label: 'Poll Management',
       color: 'purple',
       key: 'poll-management'
     },
     {
       href: '/admin/focus-groups',
-      icon: FaUserFriends,
+      icon: 'userFriends',
       label: 'Focus Groups',
       color: 'orange',
       key: 'focus-groups'
     },
     {
       href: '/admin/membership/plans',
-      icon: FaAddressCard,
+      icon: 'addressCard',
       label: 'Membership Plans',
       color: 'pink',
       key: 'membership-plans'
     },
     {
       href: '/admin/membership/subscriptions',
-      icon: FaFileInvoice,
+      icon: 'fileInvoice',
       label: 'Membership Subscriptions',
       color: 'rose',
       key: 'membership-subscriptions'
     },
     {
-      href: '/admin/promotion-emails',
-      icon: FaEnvelope,
-      label: 'Promotion Emails',
+      href: '/admin/tenant-email-addresses',
+      icon: 'mailBulk',
+      label: 'Email Addresses',
+      color: 'lime',
+      key: 'tenant-email-addresses'
+    },
+    {
+      href: '/admin/bulk-email',
+      icon: 'envelope',
+      label: 'Bulk Email',
       color: 'yellow',
-      key: 'promotion-emails'
+      key: 'bulk-email'
     },
     {
       href: '/admin/test-stripe',
-      icon: FaCreditCard,
+      icon: 'creditCard',
       label: 'Test Stripe',
       color: 'purple',
       key: 'test-stripe'
     },
     {
       href: '/admin/media',
-      icon: FaImage,
+      icon: 'image',
       label: 'Media Management',
       color: 'cyan',
       key: 'media-management'
     },
     {
       href: '/admin/executive-committee',
-      icon: FaUserTie,
+      icon: 'userTie',
       label: 'Executive Committee',
       color: 'orange',
       key: 'executive-committee'
     },
     {
       href: '/admin/event-sponsors',
-      icon: FaHandshake,
+      icon: 'handshake',
       label: 'Event Sponsors',
       color: 'amber',
       key: 'event-sponsors'
     },
     {
       href: '/admin/tenant-management/organizations',
-      icon: FaBuilding,
+      icon: 'building',
       label: 'Organizations',
       color: 'cyan',
       key: 'tenant-organizations'
     },
     {
       href: '/admin/tenant-management/settings',
-      icon: FaCog,
+      icon: 'cog',
       label: 'Tenant Settings',
       color: 'slate',
       key: 'tenant-settings'
     },
     {
       href: '/admin/tenant-management/test',
-      icon: FaChartLine,
+      icon: 'chart',
       label: 'Test CRUD',
       color: 'red',
       key: 'tenant-test'
     },
     {
       href: '/admin/event-featured-performers',
-      icon: FaMicrophone,
+      icon: 'microphone',
       label: 'Global Performers',
       color: 'pink',
       key: 'global-performers'
     },
     {
       href: '/admin/event-contacts',
-      icon: FaPhone,
+      icon: 'phone',
       label: 'Global Contacts',
       color: 'emerald',
       key: 'global-contacts'
     },
     {
       href: '/admin/event-emails',
-      icon: FaMailBulk,
+      icon: 'mailBulk',
       label: 'Global Emails',
       color: 'cyan',
       key: 'global-emails'
     },
     {
       href: '/admin/event-program-directors',
-      icon: FaUserCheck,
+      icon: 'userCheck',
       label: 'Global Directors',
       color: 'indigo',
       key: 'global-directors'
@@ -193,9 +180,99 @@ export default function AdminPage() {
       pink: 'bg-pink-50 hover:bg-pink-100 text-pink-700 border-pink-200',
       emerald: 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200',
       amber: 'bg-amber-50 hover:bg-amber-100 text-amber-700 border-amber-200',
-      rose: 'bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-200'
+      rose: 'bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-200',
+      lime: 'bg-lime-50 hover:bg-lime-100 text-lime-700 border-lime-200'
     };
     return colorMap[color] || colorMap.gray;
+  };
+
+  const getIconBgColor = (color: string) => {
+    const colorMap: Record<string, string> = {
+      gray: 'bg-gray-100',
+      blue: 'bg-blue-100',
+      green: 'bg-green-100',
+      yellow: 'bg-yellow-100',
+      purple: 'bg-purple-100',
+      orange: 'bg-orange-100',
+      teal: 'bg-teal-100',
+      indigo: 'bg-indigo-100',
+      cyan: 'bg-cyan-100',
+      slate: 'bg-slate-100',
+      red: 'bg-red-100',
+      pink: 'bg-pink-100',
+      emerald: 'bg-emerald-100',
+      amber: 'bg-amber-100',
+      rose: 'bg-rose-100',
+      lime: 'bg-lime-100'
+    };
+    return colorMap[color] || colorMap.gray;
+  };
+
+  const getIconTextColor = (color: string) => {
+    const colorMap: Record<string, string> = {
+      gray: 'text-gray-500',
+      blue: 'text-blue-500',
+      green: 'text-green-500',
+      yellow: 'text-yellow-500',
+      purple: 'text-purple-500',
+      orange: 'text-orange-500',
+      teal: 'text-teal-500',
+      indigo: 'text-indigo-500',
+      cyan: 'text-cyan-500',
+      slate: 'text-slate-500',
+      red: 'text-red-500',
+      pink: 'text-pink-500',
+      emerald: 'text-emerald-500',
+      amber: 'text-amber-500',
+      rose: 'text-rose-500',
+      lime: 'text-lime-500'
+    };
+    return colorMap[color] || colorMap.gray;
+  };
+
+  const renderIcon = (iconName: string, className: string) => {
+    switch (iconName) {
+      case 'home':
+        return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>;
+      case 'users':
+        return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>;
+      case 'calendar':
+        return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>;
+      case 'chart':
+        return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>;
+      case 'chartBar':
+        return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>;
+      case 'userFriends':
+        return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>;
+      case 'addressCard':
+        return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" /></svg>;
+      case 'fileInvoice':
+        return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>;
+      case 'mailBulk':
+        return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>;
+      case 'envelope':
+        return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>;
+      case 'creditCard':
+        return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>;
+      case 'image':
+        return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>;
+      case 'userTie':
+        return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>;
+      case 'handshake':
+        return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" /></svg>;
+      case 'building':
+        return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>;
+      case 'cog':
+        return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>;
+      case 'microphone':
+        return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>;
+      case 'phone':
+        return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>;
+      case 'userCheck':
+        return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
+      default:
+        return null;
+    }
   };
 
   if (!userId) {
@@ -213,20 +290,23 @@ export default function AdminPage() {
       <div className="bg-white rounded-xl shadow-lg p-6 lg:p-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
           {adminButtons.map((button) => {
-            const IconComponent = button.icon;
             const colorClasses = getColorClasses(button.color);
+            const iconBgColor = getIconBgColor(button.color);
+            const iconTextColor = getIconTextColor(button.color);
 
             return (
-        <Link
+              <Link
                 key={button.key}
                 href={button.href}
-                className={`flex flex-col items-center justify-center rounded-lg border-2 p-4 lg:p-6 transition-all duration-200 hover:scale-105 hover:shadow-md ${colorClasses}`}
+                className={`flex flex-col items-center justify-center rounded-lg border-2 p-4 lg:p-6 transition-all duration-300 hover:scale-105 hover:shadow-md group ${colorClasses}`}
               >
-                <IconComponent className="text-2xl lg:text-3xl mb-2 lg:mb-3" />
+                <div className={`flex-shrink-0 w-14 h-14 rounded-xl ${iconBgColor} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300`}>
+                  {renderIcon(button.icon, `w-10 h-10 ${iconTextColor}`)}
+                </div>
                 <span className="font-semibold text-center text-sm lg:text-base leading-tight">
                   {button.label}
                 </span>
-        </Link>
+              </Link>
             );
           })}
         </div>
