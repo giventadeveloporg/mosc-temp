@@ -99,7 +99,7 @@ const HolySynodPage = () => {
       href: '/mosc/holy-synod/h-g-abraham-mar-epiphanios',
       title: 'Metropolitan',
       image: '/images/holy-synod/mar-ephipanios.jpg',
-      description: 'His Grace was born on 17th September 1960 as the son of Mr. V. A. Oommen and Mrs. Gracy Oommen. His Grace is a member of St. Mary\'s Cathedral, Malaysia.'
+      description: "His Grace was born on 17th September 1960 as the son of Mr. V. A. Oommen and Mrs. Gracy Oommen. His Grace is a member of St. Mary's Cathedral, Malaysia."
     },
     {
       name: 'H. G. Dr. Mathews Mar Thimothios Metropolitan',
@@ -211,7 +211,7 @@ const HolySynodPage = () => {
       href: '/mosc/holy-synod/h-g-dr-geevarghese-mar-barnabas-metropolitan',
       title: 'Metropolitan',
       image: '/images/holy-synod/Geevarghese-Mar-Barnabas.png',
-      description: 'Born to Mr. Kochupappi and Mrs. Ammini in Kattuparambil House on April 10, 1973, His Grace belongs to the parish of St. Mary\'s Orthodox Church, Muttam under Mavelikkara diocese.'
+      description: "Born to Mr. Kochupappi and Mrs. Ammini in Kattuparambil House on April 10, 1973, His Grace belongs to the parish of St. Mary's Orthodox Church, Muttam under Mavelikkara diocese."
     },
     {
       name: 'H.G. Zachariah Mar Severios Metropolitan',
