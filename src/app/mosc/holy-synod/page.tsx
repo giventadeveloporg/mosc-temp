@@ -64,7 +64,7 @@ const HolySynodPage = () => {
       href: '/mosc/holy-synod/his-grace-dr-gabriel-mar-gregorios',
       title: 'Metropolitan',
       image: '/images/holy-synod/mar-gregorios.jpg',
-      description: 'His Grace was born on 10 February 1948 to Mr CM John and Mrs Aleyamma John, Vadakethazhethil, Kanjickal. He did schooling at St Stephen\'s High School, Pathanapuram. He persued his...'
+      description: "His Grace was born on 10 February 1948 to Mr CM John and Mrs Aleyamma John, Vadakethazhethil, Kanjickal. He did schooling at St Stephen's High School, Pathanapuram. He persued his..."
     },
     {
       name: 'H.G. Dr. Yuhanon Mar Chrisostomos Metropolitan',
