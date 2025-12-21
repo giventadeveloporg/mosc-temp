@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import AdminNavigation from '@/components/AdminNavigation';
 import { Modal } from '@/components/Modal';
 import { FaTimes, FaExclamationTriangle, FaCheckCircle } from 'react-icons/fa';
 import { cancelUserSubscriptionServer, getSubscriptionDetailsServer } from './ApiServerActions';
@@ -114,7 +116,7 @@ export function AdminSubscriptionsClient({
 
   if (error) {
     return (
-      <div className="max-w-5xl mx-auto px-8 py-8">
+      <div className="max-w-5xl mx-auto px-8 py-8" style={{ paddingTop: '180px' }}>
         <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded-md">
           {error}
         </div>
@@ -123,10 +125,28 @@ export function AdminSubscriptionsClient({
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-8 py-8">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="font-heading font-semibold text-3xl text-foreground">User Subscriptions</h1>
+    <div className="max-w-5xl mx-auto px-8 py-8" style={{ paddingTop: '180px' }}>
+      {/* Header with back button */}
+      <div className="flex items-center mb-8">
+        <Link
+          href="/admin"
+          className="flex items-center text-blue-600 hover:text-blue-800 mr-4"
+        >
+          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to Admin
+        </Link>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">User Subscriptions</h1>
+          <p className="text-gray-600">
+            View and manage all user subscriptions in the system.
+          </p>
+        </div>
       </div>
+
+      {/* Admin Navigation */}
+      <AdminNavigation currentPage="membership-subscriptions" />
 
       {/* Status Filter */}
       <div className="mb-4 flex items-center gap-4">

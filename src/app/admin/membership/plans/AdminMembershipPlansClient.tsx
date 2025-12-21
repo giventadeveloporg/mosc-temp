@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import AdminNavigation from '@/components/AdminNavigation';
 import { MembershipPlanList } from '@/components/admin/membership/MembershipPlanList';
 import { MembershipPlanForm } from '@/components/admin/membership/MembershipPlanForm';
 import {
@@ -102,7 +104,7 @@ export function AdminMembershipPlansClient({ plans: initialPlans, error }: Admin
 
   if (error) {
     return (
-      <div className="max-w-5xl mx-auto px-8 py-8">
+      <div className="max-w-5xl mx-auto px-8 py-8" style={{ paddingTop: '180px' }}>
         <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded-md">
           {error}
         </div>
@@ -111,17 +113,46 @@ export function AdminMembershipPlansClient({ plans: initialPlans, error }: Admin
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-8 py-8">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="font-heading font-semibold text-3xl text-foreground">Membership Plans</h1>
+    <div className="max-w-5xl mx-auto px-8 py-8" style={{ paddingTop: '180px' }}>
+      {/* Header with back button */}
+      <div className="flex items-center mb-8">
+        <Link
+          href="/admin"
+          className="flex items-center text-blue-600 hover:text-blue-800 mr-4"
+        >
+          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to Admin
+        </Link>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Membership Plans</h1>
+          <p className="text-gray-600">
+            Create, edit, and manage all membership plans in the system.
+          </p>
+        </div>
+      </div>
+
+      {/* Admin Navigation */}
+      <AdminNavigation currentPage="membership-plans" />
+
+      {/* Create Plan Button */}
+      <div className="flex justify-end mb-6">
         <Button
           onClick={() => {
             setEditingPlan(null);
             setIsModalOpen(true);
           }}
-          className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-medium"
+          className="flex items-center justify-center gap-3 px-6 py-3 rounded-xl bg-blue-100 hover:bg-blue-200 transition-all duration-300 hover:scale-105"
+          title="Create Plan"
+          aria-label="Create Plan"
         >
-          + Create Plan
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+          </div>
+          <span className="font-semibold text-blue-700">Create Plan</span>
         </Button>
       </div>
 
@@ -133,9 +164,16 @@ export function AdminMembershipPlansClient({ plans: initialPlans, error }: Admin
               setEditingPlan(null);
               setIsModalOpen(true);
             }}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-medium"
+            className="flex items-center justify-center gap-3 px-6 py-3 rounded-xl bg-blue-100 hover:bg-blue-200 transition-all duration-300 hover:scale-105 mx-auto"
+            title="Create Your First Plan"
+            aria-label="Create Your First Plan"
           >
-            + Create Your First Plan
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+            </div>
+            <span className="font-semibold text-blue-700">Create Your First Plan</span>
           </Button>
         </div>
       ) : (
