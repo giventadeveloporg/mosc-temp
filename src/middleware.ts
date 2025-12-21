@@ -53,6 +53,7 @@ export default authMiddleware({
     '/charity-theme(.*)',
     '/calendar(.*)',
     '/focus-groups(.*)',
+    '/pricing(.*)',  // Public pricing page (no auth required for viewing)
   ],
 
   // Satellite domain configuration (only applied when envs are set)
@@ -81,6 +82,20 @@ export default authMiddleware({
     '/api/checkout/(.*)',
     '/api/diagnostic(.*)',
     '/api/logs(.*)',
+    // CRITICAL: Ignore public page routes to allow Playwright/automated tests
+    // These routes bypass Clerk middleware completely, allowing access without session cookies
+    // NOTE: Routes are also in publicRoutes for consistency, but ignoredRoutes takes precedence
+    // IMPORTANT: /polls and /pricing are NOT in ignoredRoutes because they call auth() and need Clerk middleware
+    // They remain in publicRoutes so they're accessible without authentication, but middleware must run for auth() to work
+    '/',  // Homepage (exact match)
+    '/events(.*)',  // Events pages
+    '/sponsors(.*)',  // Sponsors pages
+    '/gallery(.*)',  // Gallery pages
+    '/calendar(.*)',  // Calendar pages
+    '/mosc(.*)',  // MOSC pages
+    '/charity-theme(.*)',  // Charity theme pages
+    '/focus-groups(.*)',  // Focus groups pages
+    // NOTE: /polls and /pricing are NOT ignored - they need Clerk middleware for auth() calls
   ],
 
   // Custom logic to add pathname header and handle prefetch requests
@@ -124,9 +139,50 @@ export default authMiddleware({
       console.log('[MIDDLEWARE] ===== END API REQUEST LOG =====');
     }
 
+    // CRITICAL: Explicitly allow public routes even if auth check fails
+    // This ensures public routes work even without session cookies (e.g., Playwright tests, curl)
+    // Note: pathname is already declared above (line 90), so we reuse it here
+
+    // Define public route patterns (must match publicRoutes array)
+    const publicRoutePatterns = [
+      /^\/$/,
+      /^\/sign-in/,
+      /^\/sign-up/,
+      /^\/sso-callback/,
+      /^\/api\/webhooks/,
+      /^\/api\/public/,
+      /^\/api\/proxy/,
+      /^\/api\/event\/success/,
+      /^\/api\/membership\/success/,
+      /^\/membership\/success/,
+      /^\/membership\/qr/,
+      /^\/api\/diagnostic/,
+      /^\/api\/logs/,
+      /^\/mosc/,
+      /^\/events/,
+      /^\/sponsors/,
+      /^\/gallery/,
+      /^\/about/,
+      /^\/contact/,
+      /^\/polls/,
+      /^\/charity-theme/,
+      /^\/calendar/,
+      /^\/focus-groups/,
+      /^\/pricing/,
+    ];
+
+    // Check if this is a public route
+    const isPublicRoute = publicRoutePatterns.some(pattern => pattern.test(pathname));
+
     // Add pathname header for layout detection (used by ConditionalLayout)
     const response = NextResponse.next();
-    response.headers.set('x-pathname', req.nextUrl.pathname);
+    response.headers.set('x-pathname', pathname);
+
+    // For public routes, always allow them through (even without auth)
+    // This fixes Playwright/curl tests that don't have session cookies
+    if (isPublicRoute) {
+      return response;
+    }
 
     // For prefetch requests on public routes, always allow them through
     if (req.nextUrl.searchParams.has('_rsc')) {

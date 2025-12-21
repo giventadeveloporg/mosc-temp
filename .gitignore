@@ -61,3 +61,7 @@ dev.js
 .qoder/rules/byterover-rules.md
 .augment/rules/byterover-rules.md# Clerk credentials
 .clerk/
+
+# Test authentication state (contains session tokens)
+TestSprite/sanity-tests/.auth-state.json
+/TestSprite/sanity-tests/screenshots/
