@@ -90,10 +90,14 @@ export default async function TenantSettingsViewPage({ params }: PageProps) {
           <li className="inline-flex items-center">
             <Link
               href="/admin"
-              className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600"
+              className="flex-shrink-0 h-14 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+              title="Admin Dashboard"
+              aria-label="Admin Dashboard"
             >
-              <FaArrowLeft className="w-4 h-4 mr-2" />
-              Admin Dashboard
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center">
+                <FaArrowLeft className="w-6 h-6 text-gray-600" />
+              </div>
+              <span className="font-semibold text-gray-700">Admin Dashboard</span>
             </Link>
           </li>
           <li>

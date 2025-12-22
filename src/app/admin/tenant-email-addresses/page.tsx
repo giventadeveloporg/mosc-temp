@@ -333,10 +333,14 @@ export default function TenantEmailAddressesPage() {
           <button
             type="button"
             onClick={openCreateModal}
-            className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium shadow-sm transition-colors"
+            className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+            title="Add Email Address"
+            aria-label="Add Email Address"
           >
-            <FaPlus className="mr-2" />
-            Add Email Address
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+              <FaPlus className="w-6 h-6 text-blue-600" />
+            </div>
+            <span className="font-semibold text-blue-700">Add Email Address</span>
           </button>
         </div>
 

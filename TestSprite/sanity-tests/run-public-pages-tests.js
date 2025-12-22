@@ -99,7 +99,6 @@ const publicPageTests = [
       'Registration/ticket button is present',
       'No 404 errors'
     ],
-    skipIf: 'No events available',
     interactions: [
       { type: 'wait', selector: 'h1', timeout: 5000 }
     ]
@@ -135,8 +134,7 @@ const publicPageTests = [
       'Sponsor details page loads',
       'Sponsor information displayed',
       'Logo/image displayed'
-    ],
-    skipIf: 'No sponsors available'
+    ]
   },
   {
     id: 'public-006',

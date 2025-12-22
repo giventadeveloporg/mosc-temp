@@ -370,12 +370,16 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
       <div className="flex items-center mb-8">
         <Link
           href="/admin"
-          className="flex items-center text-blue-600 hover:text-blue-800 mr-4"
+          className="flex-shrink-0 h-14 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+          title="Back to Admin"
+          aria-label="Back to Admin"
         >
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          Back to Admin
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center">
+            <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+          </div>
+          <span className="font-semibold text-gray-700">Back to Admin</span>
         </Link>
         <div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Registration Management</h1>

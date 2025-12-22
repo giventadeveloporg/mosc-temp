@@ -13,7 +13,7 @@ export default function AdminNavigation({ currentPage, showHome = true }: AdminN
       href: '/admin',
       icon: 'home',
       label: 'Admin Home',
-      color: 'gray',
+      color: 'indigo',
       active: currentPage === 'admin',
       key: 'admin-home'
     }] : []),
@@ -85,7 +85,7 @@ export default function AdminNavigation({ currentPage, showHome = true }: AdminN
       href: '/admin/tenant-management/settings',
       icon: 'cog',
       label: 'Tenant Settings',
-      color: 'slate',
+      color: 'purple',
       active: currentPage === 'tenant-settings',
       key: 'tenant-settings'
     },

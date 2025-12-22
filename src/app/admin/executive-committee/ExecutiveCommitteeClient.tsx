@@ -83,9 +83,17 @@ export default function ExecutiveCommitteeClient({ initialMembers }: ExecutiveCo
         </div>
         <button
           onClick={() => setIsFormOpen(true)}
-          className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-md flex items-center gap-2 transition-colors"
+          className="w-full flex-shrink-0 h-14 rounded-xl bg-teal-100 hover:bg-teal-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105"
+          title="Add Member"
+          aria-label="Add Member"
+          type="button"
         >
-          <FaPlus /> Add Member
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
+            <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+          </div>
+          <span className="font-semibold text-teal-700">Add Member</span>
         </button>
       </div>
 

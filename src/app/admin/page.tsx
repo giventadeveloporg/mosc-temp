@@ -12,7 +12,7 @@ export default function AdminPage() {
       href: '/admin',
       icon: 'home',
       label: 'Admin Home',
-      color: 'gray',
+      color: 'indigo',
       key: 'admin-home'
     },
     {
@@ -124,7 +124,7 @@ export default function AdminPage() {
       href: '/admin/tenant-management/settings',
       icon: 'cog',
       label: 'Tenant Settings',
-      color: 'slate',
+      color: 'purple',
       key: 'tenant-settings'
     },
     {

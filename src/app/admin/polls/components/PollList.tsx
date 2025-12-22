@@ -112,10 +112,14 @@ export function PollList({
         </h2>
         <Button 
           onClick={onCreate}
-          className="bg-gradient-to-r from-indigo-500 to-cyan-500 hover:from-indigo-600 hover:to-cyan-600 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+          className="flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+          title="Create Poll"
+          aria-label="Create Poll"
         >
-          <Plus className="h-5 w-5 mr-2" />
-          Create Poll
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
+            <Plus className="h-6 w-6 text-indigo-600" />
+          </div>
+          <span className="font-semibold text-indigo-700">Create Poll</span>
         </Button>
       </div>
 

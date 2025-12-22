@@ -51,6 +51,7 @@ export default function SponsorDetailsPage() {
   const [showSlideshow, setShowSlideshow] = useState(false);
   const [slideshowInitialIndex, setSlideshowInitialIndex] = useState(0);
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
+  const [heroImageError, setHeroImageError] = useState(false);
 
   useEffect(() => {
     async function fetchSponsorDetails() {
@@ -103,15 +104,15 @@ export default function SponsorDetailsPage() {
   const remainingCount = Math.max(0, gallery.length - 12);
 
   return (
-    <div>
+    <div className="pt-20">
       {/* Hero Section - Full width banner image */}
-      <section className="relative w-full bg-transparent" style={{ marginTop: '100px', paddingTop: '20px', paddingBottom: '20px' }}>
-        <div className="w-full relative">
+      <section className="relative w-full bg-transparent">
+        <div className="w-full relative min-h-[200px]">
           {/* Main hero image container */}
-          {(sponsor.bannerImageUrl || heroImage?.fileUrl) ? (
-            <div className="relative w-full flex items-center justify-center" style={{ maxWidth: '100%', minHeight: '200px' }}>
+          {(sponsor.bannerImageUrl || heroImage?.fileUrl) && !heroImageError ? (
+            <div className="relative w-full flex items-center justify-center min-h-[200px]" style={{ maxWidth: '100%' }}>
               {/* Blurred background image */}
-              <div className="absolute inset-0 w-full h-full" style={{ zIndex: 0 }}>
+              <div className="absolute inset-0 w-full h-full min-h-[200px]" style={{ zIndex: 0 }}>
                 <Image
                   src={sponsor.bannerImageUrl || heroImage?.fileUrl || ''}
                   alt="Sponsor banner background"
@@ -123,17 +124,18 @@ export default function SponsorDetailsPage() {
                   }}
                   aria-hidden="true"
                   priority
+                  onError={() => setHeroImageError(true)}
                 />
               </div>
 
               {/* Main hero image */}
-              <div className="relative w-full flex items-center justify-center" style={{ zIndex: 1, maxWidth: '100%' }}>
+              <div className="relative w-full flex items-center justify-center min-h-[200px]" style={{ zIndex: 1, maxWidth: '100%' }}>
                 <Image
                   src={sponsor.bannerImageUrl || heroImage?.fileUrl || ''}
                   alt={`${sponsor.name} Banner`}
                   width={1920}
                   height={1900}
-                  className="w-full h-auto"
+                  className="w-full h-auto min-h-[200px]"
                   style={{
                     maxHeight: '1900px',
                     maxWidth: '100%',
@@ -142,6 +144,7 @@ export default function SponsorDetailsPage() {
                     display: 'block',
                   }}
                   priority
+                  onError={() => setHeroImageError(true)}
                 />
               </div>
 
@@ -150,15 +153,24 @@ export default function SponsorDetailsPage() {
               <div className="pointer-events-none absolute left-0 bottom-0 w-full h-16" style={{ background: 'linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%)', zIndex: 20 }} />
             </div>
           ) : (
-            <div className="w-full h-64 bg-gradient-to-br from-gray-100 to-gray-200" />
+            <div className="w-full min-h-[200px] h-64 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+              <div className="text-center px-4">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-300 flex items-center justify-center">
+                  <svg className="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                </div>
+                <p className="text-gray-600 font-medium">{sponsor.name}</p>
+              </div>
+            </div>
           )}
         </div>
       </section>
 
       {/* Sponsor Details - Styled like event details page */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-6 sponsor-details-container">
         <div
-          className={`${getSponsorBackground(sponsor.id || 0)} rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 overflow-hidden`}
+          className={`sponsor-card ${getSponsorBackground(sponsor.id || 0)} rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 overflow-hidden`}
           style={{
             boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05)'
           }}
@@ -181,13 +193,13 @@ export default function SponsorDetailsPage() {
               )}
 
               {/* Sponsor Details - Centered flexbox layout */}
-              <div className="flex flex-wrap justify-center gap-3 mb-6 lg:max-w-4xl lg:mx-auto">
+              <div className="flex flex-wrap justify-center gap-3 mb-6 lg:max-w-4xl lg:mx-auto contact-info">
                 {/* Company Name */}
                 {sponsor.companyName && (
-                  <div className="flex items-center gap-3 text-gray-700 w-full sm:w-auto sm:min-w-[280px]">
+                  <div className="flex items-center gap-3 text-gray-700 w-full sm:w-auto sm:min-w-[280px] contact">
                     <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                       <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                       </svg>
                     </div>
                     <span className="text-lg font-semibold">
@@ -309,7 +321,7 @@ export default function SponsorDetailsPage() {
 
         {/* Gallery Section - Styled like event details page */}
         {gallery.length > 0 && (
-          <div className="mb-8 mt-8">
+          <div className="mb-6 mt-6">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">Sponsor Gallery</h2>
@@ -396,6 +408,11 @@ export default function SponsorDetailsPage() {
               startTime: '',
               endTime: '',
               timezone: 'America/New_York',
+              isFeaturedEvent: false,
+              featuredEventPriorityRanking: 0,
+              liveEventPriorityRanking: 0,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
             }}
             media={gallery}
             onClose={() => setShowSlideshow(false)}

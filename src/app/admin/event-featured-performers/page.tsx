@@ -312,10 +312,15 @@ export default function EventFeaturedPerformersPage() {
           </div>
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow font-bold flex items-center gap-2 hover:bg-blue-700 transition"
+            className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+            title="Add Performer"
+            aria-label="Add Performer"
+            type="button"
           >
-            <FaPlus />
-            Add Performer
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+              <FaPlus className="w-6 h-6 text-blue-600" />
+            </div>
+            <span className="font-semibold text-blue-700">Add Performer</span>
           </button>
         </div>
       </div>
@@ -345,10 +350,17 @@ export default function EventFeaturedPerformersPage() {
             <button
               onClick={() => setPage(prev => Math.max(0, prev - 1))}
               disabled={page === 0}
-              className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+              className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed disabled:hover:scale-100"
+              title="Previous Page"
+              aria-label="Previous Page"
+              type="button"
             >
-              <FaChevronLeft />
-              Previous
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </div>
+              <span className="font-semibold text-blue-700">Previous</span>
             </button>
             <div className="text-sm font-semibold">
               Page {page + 1} of {Math.max(1, Math.ceil(totalCount / pageSize))}
@@ -356,10 +368,17 @@ export default function EventFeaturedPerformersPage() {
             <button
               onClick={() => setPage(prev => prev + 1)}
               disabled={page >= Math.ceil(totalCount / pageSize) - 1}
-              className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+              className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed disabled:hover:scale-100"
+              title="Next Page"
+              aria-label="Next Page"
+              type="button"
             >
-              Next
-              <FaChevronRight />
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+              <span className="font-semibold text-blue-700">Next</span>
             </button>
           </div>
           <div className="text-center text-sm text-gray-600 mt-2">

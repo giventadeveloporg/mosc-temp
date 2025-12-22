@@ -202,10 +202,15 @@ export default function GlobalEventEmailsPage() {
               </div>
               <button
                 onClick={() => setIsCreateModalOpen(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition"
+                className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                title="Add Email"
+                aria-label="Add Email"
+                type="button"
               >
-                <FaPlus className="text-sm" />
-                <span>Add Email</span>
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                  <FaPlus className="w-6 h-6 text-blue-600" />
+                </div>
+                <span className="font-semibold text-blue-700">Add Email</span>
               </button>
             </div>
           </div>
