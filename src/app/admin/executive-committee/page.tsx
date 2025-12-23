@@ -12,11 +12,21 @@ export default async function ExecutiveCommitteePage() {
     redirect('/sign-in');
   }
 
+  // Add timeout wrapper to prevent hanging
   let members = [];
   try {
-    members = await fetchExecutiveCommitteeMembers();
+    members = await Promise.race([
+      fetchExecutiveCommitteeMembers(),
+      new Promise<[]>((resolve) =>
+        setTimeout(() => {
+          console.warn('[ExecutiveCommittee] Data fetch timeout after 25 seconds');
+          resolve([]);
+        }, 25000)
+      )
+    ]);
   } catch (error) {
     console.error('Failed to fetch executive committee members:', error);
+    members = []; // Ensure members is always an array
   }
 
   return (

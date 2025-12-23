@@ -112,7 +112,7 @@ function MediaDetailsTooltip({ media, anchorRect, onClose, onTooltipMouseEnter, 
         </div>
         <button
           onClick={onClose}
-          className="w-10 h-10 text-2xl bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all"
+          className="w-8 h-8 text-2xl bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all"
           aria-label="Close tooltip"
         >
           <FaTimes />
@@ -668,34 +668,34 @@ export default function EventMediaListPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             <Link
               href="/admin"
-              className="flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 text-gray-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+              className="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg shadow-md p-3 text-xs transition-all group"
               title="Admin Home"
               aria-label="Admin Home"
             >
-              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-gray-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-                <FaHome className="w-10 h-10 text-gray-500" />
+              <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-blue-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+                <FaHome className="w-8 h-8 text-blue-500" />
               </div>
               <span className="font-semibold text-center leading-tight">Admin Home</span>
             </Link>
             <Link
               href="/admin/manage-usage"
-              className="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+              className="flex flex-col items-center justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-800 rounded-lg shadow-md p-3 text-xs transition-all group"
               title="Manage Usage"
               aria-label="Manage Usage"
             >
-              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-                <FaUsers className="w-10 h-10 text-blue-500" />
+              <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-indigo-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+                <FaUsers className="w-8 h-8 text-indigo-500" />
               </div>
               <span className="font-semibold text-center leading-tight">Manage Usage</span>
             </Link>
             <Link
               href="/admin/manage-events"
-              className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+              className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-lg shadow-md p-3 text-xs transition-all group"
               title="Manage Events"
               aria-label="Manage Events"
             >
-              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-                <FaCalendarAlt className="w-10 h-10 text-green-500" />
+              <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+                <FaCalendarAlt className="w-8 h-8 text-green-500" />
               </div>
               <span className="font-semibold text-center leading-tight">Manage Events</span>
             </Link>
@@ -703,23 +703,23 @@ export default function EventMediaListPage() {
               <>
                 <Link
                   href={`/admin/events/${eventId}/ticket-types/list`}
-                  className="flex flex-col items-center justify-center bg-purple-50 hover:bg-purple-100 text-purple-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+                  className="flex flex-col items-center justify-center bg-purple-50 hover:bg-purple-100 text-purple-800 rounded-lg shadow-md p-3 text-xs transition-all group"
                   title="Manage Ticket Types"
                   aria-label="Manage Ticket Types"
                 >
-                  <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-                    <FaTags className="w-10 h-10 text-purple-500" />
+                  <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-purple-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+                    <FaTags className="w-8 h-8 text-purple-500" />
                   </div>
                   <span className="font-semibold text-center leading-tight">Manage Ticket Types</span>
                 </Link>
                 <Link
                   href={`/admin/events/${eventId}/tickets/list`}
-                  className="flex flex-col items-center justify-center bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+                  className="flex flex-col items-center justify-center bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-lg shadow-md p-3 text-xs transition-all group"
                   title="Manage Tickets"
                   aria-label="Manage Tickets"
                 >
-                  <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-teal-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-                    <FaTicketAlt className="w-10 h-10 text-teal-500" />
+                  <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-teal-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+                    <FaTicketAlt className="w-8 h-8 text-teal-500" />
                   </div>
                   <span className="font-semibold text-center leading-tight">Manage Tickets</span>
                 </Link>

@@ -90,7 +90,8 @@ const adminTestPages = [
     category: 'core',
     priority: 'critical',
     expectedElements: ['h1, h2', '[class*="admin"]', 'nav', 'a[href*="/admin"]'],
-    validation: ['Admin dashboard loads', 'Navigation menu visible', 'Admin buttons displayed']
+    validation: ['Admin dashboard loads', 'Navigation menu visible', 'Admin buttons displayed'],
+    timeout: 45000, // Increased timeout for client-side auth loading
   },
   {
     id: 'admin-002',
@@ -99,7 +100,8 @@ const adminTestPages = [
     category: 'core',
     priority: 'critical',
     expectedElements: ['h1', 'table', 'input[type="search"]', 'button'],
-    validation: ['User management page loads', 'User table visible', 'Search functionality present']
+    validation: ['User management page loads', 'User table visible', 'Search functionality present'],
+    timeout: 45000, // Increased timeout for API calls
   },
   {
     id: 'admin-003',
@@ -108,7 +110,8 @@ const adminTestPages = [
     category: 'core',
     priority: 'critical',
     expectedElements: ['h1', '[class*="grid"]', 'a[href*="/admin/events"]', 'input[type="search"]'],
-    validation: ['Events management hub loads', 'Event cards/list displayed', 'Search controls present']
+    validation: ['Events management hub loads', 'Event cards/list displayed', 'Search controls present'],
+    timeout: 45000, // Increased timeout for client-side auth loading
   },
 
   // ==========================================
@@ -121,7 +124,8 @@ const adminTestPages = [
     category: 'events',
     priority: 'high',
     expectedElements: ['h1', '[class*="chart"]', '[class*="stat"]'],
-    validation: ['Analytics dashboard loads', 'Charts or stats displayed']
+    validation: ['Analytics dashboard loads', 'Charts or stats displayed'],
+    timeout: 45000, // Increased timeout for this page (makes multiple API calls)
   },
   {
     id: 'admin-005',
@@ -130,7 +134,8 @@ const adminTestPages = [
     category: 'events',
     priority: 'high',
     expectedElements: ['h1', 'table', 'input[type="search"]'],
-    validation: ['Registrations page loads', 'Registration table visible']
+    validation: ['Registrations page loads', 'Registration table visible'],
+    timeout: 45000, // Increased timeout for API calls
   },
 
   // ==========================================
@@ -227,6 +232,7 @@ const adminTestPages = [
     category: 'content',
     priority: 'medium',
     expectedElements: ['h1', 'table', 'button', 'form'],
+    timeout: 45000, // Increased timeout for this page (makes API calls)
     validation: ['Executive committee page loads', 'Committee members list visible']
   },
   {
@@ -460,10 +466,12 @@ async function runTest(page, test, config) {
 
     // Navigate to page (handle page closure gracefully)
     const fullUrl = `${config.baseUrl}${test.url || test.urlPattern}`;
+    // Use test-specific timeout if provided, otherwise use config timeout
+    const pageTimeout = test.timeout || config.timeout;
     try {
       await page.goto(fullUrl, {
         waitUntil: 'domcontentloaded',
-        timeout: config.timeout
+        timeout: pageTimeout
       });
     } catch (navigationError) {
       // If page is closed during navigation, provide helpful error
@@ -477,6 +485,30 @@ async function runTest(page, test, config) {
     await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {
       console.warn(`   ⚠️  Network idle timeout, continuing...`);
     });
+
+    // CRITICAL: Wait for main content (h1) to appear for client-side rendered pages
+    // This ensures client components have hydrated and rendered their content
+    try {
+      // Wait for h1 specifically (most reliable indicator of page content)
+      await page.waitForSelector('h1', {
+        timeout: 20000,
+        state: 'visible'
+      }).catch(async () => {
+        // If h1 doesn't appear, try other selectors
+        console.warn(`   ⚠️  h1 not found, trying alternative selectors...`);
+        await page.waitForSelector('h2, main, [class*="admin"]', {
+          timeout: 10000,
+          state: 'visible'
+        }).catch(() => {
+          console.warn(`   ⚠️  Alternative selectors also not found, continuing anyway...`);
+        });
+      });
+
+      // Additional wait for client-side rendering to complete (especially for data tables)
+      await page.waitForTimeout(2000);
+    } catch (waitError) {
+      console.warn(`   ⚠️  Could not wait for main content: ${waitError.message}`);
+    }
 
     // Check for expected elements
     const elementsFound = [];

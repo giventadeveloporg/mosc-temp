@@ -637,20 +637,20 @@ export default function AdminMediaPage() {
       <div className="mb-8">
         <div className="bg-white rounded-lg shadow-md p-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 justify-items-center mx-auto max-w-6xl">
-            <Link href="/admin" className="w-full max-w-xs flex flex-col items-center justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-800 rounded-lg shadow-sm hover:shadow-md p-3 sm:p-4 text-xs sm:text-sm transition-all duration-200">
-              <FaHome className="text-lg sm:text-xl mb-2 text-indigo-600" />
+            <Link href="/admin" className="w-full max-w-xs flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg shadow-sm hover:shadow-md p-2 sm:p-3 text-xs sm:text-sm transition-all duration-200">
+              <FaHome className="text-base sm:text-lg mb-1.5 text-blue-600" />
               <span className="font-semibold text-center leading-tight">Admin Home</span>
             </Link>
-            <Link href="/admin/manage-usage" className="w-full max-w-xs flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg shadow-sm hover:shadow-md p-3 sm:p-4 text-xs sm:text-sm transition-all duration-200">
-              <FaUsers className="text-lg sm:text-xl mb-2" />
+            <Link href="/admin/manage-usage" className="w-full max-w-xs flex flex-col items-center justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-800 rounded-lg shadow-sm hover:shadow-md p-2 sm:p-3 text-xs sm:text-sm transition-all duration-200">
+              <FaUsers className="text-base sm:text-lg mb-1.5 text-indigo-600" />
               <span className="font-semibold text-center leading-tight">Manage Users [Usage]</span>
             </Link>
-            <Link href="/admin/manage-events" className="w-full max-w-xs flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-lg shadow-sm hover:shadow-md p-3 sm:p-4 text-xs sm:text-sm transition-all duration-200">
-              <FaCalendarAlt className="text-lg sm:text-xl mb-2" />
+            <Link href="/admin/manage-events" className="w-full max-w-xs flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-lg shadow-sm hover:shadow-md p-2 sm:p-3 text-xs sm:text-sm transition-all duration-200">
+              <FaCalendarAlt className="text-base sm:text-lg mb-1.5 text-green-600" />
               <span className="font-semibold text-center leading-tight">Manage Events</span>
             </Link>
-            <Link href="/admin/media" className="w-full max-w-xs flex flex-col items-center justify-center bg-purple-50 hover:bg-purple-100 text-purple-800 rounded-lg shadow-sm hover:shadow-md p-3 sm:p-4 text-xs sm:text-sm transition-all duration-200">
-              <FaPhotoVideo className="text-lg sm:text-xl mb-2" />
+            <Link href="/admin/media" className="w-full max-w-xs flex flex-col items-center justify-center bg-cyan-50 hover:bg-cyan-100 text-cyan-800 rounded-lg shadow-sm hover:shadow-md p-2 sm:p-3 text-xs sm:text-sm transition-all duration-200">
+              <FaPhotoVideo className="text-base sm:text-lg mb-1.5 text-cyan-600" />
               <span className="font-semibold text-center leading-tight">Manage Media</span>
             </Link>
           </div>
@@ -659,8 +659,8 @@ export default function AdminMediaPage() {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Manage Media Files</h1>
         <div className="flex space-x-2">
-          <Link 
-            href="/admin/media" 
+          <Link
+            href="/admin/media"
             className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
             title="Upload New Media"
             aria-label="Upload New Media"

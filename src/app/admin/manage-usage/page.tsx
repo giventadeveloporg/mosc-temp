@@ -8,12 +8,44 @@ export default async function ManageUsagePage() {
   const { userId } = await auth();
   let adminProfile = null;
   if (userId) {
-    // Ensure tenant-scoped profile exists for the current admin user
+    // Add timeout wrapper to prevent hanging
     try {
-      const u = await currentUser();
-      await bootstrapUserProfile({ userId, user: u });
-    } catch { }
-    adminProfile = await fetchAdminProfileServer(userId);
+      // Ensure tenant-scoped profile exists for the current admin user
+      const u = await Promise.race([
+        currentUser(),
+        new Promise<null>((resolve) =>
+          setTimeout(() => {
+            console.warn('[ManageUsage] currentUser() timeout after 10 seconds');
+            resolve(null);
+          }, 10000)
+        )
+      ]);
+
+      if (u) {
+        await Promise.race([
+          bootstrapUserProfile({ userId, user: u }),
+          new Promise<void>((resolve) =>
+            setTimeout(() => {
+              console.warn('[ManageUsage] bootstrapUserProfile() timeout after 15 seconds');
+              resolve();
+            }, 15000)
+          )
+        ]);
+      }
+
+      adminProfile = await Promise.race([
+        fetchAdminProfileServer(userId),
+        new Promise<null>((resolve) =>
+          setTimeout(() => {
+            console.warn('[ManageUsage] fetchAdminProfileServer() timeout after 15 seconds');
+            resolve(null);
+          }, 15000)
+        )
+      ]);
+    } catch (error) {
+      console.error('[ManageUsage] Error fetching admin profile:', error);
+      adminProfile = null;
+    }
   }
   // Note: We are not fetching all users here anymore to keep it simple.
   // The ManageUsageClient will need to handle fetching users if required.

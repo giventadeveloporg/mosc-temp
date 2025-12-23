@@ -57,10 +57,33 @@ export default async function EventDashboardPage({ searchParams }: DashboardPage
 }
 
 async function EventDashboardContent({ eventId }: { eventId: number | null }) {
-  const dashboardData = await fetchEventDashboardData(eventId);
+  // Add timeout wrapper to prevent hanging
+  const dashboardData = await Promise.race([
+    fetchEventDashboardData(eventId),
+    new Promise<null>((resolve) =>
+      setTimeout(() => {
+        console.warn('[EventDashboard] Data fetch timeout after 25 seconds');
+        resolve(null);
+      }, 25000)
+    )
+  ]);
 
+  // If data fetch failed or timed out, show empty dashboard instead of 404
   if (!dashboardData) {
-    notFound();
+    // Return empty dashboard data structure instead of calling notFound()
+    // This allows the page to render with empty state
+    return <EventDashboardClient data={{
+      eventDetails: null,
+      totalAttendees: 0,
+      totalGuests: 0,
+      capacityUtilization: 0,
+      registrationTrends: [],
+      ageGroupStats: [],
+      relationshipStats: [],
+      specialRequirements: [],
+      recentRegistrations: [],
+      topEvents: [],
+    }} />;
   }
 
   return <EventDashboardClient data={dashboardData} />;

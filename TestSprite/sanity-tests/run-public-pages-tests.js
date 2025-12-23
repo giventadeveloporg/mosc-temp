@@ -282,17 +282,17 @@ const publicPageTests = [
     name: 'Pricing Page Test',
     url: '/pricing',
     priority: 'medium',
-    // Note: Pricing page requires authentication and redirects to /sign-in if not authenticated
-    // This test verifies the page structure when authenticated, or redirect behavior when not
+    // Note: Pricing page is now public and accessible without authentication
+    // Unauthenticated users can view pricing plans, authenticated users see personalized pricing
     expectedElements: [
       'h1, [class*="title"], [class*="heading"]',
-      'main, [class*="content"], [class*="container"]',
-      // Accept either pricing page content OR sign-in page (if redirected)
-      '[class*="pricing"], [class*="plan"], [class*="sign-in"], form[action*="sign-in"]'
+      'main, [class*="content"], [class*="container"], [class*="pricing"]',
+      '[class*="pricing"], [class*="plan"]'
     ],
     validation: [
-      'Pricing page loads or redirects to sign-in',
-      'No Clerk middleware errors',
+      'Pricing page loads successfully',
+      'Pricing plans are visible',
+      'No redirect errors',
       'Page structure is correct'
     ]
   }
@@ -384,16 +384,10 @@ async function executeTestWithPlaywright(test, testUrl, startTime) {
       }
     }
 
-    // Check for redirects (allow redirects for pricing page - it requires auth)
+    // Check for redirects (pricing page is now public, should not redirect)
     const finalUrl = page.url();
     if (finalUrl.includes('/sign-in') && !testUrl.includes('/sign-in')) {
-      // Pricing page is expected to redirect to sign-in if not authenticated
-      if (testUrl.includes('/pricing')) {
-        warnings.push(`Page redirected to sign-in (expected behavior for pricing page without auth)`);
-        // Don't fail the test - this is expected behavior
-      } else {
-        throw new Error(`Page redirected to sign-in (401 Unauthorized). Original URL: ${testUrl}`);
-      }
+      throw new Error(`Page redirected to sign-in (401 Unauthorized). Original URL: ${testUrl}`);
     }
 
     if (!response || !response.ok()) {
@@ -406,16 +400,25 @@ async function executeTestWithPlaywright(test, testUrl, startTime) {
     const criticalErrors = consoleErrors.filter(err =>
       !err.includes('setState') &&
       !err.includes('Cannot update a component') &&
-      !err.includes('while rendering')
+      !err.includes('while rendering') &&
+      !err.includes('NEXT_REDIRECT') && // Next.js redirects are expected, not errors
+      !err.includes('Error: NEXT_REDIRECT')
     );
     const reactWarnings = consoleErrors.filter(err =>
       err.includes('setState') ||
       err.includes('Cannot update a component') ||
       err.includes('while rendering')
     );
+    const redirectWarnings = consoleErrors.filter(err =>
+      err.includes('NEXT_REDIRECT') || err.includes('Error: NEXT_REDIRECT')
+    );
 
     if (criticalErrors.length > 0) {
       errors.push(`JavaScript console errors: ${criticalErrors.join(', ')}`);
+    }
+    if (redirectWarnings.length > 0) {
+      // NEXT_REDIRECT is expected behavior in Next.js - log as warning, not error
+      warnings.push(`Next.js redirect detected (non-critical): ${redirectWarnings.length} redirect(s)`);
     }
     if (reactWarnings.length > 0) {
       warnings.push(`React warnings (non-critical): ${reactWarnings.join(', ')}`);

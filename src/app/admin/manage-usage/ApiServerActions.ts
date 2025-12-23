@@ -27,19 +27,29 @@ export async function fetchAllUsersServer(): Promise<UserProfileDTO[]> {
 
 export async function fetchAdminProfileServer(userId: string): Promise<UserProfileDTO | null> {
   if (!userId) return null;
-  // Use criteria endpoint to guarantee tenant scoping and consistent response shape
-  const params = new URLSearchParams();
-  params.append('userId.equals', userId);
-  params.append('tenantId.equals', getTenantId());
-  params.append('size', '1');
-  const url = `${API_BASE_URL}/api/user-profiles?${params.toString()}`;
-  const res = await fetchWithJwt(url, { cache: 'no-store' });
-  if (!res.ok) return null;
-  const data = await res.json();
-  if (Array.isArray(data) && data.length > 0) return data[0] as UserProfileDTO;
-  // Some backends may return a single object
-  if (data && typeof data === 'object') return data as UserProfileDTO;
-  return null;
+  try {
+    // Use criteria endpoint to guarantee tenant scoping and consistent response shape
+    const params = new URLSearchParams();
+    params.append('userId.equals', userId);
+    params.append('tenantId.equals', getTenantId());
+    params.append('size', '1');
+    const url = `${API_BASE_URL}/api/user-profiles?${params.toString()}`;
+
+    // Use fetchWithJwtRetry which handles retries and timeouts better
+    const res = await fetchWithJwtRetry(url, {
+      cache: 'no-store',
+    });
+
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (Array.isArray(data) && data.length > 0) return data[0] as UserProfileDTO;
+    // Some backends may return a single object
+    if (data && typeof data === 'object') return data as UserProfileDTO;
+    return null;
+  } catch (error) {
+    console.error('Error fetching admin profile:', error);
+    return null;
+  }
 }
 
 export async function fetchUsersServer({ search, searchField, status, role, page, pageSize }: {
