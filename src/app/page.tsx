@@ -81,31 +81,73 @@ function HomePageContent() {
       const hash = window.location.hash;
       if (hash) {
         const targetId = hash.substring(1);
-        
+
         // Show loading indicator for team section
         if (targetId === 'team-section') {
           showNavigationLoading();
         }
 
         // Wait for element to exist before scrolling (especially important for dynamically loaded sections)
-        const maxWaitTime = 10000; // 10 seconds max wait
+        // CRITICAL: For team-section, also wait for tenant settings to load
+        const maxWaitTime = 15000; // 15 seconds max wait (increased for team section)
         const pollInterval = 100; // Check every 100ms
         const startTime = Date.now();
         const headerHeight = 80;
 
         const waitForElementAndScroll = () => {
           const element = document.getElementById(targetId);
-          
+
           if (element) {
-            // Element exists, scroll to it
-            const targetPosition = element.offsetTop - headerHeight - 20;
-            window.scrollTo({ 
-              top: Math.max(0, targetPosition), 
-              behavior: 'smooth' 
-            });
-            hideNavigationLoading();
-            console.log('[HomePage] Successfully scrolled to:', targetId);
-            return;
+            // CRITICAL: For team-section, ensure it's fully rendered and visible
+            // Check if element has content (not just the container)
+            if (targetId === 'team-section') {
+              // Wait for tenant settings to load first
+              if (loading) {
+                const elapsed = Date.now() - startTime;
+                if (elapsed < maxWaitTime) {
+                  setTimeout(waitForElementAndScroll, pollInterval);
+                  return;
+                }
+              }
+
+              // Check if team section is actually shown (not hidden by settings)
+              if (!showTeamSection) {
+                console.warn('[HomePage] Team section is not enabled in tenant settings');
+                hideNavigationLoading();
+                return;
+              }
+
+              // Check if element has actual content (team members loaded)
+              const hasContent = element.querySelector('.max-w-7xl') &&
+                                 (element.querySelector('.grid') || element.querySelector('.flex'));
+              if (!hasContent) {
+                // Element exists but content not loaded yet, keep waiting
+                const elapsed = Date.now() - startTime;
+                if (elapsed < maxWaitTime) {
+                  setTimeout(waitForElementAndScroll, pollInterval);
+                  return;
+                }
+              }
+            }
+
+            // Element exists and is ready, scroll to it with proper offset
+            // Use larger offset to ensure section is fully visible above the fold
+            const scrollOffset = targetId === 'team-section' ? headerHeight + 40 : headerHeight + 20;
+            const targetPosition = element.offsetTop - scrollOffset;
+
+            // Ensure we scroll to the correct element by verifying the ID matches
+            if (element.id === targetId) {
+              // Small delay to ensure layout is stable before scrolling
+              setTimeout(() => {
+                window.scrollTo({
+                  top: Math.max(0, targetPosition),
+                  behavior: 'smooth'
+                });
+                hideNavigationLoading();
+                console.log('[HomePage] Successfully scrolled to:', targetId, 'at position:', targetPosition);
+              }, 100);
+              return;
+            }
           }
 
           // Element doesn't exist yet
@@ -131,7 +173,7 @@ function HomePageContent() {
     // Helper functions for loading indicator
     const showNavigationLoading = () => {
       if (typeof window === 'undefined') return;
-      
+
       // Remove existing indicator if any
       hideNavigationLoading();
 
@@ -178,7 +220,7 @@ function HomePageContent() {
 
       // Create text
       const text = document.createElement('div');
-      text.textContent = 'Loading team section...';
+      text.textContent = 'Loading team members...';
       text.style.cssText = `
         margin-top: 16px;
         font-size: 16px;

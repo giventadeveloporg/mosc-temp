@@ -548,18 +548,35 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Manage Users</h1>
         <div className="flex items-center gap-2">
-          <button onClick={() => fileInputRef.current?.click()} disabled={bulkLoading} className="h-10 flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors disabled:opacity-50">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-            </svg>
-            {bulkLoading ? 'Uploading...' : 'Bulk Upload User List'}
+          <button 
+            onClick={() => fileInputRef.current?.click()} 
+            disabled={bulkLoading} 
+            className="flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            title="Bulk Upload User List"
+            aria-label="Bulk Upload User List"
+            type="button"
+          >
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+            </div>
+            <span className="font-semibold text-green-700">{bulkLoading ? 'Uploading...' : 'Bulk Upload User List'}</span>
           </button>
           <input type="file" ref={fileInputRef} onChange={handleBulkUpload} className="hidden" accept=".xlsx" />
-          <a href="https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/media/users_profile_list_bulk_upload_template/users_profile_list_bulk_upload_template.xlsx" download="users_profile_list_bulk_upload_template.xlsx" className="h-10 flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-            Download Bulk Upload Template File
+          <a 
+            href="https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/media/users_profile_list_bulk_upload_template/users_profile_list_bulk_upload_template.xlsx" 
+            download="users_profile_list_bulk_upload_template.xlsx" 
+            className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+            title="Download Bulk Upload Template File"
+            aria-label="Download Bulk Upload Template File"
+          >
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+            </div>
+            <span className="font-semibold text-blue-700">Download Bulk Upload Template File</span>
           </a>
         </div>
       </div>
@@ -728,12 +745,17 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
             <button
               onClick={handlePrevPage}
               disabled={page <= 1}
-              className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+              className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed disabled:hover:scale-100"
+              title="Previous Page"
+              aria-label="Previous Page"
+              type="button"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              Previous
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </div>
+              <span className="font-semibold text-blue-700">Previous</span>
             </button>
             <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">
               Page {page} of {totalPages}
@@ -741,12 +763,17 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
             <button
               onClick={handleNextPage}
               disabled={page >= totalPages}
-              className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+              className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed disabled:hover:scale-100"
+              title="Next Page"
+              aria-label="Next Page"
+              type="button"
             >
-              Next
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+              <span className="font-semibold text-blue-700">Next</span>
             </button>
           </div>
           <div className="text-center text-sm text-gray-600 dark:text-gray-400 mt-2">

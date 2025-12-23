@@ -274,10 +274,15 @@ export default function GlobalEventProgramDirectorsPage() {
               </div>
               <button
                 onClick={() => setIsCreateModalOpen(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition"
+                className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                title="Add Director"
+                aria-label="Add Director"
+                type="button"
               >
-                <FaPlus className="text-sm" />
-                <span>Add Director</span>
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                  <FaPlus className="w-6 h-6 text-blue-600" />
+                </div>
+                <span className="font-semibold text-blue-700">Add Director</span>
               </button>
             </div>
           </div>
@@ -529,17 +534,31 @@ function DirectorForm({ formData, setFormData, onSubmit, loading, submitText, ev
         <button
           type="button"
           onClick={() => {/* Close modal logic handled by parent */ }}
-          className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition"
+          className="flex-shrink-0 h-14 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:hover:scale-100"
           disabled={loading}
+          title="Cancel"
+          aria-label="Cancel"
         >
-          Cancel
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center">
+            <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </div>
+          <span className="font-semibold text-gray-700">Cancel</span>
         </button>
         <button
           type="submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+          className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed disabled:hover:scale-100"
           disabled={loading}
+          title={submitText}
+          aria-label={submitText}
         >
-          {loading ? 'Processing...' : submitText}
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <span className="font-semibold text-blue-700">{loading ? 'Processing...' : submitText}</span>
         </button>
       </div>
     </form>

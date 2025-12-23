@@ -204,7 +204,7 @@
         <div class="header">
             <h1>🧪 Public Pages Test Report</h1>
             <p>Malayalees US Site Event Registration Platform</p>
-            <p style="margin-top: 10px; font-size: 0.9em;">Test Engine: Playwright (Local) | 14 Tests | 83.3% Success Rate</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">Test Engine: Playwright (Local) | 14 Tests | 92.9% Success Rate</p>
         </div>
 
         <div class="summary">
@@ -216,19 +216,19 @@
                 </div>
                 <div class="summary-card">
                     <h3>Passed</h3>
-                    <div class="number passed">10</div>
+                    <div class="number passed">13</div>
                 </div>
                 <div class="summary-card">
                     <h3>Failed</h3>
-                    <div class="number failed">2</div>
+                    <div class="number failed">1</div>
                 </div>
                 <div class="summary-card">
                     <h3>Skipped</h3>
-                    <div class="number skipped">2</div>
+                    <div class="number skipped">0</div>
                 </div>
                 <div class="summary-card">
                     <h3>Success Rate</h3>
-                    <div class="number success-rate">83.3%</div>
+                    <div class="number success-rate">92.9%</div>
                 </div>
             </div>
         </div>
@@ -247,7 +247,7 @@
                         <p>Test completed successfully</p>
                         
                         <div class="warning-details">
-                            <strong>⚠️ Warnings:</strong> React warnings (non-critical): Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render MobileDebugConsole FeaturedEventsSection FeaturedEventsSection, Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render MobileDebugConsole DynamicHeroImage DynamicHeroImage, Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render MobileDebugConsole LiveEventsSection LiveEventsSection
+                            <strong>⚠️ Warnings:</strong> React warnings (non-critical): Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render MobileDebugConsole DynamicHeroImage DynamicHeroImage, Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render MobileDebugConsole LiveEventsSection LiveEventsSection, Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render MobileDebugConsole FeaturedEventsSection FeaturedEventsSection
                         </div>
                         
                         
@@ -263,7 +263,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/</div>
-                        <div class="duration">10289ms</div>
+                        <div class="duration">4805ms</div>
                         
                     </div>
                 </div>
@@ -295,28 +295,43 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/events</div>
-                        <div class="duration">4910ms</div>
+                        <div class="duration">12114ms</div>
                         
                     </div>
                 </div>
             
-                <div class="test-item skipped">
-                    <div class="test-status">⏭️</div>
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
                     <div class="test-info">
                         <h4>
                             <span class="test-id">public-003</span>
                             Event Details Page Test
                             <span class="test-priority priority-critical">critical</span>
                         </h4>
-                        <p>Skipped: No events available</p>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="warning-details">
+                            <strong>⚠️ Warnings:</strong> Some expected elements not found: [class*="date"], [class*="time"], [class*="location"]
+                        </div>
+                        
+                        
+                        <div class="error-details">
+                            <strong class="missing-elements">Missing Elements:</strong> <code>[class*="date"], [class*="time"], [class*="location"]</code>
+                        </div>
                         
                         
                         
+                        <div class="error-details">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>h1</code></li><li><code>[class*="event"]</code></li><li><code>a[href*="/tickets"], button</code></li><li><code>[class*="date"], [class*="time"], [class*="location"]</code></li><li><code>img, [class*="image"]</code></li>
+                            </ul>
+                        </div>
                         
                     </div>
                     <div class="test-details">
                         <div class="url">/events/1</div>
-                        <div class="duration">0ms</div>
+                        <div class="duration">11844ms</div>
                         
                     </div>
                 </div>
@@ -344,28 +359,35 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/sponsors</div>
-                        <div class="duration">4840ms</div>
+                        <div class="duration">5011ms</div>
                         
                     </div>
                 </div>
             
-                <div class="test-item skipped">
-                    <div class="test-status">⏭️</div>
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
                     <div class="test-info">
                         <h4>
                             <span class="test-id">public-005</span>
                             Sponsor Details Page Test
                             <span class="test-priority priority-medium">medium</span>
                         </h4>
-                        <p>Skipped: No sponsors available</p>
+                        <p>Test completed successfully</p>
                         
                         
                         
+                        
+                        <div class="error-details">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>h1</code></li><li><code>[class*="sponsor"]</code></li><li><code>img, [class*="image"]</code></li><li><code>[class*="contact"], [class*="address"]</code></li>
+                            </ul>
+                        </div>
                         
                     </div>
                     <div class="test-details">
                         <div class="url">/sponsors/1</div>
-                        <div class="duration">0ms</div>
+                        <div class="duration">4918ms</div>
                         
                     </div>
                 </div>
@@ -393,29 +415,30 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/gallery</div>
-                        <div class="duration">5379ms</div>
+                        <div class="duration">6793ms</div>
                         
                     </div>
                 </div>
             
-                <div class="test-item failed">
-                    <div class="test-status">❌</div>
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
                     <div class="test-info">
                         <h4>
                             <span class="test-id">public-007</span>
                             Polls Listing Page Test
                             <span class="test-priority priority-medium">medium</span>
                         </h4>
-                        <p>Error: Page returned status 401 Unauthorized. URL: http://localhost:3000/polls</p>
+                        <p>Test completed successfully</p>
                         
+                        <div class="warning-details">
+                            <strong>⚠️ Warnings:</strong> Some expected elements not found: [class*="vote"], [class*="option"]
+                        </div>
                         
                         
                         <div class="error-details">
-                            <strong>Errors:</strong>
-                            <ul>
-                                <li>Page returned status 401 Unauthorized. URL: http://localhost:3000/polls</li>
-                            </ul>
+                            <strong class="missing-elements">Missing Elements:</strong> <code>[class*="vote"], [class*="option"]</code>
                         </div>
+                        
                         
                         
                         <div class="error-details">
@@ -428,7 +451,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/polls</div>
-                        <div class="duration">5368ms</div>
+                        <div class="duration">5297ms</div>
                         
                     </div>
                 </div>
@@ -464,7 +487,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/calendar</div>
-                        <div class="duration">4569ms</div>
+                        <div class="duration">5199ms</div>
                         
                     </div>
                 </div>
@@ -479,6 +502,10 @@
                         </h4>
                         <p>Test completed successfully</p>
                         
+                        <div class="warning-details">
+                            <strong>⚠️ Warnings:</strong> Network idle timeout - page may still be loading
+                        </div>
+                        
                         
                         
                         
@@ -492,7 +519,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc</div>
-                        <div class="duration">7961ms</div>
+                        <div class="duration">17467ms</div>
                         
                     </div>
                 </div>
@@ -528,7 +555,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/holy-synod</div>
-                        <div class="duration">4873ms</div>
+                        <div class="duration">8215ms</div>
                         
                     </div>
                 </div>
@@ -564,7 +591,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/gallery</div>
-                        <div class="duration">4277ms</div>
+                        <div class="duration">12325ms</div>
                         
                     </div>
                 </div>
@@ -600,7 +627,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/directory</div>
-                        <div class="duration">4240ms</div>
+                        <div class="duration">8166ms</div>
                         
                     </div>
                 </div>
@@ -616,7 +643,7 @@
                         <p>Test completed successfully</p>
                         
                         <div class="warning-details">
-                            <strong>⚠️ Warnings:</strong> Some expected elements not found: h1
+                            <strong>⚠️ Warnings:</strong> Network idle timeout - page may still be loading; Some expected elements not found: h1
                         </div>
                         
                         
@@ -636,7 +663,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/charity-theme</div>
-                        <div class="duration">4513ms</div>
+                        <div class="duration">22827ms</div>
                         
                     </div>
                 </div>
@@ -649,14 +676,56 @@
                             Pricing Page Test
                             <span class="test-priority priority-medium">medium</span>
                         </h4>
-                        <p>Error: Page returned status 401 Unauthorized. URL: http://localhost:3000/pricing</p>
+                        <p>Error: JavaScript console errors: %c%s%c Error in pricing page: background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   Error: NEXT_REDIRECT
+    at PricingPage (about://React/Server/webpack-internal:///(rsc)/./src/app/pricing/page.tsx?7:60:70)
+    at resolveErrorDev (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2337:46)
+    at getOutlinedModel (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:1699:22)
+    at parseModelString (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:1900:15)
+    at Object.eval (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2996:18)
+    at JSON.parse (<anonymous>)
+    at initializeModelChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:1246:26)
+    at getOutlinedModel (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:1634:11)
+    at parseModelString (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:1993:15)
+    at Array.eval (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2996:18)
+    at JSON.parse (<anonymous>)
+    at initializeModelChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:1246:26)
+    at resolveConsoleEntry (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2624:13)
+    at processFullStringRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2864:11)
+    at processFullBinaryRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2766:7)
+    at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2969:15)
+    at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3233:13)</p>
                         
+                        <div class="warning-details">
+                            <strong>⚠️ Warnings:</strong> Some expected elements not found: h1, [class*="title"], [class*="heading"], main, [class*="content"], [class*="container"], [class*="pricing"], [class*="plan"], [class*="sign-in"], form[action*="sign-in"]
+                        </div>
+                        
+                        
+                        <div class="error-details">
+                            <strong class="missing-elements">Missing Elements:</strong> <code>h1, [class*="title"], [class*="heading"]</code>, <code>main, [class*="content"], [class*="container"]</code>, <code>[class*="pricing"], [class*="plan"], [class*="sign-in"], form[action*="sign-in"]</code>
+                        </div>
                         
                         
                         <div class="error-details">
                             <strong>Errors:</strong>
                             <ul>
-                                <li>Page returned status 401 Unauthorized. URL: http://localhost:3000/pricing</li>
+                                <li>JavaScript console errors: %c%s%c Error in pricing page: background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   Error: NEXT_REDIRECT
+    at PricingPage (about://React/Server/webpack-internal:///(rsc)/./src/app/pricing/page.tsx?7:60:70)
+    at resolveErrorDev (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2337:46)
+    at getOutlinedModel (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:1699:22)
+    at parseModelString (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:1900:15)
+    at Object.eval (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2996:18)
+    at JSON.parse (<anonymous>)
+    at initializeModelChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:1246:26)
+    at getOutlinedModel (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:1634:11)
+    at parseModelString (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:1993:15)
+    at Array.eval (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2996:18)
+    at JSON.parse (<anonymous>)
+    at initializeModelChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:1246:26)
+    at resolveConsoleEntry (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2624:13)
+    at processFullStringRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2864:11)
+    at processFullBinaryRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2766:7)
+    at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2969:15)
+    at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3233:13)</li>
                             </ul>
                         </div>
                         
@@ -671,8 +740,8 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/pricing</div>
-                        <div class="duration">3907ms</div>
-                        
+                        <div class="duration">12462ms</div>
+                        <a href="screenshots/public-014-1766467976158.png" target="_blank" class="screenshot-link">📷 Screenshot</a>
                     </div>
                 </div>
             
@@ -680,7 +749,7 @@
 
         <div class="footer">
             <p>Generated by Public Pages Test Suite</p>
-            <p class="timestamp">Report generated on: 12/21/2025, 4:56:17 PM</p>
+            <p class="timestamp">Report generated on: 12/23/2025, 12:32:56 AM</p>
             <p class="timestamp">Base URL: http://localhost:3000</p>
             <p class="timestamp">Test Engine: Playwright (Local Browser Execution)</p>
         </div>

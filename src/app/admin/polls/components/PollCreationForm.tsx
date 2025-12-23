@@ -242,10 +242,14 @@ export function PollCreationForm({
             type="button"
             variant="outline"
             onClick={addOption}
-            className="w-full"
+            className="w-full flex-shrink-0 h-14 rounded-xl bg-purple-100 hover:bg-purple-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105"
+            title="Add Option"
+            aria-label="Add Option"
           >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Option
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-200 flex items-center justify-center">
+              <Plus className="h-6 w-6 text-purple-600" />
+            </div>
+            <span className="font-semibold text-purple-700">Add Option</span>
           </Button>
         </CardContent>
       </Card>
@@ -325,31 +329,36 @@ export function PollCreationForm({
         <Button 
           type="button" 
           onClick={onCancel}
-          className="bg-teal-100 hover:bg-teal-200 text-teal-800 font-semibold px-6 py-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 flex items-center gap-2"
+          className="flex-shrink-0 h-14 rounded-xl bg-teal-100 hover:bg-teal-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+          title="Cancel"
+          aria-label="Cancel"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-          Cancel
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
+            <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </div>
+          <span className="font-semibold text-teal-700">Cancel</span>
         </Button>
         <Button 
           type="submit" 
           disabled={isLoading}
-          className="bg-gradient-to-r from-indigo-500 to-cyan-500 hover:from-indigo-600 hover:to-cyan-600 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          className="flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:hover:scale-100 px-6"
+          title={initialData ? 'Update Poll' : 'Create Poll'}
+          aria-label={initialData ? 'Update Poll' : 'Create Poll'}
         >
-          {isLoading ? (
-            <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              Saving...
-            </>
-          ) : (
-            <>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
+            {isLoading ? (
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
+            ) : (
+              <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
-              {initialData ? 'Update Poll' : 'Create Poll'}
-            </>
-          )}
+            )}
+          </div>
+          <span className="font-semibold text-indigo-700">
+            {isLoading ? 'Saving...' : (initialData ? 'Update Poll' : 'Create Poll')}
+          </span>
         </Button>
       </div>
     </form>

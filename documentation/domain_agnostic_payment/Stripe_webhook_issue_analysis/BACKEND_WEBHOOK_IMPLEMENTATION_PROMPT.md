@@ -37,7 +37,7 @@ INSERT INTO payment_provider_config (
   'tenant_demo_002', 'STRIPE', true,
   '88byaTekKyZfq96Ca4X8VGtyT4SHmvW9Wnjxl0CfE73+yOFA4r0dlIfF+OTqS2P9b8N0vx3lrrI1aS6oB/7m9Unz5Pt9bvCcogJ5B5B84b2FpiGDmU1P5qcupcJZN9NRifUszfLAVii7XlA6p23QsYPffYW+f4WcaU7qDC0DfsUmiCKvz0IC',
   'xvbHVRPMb5hQBiJG1Qd/1WAoH5VU8iU3Vq+RhiDgcJTa4CijlRgIprofUWTIlsf8YH1sEXgtqG5HClhE+Mfb4SH8',
-  'pk_live_51JoBNqK5BrggeAHM6BYz1hSTxYd3dofcPdfXkvuXdFwNDtjnuSY7akZ7RHWxX1x9fYSrLqXnhgtP3GdquOiffO9s00wu14YbFe',
+  'pk_live_***REDACTED***',
   '2025-11-27 16:41:22.719508', '2025-11-27 16:41:22.719508'
 );
 ```

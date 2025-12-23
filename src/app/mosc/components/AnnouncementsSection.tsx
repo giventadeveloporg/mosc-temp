@@ -54,12 +54,16 @@ const AnnouncementsSection = () => {
   ];
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date?.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    // Parse date string (YYYY-MM-DD) manually to avoid timezone issues
+    const [year, month, day] = dateString.split('-').map(Number);
+    
+    // Format manually to ensure consistency between server and client
+    const monthNames = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    
+    return `${monthNames[month - 1]} ${day}, ${year}`;
   };
 
   const getCategoryIcon = (category: string) => {

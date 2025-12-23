@@ -130,12 +130,32 @@ const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string
     const targetElement = document.getElementById(targetId);
 
     if (targetElement) {
-      // Element exists, scroll to it
-      const targetPosition = targetElement.offsetTop - headerHeight - 20;
-      window.scrollTo({ top: Math.max(0, targetPosition), behavior: 'smooth' });
-      hideNavigationLoading();
-      console.log('[Header] Successfully scrolled to:', targetId);
-      return true;
+      // CRITICAL: For team-section, ensure it's fully rendered and visible
+      // Check if element has content (not just the container)
+      if (targetId === 'team-section') {
+        const hasContent = targetElement.querySelector('.max-w-7xl') || targetElement.children.length > 0;
+        if (!hasContent) {
+          // Element exists but content not loaded yet, keep waiting
+          const elapsed = Date.now() - startTime;
+          if (elapsed < maxWaitTime) {
+            setTimeout(waitForElementAndScroll, pollInterval);
+            return false;
+          }
+        }
+      }
+
+      // Element exists and is ready, scroll to it with proper offset
+      // Use larger offset for team-section to ensure it's fully visible above the fold
+      const scrollOffset = targetId === 'team-section' ? headerHeight + 40 : headerHeight + 20;
+      const targetPosition = targetElement.offsetTop - scrollOffset;
+
+      // Ensure we scroll to the correct element by verifying the ID matches
+      if (targetElement.id === targetId) {
+        window.scrollTo({ top: Math.max(0, targetPosition), behavior: 'smooth' });
+        hideNavigationLoading();
+        console.log('[Header] Successfully scrolled to:', targetId, 'at position:', targetPosition);
+        return true;
+      }
     }
 
     // Element doesn't exist yet
@@ -211,7 +231,7 @@ const showNavigationLoading = () => {
 
   // Create text
   const text = document.createElement('div');
-  text.textContent = 'Loading team section...';
+  text.textContent = 'Loading team members...';
   text.style.cssText = `
     margin-top: 16px;
     font-size: 16px;
@@ -277,25 +297,86 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
     });
   }, [isLoaded, userId, user]);
 
-  // Prefer server-verified tenant admin flag when provided; otherwise fall back to Clerk metadata
+  // Prefer server-verified tenant admin flag when provided; re-check admin status when user logs in
+  // CRITICAL: When user logs in client-side, isTenantAdmin prop may be stale (from initial SSR)
+  // We need to re-check admin status from the database when userId changes
   useEffect(() => {
-    if (typeof isTenantAdmin === 'boolean') {
-      setIsAdmin(isTenantAdmin);
+    // If user is not loaded yet, use server-verified flag (from SSR)
+    if (!isLoaded) {
+      setIsAdmin(!!isTenantAdmin);
       return;
     }
-    if (isLoaded && user) {
-      const publicRole = user.publicMetadata?.role as string;
-      const orgRole = user.organizationMemberships?.[0]?.role;
-      const isAdminUser =
-        publicRole === 'admin' ||
-        publicRole === 'administrator' ||
-        orgRole === 'admin' ||
-        orgRole === 'org:admin';
-      setIsAdmin(isAdminUser);
-    } else {
+
+    // If user is not logged in, clear admin status
+    if (!userId || !user) {
       setIsAdmin(false);
+      return;
     }
-  }, [isLoaded, user, isTenantAdmin]);
+
+    // CRITICAL: When user logs in (userId changes from null to value), re-check admin status
+    // This ensures admin menu appears immediately after login without requiring page refresh
+    // We use the proxy API endpoint which is public and doesn't require authentication
+    const checkAdminStatus = async () => {
+      try {
+        const tenantId = process.env.NEXT_PUBLIC_TENANT_ID;
+        if (!tenantId) {
+          console.warn('[Header] NEXT_PUBLIC_TENANT_ID not set, cannot check admin status');
+          // Fallback to server-verified flag or Clerk metadata
+          if (typeof isTenantAdmin === 'boolean') {
+            setIsAdmin(isTenantAdmin);
+          } else {
+            setIsAdmin(false);
+          }
+          return;
+        }
+
+        // Use proxy API endpoint to check admin status (public route, no auth required)
+        const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+        const url = `${baseUrl}/api/proxy/user-profiles?userId.equals=${encodeURIComponent(userId)}&tenantId.equals=${encodeURIComponent(tenantId)}&size=1`;
+
+        const resp = await fetch(url, {
+          cache: 'no-store',
+          headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (resp.ok) {
+          const data = await resp.json();
+          const profile = Array.isArray(data) ? data[0] : data;
+          const isAdminUser = profile?.userRole === 'ADMIN';
+          console.log('[Header] Admin status check:', { userId, isAdminUser, userRole: profile?.userRole });
+          setIsAdmin(isAdminUser);
+        } else {
+          console.warn('[Header] Failed to check admin status:', resp.status);
+          // Fallback to server-verified flag or Clerk metadata
+          if (typeof isTenantAdmin === 'boolean') {
+            setIsAdmin(isTenantAdmin);
+          } else {
+            // Fallback to Clerk metadata
+            const publicRole = user.publicMetadata?.role as string;
+            const orgRole = user.organizationMemberships?.[0]?.role;
+            const isAdminUser =
+              publicRole === 'admin' ||
+              publicRole === 'administrator' ||
+              orgRole === 'admin' ||
+              orgRole === 'org:admin';
+            setIsAdmin(isAdminUser);
+          }
+        }
+      } catch (error) {
+        console.error('[Header] Error checking admin status:', error);
+        // Fallback to server-verified flag or Clerk metadata
+        if (typeof isTenantAdmin === 'boolean') {
+          setIsAdmin(isTenantAdmin);
+        } else {
+          setIsAdmin(false);
+        }
+      }
+    };
+
+    // Only check admin status if user is logged in
+    // This prevents unnecessary API calls when user is not logged in
+    checkAdminStatus();
+  }, [isLoaded, userId, user, isTenantAdmin]);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -356,7 +437,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
       }
 
       // Wait for element to exist before scrolling (especially important for dynamically loaded sections)
-      const maxWaitTime = 10000; // 10 seconds max wait
+      const maxWaitTime = targetId === 'team-section' ? 15000 : 10000; // 15 seconds for team-section, 10 for others
       const pollInterval = 100; // Check every 100ms
       const startTime = Date.now();
 
@@ -364,12 +445,38 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
         const targetElement = document.getElementById(targetId);
 
         if (targetElement) {
-          // Element exists, scroll to it
-          const targetPosition = targetElement.offsetTop - headerHeight - 20;
-          window.scrollTo({ top: Math.max(0, targetPosition), behavior });
-          hideNavigationLoading();
-          console.log('[Header useEffect] Successfully scrolled to:', targetId);
-          return;
+          // CRITICAL: For team-section, ensure it's fully rendered and visible
+          // Check if element has content (not just the container)
+          if (targetId === 'team-section') {
+            // Check if element has actual content (team members loaded)
+            const hasContent = targetElement.querySelector('.max-w-7xl') &&
+                               (targetElement.querySelector('.grid') || targetElement.querySelector('.flex') ||
+                                targetElement.querySelector('[class*="team"]'));
+            if (!hasContent) {
+              // Element exists but content not loaded yet, keep waiting
+              const elapsed = Date.now() - startTime;
+              if (elapsed < maxWaitTime) {
+                setTimeout(waitForElementAndScroll, pollInterval);
+                return;
+              }
+            }
+          }
+
+          // Element exists and is ready, scroll to it with proper offset
+          // Use larger offset for team-section to ensure it's fully visible above the fold
+          const scrollOffset = targetId === 'team-section' ? headerHeight + 40 : headerHeight + 20;
+          const targetPosition = targetElement.offsetTop - scrollOffset;
+
+          // Ensure we scroll to the correct element by verifying the ID matches
+          if (targetElement.id === targetId) {
+            // Small delay to ensure layout is stable before scrolling
+            setTimeout(() => {
+              window.scrollTo({ top: Math.max(0, targetPosition), behavior });
+              hideNavigationLoading();
+              console.log('[Header useEffect] Successfully scrolled to:', targetId, 'at position:', targetPosition);
+            }, 100);
+            return;
+          }
         }
 
         // Element doesn't exist yet

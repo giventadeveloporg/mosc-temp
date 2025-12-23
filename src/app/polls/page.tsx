@@ -1,12 +1,15 @@
 import { auth } from '@clerk/nextjs';
+import { headers } from 'next/headers';
 import { PollList } from '@/components/polls/PollList';
 import { fetchUserProfileServer } from '@/app/profile/ApiServerActions';
 
 export default async function PollsPage() {
+  // CRITICAL: Next.js 15+ requires headers() to be awaited before calling auth()
+  await headers();
   // Ensure auth() is properly awaited
   const authResult = await auth();
   const { userId } = authResult;
-  
+
   // Get user profile if logged in
   let userProfile = null;
   if (userId) {
@@ -36,7 +39,7 @@ export default async function PollsPage() {
             Participate in interactive polls and share your opinions with our community
           </p>
         </div>
-        
+
         <PollList userId={userProfile?.id} />
       </div>
     </div>

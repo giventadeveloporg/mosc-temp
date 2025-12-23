@@ -64,23 +64,23 @@ This rule defines the standard pattern for navigation button groups displayed in
 - **`text-{color}-800`**: Text color matching action type
 - **`rounded-lg`**: Medium border radius (8px) for card appearance
 - **`shadow-md`**: Medium shadow for depth
-- **`p-4`**: Padding (16px) for card content
+- **`p-3`**: Padding (12px) for card content - reduced by 25% from original p-4
 - **`text-xs`**: Small text size for labels
 - **`transition-all`**: Smooth transitions for all properties
 - **`group`**: Enables group hover effects on child elements
 
 ### **Icon Container Requirements**
 - **`flex-shrink-0`**: Prevents icon container from shrinking
-- **`w-14 h-14`**: Fixed icon container size (56px × 56px)
+- **`w-11 h-11`**: Fixed icon container size (44px × 44px) - reduced by 25% from original w-14 h-14
 - **`rounded-xl`**: Large border radius (12px) for icon container
 - **`bg-{color}-100`**: Background color matching button hover state
 - **`flex items-center justify-center`**: Centers icon within container
-- **`mb-3`**: Margin bottom (12px) for spacing between icon and text
+- **`mb-2`**: Margin bottom (8px) for spacing between icon and text - reduced by 25% from original mb-3
 - **`group-hover:scale-110`**: Scales up 10% when parent card is hovered
 - **`transition-transform duration-300`**: Smooth scale animation
 
 ### **Icon Requirements**
-- **`w-10 h-10`**: Icon size (40px × 40px)
+- **`w-8 h-8`**: Icon size (32px × 32px) - reduced by 25% from original w-10 h-10
 - **`text-{color}-500`**: Icon color matching action type (medium shade)
 
 ### **Text Requirements**
@@ -90,9 +90,20 @@ This rule defines the standard pattern for navigation button groups displayed in
 
 ## **Color Coding System**
 
+### **CRITICAL: Unique Color Requirement**
+- **NO TWO BUTTONS IN THE SAME BUTTON GROUP CAN HAVE THE SAME BACKGROUND COLOR**
+- **ALL GRAY COLORS ARE PROHIBITED** - Never use `gray`, `slate`, `stone`, `zinc`, or `neutral` colors for button backgrounds
+- Each button in a button group must have a unique, vibrant color to ensure visual distinction
+- This requirement applies to all admin pages and subpages that display button groups
+- When adding new buttons to a group, ensure the color is not already used by another button in that group
+- Standard color assignments:
+  - **Admin Home**: Always use `blue` (not gray)
+  - **Manage Usage**: Always use `indigo` (not blue, to differentiate from Admin Home)
+  - All other buttons: Use unique colors from available palette (green, teal, purple, violet, orange, pink, rose, lime, yellow, fuchsia, cyan, amber, emerald, sky, red, or custom colors)
+
 ### **Semantic Colors for Navigation**
-- **Gray** (`gray-50/100/500/800`): Admin Home, General Navigation
-- **Blue** (`blue-50/100/500/800`): Manage Usage, User Management
+- **Blue** (`blue-50/100/500/800`): Admin Home (standard - replaces gray)
+- **Indigo** (`indigo-50/100/500/800`): Manage Usage, User Management (standard - replaces blue for Manage Usage)
 - **Green** (`green-50/100/500/800`): Manage Events, Calendar Actions
 - **Yellow** (`yellow-50/100/500/800`): Media Files, Media Management
 - **Purple** (`purple-50/100/500/800`): Ticket Types, Tags, Categories
@@ -100,6 +111,19 @@ This rule defines the standard pattern for navigation button groups displayed in
 - **Pink** (`pink-50/100/500/800`): Discount Codes, Promotions
 - **Orange** (`orange-50/100/500/800`): Warnings, Attention Items
 - **Indigo** (`indigo-50/100/500/800`): Settings, Configuration
+- **Cyan** (`cyan-50/100/500/800`): Media Management, Organizations
+- **Rose** (`rose-50/100/500/800`): Membership Subscriptions
+- **Lime** (`lime-50/100/500/800`): Email Addresses
+- **Amber** (`amber-50/100/500/800`): Event Sponsors, Executive Committee
+- **Emerald** (`emerald-50/100/500/800`): Global Contacts, Global Performers
+- **Violet** (`violet-50/100/500/800`): Test Stripe
+- **Fuchsia** (`fuchsia-50/100/500/800`): Event Sponsors
+- **Sky** (`sky-50/100/500/800`): Tenant Settings
+- **Slate** (`slate-50/100/500/800`): Organizations
+- **Stone** (`stone-50/100/500/800`): Global Contacts
+- **Zinc** (`zinc-50/100/500/800`): Global Emails
+- **Neutral** (`neutral-50/100/500/800`): Global Directors
+- **Red** (`red-50/100/500/800`): Test CRUD, Destructive Actions
 
 ## **Complete Example**
 
@@ -249,6 +273,8 @@ import { FaHome, FaUsers, FaCalendarAlt, FaPhotoVideo, FaTags, FaTicketAlt, FaPe
 - ❌ Use different grid layouts on different pages
 - ❌ Mix card-style buttons with full-width vertical buttons
 - ❌ Use arbitrary colors without semantic meaning
+- ❌ **Use duplicate colors within the same button group** (CRITICAL: Each button must have a unique color)
+- ❌ **Use gray colors** (`gray`, `slate`, `stone`, `zinc`, `neutral`) for button backgrounds (CRITICAL: All gray colors are prohibited)
 - ❌ Skip accessibility attributes (`title`, `aria-label`)
 - ❌ Use different icon container sizes (always `w-14 h-14`)
 - ❌ Omit hover effects or use different hover animations

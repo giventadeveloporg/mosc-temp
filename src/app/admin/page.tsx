@@ -7,19 +7,22 @@ import { useAuth } from "@clerk/nextjs";
 export default function AdminPage() {
   const { userId } = useAuth();
 
+  // CRITICAL: Each button must have a UNIQUE color - no duplicates allowed
+  // All gray colors (gray, slate, stone, zinc, neutral) are avoided
+  // Using all available Tailwind colors + custom colors for 24 unique buttons
   const adminButtons = [
     {
       href: '/admin',
       icon: 'home',
       label: 'Admin Home',
-      color: 'gray',
+      color: 'blue',
       key: 'admin-home'
     },
     {
       href: '/admin/manage-usage',
       icon: 'users',
       label: 'Manage Users',
-      color: 'blue',
+      color: 'indigo',
       key: 'manage-usage'
     },
     {
@@ -40,14 +43,14 @@ export default function AdminPage() {
       href: '/admin/events/registrations',
       icon: 'users',
       label: 'Registrations',
-      color: 'indigo',
+      color: 'purple',
       key: 'event-registrations'
     },
     {
       href: '/admin/polls',
       icon: 'chartBar',
       label: 'Poll Management',
-      color: 'purple',
+      color: 'violet',
       key: 'poll-management'
     },
     {
@@ -89,7 +92,7 @@ export default function AdminPage() {
       href: '/admin/test-stripe',
       icon: 'creditCard',
       label: 'Test Stripe',
-      color: 'purple',
+      color: 'fuchsia',
       key: 'test-stripe'
     },
     {
@@ -103,63 +106,63 @@ export default function AdminPage() {
       href: '/admin/executive-committee',
       icon: 'userTie',
       label: 'Executive Committee',
-      color: 'orange',
+      color: 'amber',
       key: 'executive-committee'
     },
     {
       href: '/admin/event-sponsors',
       icon: 'handshake',
       label: 'Event Sponsors',
-      color: 'amber',
+      color: 'emerald',
       key: 'event-sponsors'
     },
     {
       href: '/admin/tenant-management/organizations',
       icon: 'building',
       label: 'Organizations',
-      color: 'cyan',
+      color: 'sky',
       key: 'tenant-organizations'
     },
     {
       href: '/admin/tenant-management/settings',
       icon: 'cog',
       label: 'Tenant Settings',
-      color: 'slate',
+      color: 'red',
       key: 'tenant-settings'
     },
     {
       href: '/admin/tenant-management/test',
       icon: 'chart',
       label: 'Test CRUD',
-      color: 'red',
+      color: 'warmOrange',
       key: 'tenant-test'
     },
     {
       href: '/admin/event-featured-performers',
       icon: 'microphone',
       label: 'Global Performers',
-      color: 'pink',
+      color: 'coolBlue',
       key: 'global-performers'
     },
     {
       href: '/admin/event-contacts',
       icon: 'phone',
       label: 'Global Contacts',
-      color: 'emerald',
+      color: 'vibrantPurple',
       key: 'global-contacts'
     },
     {
       href: '/admin/event-emails',
       icon: 'mailBulk',
       label: 'Global Emails',
-      color: 'cyan',
+      color: 'softPink',
       key: 'global-emails'
     },
     {
       href: '/admin/event-program-directors',
       icon: 'userCheck',
       label: 'Global Directors',
-      color: 'indigo',
+      color: 'brightYellow',
       key: 'global-directors'
     }
   ];
@@ -181,7 +184,21 @@ export default function AdminPage() {
       emerald: 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200',
       amber: 'bg-amber-50 hover:bg-amber-100 text-amber-700 border-amber-200',
       rose: 'bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-200',
-      lime: 'bg-lime-50 hover:bg-lime-100 text-lime-700 border-lime-200'
+      lime: 'bg-lime-50 hover:bg-lime-100 text-lime-700 border-lime-200',
+      violet: 'bg-violet-50 hover:bg-violet-100 text-violet-700 border-violet-200',
+      fuchsia: 'bg-fuchsia-50 hover:bg-fuchsia-100 text-fuchsia-700 border-fuchsia-200',
+      sky: 'bg-sky-50 hover:bg-sky-100 text-sky-700 border-sky-200',
+      stone: 'bg-stone-50 hover:bg-stone-100 text-stone-700 border-stone-200',
+      zinc: 'bg-zinc-50 hover:bg-zinc-100 text-zinc-700 border-zinc-200',
+      neutral: 'bg-neutral-50 hover:bg-neutral-100 text-neutral-700 border-neutral-200',
+      // Custom colors for additional unique buttons (using Tailwind color shades)
+      warmOrange: 'bg-orange-100 hover:bg-orange-200 text-orange-800 border-orange-300',
+      coolBlue: 'bg-blue-100 hover:bg-blue-200 text-blue-800 border-blue-300',
+      vibrantPurple: 'bg-purple-100 hover:bg-purple-200 text-purple-800 border-purple-300',
+      softPink: 'bg-pink-100 hover:bg-pink-200 text-pink-800 border-pink-300',
+      brightYellow: 'bg-yellow-100 hover:bg-yellow-200 text-yellow-800 border-yellow-300',
+      deepTeal: 'bg-teal-100 hover:bg-teal-200 text-teal-800 border-teal-300',
+      lightCyan: 'bg-cyan-100 hover:bg-cyan-200 text-cyan-800 border-cyan-300'
     };
     return colorMap[color] || colorMap.gray;
   };
@@ -203,7 +220,21 @@ export default function AdminPage() {
       emerald: 'bg-emerald-100',
       amber: 'bg-amber-100',
       rose: 'bg-rose-100',
-      lime: 'bg-lime-100'
+      lime: 'bg-lime-100',
+      violet: 'bg-violet-100',
+      fuchsia: 'bg-fuchsia-100',
+      sky: 'bg-sky-100',
+      stone: 'bg-stone-100',
+      zinc: 'bg-zinc-100',
+      neutral: 'bg-neutral-100',
+      // Custom colors for additional unique buttons
+      warmOrange: 'bg-orange-200',
+      coolBlue: 'bg-blue-200',
+      vibrantPurple: 'bg-purple-200',
+      softPink: 'bg-pink-200',
+      brightYellow: 'bg-yellow-200',
+      deepTeal: 'bg-teal-200',
+      lightCyan: 'bg-cyan-200'
     };
     return colorMap[color] || colorMap.gray;
   };
@@ -225,7 +256,21 @@ export default function AdminPage() {
       emerald: 'text-emerald-500',
       amber: 'text-amber-500',
       rose: 'text-rose-500',
-      lime: 'text-lime-500'
+      lime: 'text-lime-500',
+      violet: 'text-violet-500',
+      fuchsia: 'text-fuchsia-500',
+      sky: 'text-sky-500',
+      stone: 'text-stone-500',
+      zinc: 'text-zinc-500',
+      neutral: 'text-neutral-500',
+      // Custom colors for additional unique buttons
+      warmOrange: 'text-orange-600',
+      coolBlue: 'text-blue-600',
+      vibrantPurple: 'text-purple-600',
+      softPink: 'text-pink-600',
+      brightYellow: 'text-yellow-600',
+      deepTeal: 'text-teal-600',
+      lightCyan: 'text-cyan-600'
     };
     return colorMap[color] || colorMap.gray;
   };
@@ -275,10 +320,26 @@ export default function AdminPage() {
     }
   };
 
+  // Render page content even if userId is not yet available (client-side auth loading)
+  // This prevents the page from hanging during Playwright tests
   if (!userId) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <p>Loading...</p>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ paddingTop: '180px' }}>
+        <h1 className="text-3xl font-bold text-indigo-800 mb-8 flex items-center justify-center gap-2">
+          Admin [
+          <span className="flex items-center gap-1 text-blue-600">
+            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+            Home
+          </span>
+          ] Event Management
+        </h1>
+        <div className="bg-white rounded-xl shadow-lg p-6 lg:p-8">
+          <div className="text-center py-8">
+            <p className="text-gray-600">Loading admin dashboard...</p>
+          </div>
+        </div>
       </div>
     );
   }
@@ -307,10 +368,10 @@ export default function AdminPage() {
               <Link
                 key={button.key}
                 href={button.href}
-                className={`flex flex-col items-center justify-center rounded-lg border-2 p-4 lg:p-6 transition-all duration-300 hover:scale-105 hover:shadow-md group ${colorClasses}`}
+                className={`flex flex-col items-center justify-center rounded-lg border-2 p-3 lg:p-4 transition-all duration-300 hover:scale-105 hover:shadow-md group ${colorClasses}`}
               >
-                <div className={`flex-shrink-0 w-14 h-14 rounded-xl ${iconBgColor} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300`}>
-                  {renderIcon(button.icon, `w-10 h-10 ${iconTextColor}`)}
+                <div className={`flex-shrink-0 w-11 h-11 rounded-xl ${iconBgColor} flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300`}>
+                  {renderIcon(button.icon, `w-8 h-8 ${iconTextColor}`)}
                 </div>
                 <span className="font-semibold text-center text-sm lg:text-base leading-tight">
                   {button.label}

@@ -129,9 +129,23 @@ export default async function AdminFocusGroupsPage({ searchParams }: { searchPar
           return (
             <div className="mt-8">
               <div className="flex justify-between items-center">
-                <a aria-disabled={isPrevDisabled} className={`px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 ${isPrevDisabled ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`} href={isPrevDisabled ? '#' : `/admin/focus-groups${qs(page - 1)}`}>Previous</a>
+                <a aria-disabled={isPrevDisabled} className={`flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 ${isPrevDisabled ? 'opacity-50 cursor-not-allowed pointer-events-none hover:scale-100' : ''}`} href={isPrevDisabled ? '#' : `/admin/focus-groups${qs(page - 1)}`} title="Previous Page" aria-label="Previous Page">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
+                    <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </div>
+                  <span className="font-semibold text-indigo-700">Previous</span>
+                </a>
                 <div className="text-sm font-semibold text-gray-700">Page {totalPages === 0 ? 0 : page + 1} of {totalPages}</div>
-                <a aria-disabled={isNextDisabled} className={`px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 ${isNextDisabled ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`} href={isNextDisabled ? '#' : `/admin/focus-groups${qs(page + 1)}`}>Next</a>
+                <a aria-disabled={isNextDisabled} className={`flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 ${isNextDisabled ? 'opacity-50 cursor-not-allowed pointer-events-none hover:scale-100' : ''}`} href={isNextDisabled ? '#' : `/admin/focus-groups${qs(page + 1)}`} title="Next Page" aria-label="Next Page">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
+                    <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                  <span className="font-semibold text-indigo-700">Next</span>
+                </a>
               </div>
               <div className="text-center text-sm text-gray-600 mt-2">
                 {total > 0 ? (

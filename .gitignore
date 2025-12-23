@@ -64,4 +64,13 @@ dev.js
 
 # Test authentication state (contains session tokens)
 TestSprite/sanity-tests/.auth-state.json
-/TestSprite/sanity-tests/screenshots/
+TestSprite/sanity-tests/screenshots/
+TestSprite/**/screenshots/
+
+# Admin test credentials and state
+TestSprite/admin-tests/auth.json
+TestSprite/admin-tests/.auth-state.json
+TestSprite/admin-tests/screenshots/
+
+# All screenshot folders (catch-all pattern for any screenshots directory)
+**/screenshots/

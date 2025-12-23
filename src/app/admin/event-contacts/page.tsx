@@ -297,10 +297,15 @@ export default function EventContactsPage() {
           </div>
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow font-bold flex items-center gap-2 hover:bg-blue-700 transition"
+            className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+            title="Add Contact"
+            aria-label="Add Contact"
+            type="button"
           >
-            <FaPlus />
-            Add Contact
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+              <FaPlus className="w-6 h-6 text-blue-600" />
+            </div>
+            <span className="font-semibold text-blue-700">Add Contact</span>
           </button>
         </div>
       </div>

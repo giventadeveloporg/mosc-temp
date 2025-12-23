@@ -275,25 +275,35 @@ export default function PromotionEmailsPage() {
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
             Promotional Emails for Events
           </h1>
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <button
               onClick={() => setViewMode('history')}
-              className={`px-4 py-2 rounded-md flex items-center gap-2 ${
-                viewMode === 'history'
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
+              className="flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+              title="Email History"
+              aria-label="Email History"
+              type="button"
             >
-              <FaHistory />
-              Email History
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
+                <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <span className="font-semibold text-indigo-700">Email History</span>
             </button>
             {viewMode !== 'form' && (
               <button
                 onClick={handleCreateNew}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center gap-2"
+                className="flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                title="Create New Template"
+                aria-label="Create New Template"
+                type="button"
               >
-                <FaPlus />
-                Create New Template
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-green-700">Create New Template</span>
               </button>
             )}
           </div>
@@ -548,19 +558,32 @@ function TestEmailDialog({
             <button
               onClick={onClose}
               disabled={sending}
-              className="bg-teal-100 hover:bg-teal-200 text-teal-800 px-4 py-2 rounded-md flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex-shrink-0 h-14 rounded-xl bg-teal-100 hover:bg-teal-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-teal-100 disabled:border-teal-300 disabled:text-teal-500 disabled:cursor-not-allowed disabled:hover:scale-100"
+              title="Cancel"
+              aria-label="Cancel"
+              type="button"
             >
-              <FaBan />
-              Cancel
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
+                <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </div>
+              <span className="font-semibold text-teal-700">Cancel</span>
             </button>
             <button
               type="button"
               onClick={handleConfirmClick}
               disabled={sending || !recipientEmail.trim() || !isMounted}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed disabled:hover:scale-100"
+              title="Send Test Email"
+              aria-label="Send Test Email"
             >
-              <FaEnvelope />
-              {sending ? 'Sending...' : 'Send Test Email'}
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <span className="font-semibold text-blue-700">{sending ? 'Sending...' : 'Send Test Email'}</span>
             </button>
           </div>
         </div>
@@ -629,18 +652,32 @@ function BulkEmailDialog({
             <button
               onClick={onClose}
               disabled={sending}
-              className="bg-teal-100 hover:bg-teal-200 text-teal-800 px-4 py-2 rounded-md flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex-shrink-0 h-14 rounded-xl bg-teal-100 hover:bg-teal-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-teal-100 disabled:border-teal-300 disabled:text-teal-500 disabled:cursor-not-allowed disabled:hover:scale-100"
+              title="Cancel"
+              aria-label="Cancel"
+              type="button"
             >
-              <FaBan />
-              Cancel
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
+                <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </div>
+              <span className="font-semibold text-teal-700">Cancel</span>
             </button>
             <button
               onClick={onConfirm}
               disabled={sending}
-              className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-md flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex-shrink-0 h-14 rounded-xl bg-yellow-100 hover:bg-yellow-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-yellow-100 disabled:border-yellow-300 disabled:text-yellow-500 disabled:cursor-not-allowed disabled:hover:scale-100"
+              title="Confirm & Send"
+              aria-label="Confirm & Send"
+              type="button"
             >
-              <FaSave />
-              {sending ? 'Sending...' : 'Confirm & Send'}
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-yellow-200 flex items-center justify-center">
+                <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <span className="font-semibold text-yellow-700">{sending ? 'Sending...' : 'Confirm & Send'}</span>
             </button>
           </div>
         </div>

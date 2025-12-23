@@ -637,20 +637,20 @@ export default function AdminMediaPage() {
       <div className="mb-8">
         <div className="bg-white rounded-lg shadow-md p-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 justify-items-center mx-auto max-w-6xl">
-            <Link href="/admin" className="w-full max-w-xs flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 text-gray-800 rounded-lg shadow-sm hover:shadow-md p-3 sm:p-4 text-xs sm:text-sm transition-all duration-200">
-              <FaHome className="text-lg sm:text-xl mb-2" />
+            <Link href="/admin" className="w-full max-w-xs flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg shadow-sm hover:shadow-md p-2 sm:p-3 text-xs sm:text-sm transition-all duration-200">
+              <FaHome className="text-base sm:text-lg mb-1.5 text-blue-600" />
               <span className="font-semibold text-center leading-tight">Admin Home</span>
             </Link>
-            <Link href="/admin/manage-usage" className="w-full max-w-xs flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg shadow-sm hover:shadow-md p-3 sm:p-4 text-xs sm:text-sm transition-all duration-200">
-              <FaUsers className="text-lg sm:text-xl mb-2" />
+            <Link href="/admin/manage-usage" className="w-full max-w-xs flex flex-col items-center justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-800 rounded-lg shadow-sm hover:shadow-md p-2 sm:p-3 text-xs sm:text-sm transition-all duration-200">
+              <FaUsers className="text-base sm:text-lg mb-1.5 text-indigo-600" />
               <span className="font-semibold text-center leading-tight">Manage Users [Usage]</span>
             </Link>
-            <Link href="/admin/manage-events" className="w-full max-w-xs flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-lg shadow-sm hover:shadow-md p-3 sm:p-4 text-xs sm:text-sm transition-all duration-200">
-              <FaCalendarAlt className="text-lg sm:text-xl mb-2" />
+            <Link href="/admin/manage-events" className="w-full max-w-xs flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-lg shadow-sm hover:shadow-md p-2 sm:p-3 text-xs sm:text-sm transition-all duration-200">
+              <FaCalendarAlt className="text-base sm:text-lg mb-1.5 text-green-600" />
               <span className="font-semibold text-center leading-tight">Manage Events</span>
             </Link>
-            <Link href="/admin/media" className="w-full max-w-xs flex flex-col items-center justify-center bg-purple-50 hover:bg-purple-100 text-purple-800 rounded-lg shadow-sm hover:shadow-md p-3 sm:p-4 text-xs sm:text-sm transition-all duration-200">
-              <FaPhotoVideo className="text-lg sm:text-xl mb-2" />
+            <Link href="/admin/media" className="w-full max-w-xs flex flex-col items-center justify-center bg-cyan-50 hover:bg-cyan-100 text-cyan-800 rounded-lg shadow-sm hover:shadow-md p-2 sm:p-3 text-xs sm:text-sm transition-all duration-200">
+              <FaPhotoVideo className="text-base sm:text-lg mb-1.5 text-cyan-600" />
               <span className="font-semibold text-center leading-tight">Manage Media</span>
             </Link>
           </div>
@@ -659,9 +659,16 @@ export default function AdminMediaPage() {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Manage Media Files</h1>
         <div className="flex space-x-2">
-          <Link href="/admin/media" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 flex items-center gap-2">
-            <FaUpload />
-            Upload New Media
+          <Link
+            href="/admin/media"
+            className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+            title="Upload New Media"
+            aria-label="Upload New Media"
+          >
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+              <FaUpload className="w-6 h-6 text-blue-600" />
+            </div>
+            <span className="font-semibold text-blue-700">Upload New Media</span>
           </Link>
         </div>
       </div>
@@ -815,10 +822,17 @@ export default function AdminMediaPage() {
             <button
               onClick={handlePrevPage}
               disabled={page === 0}
-              className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+              className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed disabled:hover:scale-100"
+              title="Previous Page"
+              aria-label="Previous Page"
+              type="button"
             >
-              <FaChevronLeft />
-              Previous
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </div>
+              <span className="font-semibold text-blue-700">Previous</span>
             </button>
             <div className="text-sm font-semibold text-gray-700">
               Page {page + 1} of {totalPages}
@@ -826,10 +840,17 @@ export default function AdminMediaPage() {
             <button
               onClick={handleNextPage}
               disabled={page >= totalPages - 1}
-              className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+              className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed disabled:hover:scale-100"
+              title="Next Page"
+              aria-label="Next Page"
+              type="button"
             >
-              Next
-              <FaChevronRight />
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+              <span className="font-semibold text-blue-700">Next</span>
             </button>
           </div>
           <div className="text-center text-sm text-gray-600 mt-2">
@@ -849,17 +870,33 @@ export default function AdminMediaPage() {
             <div className="mt-6 flex justify-center gap-4">
               <button
                 onClick={() => setDeletingMedia(null)}
-                className="bg-teal-100 hover:bg-teal-200 text-teal-800 px-4 py-2 rounded-md flex items-center gap-2"
+                className="flex-shrink-0 h-14 rounded-xl bg-teal-100 hover:bg-teal-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-teal-100 disabled:border-teal-300 disabled:text-teal-500 disabled:cursor-not-allowed disabled:hover:scale-100"
                 disabled={isPending}
+                title="Cancel"
+                aria-label="Cancel"
+                type="button"
               >
-                <FaBan /> Cancel
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-teal-700">Cancel</span>
               </button>
               <button
                 onClick={confirmDelete}
-                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md flex items-center gap-2"
+                className="flex-shrink-0 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-red-100 disabled:border-red-300 disabled:text-red-500 disabled:cursor-not-allowed"
                 disabled={isPending}
+                title="Confirm Delete"
+                aria-label="Confirm Delete"
+                type="button"
               >
-                <FaTrashAlt /> {isPending ? 'Deleting...' : 'Confirm Delete'}
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-200 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-red-700">{isPending ? 'Deleting...' : 'Confirm Delete'}</span>
               </button>
             </div>
           </div>

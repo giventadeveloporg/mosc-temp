@@ -73,11 +73,32 @@ async function RegistrationManagementContent({
   status: string;
   page: number;
 }) {
-  // Only fetch registrants if an event is selected
-  const data = await fetchRegistrationManagementData(eventId, search, searchType, status, page);
+  // Add timeout wrapper to prevent hanging
+  const data = await Promise.race([
+    fetchRegistrationManagementData(eventId, search, searchType, status, page),
+    new Promise<null>((resolve) =>
+      setTimeout(() => {
+        console.warn('[RegistrationManagement] Data fetch timeout after 25 seconds');
+        resolve(null);
+      }, 25000)
+    )
+  ]);
 
+  // If data fetch failed or timed out, show empty state instead of 404
   if (!data) {
-    notFound();
+    // Return empty data structure instead of calling notFound()
+    // This allows the page to render with empty state
+    return <RegistrationManagementClient data={{
+      attendees: [],
+      totalCount: 0,
+      currentPage: 1,
+      totalPages: 0,
+      events: [],
+      selectedEvent: null,
+      searchTerm: search,
+      searchType: searchType,
+      statusFilter: status,
+    }} />;
   }
 
   return <RegistrationManagementClient data={data} />;

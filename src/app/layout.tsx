@@ -27,7 +27,10 @@ export default async function RootLayout({
   // Satellite domains: Read from NEXT_PUBLIC_CLERK_DOMAIN and NEXT_PUBLIC_APP_URL env variables
   // IMPORTANT: Only apply satellite config in production, not in development (localhost)
 
+  // CRITICAL: Next.js 15+ requires headers() to be fully resolved before any iteration or access
+  // Store the headers promise result to ensure it's fully awaited
   const headersList = await headers();
+  // CRITICAL: Access headers synchronously after await to avoid iteration errors
   const hostname = headersList.get('host') || '';
 
   // Get primary domain from environment variable
@@ -68,6 +71,7 @@ export default async function RootLayout({
       // Call auth() first - it internally uses headers() which we've already awaited
       const authResult = await auth();
       userId = authResult?.userId || null;
+      console.log('[Layout] 🔍 Auth check result:', { userId, hasUserId: !!userId });
 
       // CRITICAL: Only call currentUser() after auth() completes successfully
       // This ensures headers() async context is properly maintained
@@ -97,10 +101,13 @@ export default async function RootLayout({
     if (userId) {
       const baseUrl = getAppUrl();
       const tenantId = getTenantId();
+      console.log('[Layout] 🔍 Fetching user profile:', { userId, tenantId, baseUrl });
 
       // Step 1: Check if userId + tenantId combination exists
       const url = `${baseUrl}/api/proxy/user-profiles?userId.equals=${encodeURIComponent(userId)}&tenantId.equals=${encodeURIComponent(tenantId)}&size=1`;
+      console.log('[Layout] 🔍 Profile fetch URL:', url);
       const resp = await fetch(url, { cache: 'no-store', headers: { 'Content-Type': 'application/json' } });
+      console.log('[Layout] 🔍 Profile fetch response:', { status: resp.status, ok: resp.ok });
 
       if (resp.ok) {
         const arr = await resp.json();
@@ -208,8 +215,11 @@ export default async function RootLayout({
     }
   } catch (e) {
     // Fail closed (no admin) on error
+    console.error('[Layout] ❌ Error determining admin status:', e);
     isTenantAdmin = false;
   }
+
+  console.log('[Layout] 🔍 Final admin status:', { isTenantAdmin });
 
   return (
     <ClerkProvider
