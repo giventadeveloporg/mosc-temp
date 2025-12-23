@@ -1,0 +1,618 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Test Suite Report</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .header {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .stat-card.passed { border-left: 4px solid #10b981; }
+    .stat-card.failed { border-left: 4px solid #ef4444; }
+    .stat-card.skipped { border-left: 4px solid #f59e0b; }
+    .stat-card.total { border-left: 4px solid #3b82f6; }
+    .stat-number {
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .stat-label {
+      color: #6b7280;
+      font-size: 14px;
+    }
+    .test-results {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .test-item {
+      padding: 15px;
+      border-bottom: 1px solid #e5e7eb;
+      margin-bottom: 10px;
+    }
+    .test-item:last-child {
+      border-bottom: none;
+    }
+    .test-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .test-name {
+      font-weight: 600;
+      font-size: 16px;
+    }
+    .test-status {
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .test-status.passed { background: #d1fae5; color: #065f46; }
+    .test-status.failed { background: #fee2e2; color: #991b1b; }
+    .test-status.skipped { background: #fef3c7; color: #92400e; }
+    .test-details {
+      color: #6b7280;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+    .test-error {
+      color: #ef4444;
+      margin-top: 8px;
+      padding: 10px;
+      background: #fef2f2;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    .category-header {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 20px 0 10px 0;
+      color: #374151;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Admin Test Suite Report</h1>
+    <p>Generated: 12/23/2025, 12:41:22 AM</p>
+    <p>Duration: 375.03s</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card total">
+      <div class="stat-number">23</div>
+      <div class="stat-label">Total Tests</div>
+    </div>
+    <div class="stat-card passed">
+      <div class="stat-number">16</div>
+      <div class="stat-label">Passed</div>
+    </div>
+    <div class="stat-card failed">
+      <div class="stat-number">7</div>
+      <div class="stat-label">Failed</div>
+    </div>
+    <div class="stat-card skipped">
+      <div class="stat-number">0</div>
+      <div class="stat-label">Skipped</div>
+    </div>
+  </div>
+
+  <div class="test-results">
+    
+      <div class="category-header">core</div>
+      
+        <div class="test-item">
+          <div class="test-header">
+            <div>
+              <div class="test-name">[admin-001] Admin Dashboard</div>
+              <div class="test-details">
+                /admin • 3779ms • Priority: critical
+              </div>
+            </div>
+            <span class="test-status passed">PASSED</span>
+          </div>
+          
+          
+            <div class="test-details">
+              📊 Elements found: 3/0
+            </div>
+          
+          
+        </div>
+      
+        <div class="test-item">
+          <div class="test-header">
+            <div>
+              <div class="test-name">[admin-002] Manage Users (Usage)</div>
+              <div class="test-details">
+                /admin/manage-usage • 10601ms • Priority: critical
+              </div>
+            </div>
+            <span class="test-status passed">PASSED</span>
+          </div>
+          
+          
+            <div class="test-details">
+              📊 Elements found: 3/0
+            </div>
+          
+          
+        </div>
+      
+        <div class="test-item">
+          <div class="test-header">
+            <div>
+              <div class="test-name">[admin-003] Manage Events</div>
+              <div class="test-details">
+                /admin/manage-events • 2609ms • Priority: critical
+              </div>
+            </div>
+            <span class="test-status passed">PASSED</span>
+          </div>
+          
+          
+            <div class="test-details">
+              📊 Elements found: 3/0
+            </div>
+          
+          
+        </div>
+      
+    
+      <div class="category-header">events</div>
+      
+        <div class="test-item">
+          <div class="test-header">
+            <div>
+              <div class="test-name">[admin-004] Event Analytics Dashboard</div>
+              <div class="test-details">
+                /admin/events/dashboard • 12718ms • Priority: high
+              </div>
+            </div>
+            <span class="test-status passed">PASSED</span>
+          </div>
+          
+          
+            <div class="test-details">
+              📊 Elements found: 1/0
+            </div>
+          
+          
+        </div>
+      
+        <div class="test-item">
+          <div class="test-header">
+            <div>
+              <div class="test-name">[admin-005] Event Registrations</div>
+              <div class="test-details">
+                /admin/events/registrations • 22476ms • Priority: high
+              </div>
+            </div>
+            <span class="test-status passed">PASSED</span>
+          </div>
+          
+          
+            <div class="test-details">
+              📊 Elements found: 1/0
+            </div>
+          
+          
+        </div>
+      
+    
+      <div class="category-header">polls</div>
+      
+        <div class="test-item">
+          <div class="test-header">
+            <div>
+              <div class="test-name">[admin-006] Poll Management</div>
+              <div class="test-details">
+                /admin/polls • 12196ms • Priority: medium
+              </div>
+            </div>
+            <span class="test-status passed">PASSED</span>
+          </div>
+          
+          
+            <div class="test-details">
+              📊 Elements found: 2/0
+            </div>
+          
+          
+        </div>
+      
+    
+      <div class="category-header">focus-groups</div>
+      
+        <div class="test-item">
+          <div class="test-header">
+            <div>
+              <div class="test-name">[admin-007] Focus Groups</div>
+              <div class="test-details">
+                /admin/focus-groups • 7905ms • Priority: medium
+              </div>
+            </div>
+            <span class="test-status passed">PASSED</span>
+          </div>
+          
+          
+            <div class="test-details">
+              📊 Elements found: 4/0
+            </div>
+          
+          
+        </div>
+      
+    
+      <div class="category-header">membership</div>
+      
+        <div class="test-item">
+          <div class="test-header">
+            <div>
+              <div class="test-name">[admin-008] Membership Plans</div>
+              <div class="test-details">
+                /admin/membership/plans • 10859ms • Priority: high
+              </div>
+            </div>
+            <span class="test-status passed">PASSED</span>
+          </div>
+          
+          
+            <div class="test-details">
+              📊 Elements found: 3/0
+            </div>
+          
+          
+        </div>
+      
+        <div class="test-item">
+          <div class="test-header">
+            <div>
+              <div class="test-name">[admin-009] Membership Subscriptions</div>
+              <div class="test-details">
+                /admin/membership/subscriptions • 6958ms • Priority: high
+              </div>
+            </div>
+            <span class="test-status passed">PASSED</span>
+          </div>
+          
+          
+            <div class="test-details">
+              📊 Elements found: 1/0
+            </div>
+          
+          
+        </div>
+      
+    
+      <div class="category-header">email</div>
+      
+        <div class="test-item">
+          <div class="test-header">
+            <div>
+              <div class="test-name">[admin-010] Email Addresses</div>
+              <div class="test-details">
+                /admin/tenant-email-addresses • 6361ms • Priority: medium
+              </div>
+            </div>
+            <span class="test-status failed">FAILED</span>
+          </div>
+          <div class="test-error">❌ Page loaded but no main content found</div>
+          
+            <div class="test-details">
+              📊 Elements found: 1/0
+            </div>
+          
+          
+            <div class="test-details">
+              📸 <a href="E:\project_workspace\mosc-temp\TestSprite\admin-tests\screenshots\failure-admin-010-1766468205464.png" target="_blank">View Screenshot</a>
+            </div>
+          
+        </div>
+      
+        <div class="test-item">
+          <div class="test-header">
+            <div>
+              <div class="test-name">[admin-011] Bulk Email</div>
+              <div class="test-details">
+                /admin/bulk-email • 7798ms • Priority: medium
+              </div>
+            </div>
+            <span class="test-status passed">PASSED</span>
+          </div>
+          
+          
+            <div class="test-details">
+              📊 Elements found: 2/0
+            </div>
+          
+          
+        </div>
+      
+        <div class="test-item">
+          <div class="test-header">
+            <div>
+              <div class="test-name">[admin-012] Newsletter Emails</div>
+              <div class="test-details">
+                /admin/newsletter-emails • 8529ms • Priority: medium
+              </div>
+            </div>
+            <span class="test-status failed">FAILED</span>
+          </div>
+          <div class="test-error">❌ Page loaded but no main content found</div>
+          
+            <div class="test-details">
+              📊 Elements found: 1/0
+            </div>
+          
+          
+            <div class="test-details">
+              📸 <a href="E:\project_workspace\mosc-temp\TestSprite\admin-tests\screenshots\failure-admin-012-1766468222106.png" target="_blank">View Screenshot</a>
+            </div>
+          
+        </div>
+      
+    
+      <div class="category-header">media</div>
+      
+        <div class="test-item">
+          <div class="test-header">
+            <div>
+              <div class="test-name">[admin-013] Media Management</div>
+              <div class="test-details">
+                /admin/media • 13981ms • Priority: medium
+              </div>
+            </div>
+            <span class="test-status passed">PASSED</span>
+          </div>
+          
+          
+            <div class="test-details">
+              📊 Elements found: 3/0
+            </div>
+          
+          
+        </div>
+      
+    
+      <div class="category-header">content</div>
+      
+        <div class="test-item">
+          <div class="test-header">
+            <div>
+              <div class="test-name">[admin-014] Executive Committee</div>
+              <div class="test-details">
+                /admin/executive-committee • 30011ms • Priority: medium
+              </div>
+            </div>
+            <span class="test-status failed">FAILED</span>
+          </div>
+          <div class="test-error">❌ page.goto: Timeout 30000ms exceeded.
+Call log:
+[2m  - navigating to "http://localhost:3000/admin/executive-committee", waiting until "domcontentloaded"[22m
+</div>
+          
+          
+            <div class="test-details">
+              📸 <a href="E:\project_workspace\mosc-temp\TestSprite\admin-tests\screenshots\failure-admin-014-1766468266320.png" target="_blank">View Screenshot</a>
+            </div>
+          
+        </div>
+      
+        <div class="test-item">
+          <div class="test-header">
+            <div>
+              <div class="test-name">[admin-015] Event Sponsors (Global)</div>
+              <div class="test-details">
+                /admin/event-sponsors • 30003ms • Priority: medium
+              </div>
+            </div>
+            <span class="test-status failed">FAILED</span>
+          </div>
+          <div class="test-error">❌ page.goto: Timeout 30000ms exceeded.
+Call log:
+[2m  - navigating to "http://localhost:3000/admin/event-sponsors", waiting until "domcontentloaded"[22m
+</div>
+          
+          
+            <div class="test-details">
+              📸 <a href="E:\project_workspace\mosc-temp\TestSprite\admin-tests\screenshots\failure-admin-015-1766468300636.png" target="_blank">View Screenshot</a>
+            </div>
+          
+        </div>
+      
+        <div class="test-item">
+          <div class="test-header">
+            <div>
+              <div class="test-name">[admin-016] Global Performers</div>
+              <div class="test-details">
+                /admin/event-featured-performers • 27981ms • Priority: medium
+              </div>
+            </div>
+            <span class="test-status passed">PASSED</span>
+          </div>
+          
+          
+            <div class="test-details">
+              📊 Elements found: 2/0
+            </div>
+          
+          
+        </div>
+      
+        <div class="test-item">
+          <div class="test-header">
+            <div>
+              <div class="test-name">[admin-017] Global Contacts</div>
+              <div class="test-details">
+                /admin/event-contacts • 4961ms • Priority: medium
+              </div>
+            </div>
+            <span class="test-status passed">PASSED</span>
+          </div>
+          
+          
+            <div class="test-details">
+              📊 Elements found: 2/0
+            </div>
+          
+          
+        </div>
+      
+        <div class="test-item">
+          <div class="test-header">
+            <div>
+              <div class="test-name">[admin-018] Global Emails</div>
+              <div class="test-details">
+                /admin/event-emails • 7391ms • Priority: medium
+              </div>
+            </div>
+            <span class="test-status passed">PASSED</span>
+          </div>
+          
+          
+            <div class="test-details">
+              📊 Elements found: 1/0
+            </div>
+          
+          
+        </div>
+      
+        <div class="test-item">
+          <div class="test-header">
+            <div>
+              <div class="test-name">[admin-019] Global Program Directors</div>
+              <div class="test-details">
+                /admin/event-program-directors • 5708ms • Priority: medium
+              </div>
+            </div>
+            <span class="test-status passed">PASSED</span>
+          </div>
+          
+          
+            <div class="test-details">
+              📊 Elements found: 1/0
+            </div>
+          
+          
+        </div>
+      
+    
+      <div class="category-header">tenant</div>
+      
+        <div class="test-item">
+          <div class="test-header">
+            <div>
+              <div class="test-name">[admin-020] Organizations</div>
+              <div class="test-details">
+                /admin/tenant-management/organizations • 15575ms • Priority: high
+              </div>
+            </div>
+            <span class="test-status failed">FAILED</span>
+          </div>
+          <div class="test-error">❌ Page loaded but no main content found</div>
+          
+            <div class="test-details">
+              📊 Elements found: 1/0
+            </div>
+          
+          
+            <div class="test-details">
+              📸 <a href="E:\project_workspace\mosc-temp\TestSprite\admin-tests\screenshots\failure-admin-020-1766468362683.png" target="_blank">View Screenshot</a>
+            </div>
+          
+        </div>
+      
+        <div class="test-item">
+          <div class="test-header">
+            <div>
+              <div class="test-name">[admin-021] Tenant Settings</div>
+              <div class="test-details">
+                /admin/tenant-management/settings • 30003ms • Priority: high
+              </div>
+            </div>
+            <span class="test-status failed">FAILED</span>
+          </div>
+          <div class="test-error">❌ page.goto: Timeout 30000ms exceeded.
+Call log:
+[2m  - navigating to "http://localhost:3000/admin/tenant-management/settings", waiting until "domcontentloaded"[22m
+</div>
+          
+          
+        </div>
+      
+        <div class="test-item">
+          <div class="test-header">
+            <div>
+              <div class="test-name">[admin-022] Test CRUD</div>
+              <div class="test-details">
+                /admin/tenant-management/test • 35545ms • Priority: low
+              </div>
+            </div>
+            <span class="test-status failed">FAILED</span>
+          </div>
+          <div class="test-error">❌ Page loaded but no main content found</div>
+          
+          
+            <div class="test-details">
+              📸 <a href="E:\project_workspace\mosc-temp\TestSprite\admin-tests\screenshots\failure-admin-022-1766468458438.png" target="_blank">View Screenshot</a>
+            </div>
+          
+        </div>
+      
+    
+      <div class="category-header">utilities</div>
+      
+        <div class="test-item">
+          <div class="test-header">
+            <div>
+              <div class="test-name">[admin-023] Test Stripe</div>
+              <div class="test-details">
+                /admin/test-stripe • 21347ms • Priority: low
+              </div>
+            </div>
+            <span class="test-status passed">PASSED</span>
+          </div>
+          
+          
+            <div class="test-details">
+              📊 Elements found: 2/0
+            </div>
+          
+          
+        </div>
+      
+    
+  </div>
+</body>
+</html>
+  

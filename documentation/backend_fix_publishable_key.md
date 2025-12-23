@@ -137,7 +137,7 @@ After the fix, the `/api/payments/initialize` endpoint should return:
   "transactionId": "4357",
   "providerType": "STRIPE",
   "clientSecret": "pi_xxx_secret_xxx",
-  "publishableKey": "pk_test_51JoBNqK5BrggeAHMxgJ7OBl3MKNlJMG0fuxwwsqk6bXldsQKyUlP283EUgICwcd57D9GUSAUfRPa06GD7xcXqqyH00tc3RDr97",
+  "publishableKey": "pk_test_***REDACTED***",
   "paymentMethod": "card",
   "metadata": {
     "payment_intent_id": "pi_xxx",
