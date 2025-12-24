@@ -401,9 +401,17 @@ export function MembershipClient({ plans, error, userSubscription }: MembershipC
                           />
                         )}
 
-                        {/* Desktop Subscribe Button */}
+                        {/* Desktop Subscribe Button - Navigate to subscribe page with Stripe Elements */}
                         <Button
-                          onClick={() => handleSubscribe(plan)}
+                          onClick={() => {
+                            // Check if user is authenticated
+                            if (!userId) {
+                              router.push(`/sign-in?redirect_url=/membership/subscribe/${plan.id}`);
+                              return;
+                            }
+                            // Navigate to subscribe page where Stripe Elements are shown inline
+                            router.push(`/membership/subscribe/${plan.id}`);
+                          }}
                           disabled={isLoadingPlan}
                           className={`w-full ${colorScheme.accent} hover:opacity-90 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-300`}
                           size="lg"

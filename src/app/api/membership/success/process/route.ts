@@ -43,6 +43,7 @@ async function getSessionIdFromPaymentIntent(paymentIntentId: string): Promise<s
 /**
  * GET /api/membership/success/process
  * Look up existing subscription by session_id or payment_intent
+ * CRITICAL: Desktop flow - creates subscription immediately if payment succeeded (webhook fallback)
  */
 export async function GET(req: NextRequest) {
   try {
@@ -50,8 +51,20 @@ export async function GET(req: NextRequest) {
     const session_id = searchParams.get('session_id');
     const pi = searchParams.get('pi');
     const skip_qr = searchParams.get('skip_qr') === 'true';
+    const _poll = searchParams.get('_poll'); // Polling attempt number (for logging)
 
-    console.log('[MEMBERSHIP-PROCESS GET] Received:', { session_id, pi, skip_qr });
+    // CRITICAL: Server-side mobile detection for CloudWatch logging
+    const userAgent = req.headers.get('user-agent') || 'unknown';
+    const cloudfrontMobile = req.headers.get('cloudfront-is-mobile-viewer') === 'true';
+    const cloudfrontAndroid = req.headers.get('cloudfront-is-android-viewer') === 'true';
+    const cloudfrontIOS = req.headers.get('cloudfront-is-ios-viewer') === 'true';
+
+    // Enhanced mobile detection (same logic as client-side)
+    const mobileRegexMatch = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS|FxiOS|EdgiOS/i.test(userAgent);
+    const platformMatch = /iPhone|iPad|iPod|Android|BlackBerry|Windows Phone/i.test(userAgent);
+    const isMobile = mobileRegexMatch || platformMatch || cloudfrontMobile || cloudfrontAndroid || cloudfrontIOS;
+
+    console.log('[MEMBERSHIP-PROCESS GET] Received:', { session_id, pi, skip_qr, _poll, isMobile });
 
     if (!session_id && !pi) {
       return NextResponse.json({ error: 'Missing session_id or pi (payment_intent)' }, { status: 400 });
@@ -87,7 +100,105 @@ export async function GET(req: NextRequest) {
       });
     }
 
+    // CRITICAL: Desktop flow - create subscription immediately if payment succeeded (webhook fallback)
+    // This is separate from mobile workflow (which uses POST endpoint via /membership/qr page)
+    // Desktop flow persists subscription from frontend when webhook hasn't processed yet
+    if (!isMobile && session_id && !session_id.startsWith('pi_')) {
+      console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] No subscription found - attempting to create from Checkout Session:', session_id);
+      try {
+        const { stripe } = await import('@/lib/stripe');
+        const { processMembershipSubscriptionSessionServer } = await import('@/app/membership/success/ApiServerActions');
+
+        // Retrieve Checkout Session from Stripe to validate payment succeeded
+        const session = await stripe().checkout.sessions.retrieve(session_id, {
+          expand: ['subscription', 'customer'],
+        });
+
+        // Only create subscription if payment succeeded
+        if (session.payment_status !== 'paid') {
+          console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] Checkout Session not paid:', session.payment_status);
+          return NextResponse.json({
+            subscription: null,
+            plan: null,
+            message: `Payment not completed yet. Status: ${session.payment_status}`,
+          }, { status: 200 });
+        }
+
+        // Validate metadata matches environment variables
+        const metadata = session.metadata || {};
+        const metadataTenantId = metadata.tenantId || metadata.tenant_id;
+        const metadataPaymentMethodDomainId = metadata.paymentMethodDomainId || metadata.payment_method_domain_id;
+        const { getTenantId, getPaymentMethodDomainId } = await import('@/lib/env');
+        const expectedTenantId = getTenantId();
+        const expectedPaymentMethodDomainId = getPaymentMethodDomainId();
+
+        if (metadataTenantId && metadataTenantId !== expectedTenantId) {
+          console.error('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] ⚠️⚠️⚠️ TENANT ID MISMATCH:', {
+            metadataTenantId,
+            expectedTenantId,
+            sessionId: session_id
+          });
+          return NextResponse.json({
+            subscription: null,
+            plan: null,
+            error: 'Tenant ID mismatch',
+            message: `Checkout Session tenant ID (${metadataTenantId}) does not match configured tenant ID (${expectedTenantId}).`
+          }, { status: 403 });
+        }
+
+        if (metadataPaymentMethodDomainId && metadataPaymentMethodDomainId !== expectedPaymentMethodDomainId) {
+          console.error('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] ⚠️⚠️⚠️ PAYMENT METHOD DOMAIN ID MISMATCH:', {
+            metadataPaymentMethodDomainId,
+            expectedPaymentMethodDomainId,
+            sessionId: session_id
+          });
+          return NextResponse.json({
+            subscription: null,
+            plan: null,
+            error: 'Payment Method Domain ID mismatch',
+            message: `Checkout Session Payment Method Domain ID (${metadataPaymentMethodDomainId}) does not match configured Payment Method Domain ID (${expectedPaymentMethodDomainId}).`
+          }, { status: 403 });
+        }
+
+        // Create subscription from session (same function used by POST endpoint)
+        const result = await processMembershipSubscriptionSessionServer(session_id);
+
+        if (result && result.subscription) {
+          console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] ✅ Successfully created subscription:', result.subscription.id);
+
+          // Fetch plan details
+          const details = await fetchMembershipSubscriptionDetailsServer(
+            session_id || undefined,
+            pi || undefined
+          );
+
+          return NextResponse.json({
+            subscription: result.subscription,
+            plan: result.plan || details?.plan || null,
+            amount: details?.amount || result.plan?.price || null,
+            currency: details?.currency || result.plan?.currency || 'USD',
+          });
+        } else {
+          console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] Failed to create subscription from session');
+          return NextResponse.json({
+            subscription: null,
+            plan: null,
+            message: 'Failed to create subscription. Please contact support.',
+          });
+        }
+      } catch (createErr: any) {
+        console.error('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] Error creating subscription:', createErr);
+        // Return null subscription but don't fail - allow polling to continue
+        return NextResponse.json({
+          subscription: null,
+          plan: null,
+          message: 'Subscription not found yet. Webhook may still be processing.',
+        });
+      }
+    }
+
     // Subscription not found yet (webhook may still be processing)
+    // Desktop will poll, mobile will use POST endpoint
     return NextResponse.json({
       subscription: null,
       plan: null,
