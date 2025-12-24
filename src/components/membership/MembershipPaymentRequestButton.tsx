@@ -42,6 +42,7 @@ function InnerMembershipPRB({
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [cachedAmount, setCachedAmount] = useState<number | null>(null);
   const [processing, setProcessing] = useState(false);
+  const [canMakePaymentResult, setCanMakePaymentResult] = useState<any>(null);
 
   // When validations become invalid, tear down the live PaymentRequest
   useEffect(() => {
@@ -76,6 +77,7 @@ function InnerMembershipPRB({
 
     pr.canMakePayment().then((result) => {
       console.log('[MEMBERSHIP-PRB] canMakePayment() result:', result);
+      setCanMakePaymentResult(result);
       if (result) {
         setEligible(true);
         setReady(true);
@@ -89,9 +91,30 @@ function InnerMembershipPRB({
     // Handle payment method event
     pr.on('paymentmethod', async (ev) => {
       console.log('[MEMBERSHIP-PRB] Payment method event triggered');
+
+      // Prevent duplicate processing
+      if (processing) {
+        try {
+          ev.complete('fail');
+        } catch {
+          // Ignore errors
+        }
+        return;
+      }
+
       setProcessing(true);
 
       try {
+        // CRITICAL: For Apple Pay on iOS/Safari, immediately complete to prevent sheet timeout
+        const isApplePay = !!(canMakePaymentResult && (canMakePaymentResult.applePay || (canMakePaymentResult as any).apple_pay));
+        if (isApplePay) {
+          console.log('[MEMBERSHIP-PRB] Apple Pay detected - completing immediately to prevent timeout');
+          try {
+            ev.complete('success');
+          } catch {
+            // Ignore errors
+          }
+        }
         // Create fresh Payment Intent on each payment attempt
         const piResponse = await fetch('/api/stripe/membership-payment-intent', {
           method: 'POST',
@@ -139,7 +162,15 @@ function InnerMembershipPRB({
 
         if (error) {
           console.error('[MEMBERSHIP-PRB] Payment confirmation error:', error);
-          ev.complete('fail');
+          // Only complete('fail') if not already completed (Apple Pay case)
+          // Reuse isApplePay declared at top of try block
+          if (!isApplePay) {
+            try {
+              ev.complete('fail');
+            } catch {
+              // Ignore errors
+            }
+          }
           setProcessing(false);
           alert(error.message || 'Payment failed. Please try again.');
           return;
@@ -150,8 +181,15 @@ function InnerMembershipPRB({
           status: paymentIntent?.status,
         });
 
-        // Complete payment request
-        ev.complete('success');
+        // Complete payment request (only if not already completed for Apple Pay)
+        // Reuse isApplePay declared at top of try block
+        if (!isApplePay) {
+          try {
+            ev.complete('success');
+          } catch {
+            // Ignore errors
+          }
+        }
 
         // Redirect to success page with Payment Intent ID
         const piId = paymentIntent?.id;
@@ -166,7 +204,15 @@ function InnerMembershipPRB({
         }
       } catch (err) {
         console.error('[MEMBERSHIP-PRB] Error processing payment:', err);
-        ev.complete('fail');
+        // Only complete('fail') if not already completed (Apple Pay case)
+        const isApplePay = !!(canMakePaymentResult && (canMakePaymentResult.applePay || (canMakePaymentResult as any).apple_pay));
+        if (!isApplePay) {
+          try {
+            ev.complete('fail');
+          } catch {
+            // Ignore errors
+          }
+        }
         setProcessing(false);
         alert(err instanceof Error ? err.message : 'Payment failed. Please try again.');
       }
@@ -177,6 +223,7 @@ function InnerMembershipPRB({
       setPaymentRequest(null);
       setReady(false);
       setEligible(false);
+      setCanMakePaymentResult(null);
     };
   }, [stripe, enabled, membershipPlanId, amountCents, currency, email, customerName, customerPhone, router]);
 

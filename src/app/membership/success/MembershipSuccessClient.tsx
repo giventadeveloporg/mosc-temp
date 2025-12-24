@@ -101,6 +101,12 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
 
     // Desktop: Fetch subscription data
     console.log('[MEMBERSHIP-SUCCESS] ❌ DESKTOP DETECTED - Fetching subscription data');
+    console.log('[DESKTOP FLOW] ============================================');
+    console.log('[DESKTOP FLOW] Desktop browser detected - using GET-only flow');
+    console.log('[DESKTOP FLOW] Desktop will NOT call POST endpoint (mobile-only)');
+    console.log('[DESKTOP FLOW] Desktop will poll GET endpoint if subscription not found');
+    console.log('[DESKTOP FLOW] GET endpoint will create subscription if payment succeeded (webhook fallback)');
+    console.log('[DESKTOP FLOW] ============================================');
 
     // Ensure we have at least one identifier
     if (!session_id && !payment_intent) {
@@ -116,32 +122,39 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
       setError(null);
 
       try {
-        // 1. First, try GET to check if subscription exists
+        // Build GET query parameters
         const params = new URLSearchParams();
         if (payment_intent) {
           params.append('pi', payment_intent);
         } else if (session_id) {
           params.append('session_id', session_id);
         }
+        const getQuery = params.toString();
+        const getUrl = `/api/membership/success/process?${getQuery}&_t=${Date.now()}`;
 
-        console.log('[MEMBERSHIP-SUCCESS] GET request to check subscription:', params.toString());
-        const getRes = await fetch(`/api/membership/success/process?${params.toString()}`, {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
+        console.log('[DESKTOP FLOW] GET request URL:', getUrl);
+        console.log('[DESKTOP FLOW] Desktop flow uses GET-only (no POST fallback)');
+
+        const getRes = await fetch(getUrl, {
           cache: 'no-store',
         });
 
-        console.log('[MEMBERSHIP-SUCCESS] GET response status:', getRes.status);
+        console.log('[DESKTOP FLOW] GET response status:', getRes.status);
 
         if (getRes.ok) {
           const data = await getRes.json();
-          console.log('[MEMBERSHIP-SUCCESS] GET response data:', data);
-          console.log('[MEMBERSHIP-SUCCESS] GET response has subscription?', !!data.subscription);
+          console.log('[DESKTOP FLOW] GET response data:', {
+            hasSubscription: !!data.subscription,
+            subscriptionId: data.subscription?.id,
+            error: data.error,
+            message: data.message,
+            responseKeys: Object.keys(data),
+            timestamp: new Date().toISOString()
+          });
 
           if (data.subscription) {
-            console.log('[MEMBERSHIP-SUCCESS] ✅ Subscription found in GET response:', data.subscription.id);
-            console.log('[MEMBERSHIP-SUCCESS] cancelledRef.current:', cancelledRef.current);
-            // Always update state if we have subscription data, regardless of cancelled flag
+            console.log('[DESKTOP FLOW] ✅ Subscription found in GET response:', data.subscription.id);
+            console.log('[DESKTOP FLOW] ✅ Desktop flow successful - subscription loaded via GET');
             if (!cancelledRef.current) {
               setSubscriptionDetails({
                 plan: data.plan,
@@ -149,119 +162,122 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
                 currency: data.currency || data.plan?.currency || 'USD',
                 subscription: data.subscription,
               });
-              console.log('[MEMBERSHIP-SUCCESS] ✅ Subscription details set');
-            } else {
-              console.log('[MEMBERSHIP-SUCCESS] ⚠️ Component cancelled, but subscription exists - will still set loading to false');
             }
-            // Always set loading to false if we have subscription data
-            console.log('[MEMBERSHIP-SUCCESS] ✅ Setting loading to false after GET success');
             setLoading(false);
             return;
           } else {
-            console.log('[MEMBERSHIP-SUCCESS] ⚠️ No subscription in GET response, will try POST');
+            // Log why subscription wasn't found
+            console.log('[DESKTOP FLOW] Initial GET: Subscription not found', {
+              error: data.error,
+              message: data.message,
+              note: 'Will start polling - GET endpoint will create subscription if payment succeeded'
+            });
+            console.log('[DESKTOP FLOW] ⚠️ No subscription found - webhook may still be processing or GET will create it');
+
+            // CRITICAL: Desktop flow polls GET endpoint (which creates subscription if payment succeeded)
+            // Poll GET endpoint to wait for webhook or GET endpoint to create subscription
+            let pollAttempt = 0;
+            const MAX_POLL_ATTEMPTS = 10;
+            const POLL_INTERVAL = 3000; // 3 seconds
+
+            console.log(`[DESKTOP FLOW] Starting polling loop - waiting for subscription...`);
+            console.log(`[DESKTOP FLOW] Will poll up to ${MAX_POLL_ATTEMPTS} times with ${POLL_INTERVAL}ms intervals`);
+
+            while (pollAttempt < MAX_POLL_ATTEMPTS && !cancelledRef.current) {
+              pollAttempt++;
+              console.log(`[DESKTOP FLOW] Polling attempt ${pollAttempt}/${MAX_POLL_ATTEMPTS}...`);
+
+              // Wait before polling (except first attempt which already waited)
+              if (pollAttempt > 1) {
+                await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL));
+              }
+
+              // Update URL timestamp to prevent caching
+              const pollUrl = `/api/membership/success/process?${getQuery}&_t=${Date.now()}&_poll=${pollAttempt}`;
+              console.log(`[DESKTOP FLOW] Polling URL: ${pollUrl}`);
+
+              try {
+                const pollRes = await fetch(pollUrl, { cache: 'no-store' });
+                console.log(`[DESKTOP FLOW] Poll response status (attempt ${pollAttempt}):`, pollRes.status);
+
+                if (pollRes.ok) {
+                  const pollData = await pollRes.json();
+                  console.log(`[DESKTOP FLOW] Poll response data (attempt ${pollAttempt}):`, {
+                    hasSubscription: !!pollData.subscription,
+                    subscriptionId: pollData.subscription?.id,
+                    error: pollData.error,
+                    message: pollData.message,
+                    responseKeys: Object.keys(pollData),
+                    timestamp: new Date().toISOString()
+                  });
+
+                  if (pollData.subscription) {
+                    console.log('[DESKTOP FLOW] ✅ Subscription found after polling:', pollData.subscription.id);
+                    console.log('[DESKTOP FLOW] ✅ Desktop flow successful - subscription loaded via GET polling');
+                    if (!cancelledRef.current) {
+                      setSubscriptionDetails({
+                        plan: pollData.plan,
+                        amount: pollData.amount || pollData.plan?.price || null,
+                        currency: pollData.currency || pollData.plan?.currency || 'USD',
+                        subscription: pollData.subscription,
+                      });
+                    }
+                    setLoading(false);
+                    return;
+                  } else {
+                    // Log why subscription wasn't found
+                    console.log(`[DESKTOP FLOW] Poll attempt ${pollAttempt}: Subscription not found yet`, {
+                      error: pollData.error,
+                      message: pollData.message,
+                      note: 'Webhook may still be processing or GET endpoint will create it'
+                    });
+                  }
+                } else {
+                  const errorText = await pollRes.text();
+                  console.warn(`[DESKTOP FLOW] Poll request failed (attempt ${pollAttempt}):`, {
+                    status: pollRes.status,
+                    statusText: pollRes.statusText,
+                    errorText,
+                    timestamp: new Date().toISOString()
+                  });
+                }
+              } catch (pollErr: any) {
+                console.warn(`[DESKTOP FLOW] Poll request error (attempt ${pollAttempt}):`, pollErr?.message);
+                // Continue polling even if one request fails
+              }
+            }
+
+            // If still not found after polling, show helpful error message
+            console.error('[DESKTOP FLOW] ⚠️⚠️⚠️ Subscription not found after polling:', {
+              pollAttempts: MAX_POLL_ATTEMPTS,
+              pollInterval: POLL_INTERVAL,
+              totalWaitTime: `${(MAX_POLL_ATTEMPTS * POLL_INTERVAL) / 1000} seconds`,
+              sessionId: session_id || payment_intent,
+              note: 'Webhook may be delayed or failed. Desktop flow did NOT call POST endpoint (correct behavior).',
+              timestamp: new Date().toISOString()
+            });
+            if (!cancelledRef.current) {
+              setError(
+                `Your payment was successful, but we're still processing your subscription. ` +
+                `We checked ${MAX_POLL_ATTEMPTS} times over ${(MAX_POLL_ATTEMPTS * POLL_INTERVAL) / 1000} seconds, ` +
+                `but the subscription hasn't been created yet. ` +
+                `This usually means the webhook is delayed. ` +
+                `Please wait a moment and refresh this page, or check your email for confirmation. ` +
+                `Session ID: ${session_id || payment_intent || 'N/A'}`
+              );
+            }
           }
         } else {
           const errorText = await getRes.text();
-          console.error('[MEMBERSHIP-SUCCESS] ❌ GET request failed:', getRes.status, errorText);
-        }
-
-        // 2. If not found, POST to create it (fallback if webhook failed)
-        // CRITICAL: Prevent duplicate POST requests (race condition fix)
-        if (isPostingRef.current) {
-          console.log('[MEMBERSHIP-SUCCESS] ⚠️ POST request already in progress, skipping duplicate');
-          return;
-        }
-
-        isPostingRef.current = true;
-        console.log('[MEMBERSHIP-SUCCESS] Making POST request to create subscription');
-        const postBody = session_id ? { session_id } : { pi: payment_intent };
-        console.log('[MEMBERSHIP-SUCCESS] POST body:', postBody);
-
-        try {
-          const postRes = await fetch('/api/membership/success/process', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(postBody),
-            cache: 'no-store',
-          });
-
-          console.log('[MEMBERSHIP-SUCCESS] POST response status:', postRes.status);
-
-          if (!postRes.ok) {
-            const errorText = await postRes.text();
-            console.error('[MEMBERSHIP-SUCCESS] POST request failed:', postRes.status, errorText);
-            throw new Error(errorText || 'Failed to create subscription');
+          console.error('[DESKTOP FLOW] ❌ GET request failed:', getRes.status, errorText);
+          if (!cancelledRef.current) {
+            setError(`Failed to load subscription details: ${errorText || 'Unknown error'}`);
           }
-
-          const postData = await postRes.json();
-          console.log('[MEMBERSHIP-SUCCESS] POST response data:', postData);
-          console.log('[MEMBERSHIP-SUCCESS] POST response has subscription?', !!postData.subscription);
-          console.log('[MEMBERSHIP-SUCCESS] POST response has plan?', !!postData.plan);
-          console.log('[MEMBERSHIP-SUCCESS] cancelledRef.current:', cancelledRef.current);
-
-          if (postData.subscription) {
-            console.log('[MEMBERSHIP-SUCCESS] ✅ Subscription found in POST response:', postData.subscription.id);
-            // Always update state if we have subscription data, regardless of cancelled flag
-            // The cancelled flag is only for preventing updates after unmount
-            if (!cancelledRef.current) {
-              setSubscriptionDetails({
-                plan: postData.plan,
-                amount: postData.amount || postData.plan?.price || null,
-                currency: postData.currency || postData.plan?.currency || 'USD',
-                subscription: postData.subscription,
-              });
-              console.log('[MEMBERSHIP-SUCCESS] ✅ Subscription details set');
-            } else {
-              console.log('[MEMBERSHIP-SUCCESS] ⚠️ Component cancelled, but subscription exists - will still set loading to false');
-            }
-            // Always set loading to false if we have subscription data
-            console.log('[MEMBERSHIP-SUCCESS] ✅ Setting loading to false after successful subscription creation');
-            setLoading(false);
-            return; // Exit early since we have the subscription
-          } else {
-            console.log('[MEMBERSHIP-SUCCESS] ⚠️ No subscription in POST response, trying fallback');
-            // Fallback: fetch plan details even if subscription creation failed
-            if (!cancelledRef.current) {
-              try {
-                const details = await fetchMembershipSubscriptionDetailsServer(session_id, payment_intent);
-                if (details) {
-                  console.log('[MEMBERSHIP-SUCCESS] ✅ Fallback fetch succeeded');
-                  setSubscriptionDetails({
-                    plan: details.plan,
-                    amount: details.amount || details.plan?.price || null,
-                    currency: details.currency || details.plan?.currency || 'USD',
-                    subscription: null,
-                  });
-                } else {
-                  console.log('[MEMBERSHIP-SUCCESS] ⚠️ Fallback fetch returned no details');
-                }
-              } catch (fallbackErr) {
-                console.error('[MEMBERSHIP-SUCCESS] ❌ Fallback fetch failed:', fallbackErr);
-              }
-            }
-          }
-        } finally {
-          // Reset posting flag after POST completes (success or failure)
-          isPostingRef.current = false;
         }
       } catch (err: any) {
         if (!cancelledRef.current) {
           console.error('[MEMBERSHIP-SUCCESS] Error fetching subscription data:', err);
           setError(err.message || 'Failed to load subscription details');
-          // Still try to fetch plan details as fallback
-          try {
-            const details = await fetchMembershipSubscriptionDetailsServer(session_id, payment_intent);
-            if (details) {
-              setSubscriptionDetails({
-                plan: details.plan,
-                amount: details.amount || details.plan?.price || null,
-                currency: details.currency || details.plan?.currency || 'USD',
-                subscription: null,
-              });
-            }
-          } catch (fallbackErr) {
-            console.error('[MEMBERSHIP-SUCCESS] Fallback fetch also failed:', fallbackErr);
-          }
         }
       } finally {
         if (!cancelledRef.current) {

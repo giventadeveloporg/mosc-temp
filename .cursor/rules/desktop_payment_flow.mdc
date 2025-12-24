@@ -5,7 +5,9 @@ alwaysApply: false
 ---
 
 - **Main Points in Bold**
-  - Desktop flow uses Stripe Checkout Sessions (`cs_`) and Payment Intents (`pi_`) for payment processing
+  - Desktop flow uses Stripe Checkout Sessions (`cs_`) OR Stripe Elements inline (ExpressCheckoutElement + PaymentElement) for payment processing
+  - **Stripe Elements Inline Option**: Desktop can use Stripe Elements (`StripeDesktopCheckout` component) to show Apple Pay, Google Pay, Link, and card form directly on the page (no redirect)
+  - **Stripe Checkout Session Option**: Desktop can also use Stripe Checkout Sessions (hosted payment page) via redirect
   - Desktop flow persists transactions immediately when payment succeeds via GET endpoint fallback
   - Desktop flow is completely separate from mobile workflow - uses different entry points and detection methods
   - Desktop flow must include both `tenantId` and `paymentMethodDomainId` in all backend requests
@@ -26,7 +28,27 @@ The desktop payment flow is fundamentally different from the mobile flow due to:
 
 ## Desktop vs Mobile Flow Comparison
 
-### Desktop Flow
+### Desktop Flow (Two Options)
+
+#### Option 1: Stripe Elements Inline (Preferred for Registered Users)
+```
+User fills form →
+Payment Intent created via /api/stripe/payment-intent →
+Stripe Elements rendered inline (ExpressCheckoutElement + PaymentElement) →
+Apple Pay/Google Pay/Link/Card form shown on same page →
+Payment completion →
+Redirect to /event/success?pi=pi_xxx →
+SuccessClient detects desktop →
+Stays on success page →
+GET /api/event/success/process?pi=pi_xxx →
+If transaction not found (webhook delayed) →
+Create transaction immediately via createTransactionFromPaymentIntent →
+Create transaction items via createTransactionItemsBulk →
+Fetch QR code →
+Display success page with QR inline
+```
+
+#### Option 2: Stripe Checkout Session (Fallback for Visitors)
 ```
 User fills form →
 Stripe Checkout Session created →
@@ -125,18 +147,56 @@ const isMobile = mobileRegexMatch || platformMatch || cloudfrontMobile || cloudf
 
 ### Payment Processing Entry Points
 
-#### 1. Stripe Checkout Session Flow
+#### 1. Stripe Elements Inline Flow (Preferred for Registered Users)
 ```
-User completes checkout →
+User fills form (email, name, etc.) →
+Payment Intent created via /api/stripe/payment-intent (or /api/stripe/membership-payment-intent) →
+Stripe Elements rendered inline (ExpressCheckoutElement + PaymentElement) →
+Apple Pay/Google Pay/Link/Card form shown on same page (no redirect) →
+User selects payment method and completes payment →
+Payment confirmed via stripe.confirmPayment() →
+Redirect to /event/success?pi=pi_xxx (or /membership/success?pi=pi_xxx) →
+SuccessClient detects desktop →
+Stays on success page →
+GET /api/event/success/process?pi=pi_xxx →
+If transaction not found (webhook delayed) →
+Create transaction immediately via createTransactionFromPaymentIntent →
+Create transaction items via createTransactionItemsBulk →
+Fetch QR code →
+Display success page with QR inline
+```
+
+**When to Use Stripe Elements Inline:**
+- User is registered (has user profile with email)
+- Better UX - no redirect, payment form on same page
+- Shows Apple Pay, Google Pay, Link, and card form inline
+- Example: Event checkout page (`/events/[id]/checkout`), Membership subscribe page (`/membership/subscribe/[planId]`)
+
+**Components:**
+- `StripeDesktopCheckout` - For event tickets
+- `MembershipDesktopCheckout` - For membership subscriptions
+
+#### 2. Stripe Checkout Session Flow (Fallback for Visitors)
+```
+User fills form →
+Stripe Checkout Session created →
+Redirect to Stripe hosted payment page →
+Payment completion →
 Redirect to /event/success?session_id=cs_xxx →
 SuccessClient detects desktop →
+Stays on success page →
 GET /api/event/success/process?session_id=cs_xxx →
 Lookup transaction by session_id →
 If not found, convert session_id to payment_intent →
 Create transaction from payment_intent
 ```
 
-#### 2. Payment Intent Direct Flow
+**When to Use Stripe Checkout Session:**
+- User is a visitor (no user profile, no email)
+- Fallback when Stripe Elements cannot be enabled
+- Simpler implementation (no client-side Stripe Elements setup)
+
+#### 3. Payment Intent Direct Flow
 ```
 User completes payment →
 Redirect to /event/success?pi=pi_xxx →
