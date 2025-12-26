@@ -710,10 +710,17 @@ export default function AdminMediaPage() {
             </div>
             <button
               onClick={handleScrollToSerialNumber}
-              className="mt-6 sm:mt-0 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg flex items-center gap-2 transition-colors"
+              className="mt-6 sm:mt-0 flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+              title="Go to Image"
+              aria-label="Go to Image"
+              type="button"
             >
-              <FaUsers />
-              Go to Image
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <span className="font-semibold text-blue-700">Go to Image</span>
             </button>
           </div>
 
@@ -816,49 +823,66 @@ export default function AdminMediaPage() {
         </div>
       )}
 
-      {!loading && totalCount > 0 && (
-        <div className="mt-8">
-          <div className="flex justify-between items-center">
-            <button
-              onClick={handlePrevPage}
-              disabled={page === 0}
-              className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed disabled:hover:scale-100"
-              title="Previous Page"
-              aria-label="Previous Page"
-              type="button"
-            >
-              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </div>
-              <span className="font-semibold text-blue-700">Previous</span>
-            </button>
-            <div className="text-sm font-semibold text-gray-700">
-              Page {page + 1} of {totalPages}
-            </div>
-            <button
-              onClick={handleNextPage}
-              disabled={page >= totalPages - 1}
-              className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed disabled:hover:scale-100"
-              title="Next Page"
-              aria-label="Next Page"
-              type="button"
-            >
-              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-              <span className="font-semibold text-blue-700">Next</span>
-            </button>
+      {/* Pagination Controls - Always visible, matching admin page style */}
+      <div className="mt-8">
+        <div className="flex justify-between items-center">
+          {/* Previous Button */}
+          <button
+            onClick={handlePrevPage}
+            disabled={page === 0 || loading}
+            className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+            title="Previous Page"
+            aria-label="Previous Page"
+            type="button"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+            </svg>
+            <span>Previous</span>
+          </button>
+
+          {/* Page Info */}
+          <div className="px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+            <span className="text-sm font-bold text-blue-700">
+              Page <span className="text-blue-600">{page + 1}</span> of <span className="text-blue-600">{totalPages}</span>
+            </span>
           </div>
-          <div className="text-center text-sm text-gray-600 mt-2">
-            Showing <span className="font-medium">{startItem}</span> to <span className="font-medium">{endItem}</span> of{' '}
-            <span className="font-medium">{totalCount}</span> results
-          </div>
+
+          {/* Next Button */}
+          <button
+            onClick={handleNextPage}
+            disabled={page >= totalPages - 1 || loading}
+            className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+            title="Next Page"
+            aria-label="Next Page"
+            type="button"
+          >
+            <span>Next</span>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
         </div>
-      )}
+
+        {/* Item Count Text */}
+        <div className="text-center mt-3">
+          {totalCount > 0 ? (
+            <div className="inline-flex items-center px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+              <span className="text-sm text-gray-700">
+                Showing <span className="font-bold text-blue-600">{startItem}</span> to <span className="font-bold text-blue-600">{endItem}</span> of <span className="font-bold text-blue-600">{totalCount}</span> results
+              </span>
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 border-2 border-orange-300 rounded-lg shadow-sm">
+              <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="text-sm font-medium text-orange-700">No media found</span>
+              <span className="text-sm text-orange-600">[No media match your criteria]</span>
+            </div>
+          )}
+        </div>
+      </div>
 
       {deletingMedia && (
         <Modal open={!!deletingMedia} onClose={() => setDeletingMedia(null)} title="Confirm Deletion">

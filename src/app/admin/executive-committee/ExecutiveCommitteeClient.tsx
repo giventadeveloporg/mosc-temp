@@ -20,6 +20,12 @@ export default function ExecutiveCommitteeClient({ initialMembers }: ExecutiveCo
   const [viewingMember, setViewingMember] = useState<ExecutiveCommitteeTeamMemberDTO | null>(null);
   const [deletingMember, setDeletingMember] = useState<ExecutiveCommitteeTeamMemberDTO | null>(null);
   const [uploadingMember, setUploadingMember] = useState<ExecutiveCommitteeTeamMemberDTO | null>(null);
+  
+  // Pagination state
+  const [page, setPage] = useState(0);
+  const [pageSize] = useState(10);
+  const totalCount = members.length;
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
 
   const handleMemberCreated = (newMember: ExecutiveCommitteeTeamMemberDTO) => {
     setMembers(prev => [...prev, newMember]);
@@ -83,7 +89,7 @@ export default function ExecutiveCommitteeClient({ initialMembers }: ExecutiveCo
         </div>
         <button
           onClick={() => setIsFormOpen(true)}
-          className="w-full flex-shrink-0 h-14 rounded-xl bg-teal-100 hover:bg-teal-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105"
+          className="flex-shrink-0 h-14 rounded-xl bg-teal-100 hover:bg-teal-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
           title="Add Member"
           aria-label="Add Member"
           type="button"
@@ -149,6 +155,10 @@ export default function ExecutiveCommitteeClient({ initialMembers }: ExecutiveCo
         onView={openViewForm}
         onDelete={openDeleteModal}
         onUpload={openUploadDialog}
+        page={page}
+        pageSize={pageSize}
+        totalCount={totalCount}
+        onPageChange={setPage}
       />
 
       {/* Add/Edit Form Modal */}

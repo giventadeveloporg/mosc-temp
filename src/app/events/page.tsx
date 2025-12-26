@@ -678,8 +678,8 @@ export default function EventsPage() {
           <h1 className="text-3xl font-bold mb-6">All Events</h1>
 
           {/* Event Filter Toggle */}
-          <div className="flex justify-center items-center gap-4 mb-6">
-            <span className={`text-lg font-medium ${!showPastEvents ? 'text-blue-600' : 'text-gray-500'}`}>
+          <div className="flex justify-center items-center gap-4 mt-6 mb-6">
+            <span className={`text-lg font-semibold transition-colors duration-300 ${!showPastEvents ? 'text-purple-600' : 'text-purple-300'}`}>
               Future Events
             </span>
             <button
@@ -687,15 +687,29 @@ export default function EventsPage() {
                 setShowPastEvents(!showPastEvents);
                 setPage(0); // Reset to first page when switching
               }}
-              className="relative inline-flex h-8 w-14 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              style={{ backgroundColor: showPastEvents ? '#3b82f6' : '#d1d5db' }}
+              className={`relative inline-flex h-10 w-16 items-center rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 hover:scale-105 ${
+                showPastEvents
+                  ? 'bg-blue-500 focus:ring-blue-500'
+                  : 'bg-purple-500 focus:ring-purple-500'
+              }`}
+              title={showPastEvents ? 'Show Future Events' : 'Show Past Events'}
+              aria-label={showPastEvents ? 'Show Future Events' : 'Show Past Events'}
             >
               <span
-                className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${showPastEvents ? 'translate-x-7' : 'translate-x-1'
-                  }`}
-              />
+                className={`inline-flex items-center justify-center h-8 w-8 transform rounded-full bg-white transition-transform duration-300 shadow-md ${showPastEvents ? 'translate-x-7' : 'translate-x-1'}`}
+              >
+                {showPastEvents ? (
+                  <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                )}
+              </span>
             </button>
-            <span className={`text-lg font-medium ${showPastEvents ? 'text-blue-600' : 'text-gray-500'}`}>
+            <span className={`text-lg font-semibold transition-colors duration-300 ${showPastEvents ? 'text-blue-600' : 'text-blue-300'}`}>
               Past Events
             </span>
           </div>
@@ -1156,43 +1170,69 @@ export default function EventsPage() {
                 </div>
               ))}
             </div>
-            {/* Pagination controls - Matching admin page style */}
-            {!loading && displayedCount > 0 && (
+            {/* Pagination Controls - Always visible, matching admin page style */}
+            {!loading && (
               <div className="mt-8">
                 <div className="flex justify-between items-center">
+                  {/* Previous Button */}
                   <button
                     onClick={() => setPage((p) => Math.max(0, p - 1))}
-                    disabled={page === 0}
-                    className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
-                    aria-label="Previous page"
+                    disabled={page === 0 || loading}
+                    className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+                    title="Previous Page"
+                    aria-label="Previous Page"
+                    type="button"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
                     </svg>
                     <span>Previous</span>
                   </button>
-                  <div className="text-sm font-semibold text-gray-700">
-                    Page {page + 1} of {totalPages}
+
+                  {/* Page Info */}
+                  <div className="px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+                    <span className="text-sm font-bold text-blue-700">
+                      Page <span className="text-blue-600">{page + 1}</span> of <span className="text-blue-600">{totalPages}</span>
+                    </span>
                   </div>
+
+                  {/* Next Button */}
                   <button
                     onClick={() => setPage((p) => (p + 1 < totalPages ? p + 1 : p))}
-                    disabled={page >= totalPages - 1}
-                    className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
-                    aria-label="Next page"
+                    disabled={page >= totalPages - 1 || loading}
+                    className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+                    title="Next Page"
+                    aria-label="Next Page"
+                    type="button"
                   >
                     <span>Next</span>
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                     </svg>
                   </button>
                 </div>
-                <div className="text-center text-sm text-gray-600 mt-2">
-                  Showing <span className="font-medium">{displayedCount > 0 ? page * EVENTS_PAGE_SIZE + 1 : 0}</span> to <span className="font-medium">{displayedCount > 0 ? page * EVENTS_PAGE_SIZE + displayedCount : 0}</span> of{' '}
-                  <span className="font-medium">{totalCount}</span> result{totalCount !== 1 ? 's' : ''}
-                  {totalCount > displayedCount && (
-                    <span className="text-gray-500 text-xs block mt-1">
-                      ({displayedCount} events displayed after filtering recurring events - grouped by series)
-                    </span>
+
+                {/* Item Count Text */}
+                <div className="text-center mt-3">
+                  {totalCount > 0 ? (
+                    <div className="inline-flex items-center px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+                      <span className="text-sm text-gray-700">
+                        Showing <span className="font-bold text-blue-600">{displayedCount > 0 ? page * EVENTS_PAGE_SIZE + 1 : 0}</span> to <span className="font-bold text-blue-600">{displayedCount > 0 ? page * EVENTS_PAGE_SIZE + displayedCount : 0}</span> of <span className="font-bold text-blue-600">{totalCount}</span> event{totalCount !== 1 ? 's' : ''}
+                        {totalCount > displayedCount && (
+                          <span className="text-gray-500 text-xs block mt-1">
+                            ({displayedCount} events displayed after filtering recurring events - grouped by series)
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 border-2 border-orange-300 rounded-lg shadow-sm">
+                      <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span className="text-sm font-medium text-orange-700">No events found</span>
+                      <span className="text-sm text-orange-600">[No events match your criteria]</span>
+                    </div>
                   )}
                 </div>
               </div>
