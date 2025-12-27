@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { format } from 'date-fns';
-import { Calendar, Camera, Video, Eye } from 'lucide-react';
 import { EventMediaSlideshow } from './EventMediaSlideshow';
 import type { GalleryEventWithMedia } from '../ApiServerActions';
 
@@ -21,8 +20,8 @@ export function GalleryEventCard({ eventWithMedia }: GalleryEventCardProps) {
   const remainingCount = Math.max(0, totalMediaCount - 4);
 
   // Get hero image (prefer homepage hero, then regular hero, then first available)
-  const heroImage = media.find(m => m.isHomePageHeroImage) || 
-                   media.find(m => m.isHeroImage) || 
+  const heroImage = media.find(m => m.isHomePageHeroImage) ||
+                   media.find(m => m.isHeroImage) ||
                    media.find(m => m.fileUrl);
 
   const formatEventDate = (dateString: string) => {
@@ -35,9 +34,18 @@ export function GalleryEventCard({ eventWithMedia }: GalleryEventCardProps) {
 
   const getMediaTypeIcon = (mediaType: string) => {
     if (mediaType.startsWith('video/')) {
-      return <Video className="w-4 h-4" />;
+      return (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+        </svg>
+      );
     }
-    return <Camera className="w-4 h-4" />;
+    return (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+    );
   };
 
   const getMediaTypeColor = (mediaType: string) => {
@@ -51,7 +59,7 @@ export function GalleryEventCard({ eventWithMedia }: GalleryEventCardProps) {
   const getCardBackground = (eventId: number) => {
     const colors = [
       'bg-gradient-to-br from-blue-50 to-blue-100',
-      'bg-gradient-to-br from-green-50 to-green-100', 
+      'bg-gradient-to-br from-green-50 to-green-100',
       'bg-gradient-to-br from-purple-50 to-purple-100',
       'bg-gradient-to-br from-pink-50 to-pink-100',
       'bg-gradient-to-br from-yellow-50 to-yellow-100',
@@ -78,12 +86,15 @@ export function GalleryEventCard({ eventWithMedia }: GalleryEventCardProps) {
           ) : (
             <div className="flex items-center justify-center h-full bg-gray-100">
               <div className="text-center text-gray-400">
-                <Camera className="w-12 h-12 mx-auto mb-2" />
+                <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
                 <p className="text-sm">No image available</p>
               </div>
             </div>
           )}
-          
+
           {/* Media count badge */}
           {totalMediaCount > 0 && (
             <div className="absolute top-2 right-2 bg-black bg-opacity-75 text-white px-2 py-1 rounded-full text-xs font-medium">
@@ -101,9 +112,11 @@ export function GalleryEventCard({ eventWithMedia }: GalleryEventCardProps) {
           }}>
             {event.title}
           </h3>
-          
+
           <div className="flex items-center text-sm text-gray-600 mb-2">
-            <Calendar className="w-4 h-4 mr-1" />
+            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
             {formatEventDate(event.startDate)}
           </div>
 
@@ -136,14 +149,14 @@ export function GalleryEventCard({ eventWithMedia }: GalleryEventCardProps) {
                         {getMediaTypeIcon(mediaItem.eventMediaType)}
                       </div>
                     )}
-                    
+
                     {/* Media type indicator */}
                     <div className={`absolute bottom-0 right-0 ${getMediaTypeColor(mediaItem.eventMediaType)} p-1 rounded-tl`}>
                       {getMediaTypeIcon(mediaItem.eventMediaType)}
                     </div>
                   </div>
                 ))}
-                
+
                 {/* Show remaining count */}
                 {remainingCount > 0 && (
                   <div className="flex items-center justify-center bg-gray-100 rounded text-xs font-medium text-gray-600">
@@ -158,25 +171,44 @@ export function GalleryEventCard({ eventWithMedia }: GalleryEventCardProps) {
           <div className="flex-grow"></div>
         </div>
 
-        {/* Action buttons */}
+        {/* Action buttons - Per icons_buttons_styles.mdc */}
         <div className="flex space-x-3 p-6 pt-0 mt-auto">
+            {/* View Gallery Button - Full-width with icon + text pattern */}
             <button
               onClick={() => {
                 console.log('View Gallery clicked for event:', event.title, 'Media count:', media.length);
                 setShowSlideshow(true);
               }}
-              className="flex-1 flex items-center justify-center px-4 py-3 h-12 bg-gradient-to-b from-blue-500 to-blue-700 text-white text-sm font-medium rounded-lg shadow-lg hover:shadow-xl hover:shadow-blue-500/25 border border-blue-400/20 transform hover:-translate-y-0.5 transition-all duration-200"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 h-12 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed transition-all duration-300 hover:scale-105 hover:shadow-md"
+              title="View Gallery"
+              aria-label="View Gallery"
               disabled={media.length === 0}
+              type="button"
             >
-              <Eye className="w-4 h-4 mr-1" />
-              View Gallery
+              <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-blue-200 flex items-center justify-center">
+                {/* Eye/View Icon - Inline SVG per icons_buttons_styles.mdc */}
+                <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </div>
+              <span className="text-sm">View Gallery</span>
             </button>
-            
+
+            {/* Event Details Button - Full-width with icon + text pattern */}
             <Link
               href={`/events/${event.id}`}
-              className="flex-1 flex items-center justify-center px-4 py-3 h-12 bg-gradient-to-b from-emerald-400 to-emerald-600 text-white text-sm font-medium rounded-lg shadow-lg hover:shadow-xl hover:shadow-emerald-500/25 border border-emerald-300/20 transform hover:-translate-y-0.5 transition-all duration-200"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 h-12 rounded-lg bg-green-100 hover:bg-green-200 text-green-700 font-semibold shadow-sm border-2 border-green-400 hover:border-green-500 transition-all duration-300 hover:scale-105 hover:shadow-md"
+              title="Event Details"
+              aria-label="Event Details"
             >
-              Event Details
+              <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-green-200 flex items-center justify-center">
+                {/* External Link Icon - Inline SVG per icons_buttons_styles.mdc */}
+                <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </div>
+              <span className="text-sm">Event Details</span>
             </Link>
           </div>
       </div>

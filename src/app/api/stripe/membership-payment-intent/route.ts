@@ -36,8 +36,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Build idempotency key to prevent duplicate intents
+    // CRITICAL: Exclude email from idempotency key since it may load asynchronously
+    // This prevents idempotency errors when email changes between renders
     const timestampWindow = Math.floor(Date.now() / 30000);
-    const idemSource = `membership|${membershipPlanId}|${email || ''}|${priceInCents}|${timestampWindow}`;
+    const idemSource = `membership|${membershipPlanId}|${priceInCents}|${timestampWindow}`;
     const idempotencyKey = crypto.createHash('sha256').update(idemSource).digest('hex');
 
     console.log('[MEMBERSHIP-PI] Creating PaymentIntent:', {

@@ -3,7 +3,7 @@ import React, { useRef, useState, useEffect, useCallback, useTransition } from "
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { EventMediaDTO } from "@/types";
-import { FaEdit, FaTrashAlt, FaUsers, FaPhotoVideo, FaCalendarAlt, FaSave, FaTimes, FaChevronLeft, FaChevronRight, FaTicketAlt, FaUpload, FaBan, FaTags, FaHome } from 'react-icons/fa';
+import { FaUsers, FaPhotoVideo, FaCalendarAlt, FaSave, FaTimes, FaChevronLeft, FaChevronRight, FaTicketAlt, FaUpload, FaBan, FaTags, FaHome } from 'react-icons/fa';
 import AdminNavigation from '@/components/AdminNavigation';
 import { createPortal } from "react-dom";
 import { Modal } from "@/components/Modal";
@@ -764,7 +764,13 @@ export default function AdminMediaPage() {
       {loading && <div className="text-center p-8">Loading media...</div>}
       {!loading && sortedMedia.length === 0 && <div className="text-center p-8">No media found.</div>}
       {!loading && sortedMedia.length > 0 && (
-        <div ref={mediaGridRef} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-700 via-gray-800 to-gray-700 border border-gray-600/30 shadow-2xl mb-8">
+          {/* Medium Dark Radial Gradient Overlay */}
+          <div className="absolute inset-0 pointer-events-none opacity-60" style={{ backgroundImage: 'radial-gradient(circle at top left, rgba(255, 255, 255, 0.12), transparent 55%)' }} />
+
+          {/* Grid Content */}
+          <div className="relative px-6 py-10 sm:px-10 lg:px-14">
+            <div ref={mediaGridRef} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {sortedMedia.map((item, index) => {
             const serialNumber = page * pageSize + index + 1;
             return (
@@ -801,25 +807,36 @@ export default function AdminMediaPage() {
                     <p className="text-gray-600 text-sm h-10 overflow-hidden" title={item.description || ''}>{item.description}</p>
                   </div>
                 </div>
+                {/* Action Buttons - Increased size for better visibility */}
                 <div className="p-4 pt-0 flex justify-end space-x-2">
+                  {/* Edit Button - Larger size */}
                   <button
                     onClick={() => handleEditClick(item)}
-                    className="text-blue-500 hover:text-blue-700 p-2 rounded-full"
+                    className="flex-shrink-0 w-12 h-12 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
                     aria-label="Edit Media"
+                    type="button"
                   >
-                    <FaEdit size={20} />
+                    <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
                   </button>
+                  {/* Delete Button - Larger size */}
                   <button
                     onClick={() => handleDelete(item)}
-                    className="text-red-500 hover:text-red-700 p-2 rounded-full"
+                    className="flex-shrink-0 w-12 h-12 rounded-lg bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
                     aria-label="Delete Media"
+                    type="button"
                   >
-                    <FaTrashAlt size={20} />
+                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
                   </button>
                 </div>
               </div>
             );
           })}
+            </div>
+          </div>
         </div>
       )}
 

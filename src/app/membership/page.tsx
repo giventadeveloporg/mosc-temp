@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { headers } from 'next/headers';
 import { auth } from '@clerk/nextjs/server';
 import { fetchMembershipPlansServer } from './plans/ApiServerActions';
 import { fetchUserSubscriptionServer } from './manage/ApiServerActions';
@@ -12,6 +13,9 @@ export const metadata: Metadata = {
 };
 
 export default async function MembershipPage() {
+  // CRITICAL: Next.js 15+ requires headers() to be awaited before auth()
+  await headers(); // Fully await headers() before calling auth()
+
   let plans: MembershipPlanDTO[] = [];
   let error: string | null = null;
   let userSubscription: MembershipSubscriptionDTO | null = null;

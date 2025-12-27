@@ -863,8 +863,37 @@ export default function EventsPage() {
           </div>
         ) : (
           <>
-            <div className="space-y-8">
-              {events.map((event, index) => (
+            {/* Events List Container with Gradient Background and 3D Beveled Border */}
+            <div
+              className="relative overflow-hidden rounded-3xl mb-8"
+              style={{
+                background: 'linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 50%, #f3e8ff 100%)',
+                padding: '2rem',
+                boxShadow: `
+                  0 20px 60px -12px rgba(0, 0, 0, 0.25),
+                  0 0 0 1px rgba(255, 255, 255, 0.8) inset,
+                  0 2px 4px rgba(0, 0, 0, 0.1) inset,
+                  0 -2px 4px rgba(255, 255, 255, 0.9),
+                  0 4px 8px rgba(0, 0, 0, 0.15)
+                `,
+                border: '1px solid rgba(255, 255, 255, 0.6)',
+                borderTop: '2px solid rgba(255, 255, 255, 0.9)',
+                borderLeft: '2px solid rgba(255, 255, 255, 0.9)',
+                borderBottom: '2px solid rgba(0, 0, 0, 0.1)',
+                borderRight: '2px solid rgba(0, 0, 0, 0.1)',
+              }}
+            >
+              {/* Subtle Radial Gradient Overlay */}
+              <div
+                className="absolute inset-0 pointer-events-none opacity-30"
+                style={{
+                  backgroundImage: 'radial-gradient(circle at top left, rgba(255, 255, 255, 0.5), transparent 60%)'
+                }}
+              />
+
+              {/* Content Container */}
+              <div className="relative space-y-8">
+                {events.map((event, index) => (
                 <div
                   key={event.id}
                   className={`${getRandomBackground(index)} rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 overflow-hidden group`}
@@ -1169,6 +1198,7 @@ export default function EventsPage() {
                   </div>
                 </div>
               ))}
+              </div>
             </div>
             {/* Pagination Controls - Always visible, matching admin page style */}
             {!loading && (

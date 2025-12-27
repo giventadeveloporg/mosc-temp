@@ -24,8 +24,8 @@ export function GalleryContent() {
       setLoading(true);
       try {
         const data = await fetchEventsForGallery(
-          currentPage, 
-          ITEMS_PER_PAGE, 
+          currentPage,
+          ITEMS_PER_PAGE,
           searchFilters.searchTerm,
           searchFilters.startDate,
           searchFilters.endDate
@@ -59,18 +59,28 @@ export function GalleryContent() {
     return (
       <div className="space-y-6">
         <GallerySearch onSearch={handleSearch} loading={loading} />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
-            <div key={i} className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
-              <div className="h-48 bg-gray-200"></div>
-              <div className="p-4">
-                <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded w-2/3"></div>
-              </div>
+
+        {/* Grid Container with Bold Dark Gradient Background - Matching events page style */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900 border border-white/10 shadow-2xl mb-8">
+          {/* Bold Dark Radial Gradient Overlay */}
+          <div className="absolute inset-0 pointer-events-none opacity-70" style={{ backgroundImage: 'radial-gradient(circle at top left, rgba(255,255,255,0.18), transparent 55%)' }} />
+
+          {/* Grid Content */}
+          <div className="relative px-6 py-10 sm:px-10 lg:px-14">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
+                <div key={i} className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
+                  <div className="h-48 bg-gray-200"></div>
+                  <div className="p-4">
+                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
-        
+
         {/* Always show pagination controls, even when loading */}
         <GalleryPagination
           currentPage={currentPage}
@@ -86,7 +96,7 @@ export function GalleryContent() {
 
   if (!galleryData || !galleryData.eventsWithMedia || galleryData.eventsWithMedia.length === 0) {
     const hasFilters = searchFilters.searchTerm || searchFilters.startDate || searchFilters.endDate;
-    
+
     return (
       <div className="space-y-6">
         <GallerySearch onSearch={handleSearch} loading={loading} />
@@ -96,7 +106,7 @@ export function GalleryContent() {
             {hasFilters ? 'No events found' : 'No events available'}
           </h3>
           <p className="text-gray-600">
-            {hasFilters 
+            {hasFilters
               ? 'No events match your search criteria. Try adjusting your filters.'
               : 'Check back later for event photos and videos'
             }
@@ -110,7 +120,7 @@ export function GalleryContent() {
             </button>
           )}
         </div>
-        
+
         {/* Always show pagination controls, even when no results */}
         <GalleryPagination
           currentPage={currentPage}
@@ -130,13 +140,22 @@ export function GalleryContent() {
     <div className="space-y-6">
       <GallerySearch onSearch={handleSearch} loading={loading} />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {eventsWithMedia?.map((eventWithMedia) => (
-          <GalleryEventCard
-            key={eventWithMedia.event.id}
-            eventWithMedia={eventWithMedia}
-          />
-        ))}
+      {/* Grid Container with Bold Dark Gradient Background - Matching events page style */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900 border border-white/10 shadow-2xl mb-8">
+        {/* Bold Dark Radial Gradient Overlay */}
+        <div className="absolute inset-0 pointer-events-none opacity-70" style={{ backgroundImage: 'radial-gradient(circle at top left, rgba(255,255,255,0.18), transparent 55%)' }} />
+
+        {/* Grid Content */}
+        <div className="relative px-6 py-10 sm:px-10 lg:px-14">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {eventsWithMedia?.map((eventWithMedia) => (
+              <GalleryEventCard
+                key={eventWithMedia.event.id}
+                eventWithMedia={eventWithMedia}
+              />
+            ))}
+          </div>
+        </div>
       </div>
 
       <GalleryPagination

@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Search, ChevronDown, X, Menu, LogOut } from 'lucide-react';
+import { Search, ChevronDown, X, Menu, LogOut, User } from 'lucide-react';
 import { useAuth, useClerk, useUser } from '@clerk/nextjs';
 import { useTenantSettings } from '@/components/TenantSettingsProvider';
+import Image from 'next/image';
 
 const navItems = [
   {
@@ -251,6 +252,170 @@ const hideNavigationLoading = () => {
     loadingIndicator = null;
   }
 };
+
+/**
+ * User Avatar Dropdown Component
+ * Shows user's profile image with dropdown menu for Profile and Sign Out
+ */
+function UserAvatarDropdown({
+  user,
+  onSignOut,
+  isSigningOut
+}: {
+  user: any;
+  onSignOut: () => void;
+  isSigningOut: boolean;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
+
+  // Get user's profile image or use default avatar
+  const userImageUrl = user?.imageUrl || user?.hasImage ? user?.imageUrl : null;
+  const userName = user?.firstName || user?.fullName || user?.emailAddresses?.[0]?.emailAddress || 'User';
+  const userEmail = user?.emailAddresses?.[0]?.emailAddress || '';
+
+  return (
+    <div className="relative group" ref={dropdownRef}>
+      {/* Avatar Button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`
+          relative flex items-center justify-center
+          w-10 h-10 min-w-[40px] min-h-[40px]
+          rounded-full
+          border-2 border-transparent
+          hover:border-blue-400
+          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+          transition-all duration-300 ease-in-out
+          hover:scale-105 active:scale-95
+          overflow-hidden
+          bg-gray-100
+        `}
+        aria-label="User menu"
+        aria-expanded={isOpen}
+        aria-haspopup="true"
+      >
+        {userImageUrl ? (
+          <Image
+            src={userImageUrl}
+            alt={userName}
+            width={40}
+            height={40}
+            className="w-full h-full object-cover rounded-full"
+            unoptimized
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-blue-400 text-white">
+            <User size={20} className="text-white" />
+          </div>
+        )}
+      </button>
+
+      {/* Dropdown Menu */}
+      {isOpen && (
+        <div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 z-50">
+          <div className="py-3">
+            {/* User Info */}
+            <div className="px-4 py-3 border-b border-gray-100">
+              <div className="flex items-center space-x-3">
+                {userImageUrl ? (
+                  <div className="flex-shrink-0">
+                    <Image
+                      src={userImageUrl}
+                      alt={userName}
+                      width={40}
+                      height={40}
+                      className="w-10 h-10 rounded-full object-cover"
+                      unoptimized
+                    />
+                  </div>
+                ) : (
+                  <div className="w-10 h-10 flex items-center justify-center bg-blue-400 text-white rounded-full flex-shrink-0">
+                    <User size={20} className="text-white" />
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-900 truncate">
+                    {userName}
+                  </p>
+                  {userEmail && (
+                    <p className="text-xs text-gray-500 truncate">
+                      {userEmail}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Menu Items */}
+            <div className="py-2">
+              <Link
+                href="/profile"
+                onClick={() => setIsOpen(false)}
+                className={`
+                  flex items-center space-x-3 px-4 py-2 mx-1 rounded-lg
+                  text-sm font-medium tracking-[0.025em]
+                  focus:outline-none
+                  transition-all duration-300 ease-in-out
+                  ${pathname === '/profile'
+                    ? 'text-blue-500 font-semibold bg-blue-50'
+                    : 'text-blue-400 hover:text-blue-500 hover:font-semibold hover:bg-blue-50'
+                  }
+                `}
+                role="menuitem"
+                aria-label="View profile"
+              >
+                <User size={16} aria-hidden="true" />
+                <span>Profile</span>
+              </Link>
+
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  onSignOut();
+                }}
+                disabled={isSigningOut}
+                className={`
+                  w-full flex items-center space-x-3 px-4 py-2 mx-1 rounded-lg
+                  text-sm font-medium tracking-[0.025em]
+                  focus:outline-none
+                  transition-all duration-300 ease-in-out
+                  ${isSigningOut
+                    ? 'text-gray-400 cursor-not-allowed'
+                    : 'text-red-400 hover:text-red-500 hover:font-semibold hover:bg-red-50'
+                  }
+                `}
+                role="menuitem"
+                aria-label="Sign out"
+              >
+                <LogOut size={16} aria-hidden="true" />
+                <span>{isSigningOut ? 'Signing Out...' : 'Sign Out'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function Header({ hideMenuItems = false, variant = 'charity', isTenantAdmin }: HeaderProps) {
   const pathname = usePathname();
@@ -706,28 +871,6 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                   </>
                 ) : (
                   <>
-                    <button
-                      onClick={handleSignOut}
-                      disabled={isSigningOut}
-                      className={`
-                        relative flex items-center space-x-1 font-inter
-                        text-base font-medium tracking-wide
-                        px-3 py-2 mx-1
-                        transition-all duration-300 ease-in-out
-                        focus:outline-none
-                        ${isSigningOut
-                          ? 'text-gray-400 cursor-not-allowed'
-                          : 'text-blue-400 font-medium hover:text-blue-500 hover:font-semibold border-b-2 border-transparent hover:border-blue-400'
-                        }
-                      `}
-                      aria-label="Sign out"
-                    >
-                      <LogOut size={16} aria-hidden="true" />
-                      <span className="tracking-[0.025em]">
-                        {isSigningOut ? 'Signing Out...' : 'Sign Out'}
-                      </span>
-                    </button>
-
                     {/* Admin Menu with Submenu */}
                     {isAdmin && (
                       <div className="relative group">
@@ -843,7 +986,12 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                       </div>
                     )}
 
-                    {/* UserButton removed with Clerk; consider adding profile avatar here */}
+                    {/* User Profile Avatar Dropdown - Rightmost */}
+                    <UserAvatarDropdown
+                      user={user}
+                      onSignOut={handleSignOut}
+                      isSigningOut={isSigningOut}
+                    />
                   </>
                 )}
               </div>
@@ -1108,6 +1256,59 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                 </>
               ) : (
                 <>
+                  {/* Mobile User Profile Section */}
+                  <div className="px-6 mb-4 pb-4 border-b border-gray-200">
+                    <div className="flex items-center space-x-3">
+                      {user?.imageUrl ? (
+                        <div className="flex-shrink-0">
+                          <Image
+                            src={user.imageUrl}
+                            alt={user?.firstName || user?.fullName || user?.emailAddresses?.[0]?.emailAddress || 'User'}
+                            width={48}
+                            height={48}
+                            className="w-12 h-12 rounded-full object-cover border-2 border-blue-400"
+                            unoptimized
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-12 h-12 flex items-center justify-center bg-blue-400 text-white rounded-full flex-shrink-0">
+                          <User size={24} className="text-white" />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-gray-900 truncate">
+                          {user?.firstName || user?.fullName || user?.emailAddresses?.[0]?.emailAddress || 'User'}
+                        </p>
+                        {user?.emailAddresses?.[0]?.emailAddress && (
+                          <p className="text-xs text-gray-500 truncate">
+                            {user.emailAddresses[0].emailAddress}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Mobile Profile Link */}
+                  <Link
+                    href="/profile"
+                    className="
+                      flex items-center space-x-3
+                      w-full py-4 px-6 min-h-[44px] rounded-xl
+                      font-inter font-medium text-base tracking-[0.025em]
+                      text-blue-400 hover:text-blue-500 hover:font-semibold hover:bg-blue-50
+                      border-l-4 border-transparent hover:border-blue-400
+                      focus:outline-none
+                      transition-all duration-300 ease-in-out
+                      active:scale-98
+                    "
+                    onClick={closeMobileMenu}
+                    aria-label="View profile"
+                  >
+                    <User size={18} aria-hidden="true" />
+                    <span>Profile</span>
+                  </Link>
+
+                  {/* Mobile Sign Out Button */}
                   <button
                     onClick={() => {
                       closeMobileMenu();
@@ -1224,8 +1425,6 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                       </div>
                     </>
                   )}
-
-                  {/* UserButton removed with Clerk; consider adding profile avatar here */}
                 </>
               )}
             </div>
