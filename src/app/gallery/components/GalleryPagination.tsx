@@ -9,6 +9,7 @@ interface GalleryPaginationProps {
   pageSize: number;
   onPageChange: (page: number) => void;
   loading?: boolean;
+  itemType?: 'albums' | 'events'; // For display text
 }
 
 export function GalleryPagination({
@@ -18,6 +19,7 @@ export function GalleryPagination({
   pageSize,
   onPageChange,
   loading = false,
+  itemType = 'events',
 }: GalleryPaginationProps) {
   // Convert 0-based to 1-based for display
   const displayPage = currentPage + 1;
@@ -53,11 +55,11 @@ export function GalleryPagination({
           <ChevronLeft className="h-5 w-5" />
           Previous
         </button>
-        
+
         <div className="text-sm font-semibold text-gray-700">
           Page {displayPage} of {totalPages}
         </div>
-        
+
         <button
           onClick={handleNextPage}
           disabled={isNextDisabled}
@@ -67,18 +69,18 @@ export function GalleryPagination({
           <ChevronRight className="h-5 w-5" />
         </button>
       </div>
-      
+
       <div className="text-center text-sm text-gray-600 mt-2">
         {hasResults ? (
           <>
             Showing <span className="font-medium">{startItem}</span> to <span className="font-medium">{endItem}</span> of{' '}
-            <span className="font-medium">{totalCount}</span> events
+            <span className="font-medium">{totalCount}</span> {itemType === 'albums' ? 'albums' : 'events'}
           </>
         ) : (
           <div className="flex items-center justify-center gap-2">
-            <span>No events found</span>
+            <span>No {itemType === 'albums' ? 'albums' : 'events'} found</span>
             <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-sm font-medium">
-              [No events match your criteria]
+              [No {itemType === 'albums' ? 'albums' : 'events'} match your criteria]
             </span>
           </div>
         )}
