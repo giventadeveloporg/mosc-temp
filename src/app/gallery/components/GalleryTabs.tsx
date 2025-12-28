@@ -35,7 +35,7 @@ export function GalleryTabs({
               activeTab === 'albums'
                 ? 'text-blue-700 z-10'
                 : albumsDisabled
-                ? 'text-gray-400 cursor-not-allowed z-0'
+                ? 'text-orange-500 cursor-not-allowed z-0'
                 : 'text-gray-700 hover:text-gray-900 z-0'
             }`}
             style={activeTab === 'albums' ? {
@@ -55,13 +55,13 @@ export function GalleryTabs({
               borderColor: 'rgba(59, 130, 246, 0.25)',
               borderBottom: '2px solid rgba(255, 255, 255, 0.98)',
             } : albumsDisabled ? {
-              // Disabled tab - appears behind
-              background: 'linear-gradient(135deg, rgba(243, 244, 246, 0.4) 0%, rgba(229, 231, 235, 0.4) 100%)',
+              // Disabled tab - appears behind with orange/amber tones
+              background: 'linear-gradient(135deg, rgba(254, 243, 199, 0.5) 0%, rgba(251, 191, 36, 0.3) 100%)',
               borderRadius: '10px 10px 0 0',
               padding: '10px 20px 12px 20px',
               marginBottom: '0',
               boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.05)',
-              border: '1px solid rgba(209, 213, 219, 0.3)',
+              border: '1px solid rgba(251, 191, 36, 0.4)',
               borderBottom: 'none',
             } : {
               // Inactive tab - appears behind active tab
@@ -101,7 +101,7 @@ export function GalleryTabs({
                 <span
                   className={`px-3 py-1 rounded-full text-xs font-bold ${
                     albumsDisabled
-                      ? 'bg-gray-200 text-gray-400'
+                      ? 'bg-orange-100 text-orange-600'
                       : activeTab === 'albums'
                       ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md'
                       : 'bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700'
