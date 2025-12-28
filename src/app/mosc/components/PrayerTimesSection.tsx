@@ -26,7 +26,10 @@ const PrayerTimesSection = () => {
     }
   ];
 
-  const currentDay = new Date()?.toLocaleDateString('en-US', { weekday: 'long' });
+  // Use timezone-independent day calculation to prevent hydration mismatches
+  const today = new Date();
+  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const currentDay = dayNames[today.getUTCDay()];
 
   return (
     <section className="py-16 bg-card">

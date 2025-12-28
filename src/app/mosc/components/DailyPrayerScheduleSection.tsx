@@ -1,9 +1,14 @@
+'use client';
+
 import React from 'react';
 import Icon from './ui/Icon';
 
 const DailyPrayerScheduleSection = () => {
+  // Use timezone-independent day calculation to prevent hydration mismatches
+  // Using UTC ensures server and client render the same day
   const today = new Date();
-  const dayOfWeek = today.toLocaleDateString('en-US', { weekday: 'long' });
+  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const dayOfWeek = dayNames[today.getUTCDay()];
 
   const prayerTimes = [
     {

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { fetchMembershipPlanServer } from './ApiServerActions';
 import { SubscriptionSignupClient } from './SubscriptionSignupClient';
@@ -17,8 +18,7 @@ export default async function SubscriptionSignupPage({
   params: Promise<{ planId: string }>;
 }) {
   // CRITICAL: Next.js 15+ requires headers() to be awaited before auth()
-  // Import headers() function and await it to ensure proper async context
-  const { headers } = await import('next/headers');
+  // Store the result to ensure proper async context
   const headersList = await headers(); // CRITICAL: Fully await headers() before calling auth()
 
   const { userId } = await auth();

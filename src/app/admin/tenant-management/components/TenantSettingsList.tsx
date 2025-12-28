@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { FaPlus, FaSearch, FaSort } from 'react-icons/fa';
+import { FaSearch, FaSort } from 'react-icons/fa';
 import type { TenantSettingsDTO, TenantSettingsFilters, PaginationParams } from '@/app/admin/tenant-management/types';
 
 interface TenantSettingsListProps {
@@ -155,15 +155,8 @@ export default function TenantSettingsList({
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="mb-6">
         <h2 className="text-xl font-semibold text-gray-900">Tenant Settings</h2>
-        <Link
-          href="/admin/tenant-management/settings/new"
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2"
-        >
-          <FaPlus />
-          Create New
-        </Link>
       </div>
 
       {/* Search and Filters */}

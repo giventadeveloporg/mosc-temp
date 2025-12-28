@@ -245,6 +245,266 @@ export default function Header({ isTenantAdmin }: HeaderProps) {
 
 ---
 
+## **User Profile Avatar Dropdown Pattern**
+
+### **Overview**
+The Header component includes a user profile avatar dropdown that displays the logged-in user's profile image from social login (Google, Facebook, etc.) with a dropdown menu for Profile and Sign Out actions. This replaces the previous Clerk UserButton functionality while maintaining the same user experience.
+
+### **Implementation in `src/components/Header.tsx`**
+
+**Pattern**:
+```typescript
+/**
+ * User Avatar Dropdown Component
+ * Shows user's profile image with dropdown menu for Profile and Sign Out
+ */
+function UserAvatarDropdown({
+  user,
+  onSignOut,
+  isSigningOut
+}: {
+  user: any;
+  onSignOut: () => void;
+  isSigningOut: boolean;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
+
+  // Get user's profile image or use default avatar
+  const userImageUrl = user?.imageUrl || user?.hasImage ? user?.imageUrl : null;
+  const userName = user?.firstName || user?.fullName || user?.emailAddresses?.[0]?.emailAddress || 'User';
+  const userEmail = user?.emailAddresses?.[0]?.emailAddress || '';
+
+  return (
+    <div className="relative group" ref={dropdownRef}>
+      {/* Avatar Button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="relative flex items-center justify-center w-10 h-10 min-w-[40px] min-h-[40px] rounded-full border-2 border-transparent hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 overflow-hidden bg-gray-100"
+        aria-label="User menu"
+        aria-expanded={isOpen}
+        aria-haspopup="true"
+      >
+        {userImageUrl ? (
+          <Image
+            src={userImageUrl}
+            alt={userName}
+            width={40}
+            height={40}
+            className="w-full h-full object-cover rounded-full"
+            unoptimized
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-blue-400 text-white">
+            <User size={20} className="text-white" />
+          </div>
+        )}
+      </button>
+
+      {/* Dropdown Menu */}
+      {isOpen && (
+        <div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 z-50">
+          <div className="py-3">
+            {/* User Info Section */}
+            <div className="px-4 py-3 border-b border-gray-100">
+              <div className="flex items-center space-x-3">
+                {userImageUrl ? (
+                  <Image src={userImageUrl} alt={userName} width={40} height={40} className="w-10 h-10 rounded-full object-cover" unoptimized />
+                ) : (
+                  <div className="w-10 h-10 flex items-center justify-center bg-blue-400 text-white rounded-full">
+                    <User size={20} className="text-white" />
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-900 truncate">{userName}</p>
+                  {userEmail && <p className="text-xs text-gray-500 truncate">{userEmail}</p>}
+                </div>
+              </div>
+            </div>
+
+            {/* Menu Items */}
+            <div className="py-2">
+              <Link href="/profile" onClick={() => setIsOpen(false)} className="flex items-center space-x-3 px-4 py-2 mx-1 rounded-lg text-sm font-medium tracking-[0.025em] focus:outline-none transition-all duration-300 ease-in-out text-blue-400 hover:text-blue-500 hover:font-semibold hover:bg-blue-50">
+                <User size={16} aria-hidden="true" />
+                <span>Profile</span>
+              </Link>
+              <button onClick={() => { setIsOpen(false); onSignOut(); }} disabled={isSigningOut} className="w-full flex items-center space-x-3 px-4 py-2 mx-1 rounded-lg text-sm font-medium tracking-[0.025em] focus:outline-none transition-all duration-300 ease-in-out text-red-400 hover:text-red-500 hover:font-semibold hover:bg-red-50">
+                <LogOut size={16} aria-hidden="true" />
+                <span>{isSigningOut ? 'Signing Out...' : 'Sign Out'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+### **Key Features**
+
+1. **Profile Image Display**:
+   - Uses `user.imageUrl` from Clerk's `useUser()` hook
+   - Shows social login profile picture (Google, Facebook, etc.)
+   - Falls back to User icon if no image available
+   - Circular avatar (40x40px) with hover effects
+
+2. **Dropdown Menu**:
+   - User info section with avatar, name, and email
+   - Profile link (navigates to `/profile`)
+   - Sign Out button (calls `handleSignOut` function)
+   - Click-outside to close functionality
+   - Proper ARIA labels for accessibility
+
+3. **Positioning**:
+   - **Desktop**: Rightmost position in header (after Admin menu if admin)
+   - **Mobile**: User profile section at top of mobile menu with larger avatar (48x48px)
+
+4. **Styling**:
+   - Matches admin action button pattern
+   - Hover effects (scale, border color change)
+   - Focus states for keyboard navigation
+   - Active state for Profile link when on `/profile` page
+
+### **Integration in Header Component**
+
+**Desktop Header** (when user is logged in):
+```typescript
+{/* Auth and Admin Menu Items */}
+<div className="flex items-center space-x-1">
+  {!userId ? (
+    // Sign In / Sign Up buttons
+  ) : (
+    <>
+      {/* Admin Menu with Submenu */}
+      {isAdmin && (
+        <div className="relative group">
+          {/* Admin menu dropdown */}
+        </div>
+      )}
+
+      {/* User Profile Avatar Dropdown - Rightmost */}
+      <UserAvatarDropdown
+        user={user}
+        onSignOut={handleSignOut}
+        isSigningOut={isSigningOut}
+      />
+    </>
+  )}
+</div>
+```
+
+**Mobile Menu**:
+```typescript
+{/* Mobile User Profile Section */}
+<div className="px-6 mb-4 pb-4 border-b border-gray-200">
+  <div className="flex items-center space-x-3">
+    {user?.imageUrl ? (
+      <Image src={user.imageUrl} alt={userName} width={48} height={48} className="w-12 h-12 rounded-full object-cover border-2 border-blue-400" unoptimized />
+    ) : (
+      <div className="w-12 h-12 flex items-center justify-center bg-blue-400 text-white rounded-full">
+        <User size={24} className="text-white" />
+      </div>
+    )}
+    <div className="flex-1 min-w-0">
+      <p className="text-sm font-semibold text-gray-900 truncate">{userName}</p>
+      {user?.emailAddresses?.[0]?.emailAddress && (
+        <p className="text-xs text-gray-500 truncate">{user.emailAddresses[0].emailAddress}</p>
+      )}
+    </div>
+  </div>
+</div>
+
+{/* Mobile Profile Link */}
+<Link href="/profile" onClick={closeMobileMenu}>
+  <User size={18} />
+  <span>Profile</span>
+</Link>
+
+{/* Mobile Sign Out Button */}
+<button onClick={() => { closeMobileMenu(); handleSignOut(); }}>
+  <LogOut size={18} />
+  <span>Sign Out</span>
+</button>
+```
+
+### **Required Imports**
+
+```typescript
+import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { User, LogOut } from 'lucide-react';
+import { useUser } from '@clerk/nextjs';
+import Image from 'next/image';
+```
+
+### **Key Requirements**
+
+1. ✅ **Use Clerk's `useUser()` hook** - Provides `user.imageUrl`, `user.firstName`, `user.emailAddresses`
+2. ✅ **Handle missing image** - Show User icon fallback if `user.imageUrl` is null
+3. ✅ **Click-outside to close** - Use `useRef` and `useEffect` to detect clicks outside dropdown
+4. ✅ **Accessibility** - Include `aria-label`, `aria-expanded`, `aria-haspopup` attributes
+5. ✅ **Position rightmost** - Place avatar dropdown after Admin menu (if admin) in desktop header
+6. ✅ **Mobile support** - Show user profile section at top of mobile menu with larger avatar
+
+### **Order in Header**
+
+**Desktop Header Order** (when logged in):
+1. Navigation menu items (Home, About, Events, etc.)
+2. Admin Menu (if user is admin) - **Left of avatar**
+3. User Profile Avatar Dropdown - **Rightmost**
+
+**Mobile Menu Order** (when logged in):
+1. User Profile Section (avatar, name, email) - **Top**
+2. Profile Link
+3. Sign Out Button
+4. Admin Menu (if user is admin)
+
+### **Best Practices**
+
+**DO:**
+- ✅ Use `user.imageUrl` from Clerk's `useUser()` hook for profile images
+- ✅ Provide fallback User icon if no image available
+- ✅ Use `useRef` for dropdown container to detect click-outside
+- ✅ Include proper ARIA labels for accessibility
+- ✅ Position avatar rightmost in desktop header (after Admin menu)
+- ✅ Show user profile section at top of mobile menu
+- ✅ Use Next.js `Image` component with `unoptimized` prop for external images
+
+**DON'T:**
+- ❌ Don't hardcode avatar URLs - always use `user.imageUrl`
+- ❌ Don't skip fallback icon - always show User icon if no image
+- ❌ Don't forget click-outside handler - dropdown should close when clicking outside
+- ❌ Don't skip ARIA labels - important for screen readers
+- ❌ Don't place avatar before Admin menu - should be rightmost
+
+### **Reference Implementation**
+
+- **Header Component**: [`src/components/Header.tsx`](mdc:src/components/Header.tsx) - Lines 256-420 (UserAvatarDropdown component)
+- **Desktop Integration**: [`src/components/Header.tsx`](mdc:src/components/Header.tsx) - Lines 872-995 (desktop header with Admin menu and avatar)
+- **Mobile Integration**: [`src/components/Header.tsx`](mdc:src/components/Header.tsx) - Lines 1223-1280 (mobile menu with user profile section)
+
+---
+
 ## **Common Anti-Patterns**
 
 ### **❌ DON'T: Put Routes That Call auth() in ignoredRoutes**
@@ -460,10 +720,11 @@ Does the route call auth() or currentUser() in server components?
 
 - **Middleware Config**: [`src/middleware.ts`](mdc:src/middleware.ts) - Lines 29-99
 - **Root Layout**: [`src/app/layout.tsx`](mdc:src/app/layout.tsx) - Lines 57-212
-- **Header Component**: [`src/components/Header.tsx`](mdc:src/components/Header.tsx) - Lines 280-298
+- **Header Component**: [`src/components/Header.tsx`](mdc:src/components/Header.tsx) - Lines 256-420 (UserAvatarDropdown), Lines 872-995 (desktop integration), Lines 1223-1280 (mobile integration)
 - **Admin Layout**: [`src/app/admin/layout.tsx`](mdc:src/app/admin/layout.tsx) - Admin route protection pattern
 - **Next.js 15+ Headers API**: https://nextjs.org/docs/messages/sync-dynamic-apis
 - **Clerk Middleware Docs**: https://clerk.com/docs/references/nextjs/auth-middleware
+- **Clerk useUser Hook**: https://clerk.com/docs/references/nextjs/use-user
 
 ---
 
@@ -480,8 +741,19 @@ Does the route call auth() or currentUser() in server components?
 4. Check `userRole === 'ADMIN'` (must be set in database)
 5. Pass `isTenantAdmin` to Header component
 
+**User Profile Avatar Pattern**:
+1. Use Clerk's `useUser()` hook to get `user.imageUrl`, `user.firstName`, `user.emailAddresses`
+2. Display circular avatar (40x40px desktop, 48x48px mobile) with profile image from social login
+3. Show dropdown menu with user info, Profile link, and Sign Out button
+4. Position avatar rightmost in desktop header (after Admin menu if admin)
+5. Show user profile section at top of mobile menu
+6. Handle click-outside to close dropdown and provide fallback User icon if no image
+
 **CRITICAL**: The `user_role` field in the `user_profile` table must be set to `'ADMIN'` for admin access. This can be done:
 - Via Admin Dashboard: `/admin/manage-usage` → Edit user → Change Role to `ADMIN`
 - Via Direct Database: `UPDATE user_profile SET user_role = 'ADMIN' WHERE ...`
 
-This ensures admin menu appears correctly after user login while maintaining proper authentication flow.
+This ensures:
+- Admin menu appears correctly after user login while maintaining proper authentication flow
+- User profile avatar displays social login profile picture with dropdown menu for Profile and Sign Out
+- Consistent user experience across desktop and mobile with proper accessibility support

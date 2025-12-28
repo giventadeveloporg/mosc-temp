@@ -217,6 +217,35 @@ export interface EventMediaDTO {
    * Default: 0
    */
   priorityRanking?: number;
+  /**
+   * Reference to gallery album. Mutually exclusive with eventId (media belongs to either an event OR an album, not both).
+   */
+  albumId?: number;
+}
+
+/**
+ * DTO for gallery album, matches backend schema.
+ */
+export interface GalleryAlbumDTO {
+  id?: number;
+  tenantId?: string;
+  title: string;
+  description?: string;
+  coverImageUrl?: string;
+  isPublic?: boolean;
+  displayOrder?: number;
+  createdAt: string;
+  updatedAt: string;
+  createdById?: number;
+}
+
+/**
+ * Album with associated media for gallery display.
+ */
+export interface GalleryAlbumWithMedia {
+  album: GalleryAlbumDTO;
+  media: EventMediaDTO[];
+  totalMediaCount: number;
 }
 
 export interface EventCalendarEntryDTO {

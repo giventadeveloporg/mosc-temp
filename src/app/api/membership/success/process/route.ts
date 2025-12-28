@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { headers } from 'next/headers';
+import { auth } from '@clerk/nextjs/server';
 import {
   findSubscriptionBySessionId,
   findSubscriptionByPaymentIntentId,
   processMembershipSubscriptionSessionServer,
+  processMembershipSubscriptionFromPaymentIntent,
   fetchMembershipSubscriptionDetailsServer,
 } from '@/app/membership/success/ApiServerActions';
 
@@ -83,117 +86,178 @@ export async function GET(req: NextRequest) {
       existingSubscription = await findSubscriptionByPaymentIntentId(pi);
     }
 
+    // CRITICAL: Only return existing subscription if it's ACTIVE or TRIAL
+    // If it's CANCELLED or EXPIRED, we need to create a new one
     if (existingSubscription) {
-      console.log('[MEMBERSHIP-PROCESS GET] Subscription found:', existingSubscription.id);
+      if (existingSubscription.subscriptionStatus === 'CANCELLED' || existingSubscription.subscriptionStatus === 'EXPIRED') {
+        console.log('[MEMBERSHIP-PROCESS GET] Found cancelled/expired subscription - will create new one:', {
+          subscriptionId: existingSubscription.id,
+          status: existingSubscription.subscriptionStatus,
+          paymentIntentId: pi,
+          sessionId: session_id,
+        });
+        // Reset to null so we proceed to create a new subscription
+        existingSubscription = null;
+      } else {
+        console.log('[MEMBERSHIP-PROCESS GET] Subscription found:', existingSubscription.id, 'Status:', existingSubscription.subscriptionStatus);
 
-      // Fetch plan details
-      const details = await fetchMembershipSubscriptionDetailsServer(
-        session_id || undefined,
-        pi || undefined
-      );
+        // Fetch plan details
+        const details = await fetchMembershipSubscriptionDetailsServer(
+          session_id || undefined,
+          pi || undefined
+        );
 
-      return NextResponse.json({
-        subscription: existingSubscription,
-        plan: details?.plan || null,
-        amount: details?.amount || null,
-        currency: details?.currency || null,
-      });
+        return NextResponse.json({
+          subscription: existingSubscription,
+          plan: details?.plan || null,
+          amount: details?.amount || null,
+          currency: details?.currency || null,
+        });
+      }
     }
 
     // CRITICAL: Desktop flow - create subscription immediately if payment succeeded (webhook fallback)
     // This is separate from mobile workflow (which uses POST endpoint via /membership/qr page)
     // Desktop flow persists subscription from frontend when webhook hasn't processed yet
-    if (!isMobile && session_id && !session_id.startsWith('pi_')) {
-      console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] No subscription found - attempting to create from Checkout Session:', session_id);
-      try {
-        const { stripe } = await import('@/lib/stripe');
-        const { processMembershipSubscriptionSessionServer } = await import('@/app/membership/success/ApiServerActions');
+    if (!isMobile) {
+      // Handle Checkout Session (cs_...)
+      if (session_id && !session_id.startsWith('pi_')) {
+        console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] No subscription found - attempting to create from Checkout Session:', session_id);
+        try {
+          const { stripe } = await import('@/lib/stripe');
+          const { processMembershipSubscriptionSessionServer } = await import('@/app/membership/success/ApiServerActions');
 
-        // Retrieve Checkout Session from Stripe to validate payment succeeded
-        const session = await stripe().checkout.sessions.retrieve(session_id, {
-          expand: ['subscription', 'customer'],
-        });
+          // Retrieve Checkout Session from Stripe to validate payment succeeded
+          const session = await stripe().checkout.sessions.retrieve(session_id, {
+            expand: ['subscription', 'customer'],
+          });
 
-        // Only create subscription if payment succeeded
-        if (session.payment_status !== 'paid') {
-          console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] Checkout Session not paid:', session.payment_status);
+          // Only create subscription if payment succeeded
+          if (session.payment_status !== 'paid') {
+            console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] Checkout Session not paid:', session.payment_status);
+            return NextResponse.json({
+              subscription: null,
+              plan: null,
+              message: `Payment not completed yet. Status: ${session.payment_status}`,
+            }, { status: 200 });
+          }
+
+          // Validate metadata matches environment variables
+          const metadata = session.metadata || {};
+          const metadataTenantId = metadata.tenantId || metadata.tenant_id;
+          const metadataPaymentMethodDomainId = metadata.paymentMethodDomainId || metadata.payment_method_domain_id;
+          const { getTenantId, getPaymentMethodDomainId } = await import('@/lib/env');
+          const expectedTenantId = getTenantId();
+          const expectedPaymentMethodDomainId = getPaymentMethodDomainId();
+
+          if (metadataTenantId && metadataTenantId !== expectedTenantId) {
+            console.error('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] ⚠️⚠️⚠️ TENANT ID MISMATCH:', {
+              metadataTenantId,
+              expectedTenantId,
+              sessionId: session_id
+            });
+            return NextResponse.json({
+              subscription: null,
+              plan: null,
+              error: 'Tenant ID mismatch',
+              message: `Checkout Session tenant ID (${metadataTenantId}) does not match configured tenant ID (${expectedTenantId}).`
+            }, { status: 403 });
+          }
+
+          if (metadataPaymentMethodDomainId && metadataPaymentMethodDomainId !== expectedPaymentMethodDomainId) {
+            console.error('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] ⚠️⚠️⚠️ PAYMENT METHOD DOMAIN ID MISMATCH:', {
+              metadataPaymentMethodDomainId,
+              expectedPaymentMethodDomainId,
+              sessionId: session_id
+            });
+            return NextResponse.json({
+              subscription: null,
+              plan: null,
+              error: 'Payment Method Domain ID mismatch',
+              message: `Checkout Session Payment Method Domain ID (${metadataPaymentMethodDomainId}) does not match configured Payment Method Domain ID (${expectedPaymentMethodDomainId}).`
+            }, { status: 403 });
+          }
+
+          // Create subscription from session (same function used by POST endpoint)
+          const result = await processMembershipSubscriptionSessionServer(session_id);
+
+          if (result && result.subscription) {
+            console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] ✅ Successfully created subscription:', result.subscription.id);
+
+            // Fetch plan details
+            const details = await fetchMembershipSubscriptionDetailsServer(
+              session_id || undefined,
+              pi || undefined
+            );
+
+            return NextResponse.json({
+              subscription: result.subscription,
+              plan: result.plan || details?.plan || null,
+              amount: details?.amount || result.plan?.price || null,
+              currency: details?.currency || result.plan?.currency || 'USD',
+            });
+          } else {
+            console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] Failed to create subscription from session');
+            return NextResponse.json({
+              subscription: null,
+              plan: null,
+              message: 'Failed to create subscription. Please contact support.',
+            });
+          }
+        } catch (createErr: any) {
+          console.error('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] Error creating subscription:', createErr);
+          // Return null subscription but don't fail - allow polling to continue
           return NextResponse.json({
             subscription: null,
             plan: null,
-            message: `Payment not completed yet. Status: ${session.payment_status}`,
-          }, { status: 200 });
-        }
-
-        // Validate metadata matches environment variables
-        const metadata = session.metadata || {};
-        const metadataTenantId = metadata.tenantId || metadata.tenant_id;
-        const metadataPaymentMethodDomainId = metadata.paymentMethodDomainId || metadata.payment_method_domain_id;
-        const { getTenantId, getPaymentMethodDomainId } = await import('@/lib/env');
-        const expectedTenantId = getTenantId();
-        const expectedPaymentMethodDomainId = getPaymentMethodDomainId();
-
-        if (metadataTenantId && metadataTenantId !== expectedTenantId) {
-          console.error('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] ⚠️⚠️⚠️ TENANT ID MISMATCH:', {
-            metadataTenantId,
-            expectedTenantId,
-            sessionId: session_id
+            message: 'Subscription not found yet. Webhook may still be processing.',
           });
+        }
+      }
+
+      // Handle Payment Intent (pi_...) - Desktop Stripe Elements flow
+      if (pi && pi.startsWith('pi_')) {
+        console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] No active subscription found - attempting to create from Payment Intent:', pi);
+        console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] Existing subscription was:', existingSubscription ? `${existingSubscription.id} (${existingSubscription.subscriptionStatus})` : 'null');
+        try {
+          // CRITICAL: This route is public (for polling), so we can't use auth()
+          // Get userId from Payment Intent metadata (customerEmail) by looking up user profile
+          // The processMembershipSubscriptionFromPaymentIntent function will handle this internally
+          console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] Public route - will extract userId from Payment Intent metadata (customerEmail)');
+
+          // Pass undefined userId - function will extract from Payment Intent metadata (customerEmail)
+          const result = await processMembershipSubscriptionFromPaymentIntent(pi, undefined);
+
+          if (result && result.subscription) {
+            console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] ✅ Successfully created subscription from Payment Intent:', {
+              subscriptionId: result.subscription.id,
+              status: result.subscription.subscriptionStatus,
+              paymentIntentId: pi,
+            });
+
+            return NextResponse.json({
+              subscription: result.subscription,
+              plan: result.plan || null,
+              amount: result.plan?.price || null,
+              currency: result.plan?.currency || 'USD',
+            });
+          } else {
+            console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] Failed to create subscription from Payment Intent - result:', result);
+            return NextResponse.json({
+              subscription: null,
+              plan: null,
+              message: 'Failed to create subscription. Please contact support.',
+            });
+          }
+        } catch (createErr: any) {
+          console.error('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] Error creating subscription from Payment Intent:', createErr);
+          // Return null subscription but don't fail - allow polling to continue
           return NextResponse.json({
             subscription: null,
             plan: null,
-            error: 'Tenant ID mismatch',
-            message: `Checkout Session tenant ID (${metadataTenantId}) does not match configured tenant ID (${expectedTenantId}).`
-          }, { status: 403 });
-        }
-
-        if (metadataPaymentMethodDomainId && metadataPaymentMethodDomainId !== expectedPaymentMethodDomainId) {
-          console.error('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] ⚠️⚠️⚠️ PAYMENT METHOD DOMAIN ID MISMATCH:', {
-            metadataPaymentMethodDomainId,
-            expectedPaymentMethodDomainId,
-            sessionId: session_id
-          });
-          return NextResponse.json({
-            subscription: null,
-            plan: null,
-            error: 'Payment Method Domain ID mismatch',
-            message: `Checkout Session Payment Method Domain ID (${metadataPaymentMethodDomainId}) does not match configured Payment Method Domain ID (${expectedPaymentMethodDomainId}).`
-          }, { status: 403 });
-        }
-
-        // Create subscription from session (same function used by POST endpoint)
-        const result = await processMembershipSubscriptionSessionServer(session_id);
-
-        if (result && result.subscription) {
-          console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] ✅ Successfully created subscription:', result.subscription.id);
-
-          // Fetch plan details
-          const details = await fetchMembershipSubscriptionDetailsServer(
-            session_id || undefined,
-            pi || undefined
-          );
-
-          return NextResponse.json({
-            subscription: result.subscription,
-            plan: result.plan || details?.plan || null,
-            amount: details?.amount || result.plan?.price || null,
-            currency: details?.currency || result.plan?.currency || 'USD',
-          });
-        } else {
-          console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] Failed to create subscription from session');
-          return NextResponse.json({
-            subscription: null,
-            plan: null,
-            message: 'Failed to create subscription. Please contact support.',
+            message: 'Subscription not found yet. Webhook may still be processing.',
           });
         }
-      } catch (createErr: any) {
-        console.error('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] Error creating subscription:', createErr);
-        // Return null subscription but don't fail - allow polling to continue
-        return NextResponse.json({
-          subscription: null,
-          plan: null,
-          message: 'Subscription not found yet. Webhook may still be processing.',
-        });
       }
     }
 

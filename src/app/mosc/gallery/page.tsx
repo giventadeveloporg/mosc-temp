@@ -306,7 +306,14 @@ export default function GalleryPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Grid Container with Conservative Gradient Background */}
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-background via-muted to-background border border-border/30 sacred-shadow-lg">
+            {/* Subtle Radial Gradient Overlay */}
+            <div className="absolute inset-0 pointer-events-none opacity-40" style={{ backgroundImage: 'radial-gradient(circle at top left, rgba(139, 125, 107, 0.08), transparent 55%)' }} />
+
+            {/* Grid Content */}
+            <div className="relative px-6 py-10 sm:px-10 lg:px-14">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {albums.map((album, index) => {
               // Create varied gradients for visual interest
               const gradients = [
@@ -373,6 +380,8 @@ export default function GalleryPage() {
               </Link>
             );
             })}
+              </div>
+            </div>
           </div>
         </div>
       </section>

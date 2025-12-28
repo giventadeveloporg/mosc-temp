@@ -316,7 +316,9 @@ const InnerMembershipCheckout = React.memo(function InnerMembershipCheckout({
 export default function MembershipDesktopCheckout(props: Props) {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
+  const [showTimeoutError, setShowTimeoutError] = useState(false); // Timeout error state
   const createdPiRef = useRef<string | null>(null); // Track created Payment Intent ID to prevent duplicates
+  const clientSecretRef = useRef<string | null>(null); // CRITICAL: Store clientSecret in ref to persist across re-renders
 
   // Use backend-provided publishable key or fallback to env var
   const publishableKey = props.publishableKey || process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
@@ -328,14 +330,32 @@ export default function MembershipDesktopCheckout(props: Props) {
     return loadStripe(publishableKey);
   }, [publishableKey]);
 
+  // CRITICAL: Restore clientSecret from ref on mount (handles React Strict Mode re-renders)
+  useEffect(() => {
+    if (!clientSecret && clientSecretRef.current && createdPiRef.current) {
+      console.log("[MEMBERSHIP-DESKTOP] Restoring clientSecret from ref on mount");
+      setClientSecret(clientSecretRef.current);
+    }
+  }, []); // Run only on mount
+
+  // CRITICAL: Use ref for cancelled flag to persist across re-renders
+  const cancelledRef = useRef(false);
+
   // Create Payment Intent for membership subscription
   // CRITICAL: Create Payment Intent only once when enabled becomes true
   // Don't recreate when email/customerName/customerPhone change (they're optional and don't affect idempotency)
   useEffect(() => {
-    let cancelled = false;
+    // Reset cancelled flag for this effect run
+    cancelledRef.current = false;
 
-    // CRITICAL: If Payment Intent already created, don't recreate
-    if (createdPiRef.current && clientSecret) {
+    // CRITICAL: If Payment Intent already created and clientSecret exists (in state or ref), don't recreate
+    // This prevents duplicate creation on re-renders (React Strict Mode, navigation, etc.)
+    if (createdPiRef.current && (clientSecret || clientSecretRef.current)) {
+      // Restore clientSecret from ref if state was lost
+      if (!clientSecret && clientSecretRef.current) {
+        console.log("[MEMBERSHIP-DESKTOP] Restoring clientSecret from ref after re-render");
+        setClientSecret(clientSecretRef.current);
+      }
       console.log("[MEMBERSHIP-DESKTOP] Payment Intent already created, skipping duplicate creation");
       return;
     }
@@ -343,20 +363,27 @@ export default function MembershipDesktopCheckout(props: Props) {
     async function createPi() {
       if (!props.enabled) {
         setClientSecret(null);
+        clientSecretRef.current = null;
         createdPiRef.current = null;
         return;
       }
 
-      // CRITICAL: Prevent duplicate creation
+      // CRITICAL: Prevent duplicate creation - check ref before starting
+      // Use a more robust check that persists across re-renders
+      // Check for any value (Payment Intent ID, 'creating', or 'created')
       if (createdPiRef.current) {
-        console.log("[MEMBERSHIP-DESKTOP] Payment Intent creation already in progress or completed");
+        console.log("[MEMBERSHIP-DESKTOP] Payment Intent creation already in progress or completed:", createdPiRef.current);
         return;
       }
 
       // CRITICAL: Don't wait for email - create Payment Intent immediately if enabled
       // Email can be empty initially and will be added when Clerk user loads
       // This matches the event checkout pattern where Payment Intent is created as soon as enabled=true
+
+      // Mark as creating to prevent duplicate attempts
+      createdPiRef.current = 'creating';
       setCreating(true);
+
       try {
         console.log("[MEMBERSHIP-DESKTOP] Creating Payment Intent:", {
           membershipPlanId: props.membershipPlanId,
@@ -379,31 +406,66 @@ export default function MembershipDesktopCheckout(props: Props) {
         if (!res.ok) {
           const errorText = await res.text();
           console.error("[MEMBERSHIP-DESKTOP] PI creation failed:", res.status, errorText);
-          createdPiRef.current = null; // Reset on error so it can retry
+          if (!cancelledRef.current) {
+            createdPiRef.current = null; // Reset on error so it can retry
+          }
           throw new Error(`Failed to create payment intent: ${res.status} ${errorText}`);
         }
 
         const data = await res.json();
-        if (!cancelled) {
+        console.log("[MEMBERSHIP-DESKTOP] Payment Intent API response:", {
+          hasClientSecret: !!data.clientSecret,
+          hasPaymentIntentId: !!data.paymentIntentId,
+          status: data.status,
+          keys: Object.keys(data),
+        });
+
+        // CRITICAL: Validate response has required fields
+        if (!data.clientSecret) {
+          console.error("[MEMBERSHIP-DESKTOP] ❌ Response missing clientSecret:", data);
+          if (!cancelledRef.current) {
+            createdPiRef.current = null;
+            setClientSecret(null);
+            clientSecretRef.current = null;
+            setCreating(false);
+          }
+          return;
+        }
+
+        if (!cancelledRef.current) {
+          // CRITICAL: Store clientSecret in both state and ref to persist across re-renders
           setClientSecret(data.clientSecret);
-          createdPiRef.current = data.paymentIntentId || 'created'; // Mark as created
+          clientSecretRef.current = data.clientSecret; // Store in ref for persistence
+          createdPiRef.current = data.paymentIntentId || 'created'; // Mark as created with Payment Intent ID
+          setCreating(false); // Clear creating state immediately after setting clientSecret
           console.log("[MEMBERSHIP-DESKTOP] ✅ Payment Intent created successfully:", {
             paymentIntentId: data.paymentIntentId,
             clientSecret: data.clientSecret ? `${data.clientSecret.substring(0, 20)}...` : 'null',
+            hasClientSecret: !!data.clientSecret,
+            stateUpdated: true,
           });
+        } else {
+          console.log("[MEMBERSHIP-DESKTOP] Component cancelled before setting clientSecret");
+          setCreating(false);
         }
       } catch (e) {
-        if (!cancelled) {
+        if (!cancelledRef.current) {
           setClientSecret(null);
+          clientSecretRef.current = null;
           createdPiRef.current = null; // Reset on error so it can retry
           console.error("[MEMBERSHIP-DESKTOP] ❌ PI creation failed:", e);
         }
       } finally {
-        if (!cancelled) setCreating(false);
+        if (!cancelledRef.current) {
+          setCreating(false);
+        }
       }
     }
     createPi();
-    return () => { cancelled = true; };
+    return () => {
+      cancelledRef.current = true;
+      console.log("[MEMBERSHIP-DESKTOP] Effect cleanup - marking as cancelled");
+    };
   }, [props.enabled, props.amountCents, props.membershipPlanId]); // CRITICAL: Removed email, customerName, customerPhone from dependencies to prevent duplicate creation
 
   const options = useMemo(
@@ -421,10 +483,33 @@ export default function MembershipDesktopCheckout(props: Props) {
     );
   }
 
+  // CRITICAL: Add timeout fallback - if Payment Intent creation takes too long, show error
+  useEffect(() => {
+    if (creating && !clientSecret) {
+      const timeout = setTimeout(() => {
+        setShowTimeoutError(true);
+        console.error("[MEMBERSHIP-DESKTOP] Payment Intent creation timeout - taking too long");
+      }, 15000); // 15 second timeout
+
+      return () => clearTimeout(timeout);
+    } else {
+      setShowTimeoutError(false);
+    }
+  }, [creating, clientSecret]);
+
   if (!clientSecret) {
     return (
       <div className="w-full border rounded-lg p-3 text-sm text-gray-600 bg-white">
-        {creating ? 'Preparing payment…' : 'Payment not ready'}
+        {showTimeoutError ? (
+          <div>
+            <p className="text-red-600 font-semibold mb-2">Payment setup taking longer than expected</p>
+            <p className="text-sm">Please refresh the page to retry.</p>
+          </div>
+        ) : creating ? (
+          'Preparing payment…'
+        ) : (
+          'Payment not ready'
+        )}
       </div>
     );
   }

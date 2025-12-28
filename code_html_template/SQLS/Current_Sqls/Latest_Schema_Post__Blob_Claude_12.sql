@@ -146,6 +146,7 @@ DROP TABLE IF EXISTS public.event_guest_pricing CASCADE;
 DROP TABLE IF EXISTS public.event_attendee CASCADE;
 DROP TABLE IF EXISTS public.event_admin_audit_log CASCADE;
 DROP TABLE IF EXISTS public.event_calendar_entry CASCADE;
+DROP TABLE IF EXISTS public.gallery_album CASCADE;
 DROP TABLE IF EXISTS public.event_media CASCADE;
 DROP TABLE IF EXISTS public.event_poll_response CASCADE;
 DROP TABLE IF EXISTS public.event_poll_option CASCADE;
@@ -1529,6 +1530,43 @@ CREATE TABLE public.event_sponsors_join (
     );
 
 --
+-- TOC entry 247 (class 1259 OID 83071)
+-- Name: gallery_album; Type: TABLE; Schema: public; Owner: giventa_event_management
+--
+
+CREATE TABLE public.gallery_album (
+                                    id int8 DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                    tenant_id varchar(255) NOT NULL,
+                                    title varchar(255) NOT NULL,
+                                    description varchar(2048) NULL,
+                                    cover_image_url varchar(2048) NULL,
+                                    is_public bool DEFAULT true NOT NULL,
+                                    display_order int4 DEFAULT 0 NOT NULL,
+                                    created_at timestamp DEFAULT now() NOT NULL,
+                                    updated_at timestamp DEFAULT now() NOT NULL,
+                                    created_by_id int8 NULL,
+                                    CONSTRAINT pk_gallery_album PRIMARY KEY (id),
+                                    CONSTRAINT fk_gallery_album_created_by FOREIGN KEY (created_by_id) REFERENCES public.user_profile(id) ON DELETE SET NULL,
+                                    CONSTRAINT check_display_order_non_negative CHECK (display_order >= 0)
+);
+
+
+--
+-- TOC entry 3967 (class 0 OID 0)
+-- Dependencies: 247
+-- Name: COLUMN gallery_album.cover_image_url; Type: COMMENT; Schema: public; Owner: giventa_event_management
+--
+
+COMMENT ON TABLE public.gallery_album IS 'Stores gallery albums (collections of media not associated with events)';
+
+COMMENT ON COLUMN public.gallery_album.cover_image_url IS 'URL to cover image (references event_media.file_url). Used as album thumbnail in gallery view.';
+
+COMMENT ON COLUMN public.gallery_album.display_order IS 'Order for displaying albums in gallery (lower values appear first). Default: 0.';
+
+COMMENT ON COLUMN public.gallery_album.is_public IS 'Whether album is visible to public gallery. Default: true.';
+
+
+--
 -- TOC entry 246 (class 1259 OID 83070)
 -- Name: event_media; Type: TABLE; Schema: public; Owner: giventa_event_management
 --
@@ -1570,13 +1608,16 @@ CREATE TABLE public.event_media (
                                     is_home_page_hero_image bool DEFAULT false NOT NULL,
                                     is_featured_event_image bool DEFAULT false NOT NULL,
                                     is_live_event_image bool DEFAULT false NOT NULL,
+                                    album_id int8 NULL,
                                     CONSTRAINT check_download_count_non_negative CHECK ((download_count >= 0)),
                                     CONSTRAINT check_file_size_positive CHECK (((file_size IS NULL) OR (file_size >= 0))),
                                     CONSTRAINT check_priority_ranking_non_negative CHECK (priority_ranking >= 0),
+                                    CONSTRAINT check_event_album_mutually_exclusive CHECK (((event_id IS NULL AND album_id IS NULL) OR (event_id IS NOT NULL AND album_id IS NULL) OR (event_id IS NULL AND album_id IS NOT NULL))),
                                     CONSTRAINT fk_event_media__event_id FOREIGN KEY (event_id) REFERENCES public.event_details(id) ON DELETE CASCADE,
                                     CONSTRAINT fk_event_media__uploaded_by_id FOREIGN KEY (uploaded_by_id) REFERENCES public.user_profile(id) ON DELETE SET NULL,
                                     CONSTRAINT fk_event_media_sponsor_id FOREIGN KEY (sponsor_id) REFERENCES public.event_sponsors(id) ON DELETE CASCADE,
-                                    CONSTRAINT fk_event_media_event_sponsors_join_id FOREIGN KEY (event_sponsors_join_id) REFERENCES public.event_sponsors_join(id) ON DELETE CASCADE
+                                    CONSTRAINT fk_event_media_event_sponsors_join_id FOREIGN KEY (event_sponsors_join_id) REFERENCES public.event_sponsors_join(id) ON DELETE CASCADE,
+                                    CONSTRAINT fk_event_media_album_id FOREIGN KEY (album_id) REFERENCES public.gallery_album(id) ON DELETE SET NULL
 );
 
 
@@ -1593,6 +1634,10 @@ COMMENT ON COLUMN public.event_media.sponsor_id IS 'Reference to sponsor for spo
 COMMENT ON COLUMN public.event_media.event_sponsors_join_id IS 'Reference to event-sponsor join record for custom posters. When set, this media file is a custom poster for a specific event-sponsor combination.';
 
 COMMENT ON COLUMN public.event_media.priority_ranking IS 'Priority ranking for media files (sponsor or event-sponsor). Lower values indicate higher priority (0 = highest priority). Used to determine which image to display when multiple files are available.';
+
+COMMENT ON COLUMN public.event_media.album_id IS 'Reference to gallery album. Mutually exclusive with event_id (media belongs to either an event OR an album, not both).';
+
+
 
 
 --
@@ -2656,6 +2701,54 @@ CREATE INDEX idx_event_media_pre_signed_url ON public.event_media USING btree (p
 
 
 --
+-- TOC entry 3652 (class 1259 OID 83378)
+-- Name: idx_event_media_album_id; Type: INDEX; Schema: public; Owner: giventa_event_management
+--
+
+CREATE INDEX idx_event_media_album_id ON public.event_media USING btree (album_id) WHERE (album_id IS NOT NULL);
+
+
+--
+-- TOC entry 3653 (class 1259 OID 83379)
+-- Name: idx_event_media_album_public; Type: INDEX; Schema: public; Owner: giventa_event_management
+--
+
+CREATE INDEX idx_event_media_album_public ON public.event_media USING btree (album_id, is_public) WHERE (album_id IS NOT NULL AND is_public = true);
+
+
+--
+-- TOC entry 3654 (class 1259 OID 83380)
+-- Name: idx_gallery_album_tenant_id; Type: INDEX; Schema: public; Owner: giventa_event_management
+--
+
+CREATE INDEX idx_gallery_album_tenant_id ON public.gallery_album USING btree (tenant_id);
+
+
+--
+-- TOC entry 3655 (class 1259 OID 83381)
+-- Name: idx_gallery_album_is_public; Type: INDEX; Schema: public; Owner: giventa_event_management
+--
+
+CREATE INDEX idx_gallery_album_is_public ON public.gallery_album USING btree (is_public) WHERE (is_public = true);
+
+
+--
+-- TOC entry 3656 (class 1259 OID 83382)
+-- Name: idx_gallery_album_display_order; Type: INDEX; Schema: public; Owner: giventa_event_management
+--
+
+CREATE INDEX idx_gallery_album_display_order ON public.gallery_album USING btree (display_order);
+
+
+--
+-- TOC entry 3657 (class 1259 OID 83383)
+-- Name: idx_gallery_album_created_at; Type: INDEX; Schema: public; Owner: giventa_event_management
+--
+
+CREATE INDEX idx_gallery_album_created_at ON public.gallery_album USING btree (created_at DESC);
+
+
+--
 -- TOC entry 3628 (class 1259 OID 83368)
 -- Name: idx_event_ticket_type_availability; Type: INDEX; Schema: public; Owner: giventa_event_management
 --
@@ -3208,6 +3301,10 @@ CREATE INDEX IF NOT EXISTS idx_event_media_event_sponsors_join_id ON public.even
 CREATE INDEX IF NOT EXISTS idx_event_media_priority_ranking ON public.event_media(priority_ranking) WHERE sponsor_id IS NOT NULL OR event_sponsors_join_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_event_media_sponsor_priority ON public.event_media(sponsor_id, priority_ranking) WHERE sponsor_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_event_media_event_sponsor_join_priority ON public.event_media(event_sponsors_join_id, priority_ranking) WHERE event_sponsors_join_id IS NOT NULL;
+
+-- Indexes for event_media album references
+CREATE INDEX IF NOT EXISTS idx_event_media_album_id ON public.event_media(album_id) WHERE album_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_event_media_album_public ON public.event_media(album_id, is_public) WHERE album_id IS NOT NULL AND is_public = true;
 
 -- Index for event_sponsors_join custom_poster_url
 CREATE INDEX IF NOT EXISTS idx_event_sponsors_join_custom_poster ON public.event_sponsors_join(custom_poster_url) WHERE custom_poster_url IS NOT NULL;

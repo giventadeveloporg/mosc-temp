@@ -41,19 +41,57 @@ This guide defines the standard patterns for displaying icons across the applica
 
 ### **Medium Action Icons (Buttons, Action Items)**
 - **Container:** `w-10 h-10` (40px × 40px)
-- **Icon:** `w-6 h-6` (24px × 24px)
+- **Icon:** `w-6 h-6` (24px × 24px) - **CRITICAL: Always use inline SVG, never react-icons**
 - **Container Style:** `rounded-lg` (8px border radius)
 - **Background:** Colored backgrounds with hover states
-- **Icon Color:** Matching darker colored text (e.g., `text-blue-700`, `text-green-700`)
+- **Icon Color:** Matching colored text (e.g., `text-blue-600` for edit, `text-red-600` for delete)
+- **SVG Attributes:** `fill="none" stroke="currentColor" viewBox="0 0 24 24"` with `strokeWidth={2}`
+- **Hover Effect:** `hover:scale-110 transition-all duration-300`
 
 **Example:**
 ```tsx
-// ✅ DO: Use medium action icon pattern
-<button className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-colors">
-  <svg className="w-6 h-6 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+// ✅ DO: Use medium action icon pattern with inline SVG
+<button
+  className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+  title="Edit Item"
+  aria-label="Edit Item"
+  type="button"
+>
+  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
   </svg>
 </button>
+```
+
+**Media Gallery Grid Buttons (Medium Action Icons):**
+```tsx
+// ✅ DO: Use inline SVG icons in media gallery grid tiles
+<div className="p-4 pt-0 flex justify-end gap-2">
+  {/* Edit Button */}
+  <button
+    onClick={() => handleEditClick(item)}
+    className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+    title="Edit Media"
+    aria-label="Edit Media"
+    type="button"
+  >
+    <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+    </svg>
+  </button>
+  {/* Delete Button */}
+  <button
+    onClick={() => handleDelete(item)}
+    className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+    title="Delete Media"
+    aria-label="Delete Media"
+    type="button"
+  >
+    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+    </svg>
+  </button>
+</div>
 ```
 
 ### **Small Inline Icons (Text, Lists)**
@@ -81,11 +119,12 @@ This guide defines the standard patterns for displaying icons across the applica
 - **Time/Clock:** `bg-green-100` / `text-green-500`
 - **Location/Map:** `bg-purple-100` / `text-purple-500`
 - **Calendar/Add to Calendar:** `bg-orange-100` / `text-orange-500`
-- **View/Details:** `bg-white/20` / `text-white` (on colored backgrounds)
+- **View/Details:** `bg-green-100` / `text-green-700` (table buttons) or `bg-white/20` / `text-white` (on colored backgrounds)
 - **Copy:** `bg-blue-100` / `text-blue-700`
 - **Navigate/External Link:** `bg-green-100` / `text-green-700`
-- **Edit:** `bg-blue-100` / `text-blue-500`
+- **Edit:** `bg-blue-100` / `text-blue-500` (table buttons) or `bg-blue-100` / `text-blue-600` (full-width buttons)
 - **Delete:** `bg-red-100` / `text-red-500`
+- **Create/Add:** `bg-blue-100` / `text-blue-600` (icon) / `text-blue-700` (text)
 - **Toggle Active:** `bg-green-100` / `text-green-500` (active) or `bg-gray-100` / `text-gray-500` (inactive)
 
 ---
@@ -119,15 +158,38 @@ This guide defines the standard patterns for displaying icons across the applica
 
 ### **Action Button Icons (Admin Tables)**
 ```tsx
-// Edit icon
-<button className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110">
+// Edit icon (Table Action Button)
+<Link
+  href={`/admin/tenant-management/settings/${id}/edit`}
+  className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+  title="Edit settings"
+  aria-label="Edit settings"
+>
   <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
   </svg>
-</button>
+</Link>
 
-// Delete icon
-<button className="flex-shrink-0 w-14 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110">
+// View icon (Table Action Button)
+<Link
+  href={`/admin/tenant-management/settings/${id}`}
+  className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+  title="View details"
+  aria-label="View details"
+>
+  <svg className="w-10 h-10 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+  </svg>
+</Link>
+
+// Delete icon (Table Action Button)
+<button
+  onClick={() => handleDelete(id)}
+  className="flex-shrink-0 w-14 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+  title="Delete settings"
+  aria-label="Delete settings"
+>
   <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
   </svg>
@@ -148,6 +210,38 @@ This guide defines the standard patterns for displaying icons across the applica
   )}
 </button>
 ```
+
+### **Full-Width Admin Action Buttons (With Icon + Text)**
+```tsx
+// ✅ DO: Use full-width button with icon container and text label
+<Link
+  href="/admin/tenant-management/settings/new"
+  className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+  title="Create New Settings"
+  aria-label="Create New Settings"
+>
+  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+    <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+    </svg>
+  </div>
+  <span className="font-semibold text-blue-700">Create New Settings</span>
+</Link>
+```
+
+**Full-Width Button Requirements:**
+- **`flex-shrink-0`**: Prevents button from shrinking
+- **`h-14`**: Fixed height (56px) for consistent button size
+- **`rounded-xl`**: Large border radius (12px) for modern appearance
+- **`bg-{color}-100 hover:bg-{color}-200`**: Light background with darker hover state
+- **`flex items-center justify-center`**: Centers content horizontally and vertically
+- **`gap-3`**: Spacing between icon container and text (12px)
+- **`transition-all duration-300`**: Smooth transitions for all properties
+- **`hover:scale-105`**: Subtle scale effect on hover (5% increase)
+- **`px-6`**: Horizontal padding (24px) for button content
+- **Icon Container**: `w-10 h-10 rounded-lg bg-{color}-200` (40px × 40px, darker than button background)
+- **Icon**: `w-6 h-6 text-{color}-600` (24px × 24px)
+- **Text**: `font-semibold text-{color}-700` (bold, darker than icon)
 
 ---
 
@@ -177,14 +271,26 @@ This guide defines the standard patterns for displaying icons across the applica
 
 ### **Edit/Pencil**
 ```tsx
+// Large icon (Table Action Buttons - w-14 h-14 container)
 <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+</svg>
+
+// Medium icon (Media Gallery Grid - w-10 h-10 container)
+<svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
 </svg>
 ```
 
 ### **Delete/Trash**
 ```tsx
+// Large icon (Table Action Buttons - w-14 h-14 container)
 <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+</svg>
+
+// Medium icon (Media Gallery Grid - w-10 h-10 container)
+<svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
 </svg>
 ```
@@ -200,6 +306,21 @@ This guide defines the standard patterns for displaying icons across the applica
 ```tsx
 <svg className="w-10 h-10 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+</svg>
+```
+
+### **View/Eye (Details)**
+```tsx
+<svg className="w-10 h-10 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+</svg>
+```
+
+### **Add/Plus (Create)**
+```tsx
+<svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
 </svg>
 ```
 
@@ -222,15 +343,20 @@ This guide defines the standard patterns for displaying icons across the applica
 ## **Best Practices**
 
 ### **DO:**
-- ✅ Use consistent container sizes (`w-14 h-14` for large, `w-10 h-10` for medium)
-- ✅ Use matching icon sizes (`w-10 h-10` for large, `w-6 h-6` for medium)
-- ✅ Apply semantic colors consistently (blue for date, green for time, purple for location)
-- ✅ Include hover effects (`hover:scale-110 transition-transform duration-300`)
-- ✅ Use `rounded-xl` for large containers, `rounded-lg` for medium containers
+- ✅ Use consistent container sizes (`w-14 h-14` for large square buttons, `h-14` for full-width buttons, `w-10 h-10` for medium)
+- ✅ Use matching icon sizes (`w-10 h-10` for large square buttons, `w-6 h-6` for full-width buttons and medium buttons)
+- ✅ **Always use inline SVG icons** - Never use react-icons or other icon libraries for Medium Action Icons
+- ✅ Apply semantic colors consistently (blue for date/edit/create, green for time/view, purple for location, red for delete)
+- ✅ Include hover effects (`hover:scale-110` for square buttons, `hover:scale-105` for full-width buttons)
+- ✅ Use `rounded-xl` for large containers and buttons, `rounded-lg` for icon containers within buttons
 - ✅ Always include `viewBox="0 0 24 24"` for proper scaling
 - ✅ Use `strokeWidth={2}` for consistent stroke thickness
+- ✅ Include `title` and `aria-label` attributes on all interactive buttons/links
+- ✅ Use `transition-all duration-300` for smooth animations
+- ✅ Use `fill="none" stroke="currentColor"` for outline icons
 
 ### **DON'T:**
+- ❌ **Never use react-icons for Medium Action Icons** - Always use inline SVG
 - ❌ Mix icon libraries (don't use react-icons alongside inline SVGs)
 - ❌ Use inconsistent sizes (don't mix `w-8 h-8` with `w-10 h-10`)
 - ❌ Skip hover effects on interactive icons
@@ -257,8 +383,35 @@ This guide defines the standard patterns for displaying icons across the applica
 
 ---
 
+## **Admin Page Button Patterns**
+
+### **Table Action Buttons (Square Icon-Only)**
+- **Container**: `w-14 h-14` (56px × 56px) - Square button
+- **Border Radius**: `rounded-xl` (12px)
+- **Background**: `bg-{color}-100 hover:bg-{color}-200`
+- **Icon Size**: `w-10 h-10` (40px × 40px)
+- **Icon Color**: `text-{color}-500` or `text-{color}-700` (depending on action)
+- **Hover Effect**: `hover:scale-110 transition-all duration-300`
+- **Use Cases**: Edit, View, Delete actions in admin tables
+
+### **Full-Width Action Buttons (Icon + Text)**
+- **Height**: `h-14` (56px) - Fixed height
+- **Border Radius**: `rounded-xl` (12px)
+- **Background**: `bg-{color}-100 hover:bg-{color}-200`
+- **Layout**: `flex items-center justify-center gap-3`
+- **Padding**: `px-6` (horizontal padding)
+- **Icon Container**: `w-10 h-10 rounded-lg bg-{color}-200` (darker than button background)
+- **Icon Size**: `w-6 h-6` (24px × 24px)
+- **Icon Color**: `text-{color}-600`
+- **Text**: `font-semibold text-{color}-700`
+- **Hover Effect**: `hover:scale-105 transition-all duration-300`
+- **Use Cases**: "Create New", "Add", primary actions in page headers
+
 ## **References**
 
 - Events page: [`src/app/events/page.tsx`](mdc:src/app/events/page.tsx) - Lines 979-1044 for event card icons
 - Membership plans: [`src/components/admin/membership/MembershipPlanList.tsx`](mdc:src/components/admin/membership/MembershipPlanList.tsx) - Action button icons
+- Tenant Settings Page: [`src/app/admin/tenant-management/settings/page.tsx`](mdc:src/app/admin/tenant-management/settings/page.tsx) - Lines 94-106 for full-width button, Lines 278-308 for table action buttons
+- Tenant Settings List: [`src/app/admin/tenant-management/components/TenantSettingsList.tsx`](mdc:src/app/admin/tenant-management/components/TenantSettingsList.tsx) - Lines 278-308 for table action buttons
+- Admin Media Page: [`src/app/admin/media/page.tsx`](mdc:src/app/admin/media/page.tsx) - Lines 810-832 for media gallery grid buttons with inline SVG icons
 - Heroicons: https://heroicons.com/ (source for SVG paths)
