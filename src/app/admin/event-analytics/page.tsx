@@ -116,9 +116,9 @@ function AdminEventsContent() {
   return (
     <div className="max-w-7xl mx-auto px-8 py-8">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Event Analytics Dashboard</h1>
-        <p className="text-gray-600">
+      <div className="mb-8 pt-4 sm:pt-0">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Event Analytics Dashboard</h1>
+        <p className="text-sm sm:text-base text-gray-600">
           View comprehensive event analytics, registration trends, and performance metrics.
         </p>
       </div>

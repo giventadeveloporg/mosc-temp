@@ -19,6 +19,45 @@ body {
   box-sizing: border-box;
 }
 
+/* Prevent layout shifts in AdminNavigation */
+.admin-navigation-container {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.admin-navigation-container * {
+  max-width: 100%;
+}
+
+/* User Table Scrollbar Styling */
+.user-table-scroll-container {
+  overflow-x: auto;
+  overflow-y: visible;
+  scrollbar-width: auto;
+  scrollbar-color: #9CA3AF #F3F4F6;
+  -webkit-overflow-scrolling: touch;
+}
+
+.user-table-scroll-container::-webkit-scrollbar {
+  height: 12px;
+}
+
+.user-table-scroll-container::-webkit-scrollbar-track {
+  background: #F3F4F6;
+  border-radius: 6px;
+}
+
+.user-table-scroll-container::-webkit-scrollbar-thumb {
+  background: #9CA3AF;
+  border-radius: 6px;
+  border: 2px solid #F3F4F6;
+}
+
+.user-table-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #6B7280;
+}
+
 /* Global horizontal scrollbar styling - visible thumb for all scrollable containers */
 /* This applies to any element with overflow-x: scroll or auto */
 * {

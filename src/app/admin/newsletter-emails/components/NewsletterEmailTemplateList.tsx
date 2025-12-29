@@ -464,187 +464,70 @@ export default function NewsletterEmailTemplateList({
       )}
 
       {!error && filteredTemplates.length > 0 && (
-        <>
-          {/* Rainbow Gradient Scrollbar Styles */}
-          <style dangerouslySetInnerHTML={{
-            __html: `
-              .table-scroll-container {
-                overflow-x: scroll !important;
-                overflow-y: visible !important;
-                scrollbar-width: thin !important;
-                scrollbar-color: #EC4899 #FCE7F3 !important; /* Pink thumb, pink track (Firefox) */
-                -ms-overflow-style: -ms-autohiding-scrollbar !important;
-              }
-
-              /* WebKit browsers (Chrome, Safari, Edge) */
-              .table-scroll-container::-webkit-scrollbar {
-                height: 20px !important; /* Larger for visibility */
-                display: block !important;
-                -webkit-appearance: none !important;
-                appearance: none !important;
-              }
-
-              .table-scroll-container::-webkit-scrollbar-track {
-                background: linear-gradient(90deg, #DBEAFE, #E9D5FF, #FCE7F3, #FED7AA) !important;
-                border-radius: 10px !important;
-                -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.15) !important;
-                box-shadow: inset 0 0 6px rgba(0,0,0,0.15) !important;
-              }
-
-              .table-scroll-container::-webkit-scrollbar-thumb {
-                background: linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899, #F97316) !important;
-                border-radius: 10px !important;
-                border: 4px solid #F3F4F6 !important;
-                -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.4) !important;
-                box-shadow: inset 0 0 6px rgba(0,0,0,0.4) !important;
-                min-width: 50px !important; /* CRITICAL: Ensures thumb is always visible */
-                background-clip: padding-box !important;
-              }
-
-              .table-scroll-container::-webkit-scrollbar-thumb:hover {
-                background: linear-gradient(90deg, #2563EB, #7C3AED, #DB2777, #EA580C) !important;
-                border-color: #E5E7EB !important;
-              }
-
-              .table-scroll-container::-webkit-scrollbar-thumb:active {
-                background: linear-gradient(90deg, #1D4ED8, #6D28D9, #BE185D, #C2410C) !important;
-                border-color: #D1D5DB !important;
-              }
-
-              .table-scroll-container::-webkit-scrollbar-button {
-                display: none !important;
-              }
-
-              .table-scroll-container::-webkit-scrollbar-corner {
-                background: #E0E7FF !important;
-              }
-
-              /* Flexbox spacer for right-side centering */
-              .table-scroll-container::after {
-                content: '';
-                display: block;
-                width: 100vw; /* Full viewport width of scrollable space */
-                height: 1px;
-                flex-shrink: 0;
-              }
-
-              .table-scroll-container {
-                display: flex !important;
-              }
-            `
-          }} />
-
-          {/* Outer wrapper with gradient border */}
-          <div className="rounded-lg shadow w-full overflow-hidden" style={{
-            background: 'linear-gradient(to right, #3B82F6, #8B5CF6, #EC4899, #F97316)',
-            padding: '4px'
-          }}>
-            {/* Inner scroll container with gradient background */}
-            <div
-              className="w-full table-scroll-container"
-              style={{
-                overflowX: 'scroll',
-                overflowY: 'visible',
-                WebkitOverflowScrolling: 'touch',
-                maxWidth: '100%',
-                display: 'flex',
-                position: 'relative',
-                width: '100%',
-                minHeight: '1px',
-                scrollbarGutter: 'stable',
-                background: 'linear-gradient(to right, #3B82F6, #8B5CF6, #EC4899, #F97316)',
-                borderRadius: '8px',
-                padding: '20px'
-              }}
-            >
-              <div className="w-full">
-                <div className="mb-3 text-sm text-gray-600 italic">
-                  💡 <strong>Tip:</strong> Hover over a template name to see detailed information in a popup tooltip.
-                </div>
-                {/* Table with semi-transparent white background */}
-                <table
-                  className="divide-y divide-gray-200"
-                  style={{
-                    width: 'max-content',
-                    minWidth: 'fit-content', /* Responsive: fits content naturally */
-                    flexShrink: 0,
-                    background: 'rgba(255, 255, 255, 0.95)', /* Semi-transparent white */
-                    borderRadius: '8px',
-                    overflow: 'hidden'
-                  }}
-                >
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Template Name
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Event
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Subject
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Created
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+        <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
+          <div className="p-4 sm:p-6">
+            <div className="mb-3 text-xs sm:text-sm text-gray-600 dark:text-gray-400 italic">
+              💡 <strong>Tip:</strong> Hover over a template name to see detailed information in a popup tooltip.
+            </div>
+          </div>
+          <div className="user-table-scroll-container">
+            <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-600 border border-gray-300 dark:border-gray-600" style={{ minWidth: '800px', width: '100%' }}>
+              <thead className="bg-gray-50 dark:bg-gray-700">
+                <tr>
+                  <th className="px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">Template Name</th>
+                  <th className="px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">Event</th>
+                  <th className="px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">Subject</th>
+                  <th className="px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">Status</th>
+                  <th className="px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-300 dark:border-gray-600">Created</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-300 dark:divide-gray-600">
               {filteredTemplates.map((template) => (
                 <React.Fragment key={template.id}>
                   {/* Data Row */}
-                  <tr className="hover:bg-gray-50">
+                  <tr className={`${filteredTemplates.indexOf(template) % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-blue-50 dark:bg-gray-700'} hover:bg-yellow-100 dark:hover:bg-gray-700/50 transition-colors border-b border-gray-300 dark:border-gray-600`}>
                     <td
-                      className="px-6 py-4 whitespace-nowrap cursor-pointer"
+                      className="px-2 sm:px-4 lg:px-6 py-2 sm:py-4 whitespace-nowrap cursor-pointer text-xs sm:text-sm font-medium text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600"
                       onMouseEnter={(e) => handleTemplateMouseEnter(template, e)}
                       onMouseLeave={handleTemplateMouseLeave}
                     >
-                      <div className="text-sm font-medium text-gray-900">
-                        {template.templateName}
-                      </div>
+                      {template.templateName}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {getEventName(template.eventId)}
-                      </div>
+                    <td className="px-2 sm:px-4 lg:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600">
+                      {getEventName(template.eventId)}
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900 max-w-xs truncate">
-                        {template.subject}
-                      </div>
+                    <td className="px-2 sm:px-4 lg:px-6 py-2 sm:py-4 text-xs sm:text-sm text-gray-900 dark:text-white max-w-xs truncate border-r border-gray-200 dark:border-gray-600">
+                      {template.subject}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-2 sm:px-4 lg:px-6 py-2 sm:py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600">
                       <span
                         className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                           template.isActive
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                            : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
                         }`}
                       >
                         {template.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-2 sm:px-4 lg:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                       {new Date(template.createdAt).toLocaleDateString()}
                     </td>
                   </tr>
                   {/* Actions Row with Labels */}
-                  <tr className="hover:bg-gray-50 border-t border-gray-100">
-                    <td colSpan={5} className="px-6 py-3">
-                      <div className="flex justify-start gap-4 flex-wrap">
+                  <tr className={`${filteredTemplates.indexOf(template) % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-blue-50 dark:bg-gray-700'} hover:bg-yellow-100 dark:hover:bg-gray-700/50 transition-colors border-b border-gray-300 dark:border-gray-600`}>
+                    <td colSpan={5} className="px-2 sm:px-4 lg:px-6 py-2 sm:py-3">
+                      <div className="flex justify-start gap-2 sm:gap-4 flex-wrap">
                         {template.id ? (
                           <Link
                             href={`/admin/newsletter-emails/${template.id}`}
                             className="flex flex-col items-center gap-1 group"
                             title="Edit (Right-click to open in new tab)"
                           >
-                            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-colors">
-                              <FaEdit className="w-6 h-6 text-blue-700" />
+                            <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 flex items-center justify-center transition-colors">
+                              <FaEdit className="w-4 h-4 sm:w-6 sm:h-6 text-blue-700 dark:text-blue-300" />
                             </div>
-                            <span className="text-xs text-gray-600 group-hover:text-gray-900">Edit</span>
+                            <span className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white">Edit</span>
                           </Link>
                         ) : (
                           <button
@@ -652,10 +535,10 @@ export default function NewsletterEmailTemplateList({
                             title="Edit"
                             disabled
                           >
-                            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center opacity-50">
-                              <FaEdit className="w-6 h-6 text-gray-500" />
+                            <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center opacity-50">
+                              <FaEdit className="w-4 h-4 sm:w-6 sm:h-6 text-gray-500 dark:text-gray-400" />
                             </div>
-                            <span className="text-xs text-gray-400">Edit</span>
+                            <span className="text-[10px] sm:text-xs text-gray-400 dark:text-gray-500">Edit</span>
                           </button>
                         )}
                         <button
@@ -663,72 +546,83 @@ export default function NewsletterEmailTemplateList({
                           className="flex flex-col items-center gap-1 group"
                           title="Duplicate"
                         >
-                          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-100 hover:bg-purple-200 flex items-center justify-center transition-colors">
-                            <FaCopy className="w-6 h-6 text-purple-700" />
+                          <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-purple-100 hover:bg-purple-200 dark:bg-purple-900 dark:hover:bg-purple-800 flex items-center justify-center transition-colors">
+                            <FaCopy className="w-4 h-4 sm:w-6 sm:h-6 text-purple-700 dark:text-purple-300" />
                           </div>
-                          <span className="text-xs text-gray-600 group-hover:text-gray-900">Duplicate</span>
+                          <span className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white">Duplicate</span>
                         </button>
                         <button
                           onClick={() => onSendTest(template)}
                           className="flex flex-col items-center gap-1 group"
                           title="Send Test"
                         >
-                          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-yellow-100 hover:bg-yellow-200 flex items-center justify-center transition-colors">
-                            <FaEnvelope className="w-6 h-6 text-yellow-700" />
+                          <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-yellow-100 hover:bg-yellow-200 dark:bg-yellow-900 dark:hover:bg-yellow-800 flex items-center justify-center transition-colors">
+                            <FaEnvelope className="w-4 h-4 sm:w-6 sm:h-6 text-yellow-700 dark:text-yellow-300" />
                           </div>
-                          <span className="text-xs text-gray-600 group-hover:text-gray-900">Send Test</span>
+                          <span className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white">Send Test</span>
                         </button>
                         <button
                           onClick={() => onSendBulk(template)}
                           className="flex flex-col items-center gap-1 group"
                           title="Send Bulk"
                         >
-                          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 hover:bg-green-200 flex items-center justify-center transition-colors">
-                            <FaEnvelopeOpen className="w-6 h-6 text-green-700" />
+                          <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-green-100 hover:bg-green-200 dark:bg-green-900 dark:hover:bg-green-800 flex items-center justify-center transition-colors">
+                            <FaEnvelopeOpen className="w-4 h-4 sm:w-6 sm:h-6 text-green-700 dark:text-green-300" />
                           </div>
-                          <span className="text-xs text-gray-600 group-hover:text-gray-900">Send Bulk</span>
+                          <span className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white">Send Bulk</span>
                         </button>
                         <button
                           onClick={() => onSendToSubscribed(template)}
                           className="flex flex-col items-center gap-1 group"
                           title="Send to Subscribed Members"
                         >
-                          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center transition-colors">
-                            <FaUsers className="w-6 h-6 text-indigo-700" />
+                          <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-indigo-100 hover:bg-indigo-200 dark:bg-indigo-900 dark:hover:bg-indigo-800 flex items-center justify-center transition-colors">
+                            <FaUsers className="w-4 h-4 sm:w-6 sm:h-6 text-indigo-700 dark:text-indigo-300" />
                           </div>
-                          <span className="text-xs text-gray-600 group-hover:text-gray-900">Send to All Members</span>
+                          <span className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white">Send to All Members</span>
                         </button>
                         <button
                           onClick={() => handleDeleteClick(template)}
                           className="flex flex-col items-center gap-1 group"
                           title="Delete"
                         >
-                          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-100 hover:bg-red-200 flex items-center justify-center transition-colors">
-                            <FaTrashAlt className="w-6 h-6 text-red-700" />
+                          <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-red-100 hover:bg-red-200 dark:bg-red-900 dark:hover:bg-red-800 flex items-center justify-center transition-colors">
+                            <FaTrashAlt className="w-4 h-4 sm:w-6 sm:h-6 text-red-700 dark:text-red-300" />
                           </div>
-                          <span className="text-xs text-gray-600 group-hover:text-gray-900">Delete</span>
+                          <span className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white">Delete</span>
                         </button>
                       </div>
                     </td>
                   </tr>
                 </React.Fragment>
               ))}
+              {filteredTemplates.length === 0 && (
+                <tr>
+                  <td className="px-2 sm:px-4 lg:px-6 py-4 text-xs sm:text-sm text-gray-500 dark:text-gray-400 text-center" colSpan={5}>
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 border-2 border-orange-300 rounded-lg shadow-sm">
+                      <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span className="text-sm font-medium text-orange-700">No templates found</span>
+                      <span className="text-sm text-orange-600">[No templates match your criteria]</span>
+                    </div>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
-              </div>
-            </div>
-          </div>
-        </>
+        </div>
+      </div>
       )}
 
       {/* Pagination Controls - Always visible, matching admin page style */}
       <div className="mt-8">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center gap-2">
           {/* Previous Button */}
           <button
             onClick={handlePrevPage}
             disabled={isPrevDisabled}
-            className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+            className="px-3 sm:px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
             title="Previous Page"
             aria-label="Previous Page"
             type="button"
@@ -736,12 +630,12 @@ export default function NewsletterEmailTemplateList({
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
             </svg>
-            <span>Previous</span>
+            <span className="hidden sm:inline">Previous</span>
           </button>
 
           {/* Page Info */}
-          <div className="px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
-            <span className="text-sm font-bold text-blue-700">
+          <div className="px-2 sm:px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm flex-shrink-0">
+            <span className="text-xs sm:text-sm font-bold text-blue-700">
               Page <span className="text-blue-600">{displayPage}</span> of <span className="text-blue-600">{totalPages}</span>
             </span>
           </div>
@@ -750,12 +644,12 @@ export default function NewsletterEmailTemplateList({
           <button
             onClick={handleNextPage}
             disabled={isNextDisabled}
-            className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+            className="px-3 sm:px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
             title="Next Page"
             aria-label="Next Page"
             type="button"
           >
-            <span>Next</span>
+            <span className="hidden sm:inline">Next</span>
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
             </svg>

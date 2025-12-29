@@ -333,18 +333,18 @@ export default function AdminPage() {
   // This prevents the page from hanging during Playwright tests
   if (!userId) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ paddingTop: '180px' }}>
-        <h1 className="text-3xl font-bold text-indigo-800 mb-8 flex items-center justify-center gap-2">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8" style={{ paddingTop: '120px' }}>
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-indigo-800 mb-4 sm:mb-8 flex flex-wrap items-center justify-center gap-2 text-center">
           Admin [
           <span className="flex items-center gap-1 text-blue-600">
-            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
             </svg>
             Home
           </span>
           ] Event Management
         </h1>
-        <div className="bg-white rounded-xl shadow-lg p-6 lg:p-8">
+        <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 lg:p-8">
           <div className="text-center py-8">
             <p className="text-gray-600">Loading admin dashboard...</p>
           </div>
@@ -354,11 +354,11 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ paddingTop: '180px' }}>
-      <h1 className="text-3xl font-bold text-indigo-800 mb-8 flex items-center justify-center gap-2">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8" style={{ paddingTop: '120px' }}>
+      <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-indigo-800 mb-4 sm:mb-8 flex flex-wrap items-center justify-center gap-2 text-center">
         Admin [
         <span className="flex items-center gap-1 text-blue-600">
-          <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
           </svg>
           Home
@@ -366,8 +366,8 @@ export default function AdminPage() {
         ] Event Management
       </h1>
 
-      <div className="bg-white rounded-xl shadow-lg p-6 lg:p-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
+      <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 lg:p-8">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
           {adminButtons.map((button) => {
             const colorClasses = getColorClasses(button.color);
             const iconBgColor = getIconBgColor(button.color);
@@ -377,12 +377,12 @@ export default function AdminPage() {
               <Link
                 key={button.key}
                 href={button.href}
-                className={`flex flex-col items-center justify-center rounded-lg border-2 p-3 lg:p-4 transition-all duration-300 hover:scale-105 hover:shadow-md group ${colorClasses}`}
+                className={`flex flex-col items-center justify-center rounded-lg border-2 p-2.5 sm:p-3 lg:p-4 transition-all duration-300 hover:scale-105 hover:shadow-md group ${colorClasses}`}
               >
-                <div className={`flex-shrink-0 w-11 h-11 rounded-xl ${iconBgColor} flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300`}>
-                  {renderIcon(button.icon, `w-8 h-8 ${iconTextColor}`)}
+                <div className={`flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-xl ${iconBgColor} flex items-center justify-center mb-1.5 sm:mb-2 group-hover:scale-110 transition-transform duration-300`}>
+                  {renderIcon(button.icon, `w-6 h-6 sm:w-8 sm:h-8 ${iconTextColor}`)}
                 </div>
-                <span className="font-semibold text-center text-sm lg:text-base leading-tight">
+                <span className="font-semibold text-center text-xs sm:text-sm lg:text-base leading-tight px-1">
                   {button.label}
                 </span>
               </Link>

@@ -356,10 +356,10 @@ export default function ManageEventsPage() {
   return (
     <div className="max-w-5xl mx-auto px-8 py-8" style={{ paddingTop: '180px' }}>
       {/* Header with back button */}
-      <div className="flex items-center mb-8">
+      <div className="flex items-center mb-8 gap-4">
         <Link
           href="/admin"
-          className="flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+          className="flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-3 sm:px-6"
           title="Back to Admin"
           aria-label="Back to Admin"
         >
@@ -368,11 +368,11 @@ export default function ManageEventsPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
           </div>
-          <span className="font-semibold text-indigo-700">Back to Admin</span>
+          <span className="font-semibold text-indigo-700 hidden sm:inline">Back to Admin</span>
         </Link>
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Manage Events</h1>
-          <p className="text-gray-600">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Manage Events</h1>
+          <p className="text-gray-600 text-sm sm:text-base">
             Create, edit, and manage all events in the system.
           </p>
         </div>

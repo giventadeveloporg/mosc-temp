@@ -1160,30 +1160,30 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
         {errors.promotionStartDate && <div className="text-red-500 text-sm mt-1">{errors.promotionStartDate}</div>}
         <p className="text-sm text-gray-500 mt-1">When should promotion for this event begin? Format: MM/DD/YYYY (e.g., 09/14/2025) or click calendar icon</p>
       </div>
-      <div className="flex gap-2">
-        <div className="flex-1">
-          <label className="block font-medium">Start Time *</label>
+      <div className="flex flex-col sm:flex-row gap-2">
+        <div className="flex-1 min-w-0">
+          <label className="block font-medium text-sm sm:text-base">Start Time *</label>
           <input
             ref={(el) => { if (el) fieldRefs.current.startTime = el; }}
             type="time"
             name="startTime"
             value={to24HourFormat(form.startTime)}
             onChange={handleChange}
-            className={`w-full border rounded p-2 ${errors.startTime ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'}`}
+            className={`w-full border rounded p-1.5 sm:p-2 text-sm sm:text-base ${errors.startTime ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'}`}
           />
-          {errors.startTime && <div className="text-red-500 text-sm mt-1">{errors.startTime}</div>}
+          {errors.startTime && <div className="text-red-500 text-xs sm:text-sm mt-1">{errors.startTime}</div>}
         </div>
-        <div className="flex-1">
-          <label className="block font-medium">End Time *</label>
+        <div className="flex-1 min-w-0">
+          <label className="block font-medium text-sm sm:text-base">End Time *</label>
           <input
             ref={(el) => { if (el) fieldRefs.current.endTime = el; }}
             type="time"
             name="endTime"
             value={to24HourFormat(form.endTime)}
             onChange={handleChange}
-            className={`w-full border rounded p-2 ${errors.endTime ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'}`}
+            className={`w-full border rounded p-1.5 sm:p-2 text-sm sm:text-base ${errors.endTime ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'}`}
           />
-          {errors.endTime && <div className="text-red-500 text-sm mt-1">{errors.endTime}</div>}
+          {errors.endTime && <div className="text-red-500 text-xs sm:text-sm mt-1">{errors.endTime}</div>}
         </div>
       </div>
       <div>
@@ -1696,10 +1696,10 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
         </div>
       )}
 
-      <div className="flex flex-row gap-3 mt-4">
+      <div className="flex flex-row gap-2 sm:gap-3 mt-4">
         <button
           type="submit"
-          className="flex-1 flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 sm:flex-1 flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-0 sm:gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={loading}
           title={loading ? 'Saving...' : 'Save Event'}
           aria-label={loading ? 'Saving...' : 'Save Event'}
@@ -1709,11 +1709,11 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <span className="font-semibold text-green-700">{loading ? 'Saving...' : 'Save Event'}</span>
+          <span className="font-semibold text-green-700 hidden sm:inline">{loading ? 'Saving...' : 'Save Event'}</span>
         </button>
         <button
           type="button"
-          className="flex-1 flex-shrink-0 h-14 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105"
+          className="flex-1 sm:flex-1 flex-shrink-0 h-14 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center gap-0 sm:gap-3 transition-all duration-300 hover:scale-105"
           onClick={handleReset}
           title="Reset Form"
           aria-label="Reset Form"
@@ -1723,11 +1723,11 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
           </div>
-          <span className="font-semibold text-gray-700">Reset</span>
+          <span className="font-semibold text-gray-700 hidden sm:inline">Reset</span>
         </button>
         <button
           type="button"
-          className="flex-1 flex-shrink-0 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105"
+          className="flex-1 sm:flex-1 flex-shrink-0 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center gap-0 sm:gap-3 transition-all duration-300 hover:scale-105"
           onClick={() => {
             if (onCancel) {
               onCancel();
@@ -1743,7 +1743,7 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </div>
-          <span className="font-semibold text-red-700">Cancel</span>
+          <span className="font-semibold text-red-700 hidden sm:inline">Cancel</span>
         </button>
       </div>
     </form>

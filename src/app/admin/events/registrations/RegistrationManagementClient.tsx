@@ -365,95 +365,98 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
   const cancelledCount = Math.round(totalCount * cancelledRatio);
 
   return (
-    <div className="max-w-5xl mx-auto px-8 py-8" style={{ paddingTop: '180px' }}>
-      {/* Header with back button */}
-      <div className="flex items-center mb-8">
-        <Link
-          href="/admin"
-          className="flex-shrink-0 h-14 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
-          title="Back to Admin"
-          aria-label="Back to Admin"
-        >
-          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center">
-            <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-          </div>
-          <span className="font-semibold text-gray-700">Back to Admin</span>
-        </Link>
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Registration Management</h1>
-          <p className="text-gray-600">
-            {selectedEvent ? (
-              <>
-                Manage registrations for{' '}
-                <span className="text-blue-600 font-semibold">{selectedEvent.title}</span>
-              </>
-            ) : (
-              'Search by event to view registrations'
-            )}
-          </p>
-        </div>
+    <div className="w-full overflow-x-hidden box-border" style={{ paddingTop: '120px' }}>
+      {/* Navigation Section - Full Width, Separate Responsive Container */}
+      <div className="w-full px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 mb-6 sm:mb-8">
+        <AdminNavigation currentPage="event-registrations" />
       </div>
+      {/* Main Content Section - Constrained Width */}
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-8">
+        {/* Header with back button - Moved to top, single line on mobile */}
+        <div className="flex items-center gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6">
+          <Link
+            href="/admin"
+            className="flex-shrink-0 h-10 sm:h-12 md:h-14 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 flex items-center justify-center gap-1.5 sm:gap-2 md:gap-3 transition-all duration-300 hover:scale-105 px-2 sm:px-3 md:px-6"
+            title="Back to Admin"
+            aria-label="Back to Admin"
+          >
+            <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+            </div>
+            <span className="font-semibold text-gray-700 dark:text-gray-300 text-[10px] sm:text-xs md:text-sm lg:text-base hidden sm:inline">Back to Admin</span>
+          </Link>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-sm sm:text-base md:text-xl lg:text-2xl xl:text-3xl font-bold text-gray-900 dark:text-white truncate">Registration Management</h1>
+            <p className="text-[10px] sm:text-xs md:text-sm text-gray-600 dark:text-gray-400 truncate hidden sm:block">
+              {selectedEvent ? (
+                <>
+                  Manage registrations for{' '}
+                  <span className="text-blue-600 dark:text-blue-400 font-semibold">{selectedEvent.title}</span>
+                </>
+              ) : (
+                'Search by event to view registrations'
+              )}
+            </p>
+          </div>
+        </div>
 
-      {/* Admin Navigation */}
-      <AdminNavigation currentPage="event-registrations" />
-
-      {/* Quick Action Buttons */}
-      <div className="w-full mb-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          <Link
-            href="/admin/manage-events"
-            className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-lg shadow-md p-4 text-xs transition-all group"
-            title="Manage Events"
-            aria-label="Manage Events"
-          >
-            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-              <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <span className="font-semibold text-center leading-tight">Manage Events</span>
-          </Link>
-          <Link
-            href="/admin/manage-usage"
-            className="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg shadow-md p-4 text-xs transition-all group"
-            title="Manage Usage"
-            aria-label="Manage Usage"
-          >
-            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-              <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            </div>
-            <span className="font-semibold text-center leading-tight">Manage Usage<br />[Users]</span>
-          </Link>
-          <Link
-            href="/admin/event-analytics"
-            className="flex flex-col items-center justify-center bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-lg shadow-md p-4 text-xs transition-all group"
-            title="Event Analytics Dashboard"
-            aria-label="Event Analytics Dashboard"
-          >
-            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-teal-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-              <svg className="w-10 h-10 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-            </div>
-            <span className="font-semibold text-center leading-tight">Event Analytics<br />Dashboard</span>
-          </Link>
-          <Link
-            href="/admin/communication"
-            className="flex flex-col items-center justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-800 rounded-lg shadow-md p-4 text-xs transition-all group"
-            title="Communication Center"
-            aria-label="Communication Center"
-          >
-            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-indigo-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-              <svg className="w-10 h-10 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <span className="font-semibold text-center leading-tight">Communication<br />Center</span>
-          </Link>
+        {/* Quick Action Buttons */}
+        <div className="w-full mb-6 sm:mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6">
+            <Link
+              href="/admin/manage-events"
+              className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-lg shadow-md p-1.5 sm:p-2 md:p-2.5 lg:p-3 xl:p-4 text-[9px] sm:text-[10px] md:text-xs lg:text-sm xl:text-base transition-all group overflow-hidden"
+              title="Manage Events"
+              aria-label="Manage Events"
+            >
+              <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 xl:w-11 xl:h-11 rounded-xl bg-green-100 flex items-center justify-center mb-1.5 sm:mb-2 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:h-7 xl:w-8 xl:h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <span className="font-semibold text-center leading-tight px-1 break-words hyphens-auto">Manage Events</span>
+            </Link>
+            <Link
+              href="/admin/manage-usage"
+              className="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg shadow-md p-1.5 sm:p-2 md:p-2.5 lg:p-3 xl:p-4 text-[9px] sm:text-[10px] md:text-xs lg:text-sm xl:text-base transition-all group overflow-hidden"
+              title="Manage Usage"
+              aria-label="Manage Usage"
+            >
+              <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 xl:w-11 xl:h-11 rounded-xl bg-blue-100 flex items-center justify-center mb-1.5 sm:mb-2 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:h-7 xl:w-8 xl:h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              </div>
+              <span className="font-semibold text-center leading-tight px-1 break-words hyphens-auto">Manage Usage<br />[Users]</span>
+            </Link>
+            <Link
+              href="/admin/event-analytics"
+              className="flex flex-col items-center justify-center bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-lg shadow-md p-1.5 sm:p-2 md:p-2.5 lg:p-3 xl:p-4 text-[9px] sm:text-[10px] md:text-xs lg:text-sm xl:text-base transition-all group overflow-hidden"
+              title="Event Analytics Dashboard"
+              aria-label="Event Analytics Dashboard"
+            >
+              <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 xl:w-11 xl:h-11 rounded-xl bg-teal-100 flex items-center justify-center mb-1.5 sm:mb-2 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:h-7 xl:w-8 xl:h-8 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <span className="font-semibold text-center leading-tight px-1 break-words hyphens-auto">Event Analytics<br />Dashboard</span>
+            </Link>
+            <Link
+              href="/admin/communication"
+              className="flex flex-col items-center justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-800 rounded-lg shadow-md p-1.5 sm:p-2 md:p-2.5 lg:p-3 xl:p-4 text-[9px] sm:text-[10px] md:text-xs lg:text-sm xl:text-base transition-all group overflow-hidden"
+              title="Communication Center"
+              aria-label="Communication Center"
+            >
+              <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 xl:w-11 xl:h-11 rounded-xl bg-indigo-100 flex items-center justify-center mb-1.5 sm:mb-2 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:h-7 xl:w-8 xl:h-8 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <span className="font-semibold text-center leading-tight px-1 break-words hyphens-auto">Communication<br />Center</span>
+            </Link>
         </div>
       </div>
 
@@ -794,267 +797,225 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
         </div>
       )}
 
-      {/* Registrations Table - Only show when event is selected */}
-      {hasSelectedEvent && (
-        <>
-          <style dangerouslySetInnerHTML={{
-            __html: `
-            .table-scroll-container {
-              overflow-x: scroll !important;
-              overflow-y: visible !important;
-              scrollbar-width: thin !important;
-              scrollbar-color: #EC4899 #FCE7F3 !important;
-              -ms-overflow-style: -ms-autohiding-scrollbar !important;
-            }
-            .table-scroll-container::-webkit-scrollbar {
-              height: 20px !important;
-              display: block !important;
-              -webkit-appearance: none !important;
-              appearance: none !important;
-            }
-            .table-scroll-container::-webkit-scrollbar-track {
-              background: linear-gradient(90deg, #DBEAFE, #E9D5FF, #FCE7F3, #FED7AA) !important;
-              border-radius: 10px !important;
-              -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.15) !important;
-              box-shadow: inset 0 0 6px rgba(0,0,0,0.15) !important;
-            }
-            .table-scroll-container::-webkit-scrollbar-thumb {
-              background: linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899, #F97316) !important;
-              border-radius: 10px !important;
-              border: 4px solid #F3F4F6 !important;
-              -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.4) !important;
-              box-shadow: inset 0 0 6px rgba(0,0,0,0.4) !important;
-              min-width: 50px !important;
-              background-clip: padding-box !important;
-            }
-            .table-scroll-container::-webkit-scrollbar-thumb:hover {
-              background: linear-gradient(90deg, #2563EB, #7C3AED, #DB2777, #EA580C) !important;
-              border-color: #E5E7EB !important;
-            }
-            .table-scroll-container::-webkit-scrollbar-thumb:active {
-              background: linear-gradient(90deg, #1D4ED8, #6D28D9, #BE185D, #C2410C) !important;
-              border-color: #D1D5DB !important;
-            }
-            .table-scroll-container::-webkit-scrollbar-button {
-              display: none !important;
-            }
-            .table-scroll-container::-webkit-scrollbar-corner {
-              background: #E0E7FF !important;
-            }
-            .table-scroll-container::after {
-              content: '';
-              display: block;
-              width: 100vw;
-              height: 1px;
-              flex-shrink: 0;
-            }
-            .table-scroll-container {
-              display: flex !important;
-            }
-          `
-          }} />
-          <div className="rounded-lg shadow w-full overflow-hidden" style={{
-            background: 'linear-gradient(to right, #3B82F6, #8B5CF6, #EC4899, #F97316)',
-            padding: '4px'
-          }}>
-            <div
-              className="w-full table-scroll-container"
-              style={{
-                overflowX: 'scroll',
-                overflowY: 'visible',
-                WebkitOverflowScrolling: 'touch',
-                maxWidth: '100%',
-                display: 'flex',
-                position: 'relative',
-                width: '100%',
-                minHeight: '1px',
-                scrollbarGutter: 'stable',
-                background: 'linear-gradient(to right, #3B82F6, #8B5CF6, #EC4899, #F97316)',
-                borderRadius: '8px',
-                padding: '20px'
-              }}
-            >
-              <table className="divide-y divide-gray-200" style={{
-                width: 'max-content',
-                minWidth: 'fit-content',
-                flexShrink: 0,
-                background: 'rgba(255, 255, 255, 0.95)',
-                borderRadius: '8px',
-                overflow: 'hidden'
-              }}>
-            <thead className="bg-gray-50">
-              <tr>
-                    <th className="px-3 sm:px-6 py-3 text-left">
-                  <input
-                    type="checkbox"
-                    checked={selectedAttendees.length === attendees.length && attendees.length > 0}
-                    onChange={handleSelectAll}
-                        className="w-5 h-5 sm:w-4 sm:h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 touch-manipulation"
-                  />
-                </th>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Attendee
-                </th>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Contact
-                </th>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {attendees.map((attendee) => (
-                <tr key={attendee.id} className="hover:bg-gray-50">
-                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
-                    <input
-                      type="checkbox"
-                      checked={selectedAttendees.includes(attendee.id!)}
-                      onChange={() => handleSelectAttendee(attendee.id!)}
-                          className="w-5 h-5 sm:w-4 sm:h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 touch-manipulation"
-                    />
-                  </td>
-                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                          <div className="flex-shrink-0 h-10 w-10 sm:h-12 sm:w-12">
-                            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-gray-300 flex items-center justify-center">
-                              <FaUserFriends className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600" />
-                        </div>
-                      </div>
-                          <div className="ml-2 sm:ml-4 min-w-0">
-                            <div className="text-sm font-medium text-gray-900 truncate">
-                          {attendee.firstName} {attendee.lastName}
-                        </div>
-                            <div className="text-xs sm:text-sm text-gray-500">
-                          ID: {attendee.id}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900 flex items-center">
-                          <FaEnvelope className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400 mr-2 flex-shrink-0" />
-                          <span className="break-all">{attendee.email}</span>
-                    </div>
-                    {attendee.phone && (
-                      <div className="text-sm text-gray-500 flex items-center mt-1">
-                            <FaPhone className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400 mr-2 flex-shrink-0" />
-                            <span>{attendee.phone}</span>
-                      </div>
+        {/* Registrations Table - Only show when event is selected */}
+        {hasSelectedEvent && (
+          <>
+            <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
+              <div className="user-table-scroll-container">
+                <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-600 border border-gray-300 dark:border-gray-600" style={{ minWidth: '800px', width: '100%' }}>
+                  <thead className="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                      <th className="px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-left border border-gray-300 dark:border-gray-600">
+                        <input
+                          type="checkbox"
+                          checked={selectedAttendees.length === attendees.length && attendees.length > 0}
+                          onChange={handleSelectAll}
+                          className="w-4 h-4 sm:w-5 sm:h-5 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:bg-gray-800 dark:text-blue-400 touch-manipulation"
+                        />
+                      </th>
+                      <th className="px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider border border-gray-300 dark:border-gray-600">
+                        Attendee
+                      </th>
+                      <th className="px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider border border-gray-300 dark:border-gray-600">
+                        Contact
+                      </th>
+                      <th className="px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider border border-gray-300 dark:border-gray-600">
+                        Status
+                      </th>
+                      <th className="px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider border border-gray-300 dark:border-gray-600">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    {attendees.length > 0 ? (
+                      attendees.map((attendee, index) => (
+                        <tr key={attendee.id} className={`hover:bg-gray-50 dark:hover:bg-gray-700 ${index % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-blue-50 dark:bg-gray-700'}`}>
+                          <td className="px-2 sm:px-4 lg:px-6 py-2 sm:py-4 whitespace-nowrap border border-gray-300 dark:border-gray-600">
+                            <input
+                              type="checkbox"
+                              checked={selectedAttendees.includes(attendee.id!)}
+                              onChange={() => handleSelectAttendee(attendee.id!)}
+                              className="w-4 h-4 sm:w-5 sm:h-5 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:bg-gray-800 dark:text-blue-400 touch-manipulation"
+                            />
+                          </td>
+                          <td className="px-2 sm:px-4 lg:px-6 py-2 sm:py-4 whitespace-nowrap border border-gray-300 dark:border-gray-600">
+                            <div className="flex items-center">
+                              <div className="flex-shrink-0 h-8 w-8 sm:h-10 sm:w-10">
+                                <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+                                  <FaUserFriends className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600 dark:text-gray-300" />
+                                </div>
+                              </div>
+                              <div className="ml-2 sm:ml-4 min-w-0">
+                                <div className="text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                                  {attendee.firstName} {attendee.lastName}
+                                </div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                  ID: {attendee.id}
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-2 sm:px-4 lg:px-6 py-2 sm:py-4 whitespace-nowrap border border-gray-300 dark:border-gray-600">
+                            <div className="text-xs sm:text-sm text-gray-900 dark:text-gray-100 flex items-center">
+                              <FaEnvelope className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 dark:text-gray-500 mr-2 flex-shrink-0" />
+                              <span className="break-all">{attendee.email}</span>
+                            </div>
+                            {attendee.phone && (
+                              <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 flex items-center mt-1">
+                                <FaPhone className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 dark:text-gray-500 mr-2 flex-shrink-0" />
+                                <span>{attendee.phone}</span>
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-2 sm:px-4 lg:px-6 py-2 sm:py-4 whitespace-nowrap border border-gray-300 dark:border-gray-600">
+                            <span className={`inline-flex px-2 sm:px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(attendee.registrationStatus || '')}`}>
+                              {attendee.registrationStatus || 'Unknown'}
+                            </span>
+                          </td>
+                          <td className="px-2 sm:px-4 lg:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium border border-gray-300 dark:border-gray-600">
+                            <div className="flex space-x-1 sm:space-x-2">
+                              <button
+                                onClick={() => handleViewAttendee(attendee)}
+                                className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-green-100 hover:bg-green-200 dark:bg-green-900 dark:hover:bg-green-800 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                                title="View Details"
+                                aria-label="View Details"
+                                type="button"
+                              >
+                                <FaEye className="w-6 h-6 sm:w-10 sm:h-10 text-green-600 dark:text-green-300" />
+                              </button>
+                              <button
+                                onClick={() => handleEditAttendee(attendee)}
+                                className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                                title="Edit"
+                                aria-label="Edit"
+                                type="button"
+                              >
+                                <FaEdit className="w-6 h-6 sm:w-10 sm:h-10 text-blue-600 dark:text-blue-300" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteAttendee(attendee)}
+                                className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-red-100 hover:bg-red-200 dark:bg-red-900 dark:hover:bg-red-800 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                                title="Delete Registration"
+                                aria-label="Delete"
+                                type="button"
+                              >
+                                <FaTrashAlt className="w-6 h-6 sm:w-10 sm:h-10 text-red-600 dark:text-red-300" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={5} className="px-4 py-8 text-center border border-gray-300 dark:border-gray-600">
+                          <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 dark:bg-orange-900/20 border-2 border-orange-300 dark:border-orange-600 rounded-lg shadow-sm">
+                            <svg className="w-5 h-5 text-orange-500 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span className="text-sm font-medium text-orange-700 dark:text-orange-300">No registrations found</span>
+                            <span className="text-sm text-orange-600 dark:text-orange-400 hidden sm:inline">[No registrations match your criteria]</span>
+                          </div>
+                        </td>
+                      </tr>
                     )}
-                  </td>
-                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 sm:px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(attendee.registrationStatus || '')}`}>
-                      {attendee.registrationStatus || 'Unknown'}
-                    </span>
-                  </td>
-                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex space-x-2 sm:space-x-3">
-                      <button
-                        onClick={() => handleViewAttendee(attendee)}
-                            className="p-2 sm:p-2.5 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-colors touch-manipulation"
-                        title="View Details"
-                            aria-label="View Details"
-                      >
-                            <FaEye className="h-5 w-5 sm:h-6 sm:w-6" />
-                      </button>
-                      <button
-                        onClick={() => handleEditAttendee(attendee)}
-                            className="p-2 sm:p-2.5 text-green-600 hover:text-green-900 hover:bg-green-50 rounded-lg transition-colors touch-manipulation"
-                        title="Edit"
-                            aria-label="Edit"
-                      >
-                            <FaEdit className="h-5 w-5 sm:h-6 sm:w-6" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteAttendee(attendee)}
-                            className="flex flex-col items-center text-red-700 hover:text-red-900 focus:outline-none touch-manipulation border-2 border-red-500 rounded p-1.5 sm:p-2 bg-rose-200 hover:bg-rose-300 transition-colors"
-                            style={{
-                              boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.2)',
-                              borderStyle: 'inset',
-                            }}
-                            title="Delete Registration"
-                            aria-label="Delete"
-                      >
-                            <FaTrashAlt className="h-6 w-6 sm:h-7 sm:w-7" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-            </div>
-        </div>
-
-          {/* Pagination - Matching manage-events page style */}
-          <div className="mt-4 px-2 sm:px-0">
-            <div className="flex justify-between items-center flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="white" strokeWidth="3" viewBox="0 0 24 24" style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                </svg>
-                <span>Previous</span>
-              </button>
-              <div className="text-sm font-semibold text-gray-700 px-2">
-                Page {currentPage} of {totalPages}
+                  </tbody>
+                </table>
               </div>
-              <button
-                type="button"
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
-              >
-                <span>Next</span>
-                <svg className="w-5 h-5" fill="none" stroke="white" strokeWidth="3" viewBox="0 0 24 24" style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
             </div>
-            <div className="text-center text-sm text-gray-600 mt-2">
-              Showing <span className="font-medium">{startItem}</span> to <span className="font-medium">{endItem}</span> of{' '}
-              <span className="font-medium">{totalCount}</span> registrations
+
+            {/* Pagination Controls - Always visible, matching admin page style */}
+            <div className="mt-6 sm:mt-8">
+              <div className="flex justify-between items-center gap-2">
+                {/* Previous Button */}
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1 || isPending}
+                  className="px-3 sm:px-5 py-2.5 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 text-blue-700 dark:text-blue-300 font-semibold rounded-lg shadow-sm border-2 border-blue-400 dark:border-blue-600 hover:border-blue-500 dark:hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+                  title="Previous Page"
+                  aria-label="Previous Page"
+                  type="button"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  <span className="hidden sm:inline">Previous</span>
+                </button>
+
+                {/* Page Info */}
+                <div className="px-2 sm:px-4 py-2 bg-blue-50 dark:bg-blue-900/30 border-2 border-blue-300 dark:border-blue-600 rounded-lg shadow-sm">
+                  <span className="text-xs sm:text-sm font-bold text-blue-700 dark:text-blue-300">
+                    Page <span className="text-blue-600 dark:text-blue-400">{currentPage}</span> of <span className="text-blue-600 dark:text-blue-400">{totalPages}</span>
+                  </span>
+                </div>
+
+                {/* Next Button */}
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages || isPending}
+                  className="px-3 sm:px-5 py-2.5 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 text-blue-700 dark:text-blue-300 font-semibold rounded-lg shadow-sm border-2 border-blue-400 dark:border-blue-600 hover:border-blue-500 dark:hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+                  title="Next Page"
+                  aria-label="Next Page"
+                  type="button"
+                >
+                  <span className="hidden sm:inline">Next</span>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Item Count Text */}
+              <div className="text-center mt-3">
+                {totalCount > 0 ? (
+                  <div className="inline-flex items-center px-2 sm:px-4 py-2 bg-blue-50 dark:bg-blue-900/30 border-2 border-blue-300 dark:border-blue-600 rounded-lg shadow-sm">
+                    <span className="text-xs sm:text-sm text-gray-700 dark:text-gray-300">
+                      Showing <span className="font-bold text-blue-600 dark:text-blue-400">{startItem}</span> to <span className="font-bold text-blue-600 dark:text-blue-400">{endItem}</span> of <span className="font-bold text-blue-600 dark:text-blue-400">{totalCount}</span> registrations
+                    </span>
+                  </div>
+                ) : (
+                  <div className="inline-flex items-center gap-2 px-2 sm:px-4 py-2 bg-orange-50 dark:bg-orange-900/20 border-2 border-orange-300 dark:border-orange-600 rounded-lg shadow-sm">
+                    <svg className="w-5 h-5 text-orange-500 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="text-xs sm:text-sm font-medium text-orange-700 dark:text-orange-300">No registrations found</span>
+                    <span className="text-xs sm:text-sm text-orange-600 dark:text-orange-400 hidden sm:inline">[No registrations match your criteria]</span>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        </>
+          </>
         )}
 
-      {/* Action Buttons */}
-      <div className="mt-8 flex justify-center space-x-4">
-        <Link
-          href="/admin/manage-events"
-          className="flex items-center justify-center gap-3 px-6 py-3 rounded-xl bg-green-100 hover:bg-green-200 transition-all duration-300 hover:scale-105"
-          title="Back to Manage Events"
-          aria-label="Back to Manage Events"
-        >
-          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
-            <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-          </div>
-          <span className="font-semibold text-green-700">Back to Manage Events</span>
-        </Link>
-        <Link
-          href="/admin/event-analytics"
-          className="flex items-center justify-center gap-3 px-6 py-3 rounded-xl bg-teal-100 hover:bg-teal-200 transition-all duration-300 hover:scale-105"
-          title="Event Analytics"
-          aria-label="Event Analytics"
-        >
-          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
-            <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-          </div>
-          <span className="font-semibold text-teal-700">Event Analytics</span>
-        </Link>
+        {/* Action Buttons */}
+        <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row justify-center items-center gap-4">
+          <Link
+            href="/admin/manage-events"
+            className="flex items-center justify-center gap-2 sm:gap-3 px-3 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-green-100 hover:bg-green-200 dark:bg-green-900 dark:hover:bg-green-800 transition-all duration-300 hover:scale-105"
+            title="Back to Manage Events"
+            aria-label="Back to Manage Events"
+          >
+            <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-green-200 dark:bg-green-800 flex items-center justify-center">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 dark:text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <span className="font-semibold text-green-700 dark:text-green-300 text-xs sm:text-sm lg:text-base whitespace-nowrap">Back to Manage Events</span>
+          </Link>
+          <Link
+            href="/admin/event-analytics"
+            className="flex items-center justify-center gap-2 sm:gap-3 px-3 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-teal-100 hover:bg-teal-200 dark:bg-teal-900 dark:hover:bg-teal-800 transition-all duration-300 hover:scale-105"
+            title="Event Analytics"
+            aria-label="Event Analytics"
+          >
+            <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-teal-200 dark:bg-teal-800 flex items-center justify-center">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-teal-600 dark:text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <span className="font-semibold text-teal-700 dark:text-teal-300 text-xs sm:text-sm lg:text-base whitespace-nowrap">Event Analytics</span>
+          </Link>
+        </div>
       </div>
 
       {/* View Attendee Modal */}

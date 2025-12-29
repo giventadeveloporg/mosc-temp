@@ -1,4 +1,5 @@
 import { getAppUrl } from '@/lib/env';
+import AdminNavigation from '@/components/AdminNavigation';
 // Icons removed - using inline SVGs instead
 
 function toInt(v: string | undefined, d: number) {
@@ -71,41 +72,61 @@ export default async function AdminFocusGroupsPage({ searchParams }: { searchPar
   }
 
   return (
-    <div className="px-8 pt-24 pb-8 max-w-5xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold">Manage Focus Groups</h1>
-        <a href="/admin/focus-groups/new" className="px-3 py-2 bg-blue-600 text-white rounded">New Group</a>
+    <div className="w-full overflow-x-hidden box-border" style={{ paddingTop: '120px' }}>
+      {/* Navigation Section - Full Width, Separate Responsive Container */}
+      <div className="w-full px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 mb-6 sm:mb-8">
+        <AdminNavigation />
       </div>
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+      {/* Main Content Section - Constrained Width */}
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-6">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 dark:text-white text-center sm:text-left">Manage Focus Groups</h1>
+          <a href="/admin/focus-groups/new" className="flex-shrink-0 h-12 sm:h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-2 sm:gap-3 transition-all duration-300 hover:scale-105 px-3 sm:px-6">
+            <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+            </div>
+            <span className="font-semibold text-blue-700 text-xs sm:text-sm lg:text-base whitespace-nowrap">New Group</span>
+          </a>
+        </div>
+        <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
+          <div className="user-table-scroll-container">
+            <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-600 border border-gray-300 dark:border-gray-600" style={{ minWidth: '800px', width: '100%' }}>
+          <thead className="bg-gray-50 dark:bg-gray-700">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Slug</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Active</th>
-              <th className="px-6 py-3" />
+              <th className="px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">Name</th>
+              <th className="px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">Slug</th>
+              <th className="px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">Active</th>
+              <th className="px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-300 dark:border-gray-600">Actions</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {groups.map(g => (
-              <tr key={g.id}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{g.name}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{g.slug}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm">{g.isActive ? 'YES' : 'NO'}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                  <div className="flex items-center justify-end gap-2">
-                    <a className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110" href={`/admin/focus-groups/${g.id}/edit`} title="Edit Focus Group" aria-label="Edit Focus Group">
-                      <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-300 dark:divide-gray-600">
+            {groups.map((g, index) => (
+              <tr key={g.id} className={`${index % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-blue-50 dark:bg-gray-700'} hover:bg-yellow-100 dark:hover:bg-gray-700/50 transition-colors border-b border-gray-300 dark:border-gray-600`}>
+                <td className="px-2 sm:px-4 lg:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600">{g.name}</td>
+                <td className="px-2 sm:px-4 lg:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 dark:text-gray-400 border-r border-gray-200 dark:border-gray-600">{g.slug}</td>
+                <td className="px-2 sm:px-4 lg:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm border-r border-gray-200 dark:border-gray-600">
+                  {g.isActive ? (
+                    <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">YES</span>
+                  ) : (
+                    <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">NO</span>
+                  )}
+                </td>
+                <td className="px-2 sm:px-4 lg:px-6 py-2 sm:py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <div className="flex items-center justify-end gap-1 sm:gap-2">
+                    <a className="flex-shrink-0 w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110" href={`/admin/focus-groups/${g.id}/edit`} title="Edit Focus Group" aria-label="Edit Focus Group">
+                      <svg className="w-6 h-6 sm:w-10 sm:h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                       </svg>
                     </a>
-                    <a className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center transition-all duration-300 hover:scale-110" href={`/admin/focus-groups/${g.id}/events`} title="Manage Events" aria-label="Manage Events">
-                      <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <a className="flex-shrink-0 w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center transition-all duration-300 hover:scale-110" href={`/admin/focus-groups/${g.id}/events`} title="Manage Events" aria-label="Manage Events">
+                      <svg className="w-6 h-6 sm:w-10 sm:h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                     </a>
-                    <a className="flex-shrink-0 w-14 h-14 rounded-xl bg-purple-100 hover:bg-purple-200 flex items-center justify-center transition-all duration-300 hover:scale-110" href={`/admin/focus-groups/${g.id}/members`} title="Manage Members" aria-label="Manage Members">
-                      <svg className="w-10 h-10 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <a className="flex-shrink-0 w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-purple-100 hover:bg-purple-200 flex items-center justify-center transition-all duration-300 hover:scale-110" href={`/admin/focus-groups/${g.id}/members`} title="Manage Members" aria-label="Manage Members">
+                      <svg className="w-6 h-6 sm:w-10 sm:h-10 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                       </svg>
                     </a>
@@ -114,53 +135,94 @@ export default async function AdminFocusGroupsPage({ searchParams }: { searchPar
               </tr>
             ))}
             {groups.length === 0 && (
-              <tr><td className="px-6 py-4 text-sm text-gray-500" colSpan={4}>No focus groups found.</td></tr>
+              <tr>
+                <td className="px-2 sm:px-4 lg:px-6 py-4 text-xs sm:text-sm text-gray-500 dark:text-gray-400 text-center" colSpan={4}>
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 border-2 border-orange-300 rounded-lg shadow-sm">
+                    <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="text-sm font-medium text-orange-700">No focus groups found</span>
+                    <span className="text-sm text-orange-600">[No groups match your criteria]</span>
+                  </div>
+                </td>
+              </tr>
             )}
           </tbody>
         </table>
-      </div>
+          </div>
+        </div>
 
-      {(
-        () => {
+        {/* Pagination Controls - Always visible, matching admin page style */}
+        {(() => {
           const totalPages = Math.max(1, Math.ceil((total || 0) / size));
           const isPrevDisabled = page <= 0;
           const isNextDisabled = page + 1 >= totalPages;
+          const displayPage = page + 1;
+          const startItem = total > 0 ? page * size + 1 : 0;
+          const endItem = total > 0 ? page * size + Math.min(size, total - page * size) : 0;
           const qs = (p: number) => `?page=${p}&size=${size}&sort=${encodeURIComponent(sort)}`;
+          
           return (
             <div className="mt-8">
               <div className="flex justify-between items-center">
-                <a aria-disabled={isPrevDisabled} className={`flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 ${isPrevDisabled ? 'opacity-50 cursor-not-allowed pointer-events-none hover:scale-100' : ''}`} href={isPrevDisabled ? '#' : `/admin/focus-groups${qs(page - 1)}`} title="Previous Page" aria-label="Previous Page">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
-                    <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                  </div>
-                  <span className="font-semibold text-indigo-700">Previous</span>
+                {/* Previous Button */}
+                <a
+                  href={isPrevDisabled ? '#' : `/admin/focus-groups${qs(page - 1)}`}
+                  aria-disabled={isPrevDisabled}
+                  className={`px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md ${isPrevDisabled ? 'opacity-50 cursor-not-allowed pointer-events-none hover:scale-100' : ''}`}
+                  title="Previous Page"
+                  aria-label="Previous Page"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  <span>Previous</span>
                 </a>
-                <div className="text-sm font-semibold text-gray-700">Page {totalPages === 0 ? 0 : page + 1} of {totalPages}</div>
-                <a aria-disabled={isNextDisabled} className={`flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 ${isNextDisabled ? 'opacity-50 cursor-not-allowed pointer-events-none hover:scale-100' : ''}`} href={isNextDisabled ? '#' : `/admin/focus-groups${qs(page + 1)}`} title="Next Page" aria-label="Next Page">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
-                    <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                  <span className="font-semibold text-indigo-700">Next</span>
+
+                {/* Page Info */}
+                <div className="px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+                  <span className="text-sm font-bold text-blue-700">
+                    Page <span className="text-blue-600">{displayPage}</span> of <span className="text-blue-600">{totalPages}</span>
+                  </span>
+                </div>
+
+                {/* Next Button */}
+                <a
+                  href={isNextDisabled ? '#' : `/admin/focus-groups${qs(page + 1)}`}
+                  aria-disabled={isNextDisabled}
+                  className={`px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md ${isNextDisabled ? 'opacity-50 cursor-not-allowed pointer-events-none hover:scale-100' : ''}`}
+                  title="Next Page"
+                  aria-label="Next Page"
+                >
+                  <span>Next</span>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                  </svg>
                 </a>
               </div>
-              <div className="text-center text-sm text-gray-600 mt-2">
+
+              {/* Item Count Text */}
+              <div className="text-center mt-3">
                 {total > 0 ? (
-                  <>Showing <span className="font-medium">{page * size + 1}</span> to <span className="font-medium">{page * size + Math.min(size, total - page * size)}</span> of <span className="font-medium">{total}</span> items</>
+                  <div className="inline-flex items-center px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+                    <span className="text-sm text-gray-700">
+                      Showing <span className="font-bold text-blue-600">{startItem}</span> to <span className="font-bold text-blue-600">{endItem}</span> of <span className="font-bold text-blue-600">{total}</span> focus groups
+                    </span>
+                  </div>
                 ) : (
-                  <div className="flex items-center justify-center gap-2">
-                    <span>No items found</span>
-                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-sm font-medium">[No items match your criteria]</span>
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 border-2 border-orange-300 rounded-lg shadow-sm">
+                    <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="text-sm font-medium text-orange-700">No focus groups found</span>
+                    <span className="text-sm text-orange-600">[No groups match your criteria]</span>
                   </div>
                 )}
               </div>
             </div>
           );
-        }
-      )()}
+        })()}
+      </div>
     </div>
   );
 }
