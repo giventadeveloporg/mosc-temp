@@ -27,11 +27,12 @@ const MOSCFooter = () => {
           {/* Church Info */}
           <div className="space-y-4">
             <div className="flex items-center space-x-3">
-              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center sacred-shadow overflow-hidden p-2 flex-shrink-0">
+              <div className="w-16 h-16 bg-transparent rounded-full flex items-center justify-center overflow-hidden p-2 flex-shrink-0" style={{ background: 'transparent' }}>
                 <AppImage
                   src="/images/event_1/mosc_email/logo-mosc.png"
                   alt="Malankara Orthodox Syrian Church emblem"
                   className="w-full h-full object-contain"
+                  style={{ background: 'transparent' }}
                 />
               </div>
               <div>

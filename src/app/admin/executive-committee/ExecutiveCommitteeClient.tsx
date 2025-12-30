@@ -243,15 +243,29 @@ export default function ExecutiveCommitteeClient({ initialMembers }: ExecutiveCo
                   setViewingMember(null);
                   openEditForm(viewingMember);
                 }}
-                className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-md flex items-center gap-2"
+                className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                title="Edit Member"
+                aria-label="Edit Member"
+                type="button"
               >
-                <FaEdit /> Edit
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                  <FaEdit className="w-6 h-6 text-blue-600" />
+                </div>
+                <span className="font-semibold text-blue-700">Edit</span>
               </button>
               <button
                 onClick={() => setViewingMember(null)}
-                className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md"
+                className="flex-shrink-0 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                title="Close"
+                aria-label="Close"
+                type="button"
               >
-                Close
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-200 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-red-700">Close</span>
               </button>
             </div>
           </div>
@@ -274,9 +288,17 @@ export default function ExecutiveCommitteeClient({ initialMembers }: ExecutiveCo
             <div className="mt-6 flex justify-center gap-4">
               <button
                 onClick={() => setDeletingMember(null)}
-                className="bg-teal-100 hover:bg-teal-200 text-teal-800 px-4 py-2 rounded-md flex items-center gap-2"
+                className="flex-shrink-0 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                title="Cancel"
+                aria-label="Cancel"
+                type="button"
               >
-                Cancel
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-200 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-red-700">Cancel</span>
               </button>
               <button
                 onClick={async () => {
@@ -289,9 +311,15 @@ export default function ExecutiveCommitteeClient({ initialMembers }: ExecutiveCo
                     }
                   }
                 }}
-                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md flex items-center gap-2"
+                className="flex-shrink-0 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                title="Confirm Delete"
+                aria-label="Confirm Delete"
+                type="button"
               >
-                <FaTrashAlt /> Confirm Delete
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-200 flex items-center justify-center">
+                  <FaTrashAlt className="w-6 h-6 text-red-600" />
+                </div>
+                <span className="font-semibold text-red-700">Confirm Delete</span>
               </button>
             </div>
           </div>

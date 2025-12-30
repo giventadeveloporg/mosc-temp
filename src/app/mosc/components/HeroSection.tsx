@@ -43,8 +43,13 @@ const HeroSection = () => {
 
           {/* Church Cross */}
           <div className="flex flex-col items-center">
-            <div className="w-48 h-48 lg:w-56 lg:h-56 rounded-full overflow-hidden sacred-shadow-lg bg-gradient-to-br from-muted to-secondary/30 flex items-center justify-center">
-              <AppIcon name="Cross" size={80} className="text-primary" />
+            <div className="w-48 h-48 lg:w-56 lg:h-56 rounded-full overflow-hidden sacred-shadow-lg flex items-center justify-center bg-transparent p-4">
+              <AppImage
+                src="/images/logos/Hero-Image-MOSC.png"
+                alt="MOSC Hero Image"
+                className="w-full h-full object-contain"
+                style={{ background: 'transparent' }}
+              />
             </div>
             <h3 className="mt-4 font-heading font-medium text-lg text-foreground text-center">
               The Holy Cross
@@ -53,11 +58,12 @@ const HeroSection = () => {
 
           {/* Christ Iconography */}
           <div className="flex flex-col items-center">
-            <div className="w-48 h-48 lg:w-56 lg:h-56 rounded-full overflow-hidden sacred-shadow-lg bg-muted">
+            <div className="w-48 h-48 lg:w-56 lg:h-56 rounded-full overflow-hidden flex items-center justify-center p-4" style={{ background: 'transparent' }}>
               <AppImage
-                src="https://images.pexels.com/photos/8363027/pexels-photo-8363027.jpeg"
+                src="/images/logos/Hero-Section-Jesus-Image-MOSC.png"
                 alt="Religious iconography of Christ blessing"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
+                style={{ background: 'transparent' }}
               />
             </div>
             <h3 className="mt-4 font-heading font-medium text-lg text-foreground text-center">

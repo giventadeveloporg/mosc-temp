@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import type { EventSponsorsDTO } from "@/types";
 import { getAppUrl } from '@/lib/env';
 import { SponsorCard } from '@/components/sponsors/SponsorCard';
@@ -20,18 +19,18 @@ export default function SponsorsPage() {
   const [totalPages, setTotalPages] = useState(0);
   const pageSize = 10; // Standard page size
 
-  // Array of modern background colors
+  // Array of modern background colors - using MOSC warm earth tones
   const cardBackgrounds = [
-    'bg-gradient-to-br from-blue-50 to-blue-100',
-    'bg-gradient-to-br from-green-50 to-green-100',
-    'bg-gradient-to-br from-purple-50 to-purple-100',
-    'bg-gradient-to-br from-pink-50 to-pink-100',
-    'bg-gradient-to-br from-yellow-50 to-yellow-100',
-    'bg-gradient-to-br from-indigo-50 to-indigo-100',
-    'bg-gradient-to-br from-teal-50 to-teal-100',
-    'bg-gradient-to-br from-orange-50 to-orange-100',
-    'bg-gradient-to-br from-cyan-50 to-cyan-100',
-    'bg-gradient-to-br from-rose-50 to-rose-100'
+    'bg-gradient-to-br from-primary/10 to-primary/20',
+    'bg-gradient-to-br from-secondary/10 to-secondary/20',
+    'bg-gradient-to-br from-accent/10 to-accent/20',
+    'bg-gradient-to-br from-muted to-muted/80',
+    'bg-gradient-to-br from-background to-muted',
+    'bg-gradient-to-br from-primary/5 to-secondary/10',
+    'bg-gradient-to-br from-accent/5 to-primary/10',
+    'bg-gradient-to-br from-muted/50 to-background',
+    'bg-gradient-to-br from-secondary/5 to-muted',
+    'bg-gradient-to-br from-primary/15 to-muted/50'
   ];
 
   const getRandomBackground = (index: number) => {
@@ -123,140 +122,163 @@ export default function SponsorsPage() {
   const endItem = (currentPage - 1) * pageSize + filteredSponsors.length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm" style={{ marginTop: '100px', paddingTop: '20px', paddingBottom: '20px' }}>
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <Link
-                href="/"
-                className="inline-flex items-center space-x-2 text-blue-600 hover:text-blue-800 mb-4"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-                <span>Back to Home</span>
-              </Link>
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900">Our Sponsors</h1>
-              <p className="text-lg text-gray-600 mt-2">
-                Meet the organizations that support our community initiatives
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Search Bar */}
-        <div className="mb-8">
-          <div className="relative max-w-md mx-auto">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+    <div className="min-h-screen bg-background" style={{ paddingTop: '100px' }}>
+      {/* Header Section - MOSC Styling */}
+      <section className="py-16 bg-card sacred-shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8">
+            <Link
+              href="/"
+              className="inline-flex items-center space-x-2 text-primary hover:text-accent reverent-transition mb-6"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-            </div>
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => handleSearch(e.target.value)}
-              placeholder="Search sponsors..."
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
+              <span className="font-body">Back to Home</span>
+            </Link>
+            <h1 className="font-heading font-semibold text-4xl text-foreground mb-4">
+              Our Sponsors
+            </h1>
+            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto">
+              Meet the organizations that support our community initiatives
+            </p>
           </div>
         </div>
+      </section>
 
-        {loading ? (
-          <div className="flex justify-center items-center min-h-[400px]">
-            <div className="relative">
-              <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
-            </div>
-          </div>
-        ) : fetchError ? (
-          <div className="text-center py-12">
-            <div className="bg-white rounded-lg shadow-sm p-8 max-w-md mx-auto">
-              <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full">
-                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Unable to Load Sponsors</h3>
-              <p className="text-gray-500">Please try refreshing the page or contact us if the problem persists.</p>
-            </div>
-          </div>
-        ) : filteredSponsors.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="bg-white rounded-lg shadow-sm p-8 max-w-md mx-auto">
-              <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full">
-                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      {/* Main Content Section - MOSC Styling */}
+      <section className="py-16 bg-background">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Search Bar - MOSC Styling */}
+          <div className="mb-12">
+            <div className="relative max-w-md mx-auto">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg className="h-5 w-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                {searchTerm ? 'No Sponsors Found' : 'No Sponsors Available'}
-              </h3>
-              <p className="text-gray-500">
-                {searchTerm
-                  ? `No sponsors match "${searchTerm}". Try a different search term.`
-                  : 'We\'re currently seeking sponsors for our events. Contact us to learn about sponsorship opportunities!'
-                }
-              </p>
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => handleSearch(e.target.value)}
+                placeholder="Search sponsors..."
+                className="block w-full pl-10 pr-3 py-3 border border-border rounded-lg bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring reverent-transition font-body"
+              />
             </div>
           </div>
-        ) : (
-          <>
-            {/* Results Count */}
-            <div className="text-center mb-8">
-              <p className="text-gray-600">
-                {searchTerm
-                  ? `Found ${totalCount} sponsor${totalCount !== 1 ? 's' : ''} matching "${searchTerm}"`
-                  : `Showing ${totalCount} sponsor${totalCount !== 1 ? 's' : ''}`
-                }
-              </p>
-            </div>
 
-            {/* Sponsors List - Single column stacked layout */}
-            <div className="space-y-8">
-              {filteredSponsors.map((sponsor, index) => (
-                <SponsorCard
-                  key={sponsor.id ?? `${sponsor.name}-${index}`}
-                  sponsor={sponsor}
-                  backgroundClass={getRandomBackground(index)}
-                />
-              ))}
+          {loading ? (
+            <div className="flex justify-center items-center min-h-[400px]">
+              <div className="relative">
+                <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+              </div>
             </div>
-
-            {/* Pagination Controls - Matching admin home page style */}
-            <div className="mt-4">
-              <div className="flex justify-between items-center">
-                <button
-                  onClick={handlePrevPage}
-                  disabled={!hasPrevPage}
-                  className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
-                >
-                  <FaChevronLeft />
-                  Previous
-                </button>
-                <div className="text-sm font-semibold">
-                  Page {currentPage} of {Math.max(totalPages, 1)}
+          ) : fetchError ? (
+            <div className="text-center py-12">
+              <div className="bg-card rounded-lg sacred-shadow p-8 max-w-md mx-auto">
+                <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-muted rounded-full">
+                  <svg className="w-8 h-8 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
                 </div>
-                <button
-                  onClick={handleNextPage}
-                  disabled={!hasNextPage}
-                  className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
-                >
-                  Next
-                  <FaChevronRight />
-                </button>
-              </div>
-              <div className="text-center text-sm text-gray-600 mt-2">
-                Showing {filteredSponsors.length > 0 ? startItem : 0} to {filteredSponsors.length > 0 ? endItem : 0} of {totalCount} sponsors
+                <h3 className="font-heading font-semibold text-xl text-foreground mb-2">Unable to Load Sponsors</h3>
+                <p className="font-body text-muted-foreground">Please try refreshing the page or contact us if the problem persists.</p>
               </div>
             </div>
-          </>
-        )}
-      </div>
+          ) : filteredSponsors.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="bg-card rounded-lg sacred-shadow p-8 max-w-md mx-auto">
+                <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-muted rounded-full">
+                  <svg className="w-8 h-8 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+                <h3 className="font-heading font-semibold text-xl text-foreground mb-2">
+                  {searchTerm ? 'No Sponsors Found' : 'No Sponsors Available'}
+                </h3>
+                <p className="font-body text-muted-foreground">
+                  {searchTerm
+                    ? `No sponsors match "${searchTerm}". Try a different search term.`
+                    : 'We\'re currently seeking sponsors for our events. Contact us to learn about sponsorship opportunities!'
+                  }
+                </p>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Results Count - MOSC Styling */}
+              <div className="text-center mb-12">
+                <p className="font-body text-muted-foreground">
+                  {searchTerm
+                    ? `Found ${totalCount} sponsor${totalCount !== 1 ? 's' : ''} matching "${searchTerm}"`
+                    : `Showing ${totalCount} sponsor${totalCount !== 1 ? 's' : ''}`
+                  }
+                </p>
+              </div>
+
+              {/* Sponsors List - Single column stacked layout */}
+              <div className="space-y-8 mb-12">
+                {filteredSponsors.map((sponsor, index) => (
+                  <SponsorCard
+                    key={sponsor.id ?? `${sponsor.name}-${index}`}
+                    sponsor={sponsor}
+                    backgroundClass={getRandomBackground(index)}
+                  />
+                ))}
+              </div>
+
+              {/* Pagination Controls - MOSC Styling */}
+              <div className="mt-8">
+                <div className="flex justify-between items-center">
+                  <button
+                    onClick={handlePrevPage}
+                    disabled={!hasPrevPage}
+                    className="px-5 py-2.5 bg-primary hover:bg-accent text-primary-foreground font-semibold rounded-lg sacred-shadow border-2 border-primary hover:border-accent disabled:bg-muted disabled:border-border disabled:text-muted-foreground disabled:cursor-not-allowed flex items-center gap-2 reverent-transition hover:scale-105 hover:sacred-shadow-lg"
+                    title="Previous Page"
+                    aria-label="Previous Page"
+                    type="button"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                    </svg>
+                    <span className="font-body">Previous</span>
+                  </button>
+
+                  {/* Page Info */}
+                  <div className="px-4 py-2 bg-muted border-2 border-border rounded-lg sacred-shadow-sm">
+                    <span className="font-body text-sm font-bold text-foreground">
+                      Page <span className="text-primary">{currentPage}</span> of <span className="text-primary">{Math.max(totalPages, 1)}</span>
+                    </span>
+                  </div>
+
+                  <button
+                    onClick={handleNextPage}
+                    disabled={!hasNextPage}
+                    className="px-5 py-2.5 bg-primary hover:bg-accent text-primary-foreground font-semibold rounded-lg sacred-shadow border-2 border-primary hover:border-accent disabled:bg-muted disabled:border-border disabled:text-muted-foreground disabled:cursor-not-allowed flex items-center gap-2 reverent-transition hover:scale-105 hover:sacred-shadow-lg"
+                    title="Next Page"
+                    aria-label="Next Page"
+                    type="button"
+                  >
+                    <span className="font-body">Next</span>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Item Count Text */}
+                <div className="text-center mt-4">
+                  <div className="inline-flex items-center px-4 py-2 bg-muted border-2 border-border rounded-lg sacred-shadow-sm">
+                    <span className="font-body text-sm text-muted-foreground">
+                      Showing <span className="font-bold text-primary">{filteredSponsors.length > 0 ? startItem : 0}</span> to <span className="font-bold text-primary">{filteredSponsors.length > 0 ? endItem : 0}</span> of <span className="font-bold text-primary">{totalCount}</span> sponsors
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </section>
     </div>
   );
 }

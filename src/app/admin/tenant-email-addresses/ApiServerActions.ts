@@ -8,13 +8,17 @@ import type { TenantEmailAddressDTO } from '@/types';
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 /**
- * Fetch all tenant email addresses for the current tenant.
+ * Fetch tenant email addresses for the current tenant with pagination.
  * Uses criteria filter tenantId.equals as per JHipster/Spring Data REST conventions.
+ * @param page Zero-based page index (default: 0)
+ * @param size Number of items per page (default: 10)
  */
-export async function fetchTenantEmailAddressesServer(): Promise<TenantEmailAddressDTO[]> {
+export async function fetchTenantEmailAddressesServer(page: number = 0, size: number = 10): Promise<TenantEmailAddressDTO[]> {
   const params = new URLSearchParams();
   params.append('tenantId.equals', getTenantId());
   params.append('sort', 'emailType,asc');
+  params.append('page', page.toString());
+  params.append('size', size.toString());
 
   const url = `${API_BASE_URL}/api/tenant-email-addresses?${params.toString()}`;
   const res = await fetchWithJwtRetry(url, { cache: 'no-store' });
@@ -25,6 +29,11 @@ export async function fetchTenantEmailAddressesServer(): Promise<TenantEmailAddr
   }
 
   const data = await res.json();
+  // Handle paginated response (Spring Data REST returns { content: [...], totalElements: number })
+  if (data && typeof data === 'object' && 'content' in data && Array.isArray(data.content)) {
+    return data.content;
+  }
+  // Fallback for non-paginated response
   return Array.isArray(data) ? data : [];
 }
 

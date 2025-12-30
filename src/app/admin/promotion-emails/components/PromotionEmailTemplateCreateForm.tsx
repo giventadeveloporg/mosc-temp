@@ -368,19 +368,23 @@ export default function PromotionEmailTemplateCreateForm({
           <button
             type="submit"
             disabled={saving}
-            className="flex-1 flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             title={saving ? 'Creating...' : 'Create Template'}
             aria-label={saving ? 'Creating...' : 'Create Template'}
           >
             <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
-              <FaSave className="w-6 h-6 text-blue-600" />
+              {saving ? (
+                <FaSave className="w-6 h-6 text-blue-600 animate-spin" />
+              ) : (
+                <FaSave className="w-6 h-6 text-blue-600" />
+              )}
             </div>
             <span className="font-semibold text-blue-700">{saving ? 'Creating...' : 'Create Template'}</span>
           </button>
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 flex-shrink-0 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105"
+            className="flex-1 flex-shrink-0 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
             title="Cancel"
             aria-label="Cancel"
           >
