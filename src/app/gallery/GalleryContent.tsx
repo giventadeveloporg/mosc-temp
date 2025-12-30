@@ -155,7 +155,13 @@ export function GalleryContent() {
     startDate?: string;
     endDate?: string;
   }) => {
-    setSearchFilters(filters);
+    // Always update filters and reset to first page, even if filters appear unchanged
+    // This ensures clearing search properly reloads all items
+    setSearchFilters({
+      searchTerm: filters.searchTerm || '',
+      startDate: filters.startDate,
+      endDate: filters.endDate,
+    });
     setCurrentPage(0); // Reset to first page on new search
   };
 

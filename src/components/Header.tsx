@@ -761,6 +761,10 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                                   : 'text-blue-400 font-medium hover:text-blue-500 hover:font-semibold border-b-2 border-transparent hover:border-blue-400'
                                 }
                               `}
+                              aria-haspopup="true"
+                              aria-expanded="false"
+                              role="button"
+                              tabIndex={0}
                             >
                               <span className="tracking-[0.025em]">{item.name}</span>
                               <ChevronDown
@@ -770,7 +774,11 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                               />
                             </div>
                             {/* Dropdown Menu */}
-                            <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50">
+                            <div
+                              className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50"
+                              role="menu"
+                              aria-label={`${item.name} submenu`}
+                            >
                               <div className="py-3">
                                 {item.dropdown.map((subItem: any) => {
                                   // Skip Profile if user is not authenticated

@@ -45,30 +45,17 @@ const MOSCHeader = () => {
           {/* Logo */}
           <div className="flex items-center space-x-3">
             <Link href="/mosc" className="flex items-center space-x-2 group" style={{ background: 'transparent' }}>
-              <div className="w-20 h-12 sm:w-24 sm:h-14 md:w-28 md:h-16 lg:w-32 lg:h-20 rounded-lg flex items-center justify-center group-hover:reverent-hover reverent-transition overflow-hidden" style={{ background: 'transparent' }}>
+              <div className="w-28 h-16 sm:w-32 sm:h-20 md:w-40 md:h-24 lg:w-48 lg:h-28 rounded-lg flex items-center justify-center group-hover:reverent-hover reverent-transition overflow-hidden" style={{ background: 'transparent' }}>
                 <Image
-                  src="/images/logos/Header-branding-MOSC-logo.png"
+                  src="/images/logos/Header-branding-MOSC-logo_fix_text.png"
                   alt="MOSC Logo"
-                  width={160}
-                  height={144}
+                  width={192}
+                  height={168}
                   className="w-full h-full object-contain"
                   priority
                   style={{ background: 'transparent' }}
                 />
               </div>
-              <div className="hidden sm:block">
-                <p className="text-xs sm:text-sm text-muted-foreground leading-tight">Malankara Orthodox Syrian Church</p>
-              </div>
-            </Link>
-            {/* Desktop Facebook link (kept from legacy top bar) */}
-            <Link
-              href="https://www.facebook.com/catholicatenews.in"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden md:inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 hover:bg-primary/20 sacred-shadow-sm reverent-transition"
-              aria-label="Follow Malankara Orthodox Syrian Church on Facebook"
-            >
-              <Icon name="people" size={16} className="text-primary" />
             </Link>
           </div>
 

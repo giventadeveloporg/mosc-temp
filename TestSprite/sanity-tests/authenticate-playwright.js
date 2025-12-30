@@ -539,7 +539,7 @@ async function authenticatePage(page, baseUrl, credentials) {
           console.log(`   ✅ Admin access verified! Can access admin page: ${adminUrl}`);
           // Navigate back to home page
           await page.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout: 10000 });
-          return true;
+      return true;
         }
       } catch (verifyError) {
         console.error(`   ❌ Authentication verification error: ${verifyError.message}`);

@@ -17,6 +17,10 @@ export default function MobileDebugConsole() {
   const [isMounted, setIsMounted] = useState(false);
   const logsEndRef = useRef<HTMLDivElement>(null);
 
+  // Feature flag: Enable MobileDebugConsole only when explicitly enabled
+  // Set NEXT_PUBLIC_ENABLE_MOBILE_DEBUG_CONSOLE=true to enable (default: disabled)
+  const isEnabled = typeof window !== 'undefined' && process.env.NEXT_PUBLIC_ENABLE_MOBILE_DEBUG_CONSOLE === 'true';
+
   // Ensure component only renders on client after hydration
   useEffect(() => {
     setIsMounted(true);
@@ -28,9 +32,9 @@ export default function MobileDebugConsole() {
   const mobileDetectionCount = (logs || []).filter(l => l.message?.includes('[MOBILE-DETECTION]')).length;
   const mobileWorkflowCount = (logs || []).filter(l => l.message?.includes('[MOBILE-WORKFLOW]')).length;
 
-  // Intercept console methods
+  // Intercept console methods (only when enabled)
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !isEnabled) return;
 
     const originalLog = console.log;
     const originalWarn = console.warn;
@@ -178,8 +182,8 @@ Mobile Workflow Logs: ${logs.filter(l => l.message.includes('[MOBILE-WORKFLOW]')
     console.log('[MobileDebugConsole] Logs cleared');
   };
 
-  // Don't render during SSR or before hydration - only render on client after mount
-  if (!isMounted) {
+  // Don't render during SSR, before hydration, or if disabled
+  if (typeof window === 'undefined' || !isMounted || !isEnabled) {
     return null;
   }
 
