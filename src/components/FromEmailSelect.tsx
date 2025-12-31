@@ -41,8 +41,9 @@ export default function FromEmailSelect({
     // Filter emails based on search term and optional type filter
     let filtered = emailAddresses;
 
-    // Filter by type if specified
-    if (filterByType) {
+    // Filter by type if specified (only filter if filterByType is explicitly provided)
+    // If filterByType is undefined/null, show all email types
+    if (filterByType !== undefined && filterByType !== null) {
       filtered = filtered.filter(email => email.emailType === filterByType);
     }
 
@@ -69,7 +70,8 @@ export default function FromEmailSelect({
       return a.emailAddress.localeCompare(b.emailAddress);
     });
 
-    setFilteredEmails(filtered.slice(0, 10)); // Max 10 items in dropdown
+    // Show all filtered results (no limit) - user can search to narrow down
+    setFilteredEmails(filtered);
   }, [searchTerm, emailAddresses, filterByType]);
 
   useEffect(() => {
@@ -101,7 +103,9 @@ export default function FromEmailSelect({
   const loadEmailAddresses = async () => {
     setLoading(true);
     try {
-      const addresses = await fetchTenantEmailAddressesServer();
+      // Fetch all email addresses (use large size to get all, regardless of email type)
+      // Size of 1000 should be sufficient for most tenants, but we can fetch multiple pages if needed
+      const addresses = await fetchTenantEmailAddressesServer(0, 1000);
       setEmailAddresses(addresses);
       // Check if the list is empty
       const isEmpty = Array.isArray(addresses) && addresses.length === 0;
@@ -233,7 +237,7 @@ export default function FromEmailSelect({
         <div
           className="absolute w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg"
           style={{
-            maxHeight: 'calc(10 * 3.5rem)',
+            maxHeight: '400px', // Increased max height to show more results
             overflowY: 'auto',
             zIndex: 9999
           }}
