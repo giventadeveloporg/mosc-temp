@@ -45,12 +45,12 @@ const MOSCHeader = () => {
           {/* Logo */}
           <div className="flex items-center space-x-3">
             <Link href="/mosc" className="flex items-center space-x-2 group" style={{ background: 'transparent' }}>
-              <div className="w-32 h-20 sm:w-36 sm:h-24 md:w-44 md:h-30 lg:w-60 lg:h-40 rounded-lg flex items-center justify-center group-hover:reverent-hover reverent-transition overflow-hidden" style={{ background: 'transparent' }}>
+              <div className="w-36 h-[92px] sm:w-42 sm:h-[112px] md:w-52 md:h-[140px] lg:w-72 lg:h-[192px] rounded-lg flex items-center justify-center group-hover:reverent-hover reverent-transition overflow-hidden" style={{ background: 'transparent' }}>
                 <Image
                   src="/images/logos/Header-branding-MOSC-logo.png"
                   alt="MOSC Logo"
-                  width={240}
-                  height={160}
+                  width={288}
+                  height={192}
                   className="w-full h-full object-contain"
                   priority
                   style={{ background: 'transparent' }}

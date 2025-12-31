@@ -11,9 +11,6 @@ const HeroSection = () => {
         {/* Church Logo */}
         <div className="mb-12">
           <div>
-            <h1 className="font-heading font-semibold text-3xl text-foreground">
-              Malankara Orthodox Syrian Church
-            </h1>
             <p className="font-caption text-lg text-muted-foreground">
               Saint Thomas Christian Community
             </p>
