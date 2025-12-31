@@ -110,7 +110,7 @@ const MOSCHeader = () => {
 
       {/* Quick Links Bar */}
       <div className="bg-muted/50 border-t border-border -mt-5 relative z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-0.5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <div className="flex flex-wrap items-center justify-center gap-3 text-xs">
             <span className="font-medium text-foreground">Quick Links:</span>
             {quickLinks.map((link, index) => (

@@ -17,6 +17,7 @@ import {
   uploadNewsletterEmailFooterImageClient,
 } from '../ApiServerActions';
 import { fetchDiscountCodesForEvent } from '@/app/admin/events/[id]/discount-codes/list/ApiServerActions';
+import FromEmailSelect from '@/components/FromEmailSelect';
 // Event selection is no longer editable for newsletter templates.
 
 interface NewsletterEmailTemplateEditClientProps {
@@ -67,6 +68,8 @@ export default function NewsletterEmailTemplateEditClient({
   const [isDraggingFooter, setIsDraggingFooter] = useState(false);
   const headerFileInputRef = useRef<HTMLInputElement>(null);
   const footerFileInputRef = useRef<HTMLInputElement>(null);
+  const [isEmailListEmpty, setIsEmailListEmpty] = useState(false);
+  const [fromEmailError, setFromEmailError] = useState<string | null>(null);
 
   useEffect(() => {
     if (template) {
@@ -333,20 +336,35 @@ export default function NewsletterEmailTemplateEditClient({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setFromEmailError(null);
     setSaveStatus('saving');
     setSaveMessage('Please wait while we save your template...');
 
-    // Validate fromEmail
-    if (!formData.fromEmail || !formData.fromEmail.trim()) {
-      setError('From email is required');
+    // Validate fromEmail following cursor rule pattern
+    // First check: Is the email list empty?
+    if (isEmailListEmpty) {
+      setFromEmailError('The from email list is empty. Please contact Admin to add the list of from email addresses.');
+      setError('The from email list is empty. Please contact Admin to add the list of from email addresses.');
       setSaveStatus('idle');
       return;
     }
+    // Second check: Is the fromEmail field empty or just whitespace?
+    // CRITICAL: This must catch untouched fields (empty string), null, undefined, and whitespace-only
+    const fromEmailValue = formData.fromEmail;
+    const isFromEmailEmpty = !fromEmailValue ||
+                             fromEmailValue === '' ||
+                             (typeof fromEmailValue === 'string' && fromEmailValue.trim() === '');
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.fromEmail.trim())) {
-      setError('Please enter a valid email address for the From Email field');
+    if (isFromEmailEmpty) {
+      setFromEmailError('Please enter from email address');
+      setError('Please enter from email address');
+      setSaveStatus('idle');
+      return;
+    }
+    // Third check: Is the email format valid?
+    else if (typeof fromEmailValue === 'string' && fromEmailValue.trim() !== '' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fromEmailValue.trim())) {
+      setFromEmailError('Please enter a valid email address');
+      setError('Please enter a valid email address');
       setSaveStatus('idle');
       return;
     }
@@ -479,24 +497,38 @@ export default function NewsletterEmailTemplateEditClient({
           </div>
 
           {/* From Email */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              From Email <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="email"
-              name="fromEmail"
+          <div className="mb-4">
+            <FromEmailSelect
               value={formData.fromEmail}
-              onChange={handleChange}
+              onChange={(email) => {
+                setFormData(prev => ({ ...prev, fromEmail: email || '' }));
+                // Clear error when user selects an email
+                if (fromEmailError) {
+                  setFromEmailError(null);
+                  setError(null);
+                }
+              }}
+              onEmptyListChange={(isEmpty) => {
+                setIsEmailListEmpty(isEmpty);
+                // Clear error if list becomes non-empty
+                if (!isEmpty && fromEmailError && fromEmailError.includes('empty')) {
+                  setFromEmailError(null);
+                  setError(null);
+                }
+              }}
+              error={!!fromEmailError}
               required
-              className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-2 text-base"
-              placeholder="e.g., events@example.com"
-              pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-              title="Please enter a valid email address"
             />
-            <p className="mt-1 text-sm text-gray-500">
-              The email address that will appear as the sender of newsletter emails.
-            </p>
+            {fromEmailError && (
+              <div className="mt-2 p-3 bg-red-50 border border-red-300 rounded-lg">
+                <div className="flex items-start">
+                  <svg className="w-5 h-5 text-red-600 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <p className="text-sm font-medium text-red-700">{fromEmailError}</p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Discount Code Selection */}
