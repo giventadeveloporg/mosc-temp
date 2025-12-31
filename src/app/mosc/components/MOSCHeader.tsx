@@ -38,19 +38,19 @@ const MOSCHeader = () => {
   };
 
   return (
-    <header className="bg-card border-b border-border">
+    <header className="bg-card border-b border-border overflow-hidden">
       {/* Main Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between py-3">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-0 pt-0">
+        <div className="flex items-center justify-between py-0 -mb-3 -mt-2">
           {/* Logo */}
           <div className="flex items-center space-x-3">
             <Link href="/mosc" className="flex items-center space-x-2 group" style={{ background: 'transparent' }}>
-              <div className="w-28 h-16 sm:w-32 sm:h-20 md:w-40 md:h-24 lg:w-48 lg:h-28 rounded-lg flex items-center justify-center group-hover:reverent-hover reverent-transition overflow-hidden" style={{ background: 'transparent' }}>
+              <div className="w-32 h-20 sm:w-36 sm:h-24 md:w-44 md:h-30 lg:w-60 lg:h-40 rounded-lg flex items-center justify-center group-hover:reverent-hover reverent-transition overflow-hidden" style={{ background: 'transparent' }}>
                 <Image
-                  src="/images/logos/Header-branding-MOSC-logo_fix_text.png"
+                  src="/images/logos/Header-branding-MOSC-logo.png"
                   alt="MOSC Logo"
-                  width={192}
-                  height={168}
+                  width={240}
+                  height={160}
                   className="w-full h-full object-contain"
                   priority
                   style={{ background: 'transparent' }}
@@ -109,8 +109,8 @@ const MOSCHeader = () => {
       </div>
 
       {/* Quick Links Bar */}
-      <div className="bg-muted/50 border-t border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-1.5">
+      <div className="bg-muted/50 border-t border-border -mt-5 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-0.5">
           <div className="flex flex-wrap items-center justify-center gap-3 text-xs">
             <span className="font-medium text-foreground">Quick Links:</span>
             {quickLinks.map((link, index) => (
