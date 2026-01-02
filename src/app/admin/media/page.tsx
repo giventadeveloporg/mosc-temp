@@ -656,19 +656,19 @@ export default function AdminMediaPage() {
           </div>
         </div>
       </div>
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Manage Media Files</h1>
+      <div className="flex justify-between items-center mb-8 gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex-1 min-w-0">Manage Media Files</h1>
         <div className="flex space-x-2">
           <Link
             href="/admin/media"
-            className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+            className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-3 sm:px-6"
             title="Upload New Media"
             aria-label="Upload New Media"
           >
             <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
               <FaUpload className="w-6 h-6 text-blue-600" />
             </div>
-            <span className="font-semibold text-blue-700">Upload New Media</span>
+            <span className="font-semibold text-blue-700 hidden sm:inline">Upload New Media</span>
           </Link>
         </div>
       </div>
@@ -710,7 +710,7 @@ export default function AdminMediaPage() {
             </div>
             <button
               onClick={handleScrollToSerialNumber}
-              className="mt-6 sm:mt-0 flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+              className="mt-6 sm:mt-0 flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-3 sm:px-6"
               title="Go to Image"
               aria-label="Go to Image"
               type="button"
@@ -720,7 +720,7 @@ export default function AdminMediaPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
-              <span className="font-semibold text-blue-700">Go to Image</span>
+              <span className="font-semibold text-blue-700 hidden sm:inline">Go to Image</span>
             </button>
           </div>
 
@@ -842,12 +842,12 @@ export default function AdminMediaPage() {
 
       {/* Pagination Controls - Always visible, matching admin page style */}
       <div className="mt-8">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center gap-2">
           {/* Previous Button */}
           <button
             onClick={handlePrevPage}
             disabled={page === 0 || loading}
-            className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+            className="px-3 sm:px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
             title="Previous Page"
             aria-label="Previous Page"
             type="button"
@@ -855,12 +855,12 @@ export default function AdminMediaPage() {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
             </svg>
-            <span>Previous</span>
+            <span className="hidden sm:inline">Previous</span>
           </button>
 
           {/* Page Info */}
-          <div className="px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
-            <span className="text-sm font-bold text-blue-700">
+          <div className="px-2 sm:px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm flex-shrink-0">
+            <span className="text-xs sm:text-sm font-bold text-blue-700">
               Page <span className="text-blue-600">{page + 1}</span> of <span className="text-blue-600">{totalPages}</span>
             </span>
           </div>
@@ -869,12 +869,12 @@ export default function AdminMediaPage() {
           <button
             onClick={handleNextPage}
             disabled={page >= totalPages - 1 || loading}
-            className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+            className="px-3 sm:px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
             title="Next Page"
             aria-label="Next Page"
             type="button"
           >
-            <span>Next</span>
+            <span className="hidden sm:inline">Next</span>
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
             </svg>

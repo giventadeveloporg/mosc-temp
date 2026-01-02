@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { FaPlus } from 'react-icons/fa';
 import { useAuth } from '@clerk/nextjs';
 import AdminNavigation from '@/components/AdminNavigation';
@@ -44,22 +44,19 @@ export default function TenantEmailAddressesPage() {
   const [sortKey, setSortKey] = useState<string>('emailType');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
+  const [currentPage, setCurrentPage] = useState(0); // Zero-based page index
+  const [pageSize] = useState(10); // Items per page
+
   const [toastMessage, setToastMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [createFormMessage, setCreateFormMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [editFormMessage, setEditFormMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  useEffect(() => {
-    if (userId) {
-      void loadData();
-    }
-  }, [userId]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       const [list, count] = await Promise.all([
-        fetchTenantEmailAddressesServer(),
+        fetchTenantEmailAddressesServer(currentPage, pageSize),
         fetchTenantEmailAddressesCountServer().catch(() => null),
       ]);
       setItems(list);
@@ -69,7 +66,13 @@ export default function TenantEmailAddressesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, pageSize]);
+
+  useEffect(() => {
+    if (userId) {
+      void loadData();
+    }
+  }, [userId, loadData]);
 
   const resetForm = () => {
     setFormData({
@@ -122,10 +125,10 @@ export default function TenantEmailAddressesPage() {
       };
 
       const created = await createTenantEmailAddressServer(payload as any);
-      setItems(prev => [...prev, created]);
       setIsCreateModalOpen(false);
       resetForm();
       setToastMessage({ type: 'success', message: 'Email address created successfully' });
+      setCurrentPage(0); // Reset to first page after creation
       void loadData();
     } catch (err: any) {
       setCreateFormMessage({ type: 'error', message: err.message || 'Failed to create email address' });
@@ -172,8 +175,7 @@ export default function TenantEmailAddressesPage() {
         description: formData.description?.trim() || undefined,
       };
 
-      const updated = await updateTenantEmailAddressServer(selectedItem.id, patch);
-      setItems(prev => prev.map(e => (e.id === selectedItem.id ? updated : e)));
+      await updateTenantEmailAddressServer(selectedItem.id, patch);
       setIsEditModalOpen(false);
       setSelectedItem(null);
       resetForm();
@@ -192,10 +194,15 @@ export default function TenantEmailAddressesPage() {
     try {
       setLoading(true);
       await deleteTenantEmailAddressServer(selectedItem.id);
-      setItems(prev => prev.filter(e => e.id !== selectedItem.id));
       setIsDeleteModalOpen(false);
       setSelectedItem(null);
       setToastMessage({ type: 'success', message: 'Email address deleted successfully' });
+      // Reset to first page if current page becomes empty after deletion
+      const remainingCount = (totalCount ?? 0) - 1;
+      const newTotalPages = Math.ceil(remainingCount / pageSize) || 1;
+      if (currentPage >= newTotalPages && currentPage > 0) {
+        setCurrentPage(newTotalPages - 1);
+      }
       void loadData();
     } catch (err: any) {
       setToastMessage({ type: 'error', message: err.message || 'Failed to delete email address' });
@@ -230,6 +237,13 @@ export default function TenantEmailAddressesPage() {
     setSelectedItem(item);
     setIsDeleteModalOpen(true);
   };
+
+  // Reset to first page when search term changes
+  useEffect(() => {
+    if (searchTerm.trim()) {
+      setCurrentPage(0);
+    }
+  }, [searchTerm]);
 
   const filteredAndSortedItems = useMemo(() => {
     let data = [...items];
@@ -370,6 +384,90 @@ export default function TenantEmailAddressesPage() {
           }}
           emptyMessage="No tenant email addresses configured yet."
         />
+
+        {/* Pagination Controls - Always visible, matching admin page style */}
+        {(() => {
+          const totalPages = Math.ceil((totalCount ?? 0) / pageSize) || 1;
+          const displayPage = currentPage + 1; // Display as 1-based
+          const isPrevDisabled = currentPage === 0 || loading;
+          const isNextDisabled = currentPage >= totalPages - 1 || loading;
+          const startItem = (totalCount ?? 0) > 0 ? currentPage * pageSize + 1 : 0;
+          const endItem = (totalCount ?? 0) > 0 ? Math.min(currentPage * pageSize + pageSize, totalCount ?? 0) : 0;
+
+          const handlePrevPage = () => {
+            if (!isPrevDisabled) {
+              setCurrentPage(prev => Math.max(0, prev - 1));
+            }
+          };
+
+          const handleNextPage = () => {
+            if (!isNextDisabled) {
+              setCurrentPage(prev => Math.min(totalPages - 1, prev + 1));
+            }
+          };
+
+          return (
+            <div className="mt-8">
+              <div className="flex justify-between items-center">
+                {/* Previous Button */}
+                <button
+                  onClick={handlePrevPage}
+                  disabled={isPrevDisabled}
+                  className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+                  title="Previous Page"
+                  aria-label="Previous Page"
+                  type="button"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  <span>Previous</span>
+                </button>
+
+                {/* Page Info */}
+                <div className="px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+                  <span className="text-sm font-bold text-blue-700">
+                    Page <span className="text-blue-600">{displayPage}</span> of <span className="text-blue-600">{totalPages}</span>
+                  </span>
+                </div>
+
+                {/* Next Button */}
+                <button
+                  onClick={handleNextPage}
+                  disabled={isNextDisabled}
+                  className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+                  title="Next Page"
+                  aria-label="Next Page"
+                  type="button"
+                >
+                  <span>Next</span>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Item Count Text */}
+              <div className="text-center mt-3">
+                {(totalCount ?? 0) > 0 ? (
+                  <div className="inline-flex items-center px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+                    <span className="text-sm text-gray-700">
+                      Showing <span className="font-bold text-blue-600">{startItem}</span> to <span className="font-bold text-blue-600">{endItem}</span> of <span className="font-bold text-blue-600">{totalCount}</span> email addresses
+                    </span>
+                  </div>
+                ) : (
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 border-2 border-orange-300 rounded-lg shadow-sm">
+                    <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="text-sm font-medium text-orange-700">No email addresses found</span>
+                    <span className="text-sm text-orange-600">[No email addresses match your criteria]</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })()}
       </div>
 
       {/* Toast */}

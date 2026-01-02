@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { fetchTenantSettings } from './ApiServerActions';
 import TenantSettingsList from '@/app/admin/tenant-management/components/TenantSettingsList';
+import AdminNavigation from '@/components/AdminNavigation';
 import Link from 'next/link';
 
 export default async function TenantSettingsPage() {
@@ -22,143 +23,90 @@ export default async function TenantSettingsPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Breadcrumb Navigation */}
-      <nav className="flex mb-8" aria-label="Breadcrumb">
-        <ol className="inline-flex items-center space-x-1 md:space-x-3">
-          <li className="inline-flex items-center">
+    <div className="w-full overflow-x-hidden box-border" style={{ paddingTop: '120px' }}>
+      {/* Navigation Section - Full Width, Separate Responsive Container */}
+      <div className="w-full px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 mb-6 sm:mb-8">
+        <AdminNavigation />
+      </div>
+      {/* Main Content Section - Constrained Width */}
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-8">
+        {/* Page Header */}
+        <div className="mb-4 sm:mb-6 md:mb-8">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            <div>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">Tenant Settings</h1>
+              <p className="mt-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400 text-center sm:text-left">
+                Manage tenant-specific configurations and settings
+              </p>
+            </div>
             <Link
-              href="/admin"
-              className="flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
-              title="Admin Dashboard"
-              aria-label="Admin Dashboard"
+              href="/admin/tenant-management/settings/new"
+              className="flex-shrink-0 h-12 sm:h-14 rounded-xl bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 flex items-center justify-center gap-2 sm:gap-3 transition-all duration-300 hover:scale-105 px-3 sm:px-6"
+              title="Create New Settings"
+              aria-label="Create New Settings"
             >
-              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
-                <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-blue-200 dark:bg-blue-700 flex items-center justify-center">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
               </div>
-              <span className="font-semibold text-indigo-700">Admin Dashboard</span>
+              <span className="font-semibold text-blue-700 dark:text-blue-300 text-xs sm:text-sm lg:text-base whitespace-nowrap">Create New Settings</span>
             </Link>
-          </li>
-          <li>
-            <div className="flex items-center">
-              <svg
-                className="w-6 h-6 text-gray-400"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <span className="ml-1 text-sm font-medium text-gray-500 md:ml-2">
-                Tenant Management
-              </span>
-            </div>
-          </li>
-          <li aria-current="page">
-            <div className="flex items-center">
-              <svg
-                className="w-6 h-6 text-gray-400"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <span className="ml-1 text-sm font-medium text-gray-500 md:ml-2">
-                Settings
-              </span>
-            </div>
-          </li>
-        </ol>
-      </nav>
-
-      {/* Page Header */}
-      <div className="mb-8">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Tenant Settings</h1>
-            <p className="mt-2 text-sm text-gray-600">
-              Manage tenant-specific configurations and settings
-            </p>
           </div>
-          <Link
-            href="/admin/tenant-management/settings/new"
-            className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
-            title="Create New Settings"
-            aria-label="Create New Settings"
-          >
-            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-            </div>
-            <span className="font-semibold text-blue-700">Create New Settings</span>
-          </Link>
         </div>
-      </div>
 
-      {/* Error State */}
-      {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <svg
-                className="h-5 w-5 text-red-400"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">
-                Error loading settings
-              </h3>
-              <div className="mt-2 text-sm text-red-700">
-                <p>{error}</p>
+        {/* Error State */}
+        {error && (
+          <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg
+                  className="h-5 w-5 text-red-400 dark:text-red-500"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-xs sm:text-sm font-medium text-red-800 dark:text-red-300">
+                  Error loading settings
+                </h3>
+                <div className="mt-2 text-xs sm:text-sm text-red-700 dark:text-red-400">
+                  <p>{error}</p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Settings List */}
-      <Suspense
-        fallback={
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="animate-pulse">
-              <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
-              <div className="space-y-3">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="h-4 bg-gray-200 rounded"></div>
-                ))}
+        {/* Settings List */}
+        <Suspense
+          fallback={
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-3 sm:p-4 md:p-6">
+              <div className="animate-pulse">
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-4"></div>
+                <div className="space-y-3">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        }
-      >
-        <TenantSettingsList
-          initialData={initialData}
-          initialTotalCount={initialTotalCount}
-        />
-      </Suspense>
+          }
+        >
+          <TenantSettingsList
+            initialData={initialData}
+            initialTotalCount={initialTotalCount}
+          />
+        </Suspense>
 
-      {/* Quick Stats */}
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-4 gap-6">
+        {/* Quick Stats */}
+        <div className="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
         <div className="bg-white overflow-hidden shadow rounded-lg">
           <div className="p-5">
             <div className="flex items-center">
@@ -286,6 +234,7 @@ export default async function TenantSettingsPage() {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

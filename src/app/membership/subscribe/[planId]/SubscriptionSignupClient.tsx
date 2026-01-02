@@ -7,7 +7,7 @@ import { PlanSummaryCard } from '@/components/membership/PlanSummaryCard';
 import { Button } from '@/components/ui/button';
 import { MembershipPaymentRequestButton } from '@/components/membership/MembershipPaymentRequestButton';
 import MembershipDesktopCheckout from '@/components/membership/MembershipDesktopCheckout';
-import { createSubscriptionCheckoutSessionServer } from './ApiServerActions';
+import { createSubscriptionCheckoutSessionServer, createUserProfileFromClerkUser } from './ApiServerActions';
 import type { MembershipPlanDTO, UserProfileDTO } from '@/types';
 
 interface SubscriptionSignupClientProps {
@@ -16,72 +16,134 @@ interface SubscriptionSignupClientProps {
   userProfile?: UserProfileDTO | null; // User profile if registered
 }
 
-export function SubscriptionSignupClient({ plan, error, userProfile }: SubscriptionSignupClientProps) {
+export function SubscriptionSignupClient({ plan, error, userProfile: initialUserProfile }: SubscriptionSignupClientProps) {
   const router = useRouter();
   const { userId } = useAuth();
   const { user, isLoaded: isUserLoaded } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
-  const [hasUserProfile, setHasUserProfile] = useState<boolean | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfileDTO | null>(initialUserProfile || null);
+  const [isCreatingProfile, setIsCreatingProfile] = useState(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  const [canEnablePayment, setCanEnablePayment] = useState(false);
 
-  // Check if user profile exists (user is registered, not a visitor)
+  // Ensure user profile exists before enabling payment (RECOMMENDED SOLUTION)
   useEffect(() => {
-    if (userProfile && userProfile.id) {
-      console.log('[MEMBERSHIP-SUBSCRIBE] User profile found - user is registered:', userProfile.id);
-      setHasUserProfile(true);
-    } else if (userId) {
-      // Try to fetch user profile client-side as fallback
-      async function fetchUserProfile() {
-        try {
-          const response = await fetch(`/api/proxy/user-profiles/by-user/${userId}`, {
-            cache: 'no-store',
-          });
-          if (response.ok) {
-            const profile = await response.json();
-            if (profile && profile.id) {
-              console.log('[MEMBERSHIP-SUBSCRIBE] User profile found via client fetch:', profile.id);
-              setHasUserProfile(true);
-              return;
-            }
-          }
-          console.log('[MEMBERSHIP-SUBSCRIBE] No user profile found - user is a visitor');
-          setHasUserProfile(false);
-        } catch (err) {
-          console.error('[MEMBERSHIP-SUBSCRIBE] Error fetching user profile:', err);
-          setHasUserProfile(false);
-        }
+    async function ensureUserProfile() {
+      if (!userId || !isUserLoaded) {
+        setCanEnablePayment(false);
+        return;
       }
-      fetchUserProfile();
-    } else {
-      setHasUserProfile(false);
+
+      // Check if profile already exists
+      if (userProfile?.id) {
+        console.log('[MEMBERSHIP-SUBSCRIBE] User profile confirmed:', userProfile.id);
+        setCanEnablePayment(true);
+        return;
+      }
+
+      // Try to fetch profile
+      try {
+        const response = await fetch(`/api/proxy/user-profiles/by-user/${userId}`, {
+          cache: 'no-store',
+        });
+
+        if (response.ok) {
+          const profile = await response.json();
+          if (profile?.id) {
+            console.log('[MEMBERSHIP-SUBSCRIBE] User profile found via fetch:', profile.id);
+            setUserProfile(profile);
+            setCanEnablePayment(true);
+            return;
+          }
+        }
+      } catch (err) {
+        console.error('[MEMBERSHIP-SUBSCRIBE] Error fetching profile:', err);
+      }
+
+      // Profile doesn't exist - check if we have email
+      const email = user?.emailAddresses?.[0]?.emailAddress ||
+                    user?.primaryEmailAddress?.emailAddress || '';
+
+      if (!email) {
+        console.log('[MEMBERSHIP-SUBSCRIBE] Email missing - cannot create profile');
+        setProfileError('Email address is required to complete your subscription. Please update your account settings.');
+        setCanEnablePayment(false);
+        return;
+      }
+
+      // Create profile (with retry logic)
+      if (retryCount < 3) {
+        setIsCreatingProfile(true);
+        setProfileError(null);
+
+        try {
+          const newProfile = await createUserProfileFromClerkUser({
+            userId,
+            email,
+            firstName: user?.firstName || 'User',
+            lastName: user?.lastName || '',
+            phone: user?.phoneNumbers?.[0]?.phoneNumber || '',
+            imageUrl: user?.imageUrl || '',
+          });
+
+          if (newProfile?.id) {
+            console.log('[MEMBERSHIP-SUBSCRIBE] User profile created successfully:', newProfile.id);
+            setUserProfile(newProfile);
+            setCanEnablePayment(true);
+            setIsCreatingProfile(false);
+            setRetryCount(0);
+          } else {
+            throw new Error('Profile creation returned no ID');
+          }
+        } catch (err) {
+          setIsCreatingProfile(false);
+          const errorMessage = err instanceof Error ? err.message : 'Failed to create profile';
+          console.error('[MEMBERSHIP-SUBSCRIBE] Profile creation failed:', errorMessage);
+          setProfileError(`Unable to set up your account: ${errorMessage}`);
+
+          if (retryCount < 2) {
+            // Auto-retry after 2 seconds
+            setTimeout(() => {
+              setRetryCount(prev => prev + 1);
+            }, 2000);
+          } else {
+            setProfileError('Unable to set up your account after multiple attempts. Please contact support or try again later.');
+          }
+        }
+      } else {
+        setProfileError('Unable to set up your account after multiple attempts. Please contact support.');
+        setCanEnablePayment(false);
+      }
     }
-  }, [userId, userProfile]);
 
-  // Determine if payment buttons should be enabled
-  // Enable automatically if user is registered (has user profile with email)
-  // CRITICAL: Use Clerk user email if available, fallback to userProfile email
-  const email = user?.emailAddresses?.[0]?.emailAddress || userProfile?.email || '';
-  const customerName = user?.fullName || (userProfile ? `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim() : '') || undefined;
+    ensureUserProfile();
+  }, [userId, isUserLoaded, userProfile, retryCount, user]);
+
+  // Extract user data for payment
+  const email = user?.emailAddresses?.[0]?.emailAddress ||
+                user?.primaryEmailAddress?.emailAddress ||
+                userProfile?.email || '';
+  const customerName = user?.fullName ||
+                       (userProfile ? `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim() : '') ||
+                       undefined;
   const customerPhone = user?.phoneNumbers?.[0]?.phoneNumber || userProfile?.phone || undefined;
-
-  // CRITICAL FIX: Enable payment if userId exists (authenticated user)
-  // Don't require hasUserProfile to be true - enable if userId exists (email will come from Clerk user)
-  // Match event checkout pattern: enable if authenticated user (userId exists)
-  // Email can be empty initially - it will be loaded from Clerk user object
-  const canEnablePayment = !!userId; // Enable if authenticated - email will be available from Clerk user
 
   // Debug logging
   useEffect(() => {
     console.log('[MEMBERSHIP-SUBSCRIBE] Payment state:', {
       userId,
       email,
-      hasUserProfile,
+      hasUserProfile: !!userProfile?.id,
       canEnablePayment,
       isMobile,
       isUserLoaded,
+      isCreatingProfile,
+      retryCount,
     });
-  }, [userId, email, hasUserProfile, canEnablePayment, isMobile, isUserLoaded]);
+  }, [userId, email, userProfile, canEnablePayment, isMobile, isUserLoaded, isCreatingProfile, retryCount]);
 
   // Detect mobile device
   // CRITICAL: Only detect mobile by user agent, not window width
@@ -109,6 +171,61 @@ export function SubscriptionSignupClient({ plan, error, userProfile }: Subscript
       <div className="max-w-5xl mx-auto px-8 py-8">
         <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded-md">
           {error || 'Plan not found'}
+        </div>
+      </div>
+    );
+  }
+
+  // Show loading state while creating profile
+  if (isCreatingProfile) {
+    return (
+      <div className="max-w-5xl mx-auto px-8 py-8">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <h2 className="font-heading font-semibold text-xl text-foreground mb-2">Setting up your account...</h2>
+          <p className="font-body text-muted-foreground">Please wait while we prepare your subscription</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if profile creation failed
+  if (profileError && !canEnablePayment) {
+    const hasEmail = !!(user?.emailAddresses?.[0]?.emailAddress ||
+                        user?.primaryEmailAddress?.emailAddress);
+
+    return (
+      <div className="max-w-5xl mx-auto px-8 py-8">
+        <div className="bg-red-50 border border-red-200 text-red-800 p-6 rounded-md">
+          <h3 className="font-semibold text-lg mb-2">Account Setup Required</h3>
+          <p className="mb-4">{profileError}</p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            {!hasEmail ? (
+              <Button
+                onClick={() => router.push(`/profile?redirect_url=/membership/subscribe/${plan.id}`)}
+                className="bg-blue-500 hover:bg-blue-600 text-white"
+              >
+                Update Account Settings
+              </Button>
+            ) : (
+              <>
+                {retryCount < 3 && (
+                  <Button
+                    onClick={() => setRetryCount(0)}
+                    className="bg-blue-500 hover:bg-blue-600 text-white"
+                  >
+                    Try Again
+                  </Button>
+                )}
+                <a
+                  href="mailto:support@example.com"
+                  className="px-4 py-2 text-blue-500 underline hover:text-blue-700"
+                >
+                  Contact Support
+                </a>
+              </>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -151,15 +268,11 @@ export function SubscriptionSignupClient({ plan, error, userProfile }: Subscript
             </div>
           )}
           {/* Desktop: Show Stripe Elements inline (like event checkout) */}
-          {/* CRITICAL: Always show for authenticated users - email will load from Clerk */}
-          {/* CRITICAL: Always render MembershipDesktopCheckout for authenticated users */}
-          {/* The component handles mobile detection internally and hides ExpressCheckoutElement on mobile */}
-          {userId && (
+          {/* CRITICAL: Only enable payment after profile is confirmed */}
+          {userId && canEnablePayment && (
             <>
               <p className="font-body text-muted-foreground mb-4">
-                {hasUserProfile
-                  ? 'Complete your subscription using Apple Pay, Google Pay, Link, or card.'
-                  : 'Complete your subscription. Payment options will be available once your email is loaded.'}
+                Complete your subscription using Apple Pay, Google Pay, Link, or card.
               </p>
               {/* Payment instructions - only show on desktop */}
               <div className="hidden md:block mt-3 mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
@@ -175,10 +288,12 @@ export function SubscriptionSignupClient({ plan, error, userProfile }: Subscript
                 email={email}
                 customerName={customerName}
                 customerPhone={customerPhone}
-                enabled={!!userId} // CRITICAL: Enable immediately if authenticated - email will load from Clerk user object
+                enabled={canEnablePayment} // Only enable after profile is confirmed
                 onInvalidClick={() => {
                   if (!userId) {
                     setCheckoutError('Please sign in to enable payment options');
+                  } else if (!canEnablePayment) {
+                    setCheckoutError('Account setup required. Please wait or contact support.');
                   }
                 }}
                 onLoadingChange={setIsLoading}
@@ -187,7 +302,7 @@ export function SubscriptionSignupClient({ plan, error, userProfile }: Subscript
           )}
 
           {/* Mobile Payment Request Button */}
-          {isMobile && userId && (
+          {isMobile && userId && canEnablePayment && (
             <div className="mb-4">
               <p className="font-body text-muted-foreground mb-4">
                 Use Apple Pay or Google Pay for quick checkout, or proceed to full checkout page.
@@ -198,11 +313,13 @@ export function SubscriptionSignupClient({ plan, error, userProfile }: Subscript
                 currency={plan.currency || 'USD'}
                 email={email}
                 customerName={customerName}
-                enabled={!!userId && !isLoading}
-                showPlaceholder={!userId}
+                enabled={canEnablePayment && !isLoading}
+                showPlaceholder={!canEnablePayment}
                 onInvalidClick={() => {
                   if (!userId) {
                     router.push(`/sign-in?redirect_url=/membership/subscribe/${plan.id}`);
+                  } else if (!canEnablePayment) {
+                    setCheckoutError('Account setup required. Please wait or contact support.');
                   }
                 }}
               />
@@ -217,25 +334,15 @@ export function SubscriptionSignupClient({ plan, error, userProfile }: Subscript
             </div>
           )}
 
-          {/* Fallback: Stripe Checkout Session redirect (for desktop without email, or mobile without userId) */}
-          {((!isMobile && !canEnablePayment) || (isMobile && !userId)) && (
+          {/* Fallback: Stripe Checkout Session redirect (only if payment enabled) */}
+          {canEnablePayment && (
             <>
               <p className="font-body text-muted-foreground mb-6">
-                {!email
-                  ? 'Email required to enable payment options'
-                  : 'You will be redirected to our secure payment processor to complete your subscription.'}
+                You will be redirected to our secure payment processor to complete your subscription.
               </p>
-              {!email && (
-                <div className="mb-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
-                  <div className="flex items-center text-purple-700 text-sm">
-                    <span className="mr-2">👁️</span>
-                    <span>Email required to enable payment options</span>
-                  </div>
-                </div>
-              )}
               <Button
                 onClick={handleSubscribe}
-                disabled={isLoading || !email}
+                disabled={isLoading}
                 className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
                 size="lg"
               >
@@ -244,16 +351,13 @@ export function SubscriptionSignupClient({ plan, error, userProfile }: Subscript
             </>
           )}
 
-          {/* Mobile: Show fallback button after PRB */}
-          {isMobile && userId && (
-            <Button
-              onClick={handleSubscribe}
-              disabled={isLoading}
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground mt-4"
-              size="lg"
-            >
-              {isLoading ? 'Processing...' : 'Proceed to Checkout'}
-            </Button>
+          {/* Show message if payment not enabled */}
+          {!canEnablePayment && userId && (
+            <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-yellow-800 text-sm">
+                Please wait while we set up your account, or contact support if this message persists.
+              </p>
+            </div>
           )}
         </div>
       </div>

@@ -43,7 +43,39 @@ Or add to `package.json`:
 
 ## Scripts
 
-### 1. Expedite Stripe Renewal
+### 1. View Stripe Subscription Details
+
+**File:** `view-stripe-subscription.js`
+
+Retrieves and displays detailed information about a Stripe subscription including dates, status, billing information, and other attributes.
+
+```bash
+node scripts/test-subscription-renewal/view-stripe-subscription.js \
+  --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93
+```
+
+**Parameters:**
+- `--subscription-id` (required): Stripe subscription ID
+
+**What it displays:**
+- Subscription status and customer information
+- Current billing period dates (start, end, days until renewal)
+- Billing cycle anchor
+- Billing information (currency, collection method, interval, amount)
+- Subscription items and pricing
+- Cancellation settings
+- Trial information (if applicable)
+- Latest invoice details
+- Payment method information
+- Metadata
+- Additional subscription attributes
+
+**Output:**
+- Comprehensive subscription details formatted for easy reading
+- All dates in both ISO format and localized format
+- Days until renewal calculation
+
+### 2. Expedite Stripe Renewal
 
 **File:** `expedite-stripe-renewal.js`
 
@@ -71,7 +103,7 @@ node scripts/test-subscription-renewal/expedite-stripe-renewal.js \
 - Invoice creation status
 - Final subscription state
 
-### 2. Verify Database
+### 3. Verify Database
 
 **File:** `verify-database.js`
 
@@ -103,7 +135,7 @@ node scripts/test-subscription-renewal/verify-database.js \
 - Reconciliation status
 - Recommendations
 
-### 3. Trigger Batch Job
+### 4. Trigger Batch Job
 
 **File:** `trigger-batch-job.js`
 
@@ -133,7 +165,7 @@ node scripts/test-subscription-renewal/trigger-batch-job.js \
 - Statistics (processed, updated, skipped, errors)
 - Duration
 
-### 4. Full Test Suite
+### 5. Full Test Suite
 
 **File:** `run-full-test.sh`
 
@@ -196,7 +228,15 @@ WHERE stripe_subscription_id = 'sub_1SeifsK5BrggeAHMBvg2XE93'
   AND tenant_id = 'tenant_demo_002';
 ```
 
-### Step 2: Run Expedited Renewal
+### Step 2: View Subscription Details (Optional)
+
+To check current subscription state before testing:
+```bash
+node scripts/test-subscription-renewal/view-stripe-subscription.js \
+  --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93
+```
+
+### Step 3: Run Expedited Renewal
 
 ```bash
 node scripts/test-subscription-renewal/expedite-stripe-renewal.js \
@@ -204,7 +244,7 @@ node scripts/test-subscription-renewal/expedite-stripe-renewal.js \
   --days-to-advance=30
 ```
 
-### Step 3: Verify Webhook Processing
+### Step 4: Verify Webhook Processing
 
 Wait 5-10 seconds, then verify database:
 ```bash
@@ -213,7 +253,7 @@ node scripts/test-subscription-renewal/verify-database.js \
   --tenant-id=tenant_demo_002
 ```
 
-### Step 4: Trigger Batch Job
+### Step 5: Trigger Batch Job
 
 If webhook didn't update database, trigger batch job:
 ```bash
@@ -222,7 +262,7 @@ node scripts/test-subscription-renewal/trigger-batch-job.js \
   --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93
 ```
 
-### Step 5: Final Verification
+### Step 6: Final Verification
 
 Verify database is in sync:
 ```bash

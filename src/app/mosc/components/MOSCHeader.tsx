@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import Icon from './ui/Icon';
 
@@ -37,30 +38,24 @@ const MOSCHeader = () => {
   };
 
   return (
-    <header className="bg-card border-b border-border">
+    <header className="bg-card border-b border-border overflow-hidden">
       {/* Main Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between py-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-0 pt-0">
+        <div className="flex items-center justify-between py-0 -mb-3 -mt-2">
           {/* Logo */}
-          <div className="flex items-center space-x-4">
-            <Link href="/mosc" className="flex items-center space-x-3 group">
-              <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center sacred-shadow group-hover:reverent-hover reverent-transition">
-                <Icon name="cross" size={24} className="text-primary-foreground" />
+          <div className="flex items-center space-x-3">
+            <Link href="/mosc" className="flex items-center space-x-2 group" style={{ background: 'transparent' }}>
+              <div className="w-36 h-[92px] sm:w-42 sm:h-[112px] md:w-52 md:h-[140px] lg:w-72 lg:h-[192px] rounded-lg flex items-center justify-center group-hover:reverent-hover reverent-transition overflow-hidden" style={{ background: 'transparent' }}>
+                <Image
+                  src="/images/logos/Header-branding-MOSC-logo.png"
+                  alt="MOSC Logo"
+                  width={288}
+                  height={192}
+                  className="w-full h-full object-contain"
+                  priority
+                  style={{ background: 'transparent' }}
+                />
               </div>
-              <div className="hidden sm:block">
-                <h1 className="font-heading font-semibold text-lg text-foreground">MOSC</h1>
-                <p className="text-sm text-muted-foreground">Malankara Orthodox Syrian Church</p>
-              </div>
-            </Link>
-            {/* Desktop Facebook link (kept from legacy top bar) */}
-            <Link
-              href="https://www.facebook.com/catholicatenews.in"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden md:inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 hover:bg-primary/20 sacred-shadow-sm reverent-transition"
-              aria-label="Follow Malankara Orthodox Syrian Church on Facebook"
-            >
-              <Icon name="people" size={18} className="text-primary" />
             </Link>
           </div>
 
@@ -70,7 +65,7 @@ const MOSCHeader = () => {
               <Link
                 key={item.name}
                 href={item.href}
-                className={`px-4 py-2 text-sm font-medium rounded-lg reverent-transition ${isActive(item.href)
+                className={`px-3 py-1.5 text-xs font-medium rounded-lg reverent-transition ${isActive(item.href)
                   ? 'bg-primary text-primary-foreground'
                   : 'text-foreground hover:bg-muted hover:text-foreground'
                   }`}
@@ -83,23 +78,23 @@ const MOSCHeader = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="lg:hidden p-2 rounded-lg hover:bg-muted reverent-transition"
+            className="lg:hidden p-1.5 rounded-lg hover:bg-muted reverent-transition flex items-center justify-center"
             aria-label="Toggle mobile menu"
             aria-expanded={isMobileMenuOpen}
           >
-            <Icon name="menu" size={20} className="text-foreground" />
+            <Icon name="menu" size={18} className="text-foreground" />
           </button>
         </div>
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden border-t border-border py-4">
-            <nav className="space-y-2" role="navigation" aria-label="Mobile navigation">
+          <div className="lg:hidden border-t border-border py-2">
+            <nav className="space-y-1" role="navigation" aria-label="Mobile navigation">
               {navigationItems.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`block px-4 py-2 text-sm font-medium rounded-lg reverent-transition ${isActive(item.href)
+                  className={`block px-3 py-1.5 text-xs font-medium rounded-lg reverent-transition ${isActive(item.href)
                     ? 'bg-primary text-primary-foreground'
                     : 'text-foreground hover:bg-muted'
                     }`}
@@ -114,9 +109,9 @@ const MOSCHeader = () => {
       </div>
 
       {/* Quick Links Bar */}
-      <div className="bg-muted/50 border-t border-border">
+      <div className="bg-muted/50 border-t border-border -mt-5 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="flex flex-wrap items-center gap-4 text-sm">
+          <div className="flex flex-wrap items-center justify-center gap-3 text-xs">
             <span className="font-medium text-foreground">Quick Links:</span>
             {quickLinks.map((link, index) => (
               <React.Fragment key={link.name}>

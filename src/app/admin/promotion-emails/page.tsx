@@ -258,52 +258,69 @@ export default function PromotionEmailsPage() {
 
   if (loading) {
     return (
-      <div className="max-w-5xl mx-auto px-8 py-8" style={{ paddingTop: '180px' }}>
-        <div className="text-center py-8">
-          <div className="text-gray-500">Loading...</div>
+      <div className="w-full overflow-x-hidden box-border" style={{ paddingTop: '120px' }}>
+        {/* Navigation Section Skeleton */}
+        <div className="w-full px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 mb-6 sm:mb-8">
+          <div className="bg-white rounded-xl shadow-lg p-3 sm:p-4 md:p-6 lg:p-8">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-4 lg:gap-6">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="bg-gray-200 rounded-lg h-24 animate-pulse"></div>
+              ))}
+            </div>
+          </div>
+        </div>
+        {/* Main Content Section Skeleton */}
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-8">
+          <div className="text-center py-8">
+            <div className="text-gray-500">Loading...</div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-8 py-8" style={{ paddingTop: '180px' }}>
-      <AdminNavigation currentPage="promotion-emails" />
-
-      <div className="mb-6">
+    <div className="w-full overflow-x-hidden box-border" style={{ paddingTop: '120px' }}>
+      {/* Navigation Section - Full Width, Separate Responsive Container */}
+      <div className="w-full px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 mb-6 sm:mb-8">
+        <AdminNavigation />
+      </div>
+      {/* Main Content Section - Constrained Width */}
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-8">
+        <div className="mb-6 sm:mb-8">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            Promotional Emails for Events
-          </h1>
-          <div className="flex gap-3">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">
+              Promotional Emails for Events
+            </h1>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
             <button
               onClick={() => setViewMode('history')}
-              className="flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+              className="flex-shrink-0 h-12 sm:h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-2 sm:gap-3 transition-all duration-300 hover:scale-105 px-3 sm:px-6"
               title="Email History"
               aria-label="Email History"
               type="button"
             >
-              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
-                <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <span className="font-semibold text-indigo-700">Email History</span>
+              <span className="font-semibold text-indigo-700 text-xs sm:text-sm lg:text-base whitespace-nowrap">Email History</span>
             </button>
             {viewMode !== 'form' && (
               <button
                 onClick={handleCreateNew}
-                className="flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                className="flex-shrink-0 h-12 sm:h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-2 sm:gap-3 transition-all duration-300 hover:scale-105 px-3 sm:px-6"
                 title="Create New Template"
                 aria-label="Create New Template"
                 type="button"
               >
-                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-green-200 flex items-center justify-center">
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
                 </div>
-                <span className="font-semibold text-green-700">Create New Template</span>
+                <span className="font-semibold text-green-700 text-xs sm:text-sm lg:text-base whitespace-nowrap">Create New Template</span>
               </button>
             )}
           </div>
@@ -437,6 +454,7 @@ export default function PromotionEmailsPage() {
           }
         }}
       />
+      </div>
     </div>
   );
 }

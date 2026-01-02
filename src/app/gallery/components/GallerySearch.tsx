@@ -30,6 +30,9 @@ export function GallerySearch({ onSearch, loading = false }: GallerySearchProps)
     setSearchTerm('');
     setStartDate('');
     setEndDate('');
+    setShowDateFilters(false);
+    // Explicitly call onSearch with empty filters to reset gallery
+    // Use empty string for searchTerm to ensure state change is detected
     onSearch({
       searchTerm: '',
       startDate: undefined,
@@ -71,6 +74,7 @@ export function GallerySearch({ onSearch, loading = false }: GallerySearchProps)
                   <button
                     type="button"
                     onClick={handleClear}
+                    data-testid="clear-search-button"
                     className="flex-shrink-0 w-10 h-10 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
                     title="Clear search"
                     aria-label="Clear search"

@@ -462,26 +462,37 @@ export default function ExecutiveCommitteeForm({
         <button
           type="button"
           onClick={onCancel}
-          className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+          className="flex-shrink-0 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           disabled={isSubmitting}
+          title="Cancel"
+          aria-label="Cancel"
         >
-          Cancel
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-200 flex items-center justify-center">
+            <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </div>
+          <span className="font-semibold text-red-700">Cancel</span>
         </button>
         <button
           type="submit"
-          className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2 transition-colors disabled:opacity-50"
+          className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           disabled={isSubmitting}
+          title={isSubmitting ? 'Saving...' : member ? 'Update Member' : 'Create Member'}
+          aria-label={isSubmitting ? 'Saving...' : member ? 'Update Member' : 'Create Member'}
         >
-          {isSubmitting ? (
-            <>
-              <FaSpinner className="w-4 h-4 animate-spin" />
-              Saving...
-            </>
-          ) : (
-            <>
-              {member ? 'Update' : 'Create'} Member
-            </>
-          )}
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+            {isSubmitting ? (
+              <FaSpinner className="w-6 h-6 text-blue-600 animate-spin" />
+            ) : (
+              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+          </div>
+          <span className="font-semibold text-blue-700">
+            {isSubmitting ? 'Saving...' : member ? 'Update Member' : 'Create Member'}
+          </span>
         </button>
       </div>
 

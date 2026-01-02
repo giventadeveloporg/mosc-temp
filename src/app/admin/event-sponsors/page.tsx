@@ -319,139 +319,165 @@ export default function EventSponsorsPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ paddingTop: '180px' }}>
-      <h1 className="font-heading font-semibold text-3xl text-foreground mb-2">Global Sponsors</h1>
-      <p className="font-body text-muted-foreground mb-8">(You can add or disassociate these items with any events. Please go to the corresponding event page to manage these associated entities.)</p>
-      <AdminNavigation currentPage="event-sponsors" />
-
-      {/* Toast Message */}
-      {toastMessage && (
-        <div className={`mb-4 p-4 rounded-lg sacred-shadow ${
-          toastMessage.type === 'success'
-            ? 'bg-success/10 border border-success/20 text-success'
-            : 'bg-destructive/10 border border-destructive/20 text-destructive'
-        }`}>
-          {toastMessage.message}
-        </div>
-      )}
-
-      {/* Search and Filter Bar */}
-      <div className="mb-6 bg-card rounded-lg sacred-shadow border border-border p-6">
-        <div className="flex flex-wrap gap-4 items-center">
-          <div className="flex-1 min-w-64">
-            <div className="relative">
-              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="Search sponsors..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 w-full border border-border rounded-lg bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
-              />
-            </div>
-          </div>
-
-          <div className="flex gap-2 items-center">
-            <FaFilter className="text-muted-foreground" />
-            <select
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value)}
-              className="border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
-            >
-              <option value="">All Types</option>
-              {sponsorTypes.map(type => (
-                <option key={type} value={type}>{type}</option>
-              ))}
-            </select>
-
-            <select
-              value={filterActive}
-              onChange={(e) => setFilterActive(e.target.value)}
-              className="border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
-            >
-              <option value="all">All Status</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
-          </div>
-
-          <button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
-            title="Add Sponsor"
-            aria-label="Add Sponsor"
-            type="button"
-          >
-            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
-              <FaPlus className="w-6 h-6 text-blue-600" />
-            </div>
-            <span className="font-semibold text-blue-700">Add Sponsor</span>
-          </button>
-        </div>
+    <div className="w-full overflow-x-hidden box-border" style={{ paddingTop: '120px' }}>
+      {/* Navigation Section - Full Width, Separate Responsive Container */}
+      <div className="w-full px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 mb-6 sm:mb-8">
+        <AdminNavigation currentPage="event-sponsors" />
       </div>
-
-      {error && (
-        <div className="mb-4 bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg">
-          {error}
+      {/* Main Content Section - Constrained Width */}
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-8">
+        {/* Page Header */}
+        <div className="mb-4 sm:mb-6 md:mb-8">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left mb-2">Global Sponsors</h1>
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 text-center sm:text-left">(You can add or disassociate these items with any events. Please go to the corresponding event page to manage these associated entities.)</p>
         </div>
-      )}
 
-      <DataTable
-        data={sortedSponsors}
-        columns={columns}
-        loading={loading}
-        onSort={handleSort}
-        onEdit={openEditModal}
-        onDelete={openDeleteModal}
-        onView={openEditModal} // Use onView for row clicks to navigate
-        sortKey={sortKey}
-        sortDirection={sortDirection}
-        emptyMessage="No sponsors found"
-      />
+        {/* Toast Message */}
+        {toastMessage && (
+          <div className={`mb-4 sm:mb-6 p-3 sm:p-4 rounded-lg text-xs sm:text-sm ${
+            toastMessage.type === 'success'
+              ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300'
+              : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300'
+          }`}>
+            {toastMessage.message}
+          </div>
+        )}
 
-      {/* Pagination Controls - Matching admin home page style */}
-      {!loading && totalCount > 0 && (
-        <div className="mt-4">
-          <div className="flex justify-between items-center">
+        {/* Search and Filter Bar */}
+        <div className="mb-4 sm:mb-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-3 sm:p-4 md:p-6">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center">
+            <div className="flex-1 min-w-0">
+              <div className="relative">
+                <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+                <input
+                  type="text"
+                  placeholder="Search sponsors..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 pr-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm sm:text-base"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-2 items-stretch sm:items-center">
+              <FaFilter className="text-gray-400 dark:text-gray-500 hidden sm:block" />
+              <select
+                value={filterType}
+                onChange={(e) => setFilterType(e.target.value)}
+                className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
+              >
+                <option value="">All Types</option>
+                {sponsorTypes.map(type => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+              </select>
+
+              <select
+                value={filterActive}
+                onChange={(e) => setFilterActive(e.target.value)}
+                className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
+              >
+                <option value="all">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="flex-shrink-0 h-12 sm:h-14 rounded-xl bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 flex items-center justify-center gap-2 sm:gap-3 transition-all duration-300 hover:scale-105 px-3 sm:px-6"
+              title="Add Sponsor"
+              aria-label="Add Sponsor"
+              type="button"
+            >
+              <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-blue-200 dark:bg-blue-700 flex items-center justify-center">
+                <FaPlus className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-300" />
+              </div>
+              <span className="font-semibold text-blue-700 dark:text-blue-300 text-xs sm:text-sm lg:text-base whitespace-nowrap">Add Sponsor</span>
+            </button>
+          </div>
+        </div>
+
+        {error && (
+          <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded text-xs sm:text-sm">
+            {error}
+          </div>
+        )}
+
+        <DataTable
+          data={sortedSponsors}
+          columns={columns}
+          loading={loading}
+          onSort={handleSort}
+          onEdit={openEditModal}
+          onDelete={openDeleteModal}
+          onView={openEditModal} // Use onView for row clicks to navigate
+          sortKey={sortKey}
+          sortDirection={sortDirection}
+          emptyMessage="No sponsors found"
+        />
+
+        {/* Pagination Controls - Always visible, matching admin page style */}
+        <div className="mt-6 sm:mt-8">
+          <div className="flex justify-between items-center gap-2">
+            {/* Previous Button */}
             <button
               onClick={() => setPage(prev => Math.max(0, prev - 1))}
-              disabled={page === 0}
-              className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed disabled:hover:scale-100"
+              disabled={page === 0 || loading}
+              className="px-3 sm:px-5 py-2.5 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 text-blue-700 dark:text-blue-300 font-semibold rounded-lg shadow-sm border-2 border-blue-400 dark:border-blue-600 hover:border-blue-500 dark:hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
               title="Previous Page"
               aria-label="Previous Page"
               type="button"
             >
-              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </div>
-              <span className="font-semibold text-blue-700">Previous</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+              </svg>
+              <span className="hidden sm:inline">Previous</span>
             </button>
-            <div className="text-sm font-semibold">
-              Page {page + 1} of {Math.max(1, Math.ceil(totalCount / pageSize))}
+
+            {/* Page Info */}
+            <div className="px-2 sm:px-4 py-2 bg-blue-50 dark:bg-blue-900/30 border-2 border-blue-300 dark:border-blue-600 rounded-lg shadow-sm">
+              <span className="text-xs sm:text-sm font-bold text-blue-700 dark:text-blue-300">
+                Page <span className="text-blue-600 dark:text-blue-400">{page + 1}</span> of <span className="text-blue-600 dark:text-blue-400">{Math.max(1, Math.ceil(totalCount / pageSize))}</span>
+              </span>
             </div>
+
+            {/* Next Button */}
             <button
               onClick={() => setPage(prev => prev + 1)}
-              disabled={page >= Math.ceil(totalCount / pageSize) - 1}
-              className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed disabled:hover:scale-100"
+              disabled={page >= Math.ceil(totalCount / pageSize) - 1 || loading}
+              className="px-3 sm:px-5 py-2.5 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 text-blue-700 dark:text-blue-300 font-semibold rounded-lg shadow-sm border-2 border-blue-400 dark:border-blue-600 hover:border-blue-500 dark:hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
               title="Next Page"
               aria-label="Next Page"
               type="button"
             >
-              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-              <span className="font-semibold text-blue-700">Next</span>
+              <span className="hidden sm:inline">Next</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+              </svg>
             </button>
           </div>
-          <div className="text-center text-sm text-gray-600 mt-2">
-            Showing {totalCount > 0 ? page * pageSize + 1 : 0} to {Math.min((page + 1) * pageSize, totalCount)} of {totalCount} sponsors
+
+          {/* Item Count Text */}
+          <div className="text-center mt-3">
+            {totalCount > 0 ? (
+              <div className="inline-flex items-center px-2 sm:px-4 py-2 bg-blue-50 dark:bg-blue-900/30 border-2 border-blue-300 dark:border-blue-600 rounded-lg shadow-sm">
+                <span className="text-xs sm:text-sm text-gray-700 dark:text-gray-300">
+                  Showing <span className="font-bold text-blue-600 dark:text-blue-400">{totalCount > 0 ? page * pageSize + 1 : 0}</span> to <span className="font-bold text-blue-600 dark:text-blue-400">{Math.min((page + 1) * pageSize, totalCount)}</span> of <span className="font-bold text-blue-600 dark:text-blue-400">{totalCount}</span> sponsors
+                </span>
+              </div>
+            ) : (
+              <div className="inline-flex items-center gap-2 px-2 sm:px-4 py-2 bg-orange-50 dark:bg-orange-900/20 border-2 border-orange-300 dark:border-orange-600 rounded-lg shadow-sm">
+                <svg className="w-5 h-5 text-orange-500 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="text-xs sm:text-sm font-medium text-orange-700 dark:text-orange-300">No sponsors found</span>
+                <span className="text-xs sm:text-sm text-orange-600 dark:text-orange-400 hidden sm:inline">[No sponsors match your criteria]</span>
+              </div>
+            )}
           </div>
         </div>
-      )}
+      </div>
 
       {/* Create Modal */}
       <Modal

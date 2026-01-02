@@ -247,7 +247,7 @@
                         <p>Test completed successfully</p>
                         
                         <div class="warning-details">
-                            <strong>⚠️ Warnings:</strong> React warnings (non-critical): Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render MobileDebugConsole DynamicHeroImage DynamicHeroImage, Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render MobileDebugConsole LiveEventsSection LiveEventsSection, Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render MobileDebugConsole FeaturedEventsSection FeaturedEventsSection
+                            <strong>⚠️ Warnings:</strong> Network idle timeout - page may still be loading; React warnings (non-critical): Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render MobileDebugConsole LiveEventsSection LiveEventsSection, Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render MobileDebugConsole FeaturedEventsSection FeaturedEventsSection, Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render MobileDebugConsole DynamicHeroImage DynamicHeroImage
                         </div>
                         
                         
@@ -263,7 +263,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/</div>
-                        <div class="duration">4805ms</div>
+                        <div class="duration">29006ms</div>
                         
                     </div>
                 </div>
@@ -278,10 +278,6 @@
                         </h4>
                         <p>Test completed successfully</p>
                         
-                        <div class="warning-details">
-                            <strong>⚠️ Warnings:</strong> React warnings (non-critical): Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render MobileDebugConsole EventsPage EventsPage
-                        </div>
-                        
                         
                         
                         
@@ -295,7 +291,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/events</div>
-                        <div class="duration">12114ms</div>
+                        <div class="duration">23599ms</div>
                         
                     </div>
                 </div>
@@ -311,12 +307,12 @@
                         <p>Test completed successfully</p>
                         
                         <div class="warning-details">
-                            <strong>⚠️ Warnings:</strong> Some expected elements not found: [class*="date"], [class*="time"], [class*="location"]
+                            <strong>⚠️ Warnings:</strong> Network idle timeout - page may still be loading; Some expected elements not found: h1, [class*="event"], [class*="date"], [class*="time"], [class*="location"]
                         </div>
                         
                         
                         <div class="error-details">
-                            <strong class="missing-elements">Missing Elements:</strong> <code>[class*="date"], [class*="time"], [class*="location"]</code>
+                            <strong class="missing-elements">Missing Elements:</strong> <code>h1</code>, <code>[class*="event"]</code>, <code>[class*="date"], [class*="time"], [class*="location"]</code>
                         </div>
                         
                         
@@ -331,7 +327,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/events/1</div>
-                        <div class="duration">11844ms</div>
+                        <div class="duration">19349ms</div>
                         
                     </div>
                 </div>
@@ -359,7 +355,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/sponsors</div>
-                        <div class="duration">5011ms</div>
+                        <div class="duration">4836ms</div>
                         
                     </div>
                 </div>
@@ -374,6 +370,14 @@
                         </h4>
                         <p>Test completed successfully</p>
                         
+                        <div class="warning-details">
+                            <strong>⚠️ Warnings:</strong> Some expected elements not found: h1, [class*="sponsor"], [class*="contact"], [class*="address"]
+                        </div>
+                        
+                        
+                        <div class="error-details">
+                            <strong class="missing-elements">Missing Elements:</strong> <code>h1</code>, <code>[class*="sponsor"]</code>, <code>[class*="contact"], [class*="address"]</code>
+                        </div>
                         
                         
                         
@@ -387,7 +391,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/sponsors/1</div>
-                        <div class="duration">4918ms</div>
+                        <div class="duration">7487ms</div>
                         
                     </div>
                 </div>
@@ -415,7 +419,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/gallery</div>
-                        <div class="duration">6793ms</div>
+                        <div class="duration">9139ms</div>
                         
                     </div>
                 </div>
@@ -451,7 +455,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/polls</div>
-                        <div class="duration">5297ms</div>
+                        <div class="duration">12504ms</div>
                         
                     </div>
                 </div>
@@ -487,26 +491,29 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/calendar</div>
-                        <div class="duration">5199ms</div>
+                        <div class="duration">11179ms</div>
                         
                     </div>
                 </div>
             
-                <div class="test-item passed">
-                    <div class="test-status">✅</div>
+                <div class="test-item failed">
+                    <div class="test-status">❌</div>
                     <div class="test-info">
                         <h4>
                             <span class="test-id">public-009</span>
                             MOSC Homepage Test
                             <span class="test-priority priority-medium">medium</span>
                         </h4>
-                        <p>Test completed successfully</p>
+                        <p>Error: Page errors: Invalid or unexpected token</p>
                         
-                        <div class="warning-details">
-                            <strong>⚠️ Warnings:</strong> Network idle timeout - page may still be loading
+                        
+                        
+                        <div class="error-details">
+                            <strong>Errors:</strong>
+                            <ul>
+                                <li>Page errors: Invalid or unexpected token</li>
+                            </ul>
                         </div>
-                        
-                        
                         
                         
                         <div class="error-details">
@@ -519,8 +526,8 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc</div>
-                        <div class="duration">17467ms</div>
-                        
+                        <div class="duration">26444ms</div>
+                        <a href="screenshots/public-009-1766892258863.png" target="_blank" class="screenshot-link">📷 Screenshot</a>
                     </div>
                 </div>
             
@@ -555,7 +562,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/holy-synod</div>
-                        <div class="duration">8215ms</div>
+                        <div class="duration">14334ms</div>
                         
                     </div>
                 </div>
@@ -591,7 +598,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/gallery</div>
-                        <div class="duration">12325ms</div>
+                        <div class="duration">9303ms</div>
                         
                     </div>
                 </div>
@@ -627,7 +634,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/directory</div>
-                        <div class="duration">8166ms</div>
+                        <div class="duration">8094ms</div>
                         
                     </div>
                 </div>
@@ -663,85 +670,44 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/charity-theme</div>
-                        <div class="duration">22827ms</div>
+                        <div class="duration">29981ms</div>
                         
                     </div>
                 </div>
             
-                <div class="test-item failed">
-                    <div class="test-status">❌</div>
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
                     <div class="test-info">
                         <h4>
                             <span class="test-id">public-014</span>
                             Pricing Page Test
                             <span class="test-priority priority-medium">medium</span>
                         </h4>
-                        <p>Error: JavaScript console errors: %c%s%c Error in pricing page: background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   Error: NEXT_REDIRECT
-    at PricingPage (about://React/Server/webpack-internal:///(rsc)/./src/app/pricing/page.tsx?7:60:70)
-    at resolveErrorDev (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2337:46)
-    at getOutlinedModel (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:1699:22)
-    at parseModelString (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:1900:15)
-    at Object.eval (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2996:18)
-    at JSON.parse (<anonymous>)
-    at initializeModelChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:1246:26)
-    at getOutlinedModel (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:1634:11)
-    at parseModelString (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:1993:15)
-    at Array.eval (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2996:18)
-    at JSON.parse (<anonymous>)
-    at initializeModelChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:1246:26)
-    at resolveConsoleEntry (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2624:13)
-    at processFullStringRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2864:11)
-    at processFullBinaryRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2766:7)
-    at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2969:15)
-    at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3233:13)</p>
+                        <p>Test completed successfully</p>
                         
                         <div class="warning-details">
-                            <strong>⚠️ Warnings:</strong> Some expected elements not found: h1, [class*="title"], [class*="heading"], main, [class*="content"], [class*="container"], [class*="pricing"], [class*="plan"], [class*="sign-in"], form[action*="sign-in"]
+                            <strong>⚠️ Warnings:</strong> Some expected elements not found: [class*="pricing"], [class*="plan"]
                         </div>
                         
                         
                         <div class="error-details">
-                            <strong class="missing-elements">Missing Elements:</strong> <code>h1, [class*="title"], [class*="heading"]</code>, <code>main, [class*="content"], [class*="container"]</code>, <code>[class*="pricing"], [class*="plan"], [class*="sign-in"], form[action*="sign-in"]</code>
+                            <strong class="missing-elements">Missing Elements:</strong> <code>[class*="pricing"], [class*="plan"]</code>
                         </div>
                         
-                        
-                        <div class="error-details">
-                            <strong>Errors:</strong>
-                            <ul>
-                                <li>JavaScript console errors: %c%s%c Error in pricing page: background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   Error: NEXT_REDIRECT
-    at PricingPage (about://React/Server/webpack-internal:///(rsc)/./src/app/pricing/page.tsx?7:60:70)
-    at resolveErrorDev (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2337:46)
-    at getOutlinedModel (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:1699:22)
-    at parseModelString (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:1900:15)
-    at Object.eval (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2996:18)
-    at JSON.parse (<anonymous>)
-    at initializeModelChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:1246:26)
-    at getOutlinedModel (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:1634:11)
-    at parseModelString (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:1993:15)
-    at Array.eval (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2996:18)
-    at JSON.parse (<anonymous>)
-    at initializeModelChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:1246:26)
-    at resolveConsoleEntry (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2624:13)
-    at processFullStringRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2864:11)
-    at processFullBinaryRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2766:7)
-    at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2969:15)
-    at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3233:13)</li>
-                            </ul>
-                        </div>
                         
                         
                         <div class="error-details">
                             <h5>Expected Elements:</h5>
                             <ul>
-                                <li><code>h1, [class*="title"], [class*="heading"]</code></li><li><code>main, [class*="content"], [class*="container"]</code></li><li><code>[class*="pricing"], [class*="plan"], [class*="sign-in"], form[action*="sign-in"]</code></li>
+                                <li><code>h1, [class*="title"], [class*="heading"]</code></li><li><code>main, [class*="content"], [class*="container"], [class*="pricing"]</code></li><li><code>[class*="pricing"], [class*="plan"]</code></li>
                             </ul>
                         </div>
                         
                     </div>
                     <div class="test-details">
                         <div class="url">/pricing</div>
-                        <div class="duration">12462ms</div>
-                        <a href="screenshots/public-014-1766467976158.png" target="_blank" class="screenshot-link">📷 Screenshot</a>
+                        <div class="duration">11572ms</div>
+                        
                     </div>
                 </div>
             
@@ -749,7 +715,7 @@
 
         <div class="footer">
             <p>Generated by Public Pages Test Suite</p>
-            <p class="timestamp">Report generated on: 12/23/2025, 12:32:56 AM</p>
+            <p class="timestamp">Report generated on: 12/27/2025, 10:25:36 PM</p>
             <p class="timestamp">Base URL: http://localhost:3000</p>
             <p class="timestamp">Test Engine: Playwright (Local Browser Execution)</p>
         </div>

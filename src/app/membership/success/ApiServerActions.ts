@@ -389,9 +389,66 @@ export async function processMembershipSubscriptionFromPaymentIntent(
       userProfile = await fetchUserProfileByUserId(finalUserId);
     }
 
+    // FALLBACK: If profile doesn't exist, create it from payment data
     if (!userProfile?.id) {
-      console.error('[MEMBERSHIP-SUCCESS] User profile not found:', { userId: finalUserId, email: customerEmail });
-      return null;
+      console.log('[MEMBERSHIP-SUCCESS] User profile not found - attempting fallback creation:', {
+        userId: finalUserId,
+        email: customerEmail
+      });
+
+      // Only create profile if we have both userId and email
+      if (finalUserId && customerEmail) {
+        try {
+          console.log('[MEMBERSHIP-SUCCESS] Creating user profile from payment data');
+          const now = new Date().toISOString();
+          const profileData = withTenantId({
+            userId: finalUserId,
+            email: customerEmail,
+            firstName: metadata.customerName?.split(' ')[0] || 'User',
+            lastName: metadata.customerName?.split(' ').slice(1).join(' ') || '',
+            phone: metadata.customerPhone || '',
+            userRole: 'MEMBER',
+            userStatus: 'PENDING_APPROVAL',
+            createdAt: now,
+            updatedAt: now,
+          });
+
+          const createRes = await fetchWithJwtRetry(
+            `${getAppUrl()}/api/proxy/user-profiles`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(profileData),
+            },
+            '[MEMBERSHIP-SUCCESS] fallback-create-profile'
+          );
+
+          if (createRes.ok) {
+            userProfile = await createRes.json();
+            console.log('[MEMBERSHIP-SUCCESS] ✅ Fallback profile created successfully:', userProfile.id);
+          } else {
+            const errorText = await createRes.text();
+            console.error('[MEMBERSHIP-SUCCESS] ❌ Failed to create fallback profile:', {
+              status: createRes.status,
+              error: errorText,
+            });
+            // Don't return null yet - log error but continue to show error message
+          }
+        } catch (createError) {
+          console.error('[MEMBERSHIP-SUCCESS] ❌ Error creating fallback profile:', createError);
+        }
+      }
+
+      // If still no profile after fallback attempt, log error and return null
+      if (!userProfile?.id) {
+        console.error('[MEMBERSHIP-SUCCESS] ❌ User profile not found and fallback creation failed:', {
+          userId: finalUserId,
+          email: customerEmail
+        });
+        // Return null - caller will handle error display
+        // This is an edge case that should rarely happen if we enforce profile before payment
+        return null;
+      }
     }
 
     if (!finalUserId) {

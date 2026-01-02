@@ -3,7 +3,8 @@ import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import { getAppUrl, getTenantId, getPaymentMethodDomainId } from '@/lib/env';
 import { auth } from '@clerk/nextjs/server';
 import { stripe } from '@/lib/stripe';
-import type { MembershipPlanDTO } from '@/types';
+import { withTenantId } from '@/lib/withTenantId';
+import type { MembershipPlanDTO, UserProfileDTO } from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -172,6 +173,84 @@ export async function createSubscriptionCheckoutSessionServer(
   });
 
   return { sessionUrl: session.url };
+}
+
+/**
+ * Create user profile from Clerk user data
+ * Used when profile doesn't exist before subscription payment
+ */
+export async function createUserProfileFromClerkUser({
+  userId,
+  email,
+  firstName,
+  lastName,
+  phone,
+  imageUrl,
+}: {
+  userId: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  imageUrl?: string;
+}): Promise<UserProfileDTO> {
+  if (!userId) {
+    throw new Error('UserId is required');
+  }
+
+  if (!email) {
+    throw new Error('Email is required to create user profile');
+  }
+
+  const baseUrl = getAppUrl();
+  const now = new Date().toISOString();
+
+  const profileData = withTenantId({
+    userId,
+    email,
+    firstName: firstName || 'User',
+    lastName: lastName || '',
+    phone: phone || '',
+    profileImageUrl: imageUrl || '',
+    userRole: 'MEMBER',
+    userStatus: 'PENDING_APPROVAL',
+    createdAt: now,
+    updatedAt: now,
+  });
+
+  console.log('[MEMBERSHIP-SUBSCRIBE] Creating user profile:', {
+    userId,
+    email,
+    tenantId: profileData.tenantId,
+  });
+
+  const response = await fetchWithJwtRetry(
+    `${baseUrl}/api/proxy/user-profiles`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(profileData),
+    },
+    '[MEMBERSHIP-SUBSCRIBE] create-user-profile'
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('[MEMBERSHIP-SUBSCRIBE] Failed to create user profile:', {
+      status: response.status,
+      error: errorText,
+    });
+    throw new Error(`Failed to create user profile: ${response.status} - ${errorText}`);
+  }
+
+  const createdProfile = await response.json();
+  console.log('[MEMBERSHIP-SUBSCRIBE] User profile created successfully:', {
+    profileId: createdProfile.id,
+    userId,
+    email,
+  });
+
+  return createdProfile;
 }
 
 

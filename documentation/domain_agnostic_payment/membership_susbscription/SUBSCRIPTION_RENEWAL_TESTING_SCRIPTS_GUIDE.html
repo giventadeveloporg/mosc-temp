@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Renewal Testing Scripts Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 15px;
+        }
+
+        h2 {
+            color: #34495e;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+
+        h3 {
+            color: #555;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        h4 {
+            color: #666;
+            margin-top: 25px;
+            margin-bottom: 12px;
+            font-size: 1.2em;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        .highlight-box {
+            background: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+
+        .info-box {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+
+        .copyable-code-block {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .command-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .command-tab {
+            background: transparent;
+            border: none;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 0.9em;
+            color: #666;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.3s;
+        }
+
+        .command-tab:hover {
+            color: #3498db;
+            background: #f8f9fa;
+        }
+
+        .command-tab.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+            font-weight: 600;
+        }
+
+        .command-content {
+            display: none;
+        }
+
+        .command-content.active {
+            display: block;
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: background 0.3s;
+        }
+
+        .copy-button:hover {
+            background: #2980b9;
+        }
+
+        .copy-button:active {
+            background: #21618c;
+        }
+
+        .code-block {
+            background: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            position: relative;
+        }
+
+        .code-block-title {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        code {
+            font-family: 'Courier New', monospace;
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .step-number {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .metadata {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 0.9em;
+        }
+
+        .metadata-item {
+            margin: 5px 0;
+        }
+
+        .metadata-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .script-list {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .script-list li {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            border-radius: 4px;
+        }
+
+        .script-list h4 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+    </style>
+    <script>
+        function copyToClipboard(text, button) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.background = '#28a745';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '#3498db';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy to clipboard');
+            });
+        }
+
+        function switchCommandTab(button, contentId) {
+            // Remove active class from all tabs and contents in the same container
+            const container = button.closest('.copyable-code-block');
+            const tabs = container.querySelectorAll('.command-tab');
+            const contents = container.querySelectorAll('.command-content');
+
+            tabs.forEach(tab => tab.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+
+            // Add active class to clicked tab and corresponding content
+            button.classList.add('active');
+            document.getElementById(contentId).classList.add('active');
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Subscription Renewal Testing Scripts Guide</h1>
+
+        <div class="metadata">
+            <div class="metadata-item">
+                <span class="metadata-label">Purpose:</span> Guide for using automated test scripts to expedite and test subscription renewal functionality in Stripe test mode
+            </div>
+            <div class="metadata-item">
+                <span class="metadata-label">Location:</span> <code>scripts/test-subscription-renewal/</code>
+            </div>
+            <div class="metadata-item">
+                <span class="metadata-label">Last Updated:</span> December 31, 2025
+            </div>
+        </div>
+
+        <h2>Overview</h2>
+
+        <p>
+            These scripts allow you to test subscription renewal functionality without waiting for the actual billing period to end.
+            They work with Stripe test mode subscriptions to:
+        </p>
+        <ol>
+            <li><strong>View subscription details</strong> - Retrieve and display comprehensive Stripe subscription information</li>
+            <li><strong>Expedite renewal</strong> - Advance subscription period dates in Stripe test mode</li>
+            <li><strong>Verify database</strong> - Compare database state with Stripe subscription state</li>
+            <li><strong>Trigger batch job</strong> - Execute batch job on demand for testing</li>
+            <li><strong>Full test suite</strong> - Run all tests in sequence</li>
+        </ol>
+
+        <h2>Prerequisites</h2>
+
+        <h3>Environment Variables</h3>
+
+        <div class="copyable-code-block">
+            <div class="command-tabs">
+                <button class="command-tab active" onclick="switchCommandTab(this, 'env-bash')">Bash (Multi-line)</button>
+                <button class="command-tab" onclick="switchCommandTab(this, 'env-windows')">Windows (Single-line)</button>
+            </div>
+            <div id="env-bash" class="command-content active">
+                <button class="copy-button" onclick="copyToClipboard('export STRIPE_SECRET_KEY=\"sk_test_...\"\nexport DATABASE_URL=\"postgresql://...\"\nexport NEXT_PUBLIC_API_BASE_URL=\"http://localhost:8080\"\nexport API_JWT_USER=\"jwtadmin\"\nexport API_JWT_PASS=\"jwtadmin\"\nexport NEXT_PUBLIC_TENANT_ID=\"tenant_demo_002\"', this)">Copy</button>
+                <pre><code># Required for all scripts
+export STRIPE_SECRET_KEY="sk_test_..."  # Stripe test mode secret key
+export DATABASE_URL="postgresql://..."   # PostgreSQL connection string
+export NEXT_PUBLIC_API_BASE_URL="http://localhost:8080"  # Backend API URL
+export API_JWT_USER="jwtadmin"          # Backend JWT username
+export API_JWT_PASS="jwtadmin"          # Backend JWT password
+export NEXT_PUBLIC_TENANT_ID="tenant_demo_002"  # Default tenant ID</code></pre>
+            </div>
+            <div id="env-windows" class="command-content">
+                <button class="copy-button" onclick="copyToClipboard('$env:STRIPE_SECRET_KEY=\"sk_test_...\"; $env:DATABASE_URL=\"postgresql://...\"; $env:NEXT_PUBLIC_API_BASE_URL=\"http://localhost:8080\"; $env:API_JWT_USER=\"jwtadmin\"; $env:API_JWT_PASS=\"jwtadmin\"; $env:NEXT_PUBLIC_TENANT_ID=\"tenant_demo_002\"', this)">Copy</button>
+                <pre><code>$env:STRIPE_SECRET_KEY="sk_test_..."
+$env:DATABASE_URL="postgresql://..."
+$env:NEXT_PUBLIC_API_BASE_URL="http://localhost:8080"
+$env:API_JWT_USER="jwtadmin"
+$env:API_JWT_PASS="jwtadmin"
+$env:NEXT_PUBLIC_TENANT_ID="tenant_demo_002"</code></pre>
+            </div>
+        </div>
+
+        <h3>Node.js Dependencies</h3>
+
+        <div class="copyable-code-block">
+            <div class="command-tabs">
+                <button class="command-tab active" onclick="switchCommandTab(this, 'npm-bash')">Bash (Multi-line)</button>
+                <button class="command-tab" onclick="switchCommandTab(this, 'npm-windows')">Windows (Single-line)</button>
+            </div>
+            <div id="npm-bash" class="command-content active">
+                <button class="copy-button" onclick="copyToClipboard('npm install --save-dev stripe pg', this)">Copy</button>
+                <pre><code>npm install --save-dev stripe pg</code></pre>
+            </div>
+            <div id="npm-windows" class="command-content">
+                <button class="copy-button" onclick="copyToClipboard('npm install --save-dev stripe pg', this)">Copy</button>
+                <pre><code>npm install --save-dev stripe pg</code></pre>
+            </div>
+        </div>
+
+        <p>Or add to <code>package.json</code>:</p>
+        <div class="code-block">
+            <div class="code-block-title">package.json</div>
+            <pre><code>{
+  "devDependencies": {
+    "stripe": "^14.0.0",
+    "pg": "^8.11.0"
+  }
+}</code></pre>
+        </div>
+
+        <h2>Scripts</h2>
+
+        <ul class="script-list">
+            <li>
+                <h3>1. View Stripe Subscription Details</h3>
+                <p><strong>File:</strong> <code>view-stripe-subscription.js</code></p>
+                <p>Retrieves and displays detailed information about a Stripe subscription including dates, status, billing information, and other attributes.</p>
+
+                <div class="copyable-code-block">
+                    <div class="command-tabs">
+                        <button class="command-tab active" onclick="switchCommandTab(this, 'view-bash')">Bash (Multi-line)</button>
+                        <button class="command-tab" onclick="switchCommandTab(this, 'view-windows')">Windows (Single-line)</button>
+                    </div>
+                    <div id="view-bash" class="command-content active">
+                        <button class="copy-button" onclick="copyToClipboard('node scripts/test-subscription-renewal/view-stripe-subscription.js \\\n  --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93', this)">Copy</button>
+                        <pre><code>node scripts/test-subscription-renewal/view-stripe-subscription.js \
+  --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93</code></pre>
+                    </div>
+                    <div id="view-windows" class="command-content">
+                        <button class="copy-button" onclick="copyToClipboard('node scripts/test-subscription-renewal/view-stripe-subscription.js --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93', this)">Copy</button>
+                        <pre><code>node scripts/test-subscription-renewal/view-stripe-subscription.js --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93</code></pre>
+                    </div>
+                </div>
+
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>--subscription-id</code> (required): Stripe subscription ID</li>
+                </ul>
+
+                <p><strong>What it displays:</strong></p>
+                <ul>
+                    <li>Subscription status and customer information</li>
+                    <li>Current billing period dates (start, end, days until renewal)</li>
+                    <li>Billing cycle anchor</li>
+                    <li>Billing information (currency, collection method, interval, amount)</li>
+                    <li>Subscription items and pricing</li>
+                    <li>Cancellation settings</li>
+                    <li>Trial information (if applicable)</li>
+                    <li>Latest invoice details</li>
+                    <li>Payment method information</li>
+                    <li>Metadata</li>
+                    <li>Additional subscription attributes</li>
+                </ul>
+
+                <p><strong>Output:</strong></p>
+                <ul>
+                    <li>Comprehensive subscription details formatted for easy reading</li>
+                    <li>All dates in both ISO format and localized format</li>
+                    <li>Days until renewal calculation</li>
+                </ul>
+            </li>
+
+            <li>
+                <h3>2. Expedite Stripe Renewal</h3>
+                <p><strong>File:</strong> <code>expedite-stripe-renewal.js</code></p>
+                <p>Advances a Stripe test mode subscription's billing period to trigger renewal immediately.</p>
+
+                <div class="copyable-code-block">
+                    <div class="command-tabs">
+                        <button class="command-tab active" onclick="switchCommandTab(this, 'expedite-bash')">Bash (Multi-line)</button>
+                        <button class="command-tab" onclick="switchCommandTab(this, 'expedite-windows')">Windows (Single-line)</button>
+                    </div>
+                    <div id="expedite-bash" class="command-content active">
+                        <button class="copy-button" onclick="copyToClipboard('node scripts/test-subscription-renewal/expedite-stripe-renewal.js \\\n  --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 \\\n  --days-to-advance=30', this)">Copy</button>
+                        <pre><code>node scripts/test-subscription-renewal/expedite-stripe-renewal.js \
+  --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 \
+  --days-to-advance=30</code></pre>
+                    </div>
+                    <div id="expedite-windows" class="command-content">
+                        <button class="copy-button" onclick="copyToClipboard('node scripts/test-subscription-renewal/expedite-stripe-renewal.js --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 --days-to-advance=30', this)">Copy</button>
+                        <pre><code>node scripts/test-subscription-renewal/expedite-stripe-renewal.js --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 --days-to-advance=30</code></pre>
+                    </div>
+                </div>
+
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>--subscription-id</code> (required): Stripe subscription ID</li>
+                    <li><code>--days-to-advance</code> (optional): Number of days to advance (default: 30)</li>
+                </ul>
+
+                <p><strong>What it does:</strong></p>
+                <ol>
+                    <li>Retrieves current subscription from Stripe</li>
+                    <li>Calculates new period dates</li>
+                    <li>Updates subscription billing cycle anchor</li>
+                    <li>Creates and pays invoice for new period</li>
+                    <li>Verifies final subscription state</li>
+                </ol>
+
+                <p><strong>Output:</strong></p>
+                <ul>
+                    <li>Current and new period dates</li>
+                    <li>Invoice creation status</li>
+                    <li>Final subscription state</li>
+                </ul>
+
+                <div class="info-box">
+                    <strong>Note:</strong> Running this script multiple times will advance the subscription month by month.
+                    Each run reads the current Stripe date and advances by one billing period (typically 30 days).
+                </div>
+            </li>
+
+            <li>
+                <h3>3. Verify Database</h3>
+                <p><strong>File:</strong> <code>verify-database.js</code></p>
+                <p>Compares database subscription record with Stripe subscription state.</p>
+
+                <div class="copyable-code-block">
+                    <div class="command-tabs">
+                        <button class="command-tab active" onclick="switchCommandTab(this, 'verify-bash')">Bash (Multi-line)</button>
+                        <button class="command-tab" onclick="switchCommandTab(this, 'verify-windows')">Windows (Single-line)</button>
+                    </div>
+                    <div id="verify-bash" class="command-content active">
+                        <button class="copy-button" onclick="copyToClipboard('node scripts/test-subscription-renewal/verify-database.js \\\n  --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 \\\n  --tenant-id=tenant_demo_002', this)">Copy</button>
+                        <pre><code>node scripts/test-subscription-renewal/verify-database.js \
+  --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 \
+  --tenant-id=tenant_demo_002</code></pre>
+                    </div>
+                    <div id="verify-windows" class="command-content">
+                        <button class="copy-button" onclick="copyToClipboard('node scripts/test-subscription-renewal/verify-database.js --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 --tenant-id=tenant_demo_002', this)">Copy</button>
+                        <pre><code>node scripts/test-subscription-renewal/verify-database.js --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 --tenant-id=tenant_demo_002</code></pre>
+                    </div>
+                </div>
+
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>--subscription-id</code> (required): Stripe subscription ID</li>
+                    <li><code>--tenant-id</code> (optional): Tenant ID (defaults to NEXT_PUBLIC_TENANT_ID)</li>
+                </ul>
+
+                <p><strong>What it does:</strong></p>
+                <ol>
+                    <li>Fetches subscription from Stripe</li>
+                    <li>Fetches subscription from database</li>
+                    <li>Compares:
+                        <ul>
+                            <li><code>current_period_start</code></li>
+                            <li><code>current_period_end</code></li>
+                            <li><code>subscription_status</code></li>
+                            <li><code>stripe_customer_id</code></li>
+                        </ul>
+                    </li>
+                    <li>Reports discrepancies</li>
+                    <li>Checks reconciliation status</li>
+                </ol>
+
+                <p><strong>Output:</strong></p>
+                <ul>
+                    <li>Comparison results (matches, warnings, issues)</li>
+                    <li>Reconciliation status</li>
+                    <li>Recommendations</li>
+                </ul>
+            </li>
+
+            <li>
+                <h3>4. Trigger Batch Job</h3>
+                <p><strong>File:</strong> <code>trigger-batch-job.js</code></p>
+                <p>Triggers the subscription renewal batch job manually for testing.</p>
+
+                <div class="copyable-code-block">
+                    <div class="command-tabs">
+                        <button class="command-tab active" onclick="switchCommandTab(this, 'trigger-bash')">Bash (Multi-line)</button>
+                        <button class="command-tab" onclick="switchCommandTab(this, 'trigger-windows')">Windows (Single-line)</button>
+                    </div>
+                    <div id="trigger-bash" class="command-content active">
+                        <button class="copy-button" onclick="copyToClipboard('node scripts/test-subscription-renewal/trigger-batch-job.js \\\n  --tenant-id=tenant_demo_002 \\\n  --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 \\\n  --batch-size=10 \\\n  --max-subscriptions=100', this)">Copy</button>
+                        <pre><code>node scripts/test-subscription-renewal/trigger-batch-job.js \
+  --tenant-id=tenant_demo_002 \
+  --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 \
+  --batch-size=10 \
+  --max-subscriptions=100</code></pre>
+                    </div>
+                    <div id="trigger-windows" class="command-content">
+                        <button class="copy-button" onclick="copyToClipboard('node scripts/test-subscription-renewal/trigger-batch-job.js --tenant-id=tenant_demo_002 --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 --batch-size=10 --max-subscriptions=100', this)">Copy</button>
+                        <pre><code>node scripts/test-subscription-renewal/trigger-batch-job.js --tenant-id=tenant_demo_002 --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 --batch-size=10 --max-subscriptions=100</code></pre>
+                    </div>
+                </div>
+
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>--tenant-id</code> (required): Tenant ID</li>
+                    <li><code>--subscription-id</code> (optional): Filter by specific subscription</li>
+                    <li><code>--batch-size</code> (optional): Batch size (default: 10)</li>
+                    <li><code>--max-subscriptions</code> (optional): Max subscriptions to process (default: 100)</li>
+                </ul>
+
+                <p><strong>What it does:</strong></p>
+                <ol>
+                    <li>Authenticates with backend API</li>
+                    <li>Triggers batch job endpoint</li>
+                    <li>Reports job execution results</li>
+                </ol>
+
+                <p><strong>Output:</strong></p>
+                <ul>
+                    <li>Job execution status</li>
+                    <li>Statistics (processed, updated, skipped, errors)</li>
+                    <li>Duration</li>
+                </ul>
+            </li>
+
+            <li>
+                <h3>5. Full Test Suite</h3>
+                <p><strong>File:</strong> <code>run-full-test.sh</code></p>
+                <p>Runs all tests in sequence for complete end-to-end testing.</p>
+
+                <div class="copyable-code-block">
+                    <div class="command-tabs">
+                        <button class="command-tab active" onclick="switchCommandTab(this, 'full-bash')">Bash (Multi-line)</button>
+                        <button class="command-tab" onclick="switchCommandTab(this, 'full-windows')">Windows (Single-line)</button>
+                    </div>
+                    <div id="full-bash" class="command-content active">
+                        <button class="copy-button" onclick="copyToClipboard('chmod +x scripts/test-subscription-renewal/run-full-test.sh\n./scripts/test-subscription-renewal/run-full-test.sh \\\n  --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 \\\n  --tenant-id=tenant_demo_002 \\\n  --days-to-advance=30', this)">Copy</button>
+                        <pre><code>chmod +x scripts/test-subscription-renewal/run-full-test.sh
+./scripts/test-subscription-renewal/run-full-test.sh \
+  --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 \
+  --tenant-id=tenant_demo_002 \
+  --days-to-advance=30</code></pre>
+                    </div>
+                    <div id="full-windows" class="command-content">
+                        <button class="copy-button" onclick="copyToClipboard('bash scripts/test-subscription-renewal/run-full-test.sh --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 --tenant-id=tenant_demo_002 --days-to-advance=30', this)">Copy</button>
+                        <pre><code>bash scripts/test-subscription-renewal/run-full-test.sh --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 --tenant-id=tenant_demo_002 --days-to-advance=30</code></pre>
+                    </div>
+                </div>
+
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>--subscription-id</code> (required): Stripe subscription ID</li>
+                    <li><code>--tenant-id</code> (optional): Tenant ID (defaults to NEXT_PUBLIC_TENANT_ID)</li>
+                    <li><code>--days-to-advance</code> (optional): Days to advance (default: 30)</li>
+                </ul>
+
+                <p><strong>What it does:</strong></p>
+                <ol>
+                    <li>Expedites Stripe subscription renewal</li>
+                    <li>Waits for webhook processing</li>
+                    <li>Verifies database state (before batch job)</li>
+                    <li>Triggers batch job</li>
+                    <li>Waits for batch job completion</li>
+                    <li>Verifies final database state</li>
+                </ol>
+
+                <p><strong>Output:</strong></p>
+                <ul>
+                    <li>Complete test results</li>
+                    <li>Pass/fail status</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h2>Quick Start Example</h2>
+
+        <div class="copyable-code-block">
+            <div class="command-tabs">
+                <button class="command-tab active" onclick="switchCommandTab(this, 'quick-bash')">Bash (Multi-line)</button>
+                <button class="command-tab" onclick="switchCommandTab(this, 'quick-windows')">Windows (Single-line)</button>
+            </div>
+            <div id="quick-bash" class="command-content active">
+                <button class="copy-button" onclick="copyToClipboard('# Set environment variables\nexport STRIPE_SECRET_KEY=\"sk_test_...\"\nexport DATABASE_URL=\"postgresql://user:pass@localhost:5432/dbname\"\nexport NEXT_PUBLIC_API_BASE_URL=\"http://localhost:8080\"\nexport API_JWT_USER=\"jwtadmin\"\nexport API_JWT_PASS=\"jwtadmin\"\nexport NEXT_PUBLIC_TENANT_ID=\"tenant_demo_002\"\n\n# Run full test suite\n./scripts/test-subscription-renewal/run-full-test.sh \\\n  --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 \\\n  --tenant-id=tenant_demo_002 \\\n  --days-to-advance=30', this)">Copy</button>
+                <pre><code># Set environment variables
+export STRIPE_SECRET_KEY="sk_test_..."
+export DATABASE_URL="postgresql://user:pass@localhost:5432/dbname"
+export NEXT_PUBLIC_API_BASE_URL="http://localhost:8080"
+export API_JWT_USER="jwtadmin"
+export API_JWT_PASS="jwtadmin"
+export NEXT_PUBLIC_TENANT_ID="tenant_demo_002"
+
+# Run full test suite
+./scripts/test-subscription-renewal/run-full-test.sh \
+  --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 \
+  --tenant-id=tenant_demo_002 \
+  --days-to-advance=30</code></pre>
+            </div>
+            <div id="quick-windows" class="command-content">
+                <button class="copy-button" onclick="copyToClipboard('$env:STRIPE_SECRET_KEY=\"sk_test_...\"; $env:DATABASE_URL=\"postgresql://user:pass@localhost:5432/dbname\"; $env:NEXT_PUBLIC_API_BASE_URL=\"http://localhost:8080\"; $env:API_JWT_USER=\"jwtadmin\"; $env:API_JWT_PASS=\"jwtadmin\"; $env:NEXT_PUBLIC_TENANT_ID=\"tenant_demo_002\"; bash scripts/test-subscription-renewal/run-full-test.sh --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 --tenant-id=tenant_demo_002 --days-to-advance=30', this)">Copy</button>
+                <pre><code>$env:STRIPE_SECRET_KEY="sk_test_..."
+$env:DATABASE_URL="postgresql://user:pass@localhost:5432/dbname"
+$env:NEXT_PUBLIC_API_BASE_URL="http://localhost:8080"
+$env:API_JWT_USER="jwtadmin"
+$env:API_JWT_PASS="jwtadmin"
+$env:NEXT_PUBLIC_TENANT_ID="tenant_demo_002"
+bash scripts/test-subscription-renewal/run-full-test.sh --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 --tenant-id=tenant_demo_002 --days-to-advance=30</code></pre>
+            </div>
+        </div>
+
+        <h2>Testing Workflow</h2>
+
+        <h3><span class="step-number">1</span> Prepare Test Subscription</h3>
+        <p>Ensure you have a test subscription in the database:</p>
+        <div class="code-block">
+            <div class="code-block-title">SQL Query</div>
+            <pre><code>SELECT id, tenant_id, user_profile_id, membership_plan_id,
+       subscription_status, current_period_start, current_period_end,
+       stripe_subscription_id, stripe_customer_id
+FROM membership_subscription
+WHERE stripe_subscription_id = 'sub_1SeifsK5BrggeAHMBvg2XE93'
+  AND tenant_id = 'tenant_demo_002';</code></pre>
+        </div>
+
+        <h3><span class="step-number">2</span> View Subscription Details (Optional)</h3>
+        <p>To check current subscription state before testing:</p>
+        <div class="copyable-code-block">
+            <div class="command-tabs">
+                <button class="command-tab active" onclick="switchCommandTab(this, 'view-step-bash')">Bash (Multi-line)</button>
+                <button class="command-tab" onclick="switchCommandTab(this, 'view-step-windows')">Windows (Single-line)</button>
+            </div>
+            <div id="view-step-bash" class="command-content active">
+                <button class="copy-button" onclick="copyToClipboard('node scripts/test-subscription-renewal/view-stripe-subscription.js \\\n  --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93', this)">Copy</button>
+                <pre><code>node scripts/test-subscription-renewal/view-stripe-subscription.js \
+  --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93</code></pre>
+            </div>
+            <div id="view-step-windows" class="command-content">
+                <button class="copy-button" onclick="copyToClipboard('node scripts/test-subscription-renewal/view-stripe-subscription.js --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93', this)">Copy</button>
+                <pre><code>node scripts/test-subscription-renewal/view-stripe-subscription.js --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93</code></pre>
+            </div>
+        </div>
+
+        <h3><span class="step-number">3</span> Run Expedited Renewal</h3>
+        <div class="copyable-code-block">
+            <div class="command-tabs">
+                <button class="command-tab active" onclick="switchCommandTab(this, 'expedite-step-bash')">Bash (Multi-line)</button>
+                <button class="command-tab" onclick="switchCommandTab(this, 'expedite-step-windows')">Windows (Single-line)</button>
+            </div>
+            <div id="expedite-step-bash" class="command-content active">
+                <button class="copy-button" onclick="copyToClipboard('node scripts/test-subscription-renewal/expedite-stripe-renewal.js \\\n  --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 \\\n  --days-to-advance=30', this)">Copy</button>
+                <pre><code>node scripts/test-subscription-renewal/expedite-stripe-renewal.js \
+  --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 \
+  --days-to-advance=30</code></pre>
+            </div>
+            <div id="expedite-step-windows" class="command-content">
+                <button class="copy-button" onclick="copyToClipboard('node scripts/test-subscription-renewal/expedite-stripe-renewal.js --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 --days-to-advance=30', this)">Copy</button>
+                <pre><code>node scripts/test-subscription-renewal/expedite-stripe-renewal.js --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 --days-to-advance=30</code></pre>
+            </div>
+        </div>
+
+        <h3><span class="step-number">4</span> Verify Webhook Processing</h3>
+        <p>Wait 5-10 seconds, then verify database:</p>
+        <div class="copyable-code-block">
+            <div class="command-tabs">
+                <button class="command-tab active" onclick="switchCommandTab(this, 'verify-step-bash')">Bash (Multi-line)</button>
+                <button class="command-tab" onclick="switchCommandTab(this, 'verify-step-windows')">Windows (Single-line)</button>
+            </div>
+            <div id="verify-step-bash" class="command-content active">
+                <button class="copy-button" onclick="copyToClipboard('node scripts/test-subscription-renewal/verify-database.js \\\n  --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 \\\n  --tenant-id=tenant_demo_002', this)">Copy</button>
+                <pre><code>node scripts/test-subscription-renewal/verify-database.js \
+  --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 \
+  --tenant-id=tenant_demo_002</code></pre>
+            </div>
+            <div id="verify-step-windows" class="command-content">
+                <button class="copy-button" onclick="copyToClipboard('node scripts/test-subscription-renewal/verify-database.js --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 --tenant-id=tenant_demo_002', this)">Copy</button>
+                <pre><code>node scripts/test-subscription-renewal/verify-database.js --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 --tenant-id=tenant_demo_002</code></pre>
+            </div>
+        </div>
+
+        <h3><span class="step-number">5</span> Trigger Batch Job</h3>
+        <p>If webhook didn't update database, trigger batch job:</p>
+        <div class="copyable-code-block">
+            <div class="command-tabs">
+                <button class="command-tab active" onclick="switchCommandTab(this, 'trigger-step-bash')">Bash (Multi-line)</button>
+                <button class="command-tab" onclick="switchCommandTab(this, 'trigger-step-windows')">Windows (Single-line)</button>
+            </div>
+            <div id="trigger-step-bash" class="command-content active">
+                <button class="copy-button" onclick="copyToClipboard('node scripts/test-subscription-renewal/trigger-batch-job.js \\\n  --tenant-id=tenant_demo_002 \\\n  --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93', this)">Copy</button>
+                <pre><code>node scripts/test-subscription-renewal/trigger-batch-job.js \
+  --tenant-id=tenant_demo_002 \
+  --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93</code></pre>
+            </div>
+            <div id="trigger-step-windows" class="command-content">
+                <button class="copy-button" onclick="copyToClipboard('node scripts/test-subscription-renewal/trigger-batch-job.js --tenant-id=tenant_demo_002 --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93', this)">Copy</button>
+                <pre><code>node scripts/test-subscription-renewal/trigger-batch-job.js --tenant-id=tenant_demo_002 --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93</code></pre>
+            </div>
+        </div>
+
+        <h3><span class="step-number">6</span> Final Verification</h3>
+        <p>Verify database is in sync:</p>
+        <div class="copyable-code-block">
+            <div class="command-tabs">
+                <button class="command-tab active" onclick="switchCommandTab(this, 'final-step-bash')">Bash (Multi-line)</button>
+                <button class="command-tab" onclick="switchCommandTab(this, 'final-step-windows')">Windows (Single-line)</button>
+            </div>
+            <div id="final-step-bash" class="command-content active">
+                <button class="copy-button" onclick="copyToClipboard('node scripts/test-subscription-renewal/verify-database.js \\\n  --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 \\\n  --tenant-id=tenant_demo_002', this)">Copy</button>
+                <pre><code>node scripts/test-subscription-renewal/verify-database.js \
+  --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 \
+  --tenant-id=tenant_demo_002</code></pre>
+            </div>
+            <div id="final-step-windows" class="command-content">
+                <button class="copy-button" onclick="copyToClipboard('node scripts/test-subscription-renewal/verify-database.js --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 --tenant-id=tenant_demo_002', this)">Copy</button>
+                <pre><code>node scripts/test-subscription-renewal/verify-database.js --subscription-id=sub_1SeifsK5BrggeAHMBvg2XE93 --tenant-id=tenant_demo_002</code></pre>
+            </div>
+        </div>
+
+        <h2>Troubleshooting</h2>
+
+        <h3>Stripe API Errors</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Error</th>
+                    <th>Solution</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>"No such subscription"</strong></td>
+                    <td>Check subscription ID is correct and in test mode</td>
+                </tr>
+                <tr>
+                    <td><strong>"Invalid API key"</strong></td>
+                    <td>Verify STRIPE_SECRET_KEY is set and is a test mode key</td>
+                </tr>
+                <tr>
+                    <td><strong>"Cannot update subscription"</strong></td>
+                    <td>Subscription may be canceled or in invalid state</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Database Connection Errors</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Error</th>
+                    <th>Solution</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>"Connection refused"</strong></td>
+                    <td>Check DATABASE_URL and database is running</td>
+                </tr>
+                <tr>
+                    <td><strong>"Authentication failed"</strong></td>
+                    <td>Verify database credentials</td>
+                </tr>
+                <tr>
+                    <td><strong>"Subscription not found"</strong></td>
+                    <td>Check subscription exists in database with correct tenant_id</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Batch Job Errors</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Error</th>
+                    <th>Solution</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>"401 Unauthorized"</strong></td>
+                    <td>Check API_JWT_USER and API_JWT_PASS</td>
+                </tr>
+                <tr>
+                    <td><strong>"404 Not Found"</strong></td>
+                    <td>Verify batch job endpoint exists in backend</td>
+                </tr>
+                <tr>
+                    <td><strong>"500 Internal Server Error"</strong></td>
+                    <td>Check backend logs for details</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Important Notes</h2>
+
+        <div class="warning-box">
+            <h3>⚠️ Test Mode Only</h3>
+            <p>These scripts only work with Stripe test mode subscriptions. Do not use with production subscriptions.</p>
+        </div>
+
+        <div class="info-box">
+            <h3>📋 Database Safety</h3>
+            <p>Scripts are read-only for database (except batch job which updates). The batch job will update subscription dates to match Stripe.</p>
+        </div>
+
+        <div class="highlight-box">
+            <h3>⏱️ Timing Considerations</h3>
+            <ul>
+                <li><strong>Webhook Timing:</strong> Allow 5-10 seconds for webhooks to process after expediting</li>
+                <li><strong>Batch Job Timing:</strong> Allow 10-30 seconds for batch job to complete</li>
+                <li><strong>Multiple Runs:</strong> Running expedite script multiple times will advance subscription month by month</li>
+            </ul>
+        </div>
+
+        <h2>Related Documentation</h2>
+
+        <ul>
+            <li><a href="SUBSCRIPTION_RENEWAL_BATCH_JOB_EXPLAINED.html">Subscription Renewal Batch Job Explained</a> - Plain English explanation of what the batch job does</li>
+            <li><a href="SUBSCRIPTION_RENEWAL_FALLBACK_EXPLAINED.html">Subscription Renewal Fallback Mode Explained</a> - Explanation of fallback mode configuration</li>
+            <li><a href="SUBSCRIPTION_RENEWAL_BATCH_JOB_ANALYSIS_AND_TEST_STEPS.html">Subscription Renewal Batch Job Analysis and Test Steps</a> - Comprehensive technical documentation</li>
+            <li><a href="https://stripe.com/docs/testing" target="_blank">Stripe Test Mode Documentation</a> - Official Stripe testing guide</li>
+        </ul>
+
+        <hr style="margin: 40px 0; border: none; border-top: 2px solid #ddd;">
+
+        <p style="text-align: center; color: #666; margin-top: 40px;">
+            <em>This guide covers all testing scripts for subscription renewal functionality.</em><br>
+            <em>For implementation details, see the source code files in <code>scripts/test-subscription-renewal/</code>.</em>
+        </p>
+    </div>
+</body>
+</html>
+
+

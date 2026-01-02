@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 
 interface AdminNavigationProps {
@@ -8,6 +9,17 @@ interface AdminNavigationProps {
 }
 
 export default function AdminNavigation({ currentPage, showHome = true }: AdminNavigationProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Prevent layout shifts after hydration
+  useEffect(() => {
+    if (containerRef.current) {
+      // Force layout recalculation to prevent shifts
+      containerRef.current.style.width = '100%';
+      containerRef.current.style.maxWidth = '100%';
+    }
+  }, []);
+
   const buttons = [
     ...(showHome ? [{
       href: '/admin',
@@ -142,37 +154,37 @@ export default function AdminNavigation({ currentPage, showHome = true }: AdminN
 
   const getColorClasses = (color: string, isActive: boolean) => {
     const baseColors: Record<string, string> = {
-      gray: 'bg-gray-50 hover:bg-gray-100 text-gray-800',
-      blue: 'bg-blue-50 hover:bg-blue-100 text-blue-800',
-      green: 'bg-green-50 hover:bg-green-100 text-green-800',
-      yellow: 'bg-yellow-50 hover:bg-yellow-100 text-yellow-800',
-      purple: 'bg-purple-50 hover:bg-purple-100 text-purple-800',
-      orange: 'bg-orange-50 hover:bg-orange-100 text-orange-800',
-      teal: 'bg-teal-50 hover:bg-teal-100 text-teal-800',
-      indigo: 'bg-indigo-50 hover:bg-indigo-100 text-indigo-800',
-      cyan: 'bg-cyan-50 hover:bg-cyan-100 text-cyan-800',
-      slate: 'bg-slate-50 hover:bg-slate-100 text-slate-800',
-      red: 'bg-red-50 hover:bg-red-100 text-red-800',
-      pink: 'bg-pink-50 hover:bg-pink-100 text-pink-800',
-      emerald: 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800',
-      amber: 'bg-amber-50 hover:bg-amber-100 text-amber-800'
+      gray: 'bg-gray-50 hover:bg-gray-100 text-gray-800 border-gray-200',
+      blue: 'bg-blue-50 hover:bg-blue-100 text-blue-800 border-blue-200',
+      green: 'bg-green-50 hover:bg-green-100 text-green-800 border-green-200',
+      yellow: 'bg-yellow-50 hover:bg-yellow-100 text-yellow-800 border-yellow-200',
+      purple: 'bg-purple-50 hover:bg-purple-100 text-purple-800 border-purple-200',
+      orange: 'bg-orange-50 hover:bg-orange-100 text-orange-800 border-orange-200',
+      teal: 'bg-teal-50 hover:bg-teal-100 text-teal-800 border-teal-200',
+      indigo: 'bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border-indigo-200',
+      cyan: 'bg-cyan-50 hover:bg-cyan-100 text-cyan-800 border-cyan-200',
+      slate: 'bg-slate-50 hover:bg-slate-100 text-slate-800 border-slate-200',
+      red: 'bg-red-50 hover:bg-red-100 text-red-800 border-red-200',
+      pink: 'bg-pink-50 hover:bg-pink-100 text-pink-800 border-pink-200',
+      emerald: 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-200',
+      amber: 'bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-200'
     };
 
     const activeColors: Record<string, string> = {
-      gray: 'bg-gray-200 text-gray-800',
-      blue: 'bg-blue-200 text-blue-800',
-      green: 'bg-green-200 text-green-800',
-      yellow: 'bg-yellow-200 text-yellow-800',
-      purple: 'bg-purple-200 text-purple-800',
-      orange: 'bg-orange-200 text-orange-800',
-      teal: 'bg-teal-200 text-teal-800',
-      indigo: 'bg-indigo-200 text-indigo-800',
-      cyan: 'bg-cyan-200 text-cyan-800',
-      slate: 'bg-slate-200 text-slate-800',
-      red: 'bg-red-200 text-red-800',
-      pink: 'bg-pink-200 text-pink-800',
-      emerald: 'bg-emerald-200 text-emerald-800',
-      amber: 'bg-amber-200 text-amber-800'
+      gray: 'bg-gray-200 text-gray-800 border-gray-300',
+      blue: 'bg-blue-200 text-blue-800 border-blue-300',
+      green: 'bg-green-200 text-green-800 border-green-300',
+      yellow: 'bg-yellow-200 text-yellow-800 border-yellow-300',
+      purple: 'bg-purple-200 text-purple-800 border-purple-300',
+      orange: 'bg-orange-200 text-orange-800 border-orange-300',
+      teal: 'bg-teal-200 text-teal-800 border-teal-300',
+      indigo: 'bg-indigo-200 text-indigo-800 border-indigo-300',
+      cyan: 'bg-cyan-200 text-cyan-800 border-cyan-300',
+      slate: 'bg-slate-200 text-slate-800 border-slate-300',
+      red: 'bg-red-200 text-red-800 border-red-300',
+      pink: 'bg-pink-200 text-pink-800 border-pink-300',
+      emerald: 'bg-emerald-200 text-emerald-800 border-emerald-300',
+      amber: 'bg-amber-200 text-amber-800 border-amber-300'
     };
 
     return isActive ? activeColors[color] || activeColors.gray : baseColors[color] || baseColors.gray;
@@ -254,28 +266,33 @@ export default function AdminNavigation({ currentPage, showHome = true }: AdminN
   };
 
   return (
-    <div className="w-full mb-8">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {buttons.map((button) => {
-          const colorClasses = getColorClasses(button.color, button.active);
-          const iconBgColor = getIconBgColor(button.color);
-          const iconTextColor = getIconTextColor(button.color);
+    <div ref={containerRef} className="w-full overflow-hidden box-border admin-navigation-container" style={{ maxWidth: '100%', width: '100%' }}>
+      <div className="bg-white rounded-xl shadow-lg p-2.5 sm:p-3 md:p-4 lg:p-6 xl:p-8 overflow-hidden box-border" style={{ maxWidth: '100%', width: '100%' }}>
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-2.5 sm:gap-3 md:gap-4 lg:gap-5 xl:gap-6 w-full box-border" style={{ maxWidth: '100%', width: '100%' }}>
+          {buttons.map((button) => {
+            const colorClasses = getColorClasses(button.color, button.active);
+            const iconBgColor = getIconBgColor(button.color);
+            const iconTextColor = getIconTextColor(button.color);
 
-          return (
-            <Link
-              key={button.key}
-              href={button.href}
-              className={`flex flex-col items-center justify-center ${colorClasses} rounded-lg shadow-md p-4 text-xs transition-all group`}
-              title={button.label}
-              aria-label={button.label}
-            >
-              <div className={`flex-shrink-0 w-14 h-14 rounded-xl ${iconBgColor} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300`}>
-                {renderIcon(button.icon, `w-10 h-10 ${iconTextColor}`)}
-              </div>
-              <span className="font-semibold text-center leading-tight">{button.label}</span>
-            </Link>
-          );
-        })}
+            return (
+              <Link
+                key={button.key}
+                href={button.href}
+                className={`flex flex-col items-center justify-center rounded-lg border-2 p-1.5 sm:p-2 md:p-2.5 lg:p-3 xl:p-4 transition-all duration-300 hover:scale-105 hover:shadow-md group box-border w-full min-w-0 ${colorClasses}`}
+                title={button.label}
+                aria-label={button.label}
+                style={{ width: '100%', maxWidth: '100%', flexShrink: 0 }}
+              >
+                <div className={`flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 xl:w-11 xl:h-11 rounded-xl ${iconBgColor} flex items-center justify-center mb-1 sm:mb-1.5 md:mb-2 group-hover:scale-110 transition-transform duration-300`}>
+                  {renderIcon(button.icon, `w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:h-7 xl:w-8 xl:h-8 ${iconTextColor}`)}
+                </div>
+                <span className="font-semibold text-center text-[9px] sm:text-[10px] md:text-xs lg:text-sm xl:text-base leading-tight px-0.5 sm:px-1 break-words hyphens-auto">
+                  {button.label}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

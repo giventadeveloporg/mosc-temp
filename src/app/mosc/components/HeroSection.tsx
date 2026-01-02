@@ -6,22 +6,14 @@ import AppIcon from './AppIcon';
 
 const HeroSection = () => {
   return (
-    <section className="relative bg-gradient-to-br from-background to-muted min-h-[600px] flex items-center">
+    <section className="relative bg-gradient-to-br from-background to-muted min-h-[600px] flex items-center py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         {/* Church Logo */}
         <div className="mb-12">
-          <div className="flex items-center space-x-3">
-            <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center sacred-shadow">
-              <AppIcon name="Cross" size={32} color="white" />
-            </div>
-            <div>
-              <h1 className="font-heading font-semibold text-3xl text-foreground">
-                Malankara Orthodox Syrian Church
-              </h1>
-              <p className="font-caption text-lg text-muted-foreground">
-                Saint Thomas Christian Community
-              </p>
-            </div>
+          <div>
+            <p className="font-caption text-lg text-muted-foreground">
+              Saint Thomas Christian Community
+            </p>
           </div>
         </div>
 
@@ -31,37 +23,40 @@ const HeroSection = () => {
           <div className="flex flex-col items-center">
             <div className="w-48 h-48 lg:w-56 lg:h-56 rounded-full overflow-hidden sacred-shadow-lg bg-muted flex items-center justify-center">
               <AppImage
-                src="/images/event_1/mosc_email/logo-mosc.png"
+                src="/images/logos/Hero-Section-Image-MOSC.jpg"
                 alt="Malankara Orthodox Syrian Church emblem"
                 className="max-w-full max-h-full object-contain"
               />
             </div>
             <h3 className="mt-4 font-heading font-medium text-lg text-foreground text-center">
-              His Holiness the Patriarch
             </h3>
           </div>
 
           {/* Church Cross */}
           <div className="flex flex-col items-center">
-            <div className="w-48 h-48 lg:w-56 lg:h-56 rounded-full overflow-hidden sacred-shadow-lg bg-gradient-to-br from-muted to-secondary/30 flex items-center justify-center">
-              <AppIcon name="Cross" size={80} className="text-primary" />
+            <div className="w-48 h-48 lg:w-56 lg:h-56 overflow-hidden flex items-center justify-center bg-transparent">
+              <AppImage
+                src="/images/logos/Hero-Section-Holy-Cross-MOSC.png"
+                alt="MOSC Hero Image"
+                className="w-full h-full object-contain scale-110"
+                style={{ background: 'transparent' }}
+              />
             </div>
             <h3 className="mt-4 font-heading font-medium text-lg text-foreground text-center">
-              The Holy Cross
             </h3>
           </div>
 
           {/* Christ Iconography */}
           <div className="flex flex-col items-center">
-            <div className="w-48 h-48 lg:w-56 lg:h-56 rounded-full overflow-hidden sacred-shadow-lg bg-muted">
+            <div className="w-48 h-48 lg:w-56 lg:h-56 overflow-hidden flex items-center justify-center" style={{ background: 'transparent' }}>
               <AppImage
-                src="https://images.pexels.com/photos/8363027/pexels-photo-8363027.jpeg"
+                src="/images/event_1/mosc_email/logo-mosc.png"
                 alt="Religious iconography of Christ blessing"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
+                style={{ background: 'transparent' }}
               />
             </div>
             <h3 className="mt-4 font-heading font-medium text-lg text-foreground text-center">
-              Christ the Savior
             </h3>
           </div>
         </div>

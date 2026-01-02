@@ -686,6 +686,8 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
   if (!settingsLoading && settings && showTeamSection) {
     aboutDropdown.push({ name: 'Team', href: '/#team-section' });
   }
+  // Always add Sponsors menu item
+  aboutDropdown.push({ name: 'Sponsors', href: '/sponsors' });
 
   // Update nav items with dynamic About dropdown
   // About always has a dropdown now (at minimum "About Us")
@@ -734,7 +736,8 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                     const isAboutActive = hasDropdown && item.name === 'About' && item.dropdown.some(
                       (subItem: any) => subItem.href === pathname ||
                         (subItem.href === '/#about-us' && typeof window !== 'undefined' && window.location.hash === '#about-us') ||
-                        (subItem.href === '/#team-section' && typeof window !== 'undefined' && window.location.hash === '#team-section')
+                        (subItem.href === '/#team-section' && typeof window !== 'undefined' && window.location.hash === '#team-section') ||
+                        (subItem.href === '/sponsors' && pathname === '/sponsors')
                     );
                     const isFeaturesActive = hasDropdown && item.name === 'Features' && item.dropdown.some(
                       (subItem: any) => subItem.href === pathname ||
@@ -758,6 +761,10 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                                   : 'text-blue-400 font-medium hover:text-blue-500 hover:font-semibold border-b-2 border-transparent hover:border-blue-400'
                                 }
                               `}
+                              aria-haspopup="true"
+                              aria-expanded="false"
+                              role="button"
+                              tabIndex={0}
                             >
                               <span className="tracking-[0.025em]">{item.name}</span>
                               <ChevronDown
@@ -767,7 +774,11 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                               />
                             </div>
                             {/* Dropdown Menu */}
-                            <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50">
+                            <div
+                              className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50"
+                              role="menu"
+                              aria-label={`${item.name} submenu`}
+                            >
                               <div className="py-3">
                                 {item.dropdown.map((subItem: any) => {
                                   // Skip Profile if user is not authenticated
@@ -1156,7 +1167,8 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                             const isSubItemActive = subItem.href === pathname ||
                               (subItem.href === '/membership' && pathname?.startsWith('/membership')) ||
                               (subItem.href === '/#about-us' && typeof window !== 'undefined' && window.location.hash === '#about-us') ||
-                              (subItem.href === '/#team-section' && typeof window !== 'undefined' && window.location.hash === '#team-section');
+                              (subItem.href === '/#team-section' && typeof window !== 'undefined' && window.location.hash === '#team-section') ||
+                              (subItem.href === '/sponsors' && pathname === '/sponsors');
 
                             return (
                               <li key={subItem.name}>

@@ -248,7 +248,7 @@ export default function GalleryPage() {
   const categories = ['All', 'Major Events', 'Ecumenical Visits', 'Special Events', 'Private Audiences', 'Receptions', 'Liturgical Events', 'Church Visits', 'Conferences'];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" data-testid="mosc-gallery-page">
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-background to-muted py-16 lg:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
