@@ -37,12 +37,12 @@ const HisHolinessBaseliosMarthomaMathewsIiiPage = () => {
                   </div>
 
                   {/* Content - Right Side of Image */}
-                  <div className="flex-1">
-                    <h3 className="font-heading font-semibold text-2xl text-foreground mb-6">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-heading font-semibold text-2xl text-foreground mb-6 break-words">
                       H.H. Baselios Marthoma Mathews III, The Ninth Catholicos of the East in Malankara
                     </h3>
 
-                    <div className="prose prose-lg max-w-none">
+                    <div className="prose prose-lg max-w-none break-words">
                       <p className="font-body text-muted-foreground leading-relaxed mb-4">
                         His Holiness Baselios Marthoma Mathews III was enthroned as the Catholicos of the East & Malankara Metropolitan (the Supreme Head of the Malankara Orthodox Syrian Church of India) on Friday, 15th October 2021. His Holiness is the 92nd Primate on the Apostolic Throne of St. Thomas.
                       </p>
