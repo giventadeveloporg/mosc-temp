@@ -298,7 +298,15 @@ const InnerMembershipCheckout = React.memo(function InnerMembershipCheckout({
             : 'bg-primary hover:bg-primary/90 hover:scale-105'
         }`}
       >
-        {confirming ? 'Processing...' : `Subscribe for $${(amountCents / 100).toFixed(2)}`}
+        {confirming ? 'Processing...' : (() => {
+          const amount = amountCents / 100;
+          return `Subscribe for ${new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }).format(amount)}`;
+        })()}
       </button>
     </div>
   );

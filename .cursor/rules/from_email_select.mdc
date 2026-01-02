@@ -4,6 +4,7 @@
 This rule defines the validation patterns and error handling for the `FromEmailSelect` component used in event forms and other admin pages. The component provides a searchable dropdown for selecting tenant email addresses with comprehensive validation.
 
 ## **Problem Solved**
+- **Database Value Validation**: Validates that `fromEmail` from database matches an email in the tenant email addresses list, clearing invalid values
 - **Empty List Validation**: Detects when no email addresses are configured and shows appropriate error message
 - **Empty Field Validation**: Validates that user has selected an email address before form submission
 - **Custom Error Messages**: Provides user-friendly error messages instead of browser default validation
@@ -15,7 +16,82 @@ This rule defines the validation patterns and error handling for the `FromEmailS
 
 ## **Validation Rules**
 
-### **1. Empty Email List Validation**
+### **1. Database Value Validation (Event Loading)**
+
+**CRITICAL**: When loading event data from the database, the `fromEmail` value must be validated against the tenant email addresses list. If the database value doesn't exist in the list, it must be cleared so validation will catch it.
+
+**Problem**: The database may contain an email address (e.g., `'events@example.com'`) that doesn't exist in the tenant email addresses list. This creates a conflict where:
+- The form field appears empty (because `FromEmailSelect` can't display a value not in its list)
+- But `form.fromEmail` still has the database value
+- Validation passes incorrectly because the field has a value (even though it's invalid)
+
+**Solution**: Validate the database value on event load and clear it if it doesn't exist in the email addresses list.
+
+**Implementation Pattern:**
+```tsx
+// In EventForm useEffect when loading event data
+useEffect(() => {
+  if (event) {
+    // CRITICAL: Validate fromEmail against the email addresses list
+    // If the database value doesn't exist in the list, clear it so validation will catch it
+    const validateAndSetFromEmail = async () => {
+      let validFromEmail = event.fromEmail || '';
+
+      // Only validate if fromEmail has a value
+      if (validFromEmail && validFromEmail.trim() !== '') {
+        try {
+          // Fetch all email addresses (use a large page size to get all)
+          const emailAddresses = await fetchTenantEmailAddressesServer(0, 1000);
+
+          // Check if the fromEmail exists in the list and is active
+          const emailExists = emailAddresses.some(
+            email => email.emailAddress === validFromEmail && email.isActive === true
+          );
+
+          if (!emailExists) {
+            // Email doesn't exist in the list - clear it so validation will catch it
+            console.warn('[EventForm] fromEmail from database does not exist in email addresses list:', {
+              fromEmail: validFromEmail,
+              availableEmails: emailAddresses.map(e => e.emailAddress),
+            });
+            validFromEmail = '';
+          }
+        } catch (error) {
+          // If fetching email addresses fails, log error but still clear the field
+          // This ensures validation will catch it
+          console.error('[EventForm] Failed to validate fromEmail against email addresses list:', error);
+          validFromEmail = '';
+        }
+      }
+
+      // Set form with validated fromEmail
+      const formData = { ...defaultEvent, ...event, fromEmail: validFromEmail };
+      setForm(formData);
+
+      // ... rest of event loading logic (metadata, etc.)
+    };
+
+    // Call the async function to validate and set fromEmail
+    void validateAndSetFromEmail();
+  }
+}, [event]);
+```
+
+**Key Requirements:**
+- ✅ **Always validate** database `fromEmail` value against the email addresses list when loading event data
+- ✅ **Clear invalid values** - if database value doesn't exist in list, set `form.fromEmail = ''`
+- ✅ **Check active status** - only consider emails where `isActive === true`
+- ✅ **Handle errors gracefully** - if fetching email addresses fails, clear the field to ensure validation catches it
+- ✅ **Log warnings** - log when database value doesn't match list for debugging
+- ✅ **Run before form initialization** - validation must complete before setting form state
+
+**Why This Is Critical:**
+- Prevents silent validation failures where form appears empty but has invalid value
+- Ensures users must select a valid email from the dropdown
+- Maintains data integrity by only allowing emails from the tenant email addresses list
+- Provides clear validation feedback when database contains invalid data
+
+### **2. Empty Email List Validation**
 
 When the email address list is empty (length === 0), the component must:
 
@@ -66,7 +142,7 @@ const loadEmailAddresses = async () => {
 )}
 ```
 
-### **2. Empty Field Validation (Form Submission)**
+### **3. Empty Field Validation (Form Submission)**
 
 When the user clicks "Save" without selecting an email address (including untouched fields), the parent form must:
 
@@ -84,24 +160,29 @@ function validate(): boolean {
   const errs: Record<string, string> = {};
 
   // Validate fromEmail
-  // First check: Is the email list empty?
-  if (isEmailListEmpty) {
-    errs.fromEmail = 'The from email list is empty. Please contact Admin to add the list of from email addresses.';
-  }
-  // Second check: Is the fromEmail field empty or just whitespace?
-  // CRITICAL: This must catch untouched fields (empty string), null, undefined, and whitespace-only
+  // CRITICAL: Field is ALWAYS required, regardless of list state
+  // First check: Is the fromEmail field empty or just whitespace?
+  // This must catch untouched fields (empty string), null, undefined, and whitespace-only
   // The field is initialized as '' (empty string) in defaultEvent, so we need to check for that
   const fromEmailValue = form.fromEmail;
-  const isFromEmailEmpty = !fromEmailValue ||
-                           fromEmailValue === '' ||
-                           (typeof fromEmailValue === 'string' && fromEmailValue.trim() === '');
+  // CRITICAL: Normalize value to handle null, undefined, and empty string
+  const normalizedFromEmail = fromEmailValue === null || fromEmailValue === undefined ? '' : String(fromEmailValue);
+  const isFromEmailEmpty = normalizedFromEmail === '' || normalizedFromEmail.trim() === '';
 
-  if (isFromEmailEmpty) {
-    errs.fromEmail = 'Please enter from email address';
-  }
-  // Third check: Is the email format valid?
-  else if (typeof fromEmailValue === 'string' && fromEmailValue.trim() !== '' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fromEmailValue.trim())) {
-    errs.fromEmail = 'Please enter a valid email address';
+  // Second check: Is the email list empty?
+  if (isEmailListEmpty) {
+    // If list is empty, always show error (user cannot select from empty list)
+    // This error takes priority - field cannot be used when list is empty
+    errs.fromEmail = 'The from email list is empty. Please contact Admin to add the list of from email addresses.';
+  } else {
+    // List is NOT empty - validate field value
+    if (isFromEmailEmpty) {
+      // Field is empty - require selection
+      errs.fromEmail = 'Please enter from email address';
+    } else if (normalizedFromEmail.trim() !== '' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedFromEmail.trim())) {
+      // Field has value but format is invalid
+      errs.fromEmail = 'Please enter a valid email address';
+    }
   }
 
   setErrors(errs);
@@ -109,7 +190,7 @@ function validate(): boolean {
 }
 ```
 
-### **3. Parent Component Integration**
+### **4. Parent Component Integration**
 
 The parent component (e.g., `EventForm`) must:
 
@@ -166,17 +247,22 @@ interface FromEmailSelectProps {
 
 ## **Validation Priority Order**
 
-1. **First Check**: Is the email list empty?
-   - If yes: Show "The from email list is empty. Please contact Admin to add the list of from email addresses."
-   - Block form submission
+**CRITICAL**: The from email field is **ALWAYS required**, regardless of whether the email list is empty or not.
 
-2. **Second Check**: Is the from email field empty? (including untouched fields)
-   - If yes: Show "Please enter from email address"
-   - Block form submission
-   - **CRITICAL**: Must catch untouched fields initialized as empty string (`''`)
+1. **First Check**: Is the from email field empty? (including untouched fields)
+   - **ALWAYS runs** - field validation is never skipped
+   - Must catch untouched fields initialized as empty string (`''`)
+   - Determines if field has a value before checking list state
+
+2. **Second Check**: Is the email list empty?
+   - **If list is empty**: Show "The from email list is empty. Please contact Admin to add the list of from email addresses."
+   - **If list is NOT empty AND field is empty**: Show "Please enter from email address"
+   - Block form submission in both cases
+   - **CRITICAL**: List empty error takes priority - user cannot use emails from empty list
 
 3. **Third Check**: Is the email format valid?
-   - If no: Show "Please enter a valid email address"
+   - **Only runs if list is NOT empty AND field has a value**
+   - If format is invalid: Show "Please enter a valid email address"
    - Block form submission
 
 ## **Error Display Locations**
@@ -415,39 +501,60 @@ onEmptyListChange={(isEmpty) => {
 
 ## **Complete Validation Flow**
 
-1. **Component Mounts**: `FromEmailSelect` loads email addresses
-2. **Check List**: If list is empty, set `isEmptyList = true` and call `onEmptyListChange(true)`
-3. **User Interaction**: User types or selects email (or leaves empty)
-4. **Form Submission**: User clicks "Save Event"
-5. **Validation Runs**: `validate()` function checks:
-   - Is list empty? → Show empty list error
-   - Is field empty? → Show required field error
-   - Is format valid? → Show format error
-6. **Error Display**: Errors shown in component, field, and summary
-7. **Submission Blocked**: Form does not submit if validation fails
-8. **Error Clearing**: Errors cleared when user selects email or list becomes non-empty
+1. **Event Loads**: When event data is loaded from database:
+   - **CRITICAL**: Validate `event.fromEmail` against tenant email addresses list
+   - If database value doesn't exist in list → Clear `form.fromEmail = ''`
+   - If database value exists in list → Keep it and pre-populate field
+   - Log warning if database value is invalid
+2. **Component Mounts**: `FromEmailSelect` loads email addresses
+3. **Check List**: If list is empty, set `isEmptyList = true` and call `onEmptyListChange(true)`
+4. **User Interaction**: User types or selects email (or leaves empty)
+5. **Form Submission**: User clicks "Save Event"
+6. **Validation Runs**: `validate()` function checks (field is ALWAYS validated):
+   - **First**: Is field empty? (always checked)
+   - **Then**:
+     - If list is empty → Show "list is empty" error (user cannot use emails from empty list)
+     - If list is NOT empty AND field is empty → Show "please select from email" error
+     - If list is NOT empty AND field has value → Validate email format
+7. **Error Display**: Errors shown in component, field, and summary
+8. **Submission Blocked**: Form does not submit if validation fails (field is always required)
+9. **Error Clearing**: Errors cleared when user selects email or list becomes non-empty
 
 ## **Best Practices**
 
 ### **DO:**
-- ✅ Always check `isEmailListEmpty` before checking field emptiness
+- ✅ **Validate database values** - always check if `fromEmail` from database exists in email addresses list when loading event data
+- ✅ **Clear invalid database values** - if database value doesn't exist in list, set `form.fromEmail = ''` so validation will catch it
+- ✅ **ALWAYS validate the field** - field is required regardless of list state
+- ✅ Check field emptiness first, then check list state to determine appropriate error message
+- ✅ Show "list is empty" error if list is empty (user cannot use emails from empty list)
+- ✅ Show "please select from email" error if list is NOT empty but field is empty
 - ✅ Use custom error messages instead of browser defaults
 - ✅ Display errors in multiple locations (component, field, summary)
 - ✅ Clear errors when user corrects the issue
 - ✅ Use consistent error styling (red colors, icons)
 - ✅ Notify parent component about empty list state
 - ✅ Handle loading states gracefully
+- ✅ Log warnings when database contains invalid email values
 
 ### **DON'T:**
+- ❌ **Pre-populate invalid database values** - never set `form.fromEmail` to a value that doesn't exist in the email addresses list
+- ❌ **Skip database value validation** - always validate `fromEmail` from database against the email addresses list
 - ❌ Use `required` attribute on input field (causes browser validation)
 - ❌ Show browser's default validation messages
 - ❌ Submit form when validation fails
+- ❌ **Skip field validation when email list is empty** - field is ALWAYS required
+- ❌ Allow form submission without from email value (regardless of list state)
 - ❌ Forget to clear errors when state changes
 - ❌ Show errors while data is still loading
 - ❌ Use generic error messages (be specific about the issue)
+- ❌ Ignore database values that don't match the email list (always clear them)
 
 ## **Testing Checklist**
 
+- [ ] **Database value validation** - invalid email from database is cleared on event load
+- [ ] **Database value logging** - warning is logged when database value doesn't match email list
+- [ ] **Valid database value** - valid email from database is pre-populated correctly
 - [ ] Empty list shows error message immediately after load
 - [ ] Empty field shows error when clicking "Save" without selection
 - [ ] **Untouched field** (never focused/interacted) shows error when clicking "Save"
@@ -465,8 +572,9 @@ onEmptyListChange={(isEmpty) => {
 ## **References**
 
 - **Component**: [`src/components/FromEmailSelect.tsx`](mdc:src/components/FromEmailSelect.tsx)
-- **Usage**: [`src/components/EventForm.tsx`](mdc:src/components/EventForm.tsx) - Lines 1610-1645
-- **Validation**: [`src/components/EventForm.tsx`](mdc:src/components/EventForm.tsx) - Lines 235-252 (includes untouched field validation)
+- **Usage**: [`src/components/EventForm.tsx`](mdc:src/components/EventForm.tsx) - Lines 1689-1723
+- **Database Value Validation**: [`src/components/EventForm.tsx`](mdc:src/components/EventForm.tsx) - Lines 83-196 (validates database fromEmail against email addresses list)
+- **Validation**: [`src/components/EventForm.tsx`](mdc:src/components/EventForm.tsx) - Lines 244-301 (includes untouched field validation)
 - **Chrome Autocomplete Prevention**: [`src/components/FromEmailSelect.tsx`](mdc:src/components/FromEmailSelect.tsx) - Lines 163-210 (hidden input, search type, z-index)
 - **Server Action**: [`src/app/admin/tenant-email-addresses/ApiServerActions.ts`](mdc:src/app/admin/tenant-email-addresses/ApiServerActions.ts)
 

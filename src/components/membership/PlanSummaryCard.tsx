@@ -12,7 +12,7 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency,
-      minimumFractionDigits: 0,
+      minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(price);
   };
@@ -53,7 +53,7 @@ export function PlanSummaryCard({ plan }: PlanSummaryCardProps) {
               {formatPrice(plan.price, plan.currency)}
             </span>
           </div>
-          {plan.trialDays && plan.trialDays > 0 && (
+          {plan.trialDays > 0 && (
             <p className="font-body text-sm text-muted-foreground mt-2">
               {plan.trialDays} day{plan.trialDays !== 1 ? 's' : ''} free trial included
             </p>

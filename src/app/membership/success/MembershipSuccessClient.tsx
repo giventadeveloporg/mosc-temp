@@ -23,6 +23,23 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
   const router = useRouter();
   const cancelledRef = useRef(false);
   const isPostingRef = useRef(false); // CRITICAL: Prevent duplicate POST requests
+  const processedRef = useRef(false); // CRITICAL: Prevent duplicate processing on refresh
+
+  // SessionStorage keys for duplicate prevention (persists across page refreshes)
+  const getProcessedKey = () => {
+    const identifier = payment_intent || session_id || 'unknown';
+    return `membership_subscription_processed_${identifier}`;
+  };
+
+  const hasBeenProcessed = () => {
+    if (typeof window === 'undefined') return false;
+    return sessionStorage.getItem(getProcessedKey()) === 'true';
+  };
+
+  const markAsProcessed = () => {
+    if (typeof window === 'undefined') return;
+    sessionStorage.setItem(getProcessedKey(), 'true');
+  };
 
   // Default hero image URL - same as event success page
   const defaultHeroImageUrl = '/images/default_placeholder_hero_image.jpeg';
@@ -117,6 +134,18 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
 
     async function fetchSubscriptionData() {
       if (cancelledRef.current) return;
+
+      // CRITICAL: Check sessionStorage to prevent duplicate processing on page refresh
+      if (hasBeenProcessed() && processedRef.current) {
+        console.log('[MEMBERSHIP-SUCCESS] Subscription already processed (from sessionStorage), skipping duplicate processing:', {
+          session_id,
+          payment_intent,
+          processedKey: getProcessedKey()
+        });
+        // Still fetch subscription details to display, but don't trigger creation again
+        // The GET endpoint will return existing subscription if it exists
+      }
+
       console.log('[MEMBERSHIP-SUCCESS] Starting data fetch...', { session_id, payment_intent });
       setLoading(true);
       setError(null);
@@ -134,6 +163,7 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
 
         console.log('[DESKTOP FLOW] GET request URL:', getUrl);
         console.log('[DESKTOP FLOW] Desktop flow uses GET-only (no POST fallback)');
+        console.log('[DESKTOP FLOW] Already processed:', hasBeenProcessed());
 
         const getRes = await fetch(getUrl, {
           cache: 'no-store',
@@ -155,6 +185,14 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
           if (data.subscription) {
             console.log('[DESKTOP FLOW] ✅ Subscription found in GET response:', data.subscription.id);
             console.log('[DESKTOP FLOW] ✅ Desktop flow successful - subscription loaded via GET');
+
+            // CRITICAL: Mark as processed in sessionStorage to prevent duplicate processing on refresh
+            if (!hasBeenProcessed()) {
+              markAsProcessed();
+              processedRef.current = true;
+              console.log('[MEMBERSHIP-SUCCESS] Marked subscription as processed in sessionStorage');
+            }
+
             if (!cancelledRef.current) {
               setSubscriptionDetails({
                 plan: data.plan,
@@ -214,6 +252,14 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
                   if (pollData.subscription) {
                     console.log('[DESKTOP FLOW] ✅ Subscription found after polling:', pollData.subscription.id);
                     console.log('[DESKTOP FLOW] ✅ Desktop flow successful - subscription loaded via GET polling');
+
+                    // CRITICAL: Mark as processed in sessionStorage to prevent duplicate processing on refresh
+                    if (!hasBeenProcessed()) {
+                      markAsProcessed();
+                      processedRef.current = true;
+                      console.log('[MEMBERSHIP-SUCCESS] Marked subscription as processed in sessionStorage (from polling)');
+                    }
+
                     if (!cancelledRef.current) {
                       setSubscriptionDetails({
                         plan: pollData.plan,
@@ -455,7 +501,7 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
                       return new Intl.NumberFormat('en-US', {
                         style: 'currency',
                         currency: subscriptionDetails.currency || subscriptionDetails.plan.currency || 'USD',
-                        minimumFractionDigits: 0,
+                        minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       }).format(displayAmount);
                     })()}
@@ -570,6 +616,179 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
                       {subscriptionDetails.plan.billingInterval === 'YEARLY' && 'Yearly'}
                       {subscriptionDetails.plan.billingInterval === 'ONE_TIME' && 'One-time'} • {subscriptionDetails.plan.currency}
                     </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Subscription Status & Billing Details */}
+        {subscriptionDetails?.subscription && (
+          <div className="max-w-2xl mx-auto mt-8">
+            <div className="bg-white rounded-lg shadow-md p-8 border border-border">
+              <h2 className="text-2xl font-heading font-semibold text-foreground mb-6 text-center">
+                Subscription Details
+              </h2>
+
+              <div className="space-y-4">
+                {/* Subscription Status */}
+                <div className="flex items-start gap-3 pb-4 border-b border-border">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                    <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-body text-sm font-semibold text-foreground">Status</p>
+                    <p className="font-body text-sm text-muted-foreground capitalize">
+                      {subscriptionDetails.subscription.subscriptionStatus?.toLowerCase() || 'Active'}
+                      {subscriptionDetails.subscription.cancelAtPeriodEnd && ' (Cancels at period end)'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Current Period */}
+                {subscriptionDetails.subscription.currentPeriodStart && (
+                  <div className="flex items-start gap-3 pb-4 border-b border-border">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                      <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-body text-sm font-semibold text-foreground">Current Period</p>
+                      <p className="font-body text-sm text-muted-foreground">
+                        {new Date(subscriptionDetails.subscription.currentPeriodStart).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })} - {subscriptionDetails.subscription.currentPeriodEnd ? new Date(subscriptionDetails.subscription.currentPeriodEnd).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        }) : 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Next Payment */}
+                {subscriptionDetails.subscription.currentPeriodEnd && subscriptionDetails?.plan && subscriptionDetails.plan.billingInterval !== 'ONE_TIME' && (
+                  <div className="flex items-start gap-3 pb-4 border-b border-border">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+                      <svg className="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-body text-sm font-semibold text-foreground">Next Payment</p>
+                      <p className="font-body text-sm text-muted-foreground">
+                        {new Date(subscriptionDetails.subscription.currentPeriodEnd).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Stripe Subscription ID */}
+                {subscriptionDetails.subscription.stripeSubscriptionId && (
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                      <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l4-4-4-4" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-body text-sm font-semibold text-foreground">Subscription ID</p>
+                      <p className="font-body text-xs text-muted-foreground font-mono break-all">
+                        {subscriptionDetails.subscription.stripeSubscriptionId}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Action Buttons */}
+        <div className="max-w-2xl mx-auto mt-8">
+          <div className="bg-white rounded-lg shadow-md p-8 border border-border">
+            <h2 className="text-xl font-heading font-semibold text-foreground mb-6 text-center">
+              What's Next?
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <button
+                onClick={() => router.push('/membership/manage')}
+                className="flex items-center justify-center gap-3 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-all duration-300 hover:scale-105"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span>Manage Subscription</span>
+              </button>
+              <button
+                onClick={() => router.push('/membership')}
+                className="flex items-center justify-center gap-3 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-all duration-300 hover:scale-105"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                <span>View All Plans</span>
+              </button>
+              <button
+                onClick={() => router.push('/profile')}
+                className="flex items-center justify-center gap-3 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-all duration-300 hover:scale-105"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span>My Profile</span>
+              </button>
+              <button
+                onClick={() => router.push('/')}
+                className="flex items-center justify-center gap-3 px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-semibold transition-all duration-300 hover:scale-105"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                <span>Go Home</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Error Message Display */}
+        {error && (
+          <div className="max-w-2xl mx-auto mt-8">
+            <div className="bg-red-50 border-l-4 border-red-500 p-6 rounded-lg">
+              <div className="flex items-start">
+                <div className="flex-shrink-0">
+                  <svg className="h-6 w-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div className="ml-4 flex-1">
+                  <h3 className="text-lg font-semibold text-red-900 mb-2">Processing Issue</h3>
+                  <p className="text-red-800 text-sm mb-4">{error}</p>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <button
+                      onClick={() => window.location.reload()}
+                      className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-all duration-300"
+                    >
+                      Refresh Page
+                    </button>
+                    <a
+                      href="mailto:support@example.com"
+                      className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-800 rounded-lg font-semibold transition-all duration-300 text-center"
+                    >
+                      Contact Support
+                    </a>
                   </div>
                 </div>
               </div>

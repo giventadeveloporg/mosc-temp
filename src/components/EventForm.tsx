@@ -11,6 +11,7 @@ import type { RecurrencePattern, RecurrenceEndType } from '@/lib/recurrenceUtils
 import { validateRecurrenceEndDate, generateOccurrenceDates } from '@/lib/recurrenceUtils';
 import { useRouter } from 'next/navigation';
 import FromEmailSelect from '@/components/FromEmailSelect';
+import { fetchTenantEmailAddressesServer } from '@/app/admin/tenant-email-addresses/ApiServerActions';
 
 interface EventFormProps {
   event?: EventDetailsDTO;
@@ -81,63 +82,73 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
 
   useEffect(() => {
     if (event) {
-      setForm({ ...defaultEvent, ...event });
+      // CRITICAL: Validate fromEmail against the email addresses list
+      // If the database value doesn't exist in the list, clear it so validation will catch it
+      const validateAndSetFromEmail = async () => {
+        let validFromEmail = event.fromEmail || '';
 
-      // Load donation metadata (NEW - preferred)
-      if (event.donationMetadata) {
-        try {
-          const donationMetadata = JSON.parse(event.donationMetadata);
-          setIsFundraiserEvent(Boolean(donationMetadata.isFundraiserEvent));
-          setIsCharityEvent(Boolean(donationMetadata.isCharityEvent));
-          setZeroFeeProvider(donationMetadata.zeroFeeProvider || '');
-          setGivebutterCampaignId(donationMetadata.givebutterCampaignId || '');
-          setUseZeroFeeProvider(Boolean(donationMetadata.zeroFeeProvider));
-        } catch (e) {
-          console.error('Failed to parse donation metadata', e);
-        }
-      }
-      // Fallback: Load from old metadata field (backward compatibility)
-      else if (event.metadata) {
-        const metadata = parseEventMetadata(event.metadata);
-        setIsFundraiserEvent(Boolean(metadata.isFundraiserEvent));
-        setIsCharityEvent(Boolean(metadata.isCharityEvent));
+        // Only validate if fromEmail has a value
+        if (validFromEmail && validFromEmail.trim() !== '') {
+          try {
+            // Fetch all email addresses (use a large page size to get all)
+            const emailAddresses = await fetchTenantEmailAddressesServer(0, 1000);
 
-        const donationConfig = metadata.donationConfig;
-        if (donationConfig) {
-          setUseZeroFeeProvider(Boolean(donationConfig.useZeroFeeProvider));
-          setZeroFeeProvider(donationConfig.zeroFeeProvider || '');
-          setGivebutterCampaignId(donationConfig.givebutterCampaignId || '');
-        }
-      }
+            // Check if the fromEmail exists in the list
+            const emailExists = emailAddresses.some(
+              email => email.emailAddress === validFromEmail && email.isActive === true
+            );
 
-      // Load recurrence metadata (NEW - preferred)
-      if (event.eventRecurrenceMetadata) {
-        try {
-          const recurrenceConfig = JSON.parse(event.eventRecurrenceMetadata);
-          setIsRecurring(true);
-          setRecurrencePattern((recurrenceConfig.pattern as RecurrencePattern) || '');
-          setRecurrenceInterval(recurrenceConfig.interval || 1);
-          setRecurrenceEndType((recurrenceConfig.endType as RecurrenceEndType) || 'END_DATE');
-          setRecurrenceEndDate(recurrenceConfig.endDate || '');
-          setRecurrenceOccurrences(recurrenceConfig.occurrences || 1);
-          setRecurrenceWeeklyDays(recurrenceConfig.weeklyDays || []);
-          if (recurrenceConfig.monthlyDay === 'LAST') {
-            setRecurrenceMonthlyDay('LAST');
-            setRecurrenceMonthlyDayType('LAST_DAY');
-          } else if (recurrenceConfig.monthlyDay) {
-            setRecurrenceMonthlyDay(recurrenceConfig.monthlyDay);
-            setRecurrenceMonthlyDayType('DAY_NUMBER');
+            if (!emailExists) {
+              // Email doesn't exist in the list - clear it so validation will catch it
+              console.warn('[EventForm] fromEmail from database does not exist in email addresses list:', {
+                fromEmail: validFromEmail,
+                availableEmails: emailAddresses.map(e => e.emailAddress),
+              });
+              validFromEmail = '';
+            }
+          } catch (error) {
+            // If fetching email addresses fails, log error but still clear the field
+            // This ensures validation will catch it
+            console.error('[EventForm] Failed to validate fromEmail against email addresses list:', error);
+            validFromEmail = '';
           }
-        } catch (e) {
-          console.error('Failed to parse recurrence metadata', e);
         }
-      }
-      // Fallback: Load from old metadata field (backward compatibility)
-      else if (event.metadata) {
-        const metadata = parseEventMetadata(event.metadata);
-        if (metadata.isRecurring) {
-          const recurrenceConfig = metadata.recurrenceConfig;
-          if (recurrenceConfig) {
+
+        // Set form with validated fromEmail
+        const formData = { ...defaultEvent, ...event, fromEmail: validFromEmail };
+        setForm(formData);
+
+        // Load donation metadata (NEW - preferred)
+        if (event.donationMetadata) {
+          try {
+            const donationMetadata = JSON.parse(event.donationMetadata);
+            setIsFundraiserEvent(Boolean(donationMetadata.isFundraiserEvent));
+            setIsCharityEvent(Boolean(donationMetadata.isCharityEvent));
+            setZeroFeeProvider(donationMetadata.zeroFeeProvider || '');
+            setGivebutterCampaignId(donationMetadata.givebutterCampaignId || '');
+            setUseZeroFeeProvider(Boolean(donationMetadata.zeroFeeProvider));
+          } catch (e) {
+            console.error('Failed to parse donation metadata', e);
+          }
+        }
+        // Fallback: Load from old metadata field (backward compatibility)
+        else if (event.metadata) {
+          const metadata = parseEventMetadata(event.metadata);
+          setIsFundraiserEvent(Boolean(metadata.isFundraiserEvent));
+          setIsCharityEvent(Boolean(metadata.isCharityEvent));
+
+          const donationConfig = metadata.donationConfig;
+          if (donationConfig) {
+            setUseZeroFeeProvider(Boolean(donationConfig.useZeroFeeProvider));
+            setZeroFeeProvider(donationConfig.zeroFeeProvider || '');
+            setGivebutterCampaignId(donationConfig.givebutterCampaignId || '');
+          }
+        }
+
+        // Load recurrence metadata (NEW - preferred)
+        if (event.eventRecurrenceMetadata) {
+          try {
+            const recurrenceConfig = JSON.parse(event.eventRecurrenceMetadata);
             setIsRecurring(true);
             setRecurrencePattern((recurrenceConfig.pattern as RecurrencePattern) || '');
             setRecurrenceInterval(recurrenceConfig.interval || 1);
@@ -152,9 +163,37 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
               setRecurrenceMonthlyDay(recurrenceConfig.monthlyDay);
               setRecurrenceMonthlyDayType('DAY_NUMBER');
             }
+          } catch (e) {
+            console.error('Failed to parse recurrence metadata', e);
           }
         }
-      }
+        // Fallback: Load from old metadata field (backward compatibility)
+        else if (event.metadata) {
+          const metadata = parseEventMetadata(event.metadata);
+          if (metadata.isRecurring) {
+            const recurrenceConfig = metadata.recurrenceConfig;
+            if (recurrenceConfig) {
+              setIsRecurring(true);
+              setRecurrencePattern((recurrenceConfig.pattern as RecurrencePattern) || '');
+              setRecurrenceInterval(recurrenceConfig.interval || 1);
+              setRecurrenceEndType((recurrenceConfig.endType as RecurrenceEndType) || 'END_DATE');
+              setRecurrenceEndDate(recurrenceConfig.endDate || '');
+              setRecurrenceOccurrences(recurrenceConfig.occurrences || 1);
+              setRecurrenceWeeklyDays(recurrenceConfig.weeklyDays || []);
+              if (recurrenceConfig.monthlyDay === 'LAST') {
+                setRecurrenceMonthlyDay('LAST');
+                setRecurrenceMonthlyDayType('LAST_DAY');
+              } else if (recurrenceConfig.monthlyDay) {
+                setRecurrenceMonthlyDay(recurrenceConfig.monthlyDay);
+                setRecurrenceMonthlyDayType('DAY_NUMBER');
+              }
+            }
+          }
+        }
+      };
+
+      // Call the async function to validate and set fromEmail
+      void validateAndSetFromEmail();
     }
   }, [event]);
 
@@ -242,24 +281,62 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
     if (!form.timezone) errs.timezone = 'Timezone is required';
 
     // Validate fromEmail
-    // First check: Is the email list empty?
-    if (isEmailListEmpty) {
-      errs.fromEmail = 'The from email list is empty. Please contact Admin to add the list of from email addresses.';
-    }
-    // Second check: Is the fromEmail field empty or just whitespace?
-    // CRITICAL: This must catch untouched fields (empty string), null, undefined, and whitespace-only
-    // The field is initialized as '' (empty string) in defaultEvent, so we need to check for that
-    const fromEmailValue = form.fromEmail;
-    const isFromEmailEmpty = !fromEmailValue ||
-                             fromEmailValue === '' ||
-                             (typeof fromEmailValue === 'string' && fromEmailValue.trim() === '');
+    // CRITICAL: Field is ALWAYS required, regardless of list state
+    // This validation MUST catch:
+    // 1. Untouched fields (initialized as '' in defaultEvent)
+    // 2. Fields cleared by user (set to '' when onChange(undefined) is called)
+    // 3. Null/undefined values (from database or API)
+    // 4. Whitespace-only values
 
-    if (isFromEmailEmpty) {
-      errs.fromEmail = 'Please enter from email address';
-    }
-    // Third check: Is the email format valid?
-    else if (typeof fromEmailValue === 'string' && fromEmailValue.trim() !== '' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fromEmailValue.trim())) {
-      errs.fromEmail = 'Please enter a valid email address';
+    const fromEmailValue = form.fromEmail;
+    // CRITICAL: Normalize value to handle null, undefined, and empty string
+    // This ensures consistent validation regardless of how the value was set
+    const normalizedFromEmail = fromEmailValue === null || fromEmailValue === undefined ? '' : String(fromEmailValue);
+
+    // CRITICAL: Check if field is empty (catches untouched fields, cleared fields, whitespace-only)
+    // An untouched field will have form.fromEmail === '' (from defaultEvent initialization)
+    // This check MUST run even if the user never interacted with the field
+    const isFromEmailEmpty = normalizedFromEmail === '' || normalizedFromEmail.trim() === '';
+
+    // DEBUG: Log validation state
+    console.log('[EventForm validate] fromEmail validation:', {
+      fromEmailValue,
+      normalizedFromEmail,
+      isFromEmailEmpty,
+      isEmailListEmpty,
+      fromEmailValueType: typeof fromEmailValue,
+    });
+
+    // Second check: Is the email list empty?
+    if (isEmailListEmpty) {
+      // If list is empty, always show error (user cannot select from empty list)
+      // This error takes priority - field cannot be used when list is empty
+      errs.fromEmail = 'The from email list is empty. Please contact Admin to add the list of from email addresses.';
+      console.log('[EventForm validate] fromEmail error: List is empty');
+    } else {
+      // List is NOT empty - validate field value
+      // CRITICAL: This check MUST run even if the user never touched the field
+      // An untouched field will have form.fromEmail === '' which will be caught by isFromEmailEmpty
+      //
+      // Test Scenario: User hasn't touched field, list is NOT empty, field is empty
+      // - form.fromEmail = '' (from defaultEvent initialization)
+      // - normalizedFromEmail = String('') = ''
+      // - isFromEmailEmpty = '' === '' || ''.trim() === '' = true
+      // - isEmailListEmpty = false (list is NOT empty)
+      // - Enters this else block
+      // - if (isFromEmailEmpty) = true → Sets error: 'Please enter from email address'
+      // - Validation returns false → Form submission prevented ✅
+      if (isFromEmailEmpty) {
+        // Field is empty (untouched, cleared, or whitespace-only) - require selection
+        errs.fromEmail = 'Please enter from email address';
+        console.log('[EventForm validate] fromEmail error: Field is empty');
+      } else if (normalizedFromEmail.trim() !== '' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedFromEmail.trim())) {
+        // Field has value but format is invalid
+        errs.fromEmail = 'Please enter a valid email address';
+        console.log('[EventForm validate] fromEmail error: Invalid format');
+      } else {
+        console.log('[EventForm validate] fromEmail validation passed');
+      }
     }
 
     // Validate Givebutter configuration
@@ -749,7 +826,25 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     e.stopPropagation(); // Prevent browser default validation and scrolling
-    if (!validate()) return;
+
+    // DEBUG: Log form state before validation
+    console.log('[EventForm handleSubmit] Form state before validation:', {
+      fromEmail: form.fromEmail,
+      fromEmailType: typeof form.fromEmail,
+      fromEmailIsEmpty: !form.fromEmail || form.fromEmail === '' || (typeof form.fromEmail === 'string' && form.fromEmail.trim() === ''),
+      isEmailListEmpty,
+    });
+
+    // CRITICAL: Always validate before submission
+    const isValid = validate();
+    console.log('[EventForm handleSubmit] Validation result:', isValid, 'Errors:', errors);
+
+    if (!isValid) {
+      console.log('[EventForm handleSubmit] Validation failed - preventing submission');
+      return; // Validation failed - prevent submission
+    }
+
+    console.log('[EventForm handleSubmit] Validation passed - proceeding with submission');
 
     // Clear any previous errors and hide error display
     setErrors({});
@@ -1633,9 +1728,27 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
         <FromEmailSelect
           value={form.fromEmail}
           onChange={(email) => {
-            setForm(prev => ({ ...prev, fromEmail: email || '' }));
-            // Clear error when user selects an email
-            if (errors.fromEmail) {
+            // DEBUG: Log onChange event
+            console.log('[EventForm FromEmailSelect onChange]', {
+              email,
+              emailType: typeof email,
+              emailIsUndefined: email === undefined,
+              emailIsNull: email === null,
+              emailIsEmpty: email === '' || (typeof email === 'string' && email.trim() === ''),
+              currentFormFromEmail: form.fromEmail,
+            });
+
+            // CRITICAL: Set to empty string if email is undefined/null to ensure validation catches it
+            const emailValue = email || '';
+            console.log('[EventForm FromEmailSelect onChange] Setting form.fromEmail to:', emailValue);
+            setForm(prev => {
+              const newForm = { ...prev, fromEmail: emailValue };
+              console.log('[EventForm FromEmailSelect onChange] New form state:', { fromEmail: newForm.fromEmail });
+              return newForm;
+            });
+
+            // Only clear error when user actually selects a valid email (not when clearing)
+            if (email && email.trim() !== '' && errors.fromEmail) {
               setErrors(prev => {
                 const newErrors = { ...prev };
                 delete newErrors.fromEmail;

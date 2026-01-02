@@ -19,6 +19,7 @@ export default async function MembershipPage() {
   let plans: MembershipPlanDTO[] = [];
   let error: string | null = null;
   let userSubscription: MembershipSubscriptionDTO | null = null;
+  let hasUserProfile = false;
 
   try {
     plans = await fetchMembershipPlansServer({ isActive: true, sort: 'price,asc' });
@@ -29,6 +30,7 @@ export default async function MembershipPage() {
       if (userId) {
         const userProfile = await fetchUserProfileServer(userId);
         if (userProfile?.id) {
+          hasUserProfile = true;
           userSubscription = await fetchUserSubscriptionServer(userProfile.id);
         }
       }
@@ -41,7 +43,19 @@ export default async function MembershipPage() {
     error = err instanceof Error ? err.message : 'Failed to load membership plans';
   }
 
-  return <MembershipClient plans={plans} error={error} userSubscription={userSubscription} />;
+  // Check authentication status
+  const { userId } = await auth();
+  const isAuthenticated = !!userId;
+
+  return (
+    <MembershipClient
+      plans={plans}
+      error={error}
+      userSubscription={userSubscription}
+      isAuthenticated={isAuthenticated}
+      hasUserProfile={hasUserProfile}
+    />
+  );
 }
 
 

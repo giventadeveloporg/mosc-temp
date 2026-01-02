@@ -15,17 +15,52 @@ interface MembershipClientProps {
   plans: MembershipPlanDTO[];
   error: string | null;
   userSubscription?: MembershipSubscriptionDTO | null;
+  isAuthenticated?: boolean;
+  hasUserProfile?: boolean;
 }
 
-export function MembershipClient({ plans, error, userSubscription }: MembershipClientProps) {
+export function MembershipClient({ plans, error, userSubscription, isAuthenticated: serverIsAuthenticated = false, hasUserProfile: serverHasUserProfile = false }: MembershipClientProps) {
   const router = useRouter();
   const { userId } = useAuth();
-  const { user } = useUser();
+  const { user, isLoaded: isUserLoaded } = useUser();
   const [isLoading, setIsLoading] = useState<number | null>(null);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [expandedPlanId, setExpandedPlanId] = useState<number | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [cancelingSubscriptionId, setCancelingSubscriptionId] = useState<number | null>(null);
+  const [clientHasUserProfile, setClientHasUserProfile] = useState<boolean | null>(null);
+
+  // Check user profile status client-side (in case user signs in after page load)
+  useEffect(() => {
+    async function checkUserProfile() {
+      if (userId && isUserLoaded) {
+        try {
+          const response = await fetch(`/api/proxy/user-profiles/by-user/${userId}`, {
+            cache: 'no-store',
+          });
+          if (response.ok) {
+            const profile = await response.json();
+            setClientHasUserProfile(!!profile?.id);
+          } else {
+            setClientHasUserProfile(false);
+          }
+        } catch (err) {
+          console.error('[MEMBERSHIP] Error checking user profile:', err);
+          setClientHasUserProfile(false);
+        }
+      } else {
+        setClientHasUserProfile(false);
+      }
+    }
+
+    if (isUserLoaded) {
+      checkUserProfile();
+    }
+  }, [userId, isUserLoaded]);
+
+  // Determine authentication and profile status (prefer client-side if available)
+  const isAuthenticated = userId !== null || serverIsAuthenticated;
+  const hasUserProfile = clientHasUserProfile !== null ? clientHasUserProfile : serverHasUserProfile;
 
   // Detect mobile device
   useEffect(() => {
@@ -45,7 +80,7 @@ export function MembershipClient({ plans, error, userSubscription }: MembershipC
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency,
-      minimumFractionDigits: 0,
+      minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(price);
   };
@@ -141,6 +176,70 @@ export function MembershipClient({ plans, error, userSubscription }: MembershipC
             Join our community and unlock exclusive benefits, access to events, and more.
           </p>
         </div>
+
+        {/* Informational Box: Authentication & Registration Status */}
+        {isUserLoaded && (
+          <div className="mb-8">
+            {!isAuthenticated ? (
+              <div className="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-lg shadow-sm">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0">
+                    <svg className="h-6 w-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div className="ml-4 flex-1">
+                    <h3 className="text-lg font-semibold text-blue-900 mb-2">
+                      Sign In Required to Subscribe
+                    </h3>
+                    <p className="text-blue-800 mb-4">
+                      To subscribe to a membership plan, you need to be signed in. If you don't have an account yet, you'll be redirected to the sign-up page when you click "Subscribe". You can also sign in or create an account now using the buttons below.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <Button
+                        onClick={() => router.push('/sign-in?redirect_url=/membership')}
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                      >
+                        Sign In
+                      </Button>
+                      <Button
+                        onClick={() => router.push('/sign-up?redirect_url=/membership')}
+                        variant="outline"
+                        className="border-blue-600 text-blue-600 hover:bg-blue-50"
+                      >
+                        Create Account
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : !hasUserProfile ? (
+              <div className="bg-amber-50 border-l-4 border-amber-500 p-6 rounded-lg shadow-sm">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0">
+                    <svg className="h-6 w-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                  </div>
+                  <div className="ml-4 flex-1">
+                    <h3 className="text-lg font-semibold text-amber-900 mb-2">
+                      Complete Your Registration
+                    </h3>
+                    <p className="text-amber-800 mb-4">
+                      You're signed in, but your account registration is not complete. Please complete your profile registration before subscribing to a membership plan. You'll be redirected to complete your registration when you click "Subscribe", or you can complete it now using the button below.
+                    </p>
+                    <Button
+                      onClick={() => router.push(`/profile?redirect_url=/membership`)}
+                      className="bg-amber-600 hover:bg-amber-700 text-white"
+                    >
+                      Complete Registration
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+          </div>
+        )}
 
         {/* Error Message */}
         {checkoutError && (
@@ -346,15 +445,20 @@ export function MembershipClient({ plans, error, userSubscription }: MembershipC
                     )}
                   </CardContent>
 
-                  <CardFooter className="pt-4 px-6 pb-6 space-y-3">
+                  <CardFooter className="pt-6 px-6 pb-6 flex flex-col gap-4">
                     {/* Check if user is subscribed to this plan */}
                     {isSubscribedToPlan(plan.id) && userSubscription?.id ? (
                       <>
-                        {/* Already Subscribed - Show Cancel Button */}
-                        <div className="w-full p-3 bg-green-50 border border-green-200 rounded-lg mb-2">
-                          <p className="text-sm font-body text-green-800 text-center">
-                            ✓ You are currently subscribed to this plan
-                          </p>
+                        {/* Already Subscribed - Show Info Box */}
+                        <div className="w-full p-4 bg-green-50 border border-green-200 rounded-lg">
+                          <div className="flex items-center justify-center gap-2">
+                            <svg className="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <p className="text-sm font-body text-green-800 text-center">
+                              You are currently subscribed to this plan
+                            </p>
+                          </div>
                         </div>
                         <Button
                           onClick={() => handleCancelSubscription(userSubscription.id!)}
@@ -402,7 +506,7 @@ export function MembershipClient({ plans, error, userSubscription }: MembershipC
                         )}
 
                         {/* Desktop Subscribe Button - Navigate to subscribe page with Stripe Elements */}
-                        <Button
+                        <button
                           onClick={() => {
                             // Check if user is authenticated
                             if (!userId) {
@@ -413,28 +517,30 @@ export function MembershipClient({ plans, error, userSubscription }: MembershipC
                             router.push(`/membership/subscribe/${plan.id}`);
                           }}
                           disabled={isLoadingPlan}
-                          className={`w-full ${colorScheme.accent} hover:opacity-90 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-300`}
-                          size="lg"
+                          className="w-full flex-shrink-0 h-14 rounded-xl bg-orange-500 hover:bg-orange-600 disabled:bg-orange-400 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 border-2 border-orange-600 hover:border-orange-700 shadow-md hover:shadow-lg"
+                          title="Subscribe Now"
+                          aria-label="Subscribe Now"
+                          type="button"
                         >
                           {isLoadingPlan ? (
                             <span className="flex items-center gap-2">
-                              <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                              <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                               </svg>
-                              Processing...
+                              <span className="font-semibold text-white">Processing...</span>
                             </span>
                           ) : (
-                            <span className="flex items-center justify-center gap-2">
-                              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                            <>
+                              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-600 flex items-center justify-center">
                                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                               </div>
-                              Subscribe Now
-                            </span>
+                              <span className="font-semibold text-white">Subscribe Now</span>
+                            </>
                           )}
-                        </Button>
+                        </button>
                       </>
                     )}
                   </CardFooter>
