@@ -28,6 +28,7 @@ export function SubscriptionSignupClient({ plan, error, userProfile: initialUser
   const [profileError, setProfileError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
   const [canEnablePayment, setCanEnablePayment] = useState(false);
+  const [isPRBReady, setIsPRBReady] = useState(false); // Track when Payment Request Buttons are ready
 
   // Ensure user profile exists before enabling payment (RECOMMENDED SOLUTION)
   useEffect(() => {
@@ -179,7 +180,31 @@ export function SubscriptionSignupClient({ plan, error, userProfile: initialUser
   // Show loading state while creating profile
   if (isCreatingProfile) {
     return (
-      <div className="max-w-5xl mx-auto px-8 py-8">
+      <div className="max-w-5xl mx-auto px-8 pt-24 pb-8">
+        <div className="text-center mb-8">
+          <h1 className="font-heading font-semibold text-3xl text-foreground mb-4">Complete Your Subscription</h1>
+          <p className="font-body text-lg text-muted-foreground mb-6">
+            Review your plan details and proceed to checkout
+          </p>
+        </div>
+
+        {/* Back to Plans Button - Left aligned, following admin action buttons pattern */}
+        <div className="mb-6 flex justify-start">
+          <button
+            onClick={() => router.push('/membership')}
+            className="flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+            title="Back to Membership Plans"
+            aria-label="Back to Membership Plans"
+            type="button"
+          >
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
+              <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+            </div>
+            <span className="font-semibold text-indigo-700">Back to Plans</span>
+          </button>
+        </div>
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
           <h2 className="font-heading font-semibold text-xl text-foreground mb-2">Setting up your account...</h2>
@@ -195,7 +220,31 @@ export function SubscriptionSignupClient({ plan, error, userProfile: initialUser
                         user?.primaryEmailAddress?.emailAddress);
 
     return (
-      <div className="max-w-5xl mx-auto px-8 py-8">
+      <div className="max-w-5xl mx-auto px-8 pt-24 pb-8">
+        <div className="text-center mb-8">
+          <h1 className="font-heading font-semibold text-3xl text-foreground mb-4">Complete Your Subscription</h1>
+          <p className="font-body text-lg text-muted-foreground mb-6">
+            Review your plan details and proceed to checkout
+          </p>
+        </div>
+
+        {/* Back to Plans Button - Left aligned, following admin action buttons pattern */}
+        <div className="mb-6 flex justify-start">
+          <button
+            onClick={() => router.push('/membership')}
+            className="flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+            title="Back to Membership Plans"
+            aria-label="Back to Membership Plans"
+            type="button"
+          >
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
+              <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+            </div>
+            <span className="font-semibold text-indigo-700">Back to Plans</span>
+          </button>
+        </div>
         <div className="bg-red-50 border border-red-200 text-red-800 p-6 rounded-md">
           <h3 className="font-semibold text-lg mb-2">Account Setup Required</h3>
           <p className="mb-4">{profileError}</p>
@@ -248,12 +297,30 @@ export function SubscriptionSignupClient({ plan, error, userProfile: initialUser
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-8 py-8">
+    <div className="max-w-5xl mx-auto px-8 pt-24 pb-8">
       <div className="text-center mb-8">
         <h1 className="font-heading font-semibold text-3xl text-foreground mb-4">Complete Your Subscription</h1>
-        <p className="font-body text-lg text-muted-foreground">
+        <p className="font-body text-lg text-muted-foreground mb-6">
           Review your plan details and proceed to checkout
         </p>
+      </div>
+
+      {/* Back to Plans Button - Left aligned above plan summary, following admin action buttons pattern */}
+      <div className="mb-6 flex justify-start">
+        <button
+          onClick={() => router.push('/membership')}
+          className="flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+          title="Back to Membership Plans"
+          aria-label="Back to Membership Plans"
+          type="button"
+        >
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
+            <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+          </div>
+          <span className="font-semibold text-indigo-700">Back to Plans</span>
+        </button>
       </div>
 
       <div className="flex flex-col gap-8">
@@ -296,7 +363,11 @@ export function SubscriptionSignupClient({ plan, error, userProfile: initialUser
                     setCheckoutError('Account setup required. Please wait or contact support.');
                   }
                 }}
-                onLoadingChange={setIsLoading}
+                onLoadingChange={(loading) => {
+                  setIsLoading(loading);
+                  // When loading is false, PRB buttons are ready
+                  setIsPRBReady(!loading);
+                }}
               />
             </>
           )}
@@ -335,8 +406,21 @@ export function SubscriptionSignupClient({ plan, error, userProfile: initialUser
           )}
 
           {/* Fallback: Stripe Checkout Session redirect (only if payment enabled) */}
-          {canEnablePayment && (
+          {/* CRITICAL: On desktop, hide checkout button until PRB buttons are ready to prevent premature clicks */}
+          {/* On mobile, show immediately since mobile PRB is a separate component */}
+          {canEnablePayment && (isMobile || isPRBReady) && (
             <>
+              {/* Only show divider on desktop (mobile already has one above) */}
+              {!isMobile && (
+                <div className="relative my-4">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-300"></div>
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-2 bg-white text-muted-foreground">or</span>
+                  </div>
+                </div>
+              )}
               <p className="font-body text-muted-foreground mb-6">
                 You will be redirected to our secure payment processor to complete your subscription.
               </p>

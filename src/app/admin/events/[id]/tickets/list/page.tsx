@@ -465,8 +465,16 @@ export default async function TicketListPage({ params, searchParams }: { params:
             <FaUser className="text-gray-400" />
             <input name="name" placeholder="Name" defaultValue={name} className="border rounded px-2 py-1 text-sm" />
           </div>
-          <button type="submit" className="ml-2 bg-teal-600 hover:bg-teal-700 text-white px-3 py-1 rounded flex items-center gap-1 text-sm">
-            <FaSearch /> Search
+          <button
+            type="submit"
+            className="flex-shrink-0 h-14 rounded-xl bg-teal-100 hover:bg-teal-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+            title="Search"
+            aria-label="Search"
+          >
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
+              <FaSearch className="w-6 h-6 text-teal-600" />
+            </div>
+            <span className="font-semibold text-teal-700">Search</span>
           </button>
         </form>
       </div>
@@ -516,33 +524,59 @@ export default async function TicketListPage({ params, searchParams }: { params:
         {/* Pagination Controls */}
         <div className="mt-8">
           <div className="flex justify-between items-center">
+            {/* Previous Button */}
             <Link
               href={`?${buildQueryString({ ...sp, page: page - 1 })}`}
-              className={`px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors${!hasPrevPage ? ' pointer-events-none opacity-50' : ''}`}
+              className={`px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md${!hasPrevPage ? ' pointer-events-none opacity-50 bg-blue-100 border-blue-300 text-blue-500' : ''}`}
               aria-disabled={!hasPrevPage}
               tabIndex={!hasPrevPage ? -1 : 0}
+              title="Previous Page"
+              aria-label="Previous Page"
             >
-              <FaChevronLeft /> Previous
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+              </svg>
+              <span>Previous</span>
             </Link>
-            <div className="text-sm font-semibold text-gray-700">
-              Page {currentPage} of {totalPages}
+
+            {/* Page Info */}
+            <div className="px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+              <span className="text-sm font-bold text-blue-700">
+                Page <span className="text-blue-600">{currentPage}</span> of <span className="text-blue-600">{totalPages}</span>
+              </span>
             </div>
+
+            {/* Next Button */}
             <Link
               href={`?${buildQueryString({ ...sp, page: page + 1 })}`}
-              className={`px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors${!hasNextPage ? ' pointer-events-none opacity-50' : ''}`}
+              className={`px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md${!hasNextPage ? ' pointer-events-none opacity-50 bg-blue-100 border-blue-300 text-blue-500' : ''}`}
               aria-disabled={!hasNextPage}
               tabIndex={!hasNextPage ? -1 : 0}
+              title="Next Page"
+              aria-label="Next Page"
             >
-              Next <FaChevronRight />
+              <span>Next</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+              </svg>
             </Link>
           </div>
-          <div className="text-center text-sm text-gray-600 mt-2">
+
+          {/* Item Count Text */}
+          <div className="text-center mt-3">
             {rows.length > 0 ? (
-              <>Showing <span className="font-medium">{startItemControl}</span> to <span className="font-medium">{endItemControl}</span> of <span className="font-medium">{totalCount}</span> tickets</>
+              <div className="inline-flex items-center px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+                <span className="text-sm text-gray-700">
+                  Showing <span className="font-bold text-blue-600">{startItemControl}</span> to <span className="font-bold text-blue-600">{endItemControl}</span> of <span className="font-bold text-blue-600">{totalCount}</span> tickets
+                </span>
+              </div>
             ) : (
-              <div className="flex items-center justify-center gap-2">
-                <span>No tickets found</span>
-                <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-sm font-medium">[No tickets sold yet]</span>
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 border-2 border-orange-300 rounded-lg shadow-sm">
+                <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="text-sm font-medium text-orange-700">No tickets found</span>
+                <span className="text-sm text-orange-600">[No tickets sold yet]</span>
               </div>
             )}
           </div>

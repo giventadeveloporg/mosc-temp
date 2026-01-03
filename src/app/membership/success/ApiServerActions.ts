@@ -99,8 +99,43 @@ export async function findSubscriptionByPaymentIntentId(
         );
 
         if (activeSubscriptions.length > 0) {
-          console.log('[MEMBERSHIP-SUCCESS] Found active subscription by stripePaymentIntentId:', activeSubscriptions[0].id);
-          return activeSubscriptions[0];
+          const foundSubscription = activeSubscriptions[0];
+
+          // CRITICAL: Verify that the found subscription actually has the matching payment intent ID
+          // The backend query might return subscriptions with null/undefined stripePaymentIntentId
+          if (foundSubscription.stripePaymentIntentId && foundSubscription.stripePaymentIntentId === paymentIntentId) {
+            console.log('[MEMBERSHIP-SUCCESS] Found active subscription by stripePaymentIntentId:', {
+              subscriptionId: foundSubscription.id,
+              paymentIntentId: foundSubscription.stripePaymentIntentId,
+              planId: foundSubscription.membershipPlanId,
+              status: foundSubscription.subscriptionStatus,
+            });
+            return foundSubscription;
+          } else if (!foundSubscription.stripePaymentIntentId) {
+            // CRITICAL: Subscription exists but stripePaymentIntentId is NULL
+            // DO NOT update and return it here - we can't verify it's the correct subscription
+            // The backend query might be returning subscriptions incorrectly (e.g., by user/tenant instead of payment intent)
+            // Let the caller (processMembershipSubscriptionFromPaymentIntent) handle plan matching
+            console.log('[MEMBERSHIP-SUCCESS] ⚠️ Found subscription with NULL stripePaymentIntentId - NOT updating (caller will verify plan):', {
+              subscriptionId: foundSubscription.id,
+              searchedPaymentIntentId: paymentIntentId,
+              planId: foundSubscription.membershipPlanId,
+              status: foundSubscription.subscriptionStatus,
+              message: 'Backend query may have returned wrong subscription - caller will verify plan match before updating'
+            });
+            // Return null so caller can check for existing subscriptions by user/plan and handle plan switching
+            return null;
+          } else {
+            console.log('[MEMBERSHIP-SUCCESS] ⚠️ Backend returned subscription but payment intent ID does not match:', {
+              subscriptionId: foundSubscription.id,
+              storedPaymentIntentId: foundSubscription.stripePaymentIntentId,
+              searchedPaymentIntentId: paymentIntentId,
+              planId: foundSubscription.membershipPlanId,
+              message: 'Different payment intent ID - ignoring this result'
+            });
+            // Don't return this subscription - it's a false match
+            // Continue to fallback lookup or return null
+          }
         } else {
           console.log('[MEMBERSHIP-SUCCESS] Found cancelled/expired subscription by stripePaymentIntentId - will be ignored:', items[0].id);
           return null; // Return null so caller creates a new subscription
@@ -226,6 +261,49 @@ export async function processMembershipSubscriptionSessionServer(
     const stripeSubscription = session.subscription as any;
     const stripeSubscriptionId = stripeSubscription?.id || null;
     const stripeCustomerId = typeof session.customer === 'string' ? session.customer : (session.customer as any)?.id || null;
+
+    // NOTE: Test clocks should be managed via scripts, not in application code
+    // See documentation/domain_agnostic_payment/membership_susbscription/STRIPE_TEST_CLOCKS_GUIDE.html
+    // Stripe Checkout will automatically use the test clock if the customer is attached to one
+    // Use setup-test-clock.js to attach customers to test clocks before creating subscriptions
+
+    // CRITICAL: If subscription from session is incomplete, try to complete it
+    // This can happen if the checkout session was created but payment wasn't fully processed
+    if (stripeSubscription && (stripeSubscription.status === 'incomplete' || stripeSubscription.status === 'incomplete_expired')) {
+      console.log('[MEMBERSHIP-SUCCESS] ⚠️ Subscription from session is incomplete, attempting to complete...');
+      try {
+        // Retrieve subscription with expanded invoice
+        const subscriptionWithInvoice = await stripe().subscriptions.retrieve(stripeSubscriptionId, {
+          expand: ['latest_invoice', 'latest_invoice.payment_intent'],
+        });
+
+        const latestInvoice = subscriptionWithInvoice.latest_invoice;
+        if (latestInvoice && typeof latestInvoice !== 'string' && (latestInvoice.status === 'draft' || latestInvoice.status === 'open')) {
+          // Try to pay the invoice
+          const paidInvoice = await stripe().invoices.pay(latestInvoice.id);
+          console.log('[MEMBERSHIP-SUCCESS] ✅ Completed subscription by paying invoice:', {
+            invoiceId: paidInvoice.id,
+            invoiceStatus: paidInvoice.status,
+          });
+
+          // Wait for Stripe to process
+          await new Promise(resolve => setTimeout(resolve, 1000));
+
+          // Retrieve updated subscription
+          const updatedSubscription = await stripe().subscriptions.retrieve(stripeSubscriptionId);
+          if (updatedSubscription.status === 'active') {
+            console.log('[MEMBERSHIP-SUCCESS] ✅ Subscription is now ACTIVE');
+            // Update the stripeSubscription object with new status
+            stripeSubscription.status = 'active';
+            stripeSubscription.current_period_start = updatedSubscription.current_period_start;
+            stripeSubscription.current_period_end = updatedSubscription.current_period_end;
+          }
+        }
+      } catch (completeError: any) {
+        console.warn('[MEMBERSHIP-SUCCESS] ⚠️ Could not complete subscription from session:', completeError.message);
+        // Continue - subscription will still be created in database
+      }
+    }
 
     // CRITICAL: Double-check by stripeSubscriptionId before creating (race condition fix)
     // This prevents duplicates when multiple requests come in simultaneously
@@ -486,6 +564,59 @@ export async function processMembershipSubscriptionFromPaymentIntent(
     // First try to find by Payment Intent ID (if stored)
     let existingSubscription = await findSubscriptionByPaymentIntentId(paymentIntentId);
 
+    // CRITICAL: Verify that the found subscription actually matches this payment intent AND plan
+    // If the payment intent ID doesn't match, it might be a false match
+    if (existingSubscription) {
+      const paymentIntentMatch = existingSubscription.stripePaymentIntentId === paymentIntentId;
+      // CRITICAL: Ensure both plan IDs are numbers for proper comparison
+      const existingPlanIdForCheck = typeof existingSubscription.membershipPlanId === 'number'
+        ? existingSubscription.membershipPlanId
+        : parseInt(String(existingSubscription.membershipPlanId), 10);
+      const newPlanIdForCheck = parseInt(membershipPlanId, 10);
+      const planIdMatch = existingPlanIdForCheck === newPlanIdForCheck;
+
+      console.log('[MEMBERSHIP-SUCCESS] Verifying found subscription:', {
+        subscriptionId: existingSubscription.id,
+        storedPaymentIntentId: existingSubscription.stripePaymentIntentId || 'NULL/UNDEFINED',
+        currentPaymentIntentId: paymentIntentId,
+        paymentIntentMatch,
+        storedPlanId: existingSubscription.membershipPlanId,
+        storedPlanIdType: typeof existingSubscription.membershipPlanId,
+        convertedStoredPlanId: existingPlanIdForCheck,
+        currentPlanId: newPlanIdForCheck,
+        planIdMatch,
+        status: existingSubscription.subscriptionStatus,
+      });
+
+      // If payment intent ID doesn't match, it's a false match from backend
+      if (!paymentIntentMatch) {
+        console.log('[MEMBERSHIP-SUCCESS] ⚠️ Found subscription but payment intent ID mismatch - ignoring:', {
+          subscriptionId: existingSubscription.id,
+          storedPaymentIntentId: existingSubscription.stripePaymentIntentId || 'NULL/UNDEFINED',
+          currentPaymentIntentId: paymentIntentId,
+          message: 'Payment intent ID mismatch - will create new subscription'
+        });
+        existingSubscription = null; // Reset to null so we create a new subscription
+      }
+      // If plan ID doesn't match, it's a plan switch scenario
+      // CRITICAL: Even if payment intent ID matches, if plan ID doesn't match, we need to cancel old and create new
+      else if (!planIdMatch) {
+        console.log('[MEMBERSHIP-SUCCESS] ⚠️ CRITICAL: Payment intent ID matches but plan ID mismatch (plan switch detected):', {
+          subscriptionId: existingSubscription.id,
+          storedPlanId: existingSubscription.membershipPlanId,
+          storedPlanIdType: typeof existingSubscription.membershipPlanId,
+          convertedStoredPlanId: existingPlanIdForCheck,
+          currentPlanId: newPlanIdForCheck,
+          storedPaymentIntentId: existingSubscription.stripePaymentIntentId,
+          currentPaymentIntentId: paymentIntentId,
+          status: existingSubscription.subscriptionStatus,
+          message: 'Plan switch detected - will cancel old subscription and create new one. Keeping existingSubscription set so plan switch logic can cancel it.'
+        });
+        // Keep existingSubscription set so the plan switch logic at line 644+ can cancel it
+        // Don't set to null here - the plan switch logic will handle cancellation and then set it to null
+      }
+    }
+
     // CRITICAL: Only accept ACTIVE or TRIAL subscriptions - ignore CANCELLED ones
     // If a cancelled subscription is found, we need to create a new one
     if (existingSubscription && (existingSubscription.subscriptionStatus === 'CANCELLED' || existingSubscription.subscriptionStatus === 'EXPIRED')) {
@@ -534,6 +665,39 @@ export async function processMembershipSubscriptionFromPaymentIntent(
               paymentIntentId,
               timestamp: new Date().toISOString(),
             });
+
+            // CRITICAL: If the found subscription has NULL stripePaymentIntentId, update it
+            // This ensures the payment intent ID is properly linked to the subscription
+            if (!existingSubscription.stripePaymentIntentId) {
+              console.log('[MEMBERSHIP-SUCCESS] Updating subscription with payment intent ID:', {
+                subscriptionId: existingSubscription.id,
+                paymentIntentId,
+              });
+              try {
+                const updatePayload = withTenantId({
+                  id: existingSubscription.id!,
+                  stripePaymentIntentId: paymentIntentId,
+                });
+
+                await fetchWithJwtRetry(
+                  `${getAppUrl()}/api/proxy/membership-subscriptions/${existingSubscription.id}`,
+                  {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/merge-patch+json' },
+                    body: JSON.stringify(updatePayload),
+                    cache: 'no-store',
+                  },
+                  '[MEMBERSHIP-SUCCESS] update-payment-intent-id-for-existing'
+                );
+
+                // Update the subscription object with the new payment intent ID
+                existingSubscription.stripePaymentIntentId = paymentIntentId;
+                console.log('[MEMBERSHIP-SUCCESS] ✅ Updated existing subscription with payment intent ID');
+              } catch (updateError) {
+                console.warn('[MEMBERSHIP-SUCCESS] ⚠️ Failed to update payment intent ID (non-fatal):', updateError);
+                // Continue - subscription is still valid
+              }
+            }
           }
         }
       } catch (error) {
@@ -543,17 +707,176 @@ export async function processMembershipSubscriptionFromPaymentIntent(
     }
 
     if (existingSubscription && (existingSubscription.subscriptionStatus === 'ACTIVE' || existingSubscription.subscriptionStatus === 'TRIAL')) {
-      console.log('[MEMBERSHIP-SUCCESS] Subscription already exists for Payment Intent:', {
+      // CRITICAL: Check if existing subscription is for the SAME plan as the payment intent
+      // If it's for a DIFFERENT plan, we need to cancel the old subscription and create a new one
+      // CRITICAL: Ensure both are numbers for proper comparison
+      const existingPlanId = typeof existingSubscription.membershipPlanId === 'number'
+        ? existingSubscription.membershipPlanId
+        : parseInt(String(existingSubscription.membershipPlanId), 10);
+      const newPlanId = parseInt(membershipPlanId, 10);
+
+      console.log('[MEMBERSHIP-SUCCESS] 🔍 Checking plan switch scenario:', {
+        existingSubscriptionId: existingSubscription.id,
+        existingPlanId,
+        existingPlanIdType: typeof existingSubscription.membershipPlanId,
+        newPlanId,
+        planIdsMatch: existingPlanId === newPlanId,
+        subscriptionStatus: existingSubscription.subscriptionStatus,
         paymentIntentId,
-        subscriptionId: existingSubscription.id,
-        status: existingSubscription.subscriptionStatus,
-        timestamp: new Date().toISOString(),
-        message: 'Backend webhook already created subscription - returning existing subscription'
       });
-      // Fetch plan and user profile for return (already fetched above)
-      const plan = existingSubscription.membershipPlan || plan;
-      const userProfile = existingSubscription.userProfile || userProfile;
-      return { subscription: existingSubscription, plan, userProfile };
+
+      if (existingPlanId !== newPlanId) {
+        console.log('[MEMBERSHIP-SUCCESS] ⚠️ Plan switch detected - existing subscription is for different plan:', {
+          existingSubscriptionId: existingSubscription.id,
+          existingPlanId,
+          newPlanId,
+          paymentIntentId,
+          message: 'Will cancel old subscription and create new one for new plan'
+        });
+
+        // Cancel the old subscription (cancel at period end to maintain access until new subscription starts)
+        try {
+          const cancelPayload = withTenantId({
+            id: existingSubscription.id!,
+            cancelAtPeriodEnd: true,
+            cancellationReason: `Switched to plan ${newPlanId}`,
+            subscriptionStatus: 'CANCELLED',
+            cancelledAt: new Date().toISOString(),
+          });
+
+          await fetchWithJwtRetry(
+            `${getAppUrl()}/api/proxy/membership-subscriptions/${existingSubscription.id}`,
+            {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/merge-patch+json' },
+              body: JSON.stringify(cancelPayload),
+              cache: 'no-store',
+            },
+            '[MEMBERSHIP-SUCCESS] cancel-old-subscription-for-plan-switch'
+          );
+
+          console.log('[MEMBERSHIP-SUCCESS] ✅ Cancelled old subscription for plan switch:', existingSubscription.id);
+
+          // Also cancel the Stripe subscription if it exists
+          if (existingSubscription.stripeSubscriptionId) {
+            try {
+              await stripe().subscriptions.update(existingSubscription.stripeSubscriptionId, {
+                cancel_at_period_end: true,
+                metadata: {
+                  ...(await stripe().subscriptions.retrieve(existingSubscription.stripeSubscriptionId)).metadata,
+                  cancellation_reason: `Switched to plan ${newPlanId}`,
+                  cancelled_at: new Date().toISOString(),
+                },
+              });
+              console.log('[MEMBERSHIP-SUCCESS] ✅ Cancelled Stripe subscription for plan switch:', existingSubscription.stripeSubscriptionId);
+            } catch (stripeError) {
+              console.error('[MEMBERSHIP-SUCCESS] ⚠️ Failed to cancel Stripe subscription (non-fatal):', stripeError);
+            }
+          }
+        } catch (cancelError) {
+          console.error('[MEMBERSHIP-SUCCESS] ⚠️ Failed to cancel old subscription (non-fatal, will still create new one):', cancelError);
+        }
+
+        // Reset existingSubscription to null so we create a new subscription
+        existingSubscription = null;
+      } else {
+        // Same plan - return existing subscription (webhook may have already created it)
+        console.log('[MEMBERSHIP-SUCCESS] Subscription already exists for Payment Intent (same plan):', {
+          paymentIntentId,
+          subscriptionId: existingSubscription.id,
+          planId: existingPlanId,
+          status: existingSubscription.subscriptionStatus,
+          timestamp: new Date().toISOString(),
+          message: 'Backend webhook already created subscription - returning existing subscription'
+        });
+        // Fetch plan and user profile for return (already fetched above)
+        const plan = existingSubscription.membershipPlan || plan;
+        const userProfile = existingSubscription.userProfile || userProfile;
+        return { subscription: existingSubscription, plan, userProfile };
+      }
+    }
+
+    // CRITICAL: Before creating new subscription, check if user has other active subscriptions
+    // If user has an active subscription for a DIFFERENT plan, cancel it first
+    if (userProfile.id && !existingSubscription) {
+      try {
+        const tenantId = getTenantId();
+        const params = new URLSearchParams({
+          'userProfileId.equals': String(userProfile.id),
+          'tenantId.equals': tenantId,
+          'subscriptionStatus.in': 'ACTIVE,TRIAL', // Check for active or trial subscriptions
+        });
+        const response = await fetchWithJwtRetry(
+          `${getAppUrl()}/api/proxy/membership-subscriptions?${params.toString()}`,
+          { cache: 'no-store' }
+        );
+        if (response.ok) {
+          const items: MembershipSubscriptionDTO[] = await response.json();
+          // Filter out subscriptions for the same plan (those are OK)
+          const otherPlanSubscriptions = items.filter(sub =>
+            sub.membershipPlanId !== parseInt(membershipPlanId, 10)
+          );
+
+          if (otherPlanSubscriptions.length > 0) {
+            console.log('[MEMBERSHIP-SUCCESS] ⚠️ User has active subscription(s) for different plan(s) - will cancel:', {
+              otherSubscriptions: otherPlanSubscriptions.map(sub => ({
+                id: sub.id,
+                planId: sub.membershipPlanId,
+                status: sub.subscriptionStatus,
+              })),
+              newPlanId: parseInt(membershipPlanId, 10),
+            });
+
+            // Cancel all other active subscriptions
+            for (const oldSub of otherPlanSubscriptions) {
+              try {
+                const cancelPayload = withTenantId({
+                  id: oldSub.id!,
+                  cancelAtPeriodEnd: true,
+                  cancellationReason: `Switched to plan ${membershipPlanId}`,
+                  subscriptionStatus: 'CANCELLED',
+                  cancelledAt: new Date().toISOString(),
+                });
+
+                await fetchWithJwtRetry(
+                  `${getAppUrl()}/api/proxy/membership-subscriptions/${oldSub.id}`,
+                  {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/merge-patch+json' },
+                    body: JSON.stringify(cancelPayload),
+                    cache: 'no-store',
+                  },
+                  '[MEMBERSHIP-SUCCESS] cancel-other-plan-subscription'
+                );
+
+                console.log('[MEMBERSHIP-SUCCESS] ✅ Cancelled other plan subscription:', oldSub.id);
+
+                // Also cancel the Stripe subscription if it exists
+                if (oldSub.stripeSubscriptionId) {
+                  try {
+                    await stripe().subscriptions.update(oldSub.stripeSubscriptionId, {
+                      cancel_at_period_end: true,
+                      metadata: {
+                        ...(await stripe().subscriptions.retrieve(oldSub.stripeSubscriptionId)).metadata,
+                        cancellation_reason: `Switched to plan ${membershipPlanId}`,
+                        cancelled_at: new Date().toISOString(),
+                      },
+                    });
+                    console.log('[MEMBERSHIP-SUCCESS] ✅ Cancelled Stripe subscription:', oldSub.stripeSubscriptionId);
+                  } catch (stripeError) {
+                    console.error('[MEMBERSHIP-SUCCESS] ⚠️ Failed to cancel Stripe subscription (non-fatal):', stripeError);
+                  }
+                }
+              } catch (cancelError) {
+                console.error('[MEMBERSHIP-SUCCESS] ⚠️ Failed to cancel other plan subscription (non-fatal):', cancelError);
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error('[MEMBERSHIP-SUCCESS] Error checking for other plan subscriptions:', error);
+        // Continue with creation if check fails
+      }
     }
 
     // CRITICAL: Get or create Stripe Customer from Payment Intent
@@ -599,6 +922,53 @@ export async function processMembershipSubscriptionFromPaymentIntent(
       } catch (customerError) {
         console.error('[MEMBERSHIP-SUCCESS] Error creating/getting Stripe customer:', customerError);
         // Continue without customer ID - subscription will still be created
+      }
+    }
+
+    // CRITICAL: Attach payment method from payment intent to customer
+    // This ensures the customer has a payment method before creating the subscription
+    // This prevents the subscription from being created as 'incomplete'
+    if (stripeCustomerId && paymentIntent.payment_method) {
+      try {
+        const pmId = typeof paymentIntent.payment_method === 'string'
+          ? paymentIntent.payment_method
+          : (paymentIntent.payment_method as any)?.id;
+
+        if (pmId) {
+          // Check if payment method is already attached to this customer
+          const paymentMethod = await stripe().paymentMethods.retrieve(pmId);
+
+          if (paymentMethod.customer !== stripeCustomerId) {
+            // Payment method exists but isn't attached to this customer - attach it
+            console.log('[MEMBERSHIP-SUCCESS] Attaching payment method from payment intent to customer...');
+            try {
+              await stripe().paymentMethods.attach(pmId, {
+                customer: stripeCustomerId,
+              });
+              console.log('[MEMBERSHIP-SUCCESS] ✅ Attached payment method to customer:', pmId);
+
+              // Set it as the default payment method for the customer
+              await stripe().customers.update(stripeCustomerId, {
+                invoice_settings: {
+                  default_payment_method: pmId,
+                },
+              });
+              console.log('[MEMBERSHIP-SUCCESS] ✅ Set payment method as default for customer');
+            } catch (attachError: any) {
+              if (attachError.code === 'resource_already_exists') {
+                console.log('[MEMBERSHIP-SUCCESS] Payment method already attached to customer');
+              } else {
+                console.warn('[MEMBERSHIP-SUCCESS] ⚠️ Could not attach payment method to customer:', attachError.message);
+                // Continue - we'll try to attach it later when paying the invoice
+              }
+            }
+          } else {
+            console.log('[MEMBERSHIP-SUCCESS] Payment method already attached to customer:', pmId);
+          }
+        }
+      } catch (pmError: any) {
+        console.warn('[MEMBERSHIP-SUCCESS] ⚠️ Could not attach payment method from payment intent:', pmError.message);
+        // Continue - we'll try to attach it later when paying the invoice
       }
     }
 
@@ -724,6 +1094,11 @@ export async function processMembershipSubscriptionFromPaymentIntent(
           console.warn('[MEMBERSHIP-SUCCESS] Could not list customer payment methods:', pmListError.message);
         }
 
+        // NOTE: Test clocks should be managed via scripts, not in application code
+        // See documentation/domain_agnostic_payment/membership_susbscription/STRIPE_TEST_CLOCKS_GUIDE.html
+        // Use setup-test-clock.js to attach customers to test clocks before creating subscriptions
+        // If a customer is already attached to a test clock, Stripe will automatically use it for new subscriptions
+
         console.log('[MEMBERSHIP-SUCCESS] Creating Stripe Subscription for recurring billing:', {
           customerId: stripeCustomerId,
           priceId: finalStripePriceId,
@@ -741,21 +1116,110 @@ export async function processMembershipSubscriptionFromPaymentIntent(
             userProfileId: String(userProfile.id),
             paymentIntentId: paymentIntentId,
           },
-          // CRITICAL: Use default_incomplete to allow subscription creation without payment method
-          // The subscription will be created but may require payment method setup for future invoices
-          payment_behavior: 'default_incomplete',
-          payment_settings: {
-            save_default_payment_method: 'on_subscription',
-          },
           expand: ['latest_invoice.payment_intent'],
         };
+
+        // CRITICAL: Use the payment intent's payment method for the subscription
+        // If Payment Intent was created with customer parameter, payment method should be automatically attached
+        // Check if payment method is attached and use it for subscription
+        if (paymentIntent.payment_method && stripeCustomerId) {
+          const pmId = typeof paymentIntent.payment_method === 'string'
+            ? paymentIntent.payment_method
+            : (paymentIntent.payment_method as any)?.id;
+
+          if (pmId) {
+            try {
+              // Check if payment method is already attached to customer
+              // If Payment Intent was created with customer, it should be attached automatically
+              const paymentMethod = await stripe().paymentMethods.retrieve(pmId);
+
+              if (paymentMethod.customer === stripeCustomerId) {
+                // Payment method is already attached - use it for subscription
+                subscriptionParams.default_payment_method = pmId;
+                console.log('[MEMBERSHIP-SUCCESS] ✅ Payment method already attached to customer, using for subscription:', pmId);
+
+                // Ensure it's set as default
+                await stripe().customers.update(stripeCustomerId, {
+                  invoice_settings: {
+                    default_payment_method: pmId,
+                  },
+                });
+                console.log('[MEMBERSHIP-SUCCESS] ✅ Set payment method as default for customer');
+              } else {
+                // Payment method exists but isn't attached - try to attach it
+                console.log('[MEMBERSHIP-SUCCESS] Payment method not attached to customer, attempting to attach...');
+                try {
+                  await stripe().paymentMethods.attach(pmId, {
+                    customer: stripeCustomerId,
+                  });
+                  console.log('[MEMBERSHIP-SUCCESS] ✅ Attached payment method to customer:', pmId);
+
+                  subscriptionParams.default_payment_method = pmId;
+
+                  await stripe().customers.update(stripeCustomerId, {
+                    invoice_settings: {
+                      default_payment_method: pmId,
+                    },
+                  });
+                  console.log('[MEMBERSHIP-SUCCESS] ✅ Set payment method as default for customer');
+                } catch (attachError: any) {
+                  // If attachment fails (payment method was used without attachment), use default_incomplete
+                  console.warn('[MEMBERSHIP-SUCCESS] ⚠️ Could not attach payment method (payment method was used without attachment):', attachError.message);
+                  subscriptionParams.payment_behavior = 'default_incomplete';
+                  subscriptionParams.payment_settings = {
+                    save_default_payment_method: 'on_subscription',
+                  };
+                }
+              }
+            } catch (pmError: any) {
+              console.warn('[MEMBERSHIP-SUCCESS] ⚠️ Could not retrieve payment method, using default_incomplete:', pmError.message);
+              subscriptionParams.payment_behavior = 'default_incomplete';
+              subscriptionParams.payment_settings = {
+                save_default_payment_method: 'on_subscription',
+              };
+            }
+          } else {
+            // No payment method ID - use default_incomplete
+            subscriptionParams.payment_behavior = 'default_incomplete';
+            subscriptionParams.payment_settings = {
+              save_default_payment_method: 'on_subscription',
+            };
+          }
+        } else {
+          // No payment method or customer - use default_incomplete
+          subscriptionParams.payment_behavior = 'default_incomplete';
+          subscriptionParams.payment_settings = {
+            save_default_payment_method: 'on_subscription',
+          };
+        }
 
         // Add trial period if applicable
         if (plan.trialDays && plan.trialDays > 0) {
           subscriptionParams.trial_period_days = plan.trialDays;
         }
 
-        const stripeSubscription = await stripe().subscriptions.create(subscriptionParams);
+        // CRITICAL: Create subscription with payment method from payment intent
+        // If the payment method cannot be attached, we'll create with default_incomplete and pay the invoice manually
+        let stripeSubscription;
+        try {
+          stripeSubscription = await stripe().subscriptions.create(subscriptionParams);
+        } catch (createError: any) {
+          // If subscription creation fails because payment method isn't attached, retry with default_incomplete
+          if (createError.message?.includes('payment method') || createError.message?.includes('must be attached')) {
+            console.warn('[MEMBERSHIP-SUCCESS] ⚠️ Subscription creation failed with payment method, retrying with default_incomplete:', createError.message);
+            // Remove default_payment_method and use default_incomplete instead
+            delete subscriptionParams.default_payment_method;
+            subscriptionParams.payment_behavior = 'default_incomplete';
+            subscriptionParams.payment_settings = {
+              save_default_payment_method: 'on_subscription',
+            };
+            stripeSubscription = await stripe().subscriptions.create(subscriptionParams);
+            console.log('[MEMBERSHIP-SUCCESS] ✅ Created subscription with default_incomplete after retry');
+          } else {
+            // Re-throw if it's a different error
+            throw createError;
+          }
+        }
 
         // Update current period dates from Stripe Subscription (more accurate than calculated dates)
         if (stripeSubscription.current_period_start) {
@@ -778,14 +1242,334 @@ export async function processMembershipSubscriptionFromPaymentIntent(
           paymentBehavior: 'default_incomplete',
         });
 
-        // Log warning if subscription is incomplete and needs payment method
+        // CRITICAL: Complete incomplete subscription by paying its invoice with the confirmed payment intent
+        // This ensures the subscription becomes 'active' immediately after creation
         if (stripeSubscription.status === 'incomplete' || stripeSubscription.status === 'incomplete_expired') {
-          console.warn('[MEMBERSHIP-SUCCESS] ⚠️ Subscription created but is incomplete - payment method may be required:', {
-            subscriptionId: stripeSubscriptionId,
-            status: stripeSubscription.status,
-            latestInvoiceStatus: (stripeSubscription.latest_invoice as any)?.status,
-            message: 'Subscription ID is created but may need payment method for future invoices',
-          });
+          console.log('[MEMBERSHIP-SUCCESS] 🔄 Completing incomplete subscription by paying invoice...');
+
+          try {
+            // Retrieve subscription with expanded latest invoice to get invoice details
+            const subscriptionWithInvoice = await stripe().subscriptions.retrieve(stripeSubscriptionId, {
+              expand: ['latest_invoice', 'latest_invoice.payment_intent'],
+            });
+
+            const latestInvoice = subscriptionWithInvoice.latest_invoice;
+            if (latestInvoice && typeof latestInvoice !== 'string') {
+              const invoiceId = latestInvoice.id;
+              const invoiceStatus = latestInvoice.status;
+
+              console.log('[MEMBERSHIP-SUCCESS] Invoice details:', {
+                invoiceId,
+                invoiceStatus,
+                amountDue: latestInvoice.amount_due,
+                paymentIntentId: typeof latestInvoice.payment_intent === 'string'
+                  ? latestInvoice.payment_intent
+                  : latestInvoice.payment_intent?.id,
+              });
+
+              // If invoice is draft or open, try to pay it using the customer's payment method
+              if (invoiceStatus === 'draft' || invoiceStatus === 'open') {
+                // CRITICAL: Use the customer's existing default payment method to pay the invoice
+                // The payment method from the payment intent may not be reusable, so we use the customer's default
+                let paymentMethodId: string | null = null;
+
+                try {
+                  // Get customer's default payment method
+                  const customer = await stripe().customers.retrieve(stripeCustomerId!, {
+                    expand: ['invoice_settings.default_payment_method'],
+                  });
+
+                  if (customer && typeof customer !== 'string') {
+                    // Try to get default payment method from invoice_settings
+                    const defaultPaymentMethod = customer.invoice_settings?.default_payment_method;
+                    if (defaultPaymentMethod) {
+                      paymentMethodId = typeof defaultPaymentMethod === 'string'
+                        ? defaultPaymentMethod
+                        : (defaultPaymentMethod as any)?.id;
+                      console.log('[MEMBERSHIP-SUCCESS] Found customer default payment method:', paymentMethodId);
+                    }
+
+                    // If no default, get any payment method from customer
+                    if (!paymentMethodId) {
+                      const paymentMethods = await stripe().paymentMethods.list({
+                        customer: stripeCustomerId!,
+                        limit: 1,
+                      });
+                      if (paymentMethods.data.length > 0) {
+                        paymentMethodId = paymentMethods.data[0].id;
+                        console.log('[MEMBERSHIP-SUCCESS] Found customer payment method:', paymentMethodId);
+                      }
+                    }
+                  }
+                } catch (customerError: any) {
+                  console.warn('[MEMBERSHIP-SUCCESS] ⚠️ Could not retrieve customer payment method:', customerError.message);
+
+                  // Fallback: Try to get payment method from the confirmed payment intent
+                  // CRITICAL: If payment method exists but isn't attached, attach it to the customer
+                  try {
+                    const confirmedPaymentIntent = await stripe().paymentIntents.retrieve(paymentIntentId, {
+                      expand: ['payment_method'],
+                    });
+
+                    if (confirmedPaymentIntent.payment_method) {
+                      const pmId = typeof confirmedPaymentIntent.payment_method === 'string'
+                        ? confirmedPaymentIntent.payment_method
+                        : (confirmedPaymentIntent.payment_method as any)?.id;
+
+                      if (pmId) {
+                        try {
+                          const paymentMethod = await stripe().paymentMethods.retrieve(pmId);
+
+                          // Check if payment method is already attached to this customer
+                          if (paymentMethod.customer === stripeCustomerId) {
+                            paymentMethodId = pmId;
+                            console.log('[MEMBERSHIP-SUCCESS] Using payment method from payment intent (already attached):', paymentMethodId);
+                          } else {
+                            // CRITICAL: Payment method exists but isn't attached - attach it to the customer
+                            console.log('[MEMBERSHIP-SUCCESS] Payment method from payment intent not attached to customer, attaching now...');
+                            try {
+                              // Attach the payment method to the customer
+                              await stripe().paymentMethods.attach(pmId, {
+                                customer: stripeCustomerId!,
+                              });
+                              console.log('[MEMBERSHIP-SUCCESS] ✅ Attached payment method to customer:', pmId);
+
+                              // Set it as the default payment method for the customer
+                              await stripe().customers.update(stripeCustomerId!, {
+                                invoice_settings: {
+                                  default_payment_method: pmId,
+                                },
+                              });
+                              console.log('[MEMBERSHIP-SUCCESS] ✅ Set payment method as default for customer');
+
+                              // Now use it to pay the invoice
+                              paymentMethodId = pmId;
+                              console.log('[MEMBERSHIP-SUCCESS] Using attached payment method to pay invoice:', paymentMethodId);
+                            } catch (attachError: any) {
+                              console.warn('[MEMBERSHIP-SUCCESS] ⚠️ Could not attach payment method to customer:', attachError.message);
+                              // If attachment fails, still try to use it (it might work for one-time payment)
+                              if (attachError.code !== 'resource_already_exists') {
+                                paymentMethodId = pmId;
+                                console.log('[MEMBERSHIP-SUCCESS] Attempting to use payment method despite attachment failure:', paymentMethodId);
+                              }
+                            }
+                          }
+                        } catch (pmRetrieveError: any) {
+                          console.warn('[MEMBERSHIP-SUCCESS] ⚠️ Could not retrieve payment method from payment intent:', pmRetrieveError.message);
+                        }
+                      }
+                    }
+                  } catch (pmError: any) {
+                    console.warn('[MEMBERSHIP-SUCCESS] ⚠️ Could not retrieve payment method from payment intent:', pmError.message);
+                  }
+                }
+
+                // Try to finalize invoice if it's in draft status
+                if (invoiceStatus === 'draft') {
+                  try {
+                    const finalizedInvoice = await stripe().invoices.finalizeInvoice(invoiceId);
+                    console.log('[MEMBERSHIP-SUCCESS] ✅ Finalized draft invoice:', {
+                      invoiceId: finalizedInvoice.id,
+                      status: finalizedInvoice.status,
+                    });
+                  } catch (finalizeError: any) {
+                    console.warn('[MEMBERSHIP-SUCCESS] ⚠️ Could not finalize invoice:', finalizeError.message);
+                  }
+                }
+
+                // CRITICAL: Pay the invoice using a payment method attached to the customer
+                // Since the payment method from the payment intent cannot be reused, we need to create a new one
+                // However, we cannot create a new payment method without full card details (which we don't have)
+                // The solution: Use the payment intent's charges to get payment method details and create a setup intent
+                // OR: Use the payment intent's payment method by cloning it (if possible)
+                // OR: Create subscription with payment method at creation time (best approach)
+                //
+                // ACTUAL SOLUTION: Since we can't attach the old payment method, we need to create the subscription
+                // WITH a payment method attached at creation time. But we're creating it with default_incomplete.
+                //
+                // WORKAROUND: Use the payment intent's payment method by setting it on the subscription's default_payment_method
+                // before paying the invoice, OR use invoices.pay() with the payment intent directly
+                try {
+                  console.log('[MEMBERSHIP-SUCCESS] Attempting to pay invoice using payment intent...');
+
+                  // Get the payment method from the confirmed payment intent
+                  const confirmedPaymentIntent = await stripe().paymentIntents.retrieve(paymentIntentId, {
+                    expand: ['payment_method'],
+                  });
+
+                  const pmIdFromPI = typeof confirmedPaymentIntent.payment_method === 'string'
+                    ? confirmedPaymentIntent.payment_method
+                    : (confirmedPaymentIntent.payment_method as any)?.id;
+
+                  if (!pmIdFromPI) {
+                    throw new Error('No payment method found in payment intent');
+                  }
+
+                  // CRITICAL: Try to attach the payment method to the customer first
+                  // If it fails (because it was previously used), we'll try a different approach
+                  let attachedPaymentMethodId: string | null = null;
+
+                  try {
+                    // Try to attach the payment method
+                    await stripe().paymentMethods.attach(pmIdFromPI, {
+                      customer: stripeCustomerId!,
+                    });
+                    console.log('[MEMBERSHIP-SUCCESS] ✅ Attached payment method to customer:', pmIdFromPI);
+
+                    // Set it as default
+                    await stripe().customers.update(stripeCustomerId!, {
+                      invoice_settings: {
+                        default_payment_method: pmIdFromPI,
+                      },
+                    });
+                    console.log('[MEMBERSHIP-SUCCESS] ✅ Set payment method as default');
+
+                    attachedPaymentMethodId = pmIdFromPI;
+                  } catch (attachError: any) {
+                    console.warn('[MEMBERSHIP-SUCCESS] ⚠️ Could not attach payment method (expected if previously used):', attachError.message);
+
+                    // If attachment fails, try to create a new payment method from the charge details
+                    // This only works if we have access to the charge's payment method details
+                    if (confirmedPaymentIntent.charges && confirmedPaymentIntent.charges.data.length > 0) {
+                      const charge = confirmedPaymentIntent.charges.data[0];
+                      const chargePaymentMethodId = typeof charge.payment_method === 'string'
+                        ? charge.payment_method
+                        : (charge.payment_method as any)?.id;
+
+                      if (chargePaymentMethodId && chargePaymentMethodId !== pmIdFromPI) {
+                        // Try to attach the charge's payment method instead
+                        try {
+                          await stripe().paymentMethods.attach(chargePaymentMethodId, {
+                            customer: stripeCustomerId!,
+                          });
+                          await stripe().customers.update(stripeCustomerId!, {
+                            invoice_settings: {
+                              default_payment_method: chargePaymentMethodId,
+                            },
+                          });
+                          attachedPaymentMethodId = chargePaymentMethodId;
+                          console.log('[MEMBERSHIP-SUCCESS] ✅ Attached charge payment method to customer:', chargePaymentMethodId);
+                        } catch (chargeAttachError: any) {
+                          console.warn('[MEMBERSHIP-SUCCESS] ⚠️ Could not attach charge payment method:', chargeAttachError.message);
+                        }
+                      }
+                    }
+                  }
+
+                  // Now try to pay the invoice
+                  if (attachedPaymentMethodId) {
+                    // We have an attached payment method - use it to pay the invoice
+                    const paidInvoice = await stripe().invoices.pay(invoiceId, {
+                      payment_method: attachedPaymentMethodId,
+                    });
+                    console.log('[MEMBERSHIP-SUCCESS] ✅ Invoice paid successfully using attached payment method:', {
+                      invoiceId: paidInvoice.id,
+                      invoiceStatus: paidInvoice.status,
+                      amountPaid: paidInvoice.amount_paid,
+                      paymentMethodId: attachedPaymentMethodId,
+                    });
+                  } else if (paymentMethodId) {
+                    // Fallback: Use customer's existing payment method
+                    const paidInvoice = await stripe().invoices.pay(invoiceId, {
+                      payment_method: paymentMethodId,
+                    });
+                    console.log('[MEMBERSHIP-SUCCESS] ✅ Invoice paid successfully using customer payment method:', {
+                      invoiceId: paidInvoice.id,
+                      invoiceStatus: paidInvoice.status,
+                      amountPaid: paidInvoice.amount_paid,
+                      paymentMethodId,
+                    });
+                  } else {
+                    // Last resort: Try to pay with the payment intent's payment method directly
+                    // This might work if Stripe allows it for one-time payments
+                    console.log('[MEMBERSHIP-SUCCESS] Attempting to pay invoice with payment intent payment method (may fail)...');
+                    try {
+                      const paidInvoice = await stripe().invoices.pay(invoiceId, {
+                        payment_method: pmIdFromPI,
+                      });
+                      console.log('[MEMBERSHIP-SUCCESS] ✅ Invoice paid successfully (direct payment method):', {
+                        invoiceId: paidInvoice.id,
+                        invoiceStatus: paidInvoice.status,
+                        amountPaid: paidInvoice.amount_paid,
+                      });
+                    } catch (directPayError: any) {
+                      throw new Error(`Cannot pay invoice: Payment method must be attached to customer. Error: ${directPayError.message}`);
+                    }
+                  }
+                } catch (payError: any) {
+                  console.error('[MEMBERSHIP-SUCCESS] ❌ Could not pay invoice:', {
+                    error: payError.message,
+                    type: payError.type,
+                    code: payError.code,
+                    invoiceId,
+                    paymentIntentId,
+                    customerId: stripeCustomerId,
+                    message: 'Invoice payment failed - subscription will remain incomplete. The payment method from the payment intent cannot be reused. User may need to add a payment method manually in Stripe dashboard.',
+                  });
+                  // Don't throw - continue to check subscription status
+                }
+
+                // Wait a moment for Stripe to process the payment
+                await new Promise(resolve => setTimeout(resolve, 2000)); // Increased wait time
+
+                // Retrieve updated subscription to get final status
+                const updatedSubscription = await stripe().subscriptions.retrieve(stripeSubscriptionId);
+                console.log('[MEMBERSHIP-SUCCESS] Updated subscription status:', {
+                  subscriptionId: updatedSubscription.id,
+                  status: updatedSubscription.status,
+                  currentPeriodStart: updatedSubscription.current_period_start
+                    ? new Date(updatedSubscription.current_period_start * 1000).toISOString()
+                    : 'N/A',
+                  currentPeriodEnd: updatedSubscription.current_period_end
+                    ? new Date(updatedSubscription.current_period_end * 1000).toISOString()
+                    : 'N/A',
+                });
+
+                // Update period dates if subscription is now active
+                if (updatedSubscription.status === 'active') {
+                  if (updatedSubscription.current_period_start) {
+                    currentPeriodStart = new Date(updatedSubscription.current_period_start * 1000).toISOString();
+                  }
+                  if (updatedSubscription.current_period_end) {
+                    currentPeriodEnd = new Date(updatedSubscription.current_period_end * 1000).toISOString();
+                  }
+                  console.log('[MEMBERSHIP-SUCCESS] ✅ Subscription is now ACTIVE');
+                } else {
+                  console.warn('[MEMBERSHIP-SUCCESS] ⚠️ Subscription status is still:', updatedSubscription.status);
+                  // CRITICAL: If still incomplete, log detailed error for debugging
+                  if (updatedSubscription.status === 'incomplete' || updatedSubscription.status === 'incomplete_expired') {
+                    const invoiceCheck = await stripe().invoices.retrieve(invoiceId);
+                    console.error('[MEMBERSHIP-SUCCESS] ❌ Subscription still incomplete after payment attempt:', {
+                      subscriptionId: updatedSubscription.id,
+                      subscriptionStatus: updatedSubscription.status,
+                      invoiceId: invoiceCheck.id,
+                      invoiceStatus: invoiceCheck.status,
+                      invoiceAmountDue: invoiceCheck.amount_due,
+                      invoiceAmountPaid: invoiceCheck.amount_paid,
+                      invoicePaymentIntent: typeof invoiceCheck.payment_intent === 'string'
+                        ? invoiceCheck.payment_intent
+                        : invoiceCheck.payment_intent?.id,
+                      confirmedPaymentIntentId: paymentIntentId,
+                    });
+                  }
+                }
+              } else if (invoiceStatus === 'paid') {
+                console.log('[MEMBERSHIP-SUCCESS] ✅ Invoice is already paid');
+              } else {
+                console.warn('[MEMBERSHIP-SUCCESS] ⚠️ Invoice status is:', invoiceStatus, '- may need manual intervention');
+              }
+            } else {
+              console.warn('[MEMBERSHIP-SUCCESS] ⚠️ Could not retrieve invoice from subscription');
+            }
+          } catch (completeError: any) {
+            console.error('[MEMBERSHIP-SUCCESS] ❌ Error completing subscription:', {
+              error: completeError.message,
+              type: completeError.type,
+              code: completeError.code,
+              stack: completeError.stack?.substring(0, 500),
+            });
+            // Continue - subscription will still be created in database, can be completed later
+          }
         }
       } catch (subscriptionError: any) {
         console.error('[MEMBERSHIP-SUCCESS] ❌ Error creating Stripe Subscription:', {
@@ -799,8 +1583,10 @@ export async function processMembershipSubscriptionFromPaymentIntent(
           planName: plan.planName,
           stack: subscriptionError.stack?.substring(0, 500), // Limit stack trace length
         });
-        // Continue without Stripe Subscription ID - subscription will still be created in database
-        // This allows manual reconciliation later
+        // CRITICAL: Do not create database record if Stripe subscription creation failed
+        // The subscription must be created in Stripe first before we can store it in the database
+        // Return null to indicate failure - user will need to retry or add payment method manually
+        throw new Error(`Failed to create Stripe subscription: ${subscriptionError.message}. Subscription cannot be created without a valid Stripe subscription ID.`);
       }
     } else {
       console.warn('[MEMBERSHIP-SUCCESS] ⚠️ Skipping Stripe Subscription creation - missing requirements:', {
@@ -813,8 +1599,68 @@ export async function processMembershipSubscriptionFromPaymentIntent(
       });
     }
 
-    // Determine subscription status
-    const subscriptionStatus = plan.trialDays && plan.trialDays > 0 ? 'TRIAL' : 'ACTIVE';
+    // CRITICAL: Do not create database record if Stripe subscription was not created
+    // The subscription must exist in Stripe before we can store it in the database
+    if (!stripeSubscriptionId) {
+      console.error('[MEMBERSHIP-SUCCESS] ❌ Cannot create database record: Stripe subscription ID is missing');
+      throw new Error('Stripe subscription was not created successfully. Cannot create database record without Stripe subscription ID.');
+    }
+
+    // Determine subscription status based on Stripe subscription status
+    // If subscription was completed and is now active, use ACTIVE
+    // Otherwise, use TRIAL if trial days exist, or map Stripe status to database status
+    let subscriptionStatus: 'ACTIVE' | 'TRIAL' | 'CANCELLED' | 'PAST_DUE' | 'EXPIRED' | 'SUSPENDED' = 'ACTIVE';
+
+    // Check if we have a Stripe subscription and its status
+    if (stripeSubscriptionId) {
+      try {
+        const finalSubscription = await stripe().subscriptions.retrieve(stripeSubscriptionId);
+        if (finalSubscription.status === 'active') {
+          // If subscription is active and has trial, check if it's in trial period
+          if (plan.trialDays && plan.trialDays > 0) {
+            const now = Math.floor(Date.now() / 1000);
+            const trialEnd = finalSubscription.trial_end;
+            if (trialEnd && now < trialEnd) {
+              subscriptionStatus = 'TRIAL';
+            } else {
+              subscriptionStatus = 'ACTIVE';
+            }
+          } else {
+            subscriptionStatus = 'ACTIVE';
+          }
+        } else if (finalSubscription.status === 'trialing') {
+          subscriptionStatus = 'TRIAL';
+        } else if (finalSubscription.status === 'incomplete' || finalSubscription.status === 'incomplete_expired') {
+          // CRITICAL: Map incomplete subscriptions to PAST_DUE (payment not completed)
+          // This accurately reflects that the subscription exists but payment hasn't been completed
+          subscriptionStatus = 'PAST_DUE';
+          console.warn('[MEMBERSHIP-SUCCESS] ⚠️ Subscription is incomplete - setting status to PAST_DUE:', {
+            stripeSubscriptionId,
+            stripeStatus: finalSubscription.status,
+            databaseStatus: subscriptionStatus,
+          });
+        } else if (finalSubscription.status === 'past_due') {
+          subscriptionStatus = 'PAST_DUE';
+        } else if (finalSubscription.status === 'canceled' || finalSubscription.status === 'unpaid') {
+          subscriptionStatus = 'CANCELLED';
+        } else if (finalSubscription.status === 'paused') {
+          subscriptionStatus = 'SUSPENDED';
+        } else {
+          // For any other status, default based on plan (will be updated by webhook)
+          subscriptionStatus = plan.trialDays && plan.trialDays > 0 ? 'TRIAL' : 'ACTIVE';
+          console.warn('[MEMBERSHIP-SUCCESS] ⚠️ Unknown subscription status, using default:', {
+            stripeStatus: finalSubscription.status,
+            databaseStatus: subscriptionStatus,
+          });
+        }
+      } catch (statusError: any) {
+        console.warn('[MEMBERSHIP-SUCCESS] Could not retrieve final subscription status, using default:', statusError.message);
+        subscriptionStatus = plan.trialDays && plan.trialDays > 0 ? 'TRIAL' : 'ACTIVE';
+      }
+    } else {
+      // No Stripe subscription ID, use default based on plan
+      subscriptionStatus = plan.trialDays && plan.trialDays > 0 ? 'TRIAL' : 'ACTIVE';
+    }
 
     // Create subscription payload
     const subscriptionPayload = withTenantId({
@@ -867,10 +1713,90 @@ export async function processMembershipSubscriptionFromPaymentIntent(
 
     if (!createRes.ok) {
       const errorBody = await createRes.text();
+      let errorData: any = null;
+      try {
+        errorData = JSON.parse(errorBody);
+      } catch {
+        // Not JSON, use as string
+      }
+
+      // CRITICAL: Handle "active subscription exists" error - look up existing subscription
+      if (createRes.status === 400 && errorData?.message === 'error.activesubscriptionexists') {
+        console.log('[MEMBERSHIP-SUCCESS] ⚠️ Subscription already exists (400 error) - looking up existing subscription:', {
+          userProfileId: userProfile.id,
+          membershipPlanId,
+          paymentIntentId,
+        });
+
+        // Look up existing subscription by userProfileId + membershipPlanId
+        try {
+          const tenantId = getTenantId();
+          const params = new URLSearchParams({
+            'userProfileId.equals': String(userProfile.id),
+            'membershipPlanId.equals': String(membershipPlanId),
+            'tenantId.equals': tenantId,
+            'subscriptionStatus.in': 'ACTIVE,TRIAL',
+          });
+          const lookupRes = await fetchWithJwtRetry(
+            `${baseUrl}/api/proxy/membership-subscriptions?${params.toString()}`,
+            { cache: 'no-store' }
+          );
+
+          if (lookupRes.ok) {
+            const items: MembershipSubscriptionDTO[] = await lookupRes.json();
+            if (items.length > 0) {
+              // Get the most recent subscription
+              const existingSub = items.sort((a, b) => {
+                const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+                const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+                return bTime - aTime;
+              })[0];
+
+              console.log('[MEMBERSHIP-SUCCESS] ✅ Found existing subscription:', {
+                subscriptionId: existingSub.id,
+                planId: existingSub.membershipPlanId,
+                status: existingSub.subscriptionStatus,
+                paymentIntentId,
+              });
+
+              // Update the subscription with the payment intent ID if it's missing
+              if (!existingSub.stripePaymentIntentId && paymentIntentId) {
+                try {
+                  const updatePayload = withTenantId({
+                    id: existingSub.id!,
+                    stripePaymentIntentId: paymentIntentId,
+                  });
+
+                  await fetchWithJwtRetry(
+                    `${baseUrl}/api/proxy/membership-subscriptions/${existingSub.id}`,
+                    {
+                      method: 'PATCH',
+                      headers: { 'Content-Type': 'application/merge-patch+json' },
+                      body: JSON.stringify(updatePayload),
+                      cache: 'no-store',
+                    }
+                  );
+
+                  console.log('[MEMBERSHIP-SUCCESS] ✅ Updated existing subscription with payment intent ID');
+                  return { subscription: { ...existingSub, stripePaymentIntentId: paymentIntentId } as MembershipSubscriptionDTO, plan, userProfile };
+                } catch (updateError) {
+                  console.warn('[MEMBERSHIP-SUCCESS] ⚠️ Failed to update payment intent ID (non-fatal):', updateError);
+                }
+              }
+
+              return { subscription: existingSub, plan, userProfile };
+            }
+          }
+        } catch (lookupError) {
+          console.error('[MEMBERSHIP-SUCCESS] Error looking up existing subscription:', lookupError);
+        }
+      }
+
       console.error('[MEMBERSHIP-SUCCESS] ❌ Failed to create subscription:', {
         status: createRes.status,
         statusText: createRes.statusText,
         errorBody,
+        errorData,
         paymentIntentId,
         userId,
       });

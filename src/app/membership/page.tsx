@@ -13,39 +13,38 @@ export const metadata: Metadata = {
 };
 
 export default async function MembershipPage() {
-  // CRITICAL: Next.js 15+ requires headers() to be awaited before auth()
-  await headers(); // Fully await headers() before calling auth()
+  // CRITICAL: Next.js 15+ requires headers() to be awaited and stored before auth()
+  const headersList = await headers(); // Fully await headers() before calling auth()
 
   let plans: MembershipPlanDTO[] = [];
   let error: string | null = null;
   let userSubscription: MembershipSubscriptionDTO | null = null;
   let hasUserProfile = false;
 
+  // Get auth status once (after headers() is awaited)
+  const { userId } = await auth();
+  const isAuthenticated = !!userId;
+
   try {
     plans = await fetchMembershipPlansServer({ isActive: true, sort: 'price,asc' });
 
     // Fetch user subscription if authenticated
-    try {
-      const { userId } = await auth();
-      if (userId) {
+    if (userId) {
+      try {
         const userProfile = await fetchUserProfileServer(userId);
         if (userProfile?.id) {
           hasUserProfile = true;
           userSubscription = await fetchUserSubscriptionServer(userProfile.id);
         }
+      } catch (subErr) {
+        // Non-fatal - subscription fetch failure shouldn't break the page
+        console.error('Failed to fetch user subscription:', subErr);
       }
-    } catch (subErr) {
-      // Non-fatal - subscription fetch failure shouldn't break the page
-      console.error('Failed to fetch user subscription:', subErr);
     }
   } catch (err) {
     console.error('Failed to fetch membership plans:', err);
     error = err instanceof Error ? err.message : 'Failed to load membership plans';
   }
-
-  // Check authentication status
-  const { userId } = await auth();
-  const isAuthenticated = !!userId;
 
   return (
     <MembershipClient

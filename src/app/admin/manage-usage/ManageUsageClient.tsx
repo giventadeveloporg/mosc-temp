@@ -102,16 +102,19 @@ function EditUserModal({ user, open, onClose, onSave }: {
   if (!open || !user) return null;
   return ReactDOM.createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg relative">
-        <button className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-lg font-bold" onClick={onClose}>&times;</button>
-        <h2 className="text-xl font-bold mb-4">Edit User</h2>
-        <form
-          onSubmit={e => {
-            e.preventDefault();
-            onSave(form);
-          }}
-          className="space-y-4"
-        >
+      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg relative h-[calc(100vh-2rem)] max-h-[calc(100vh-2rem)] flex flex-col overflow-hidden">
+        <div className="flex-shrink-0 mb-4">
+          <button className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-lg font-bold" onClick={onClose}>&times;</button>
+          <h2 className="text-xl font-bold">Edit User</h2>
+        </div>
+        <div className="flex-1 overflow-y-auto min-h-0">
+          <form
+            onSubmit={e => {
+              e.preventDefault();
+              onSave(form);
+            }}
+            className="space-y-4"
+          >
           {/* Editable fields */}
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -222,20 +225,36 @@ function EditUserModal({ user, open, onClose, onSave }: {
             </div>
           </div>
           <div className="flex justify-end gap-2 mt-4">
-            <button type="button" className="bg-teal-100 hover:bg-teal-200 text-teal-800 font-bold px-4 py-2 rounded-md flex items-center gap-2 transition-colors" onClick={onClose}>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-              Cancel
+            <button
+              type="button"
+              className="flex-shrink-0 h-14 rounded-xl bg-teal-100 hover:bg-teal-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+              onClick={onClose}
+              title="Cancel"
+              aria-label="Cancel"
+            >
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
+                <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </div>
+              <span className="font-semibold text-teal-700">Cancel</span>
             </button>
-            <button type="submit" className="px-4 py-2 rounded bg-blue-600 text-white font-bold hover:bg-blue-700 flex items-center gap-2 transition-colors">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              Save
+            <button
+              type="submit"
+              className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+              title="Save"
+              aria-label="Save"
+            >
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <span className="font-semibold text-blue-700">Save</span>
             </button>
           </div>
         </form>
+        </div>
       </div>
     </div>,
     document.body
