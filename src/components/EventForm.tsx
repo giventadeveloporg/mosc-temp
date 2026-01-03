@@ -118,37 +118,61 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
         const formData = { ...defaultEvent, ...event, fromEmail: validFromEmail };
         setForm(formData);
 
-        // Load donation metadata (NEW - preferred)
-        if (event.donationMetadata) {
-          try {
-            const donationMetadata = JSON.parse(event.donationMetadata);
-            setIsFundraiserEvent(Boolean(donationMetadata.isFundraiserEvent));
-            setIsCharityEvent(Boolean(donationMetadata.isCharityEvent));
-            setZeroFeeProvider(donationMetadata.zeroFeeProvider || '');
-            setGivebutterCampaignId(donationMetadata.givebutterCampaignId || '');
-            setUseZeroFeeProvider(Boolean(donationMetadata.zeroFeeProvider));
-          } catch (e) {
-            console.error('Failed to parse donation metadata', e);
-          }
+      // Load donation metadata (NEW - preferred)
+      if (event.donationMetadata) {
+        try {
+          const donationMetadata = JSON.parse(event.donationMetadata);
+          setIsFundraiserEvent(Boolean(donationMetadata.isFundraiserEvent));
+          setIsCharityEvent(Boolean(donationMetadata.isCharityEvent));
+          setZeroFeeProvider(donationMetadata.zeroFeeProvider || '');
+          setGivebutterCampaignId(donationMetadata.givebutterCampaignId || '');
+          setUseZeroFeeProvider(Boolean(donationMetadata.zeroFeeProvider));
+        } catch (e) {
+          console.error('Failed to parse donation metadata', e);
         }
-        // Fallback: Load from old metadata field (backward compatibility)
-        else if (event.metadata) {
-          const metadata = parseEventMetadata(event.metadata);
-          setIsFundraiserEvent(Boolean(metadata.isFundraiserEvent));
-          setIsCharityEvent(Boolean(metadata.isCharityEvent));
+      }
+      // Fallback: Load from old metadata field (backward compatibility)
+      else if (event.metadata) {
+        const metadata = parseEventMetadata(event.metadata);
+        setIsFundraiserEvent(Boolean(metadata.isFundraiserEvent));
+        setIsCharityEvent(Boolean(metadata.isCharityEvent));
 
-          const donationConfig = metadata.donationConfig;
-          if (donationConfig) {
-            setUseZeroFeeProvider(Boolean(donationConfig.useZeroFeeProvider));
-            setZeroFeeProvider(donationConfig.zeroFeeProvider || '');
-            setGivebutterCampaignId(donationConfig.givebutterCampaignId || '');
-          }
+        const donationConfig = metadata.donationConfig;
+        if (donationConfig) {
+          setUseZeroFeeProvider(Boolean(donationConfig.useZeroFeeProvider));
+          setZeroFeeProvider(donationConfig.zeroFeeProvider || '');
+          setGivebutterCampaignId(donationConfig.givebutterCampaignId || '');
         }
+      }
 
-        // Load recurrence metadata (NEW - preferred)
-        if (event.eventRecurrenceMetadata) {
-          try {
-            const recurrenceConfig = JSON.parse(event.eventRecurrenceMetadata);
+      // Load recurrence metadata (NEW - preferred)
+      if (event.eventRecurrenceMetadata) {
+        try {
+          const recurrenceConfig = JSON.parse(event.eventRecurrenceMetadata);
+          setIsRecurring(true);
+          setRecurrencePattern((recurrenceConfig.pattern as RecurrencePattern) || '');
+          setRecurrenceInterval(recurrenceConfig.interval || 1);
+          setRecurrenceEndType((recurrenceConfig.endType as RecurrenceEndType) || 'END_DATE');
+          setRecurrenceEndDate(recurrenceConfig.endDate || '');
+          setRecurrenceOccurrences(recurrenceConfig.occurrences || 1);
+          setRecurrenceWeeklyDays(recurrenceConfig.weeklyDays || []);
+          if (recurrenceConfig.monthlyDay === 'LAST') {
+            setRecurrenceMonthlyDay('LAST');
+            setRecurrenceMonthlyDayType('LAST_DAY');
+          } else if (recurrenceConfig.monthlyDay) {
+            setRecurrenceMonthlyDay(recurrenceConfig.monthlyDay);
+            setRecurrenceMonthlyDayType('DAY_NUMBER');
+          }
+        } catch (e) {
+          console.error('Failed to parse recurrence metadata', e);
+        }
+      }
+      // Fallback: Load from old metadata field (backward compatibility)
+      else if (event.metadata) {
+        const metadata = parseEventMetadata(event.metadata);
+        if (metadata.isRecurring) {
+          const recurrenceConfig = metadata.recurrenceConfig;
+          if (recurrenceConfig) {
             setIsRecurring(true);
             setRecurrencePattern((recurrenceConfig.pattern as RecurrencePattern) || '');
             setRecurrenceInterval(recurrenceConfig.interval || 1);
@@ -163,33 +187,9 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
               setRecurrenceMonthlyDay(recurrenceConfig.monthlyDay);
               setRecurrenceMonthlyDayType('DAY_NUMBER');
             }
-          } catch (e) {
-            console.error('Failed to parse recurrence metadata', e);
           }
         }
-        // Fallback: Load from old metadata field (backward compatibility)
-        else if (event.metadata) {
-          const metadata = parseEventMetadata(event.metadata);
-          if (metadata.isRecurring) {
-            const recurrenceConfig = metadata.recurrenceConfig;
-            if (recurrenceConfig) {
-              setIsRecurring(true);
-              setRecurrencePattern((recurrenceConfig.pattern as RecurrencePattern) || '');
-              setRecurrenceInterval(recurrenceConfig.interval || 1);
-              setRecurrenceEndType((recurrenceConfig.endType as RecurrenceEndType) || 'END_DATE');
-              setRecurrenceEndDate(recurrenceConfig.endDate || '');
-              setRecurrenceOccurrences(recurrenceConfig.occurrences || 1);
-              setRecurrenceWeeklyDays(recurrenceConfig.weeklyDays || []);
-              if (recurrenceConfig.monthlyDay === 'LAST') {
-                setRecurrenceMonthlyDay('LAST');
-                setRecurrenceMonthlyDayType('LAST_DAY');
-              } else if (recurrenceConfig.monthlyDay) {
-                setRecurrenceMonthlyDay(recurrenceConfig.monthlyDay);
-                setRecurrenceMonthlyDayType('DAY_NUMBER');
-              }
-            }
-          }
-        }
+      }
       };
 
       // Call the async function to validate and set fromEmail
@@ -326,13 +326,13 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
       // - Enters this else block
       // - if (isFromEmailEmpty) = true → Sets error: 'Please enter from email address'
       // - Validation returns false → Form submission prevented ✅
-      if (isFromEmailEmpty) {
+    if (isFromEmailEmpty) {
         // Field is empty (untouched, cleared, or whitespace-only) - require selection
-        errs.fromEmail = 'Please enter from email address';
+      errs.fromEmail = 'Please enter from email address';
         console.log('[EventForm validate] fromEmail error: Field is empty');
       } else if (normalizedFromEmail.trim() !== '' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedFromEmail.trim())) {
         // Field has value but format is invalid
-        errs.fromEmail = 'Please enter a valid email address';
+      errs.fromEmail = 'Please enter a valid email address';
         console.log('[EventForm validate] fromEmail error: Invalid format');
       } else {
         console.log('[EventForm validate] fromEmail validation passed');
@@ -1722,7 +1722,7 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
         {/* AWS SES Verification Note */}
         <div className="mb-3 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
           <p className="text-sm text-yellow-800">
-            <strong>From Email Field:</strong> The email address used in the "From Email" field must be registered and verified with AWS SES (Amazon Simple Email Service). Contact your administrator for help.
+            <strong>From Email Field:</strong> The email address used in the "From Email" field must be registered and verified with AWS SES (Amazon Simple Email Service). Contact your administrator for help. In order to see the full list of available email addresses, you may have to clear the form field below. The field also supports type-ahead - if you want to see more emails, clear the field and then start typing.
           </p>
         </div>
         <FromEmailSelect

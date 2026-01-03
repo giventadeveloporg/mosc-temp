@@ -229,7 +229,7 @@ export async function GET(req: NextRequest) {
           const result = await processMembershipSubscriptionFromPaymentIntent(pi, undefined);
 
           if (result && result.subscription) {
-            console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] ✅ Successfully created subscription from Payment Intent:', {
+            console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] ✅ Successfully created/retrieved subscription from Payment Intent:', {
               subscriptionId: result.subscription.id,
               status: result.subscription.subscriptionStatus,
               paymentIntentId: pi,
@@ -243,10 +243,31 @@ export async function GET(req: NextRequest) {
             });
           } else {
             console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] Failed to create subscription from Payment Intent - result:', result);
+
+            // CRITICAL: If subscription creation failed with "already exists" error,
+            // the function should have returned the existing subscription, but if it didn't,
+            // try one more lookup by payment intent ID (which may have been updated)
+            const retryLookup = await findSubscriptionByPaymentIntentId(pi);
+            if (retryLookup && (retryLookup.subscriptionStatus === 'ACTIVE' || retryLookup.subscriptionStatus === 'TRIAL')) {
+              console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] Found existing subscription on retry lookup:', retryLookup.id);
+
+              const details = await fetchMembershipSubscriptionDetailsServer(
+                undefined,
+                pi
+              );
+
+              return NextResponse.json({
+                subscription: retryLookup,
+                plan: details?.plan || null,
+                amount: details?.amount || null,
+                currency: details?.currency || 'USD',
+              });
+            }
+
             return NextResponse.json({
               subscription: null,
               plan: null,
-              message: 'Failed to create subscription. Please contact support.',
+              message: 'Subscription not found yet. Webhook may still be processing.',
             });
           }
         } catch (createErr: any) {

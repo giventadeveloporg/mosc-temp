@@ -77,8 +77,45 @@ export async function POST(req: NextRequest) {
       }, { status: 500 });
     }
 
+    // CRITICAL: Create or retrieve customer BEFORE creating Payment Intent
+    // This ensures payment method is automatically attached when payment is confirmed
+    // This is required for subscriptions to work properly (payment method must be reusable)
+    let customerId: string | undefined;
+    if (email) {
+      try {
+        // Search for existing customer by email
+        const existingCustomers = await stripe().customers.list({
+          email: email,
+          limit: 1,
+        });
+
+        if (existingCustomers.data.length > 0) {
+          customerId = existingCustomers.data[0].id;
+          console.log('[MEMBERSHIP-PI] Found existing customer:', customerId);
+        } else {
+          // Create new customer if doesn't exist
+          const newCustomer = await stripe().customers.create({
+            email: email,
+            name: customerName,
+            phone: customerPhone,
+            metadata: {
+              tenantId: tenantId,
+              membershipPlanId: String(membershipPlanId),
+            },
+          });
+          customerId = newCustomer.id;
+          console.log('[MEMBERSHIP-PI] Created new customer:', customerId);
+        }
+      } catch (customerError: any) {
+        console.warn('[MEMBERSHIP-PI] Could not create/get customer, will create after payment:', customerError.message);
+        // Continue without customer - customer will be created in success handler
+        // Payment method won't be automatically attached, but subscription will still work with default_incomplete
+      }
+    }
+
     // Create PaymentIntent with automatic payment methods (enables wallets)
-    const pi = await stripe().paymentIntents.create({
+    // CRITICAL: Include customer parameter if available - this ensures payment method is attached automatically
+    const piParams: any = {
       amount: priceInCents,
       currency: plan.currency?.toLowerCase() || 'usd',
       receipt_email: email,
@@ -93,7 +130,19 @@ export async function POST(req: NextRequest) {
         metadataSource: 'membership_mobile_payment_intent',
         timestamp: new Date().toISOString(),
       },
-    }, { idempotencyKey });
+    };
+
+    // CRITICAL: Add customer if available - this ensures payment method is attached when payment is confirmed
+    if (customerId) {
+      piParams.customer = customerId;
+      // Enable payment method reuse for subscriptions
+      piParams.setup_future_usage = 'off_session';
+      console.log('[MEMBERSHIP-PI] Creating PaymentIntent with customer (payment method will be attached automatically):', customerId);
+    } else {
+      console.log('[MEMBERSHIP-PI] Creating PaymentIntent without customer (customer will be created after payment)');
+    }
+
+    const pi = await stripe().paymentIntents.create(piParams, { idempotencyKey });
 
     console.log('[MEMBERSHIP-PI] PaymentIntent created successfully:', {
       id: pi.id,

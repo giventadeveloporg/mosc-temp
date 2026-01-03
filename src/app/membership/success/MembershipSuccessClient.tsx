@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchMembershipSubscriptionDetailsServer } from './ApiServerActions';
 import { PlanFeaturesList } from '@/components/membership/PlanFeaturesList';
-import type { MembershipPlanDTO } from '@/types';
+import type { MembershipPlanDTO, MembershipSubscriptionDTO } from '@/types';
 
 interface MembershipSuccessClientProps {
   session_id?: string;
@@ -137,13 +137,19 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
 
       // CRITICAL: Check sessionStorage to prevent duplicate processing on page refresh
       if (hasBeenProcessed() && processedRef.current) {
-        console.log('[MEMBERSHIP-SUCCESS] Subscription already processed (from sessionStorage), skipping duplicate processing:', {
+        console.log('[MEMBERSHIP-SUCCESS] Subscription already processed (from sessionStorage), redirecting to membership page:', {
           session_id,
           payment_intent,
           processedKey: getProcessedKey()
         });
-        // Still fetch subscription details to display, but don't trigger creation again
-        // The GET endpoint will return existing subscription if it exists
+        // If already processed, redirect to membership page instead of polling
+        if (!cancelledRef.current) {
+          setTimeout(() => {
+            router.push('/membership');
+          }, 2000); // Show success message for 2 seconds, then redirect
+        }
+        setLoading(false);
+        return;
       }
 
       console.log('[MEMBERSHIP-SUCCESS] Starting data fetch...', { session_id, payment_intent });
@@ -151,6 +157,7 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
       setError(null);
 
       try {
+
         // Build GET query parameters
         const params = new URLSearchParams();
         if (payment_intent) {
@@ -280,10 +287,40 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
                   }
                 } else {
                   const errorText = await pollRes.text();
+                  let errorData: any = null;
+                  try {
+                    errorData = JSON.parse(errorText);
+                  } catch {
+                    // Not JSON, use as string
+                  }
+
+                  // CRITICAL: If we get a 400 error indicating subscription already exists, stop polling and redirect
+                  if (pollRes.status === 400 && errorData?.message === 'error.activesubscriptionexists') {
+                    console.log('[DESKTOP FLOW] Subscription already exists (400 error) - stopping polling and redirecting:', {
+                      pollAttempt,
+                      errorData,
+                      timestamp: new Date().toISOString()
+                    });
+
+                    // Mark as processed
+                    markAsProcessed();
+                    processedRef.current = true;
+
+                    if (!cancelledRef.current) {
+                      // Redirect to membership page where subscription will be visible
+                      setTimeout(() => {
+                        router.push('/membership');
+                      }, 2000);
+                    }
+                    setLoading(false);
+                    return;
+                  }
+
                   console.warn(`[DESKTOP FLOW] Poll request failed (attempt ${pollAttempt}):`, {
                     status: pollRes.status,
                     statusText: pollRes.statusText,
                     errorText,
+                    errorData,
                     timestamp: new Date().toISOString()
                   });
                 }
@@ -293,24 +330,34 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
               }
             }
 
-            // If still not found after polling, show helpful error message
-            console.error('[DESKTOP FLOW] ⚠️⚠️⚠️ Subscription not found after polling:', {
+            // If still not found after polling, redirect to membership page (similar to ticket success page)
+            console.log('[DESKTOP FLOW] Subscription not found after polling - redirecting to membership page:', {
               pollAttempts: MAX_POLL_ATTEMPTS,
               pollInterval: POLL_INTERVAL,
               totalWaitTime: `${(MAX_POLL_ATTEMPTS * POLL_INTERVAL) / 1000} seconds`,
               sessionId: session_id || payment_intent,
-              note: 'Webhook may be delayed or failed. Desktop flow did NOT call POST endpoint (correct behavior).',
+              note: 'Payment was successful. Redirecting to membership page where subscription will be visible once processed.',
               timestamp: new Date().toISOString()
             });
+
+            // Mark as processed to prevent further attempts
+            markAsProcessed();
+            processedRef.current = true;
+
             if (!cancelledRef.current) {
-              setError(
-                `Your payment was successful, but we're still processing your subscription. ` +
-                `We checked ${MAX_POLL_ATTEMPTS} times over ${(MAX_POLL_ATTEMPTS * POLL_INTERVAL) / 1000} seconds, ` +
-                `but the subscription hasn't been created yet. ` +
-                `This usually means the webhook is delayed. ` +
-                `Please wait a moment and refresh this page, or check your email for confirmation. ` +
-                `Session ID: ${session_id || payment_intent || 'N/A'}`
-              );
+              // Show success message briefly, then redirect to membership page
+              setSubscriptionDetails({
+                plan: null,
+                amount: null,
+                currency: null,
+                subscription: null,
+              });
+              setError(null);
+
+              // Redirect after 3 seconds
+              setTimeout(() => {
+                router.push('/membership');
+              }, 3000);
             }
           }
         } else {
@@ -721,43 +768,70 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
             <h2 className="text-xl font-heading font-semibold text-foreground mb-6 text-center">
               What's Next?
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <button
-                onClick={() => router.push('/membership/manage')}
-                className="flex items-center justify-center gap-3 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-all duration-300 hover:scale-105"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                <span>Manage Subscription</span>
-              </button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Manage Subscription Button (Blue) */}
               <button
                 onClick={() => router.push('/membership')}
-                className="flex items-center justify-center gap-3 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-all duration-300 hover:scale-105"
+                className="w-full flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                title="Manage Subscription"
+                aria-label="Manage Subscription"
+                type="button"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-                <span>View All Plans</span>
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-blue-700">Manage Subscription</span>
               </button>
+
+              {/* View All Plans Button (Green) */}
+              <button
+                onClick={() => router.push('/membership')}
+                className="w-full flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                title="View All Plans"
+                aria-label="View All Plans"
+                type="button"
+              >
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-green-700">View All Plans</span>
+              </button>
+
+              {/* My Profile Button (Purple) */}
               <button
                 onClick={() => router.push('/profile')}
-                className="flex items-center justify-center gap-3 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-all duration-300 hover:scale-105"
+                className="w-full flex-shrink-0 h-14 rounded-xl bg-purple-100 hover:bg-purple-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                title="My Profile"
+                aria-label="My Profile"
+                type="button"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                <span>My Profile</span>
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-200 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-purple-700">My Profile</span>
               </button>
+
+              {/* Go Home Button (Indigo) */}
               <button
                 onClick={() => router.push('/')}
-                className="flex items-center justify-center gap-3 px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-semibold transition-all duration-300 hover:scale-105"
+                className="w-full flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                title="Go Home"
+                aria-label="Go Home"
+                type="button"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                </svg>
-                <span>Go Home</span>
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-indigo-700">Go Home</span>
               </button>
             </div>
           </div>

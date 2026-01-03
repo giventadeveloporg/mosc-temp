@@ -1633,4 +1633,111 @@ if (!finalUserId && customerEmail) {
 
 **Lesson**: Always support email-based user profile lookup for public routes. Extract email from Payment Intent metadata or `receipt_email` field.
 
+### 10. Payment Method Attachment Fix - CRITICAL for Subscription Functionality
+
+**Issue**: When a user purchases a membership subscription, the payment method from the confirmed Payment Intent cannot be reused for the subscription because it was used **without being attached to the customer first**. This results in:
+- Subscription status `INCOMPLETE` instead of `ACTIVE`
+- Error: "This PaymentMethod was previously used without being attached to a Customer or was detached from a Customer, and may not be used again."
+- Missing `stripeSubscriptionId` in database (subscription creation fails)
+
+**Root Cause**:
+1. **Payment Intent Creation**: Payment Intent was created **without** a `customer` parameter, so the payment method wasn't associated with a customer
+2. **Payment Confirmation**: When payment is confirmed, the payment method is used but **not attached** to a customer
+3. **Stripe Security Model**: Payment methods used without attachment are marked as "one-time use" and cannot be reused for subscriptions
+4. **Subscription Creation**: When trying to create a subscription with the payment method, Stripe rejects it because it was already used without attachment
+
+**Why Attachment is Mandatory**:
+- **Stripe's Security Model**: Payment methods used without attachment are considered "one-time use" to prevent unauthorized reuse
+- **Subscription Requirements**: Subscriptions need a **reusable** payment method for recurring billing
+- **Best Practices**: Stripe recommends attaching payment methods to customers for:
+  - Recurring billing
+  - Payment method management in customer portal
+  - Better fraud detection
+  - PCI compliance benefits
+
+**Why We Haven't Done It Yet**:
+1. **Original Design**: Payment flow was designed for one-time payments (event tickets), not subscriptions
+2. **Customer Creation Timing**: Customer was created after payment confirmation, not before
+3. **Payment Element Limitation**: Payment Element doesn't expose payment method until after confirmation
+
+**Production Safety**:
+- ✅ **YES - It's Safe and Recommended**: Attaching payment methods is a standard Stripe operation with no additional security risks
+- ✅ **User Experience**: Users expect their payment method to be saved for subscriptions
+- ✅ **Compliance**: PCI DSS compliant (Stripe handles all sensitive data)
+- ✅ **No Side Effects**: Doesn't affect one-time payments, doesn't create duplicate charges
+
+**Solution Implemented**: Create Payment Intent with Customer Parameter
+
+**Implementation** (`src/app/api/stripe/membership-payment-intent/route.ts`):
+```typescript
+// CRITICAL: Create or retrieve customer BEFORE creating Payment Intent
+// This ensures payment method is automatically attached when payment is confirmed
+let customerId: string | undefined;
+if (email) {
+  // Search for existing customer by email
+  const existingCustomers = await stripe().customers.list({
+    email: email,
+    limit: 1,
+  });
+
+  if (existingCustomers.data.length > 0) {
+    customerId = existingCustomers.data[0].id;
+  } else {
+    // Create new customer if doesn't exist
+    const newCustomer = await stripe().customers.create({
+      email: email,
+      name: customerName,
+      phone: customerPhone,
+      metadata: {
+        tenantId: tenantId,
+        membershipPlanId: String(membershipPlanId),
+      },
+    });
+    customerId = newCustomer.id;
+  }
+}
+
+// CRITICAL: Add customer if available - this ensures payment method is attached when payment is confirmed
+if (customerId) {
+  piParams.customer = customerId;
+  // Enable payment method reuse for subscriptions
+  piParams.setup_future_usage = 'off_session';
+}
+```
+
+**How It Works**:
+1. **Before Payment Intent Creation**: Create or retrieve Stripe Customer by email
+2. **Payment Intent Creation**: Include `customer` parameter in `PaymentIntent.create()` call
+3. **Payment Confirmation**: When payment is confirmed on frontend, Stripe **automatically attaches** the payment method to the specified customer
+4. **Subscription Creation**: Payment method is now reusable and can be used for subscription creation
+
+**Key Benefits**:
+- ✅ Minimal code changes (only one file modified)
+- ✅ Works with existing Payment Element flow
+- ✅ Payment method automatically attached when customer is provided
+- ✅ No frontend changes required
+- ✅ Safe for production
+
+**Expected Result**:
+- Payment method is attached to customer automatically
+- Subscription can be created with attached payment method
+- Subscription status will be `ACTIVE` (not `incomplete`)
+- No more "payment method cannot be reused" errors
+- `stripeSubscriptionId` is properly stored in database
+
+**Alternative Solutions Considered**:
+1. **Setup Intent for Subscriptions** (Long-term recommended): Use Setup Intent instead of Payment Intent for subscription signups - cleaner separation but requires significant refactoring
+2. **Attach Payment Method in Frontend**: Attach payment method before confirming Payment Intent - requires frontend changes and more complex flow
+3. **Attach Payment Method After Confirmation**: Current attempt failed because payment method is already marked as "used" before attachment
+
+**Testing Checklist**:
+- ✅ Test desktop card payment → subscription should be `active`
+- ✅ Test mobile Apple Pay/Google Pay → subscription should be `active`
+- ✅ Test existing customer → should use existing customer, attach new payment method
+- ✅ Test payment failure → should handle gracefully
+- ✅ Verify payment method is attached in Stripe dashboard
+- ✅ Verify subscription is `active` in both database and Stripe
+
+**Lesson**: For membership subscriptions, **always create/retrieve the Stripe Customer BEFORE creating the Payment Intent** and include the `customer` parameter. This ensures the payment method is automatically attached when payment is confirmed, making it reusable for subscriptions. This is the simplest and most reliable solution that works with the existing Payment Element flow.
+
 This architecture ensures optimal desktop payment experience while maintaining security, reliability, and proper transaction persistence for the MCEFEE event management system. The membership subscription flow now properly creates Stripe Subscriptions for recurring billing and stores all required Stripe IDs in the database.
