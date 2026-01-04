@@ -433,7 +433,11 @@ export async function processMembershipSubscriptionFromPaymentIntent(
     // Check if payment succeeded or requires capture (both indicate successful payment)
     // Payment Intents can be in 'succeeded' or 'requires_capture' status after successful payment
     if (paymentIntent.status !== 'succeeded' && paymentIntent.status !== 'requires_capture') {
-      console.log('[MEMBERSHIP-SUCCESS] Payment Intent not in succeeded state:', paymentIntent.status);
+      console.error('[MEMBERSHIP-SUCCESS] ❌ Payment Intent not in succeeded state:', {
+        status: paymentIntent.status,
+        paymentIntentId,
+        expectedStatuses: ['succeeded', 'requires_capture'],
+      });
       return null;
     }
 
@@ -443,8 +447,20 @@ export async function processMembershipSubscriptionFromPaymentIntent(
     const tenantId = metadata.tenantId || getTenantId();
     const customerEmail = metadata.customerEmail || paymentIntent.receipt_email || '';
 
+    console.log('[MEMBERSHIP-SUCCESS] Payment Intent metadata:', {
+      membershipPlanId,
+      tenantId,
+      customerEmail: customerEmail ? `${customerEmail.substring(0, 5)}...` : 'missing',
+      hasMetadata: !!metadata,
+      metadataKeys: Object.keys(metadata),
+    });
+
     if (!membershipPlanId) {
-      console.error('[MEMBERSHIP-SUCCESS] Missing membershipPlanId in Payment Intent metadata');
+      console.error('[MEMBERSHIP-SUCCESS] ❌ Missing membershipPlanId in Payment Intent metadata:', {
+        paymentIntentId,
+        metadata,
+        allMetadataKeys: Object.keys(metadata),
+      });
       return null;
     }
 
@@ -457,14 +473,24 @@ export async function processMembershipSubscriptionFromPaymentIntent(
       userProfile = await fetchUserProfileByEmail(customerEmail);
       if (userProfile?.userId) {
         finalUserId = userProfile.userId;
-        console.log('[MEMBERSHIP-SUCCESS] Found userId from email lookup:', finalUserId);
+        console.log('[MEMBERSHIP-SUCCESS] ✅ Found userId from email lookup:', finalUserId);
       } else {
-        console.error('[MEMBERSHIP-SUCCESS] User profile not found for email:', customerEmail);
-        return null;
+        console.error('[MEMBERSHIP-SUCCESS] ❌ User profile not found for email:', {
+          email: customerEmail,
+          paymentIntentId,
+          note: 'Will attempt fallback profile creation',
+        });
+        // Don't return null yet - try fallback creation below
       }
     } else if (finalUserId) {
       // Fetch user profile by userId
+      console.log('[MEMBERSHIP-SUCCESS] Fetching user profile by userId:', finalUserId);
       userProfile = await fetchUserProfileByUserId(finalUserId);
+      if (userProfile) {
+        console.log('[MEMBERSHIP-SUCCESS] ✅ User profile found by userId:', userProfile.id);
+      } else {
+        console.error('[MEMBERSHIP-SUCCESS] ❌ User profile not found for userId:', finalUserId);
+      }
     }
 
     // FALLBACK: If profile doesn't exist, create it from payment data
