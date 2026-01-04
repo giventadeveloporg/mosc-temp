@@ -422,18 +422,32 @@ export async function processMembershipSubscriptionFromPaymentIntent(
   paymentIntentId: string,
   userId?: string | null,
 ): Promise<{ subscription: MembershipSubscriptionDTO | null; plan: MembershipPlanDTO | null; userProfile: UserProfileDTO | null } | null> {
-  try {
-    console.log('[MEMBERSHIP-SUCCESS] Processing subscription from Payment Intent:', { paymentIntentId, userId: userId || 'will be extracted from email' });
+  const functionStartTime = Date.now();
+  console.log('[MEMBERSHIP-SUCCESS] 🔵 START: processMembershipSubscriptionFromPaymentIntent', {
+    paymentIntentId,
+    userId: userId || 'will be extracted from email',
+    timestamp: new Date().toISOString()
+  });
 
+  try {
     // Retrieve Payment Intent from Stripe (expand payment_method to get payment method details)
+    console.log('[MEMBERSHIP-SUCCESS] Step 1: Retrieving Payment Intent from Stripe...', { paymentIntentId });
     const paymentIntent = await stripe().paymentIntents.retrieve(paymentIntentId, {
       expand: ['payment_method'],
+    });
+    console.log('[MEMBERSHIP-SUCCESS] Step 1 ✅: Payment Intent retrieved', {
+      status: paymentIntent.status,
+      amount: paymentIntent.amount,
+      currency: paymentIntent.currency,
+      customer: paymentIntent.customer,
+      hasMetadata: !!paymentIntent.metadata,
+      metadataKeys: paymentIntent.metadata ? Object.keys(paymentIntent.metadata) : [],
     });
 
     // Check if payment succeeded or requires capture (both indicate successful payment)
     // Payment Intents can be in 'succeeded' or 'requires_capture' status after successful payment
     if (paymentIntent.status !== 'succeeded' && paymentIntent.status !== 'requires_capture') {
-      console.error('[MEMBERSHIP-SUCCESS] ❌ Payment Intent not in succeeded state:', {
+      console.error('[MEMBERSHIP-SUCCESS] ❌ RETURN NULL #1: Payment Intent not in succeeded state:', {
         status: paymentIntent.status,
         paymentIntentId,
         expectedStatuses: ['succeeded', 'requires_capture'],
@@ -442,40 +456,47 @@ export async function processMembershipSubscriptionFromPaymentIntent(
     }
 
     // Extract metadata
+    console.log('[MEMBERSHIP-SUCCESS] Step 2: Extracting metadata...');
     const metadata = paymentIntent.metadata || {};
     const membershipPlanId = metadata.membershipPlanId;
     const tenantId = metadata.tenantId || getTenantId();
     const customerEmail = metadata.customerEmail || paymentIntent.receipt_email || '';
 
-    console.log('[MEMBERSHIP-SUCCESS] Payment Intent metadata:', {
+    console.log('[MEMBERSHIP-SUCCESS] Step 2 ✅: Metadata extracted', {
       membershipPlanId,
       tenantId,
       customerEmail: customerEmail ? `${customerEmail.substring(0, 5)}...` : 'missing',
       hasMetadata: !!metadata,
       metadataKeys: Object.keys(metadata),
+      fullMetadata: metadata, // Log full metadata for debugging
     });
 
     if (!membershipPlanId) {
-      console.error('[MEMBERSHIP-SUCCESS] ❌ Missing membershipPlanId in Payment Intent metadata:', {
+      console.error('[MEMBERSHIP-SUCCESS] ❌ RETURN NULL #2: Missing membershipPlanId in Payment Intent metadata:', {
         paymentIntentId,
         metadata,
         allMetadataKeys: Object.keys(metadata),
+        fullMetadata: metadata,
       });
       return null;
     }
 
     // CRITICAL: Get userId from email if not provided (for public routes)
+    console.log('[MEMBERSHIP-SUCCESS] Step 3: Getting userId and user profile...');
     let finalUserId = userId;
     let userProfile: UserProfileDTO | null = null;
 
     if (!finalUserId && customerEmail) {
-      console.log('[MEMBERSHIP-SUCCESS] userId not provided - looking up by email:', customerEmail);
+      console.log('[MEMBERSHIP-SUCCESS] Step 3a: userId not provided - looking up by email:', customerEmail);
       userProfile = await fetchUserProfileByEmail(customerEmail);
       if (userProfile?.userId) {
         finalUserId = userProfile.userId;
-        console.log('[MEMBERSHIP-SUCCESS] ✅ Found userId from email lookup:', finalUserId);
+        console.log('[MEMBERSHIP-SUCCESS] Step 3a ✅: Found userId from email lookup:', {
+          userId: finalUserId,
+          profileId: userProfile.id,
+        });
       } else {
-        console.error('[MEMBERSHIP-SUCCESS] ❌ User profile not found for email:', {
+        console.error('[MEMBERSHIP-SUCCESS] Step 3a ⚠️: User profile not found for email:', {
           email: customerEmail,
           paymentIntentId,
           note: 'Will attempt fallback profile creation',
@@ -484,13 +505,18 @@ export async function processMembershipSubscriptionFromPaymentIntent(
       }
     } else if (finalUserId) {
       // Fetch user profile by userId
-      console.log('[MEMBERSHIP-SUCCESS] Fetching user profile by userId:', finalUserId);
+      console.log('[MEMBERSHIP-SUCCESS] Step 3b: Fetching user profile by userId:', finalUserId);
       userProfile = await fetchUserProfileByUserId(finalUserId);
       if (userProfile) {
-        console.log('[MEMBERSHIP-SUCCESS] ✅ User profile found by userId:', userProfile.id);
+        console.log('[MEMBERSHIP-SUCCESS] Step 3b ✅: User profile found by userId:', {
+          profileId: userProfile.id,
+          userId: finalUserId,
+        });
       } else {
-        console.error('[MEMBERSHIP-SUCCESS] ❌ User profile not found for userId:', finalUserId);
+        console.error('[MEMBERSHIP-SUCCESS] Step 3b ❌: User profile not found for userId:', finalUserId);
       }
+    } else {
+      console.error('[MEMBERSHIP-SUCCESS] Step 3 ❌: No userId and no customerEmail available');
     }
 
     // FALLBACK: If profile doesn't exist, create it from payment data
@@ -545,9 +571,11 @@ export async function processMembershipSubscriptionFromPaymentIntent(
 
       // If still no profile after fallback attempt, log error and return null
       if (!userProfile?.id) {
-        console.error('[MEMBERSHIP-SUCCESS] ❌ User profile not found and fallback creation failed:', {
+        console.error('[MEMBERSHIP-SUCCESS] ❌ RETURN NULL #3: User profile not found and fallback creation failed:', {
           userId: finalUserId,
-          email: customerEmail
+          email: customerEmail,
+          paymentIntentId,
+          step: 'After fallback profile creation attempt',
         });
         // Return null - caller will handle error display
         // This is an edge case that should rarely happen if we enforce profile before payment
@@ -556,16 +584,29 @@ export async function processMembershipSubscriptionFromPaymentIntent(
     }
 
     if (!finalUserId) {
-      console.error('[MEMBERSHIP-SUCCESS] Missing userId - could not determine from email or provided value');
+      console.error('[MEMBERSHIP-SUCCESS] ❌ RETURN NULL #4: Missing userId - could not determine from email or provided value', {
+        providedUserId: userId,
+        customerEmail,
+        paymentIntentId,
+      });
       return null;
     }
 
     // Fetch membership plan
+    console.log('[MEMBERSHIP-SUCCESS] Step 4: Fetching membership plan...', { membershipPlanId });
     const plan = await fetchMembershipPlanById(parseInt(membershipPlanId, 10));
     if (!plan) {
-      console.error('[MEMBERSHIP-SUCCESS] Membership plan not found:', membershipPlanId);
+      console.error('[MEMBERSHIP-SUCCESS] ❌ RETURN NULL #5: Membership plan not found:', {
+        membershipPlanId,
+        paymentIntentId,
+        parsedPlanId: parseInt(membershipPlanId, 10),
+      });
       return null;
     }
+    console.log('[MEMBERSHIP-SUCCESS] Step 4 ✅: Membership plan found', {
+      planId: plan.id,
+      planName: plan.planName,
+    });
 
     // CRITICAL: Verify plan has required Stripe fields
     console.log('[MEMBERSHIP-SUCCESS] Plan details:', {
@@ -588,7 +629,13 @@ export async function processMembershipSubscriptionFromPaymentIntent(
 
     // CRITICAL: Check if subscription already exists (backend webhook may have created it)
     // First try to find by Payment Intent ID (if stored)
+    console.log('[MEMBERSHIP-SUCCESS] Step 5: Checking for existing subscription by Payment Intent ID...', { paymentIntentId });
     let existingSubscription = await findSubscriptionByPaymentIntentId(paymentIntentId);
+    console.log('[MEMBERSHIP-SUCCESS] Step 5 ✅: Existing subscription check complete', {
+      found: !!existingSubscription,
+      subscriptionId: existingSubscription?.id,
+      status: existingSubscription?.subscriptionStatus,
+    });
 
     // CRITICAL: Verify that the found subscription actually matches this payment intent AND plan
     // If the payment intent ID doesn't match, it might be a false match
@@ -656,6 +703,11 @@ export async function processMembershipSubscriptionFromPaymentIntent(
 
     // If not found by Payment Intent ID, check for active subscription for this user and plan
     // (prevents duplicates when Payment Intent ID isn't stored)
+    console.log('[MEMBERSHIP-SUCCESS] Step 6: Checking for existing subscription by user and plan...', {
+      userProfileId: userProfile.id,
+      membershipPlanId,
+      hasExistingSubscription: !!existingSubscription,
+    });
     if (!existingSubscription && userProfile.id && membershipPlanId) {
       try {
         const tenantId = getTenantId();
@@ -1125,11 +1177,12 @@ export async function processMembershipSubscriptionFromPaymentIntent(
         // Use setup-test-clock.js to attach customers to test clocks before creating subscriptions
         // If a customer is already attached to a test clock, Stripe will automatically use it for new subscriptions
 
-        console.log('[MEMBERSHIP-SUCCESS] Creating Stripe Subscription for recurring billing:', {
+        console.log('[MEMBERSHIP-SUCCESS] Step 8: Creating Stripe Subscription for recurring billing:', {
           customerId: stripeCustomerId,
           priceId: finalStripePriceId,
           trialDays: plan.trialDays,
           hasPaymentMethod,
+          paymentIntentId,
         });
 
         const subscriptionParams: any = {
@@ -1226,10 +1279,26 @@ export async function processMembershipSubscriptionFromPaymentIntent(
 
         // CRITICAL: Create subscription with payment method from payment intent
         // If the payment method cannot be attached, we'll create with default_incomplete and pay the invoice manually
+        console.log('[MEMBERSHIP-SUCCESS] Step 8a: Creating Stripe Subscription with params:', {
+          customer: subscriptionParams.customer,
+          priceId: subscriptionParams.items[0]?.price,
+          hasDefaultPaymentMethod: !!subscriptionParams.default_payment_method,
+          paymentBehavior: subscriptionParams.payment_behavior,
+          trialDays: subscriptionParams.trial_period_days,
+        });
         let stripeSubscription;
         try {
           stripeSubscription = await stripe().subscriptions.create(subscriptionParams);
+          console.log('[MEMBERSHIP-SUCCESS] Step 8a ✅: Stripe Subscription created:', {
+            subscriptionId: stripeSubscription.id,
+            status: stripeSubscription.status,
+          });
         } catch (createError: any) {
+          console.error('[MEMBERSHIP-SUCCESS] Step 8a ❌: Stripe Subscription creation failed:', {
+            error: createError.message,
+            errorCode: createError.code,
+            errorType: createError.type,
+          });
           // If subscription creation fails because payment method isn't attached, retry with default_incomplete
           if (createError.message?.includes('payment method') || createError.message?.includes('must be attached')) {
             console.warn('[MEMBERSHIP-SUCCESS] ⚠️ Subscription creation failed with payment method, retrying with default_incomplete:', createError.message);
@@ -1628,9 +1697,22 @@ export async function processMembershipSubscriptionFromPaymentIntent(
     // CRITICAL: Do not create database record if Stripe subscription was not created
     // The subscription must exist in Stripe before we can store it in the database
     if (!stripeSubscriptionId) {
-      console.error('[MEMBERSHIP-SUCCESS] ❌ Cannot create database record: Stripe subscription ID is missing');
+      const functionEndTime = Date.now();
+      const duration = functionEndTime - functionStartTime;
+      console.error('[MEMBERSHIP-SUCCESS] ❌ RETURN NULL #7: Cannot create database record: Stripe subscription ID is missing', {
+        paymentIntentId,
+        userId: finalUserId,
+        membershipPlanId,
+        stripeCustomerId,
+        duration: `${duration}ms`,
+        timestamp: new Date().toISOString(),
+        note: 'This usually means Stripe subscription creation failed or was skipped',
+      });
       throw new Error('Stripe subscription was not created successfully. Cannot create database record without Stripe subscription ID.');
     }
+    console.log('[MEMBERSHIP-SUCCESS] Step 9 ✅: Stripe subscription ID available, proceeding to database creation', {
+      stripeSubscriptionId,
+    });
 
     // Determine subscription status based on Stripe subscription status
     // If subscription was completed and is now active, use ACTIVE
@@ -1706,6 +1788,16 @@ export async function processMembershipSubscriptionFromPaymentIntent(
     });
 
     // Create subscription via backend API
+    console.log('[MEMBERSHIP-SUCCESS] Step 10: Creating database record for subscription...', {
+      stripeSubscriptionId,
+      userProfileId: userProfile.id,
+      membershipPlanId,
+    });
+    console.log('[MEMBERSHIP-SUCCESS] Step 10: Creating database record for subscription...', {
+      stripeSubscriptionId,
+      userProfileId: userProfile.id,
+      membershipPlanId,
+    });
     const baseUrl = getAppUrl();
     console.log('[MEMBERSHIP-SUCCESS] Creating subscription with payload (all fields):', {
       // Required fields
@@ -1818,13 +1910,17 @@ export async function processMembershipSubscriptionFromPaymentIntent(
         }
       }
 
-      console.error('[MEMBERSHIP-SUCCESS] ❌ Failed to create subscription:', {
+      const functionEndTime = Date.now();
+      const duration = functionEndTime - functionStartTime;
+      console.error('[MEMBERSHIP-SUCCESS] ❌ RETURN NULL #6: Failed to create subscription:', {
         status: createRes.status,
         statusText: createRes.statusText,
         errorBody,
         errorData,
         paymentIntentId,
-        userId,
+        userId: finalUserId,
+        duration: `${duration}ms`,
+        timestamp: new Date().toISOString(),
       });
       return null;
     }
@@ -1845,9 +1941,29 @@ export async function processMembershipSubscriptionFromPaymentIntent(
       timestamp: new Date().toISOString(),
     });
 
+    const functionEndTime = Date.now();
+    const duration = functionEndTime - functionStartTime;
+    console.log('[MEMBERSHIP-SUCCESS] 🟢 SUCCESS: processMembershipSubscriptionFromPaymentIntent completed', {
+      subscriptionId: createdSubscription.id,
+      paymentIntentId,
+      duration: `${duration}ms`,
+      timestamp: new Date().toISOString(),
+    });
+
     return { subscription: createdSubscription, plan, userProfile };
   } catch (error) {
-    console.error('[MEMBERSHIP-SUCCESS] Error processing subscription from Payment Intent:', error);
+    const functionEndTime = Date.now();
+    const duration = functionEndTime - functionStartTime;
+    console.error('[MEMBERSHIP-SUCCESS] 🔴 ERROR: processMembershipSubscriptionFromPaymentIntent failed', {
+      error,
+      errorMessage: error instanceof Error ? error.message : String(error),
+      errorStack: error instanceof Error ? error.stack : undefined,
+      errorName: error instanceof Error ? error.name : undefined,
+      paymentIntentId,
+      userId,
+      duration: `${duration}ms`,
+      timestamp: new Date().toISOString(),
+    });
     return null;
   }
 }
