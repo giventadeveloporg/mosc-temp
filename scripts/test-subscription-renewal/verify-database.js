@@ -10,12 +10,13 @@
  *     --tenant-id=tenant_demo_002
  *
  * Environment Variables Required:
- *   - DATABASE_URL (PostgreSQL connection string)
+ *   - NEXT_PUBLIC_API_BASE_URL (Backend API base URL)
+ *   - NEXT_PUBLIC_API_JWT_USER (API JWT username)
+ *   - NEXT_PUBLIC_API_JWT_PASS (API JWT password)
  *   - NEXT_PUBLIC_TENANT_ID (default tenant ID)
+ *   - STRIPE_SECRET_KEY (Stripe secret key)
  */
 
-import pg from 'pg';
-const { Client } = pg;
 import Stripe from 'stripe';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
@@ -73,26 +74,89 @@ const stripe = new Stripe(stripeKey, {
   apiVersion: '2024-12-18.acacia',
 });
 
-// Initialize PostgreSQL client
-const dbUrl = process.env.DATABASE_URL ||
-              process.env.POSTGRES_URL ||
-              process.env.NEXT_PUBLIC_DATABASE_URL;
-if (!dbUrl) {
-  console.error('❌ Error: DATABASE_URL environment variable is required');
-  console.error('   Please add DATABASE_URL to your .env.local file in the project root');
-  console.error('   Example: DATABASE_URL=postgresql://user:pass@localhost:5432/dbname');
+// Initialize API configuration
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_JWT_USER = process.env.NEXT_PUBLIC_API_JWT_USER || process.env.AMPLIFY_API_JWT_USER;
+const API_JWT_PASS = process.env.NEXT_PUBLIC_API_JWT_PASS || process.env.AMPLIFY_API_JWT_PASS;
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+
+if (!API_BASE_URL) {
+  console.error('❌ Error: NEXT_PUBLIC_API_BASE_URL environment variable is required');
+  console.error('   Please add NEXT_PUBLIC_API_BASE_URL to your .env.local file');
   console.error(`   Checked: ${envLocalPath}`);
   process.exit(1);
 }
 
-const dbClient = new Client({
-  connectionString: dbUrl,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-});
+if (!API_JWT_USER || !API_JWT_PASS) {
+  console.error('❌ Error: API JWT credentials are required');
+  console.error('   Please add NEXT_PUBLIC_API_JWT_USER and NEXT_PUBLIC_API_JWT_PASS to your .env.local file');
+  console.error(`   Checked: ${envLocalPath}`);
+  process.exit(1);
+}
+
+/**
+ * Generate API JWT token for authentication
+ */
+async function generateApiJwt() {
+  const apiUrl = `${API_BASE_URL}/api/authenticate`;
+  const body = {
+    username: API_JWT_USER,
+    password: API_JWT_PASS,
+    rememberMe: true,
+  };
+
+  const response = await fetch(apiUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to authenticate: ${response.status} ${errorText}`);
+  }
+
+  const data = await response.json();
+  return data.id_token;
+}
+
+/**
+ * Fetch subscription from API by Stripe subscription ID
+ */
+async function fetchSubscriptionFromApi(stripeSubscriptionId, tenantId) {
+  let token = await generateApiJwt();
+
+  const params = new URLSearchParams({
+    'stripeSubscriptionId.equals': stripeSubscriptionId,
+    'tenantId.equals': tenantId,
+  });
+
+  const url = `${APP_URL}/api/proxy/membership-subscriptions?${params.toString()}`;
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    if (response.status === 404) {
+      return null;
+    }
+    const errorText = await response.text();
+    throw new Error(`Failed to fetch subscription: ${response.status} ${errorText}`);
+  }
+
+  const data = await response.json();
+  return Array.isArray(data) && data.length > 0 ? data[0] : null;
+}
 
 async function verifyDatabase() {
   try {
-    await dbClient.connect();
     console.log('\n🔍 Verifying Database Subscription State');
     console.log('='.repeat(60));
     console.log(`Subscription ID: ${subscriptionId}`);
@@ -117,47 +181,20 @@ async function verifyDatabase() {
       ? stripeSubscription.customer
       : stripeSubscription.customer?.id);
 
-    // 2. Fetch from database
-    console.log('\n📋 Step 2: Fetching subscription from database...');
-    const dbResult = await dbClient.query(
-      `SELECT
-        id,
-        tenant_id,
-        user_profile_id,
-        membership_plan_id,
-        subscription_status,
-        current_period_start,
-        current_period_end,
-        trial_start,
-        trial_end,
-        cancel_at_period_end,
-        cancelled_at,
-        stripe_subscription_id,
-        stripe_customer_id,
-        last_reconciliation_at,
-        last_stripe_sync_at,
-        reconciliation_status,
-        reconciliation_error,
-        created_at,
-        updated_at
-      FROM membership_subscription
-      WHERE stripe_subscription_id = $1 AND tenant_id = $2`,
-      [subscriptionId, tenantId]
-    );
+    // 2. Fetch from API (which queries the database)
+    console.log('\n📋 Step 2: Fetching subscription from API...');
+    const dbSubscription = await fetchSubscriptionFromApi(subscriptionId, tenantId);
 
-    if (dbResult.rows.length === 0) {
+    if (!dbSubscription) {
       console.error('❌ Error: Subscription not found in database');
-      console.log(`   Searched for: stripe_subscription_id = '${subscriptionId}', tenant_id = '${tenantId}'`);
-      await dbClient.end();
+      console.log(`   Searched for: stripeSubscriptionId = '${subscriptionId}', tenantId = '${tenantId}'`);
       process.exit(1);
     }
-
-    const dbSubscription = dbResult.rows[0];
     console.log('✅ Database subscription retrieved');
     console.log('   Database ID:', dbSubscription.id);
-    console.log('   Status:', dbSubscription.subscription_status);
-    console.log('   Period start:', dbSubscription.current_period_start);
-    console.log('   Period end:', dbSubscription.current_period_end);
+    console.log('   Status:', dbSubscription.subscriptionStatus);
+    console.log('   Period start:', dbSubscription.currentPeriodStart);
+    console.log('   Period end:', dbSubscription.currentPeriodEnd);
 
     // 3. Compare and verify
     console.log('\n🔍 Step 3: Comparing Stripe vs Database...');
@@ -166,7 +203,7 @@ async function verifyDatabase() {
     const warnings = [];
 
     // Compare period start
-    const dbPeriodStart = new Date(dbSubscription.current_period_start);
+    const dbPeriodStart = new Date(dbSubscription.currentPeriodStart);
     const periodStartDiff = Math.abs(stripePeriodStart.getTime() - dbPeriodStart.getTime());
     if (periodStartDiff > 60000) { // More than 1 minute difference
       issues.push({
@@ -185,7 +222,7 @@ async function verifyDatabase() {
     }
 
     // Compare period end
-    const dbPeriodEnd = new Date(dbSubscription.current_period_end);
+    const dbPeriodEnd = new Date(dbSubscription.currentPeriodEnd);
     const periodEndDiff = Math.abs(stripePeriodEnd.getTime() - dbPeriodEnd.getTime());
     if (periodEndDiff > 60000) { // More than 1 minute difference
       issues.push({
@@ -215,12 +252,12 @@ async function verifyDatabase() {
       'paused': 'SUSPENDED',
     };
     const expectedStatus = statusMap[stripeStatus.toLowerCase()] || 'ACTIVE';
-    if (dbSubscription.subscription_status !== expectedStatus) {
+    if (dbSubscription.subscriptionStatus !== expectedStatus) {
       issues.push({
-        field: 'subscription_status',
+        field: 'subscriptionStatus',
         stripe: stripeStatus,
         expected: expectedStatus,
-        database: dbSubscription.subscription_status,
+        database: dbSubscription.subscriptionStatus,
       });
     }
 
@@ -228,11 +265,11 @@ async function verifyDatabase() {
     const stripeCustomerId = typeof stripeSubscription.customer === 'string'
       ? stripeSubscription.customer
       : stripeSubscription.customer?.id;
-    if (dbSubscription.stripe_customer_id !== stripeCustomerId) {
+    if (dbSubscription.stripeCustomerId !== stripeCustomerId) {
       issues.push({
-        field: 'stripe_customer_id',
+        field: 'stripeCustomerId',
         stripe: stripeCustomerId,
-        database: dbSubscription.stripe_customer_id,
+        database: dbSubscription.stripeCustomerId,
       });
     }
 
@@ -273,11 +310,11 @@ async function verifyDatabase() {
 
     // 5. Reconciliation status check
     console.log('\n📋 Step 4: Checking reconciliation status...');
-    console.log('   Reconciliation status:', dbSubscription.reconciliation_status || 'PENDING');
-    console.log('   Last reconciliation:', dbSubscription.last_reconciliation_at || 'Never');
-    console.log('   Last Stripe sync:', dbSubscription.last_stripe_sync_at || 'Never');
-    if (dbSubscription.reconciliation_error) {
-      console.log('   ⚠️  Reconciliation error:', dbSubscription.reconciliation_error);
+    console.log('   Reconciliation status:', dbSubscription.reconciliationStatus || 'PENDING');
+    console.log('   Last reconciliation:', dbSubscription.lastReconciliationAt || 'Never');
+    console.log('   Last Stripe sync:', dbSubscription.lastStripeSyncAt || 'Never');
+    if (dbSubscription.reconciliationError) {
+      console.log('   ⚠️  Reconciliation error:', dbSubscription.reconciliationError);
     }
 
     // 6. Summary
@@ -293,8 +330,6 @@ async function verifyDatabase() {
       console.log('\n💡 Recommendation: Run batch job to sync database with Stripe');
     }
 
-    await dbClient.end();
-
     // Exit with error code if issues found
     if (issues.length > 0) {
       process.exit(1);
@@ -304,7 +339,6 @@ async function verifyDatabase() {
     if (error.stack) {
       console.error('   Stack:', error.stack);
     }
-    await dbClient.end();
     process.exit(1);
   }
 }
