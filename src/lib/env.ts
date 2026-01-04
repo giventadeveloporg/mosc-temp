@@ -141,3 +141,13 @@ export function getAuthJwtSecret(): string {
 export function getBackendApiUrl(): string {
   return process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
 }
+
+/**
+ * Get feature flag for Stripe Checkout migration
+ * Returns true if we should use Stripe Checkout Sessions instead of Payment Intents
+ * Defaults to false (use Payment Intent flow) for backward compatibility
+ * Set NEXT_PUBLIC_USE_STRIPE_CHECKOUT=true to enable Checkout Session flow
+ */
+export function useStripeCheckout(): boolean {
+  return process.env.NEXT_PUBLIC_USE_STRIPE_CHECKOUT === 'true';
+}
