@@ -25,10 +25,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Build the backend path
     let path = '/api/user-profiles';
+    let userIdFromPath: string | null = null;
+
     if (slug) {
       if (Array.isArray(slug)) {
-        path += '/' + slug.map(encodeURIComponent).join('/');
+        // Check if this is a /by-user/{userId} path
+        if (slug.length === 2 && slug[0] === 'by-user') {
+          userIdFromPath = slug[1];
+          // Convert /by-user/{userId} to query parameter format (backend doesn't support path format)
+          path = '/api/user-profiles'; // Remove /by-user/{userId} from path
+        } else {
+          path += '/' + slug.map(encodeURIComponent).join('/');
+        }
       } else if (typeof slug === 'string') {
+        // Single slug - check if it's a numeric ID or something else
         path += '/' + encodeURIComponent(slug);
       }
     }
@@ -37,8 +47,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { slug: _omit, ...restQuery } = query;
     const qs = new URLSearchParams(restQuery as Record<string, string>);
 
+    // If we extracted userId from /by-user/{userId} path, add it as query parameter
+    if (userIdFromPath) {
+      if (!Array.from(qs.keys()).includes('userId.equals')) {
+        qs.append('userId.equals', userIdFromPath);
+        console.log('[UserProfile Proxy] Converted /by-user/ path to query parameter:', userIdFromPath);
+      }
+    }
+
     // Special handling for /by-user/{userId} endpoint - always needs tenantId.equals
-    const isByUserEndpoint = /\/by-user\/[^/]+(\/|$)/.test(path);
+    const isByUserEndpoint = userIdFromPath !== null;
 
     // Only append tenantId.equals for GET/POST list endpoints, not for PATCH/PUT/DELETE by ID
     // Also add for /by-user/ endpoints which require tenant scoping
