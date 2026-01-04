@@ -30,6 +30,11 @@ export function SubscriptionSignupClient({ plan, error, userProfile: initialUser
   const [canEnablePayment, setCanEnablePayment] = useState(false);
   const [isPRBReady, setIsPRBReady] = useState(false); // Track when Payment Request Buttons are ready
 
+  // Feature flag: Use Stripe Checkout Sessions instead of Payment Intents
+  // Set NEXT_PUBLIC_USE_STRIPE_CHECKOUT=true to enable Checkout Session flow
+  // This is a client-side check of the environment variable
+  const useCheckoutFlow = process.env.NEXT_PUBLIC_USE_STRIPE_CHECKOUT === 'true';
+
   // Ensure user profile exists before enabling payment (RECOMMENDED SOLUTION)
   useEffect(() => {
     async function ensureUserProfile() {
@@ -328,12 +333,22 @@ export function SubscriptionSignupClient({ plan, error, userProfile: initialUser
       setIsLoading(true);
       setCheckoutError(null);
 
-      const successUrl = `${window.location.origin}/membership/manage?success=true`;
-      const cancelUrl = `${window.location.origin}/membership/plans?canceled=true`;
+      // Use Checkout Session flow (recommended - simpler and more reliable)
+      const successUrl = `${window.location.origin}/membership/success?session_id={CHECKOUT_SESSION_ID}`;
+      const cancelUrl = `${window.location.origin}/membership?canceled=true`;
+
+      console.log('[MEMBERSHIP-SUBSCRIBE] Creating Checkout Session (Phase 1 Migration)...', {
+        planId: plan.id,
+        useCheckoutFlow,
+        timestamp: new Date().toISOString(),
+      });
 
       const { sessionUrl } = await createSubscriptionCheckoutSessionServer(plan.id!, successUrl, cancelUrl);
+
+      console.log('[MEMBERSHIP-SUBSCRIBE] Checkout Session created, redirecting to:', sessionUrl);
       window.location.href = sessionUrl;
     } catch (err) {
+      console.error('[MEMBERSHIP-SUBSCRIBE] Error creating checkout session:', err);
       setCheckoutError(err instanceof Error ? err.message : 'Failed to create checkout session');
       setIsLoading(false);
     }
@@ -379,16 +394,23 @@ export function SubscriptionSignupClient({ plan, error, userProfile: initialUser
           )}
           {/* Desktop: Show Stripe Elements inline (like event checkout) */}
           {/* CRITICAL: Only enable payment after profile is confirmed */}
+          {/* Phase 1 Migration: Show Payment Intent flow alongside Checkout button for better UX */}
           {userId && canEnablePayment && (
             <>
               <p className="font-body text-muted-foreground mb-4">
-                Complete your subscription using Apple Pay, Google Pay, Link, or card.
+                {useCheckoutFlow
+                  ? 'Complete your subscription using Apple Pay, Google Pay, Link, or card below, or proceed to our secure checkout page.'
+                  : 'Complete your subscription using Apple Pay, Google Pay, Link, or card.'}
               </p>
               {/* Payment instructions - only show on desktop */}
               <div className="hidden md:block mt-3 mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <div className="flex items-center text-blue-700 text-sm">
                   <span className="mr-2">💳</span>
-                  <span>Please select a payment method or click any of the payment buttons below</span>
+                  <span>
+                    {useCheckoutFlow
+                      ? 'Select a payment method below, or click "Proceed to Checkout" to use Stripe\'s secure checkout page.'
+                      : 'Please select a payment method or click any of the payment buttons below'}
+                  </span>
                 </div>
               </div>
               <MembershipDesktopCheckout
@@ -416,6 +438,7 @@ export function SubscriptionSignupClient({ plan, error, userProfile: initialUser
           )}
 
           {/* Mobile Payment Request Button */}
+          {/* Phase 1 Migration: Show Payment Intent flow alongside Checkout button for better UX */}
           {isMobile && userId && canEnablePayment && (
             <div className="mb-4">
               <p className="font-body text-muted-foreground mb-4">
@@ -448,13 +471,12 @@ export function SubscriptionSignupClient({ plan, error, userProfile: initialUser
             </div>
           )}
 
-          {/* Fallback: Stripe Checkout Session redirect (only if payment enabled) */}
-          {/* CRITICAL: On desktop, hide checkout button until PRB buttons are ready to prevent premature clicks */}
-          {/* On mobile, show immediately since mobile PRB is a separate component */}
-          {canEnablePayment && (isMobile || isPRBReady) && (
+          {/* Stripe Checkout Session redirect button */}
+          {/* Phase 1 Migration: Show Checkout button when Checkout flow is enabled OR as fallback */}
+          {canEnablePayment && (
             <>
-              {/* Only show divider on desktop (mobile already has one above) */}
-              {!isMobile && (
+              {/* Show divider only if Payment Intent flow was shown above */}
+              {(isMobile || isPRBReady) && (
                 <div className="relative my-4">
                   <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-gray-300"></div>
@@ -465,7 +487,9 @@ export function SubscriptionSignupClient({ plan, error, userProfile: initialUser
                 </div>
               )}
               <p className="font-body text-muted-foreground mb-6">
-                You will be redirected to our secure payment processor to complete your subscription.
+                {useCheckoutFlow
+                  ? 'Alternatively, proceed to our secure Stripe Checkout page for a streamlined payment experience with automatic Apple Pay and Google Pay support on mobile devices.'
+                  : 'You will be redirected to our secure payment processor to complete your subscription.'}
               </p>
               <Button
                 onClick={handleSubscribe}
@@ -475,6 +499,11 @@ export function SubscriptionSignupClient({ plan, error, userProfile: initialUser
               >
                 {isLoading ? 'Processing...' : 'Proceed to Checkout'}
               </Button>
+              {useCheckoutFlow && (
+                <p className="mt-2 text-xs text-muted-foreground text-center">
+                  Stripe Checkout automatically shows Apple Pay and Google Pay on compatible mobile devices
+                </p>
+              )}
             </>
           )}
 

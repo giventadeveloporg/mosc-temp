@@ -257,7 +257,22 @@ export async function GET(req: NextRequest) {
           }
 
           // Pass undefined userId - function will extract from Payment Intent metadata (customerEmail)
+          console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] Calling processMembershipSubscriptionFromPaymentIntent...', {
+            paymentIntentId: pi,
+            timestamp: new Date().toISOString(),
+          });
+
           const result = await processMembershipSubscriptionFromPaymentIntent(pi, undefined);
+
+          console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] processMembershipSubscriptionFromPaymentIntent returned:', {
+            hasResult: !!result,
+            hasSubscription: !!(result?.subscription),
+            hasPlan: !!(result?.plan),
+            hasUserProfile: !!(result?.userProfile),
+            subscriptionId: result?.subscription?.id,
+            subscriptionStatus: result?.subscription?.subscriptionStatus,
+            timestamp: new Date().toISOString(),
+          });
 
           if (result && result.subscription) {
             console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] ✅ Successfully created/retrieved subscription from Payment Intent:', {
@@ -319,6 +334,10 @@ export async function GET(req: NextRequest) {
             message: createErr?.message,
             stack: createErr?.stack,
             paymentIntentId: pi,
+            errorName: createErr?.name,
+            errorCode: createErr?.code,
+            errorType: createErr?.type,
+            fullError: JSON.stringify(createErr, Object.getOwnPropertyNames(createErr)),
           });
           // Return detailed error for debugging (but don't fail - allow polling to continue)
           return NextResponse.json({
@@ -327,6 +346,8 @@ export async function GET(req: NextRequest) {
             message: 'Subscription not found yet. Webhook may still be processing.',
             error: createErr?.message || 'Unknown error during subscription creation',
             errorType: createErr?.name || 'Error',
+            errorCode: createErr?.code,
+            errorStack: createErr?.stack?.substring(0, 500), // First 500 chars of stack
           });
         }
       }

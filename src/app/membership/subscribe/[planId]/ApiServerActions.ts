@@ -110,8 +110,13 @@ export async function createSubscriptionCheckoutSessionServer(
   const intervalCount = plan.billingInterval === 'QUARTERLY' ? 3 : 1;
 
   // Create Stripe Checkout Session
+  // Note: Stripe Checkout automatically enables Apple Pay and Google Pay on mobile devices
+  // when the device/browser supports it and the customer has cards in their wallet.
+  // No additional configuration needed - Stripe handles this automatically.
   const sessionParams: any = {
     payment_method_types: paymentMethods,
+    // automatic_payment_methods is not needed for Checkout Sessions - Stripe handles this automatically
+    // Apple Pay and Google Pay will appear automatically on supported devices
     mode: 'subscription',
     success_url: successUrl || `${baseUrl}/membership/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: cancelUrl || `${baseUrl}/membership?canceled=true`,
