@@ -139,31 +139,70 @@ export async function createSubscriptionCheckoutSessionServer(
     },
   };
 
-  // If plan has stripePriceId, use it; otherwise create price_data
+  // Helper function to create price_data inline
+  const createPriceData = () => ({
+    price_data: {
+      currency: plan.currency?.toLowerCase() || 'usd',
+      product_data: {
+        name: plan.planName || `Membership Plan ${planId}`,
+        description: `Membership subscription - ${plan.billingInterval || 'Monthly'}`,
+      },
+      unit_amount: Math.round(plan.price * 100), // Convert to cents
+      recurring: {
+        interval: stripeInterval,
+        interval_count: intervalCount,
+      },
+    },
+    quantity: 1,
+  });
+
+  // If plan has stripePriceId, try to use it; fall back to price_data on mode mismatch
   if (plan.stripePriceId) {
-    sessionParams.line_items = [{
-      price: plan.stripePriceId,
-      quantity: 1,
-    }];
+    try {
+      // First attempt: Use the stored price ID
+      sessionParams.line_items = [{
+        price: plan.stripePriceId,
+        quantity: 1,
+      }];
+
+      // Try to create session with price ID
+      const session = await stripe().checkout.sessions.create(sessionParams);
+
+      if (!session.url) {
+        throw new Error('Failed to create checkout session URL');
+      }
+
+      console.log('[MEMBERSHIP-CHECKOUT] Checkout session created with price ID:', {
+        sessionId: session.id,
+        url: session.url,
+        membershipPlanId: planId,
+        priceId: plan.stripePriceId,
+        userId,
+      });
+
+      return { sessionUrl: session.url };
+    } catch (error: any) {
+      // Check if error is due to mode mismatch (test price with live key or vice versa)
+      if (error?.code === 'resource_missing' && error?.type === 'StripeInvalidRequestError') {
+        console.warn('[MEMBERSHIP-CHECKOUT] Price ID mode mismatch detected, falling back to price_data:', {
+          priceId: plan.stripePriceId,
+          error: error.message,
+          membershipPlanId: planId,
+        });
+
+        // Fall back to creating price_data inline
+        sessionParams.line_items = [createPriceData()];
+      } else {
+        // Re-throw other errors
+        throw error;
+      }
+    }
   } else {
     // Create price_data inline (for plans without Stripe Price ID)
-    sessionParams.line_items = [{
-      price_data: {
-        currency: plan.currency?.toLowerCase() || 'usd',
-        product_data: {
-          name: plan.planName || `Membership Plan ${planId}`,
-          description: `Membership subscription - ${plan.billingInterval || 'Monthly'}`,
-        },
-        unit_amount: Math.round(plan.price * 100), // Convert to cents
-        recurring: {
-          interval: stripeInterval,
-          interval_count: intervalCount,
-        },
-      },
-      quantity: 1,
-    }];
+    sessionParams.line_items = [createPriceData()];
   }
 
+  // Create session (either with price_data fallback or if no price ID was provided)
   const session = await stripe().checkout.sessions.create(sessionParams);
 
   if (!session.url) {
