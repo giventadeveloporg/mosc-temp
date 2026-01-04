@@ -38,15 +38,41 @@ export function MembershipClient({ plans, error, userSubscription, isAuthenticat
           const response = await fetch(`/api/proxy/user-profiles/by-user/${userId}`, {
             cache: 'no-store',
           });
+
           if (response.ok) {
-            const profile = await response.json();
-            setClientHasUserProfile(!!profile?.id);
-          } else {
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+              try {
+                const profile = await response.json();
+                // Handle both array and object responses
+                const profileData = Array.isArray(profile) ? profile[0] : profile;
+                const hasProfile = !!(profileData?.id);
+                console.log('[MEMBERSHIP] User profile check:', { userId, hasProfile, profileId: profileData?.id });
+                setClientHasUserProfile(hasProfile);
+              } catch (jsonErr) {
+                console.error('[MEMBERSHIP] Failed to parse user profile JSON:', jsonErr);
+                // Only set to false if we haven't received a server-side value yet
+                setClientHasUserProfile(prev => prev === null ? false : prev);
+              }
+            } else {
+              console.warn('[MEMBERSHIP] User profile response is not JSON:', contentType);
+              // Only set to false if we haven't received a server-side value yet
+              setClientHasUserProfile(prev => prev === null ? false : prev);
+            }
+          } else if (response.status === 404) {
+            // 404 is expected if profile doesn't exist
+            console.log('[MEMBERSHIP] User profile not found (404) for userId:', userId);
             setClientHasUserProfile(false);
+          } else {
+            // Other errors - log but don't override server-side value if available
+            console.warn(`[MEMBERSHIP] User profile fetch returned status ${response.status} for userId:`, userId);
+            // Only set to false if we haven't received a server-side value yet
+            setClientHasUserProfile(prev => prev === null ? false : prev);
           }
         } catch (err) {
           console.error('[MEMBERSHIP] Error checking user profile:', err);
-          setClientHasUserProfile(false);
+          // Only set to false if we haven't received a server-side value yet
+          setClientHasUserProfile(prev => prev === null ? false : prev);
         }
       } else {
         setClientHasUserProfile(false);
