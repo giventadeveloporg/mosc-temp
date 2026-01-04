@@ -392,25 +392,18 @@ export function SubscriptionSignupClient({ plan, error, userProfile: initialUser
               {checkoutError}
             </div>
           )}
-          {/* Desktop: Show Stripe Elements inline (like event checkout) */}
-          {/* CRITICAL: Only enable payment after profile is confirmed */}
-          {/* Phase 1 Migration: Show Payment Intent flow alongside Checkout button for better UX */}
-          {userId && canEnablePayment && (
+          {/* Phase 2/3: When useCheckoutFlow is true, Stripe Checkout is the ONLY payment option */}
+          {/* Phase 1 (useCheckoutFlow=false): Show Stripe Elements inline payment form */}
+          {!useCheckoutFlow && userId && canEnablePayment && (
             <>
               <p className="font-body text-muted-foreground mb-4">
-                {useCheckoutFlow
-                  ? 'Complete your subscription using Apple Pay, Google Pay, Link, or card below, or proceed to our secure checkout page.'
-                  : 'Complete your subscription using Apple Pay, Google Pay, Link, or card.'}
+                Complete your subscription using Apple Pay, Google Pay, Link, or card.
               </p>
               {/* Payment instructions - only show on desktop */}
               <div className="hidden md:block mt-3 mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <div className="flex items-center text-blue-700 text-sm">
                   <span className="mr-2">💳</span>
-                  <span>
-                    {useCheckoutFlow
-                      ? 'Select a payment method below, or click "Proceed to Checkout" to use Stripe\'s secure checkout page.'
-                      : 'Please select a payment method or click any of the payment buttons below'}
-                  </span>
+                  <span>Please select a payment method or click any of the payment buttons below</span>
                 </div>
               </div>
               <MembershipDesktopCheckout
@@ -437,9 +430,8 @@ export function SubscriptionSignupClient({ plan, error, userProfile: initialUser
             </>
           )}
 
-          {/* Mobile Payment Request Button */}
-          {/* Phase 1 Migration: Show Payment Intent flow alongside Checkout button for better UX */}
-          {isMobile && userId && canEnablePayment && (
+          {/* Mobile Payment Request Button - Phase 1 only (hidden in Phase 2/3) */}
+          {!useCheckoutFlow && isMobile && userId && canEnablePayment && (
             <div className="mb-4">
               <p className="font-body text-muted-foreground mb-4">
                 Use Apple Pay or Google Pay for quick checkout, or proceed to full checkout page.
@@ -472,11 +464,12 @@ export function SubscriptionSignupClient({ plan, error, userProfile: initialUser
           )}
 
           {/* Stripe Checkout Session redirect button */}
-          {/* Phase 1 Migration: Show Checkout button when Checkout flow is enabled OR as fallback */}
+          {/* Phase 1 (useCheckoutFlow=false): Show as fallback option with divider */}
+          {/* Phase 2/3 (useCheckoutFlow=true): Show as PRIMARY/ONLY payment option */}
           {canEnablePayment && (
             <>
-              {/* Show divider only if Payment Intent flow was shown above */}
-              {(isMobile || isPRBReady) && (
+              {/* Show divider only in Phase 1 when Payment Intent flow was shown above */}
+              {!useCheckoutFlow && (isMobile || isPRBReady) && (
                 <div className="relative my-4">
                   <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-gray-300"></div>
@@ -486,23 +479,40 @@ export function SubscriptionSignupClient({ plan, error, userProfile: initialUser
                   </div>
                 </div>
               )}
-              <p className="font-body text-muted-foreground mb-6">
-                {useCheckoutFlow
-                  ? 'Alternatively, proceed to our secure Stripe Checkout page for a streamlined payment experience with automatic Apple Pay and Google Pay support on mobile devices.'
-                  : 'You will be redirected to our secure payment processor to complete your subscription.'}
-              </p>
-              <Button
-                onClick={handleSubscribe}
-                disabled={isLoading}
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                size="lg"
-              >
-                {isLoading ? 'Processing...' : 'Proceed to Checkout'}
-              </Button>
-              {useCheckoutFlow && (
-                <p className="mt-2 text-xs text-muted-foreground text-center">
-                  Stripe Checkout automatically shows Apple Pay and Google Pay on compatible mobile devices
-                </p>
+
+              {/* Phase 2/3: Checkout-only messaging */}
+              {useCheckoutFlow ? (
+                <>
+                  <p className="font-body text-muted-foreground mb-6">
+                    You will be redirected to our secure Stripe Checkout page to complete your subscription. Stripe Checkout automatically shows Apple Pay, Google Pay, and other payment methods based on your device and browser.
+                  </p>
+                  <Button
+                    onClick={handleSubscribe}
+                    disabled={isLoading}
+                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                    size="lg"
+                  >
+                    {isLoading ? 'Processing...' : 'Proceed to Checkout'}
+                  </Button>
+                  <p className="mt-3 text-sm text-muted-foreground text-center">
+                    Stripe Checkout automatically optimizes for your device and shows Apple Pay, Google Pay, and Link when available
+                  </p>
+                </>
+              ) : (
+                <>
+                  {/* Phase 1: Fallback messaging */}
+                  <p className="font-body text-muted-foreground mb-6">
+                    You will be redirected to our secure payment processor to complete your subscription.
+                  </p>
+                  <Button
+                    onClick={handleSubscribe}
+                    disabled={isLoading}
+                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                    size="lg"
+                  >
+                    {isLoading ? 'Processing...' : 'Proceed to Checkout'}
+                  </Button>
+                </>
               )}
             </>
           )}

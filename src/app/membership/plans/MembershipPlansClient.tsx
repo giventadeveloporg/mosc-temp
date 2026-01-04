@@ -173,9 +173,9 @@ export function MembershipPlansClient({ plans, error, userSubscription, isAuthen
   if (error) {
     return (
       <div className="min-h-screen bg-background pt-20">
-        <div className="max-w-5xl mx-auto px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded-md">
-            {error}
+      <div className="max-w-5xl mx-auto px-8 py-8">
+        <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded-md">
+          {error}
           </div>
         </div>
       </div>
@@ -184,16 +184,16 @@ export function MembershipPlansClient({ plans, error, userSubscription, isAuthen
 
   return (
     <div className="min-h-screen bg-background pt-20">
-      <div className="max-w-5xl mx-auto px-8 py-8">
+    <div className="max-w-5xl mx-auto px-8 py-8">
         {/* Header Section */}
-        <div className="text-center mb-12">
+      <div className="text-center mb-12">
           <h1 className="text-4xl font-heading font-bold text-foreground mb-4">
             Membership Plans
           </h1>
           <p className="text-lg font-body text-muted-foreground max-w-3xl mx-auto">
-            Choose the membership plan that works best for you. All plans include access to our premium features.
-          </p>
-        </div>
+          Choose the membership plan that works best for you. All plans include access to our premium features.
+        </p>
+      </div>
 
         {/* Canceled Message */}
         {showCanceledMessage && (
@@ -294,11 +294,11 @@ export function MembershipPlansClient({ plans, error, userSubscription, isAuthen
         )}
 
         {/* Membership Plans Grid */}
-        {plans.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <p className="font-body text-muted-foreground">No membership plans available at this time.</p>
-          </div>
-        ) : (
+      {plans.length === 0 ? (
+        <div className="bg-white rounded-lg shadow-md p-6 text-center">
+          <p className="font-body text-muted-foreground">No membership plans available at this time.</p>
+        </div>
+      ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {plans.map((plan) => {
               // Parse features and filter out invalid entries (like curly braces, empty values, "0", etc.)
@@ -592,8 +592,8 @@ export function MembershipPlansClient({ plans, error, userSubscription, isAuthen
                 </Card>
               );
             })}
-          </div>
-        )}
+        </div>
+      )}
 
         {/* Membership Benefits Section */}
         <div className="bg-white rounded-lg shadow-md p-8 border border-border">
