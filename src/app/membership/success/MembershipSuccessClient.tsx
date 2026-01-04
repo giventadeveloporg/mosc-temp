@@ -222,11 +222,11 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
             // CRITICAL: Desktop flow polls GET endpoint (which creates subscription if payment succeeded)
             // Poll GET endpoint to wait for webhook or GET endpoint to create subscription
             let pollAttempt = 0;
-            const MAX_POLL_ATTEMPTS = 10;
-            const POLL_INTERVAL = 3000; // 3 seconds
+            const MAX_POLL_ATTEMPTS = 8; // Reduced from 10 to 8 for faster failure detection
+            const POLL_INTERVAL = 2000; // Reduced from 3000ms to 2000ms (2 seconds) for faster polling
 
             console.log(`[DESKTOP FLOW] Starting polling loop - waiting for subscription...`);
-            console.log(`[DESKTOP FLOW] Will poll up to ${MAX_POLL_ATTEMPTS} times with ${POLL_INTERVAL}ms intervals`);
+            console.log(`[DESKTOP FLOW] Will poll up to ${MAX_POLL_ATTEMPTS} times with ${POLL_INTERVAL}ms intervals (total max wait: ${MAX_POLL_ATTEMPTS * POLL_INTERVAL / 1000}s)`);
 
             while (pollAttempt < MAX_POLL_ATTEMPTS && !cancelledRef.current) {
               pollAttempt++;
@@ -278,12 +278,21 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
                     setLoading(false);
                     return;
                   } else {
-                    // Log why subscription wasn't found
+                    // Log why subscription wasn't found with detailed error information
                     console.log(`[DESKTOP FLOW] Poll attempt ${pollAttempt}: Subscription not found yet`, {
                       error: pollData.error,
+                      errorType: pollData.errorType,
                       message: pollData.message,
+                      paymentIntentStatus: pollData.paymentIntentStatus,
+                      hasMetadata: pollData.hasMetadata,
+                      membershipPlanId: pollData.membershipPlanId,
                       note: 'Webhook may still be processing or GET endpoint will create it'
                     });
+
+                    // If we have a specific error (not just "webhook processing"), log it for debugging
+                    if (pollData.error && pollData.error !== 'processMembershipSubscriptionFromPaymentIntent returned null') {
+                      console.error(`[DESKTOP FLOW] ⚠️ Subscription creation error detected (attempt ${pollAttempt}):`, pollData.error);
+                    }
                   }
                 } else {
                   const errorText = await pollRes.text();
@@ -330,12 +339,29 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
               }
             }
 
+            // If still not found after polling, check last poll response for error details
+            let lastPollError: string | null = null;
+            try {
+              const lastPollUrl = `/api/membership/success/process?${getQuery}&_t=${Date.now()}&_poll=${MAX_POLL_ATTEMPTS}`;
+              const lastPollRes = await fetch(lastPollUrl, { cache: 'no-store' });
+              if (lastPollRes.ok) {
+                const lastPollData = await lastPollRes.json();
+                if (lastPollData.error) {
+                  lastPollError = lastPollData.error;
+                  console.error('[DESKTOP FLOW] ❌ Last poll attempt error:', lastPollError);
+                }
+              }
+            } catch (err) {
+              // Ignore errors in final check
+            }
+
             // If still not found after polling, redirect to membership page (similar to ticket success page)
             console.log('[DESKTOP FLOW] Subscription not found after polling - redirecting to membership page:', {
               pollAttempts: MAX_POLL_ATTEMPTS,
               pollInterval: POLL_INTERVAL,
               totalWaitTime: `${(MAX_POLL_ATTEMPTS * POLL_INTERVAL) / 1000} seconds`,
               sessionId: session_id || payment_intent,
+              lastError: lastPollError,
               note: 'Payment was successful. Redirecting to membership page where subscription will be visible once processed.',
               timestamp: new Date().toISOString()
             });
@@ -345,6 +371,11 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
             processedRef.current = true;
 
             if (!cancelledRef.current) {
+              // Show error message if we have one, otherwise show success message
+              if (lastPollError) {
+                setError(`Subscription processing encountered an issue: ${lastPollError}. Your payment was successful. Please check your membership page or contact support.`);
+              }
+
               // Show success message briefly, then redirect to membership page
               setSubscriptionDetails({
                 plan: null,

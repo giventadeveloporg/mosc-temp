@@ -225,6 +225,37 @@ export async function GET(req: NextRequest) {
           // The processMembershipSubscriptionFromPaymentIntent function will handle this internally
           console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] Public route - will extract userId from Payment Intent metadata (customerEmail)');
 
+          // First, verify Payment Intent status and metadata before attempting creation
+          const { stripe } = await import('@/lib/stripe');
+          const paymentIntent = await stripe().paymentIntents.retrieve(pi, {
+            expand: ['payment_method'],
+          });
+
+          console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] Payment Intent status:', paymentIntent.status);
+          console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] Payment Intent metadata:', paymentIntent.metadata);
+
+          // Check if payment succeeded
+          if (paymentIntent.status !== 'succeeded' && paymentIntent.status !== 'requires_capture') {
+            console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] ⚠️ Payment Intent not in succeeded state:', paymentIntent.status);
+            return NextResponse.json({
+              subscription: null,
+              plan: null,
+              message: `Payment not completed yet. Status: ${paymentIntent.status}`,
+              error: `Payment Intent status: ${paymentIntent.status}`,
+            });
+          }
+
+          // Check for required metadata
+          if (!paymentIntent.metadata?.membershipPlanId) {
+            console.error('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] ❌ Missing membershipPlanId in Payment Intent metadata');
+            return NextResponse.json({
+              subscription: null,
+              plan: null,
+              message: 'Missing required payment information. Please contact support.',
+              error: 'Missing membershipPlanId in Payment Intent metadata',
+            });
+          }
+
           // Pass undefined userId - function will extract from Payment Intent metadata (customerEmail)
           const result = await processMembershipSubscriptionFromPaymentIntent(pi, undefined);
 
@@ -242,14 +273,21 @@ export async function GET(req: NextRequest) {
               currency: result.plan?.currency || 'USD',
             });
           } else {
-            console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] Failed to create subscription from Payment Intent - result:', result);
+            console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] ⚠️ Failed to create subscription from Payment Intent - result:', result);
+            console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] ⚠️ Payment Intent details:', {
+              status: paymentIntent.status,
+              amount: paymentIntent.amount,
+              currency: paymentIntent.currency,
+              metadata: paymentIntent.metadata,
+              customer: paymentIntent.customer,
+            });
 
             // CRITICAL: If subscription creation failed with "already exists" error,
             // the function should have returned the existing subscription, but if it didn't,
             // try one more lookup by payment intent ID (which may have been updated)
             const retryLookup = await findSubscriptionByPaymentIntentId(pi);
             if (retryLookup && (retryLookup.subscriptionStatus === 'ACTIVE' || retryLookup.subscriptionStatus === 'TRIAL')) {
-              console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] Found existing subscription on retry lookup:', retryLookup.id);
+              console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] ✅ Found existing subscription on retry lookup:', retryLookup.id);
 
               const details = await fetchMembershipSubscriptionDetailsServer(
                 undefined,
@@ -264,19 +302,31 @@ export async function GET(req: NextRequest) {
               });
             }
 
+            // Return more detailed error information for debugging
             return NextResponse.json({
               subscription: null,
               plan: null,
               message: 'Subscription not found yet. Webhook may still be processing.',
+              error: result === null ? 'processMembershipSubscriptionFromPaymentIntent returned null' : 'Unknown error',
+              paymentIntentStatus: paymentIntent.status,
+              hasMetadata: !!paymentIntent.metadata,
+              membershipPlanId: paymentIntent.metadata?.membershipPlanId || 'missing',
             });
           }
         } catch (createErr: any) {
-          console.error('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] Error creating subscription from Payment Intent:', createErr);
-          // Return null subscription but don't fail - allow polling to continue
+          console.error('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] ❌ Error creating subscription from Payment Intent:', {
+            error: createErr,
+            message: createErr?.message,
+            stack: createErr?.stack,
+            paymentIntentId: pi,
+          });
+          // Return detailed error for debugging (but don't fail - allow polling to continue)
           return NextResponse.json({
             subscription: null,
             plan: null,
             message: 'Subscription not found yet. Webhook may still be processing.',
+            error: createErr?.message || 'Unknown error during subscription creation',
+            errorType: createErr?.name || 'Error',
           });
         }
       }
@@ -344,13 +394,94 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // No existing subscription - try to create from Stripe session
+    // No existing subscription - try to create from Stripe session or Payment Intent
+    if (!resolvedSessionId && pi) {
+      // For Payment Intent flow, use processMembershipSubscriptionFromPaymentIntent
+      console.log('[MEMBERSHIP-PROCESS POST] No session ID resolved, attempting to create from Payment Intent:', pi);
+      try {
+        // First verify Payment Intent status and metadata
+        const { stripe } = await import('@/lib/stripe');
+        const paymentIntent = await stripe().paymentIntents.retrieve(pi, {
+          expand: ['payment_method'],
+        });
+
+        console.log('[MEMBERSHIP-PROCESS POST] Payment Intent status:', paymentIntent.status);
+        console.log('[MEMBERSHIP-PROCESS POST] Payment Intent metadata:', paymentIntent.metadata);
+
+        // Check if payment succeeded
+        if (paymentIntent.status !== 'succeeded' && paymentIntent.status !== 'requires_capture') {
+          console.log('[MEMBERSHIP-PROCESS POST] ⚠️ Payment Intent not in succeeded state:', paymentIntent.status);
+          return NextResponse.json({
+            subscription: null,
+            plan: null,
+            message: `Payment not completed yet. Status: ${paymentIntent.status}`,
+            error: `Payment Intent status: ${paymentIntent.status}`,
+          });
+        }
+
+        // Check for required metadata
+        if (!paymentIntent.metadata?.membershipPlanId) {
+          console.error('[MEMBERSHIP-PROCESS POST] ❌ Missing membershipPlanId in Payment Intent metadata');
+          return NextResponse.json({
+            subscription: null,
+            plan: null,
+            message: 'Missing required payment information. Please contact support.',
+            error: 'Missing membershipPlanId in Payment Intent metadata',
+          });
+        }
+
+        // Create subscription from Payment Intent
+        const { processMembershipSubscriptionFromPaymentIntent } = await import('@/app/membership/success/ApiServerActions');
+        const result = await processMembershipSubscriptionFromPaymentIntent(pi, undefined);
+
+        if (result && result.subscription) {
+          console.log('[MEMBERSHIP-PROCESS POST] ✅ Successfully created subscription from Payment Intent:', result.subscription.id);
+          return NextResponse.json({
+            subscription: result.subscription,
+            plan: result.plan,
+            userProfile: result.userProfile,
+            amount: result.plan?.price || null,
+            currency: result.plan?.currency || 'USD',
+          });
+        } else {
+          console.error('[MEMBERSHIP-PROCESS POST] ❌ Failed to create subscription from Payment Intent:', {
+            paymentIntentId: pi,
+            result: result === null ? 'null' : 'no subscription',
+          });
+          return NextResponse.json({
+            subscription: null,
+            plan: null,
+            message: 'Failed to create subscription. Please contact support.',
+            error: result === null ? 'processMembershipSubscriptionFromPaymentIntent returned null' : 'Unknown error',
+            paymentIntentStatus: paymentIntent.status,
+            hasMetadata: !!paymentIntent.metadata,
+            membershipPlanId: paymentIntent.metadata?.membershipPlanId || 'missing',
+          });
+        }
+      } catch (createErr: any) {
+        console.error('[MEMBERSHIP-PROCESS POST] ❌ Error creating subscription from Payment Intent:', {
+          error: createErr,
+          message: createErr?.message,
+          stack: createErr?.stack,
+          paymentIntentId: pi,
+        });
+        return NextResponse.json({
+          subscription: null,
+          plan: null,
+          message: 'Failed to create subscription. Please contact support.',
+          error: createErr?.message || 'Unknown error during subscription creation',
+          errorType: createErr?.name || 'Error',
+        }, { status: 500 });
+      }
+    }
+
     if (!resolvedSessionId) {
       console.log('[MEMBERSHIP-PROCESS POST] Could not resolve session ID from payment intent');
       return NextResponse.json({
         subscription: null,
         plan: null,
         message: 'Could not resolve session ID. Please wait for webhook processing.',
+        error: 'Could not resolve session ID from payment intent',
       });
     }
 
@@ -358,10 +489,15 @@ export async function POST(req: NextRequest) {
     const result = await processMembershipSubscriptionSessionServer(resolvedSessionId);
 
     if (!result || !result.subscription) {
+      console.error('[MEMBERSHIP-PROCESS POST] ❌ Failed to create subscription from session:', {
+        sessionId: resolvedSessionId,
+        result: result === null ? 'null' : 'no subscription',
+      });
       return NextResponse.json({
         subscription: null,
         plan: null,
         message: 'Failed to create subscription. Please contact support.',
+        error: result === null ? 'processMembershipSubscriptionSessionServer returned null' : 'Unknown error',
       });
     }
 

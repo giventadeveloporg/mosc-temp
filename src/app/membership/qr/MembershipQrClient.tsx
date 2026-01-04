@@ -78,7 +78,7 @@ export function MembershipQrClient({ session_id, payment_intent }: MembershipQrC
         }
 
         // Poll GET endpoint for existing subscription
-        const response = await fetch(`/api/membership/success/process?${params.toString()}`, {
+        const response = await fetch(`/api/membership/success/process?${params.toString()}&_t=${Date.now()}&_poll=${attempt}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
           cache: 'no-store',
@@ -92,7 +92,29 @@ export function MembershipQrClient({ session_id, payment_intent }: MembershipQrC
             setPlan(data.plan || null);
             setLoading(false);
             return; // Success - exit polling
+          } else {
+            // Log why subscription wasn't found with detailed error information
+            console.log(`[MEMBERSHIP-QR] Poll attempt ${attempt}: Subscription not found yet`, {
+              error: data.error,
+              errorType: data.errorType,
+              message: data.message,
+              paymentIntentStatus: data.paymentIntentStatus,
+              hasMetadata: data.hasMetadata,
+              membershipPlanId: data.membershipPlanId,
+              note: 'Webhook may still be processing or GET endpoint will create it'
+            });
+
+            // If we have a specific error (not just "webhook processing"), log it for debugging
+            if (data.error && data.error !== 'processMembershipSubscriptionFromPaymentIntent returned null') {
+              console.error(`[MEMBERSHIP-QR] ⚠️ Subscription creation error detected (attempt ${attempt}):`, data.error);
+            }
           }
+        } else {
+          const errorText = await response.text();
+          console.error(`[MEMBERSHIP-QR] GET request failed (attempt ${attempt}):`, {
+            status: response.status,
+            error: errorText,
+          });
         }
 
         // CRITICAL: Try POST fallback after 3 attempts OR on final attempt
@@ -100,7 +122,7 @@ export function MembershipQrClient({ session_id, payment_intent }: MembershipQrC
         const shouldTryPost = (pollAttemptRef.current >= 3 && pollAttemptRef.current < MAX_POLL_ATTEMPTS) || pollAttemptRef.current === MAX_POLL_ATTEMPTS;
 
         if (shouldTryPost && !cancelledRef.current) {
-          console.log('[MEMBERSHIP-QR] Transaction not found after polling, attempting POST to create subscription');
+          console.log(`[MEMBERSHIP-QR] Transaction not found after ${attempt} polling attempts, attempting POST to create subscription`);
 
           const postBody = session_id ? { session_id, skip_qr: true } : { pi: payment_intent || identifier, skip_qr: true };
           const postRes = await fetch('/api/membership/success/process', {
@@ -118,9 +140,27 @@ export function MembershipQrClient({ session_id, payment_intent }: MembershipQrC
               setPlan(postData.plan || null);
               setLoading(false);
               return; // Success - exit polling
+            } else {
+              console.error('[MEMBERSHIP-QR] POST fallback returned OK but no subscription:', {
+                error: postData.error,
+                message: postData.message,
+                responseKeys: Object.keys(postData),
+              });
             }
           } else {
-            console.error('[MEMBERSHIP-QR] POST fallback failed:', postRes.status);
+            const errorText = await postRes.text();
+            let errorData: any = null;
+            try {
+              errorData = JSON.parse(errorText);
+            } catch {
+              // Not JSON, use as string
+            }
+            console.error('[MEMBERSHIP-QR] POST fallback failed:', {
+              status: postRes.status,
+              statusText: postRes.statusText,
+              error: errorText,
+              errorData,
+            });
           }
         }
 
@@ -128,8 +168,43 @@ export function MembershipQrClient({ session_id, payment_intent }: MembershipQrC
         if (attempt < MAX_POLL_ATTEMPTS) {
           setTimeout(pollForSubscription, POLL_INTERVAL_MS);
         } else {
-          console.error('[MEMBERSHIP-QR] Subscription not found after maximum polling attempts');
-          setError('Subscription not found. Please contact support if payment was successful.');
+          // Get last error details before showing error
+          let lastError: string | null = null;
+          try {
+            const lastParams = new URLSearchParams();
+            if (payment_intent || identifier?.startsWith('pi_')) {
+              lastParams.append('pi', payment_intent || identifier || '');
+            } else if (session_id || identifier?.startsWith('cs_')) {
+              lastParams.append('session_id', session_id || identifier || '');
+            }
+            const lastResponse = await fetch(`/api/membership/success/process?${lastParams.toString()}&_t=${Date.now()}&_poll=${MAX_POLL_ATTEMPTS}`, {
+              method: 'GET',
+              headers: { 'Content-Type': 'application/json' },
+              cache: 'no-store',
+            });
+            if (lastResponse.ok) {
+              const lastData = await lastResponse.json();
+              if (lastData.error) {
+                lastError = lastData.error;
+              }
+            }
+          } catch (err) {
+            // Ignore errors in final check
+          }
+
+          console.error('[MEMBERSHIP-QR] ❌ Subscription not found after maximum polling attempts:', {
+            attempts: MAX_POLL_ATTEMPTS,
+            interval: POLL_INTERVAL_MS,
+            totalWaitTime: `${(MAX_POLL_ATTEMPTS * POLL_INTERVAL_MS) / 1000} seconds`,
+            lastError,
+            identifier,
+          });
+
+          // Show detailed error message if available
+          const errorMessage = lastError
+            ? `Subscription processing encountered an issue: ${lastError}. Your payment was successful. Please check your membership page or contact support.`
+            : 'Subscription not found. Please contact support if payment was successful.';
+          setError(errorMessage);
           setLoading(false);
         }
       } catch (err) {
