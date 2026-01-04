@@ -192,6 +192,19 @@
                 <li><strong>Current implementation</strong> = Hybrid approach (both options available when <code>NEXT_PUBLIC_USE_STRIPE_CHECKOUT=true</code>)</li>
             </ul>
             <p><strong>Note:</strong> Stripe doesn't have a single "UI Kit" - they offer different products (Elements, Checkout, Payment Request Button) that work together.</p>
+            <p><strong>Important:</strong> The link to "Stripe Billing UI Kit" (https://stripe.com/docs/billing/subscriptions/checkout) refers to <strong>Stripe Checkout + Customer Portal</strong>, not a standalone React component library. Stripe Checkout is the hosted payment page solution we're implementing.</p>
+        </div>
+
+        <div class="success">
+            <strong>✅ Stripe Checkout PRB Support (Mobile + Desktop):</strong>
+            <ul>
+                <li><strong>Mobile Apple Pay:</strong> Automatically appears on Safari (iOS) - No code needed</li>
+                <li><strong>Mobile Google Pay:</strong> Automatically appears on Chrome/Safari (Android/iOS) - No code needed</li>
+                <li><strong>Desktop Apple Pay:</strong> Automatically appears on Safari (macOS) - No code needed</li>
+                <li><strong>Desktop Google Pay:</strong> Automatically appears on Chrome/Edge/Firefox - No code needed</li>
+                <li><strong>Fully Mobile-Friendly:</strong> Stripe optimizes the Checkout page for all devices</li>
+            </ul>
+            <p><strong>Phase 2/3:</strong> When Checkout becomes primary/only method, users will always see these PRB buttons automatically on Stripe's hosted page - no custom implementation needed!</p>
         </div>
     </section>
 
