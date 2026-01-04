@@ -37,16 +37,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { slug: _omit, ...restQuery } = query;
     const qs = new URLSearchParams(restQuery as Record<string, string>);
 
+    // Special handling for /by-user/{userId} endpoint - always needs tenantId.equals
+    const isByUserEndpoint = /\/by-user\/[^/]+(\/|$)/.test(path);
+
     // Only append tenantId.equals for GET/POST list endpoints, not for PATCH/PUT/DELETE by ID
+    // Also add for /by-user/ endpoints which require tenant scoping
     const isListEndpoint = (method === 'GET' || method === 'POST') && !/\/\d+(\/|$)/.test(path);
-    if (isListEndpoint && !Array.from(qs.keys()).includes('tenantId.equals')) {
+    if ((isListEndpoint || isByUserEndpoint) && !Array.from(qs.keys()).includes('tenantId.equals')) {
       qs.append('tenantId.equals', tenantId);
+      if (isByUserEndpoint) {
+        console.log('[UserProfile Proxy] Detected /by-user/ endpoint - adding tenantId.equals:', tenantId);
+      }
     }
 
     const queryString = qs.toString();
     const apiUrl = `${API_BASE_URL}${path}${queryString ? `?${queryString}` : ''}`;
 
     console.log('[UserProfile Proxy] Forwarding to backend URL:', apiUrl);
+    console.log('[UserProfile Proxy] Path:', path, '| Method:', method, '| IsByUserEndpoint:', isByUserEndpoint, '| IsListEndpoint:', isListEndpoint);
 
     // Make the initial request
     let apiRes = await fetchWithJwtRetry(apiUrl, {
