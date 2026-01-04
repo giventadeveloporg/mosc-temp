@@ -4,14 +4,20 @@ import { getTenantId, getAppUrl } from '@/lib/env';
 import { getCachedApiJwt, generateApiJwt } from '@/lib/api/jwt';
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 
-export async function fetchUserProfileServer(userId: string): Promise<UserProfileDTO | null> {
+/**
+ * Fetch user profile with optimized performance
+ * Accepts optional Clerk user data to avoid multiple Clerk API calls
+ */
+export async function fetchUserProfileServer(
+  userId: string,
+  clerkUserData?: { email?: string; firstName?: string; lastName?: string }
+): Promise<UserProfileDTO | null> {
   const baseUrl = getAppUrl();
 
   try {
     console.log('[Profile Server] Starting profile fetch for userId:', userId);
 
-    // Step 1: Try to fetch the profile by userId
-    console.log('[Profile Server] Step 1: Looking up profile by userId');
+    // Step 1: Try to fetch the profile by userId (most common case - should be fast)
     const url = `${baseUrl}/api/proxy/user-profiles/by-user/${userId}`;
     let response = await fetch(url, {
       headers: { 'Content-Type': 'application/json' },
@@ -20,89 +26,15 @@ export async function fetchUserProfileServer(userId: string): Promise<UserProfil
 
     if (response.ok) {
       const data = await response.json();
-      console.log('[Profile Server] ✅ Step 1 successful: Profile found by userId');
+      console.log('[Profile Server] ✅ Profile found by userId');
       return Array.isArray(data) ? data[0] : data;
     }
 
-    // Step 2: Fallback to email lookup using Clerk auth() instead of currentUser()
-    console.log('[Profile Server] Step 2: Looking up profile by email');
-    let email = "";
-    try {
-      // Use auth() instead of currentUser() - it doesn't require middleware
-      const { userId: authUserId } = await auth();
-      if (authUserId) {
-        // Fetch Clerk user data from API to get email
-        const clerkApiKey = process.env.CLERK_SECRET_KEY;
-        if (clerkApiKey) {
-          const clerkRes = await fetch(`https://api.clerk.dev/v1/users/${authUserId}`, {
-            headers: {
-              'Authorization': `Bearer ${clerkApiKey}`,
-              'Content-Type': 'application/json'
-            }
-          });
-          if (clerkRes.ok) {
-            const clerkUser = await clerkRes.json();
-            email = clerkUser.email_addresses?.[0]?.email_address || "";
-          }
-        }
-      }
-    } catch (error) {
-      console.log('[Profile Server] Error getting user email:', error);
-      // Continue without email if this fails
-    }
-
-    if (email) {
-      const emailUrl = `${baseUrl}/api/proxy/user-profiles?email.equals=${encodeURIComponent(email)}`;
-      const emailRes = await fetch(emailUrl, {
-        headers: { 'Content-Type': 'application/json' },
-        cache: 'no-store'
-      });
-
-      if (emailRes.ok) {
-        const emailData = await emailRes.json();
-        const profile = Array.isArray(emailData) ? emailData[0] : emailData;
-
-        if (profile && profile.id) {
-          console.log('[Profile Server] ✅ Step 2 successful: Profile found by email');
-
-          // Check if profile needs userId update
-          if (profile.userId !== userId) {
-            console.log('[Profile Server] 🔄 Profile needs userId reconciliation');
-            try {
-              const updatePayload: Partial<UserProfileDTO> = {
-                id: profile.id,
-                userId: userId,
-                updatedAt: new Date().toISOString()
-              };
-
-              const updateResponse = await fetch(`${baseUrl}/api/proxy/user-profiles/${profile.id}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/merge-patch+json' },
-                body: JSON.stringify(updatePayload),
-              });
-
-              if (updateResponse.ok) {
-                const updatedProfile = await updateResponse.json();
-                console.log('[Profile Server] ✅ Profile reconciled successfully');
-                return updatedProfile;
-              }
-            } catch (reconciliationError) {
-              console.error('[Profile Server] ⚠️ Profile reconciliation failed:', reconciliationError);
-            }
-          }
-
-          return profile;
-        }
-      }
-    }
-
-    // Step 3: Create profile if not found
-    console.log('[Profile Server] ❌ No profile found for userId:', userId);
-    console.log('[Profile Server] 🔨 Attempting to create profile automatically...');
-
-    try {
-      // Get user details from Clerk if we don't have email yet
-      if (!email) {
+    // Step 2: Fallback to email lookup (only if userId lookup fails)
+    // Use provided Clerk data or fetch once if needed
+    let email = clerkUserData?.email;
+    if (!email) {
+      try {
         const { userId: authUserId } = await auth();
         if (authUserId) {
           const clerkApiKey = process.env.CLERK_SECRET_KEY;
@@ -119,86 +51,48 @@ export async function fetchUserProfileServer(userId: string): Promise<UserProfil
             }
           }
         }
+      } catch (error) {
+        console.log('[Profile Server] Error getting user email:', error);
       }
-
-      // Call backend sync endpoint to create user
-      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
-      const tenantId = getTenantId();
-
-      // Get Clerk user details for profile creation
-      const clerkApiKey = process.env.CLERK_SECRET_KEY;
-      let firstName = 'User';
-      let lastName = 'User';
-
-      if (clerkApiKey) {
-        try {
-          const clerkRes = await fetch(`https://api.clerk.dev/v1/users/${userId}`, {
-            headers: {
-              'Authorization': `Bearer ${clerkApiKey}`,
-              'Content-Type': 'application/json'
-            }
-          });
-          if (clerkRes.ok) {
-            const clerkUser = await clerkRes.json();
-            firstName = clerkUser.first_name || 'User';
-            lastName = clerkUser.last_name || 'User';
-            if (!email) {
-              email = clerkUser.email_addresses?.[0]?.email_address || "";
-            }
-          }
-        } catch (clerkError) {
-          console.log('[Profile Server] Warning: Could not fetch Clerk user details:', clerkError);
-        }
-      }
-
-      const syncPayload = {
-        clerkUserId: userId,
-        email: email,
-        firstName: firstName,
-        lastName: lastName,
-        tenantId: tenantId,
-      };
-
-      console.log('[Profile Server] Calling sync-user endpoint:', JSON.stringify(syncPayload));
-
-      // Use centralized JWT retry helper (complies with .cursor/rules/nextjs_api_routes.mdc)
-      const syncResponse = await fetchWithJwtRetry(`${apiBaseUrl}/api/clerk/sync-user`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Tenant-Id': tenantId,
-        },
-        body: JSON.stringify(syncPayload),
-      }, '[Profile Server] sync-user');
-
-      console.log('[Profile Server] Sync response status:', syncResponse.status);
-      const syncResponseText = await syncResponse.text();
-      console.log('[Profile Server] Sync response body:', syncResponseText);
-
-      if (syncResponse.ok) {
-        console.log('[Profile Server] ✅ User created successfully, fetching again...');
-        // Wait a bit for database to commit
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        // Retry fetching the profile
-        const retryUrl = `${baseUrl}/api/proxy/user-profiles/by-user/${userId}`;
-        const retryResponse = await fetch(retryUrl, {
-          headers: { 'Content-Type': 'application/json' },
-          cache: 'no-store'
-        });
-
-        if (retryResponse.ok) {
-          const data = await retryResponse.json();
-          console.log('[Profile Server] ✅ Profile created and retrieved successfully');
-          return Array.isArray(data) ? data[0] : data;
-        }
-      } else {
-        console.error('[Profile Server] ❌ Failed to create profile:', syncResponse.status, syncResponseText);
-      }
-    } catch (createError) {
-      console.error('[Profile Server] ❌ Error creating profile:', createError);
     }
 
+    if (email) {
+      const emailUrl = `${baseUrl}/api/proxy/user-profiles?email.equals=${encodeURIComponent(email)}`;
+      const emailRes = await fetch(emailUrl, {
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store'
+      });
+
+      if (emailRes.ok) {
+        const emailData = await emailRes.json();
+        const profile = Array.isArray(emailData) ? emailData[0] : emailData;
+
+        if (profile && profile.id) {
+          console.log('[Profile Server] ✅ Profile found by email');
+
+          // Check if profile needs userId update (async - don't block return)
+          if (profile.userId !== userId) {
+            console.log('[Profile Server] 🔄 Profile needs userId reconciliation');
+            // Fire and forget - don't wait for reconciliation
+            fetch(`${baseUrl}/api/proxy/user-profiles/${profile.id}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/merge-patch+json' },
+              body: JSON.stringify({
+                id: profile.id,
+                userId: userId,
+                updatedAt: new Date().toISOString()
+              }),
+            }).catch(err => console.error('[Profile Server] ⚠️ Profile reconciliation failed:', err));
+          }
+
+          return profile;
+        }
+      }
+    }
+
+    // Step 3: Profile not found - return null (let caller handle creation if needed)
+    // This avoids duplicate creation logic and reduces latency
+    console.log('[Profile Server] ❌ No profile found for userId:', userId);
     return null;
 
   } catch (error) {

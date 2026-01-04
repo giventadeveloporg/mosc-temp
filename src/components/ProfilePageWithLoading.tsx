@@ -60,14 +60,14 @@ export default function ProfilePageWithLoading() {
           console.log('[ProfilePageWithLoading] 🔄 401 error detected, but continuing to show profile form');
           // Don't set error state for 401s - let the page continue
 
-          // Try to retry once after a short delay
+          // Try to retry once after a shorter delay (reduced from 1000ms to 300ms)
           console.log('[ProfilePageWithLoading] 🔄 Retrying profile fetch after 401 error...');
           setTimeout(() => {
             if (userId) {
               console.log('[ProfilePageWithLoading] 🔄 Retry attempt for user:', userId);
               fetchProfile();
             }
-          }, 1000); // Wait 1 second before retry
+          }, 300); // Reduced delay - 401s are usually auth timing issues that resolve quickly
         } else if (response.status === 500) {
           const errorMessage = 'There is some unexpected error happened. Please try back again later.';
           setError(errorMessage);

@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
   try {
     console.log('[PROFILE-FETCH-API] 🚀 Profile fetch endpoint called');
 
-    // Get authenticated user from Clerk
+    // Get authenticated user from Clerk (single call)
     const { userId: clerkUserId } = await auth();
     const user = await currentUser();
 
@@ -25,23 +25,29 @@ export async function POST(request: NextRequest) {
 
     console.log('[PROFILE-FETCH-API] ✅ Authenticated user:', clerkUserId);
 
-    // Try to fetch existing profile
-    let profile = await fetchUserProfileServer(clerkUserId);
+    // Extract Clerk user data once to pass to fetchUserProfileServer
+    // This avoids multiple Clerk API calls in fetchUserProfileServer
+    const clerkUserData = {
+      email: user.primaryEmailAddress?.emailAddress || user.emailAddresses[0]?.emailAddress,
+      firstName: user.firstName,
+      lastName: user.lastName,
+    };
+
+    // Try to fetch existing profile (with Clerk data to avoid extra API calls)
+    let profile = await fetchUserProfileServer(clerkUserId, clerkUserData);
 
     // If profile doesn't exist, create it automatically
     if (!profile) {
       console.log('[PROFILE-FETCH-API] ℹ️ Profile not found, creating automatically...');
 
       const tenantId = process.env.NEXT_PUBLIC_TENANT_ID || 'tenant_demo_001';
-
-      // Call backend sync endpoint to create user
       const backendUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
 
       const syncPayload = {
         clerkUserId: user.id,
-        email: user.primaryEmailAddress?.emailAddress || user.emailAddresses[0]?.emailAddress,
-        firstName: user.firstName || 'User',
-        lastName: user.lastName || 'User',
+        email: clerkUserData.email,
+        firstName: clerkUserData.firstName || 'User',
+        lastName: clerkUserData.lastName || 'User',
         tenantId: tenantId,
       };
 
@@ -64,10 +70,10 @@ export async function POST(request: NextRequest) {
 
         if (syncResponse.ok) {
           console.log('[PROFILE-FETCH-API] ✅ User created successfully, fetching again...');
-          // Wait a bit for database to commit
-          await new Promise(resolve => setTimeout(resolve, 500));
-          // Fetch the newly created profile
-          profile = await fetchUserProfileServer(clerkUserId);
+          // Reduced delay - database commits are usually faster than 500ms
+          await new Promise(resolve => setTimeout(resolve, 200));
+          // Fetch the newly created profile (with Clerk data to avoid extra calls)
+          profile = await fetchUserProfileServer(clerkUserId, clerkUserData);
         } else {
           console.error('[PROFILE-FETCH-API] ❌ Failed to create user:', syncResponse.status, syncResponseText);
         }
