@@ -8,6 +8,10 @@ import {
   processMembershipSubscriptionFromPaymentIntent,
   fetchMembershipSubscriptionDetailsServer,
 } from '@/app/membership/success/ApiServerActions';
+import { fetchWithJwtRetry } from '@/lib/proxyHandler';
+import { getAppUrl, getTenantId } from '@/lib/env';
+import { withTenantId } from '@/lib/withTenantId';
+import type { MembershipSubscriptionDTO } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -100,6 +104,191 @@ export async function GET(req: NextRequest) {
         existingSubscription = null;
       } else {
         console.log('[MEMBERSHIP-PROCESS GET] Subscription found:', existingSubscription.id, 'Status:', existingSubscription.subscriptionStatus);
+
+        // CRITICAL: First check if the existing subscription's plan ID matches the session's plan ID
+        // If they DON'T match, the existing subscription itself is for a different plan and should be cancelled
+        // This handles plan switches (e.g., switching from Plan 2 to Plan 1)
+        try {
+          // Get plan ID from session if available
+          let sessionPlanId: number | null = null;
+          if (session_id && !session_id.startsWith('pi_')) {
+            try {
+              const { stripe } = await import('@/lib/stripe');
+              const session = await stripe().checkout.sessions.retrieve(session_id);
+              if (session.metadata?.membershipPlanId) {
+                sessionPlanId = parseInt(session.metadata.membershipPlanId, 10);
+              }
+            } catch (sessionError) {
+              console.warn('[MEMBERSHIP-PROCESS GET] Could not retrieve session to get plan ID:', sessionError);
+            }
+          }
+
+          // CRITICAL: Check if existing subscription's plan ID matches session's plan ID
+          if (sessionPlanId) {
+            const existingPlanId = typeof existingSubscription.membershipPlanId === 'number'
+              ? existingSubscription.membershipPlanId
+              : parseInt(String(existingSubscription.membershipPlanId), 10);
+
+            console.log('[MEMBERSHIP-PROCESS GET] Checking plan match:', {
+              existingSubscriptionId: existingSubscription.id,
+              existingPlanId,
+              sessionPlanId,
+              planIdsMatch: existingPlanId === sessionPlanId,
+            });
+
+            // If plan IDs DON'T match, the existing subscription is for a different plan - cancel it
+            if (existingPlanId !== sessionPlanId) {
+              console.log('[MEMBERSHIP-PROCESS GET] ⚠️ Existing subscription is for DIFFERENT plan - will cancel and proceed to create new one:', {
+                existingSubscriptionId: existingSubscription.id,
+                existingPlanId,
+                sessionPlanId,
+                message: 'Plan switch detected - will cancel old subscription and create new one'
+              });
+
+              // Cancel the existing subscription (it's for the wrong plan)
+              try {
+                const cancelPayload = withTenantId({
+                  id: existingSubscription.id!,
+                  cancelAtPeriodEnd: true,
+                  cancellationReason: `Switched to plan ${sessionPlanId}`,
+                  subscriptionStatus: 'CANCELLED',
+                  cancelledAt: new Date().toISOString(),
+                });
+
+                await fetchWithJwtRetry(
+                  `${getAppUrl()}/api/proxy/membership-subscriptions/${existingSubscription.id}`,
+                  {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/merge-patch+json' },
+                    body: JSON.stringify(cancelPayload),
+                    cache: 'no-store',
+                  },
+                  '[MEMBERSHIP-PROCESS GET] cancel-existing-wrong-plan-subscription'
+                );
+
+                console.log('[MEMBERSHIP-PROCESS GET] ✅ Cancelled existing subscription (wrong plan) in database:', existingSubscription.id);
+
+                // Also cancel the Stripe subscription if it exists
+                if (existingSubscription.stripeSubscriptionId) {
+                  try {
+                    const { stripe } = await import('@/lib/stripe');
+                    const stripeSub = await stripe().subscriptions.retrieve(existingSubscription.stripeSubscriptionId);
+                    if (stripeSub.status !== 'canceled' && stripeSub.status !== 'incomplete_expired') {
+                      await stripe().subscriptions.update(existingSubscription.stripeSubscriptionId, {
+                        cancel_at_period_end: true,
+                        metadata: {
+                          ...stripeSub.metadata,
+                          cancellation_reason: `Switched to plan ${sessionPlanId}`,
+                          cancelled_at: new Date().toISOString(),
+                        },
+                      });
+                      console.log('[MEMBERSHIP-PROCESS GET] ✅ Cancelled Stripe subscription (wrong plan):', existingSubscription.stripeSubscriptionId);
+                    } else {
+                      console.log('[MEMBERSHIP-PROCESS GET] ⚠️ Stripe subscription already cancelled/incomplete_expired:', existingSubscription.stripeSubscriptionId);
+                    }
+                  } catch (stripeError) {
+                    console.error('[MEMBERSHIP-PROCESS GET] ⚠️ Failed to cancel Stripe subscription (non-fatal):', stripeError);
+                  }
+                }
+
+                // Reset to null so we proceed to create/find the subscription for the NEW plan
+                existingSubscription = null;
+              } catch (cancelError) {
+                console.error('[MEMBERSHIP-PROCESS GET] ⚠️ Failed to cancel existing subscription (non-fatal):', cancelError);
+                // Reset to null anyway so we proceed to create/find the subscription for the NEW plan
+                existingSubscription = null;
+              }
+            } else {
+              // Plan IDs match - this is the correct subscription
+              console.log('[MEMBERSHIP-PROCESS GET] ✅ Existing subscription matches plan - will check for other subscriptions and return');
+
+              // Check for OTHER active subscriptions for different plans (excluding this one)
+              if (existingSubscription.userProfileId) {
+                const tenantId = getTenantId();
+                const params = new URLSearchParams({
+                  'userProfileId.equals': String(existingSubscription.userProfileId),
+                  'tenantId.equals': tenantId,
+                  'subscriptionStatus.in': 'ACTIVE,TRIAL', // Check for active or trial subscriptions
+                });
+                const response = await fetchWithJwtRetry(
+                  `${getAppUrl()}/api/proxy/membership-subscriptions?${params.toString()}`,
+                  { cache: 'no-store' }
+                );
+                if (response.ok) {
+                  const items: MembershipSubscriptionDTO[] = await response.json();
+                  // Filter out subscriptions for the same plan AND the current subscription (those are OK)
+                  const otherPlanSubscriptions = items.filter(sub =>
+                    sub.membershipPlanId !== sessionPlanId && sub.id !== existingSubscription.id
+                  );
+
+                  if (otherPlanSubscriptions.length > 0) {
+                    console.log('[MEMBERSHIP-PROCESS GET] ⚠️ User has active subscription(s) for different plan(s) - will cancel:', {
+                      otherSubscriptions: otherPlanSubscriptions.map(sub => ({
+                        id: sub.id,
+                        planId: sub.membershipPlanId,
+                        status: sub.subscriptionStatus,
+                        stripeSubscriptionId: sub.stripeSubscriptionId,
+                      })),
+                      currentSubscriptionId: existingSubscription.id,
+                      currentPlanId: existingSubscription.membershipPlanId,
+                      newPlanId: sessionPlanId,
+                    });
+
+                    // Cancel all other active subscriptions (both database and Stripe)
+                    for (const oldSub of otherPlanSubscriptions) {
+                      try {
+                        // Cancel in database
+                        const cancelPayload = withTenantId({
+                          id: oldSub.id!,
+                          cancelAtPeriodEnd: true,
+                          cancellationReason: `Switched to plan ${sessionPlanId}`,
+                          subscriptionStatus: 'CANCELLED',
+                          cancelledAt: new Date().toISOString(),
+                        });
+
+                        await fetchWithJwtRetry(
+                          `${getAppUrl()}/api/proxy/membership-subscriptions/${oldSub.id}`,
+                          {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/merge-patch+json' },
+                            body: JSON.stringify(cancelPayload),
+                            cache: 'no-store',
+                          },
+                          '[MEMBERSHIP-PROCESS GET] cancel-other-plan-subscription'
+                        );
+
+                        console.log('[MEMBERSHIP-PROCESS GET] ✅ Cancelled other plan subscription in database:', oldSub.id);
+
+                        // Also cancel the Stripe subscription if it exists
+                        if (oldSub.stripeSubscriptionId) {
+                          try {
+                            const { stripe } = await import('@/lib/stripe');
+                            await stripe().subscriptions.update(oldSub.stripeSubscriptionId, {
+                              cancel_at_period_end: true,
+                              metadata: {
+                                ...(await stripe().subscriptions.retrieve(oldSub.stripeSubscriptionId)).metadata,
+                                cancellation_reason: `Switched to plan ${sessionPlanId}`,
+                                cancelled_at: new Date().toISOString(),
+                              },
+                            });
+                            console.log('[MEMBERSHIP-PROCESS GET] ✅ Cancelled Stripe subscription:', oldSub.stripeSubscriptionId);
+                          } catch (stripeError) {
+                            console.error('[MEMBERSHIP-PROCESS GET] ⚠️ Failed to cancel Stripe subscription (non-fatal):', stripeError);
+                          }
+                        }
+                      } catch (cancelError) {
+                        console.error('[MEMBERSHIP-PROCESS GET] ⚠️ Failed to cancel other plan subscription (non-fatal):', cancelError);
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            }
+          } catch (error) {
+            console.error('[MEMBERSHIP-PROCESS GET] Error checking for other plan subscriptions:', error);
+            // Continue - subscription is still valid
+          }
 
         // Fetch plan details
         const details = await fetchMembershipSubscriptionDetailsServer(
