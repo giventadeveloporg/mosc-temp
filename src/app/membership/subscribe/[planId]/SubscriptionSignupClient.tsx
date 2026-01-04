@@ -101,17 +101,60 @@ export function SubscriptionSignupClient({ plan, error, userProfile: initialUser
           }
         } catch (err) {
           setIsCreatingProfile(false);
-          const errorMessage = err instanceof Error ? err.message : 'Failed to create profile';
-          console.error('[MEMBERSHIP-SUBSCRIBE] Profile creation failed:', errorMessage);
-          setProfileError(`Unable to set up your account: ${errorMessage}`);
 
-          if (retryCount < 2) {
-            // Auto-retry after 2 seconds
+          // Extract detailed error information
+          const errorDetails = err instanceof Error ? {
+            message: err.message,
+            name: err.name,
+            stack: err.stack,
+          } : { error: String(err) };
+
+          console.error('[MEMBERSHIP-SUBSCRIBE] Profile creation failed:', {
+            error: errorDetails,
+            userId,
+            email,
+            retryCount,
+          });
+
+          // Provide user-friendly error message
+          let userErrorMessage = 'Unable to set up your account. ';
+          if (errorDetails.message) {
+            // Check for specific error types to provide better feedback
+            if (errorDetails.message.includes('NEXT_PUBLIC_APP_URL')) {
+              userErrorMessage += 'Configuration error. Please contact support.';
+            } else if (errorDetails.message.includes('Network error')) {
+              userErrorMessage += 'Network connection issue. Please check your internet and try again.';
+            } else if (errorDetails.message.includes('Failed to create user profile')) {
+              userErrorMessage += 'Server error. Please try again or contact support.';
+            } else {
+              userErrorMessage += errorDetails.message;
+            }
+          } else {
+            userErrorMessage += 'Please try again or contact support.';
+          }
+
+          setProfileError(userErrorMessage);
+
+          // Only retry for network errors or transient failures, not for validation errors
+          const isRetryableError = errorDetails.message && (
+            errorDetails.message.includes('Network error') ||
+            errorDetails.message.includes('Failed to create user profile') ||
+            errorDetails.message.includes('timeout') ||
+            errorDetails.message.includes('ECONNREFUSED')
+          );
+
+          if (isRetryableError && retryCount < 2) {
+            // Auto-retry after 2 seconds for retryable errors
+            console.log(`[MEMBERSHIP-SUBSCRIBE] Retrying profile creation (attempt ${retryCount + 1}/3)...`);
             setTimeout(() => {
               setRetryCount(prev => prev + 1);
             }, 2000);
           } else {
-            setProfileError('Unable to set up your account after multiple attempts. Please contact support or try again later.');
+            // Don't retry for validation errors or after max retries
+            if (retryCount >= 2) {
+              setProfileError('Unable to set up your account after multiple attempts. Please contact support or try again later.');
+            }
+            // Error message already set above
           }
         }
       } else {

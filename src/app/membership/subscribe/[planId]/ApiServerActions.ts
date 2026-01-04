@@ -195,59 +195,174 @@ export async function createUserProfileFromClerkUser({
   imageUrl?: string;
 }): Promise<UserProfileDTO> {
   if (!userId) {
-    throw new Error('UserId is required');
+    const error = new Error('UserId is required to create user profile');
+    console.error('[MEMBERSHIP-SUBSCRIBE] createUserProfileFromClerkUser validation failed:', {
+      error: error.message,
+      userId: userId || 'missing',
+    });
+    throw error;
   }
 
   if (!email) {
-    throw new Error('Email is required to create user profile');
+    const error = new Error('Email is required to create user profile');
+    console.error('[MEMBERSHIP-SUBSCRIBE] createUserProfileFromClerkUser validation failed:', {
+      error: error.message,
+      email: email || 'missing',
+      userId,
+    });
+    throw error;
   }
 
   const baseUrl = getAppUrl();
+  if (!baseUrl) {
+    const error = new Error('NEXT_PUBLIC_APP_URL is not configured. Cannot create user profile.');
+    console.error('[MEMBERSHIP-SUBSCRIBE] createUserProfileFromClerkUser configuration error:', {
+      error: error.message,
+      userId,
+      email,
+    });
+    throw error;
+  }
+
   const now = new Date().toISOString();
 
-  const profileData = withTenantId({
-    userId,
-    email,
-    firstName: firstName || 'User',
-    lastName: lastName || '',
-    phone: phone || '',
-    profileImageUrl: imageUrl || '',
-    userRole: 'MEMBER',
-    userStatus: 'PENDING_APPROVAL',
-    createdAt: now,
-    updatedAt: now,
-  });
+  let profileData;
+  try {
+    profileData = withTenantId({
+      userId,
+      email,
+      firstName: firstName || 'User',
+      lastName: lastName || '',
+      phone: phone || '',
+      profileImageUrl: imageUrl || '',
+      userRole: 'MEMBER',
+      userStatus: 'PENDING_APPROVAL',
+      createdAt: now,
+      updatedAt: now,
+    });
+  } catch (tenantErr) {
+    const error = tenantErr instanceof Error
+      ? new Error(`Failed to prepare profile data: ${tenantErr.message}`)
+      : new Error('Failed to prepare profile data: Unknown error');
+    console.error('[MEMBERSHIP-SUBSCRIBE] createUserProfileFromClerkUser tenant ID error:', {
+      error: error.message,
+      originalError: tenantErr instanceof Error ? tenantErr.message : String(tenantErr),
+      userId,
+      email,
+    });
+    throw error;
+  }
 
   console.log('[MEMBERSHIP-SUBSCRIBE] Creating user profile:', {
     userId,
     email,
     tenantId: profileData.tenantId,
+    baseUrl,
   });
 
-  const response = await fetchWithJwtRetry(
-    `${baseUrl}/api/proxy/user-profiles`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(profileData),
-    },
-    '[MEMBERSHIP-SUBSCRIBE] create-user-profile'
-  );
+  let response;
+  try {
+    const profileUrl = `${baseUrl}/api/proxy/user-profiles`;
+    console.log('[MEMBERSHIP-SUBSCRIBE] POST request to:', profileUrl);
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error('[MEMBERSHIP-SUBSCRIBE] Failed to create user profile:', {
-      status: response.status,
-      error: errorText,
+    response = await fetchWithJwtRetry(
+      profileUrl,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(profileData),
+      },
+      '[MEMBERSHIP-SUBSCRIBE] create-user-profile'
+    );
+  } catch (fetchErr) {
+    const error = fetchErr instanceof Error
+      ? new Error(`Network error while creating user profile: ${fetchErr.message}`)
+      : new Error('Network error while creating user profile: Unknown error');
+    console.error('[MEMBERSHIP-SUBSCRIBE] createUserProfileFromClerkUser fetch error:', {
+      error: error.message,
+      originalError: fetchErr instanceof Error ? {
+        message: fetchErr.message,
+        stack: fetchErr.stack,
+        name: fetchErr.name,
+      } : String(fetchErr),
+      userId,
+      email,
+      baseUrl,
     });
-    throw new Error(`Failed to create user profile: ${response.status} - ${errorText}`);
+    throw error;
   }
 
-  const createdProfile = await response.json();
+  if (!response.ok) {
+    let errorText = '';
+    try {
+      errorText = await response.text();
+    } catch (textErr) {
+      errorText = `Failed to read error response: ${textErr instanceof Error ? textErr.message : String(textErr)}`;
+    }
+
+    const error = new Error(`Failed to create user profile: ${response.status} - ${errorText}`);
+    console.error('[MEMBERSHIP-SUBSCRIBE] Failed to create user profile:', {
+      status: response.status,
+      statusText: response.statusText,
+      error: errorText,
+      userId,
+      email,
+      tenantId: profileData.tenantId,
+    });
+    throw error;
+  }
+
+  let createdProfile;
+  try {
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const errorText = await response.text();
+      const error = new Error(`Invalid response format: expected JSON, got ${contentType}`);
+      console.error('[MEMBERSHIP-SUBSCRIBE] createUserProfileFromClerkUser invalid response format:', {
+        error: error.message,
+        contentType,
+        responseBody: errorText.substring(0, 500), // First 500 chars
+        userId,
+        email,
+      });
+      throw error;
+    }
+
+    createdProfile = await response.json();
+
+    if (!createdProfile || !createdProfile.id) {
+      const error = new Error('Profile creation succeeded but response missing ID');
+      console.error('[MEMBERSHIP-SUBSCRIBE] createUserProfileFromClerkUser invalid response:', {
+        error: error.message,
+        response: createdProfile,
+        userId,
+        email,
+      });
+      throw error;
+    }
+  } catch (jsonErr) {
+    const error = jsonErr instanceof Error
+      ? new Error(`Failed to parse profile creation response: ${jsonErr.message}`)
+      : new Error('Failed to parse profile creation response: Unknown error');
+    console.error('[MEMBERSHIP-SUBSCRIBE] createUserProfileFromClerkUser JSON parse error:', {
+      error: error.message,
+      originalError: jsonErr instanceof Error ? {
+        message: jsonErr.message,
+        stack: jsonErr.stack,
+        name: jsonErr.name,
+      } : String(jsonErr),
+      userId,
+      email,
+      status: response.status,
+    });
+    throw error;
+  }
+
   console.log('[MEMBERSHIP-SUBSCRIBE] User profile created successfully:', {
     profileId: createdProfile.id,
     userId,
     email,
+    tenantId: profileData.tenantId,
   });
 
   return createdProfile;

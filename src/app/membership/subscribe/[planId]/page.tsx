@@ -52,18 +52,52 @@ export default async function SubscriptionSignupPage({
   if (userId && !error) {
     try {
       const baseUrl = getAppUrl();
-      const response = await fetch(`${baseUrl}/api/proxy/user-profiles/by-user/${userId}`, {
-        cache: 'no-store',
-      });
-      if (response.ok) {
-        const profile = await response.json();
-        userProfile = Array.isArray(profile) ? profile[0] : profile;
-        if (userProfile && userProfile.id) {
-          console.log('[MEMBERSHIP-SUBSCRIBE] User profile found - user is registered:', userProfile.id);
+      if (!baseUrl) {
+        console.warn('[MEMBERSHIP-SUBSCRIBE] NEXT_PUBLIC_APP_URL not set - skipping user profile fetch');
+        // Continue without user profile - client component will handle fallback
+      } else {
+        const profileUrl = `${baseUrl}/api/proxy/user-profiles/by-user/${userId}`;
+        console.log('[MEMBERSHIP-SUBSCRIBE] Fetching user profile from:', profileUrl);
+
+        const response = await fetch(profileUrl, {
+          cache: 'no-store',
+        });
+
+        if (response.ok) {
+          const contentType = response.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            try {
+              const profile = await response.json();
+              userProfile = Array.isArray(profile) ? profile[0] : profile;
+              if (userProfile && userProfile.id) {
+                console.log('[MEMBERSHIP-SUBSCRIBE] User profile found - user is registered:', userProfile.id);
+              } else {
+                console.log('[MEMBERSHIP-SUBSCRIBE] User profile response received but no ID found');
+              }
+            } catch (jsonErr) {
+              console.error('[MEMBERSHIP-SUBSCRIBE] Failed to parse user profile JSON:', jsonErr);
+              // Continue without user profile - client component will handle fallback
+            }
+          } else {
+            console.warn('[MEMBERSHIP-SUBSCRIBE] User profile response is not JSON:', contentType);
+            // Continue without user profile - client component will handle fallback
+          }
+        } else if (response.status === 404) {
+          // 404 is expected if user profile doesn't exist yet
+          console.log('[MEMBERSHIP-SUBSCRIBE] User profile not found (404) - will be created by client component');
+        } else {
+          console.warn(`[MEMBERSHIP-SUBSCRIBE] User profile fetch returned status ${response.status}`);
+          // Continue without user profile - client component will handle fallback
         }
       }
     } catch (err) {
-      console.error('[MEMBERSHIP-SUBSCRIBE] Error fetching user profile:', err);
+      // Log full error details for debugging
+      const errorDetails = err instanceof Error ? {
+        message: err.message,
+        stack: err.stack,
+        name: err.name,
+      } : { error: String(err) };
+      console.error('[MEMBERSHIP-SUBSCRIBE] Error fetching user profile:', errorDetails);
       // Continue without user profile - client component will handle fallback
     }
   }
