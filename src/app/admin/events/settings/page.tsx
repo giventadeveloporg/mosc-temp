@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { auth } from '@clerk/nextjs';
 import AdminNavigation from '@/components/AdminNavigation';
-import { FaCog, FaEnvelope, FaUsers, FaCalendarAlt } from 'react-icons/fa';
+import { FaCog, FaEnvelope, FaUsers, FaCalendarAlt, FaSave } from 'react-icons/fa';
 
 function LoadingSkeleton() {
   return (
@@ -210,16 +210,10 @@ function AdminEventsSettingsContent() {
           <div className="pt-6">
             <button
               type="submit"
-              className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
-              title="Save Settings"
-              aria-label="Save Settings"
+              className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
             >
-              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <span className="font-semibold text-blue-700">Save Settings</span>
+              <FaSave className="mr-2" />
+              Save Settings
             </button>
           </div>
         </form>

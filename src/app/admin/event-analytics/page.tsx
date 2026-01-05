@@ -116,9 +116,9 @@ function AdminEventsContent() {
   return (
     <div className="max-w-7xl mx-auto px-8 py-8">
       {/* Header */}
-      <div className="mb-8 pt-4 sm:pt-0">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Event Analytics Dashboard</h1>
-        <p className="text-sm sm:text-base text-gray-600">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Event Analytics Dashboard</h1>
+        <p className="text-gray-600">
           View comprehensive event analytics, registration trends, and performance metrics.
         </p>
       </div>
@@ -285,9 +285,9 @@ function AdminEventsContent() {
         <div className="flex flex-wrap gap-4">
           <Link
             href="/admin/events/new"
-            className="flex items-center gap-3 px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 hover:scale-105 shadow-md group"
+            className="flex items-center gap-3 px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 hover:scale-105 shadow-md"
           >
-            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-500 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-500 flex items-center justify-center">
               <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
@@ -296,9 +296,9 @@ function AdminEventsContent() {
           </Link>
           <Link
             href="/admin/events/dashboard"
-            className="flex items-center gap-3 px-6 py-4 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all duration-300 hover:scale-105 shadow-md group"
+            className="flex items-center gap-3 px-6 py-4 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all duration-300 hover:scale-105 shadow-md"
           >
-            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-teal-500 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-teal-500 flex items-center justify-center">
               <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
@@ -307,9 +307,9 @@ function AdminEventsContent() {
           </Link>
           <Link
             href="/admin/events/registrations"
-            className="flex items-center gap-3 px-6 py-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all duration-300 hover:scale-105 shadow-md group"
+            className="flex items-center gap-3 px-6 py-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all duration-300 hover:scale-105 shadow-md"
           >
-            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-indigo-500 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-indigo-500 flex items-center justify-center">
               <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
@@ -318,9 +318,9 @@ function AdminEventsContent() {
           </Link>
           <Link
             href="/admin/events/registrations?export=true"
-            className="flex items-center gap-3 px-6 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-300 hover:scale-105 shadow-md group"
+            className="flex items-center gap-3 px-6 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-300 hover:scale-105 shadow-md"
           >
-            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-500 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-500 flex items-center justify-center">
               <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>

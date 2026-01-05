@@ -1,7 +1,7 @@
 "use client";
 import React, { useRef, useState, useEffect } from "react";
 import { EventMediaDTO, EventDetailsDTO } from "@/types";
-import { FaEdit, FaTrashAlt, FaUpload, FaFolderOpen, FaSpinner, FaBan, FaTimes, FaCheckCircle, FaPhotoVideo } from 'react-icons/fa';
+import { FaEdit, FaTrashAlt, FaUpload, FaFolderOpen, FaSpinner, FaBan, FaTimes, FaCheckCircle } from 'react-icons/fa';
 import { deleteMediaServer, editMediaServer } from './ApiServerActions';
 import { createPortal } from "react-dom";
 import Link from 'next/link';
@@ -737,27 +737,19 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
       <div className="flex justify-end mb-4 gap-2">
         <button
           type="button"
-          className="flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+          className="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded shadow-sm border border-green-700 transition-colors flex items-center gap-2"
           onClick={() => uploadFormDivRef.current?.scrollIntoView({ behavior: 'smooth' })}
-          title="Upload Files"
-          aria-label="Upload Files"
         >
-          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
-            <FaUpload className="w-6 h-6 text-green-600" />
-          </div>
-          <span className="font-semibold text-green-700">Upload Files</span>
+          <FaUpload className="w-5 h-5 mr-1" />
+          Upload Files
         </button>
         <button
           type="button"
-          className="flex-shrink-0 h-20 rounded-xl bg-yellow-100 hover:bg-yellow-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 py-3"
+          className="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold px-4 py-2 rounded shadow-sm border border-yellow-700 transition-colors flex items-center gap-2"
           onClick={() => uploadedMediaSectionRef.current?.scrollIntoView({ behavior: 'smooth' })}
-          title="Go to Uploaded Media Files Full Files List"
-          aria-label="Go to Uploaded Media Files Full Files List"
         >
-          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-yellow-200 flex items-center justify-center">
-            <FaPhotoVideo className="w-6 h-6 text-yellow-600" />
-          </div>
-          <span className="font-semibold text-yellow-700 text-left">
+          <FaPhotoVideo className="w-5 h-5 mr-1" />
+          <span className="text-left">
             Go to / View<br />Uploaded Media Files<br />Full Files List
           </span>
         </button>
@@ -1186,15 +1178,11 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
           </div>
           <button
             type="submit"
-            className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-blue-100 disabled:cursor-not-allowed disabled:hover:scale-100"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded shadow-sm border border-blue-700 transition-colors flex items-center gap-2 disabled:bg-blue-300 disabled:cursor-not-allowed"
             disabled={uploading}
-            title={uploading ? 'Uploading...' : 'Upload Images'}
-            aria-label={uploading ? 'Uploading...' : 'Upload Images'}
           >
-            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
-              <FaUpload className="w-6 h-6 text-blue-600" />
-            </div>
-            <span className="font-semibold text-blue-700">{uploading ? 'Uploading...' : 'Upload Images'}</span>
+            <FaUpload className="w-5 h-5" />
+            {uploading ? 'Uploading...' : 'Upload Images'}
           </button>
           {message && (
             <div className={`mt-4 text-2xl font-extrabold italic drop-shadow-sm tracking-wide ${message.includes('successful') ? 'text-green-600' : 'text-blue-700'}`}
@@ -1329,14 +1317,10 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
             <Link href={`/admin/events/${eventId}/media/list`}>
               <button
                 type="button"
-                className="flex-shrink-0 h-20 rounded-xl bg-yellow-100 hover:bg-yellow-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 py-3"
-                title="Go to Uploaded Media Files Full Files List"
-                aria-label="Go to Uploaded Media Files Full Files List"
+                className="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold px-4 py-2 rounded shadow-sm border border-yellow-700 transition-colors flex items-center gap-2"
               >
-                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-yellow-200 flex items-center justify-center">
-                  <FaPhotoVideo className="w-6 h-6 text-yellow-600" />
-                </div>
-                <span className="font-semibold text-yellow-700 text-left">
+                <FaPhotoVideo className="w-5 h-5 mr-1" />
+                <span className="text-left">
                   Go to / View<br />Uploaded Media Files<br />Full Files List
                 </span>
               </button>

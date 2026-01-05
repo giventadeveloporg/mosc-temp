@@ -246,10 +246,6 @@
                         </h4>
                         <p>Test completed successfully</p>
                         
-                        <div class="warning-details">
-                            <strong>⚠️ Warnings:</strong> Network idle timeout - page may still be loading; React warnings (non-critical): Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render MobileDebugConsole LiveEventsSection LiveEventsSection, Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render MobileDebugConsole FeaturedEventsSection FeaturedEventsSection, Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render MobileDebugConsole DynamicHeroImage DynamicHeroImage
-                        </div>
-                        
                         
                         
                         
@@ -263,7 +259,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/</div>
-                        <div class="duration">29006ms</div>
+                        <div class="duration">6482ms</div>
                         
                     </div>
                 </div>
@@ -291,7 +287,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/events</div>
-                        <div class="duration">23599ms</div>
+                        <div class="duration">6082ms</div>
                         
                     </div>
                 </div>
@@ -307,12 +303,12 @@
                         <p>Test completed successfully</p>
                         
                         <div class="warning-details">
-                            <strong>⚠️ Warnings:</strong> Network idle timeout - page may still be loading; Some expected elements not found: h1, [class*="event"], [class*="date"], [class*="time"], [class*="location"]
+                            <strong>⚠️ Warnings:</strong> Some expected elements not found: [class*="date"], [class*="time"], [class*="location"]
                         </div>
                         
                         
                         <div class="error-details">
-                            <strong class="missing-elements">Missing Elements:</strong> <code>h1</code>, <code>[class*="event"]</code>, <code>[class*="date"], [class*="time"], [class*="location"]</code>
+                            <strong class="missing-elements">Missing Elements:</strong> <code>[class*="date"], [class*="time"], [class*="location"]</code>
                         </div>
                         
                         
@@ -327,7 +323,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/events/1</div>
-                        <div class="duration">19349ms</div>
+                        <div class="duration">10583ms</div>
                         
                     </div>
                 </div>
@@ -355,7 +351,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/sponsors</div>
-                        <div class="duration">4836ms</div>
+                        <div class="duration">3765ms</div>
                         
                     </div>
                 </div>
@@ -370,14 +366,6 @@
                         </h4>
                         <p>Test completed successfully</p>
                         
-                        <div class="warning-details">
-                            <strong>⚠️ Warnings:</strong> Some expected elements not found: h1, [class*="sponsor"], [class*="contact"], [class*="address"]
-                        </div>
-                        
-                        
-                        <div class="error-details">
-                            <strong class="missing-elements">Missing Elements:</strong> <code>h1</code>, <code>[class*="sponsor"]</code>, <code>[class*="contact"], [class*="address"]</code>
-                        </div>
                         
                         
                         
@@ -391,22 +379,29 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/sponsors/1</div>
-                        <div class="duration">7487ms</div>
+                        <div class="duration">3171ms</div>
                         
                     </div>
                 </div>
             
-                <div class="test-item passed">
-                    <div class="test-status">✅</div>
+                <div class="test-item failed">
+                    <div class="test-status">❌</div>
                     <div class="test-info">
                         <h4>
                             <span class="test-id">public-006</span>
                             Gallery Page Test
                             <span class="test-priority priority-high">high</span>
                         </h4>
-                        <p>Test completed successfully</p>
+                        <p>Error: JavaScript console errors: %s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderBottom</p>
                         
                         
+                        
+                        <div class="error-details">
+                            <strong>Errors:</strong>
+                            <ul>
+                                <li>JavaScript console errors: %s a style property during rerender (%s) when a conflicting property is set (%s) can lead to styling bugs. To avoid this, don't mix shorthand and non-shorthand properties for the same value; instead, replace the shorthand with separate values. Updating border borderBottom</li>
+                            </ul>
+                        </div>
                         
                         
                         <div class="error-details">
@@ -419,8 +414,8 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/gallery</div>
-                        <div class="duration">9139ms</div>
-                        
+                        <div class="duration">11104ms</div>
+                        <a href="screenshots/public-006-1767624714037.png" target="_blank" class="screenshot-link">📷 Screenshot</a>
                     </div>
                 </div>
             
@@ -455,7 +450,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/polls</div>
-                        <div class="duration">12504ms</div>
+                        <div class="duration">7967ms</div>
                         
                     </div>
                 </div>
@@ -491,29 +486,22 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/calendar</div>
-                        <div class="duration">11179ms</div>
+                        <div class="duration">4080ms</div>
                         
                     </div>
                 </div>
             
-                <div class="test-item failed">
-                    <div class="test-status">❌</div>
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
                     <div class="test-info">
                         <h4>
                             <span class="test-id">public-009</span>
                             MOSC Homepage Test
                             <span class="test-priority priority-medium">medium</span>
                         </h4>
-                        <p>Error: Page errors: Invalid or unexpected token</p>
+                        <p>Test completed successfully</p>
                         
                         
-                        
-                        <div class="error-details">
-                            <strong>Errors:</strong>
-                            <ul>
-                                <li>Page errors: Invalid or unexpected token</li>
-                            </ul>
-                        </div>
                         
                         
                         <div class="error-details">
@@ -526,8 +514,8 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc</div>
-                        <div class="duration">26444ms</div>
-                        <a href="screenshots/public-009-1766892258863.png" target="_blank" class="screenshot-link">📷 Screenshot</a>
+                        <div class="duration">18632ms</div>
+                        
                     </div>
                 </div>
             
@@ -562,7 +550,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/holy-synod</div>
-                        <div class="duration">14334ms</div>
+                        <div class="duration">11118ms</div>
                         
                     </div>
                 </div>
@@ -598,7 +586,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/gallery</div>
-                        <div class="duration">9303ms</div>
+                        <div class="duration">6635ms</div>
                         
                     </div>
                 </div>
@@ -634,7 +622,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/directory</div>
-                        <div class="duration">8094ms</div>
+                        <div class="duration">4789ms</div>
                         
                     </div>
                 </div>
@@ -670,7 +658,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/charity-theme</div>
-                        <div class="duration">29981ms</div>
+                        <div class="duration">18634ms</div>
                         
                     </div>
                 </div>
@@ -706,7 +694,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/pricing</div>
-                        <div class="duration">11572ms</div>
+                        <div class="duration">7821ms</div>
                         
                     </div>
                 </div>
@@ -715,7 +703,7 @@
 
         <div class="footer">
             <p>Generated by Public Pages Test Suite</p>
-            <p class="timestamp">Report generated on: 12/27/2025, 10:25:36 PM</p>
+            <p class="timestamp">Report generated on: 1/5/2026, 2:53:18 PM</p>
             <p class="timestamp">Base URL: http://localhost:3000</p>
             <p class="timestamp">Test Engine: Playwright (Local Browser Execution)</p>
         </div>

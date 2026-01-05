@@ -102,19 +102,16 @@ function EditUserModal({ user, open, onClose, onSave }: {
   if (!open || !user) return null;
   return ReactDOM.createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg relative h-[calc(100vh-2rem)] max-h-[calc(100vh-2rem)] flex flex-col overflow-hidden">
-        <div className="flex-shrink-0 mb-4">
-          <button className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-lg font-bold" onClick={onClose}>&times;</button>
-          <h2 className="text-xl font-bold">Edit User</h2>
-        </div>
-        <div className="flex-1 overflow-y-auto min-h-0">
-          <form
-            onSubmit={e => {
-              e.preventDefault();
-              onSave(form);
-            }}
-            className="space-y-4"
-          >
+      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg relative">
+        <button className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-lg font-bold" onClick={onClose}>&times;</button>
+        <h2 className="text-xl font-bold mb-4">Edit User</h2>
+        <form
+          onSubmit={e => {
+            e.preventDefault();
+            onSave(form);
+          }}
+          className="space-y-4"
+        >
           {/* Editable fields */}
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -225,36 +222,20 @@ function EditUserModal({ user, open, onClose, onSave }: {
             </div>
           </div>
           <div className="flex justify-end gap-2 mt-4">
-            <button
-              type="button"
-              className="flex-shrink-0 h-14 rounded-xl bg-teal-100 hover:bg-teal-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
-              onClick={onClose}
-              title="Cancel"
-              aria-label="Cancel"
-            >
-              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
-                <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </div>
-              <span className="font-semibold text-teal-700">Cancel</span>
+            <button type="button" className="bg-teal-100 hover:bg-teal-200 text-teal-800 font-bold px-4 py-2 rounded-md flex items-center gap-2 transition-colors" onClick={onClose}>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              Cancel
             </button>
-            <button
-              type="submit"
-              className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
-              title="Save"
-              aria-label="Save"
-            >
-              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <span className="font-semibold text-blue-700">Save</span>
+            <button type="submit" className="px-4 py-2 rounded bg-blue-600 text-white font-bold hover:bg-blue-700 flex items-center gap-2 transition-colors">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              Save
             </button>
           </div>
         </form>
-        </div>
       </div>
     </div>,
     document.body
@@ -562,52 +543,47 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
   const totalPages = Math.ceil(totalUsers / pageSize) || 1;
 
   return (
-    <div className="w-full overflow-x-hidden box-border" style={{ paddingTop: '120px' }}>
-      {/* Navigation Section - Full Width, Separate Responsive Container */}
-      <div className="w-full px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 mb-6 sm:mb-8">
-        <AdminNavigation />
-      </div>
-      {/* Main Content Section - Constrained Width */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-8">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-6">
-        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 dark:text-white text-center sm:text-left">Manage Users</h1>
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2">
-          <button 
-            onClick={() => fileInputRef.current?.click()} 
-            disabled={bulkLoading} 
-            className="flex-shrink-0 h-12 sm:h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-2 sm:gap-3 transition-all duration-300 hover:scale-105 px-3 sm:px-6 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ paddingTop: '180px' }}>
+      <AdminNavigation />
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Manage Users</h1>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={bulkLoading}
+            className="flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             title="Bulk Upload User List"
             aria-label="Bulk Upload User List"
             type="button"
           >
-            <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-green-200 flex items-center justify-center">
-              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
               </svg>
             </div>
-            <span className="font-semibold text-green-700 text-xs sm:text-sm lg:text-base whitespace-nowrap">{bulkLoading ? 'Uploading...' : 'Bulk Upload User List'}</span>
+            <span className="font-semibold text-green-700">{bulkLoading ? 'Uploading...' : 'Bulk Upload User List'}</span>
           </button>
           <input type="file" ref={fileInputRef} onChange={handleBulkUpload} className="hidden" accept=".xlsx" />
-          <a 
-            href="https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/media/users_profile_list_bulk_upload_template/users_profile_list_bulk_upload_template.xlsx" 
-            download="users_profile_list_bulk_upload_template.xlsx" 
-            className="flex-shrink-0 h-12 sm:h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-2 sm:gap-3 transition-all duration-300 hover:scale-105 px-3 sm:px-6"
+          <a
+            href="https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/media/users_profile_list_bulk_upload_template/users_profile_list_bulk_upload_template.xlsx"
+            download="users_profile_list_bulk_upload_template.xlsx"
+            className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
             title="Download Bulk Upload Template File"
             aria-label="Download Bulk Upload Template File"
           >
-            <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-blue-200 flex items-center justify-center">
-              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
             </div>
-            <span className="font-semibold text-blue-700 text-xs sm:text-sm lg:text-base whitespace-nowrap">Download Bulk Upload Template File</span>
+            <span className="font-semibold text-blue-700">Download Bulk Upload Template File</span>
           </a>
         </div>
       </div>
 
       {/* Filter and Action Controls */}
-      <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
+      <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Search Input */}
           <div className="flex items-center gap-2">
             <select
@@ -661,66 +637,66 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
 
       {/* Users Table */}
       <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
-        <div className="user-table-scroll-container">
-          <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-600 border border-gray-300 dark:border-gray-600" style={{ minWidth: '800px', width: '100%' }}>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-600 border border-gray-300 dark:border-gray-600">
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th scope="col" className="px-2 sm:px-4 lg:px-8 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">Name</th>
-                <th scope="col" className="px-2 sm:px-4 lg:px-8 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600 hidden sm:table-cell">Contact</th>
-                <th scope="col" className="px-2 sm:px-4 lg:px-8 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">Role</th>
-                <th scope="col" className="px-2 sm:px-4 lg:px-8 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">Status</th>
-                <th scope="col" className="px-2 sm:px-4 lg:px-8 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600 hidden md:table-cell">Joined</th>
-                <th scope="col" className="px-2 sm:px-4 lg:px-8 py-2 sm:py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-300 dark:border-gray-600">Actions</th>
+                <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">Name</th>
+                <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">Contact</th>
+                <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">Role</th>
+                <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">Status</th>
+                <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">Joined</th>
+                <th scope="col" className="px-8 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-300 dark:border-gray-600">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-300 dark:divide-gray-600">
               {loading && Array.from({ length: pageSize }).map((_, i) => (
                 <tr key={`skel-${i}`} className={`${i % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-blue-50 dark:bg-gray-700'} border-b border-gray-300 dark:border-gray-600`}>
-                  <td className="px-2 sm:px-4 lg:px-8 py-2 sm:py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600"><div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 animate-pulse"></div></td>
-                  <td className="px-2 sm:px-4 lg:px-8 py-2 sm:py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600 hidden sm:table-cell"><div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full animate-pulse"></div></td>
-                  <td className="px-2 sm:px-4 lg:px-8 py-2 sm:py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600"><div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-20 animate-pulse"></div></td>
-                  <td className="px-2 sm:px-4 lg:px-8 py-2 sm:py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600"><div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-20 animate-pulse"></div></td>
-                  <td className="px-2 sm:px-4 lg:px-8 py-2 sm:py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600 hidden md:table-cell"><div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse"></div></td>
-                  <td className="px-2 sm:px-4 lg:px-8 py-2 sm:py-4 whitespace-nowrap text-right">
-                    <div className="flex justify-end items-center gap-1 sm:gap-2">
-                      <div className="h-8 w-8 sm:h-10 sm:w-10 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"></div>
-                      <div className="h-8 w-8 sm:h-10 sm:w-10 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"></div>
+                  <td className="px-8 py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600"><div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 animate-pulse"></div></td>
+                  <td className="px-8 py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600"><div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full animate-pulse"></div></td>
+                  <td className="px-8 py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600"><div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-20 animate-pulse"></div></td>
+                  <td className="px-8 py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600"><div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-20 animate-pulse"></div></td>
+                  <td className="px-8 py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600"><div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse"></div></td>
+                  <td className="px-8 py-4 whitespace-nowrap text-right">
+                    <div className="flex justify-end items-center gap-2">
+                      <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"></div>
+                      <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"></div>
                     </div>
                   </td>
                 </tr>
               ))}
               {!loading && users.map((user, index) => (
                 <tr key={user.id} className={`${index % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-blue-50 dark:bg-gray-700'} hover:bg-yellow-100 dark:hover:bg-gray-700/50 transition-colors border-b border-gray-300 dark:border-gray-600`}>
-                  <td className="px-2 sm:px-4 lg:px-8 py-2 sm:py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600" onMouseEnter={(e) => handleMouseEnter(user, e)} onMouseLeave={handleMouseLeave}>
+                  <td className="px-8 py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600" onMouseEnter={(e) => handleMouseEnter(user, e)} onMouseLeave={handleMouseLeave}>
                     <div className="flex items-center">
-                      <div className="flex-shrink-0 h-8 w-8 sm:h-10 sm:w-10">
-                        <img className="h-8 w-8 sm:h-10 sm:w-10 rounded-full object-cover" src={user.profileImageUrl || `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=random`} alt={`${user.firstName} ${user.lastName}`} />
+                      <div className="flex-shrink-0 h-10 w-10">
+                        <img className="h-10 w-10 rounded-full object-cover" src={user.profileImageUrl || `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=random`} alt={`${user.firstName} ${user.lastName}`} />
                       </div>
-                      <div className="ml-2 sm:ml-4">
+                      <div className="ml-4">
                         <div className="text-xs font-medium text-gray-900 dark:text-white">{user.firstName} {user.lastName}</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">{user.email}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">{user.email}</div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-2 sm:px-4 lg:px-8 py-2 sm:py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600 hidden sm:table-cell" onMouseEnter={(e) => handleMouseEnter(user, e)} onMouseLeave={handleMouseLeave}>
+                  <td className="px-8 py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600" onMouseEnter={(e) => handleMouseEnter(user, e)} onMouseLeave={handleMouseLeave}>
                     <div className="text-xs text-gray-900 dark:text-white">{user.phone}</div>
                     <div className="text-xs text-gray-500 dark:text-gray-400">{user.city}, {user.state}</div>
                   </td>
-                  <td className="px-2 sm:px-4 lg:px-8 py-2 sm:py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600">{renderRoleBadge(user.userRole)}</td>
-                  <td className="px-2 sm:px-4 lg:px-8 py-2 sm:py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600">{renderStatusBadge(user.userStatus)}</td>
-                  <td className="px-2 sm:px-4 lg:px-8 py-2 sm:py-4 whitespace-nowrap text-xs text-gray-500 dark:text-gray-400 border-r border-gray-200 dark:border-gray-600 hidden md:table-cell">
+                  <td className="px-8 py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600">{renderRoleBadge(user.userRole)}</td>
+                  <td className="px-8 py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600">{renderStatusBadge(user.userStatus)}</td>
+                  <td className="px-8 py-4 whitespace-nowrap text-xs text-gray-500 dark:text-gray-400 border-r border-gray-200 dark:border-gray-600">
                     {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
                   </td>
-                  <td className="px-2 sm:px-4 lg:px-8 py-2 sm:py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex items-center justify-end gap-1 sm:gap-2">
+                  <td className="px-8 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <div className="flex items-center justify-end gap-2">
                       <button
                         onClick={() => setEditUser(user)}
                         disabled={editLoading && editUser?.id === user.id}
-                        className="flex-shrink-0 w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-50"
+                        className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-50"
                         aria-label="Edit User"
                         title="Edit User"
                       >
-                        <svg className="w-6 h-6 sm:w-10 sm:h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
                       </button>
@@ -728,14 +704,14 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
                       <button
                         onClick={() => handleApprove(user)}
                         disabled={approvingId === user.id || user.userStatus === 'ACTIVE' || user.userStatus === 'APPROVED'}
-                        className="flex-shrink-0 w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="Approve User"
                         title="Approve User"
                       >
                         {approvingId === user.id ? (
-                          <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-b-2 border-green-600"></div>
+                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-600"></div>
                         ) : (
-                          <svg className="w-6 h-6 sm:w-10 sm:h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
                         )}
@@ -743,14 +719,14 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
                       <button
                         onClick={() => handleReject(user)}
                         disabled={rejectingId === user.id || user.userStatus === 'REJECTED'}
-                        className="flex-shrink-0 w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex-shrink-0 w-14 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="Reject User"
                         title="Reject User"
                       >
                         {rejectingId === user.id ? (
-                          <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-b-2 border-red-600"></div>
+                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-red-600"></div>
                         ) : (
-                          <svg className="w-6 h-6 sm:w-10 sm:h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                           </svg>
                         )}
@@ -763,64 +739,46 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
             </tbody>
           </table>
         </div>
-        {/* Pagination Controls - Always visible, matching admin page style */}
-        <div className="mt-8">
-          <div className="flex justify-between items-center gap-2">
-            {/* Previous Button */}
+        {/* Pagination Controls */}
+        <div className="mt-4 px-4 py-3 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex justify-between items-center">
             <button
               onClick={handlePrevPage}
-              disabled={page <= 1 || loading}
-              className="px-3 sm:px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+              disabled={page <= 1}
+              className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed disabled:hover:scale-100"
               title="Previous Page"
               aria-label="Previous Page"
               type="button"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
-              </svg>
-              <span className="hidden sm:inline">Previous</span>
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </div>
+              <span className="font-semibold text-blue-700">Previous</span>
             </button>
-
-            {/* Page Info */}
-            <div className="px-2 sm:px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm flex-shrink-0">
-              <span className="text-xs sm:text-sm font-bold text-blue-700">
-                Page <span className="text-blue-600">{page}</span> of <span className="text-blue-600">{totalPages}</span>
-              </span>
+            <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+              Page {page} of {totalPages}
             </div>
-
-            {/* Next Button */}
             <button
               onClick={handleNextPage}
-              disabled={page >= totalPages || loading}
-              className="px-3 sm:px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+              disabled={page >= totalPages}
+              className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed disabled:hover:scale-100"
               title="Next Page"
               aria-label="Next Page"
               type="button"
             >
-              <span className="hidden sm:inline">Next</span>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          </div>
-
-          {/* Item Count Text */}
-          <div className="text-center mt-3">
-            {totalUsers > 0 ? (
-              <div className="inline-flex items-center px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
-                <span className="text-sm text-gray-700">
-                  Showing <span className="font-bold text-blue-600">{startEntry}</span> to <span className="font-bold text-blue-600">{endEntry}</span> of <span className="font-bold text-blue-600">{totalUsers}</span> results
-                </span>
-              </div>
-            ) : (
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 border-2 border-orange-300 rounded-lg shadow-sm">
-                <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
-                <span className="text-sm font-medium text-orange-700">No users found</span>
-                <span className="text-sm text-orange-600">[No users match your criteria]</span>
               </div>
-            )}
+              <span className="font-semibold text-blue-700">Next</span>
+            </button>
+
+          </div>
+          <div className="text-center text-sm text-gray-600 dark:text-gray-400 mt-2">
+            Showing <span className="font-medium">{startEntry}</span> to <span className="font-medium">{endEntry}</span> of <span className="font-medium">{totalUsers}</span> results
           </div>
         </div>
       </div>
@@ -852,7 +810,6 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
           onSave={handleEditSave}
         />
       )}
-      </div>
     </div>
   );
 }

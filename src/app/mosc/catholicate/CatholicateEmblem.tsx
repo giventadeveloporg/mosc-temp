@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 
 export default function CatholicateEmblem() {
-  const [imgSrc, setImgSrc] = useState('/images/catholicate/emblem.png');
+  const [imgSrc, setImgSrc] = useState('/images/logos/Catholicate-Main-Image-MOSC.jpeg');
 
   return (
     <div className="relative w-64 md:w-80 h-auto flex items-center justify-center">

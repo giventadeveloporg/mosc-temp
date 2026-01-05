@@ -731,16 +731,9 @@ export default function EventMediaListPage() {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Media Files for Event</h1>
         <div className="flex space-x-2">
-          <Link
-            href={`/admin/events/${eventId}/media`}
-            className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
-            title="Upload New Media"
-            aria-label="Upload New Media"
-          >
-            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
-              <FaUpload className="w-6 h-6 text-blue-600" />
-            </div>
-            <span className="font-semibold text-blue-700">Upload New Media</span>
+          <Link href={`/admin/events/${eventId}/media`} className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 flex items-center gap-2">
+            <FaUpload />
+            Upload New Media
           </Link>
         </div>
       </div>
@@ -750,9 +743,9 @@ export default function EventMediaListPage() {
       <div className="mb-8 bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-xl font-bold text-gray-800 mb-4">Search Media</h2>
 
-        <div className="flex flex-col lg:flex-row gap-4 items-end lg:items-end">
+        <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center">
           {/* Search by title */}
-          <div className="flex-grow w-full lg:w-auto">
+          <div className="flex-grow">
             <label htmlFor="search-input" className="block text-sm font-medium text-gray-700 mb-1">
               Search by Title
             </label>
@@ -767,8 +760,8 @@ export default function EventMediaListPage() {
           </div>
 
           {/* Scroll to serial number */}
-          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto items-end sm:items-end">
-            <div className="w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row gap-2">
+            <div>
               <label htmlFor="serial-input" className="block text-sm font-medium text-gray-700 mb-1">
                 Go to Serial #
               </label>
@@ -778,25 +771,21 @@ export default function EventMediaListPage() {
                 placeholder="e.g., 5"
                 value={serialNumberInput}
                 onChange={(e) => setSerialNumberInput(e.target.value)}
-                className="w-full sm:w-24 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 min="1"
               />
             </div>
             <button
               onClick={handleScrollToSerialNumber}
-              className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 w-full sm:w-auto"
-              title="Go to Image"
-              aria-label="Go to Image"
+              className="mt-6 sm:mt-0 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg flex items-center gap-2 transition-colors"
             >
-              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
-                <FaUsers className="w-6 h-6 text-blue-600" />
-              </div>
-              <span className="font-semibold text-blue-700">Go to Image</span>
+              <FaUsers />
+              Go to Image
             </button>
           </div>
 
           {/* Boolean field filters */}
-          <div className="flex flex-wrap items-center gap-4 mt-4 pl-10">
+          <div className="flex flex-wrap items-center gap-4 mt-4">
             <label className="flex items-center gap-2 cursor-pointer">
               <span className="relative flex items-center justify-center">
                 <input
@@ -1017,51 +1006,29 @@ export default function EventMediaListPage() {
       {!loading && totalCount > 0 && (
         <div className="mt-8">
           <div className="flex justify-between items-center">
-            {/* Previous Button */}
             <button
               onClick={handlePrevPage}
               disabled={page === 0}
-              className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
-              title="Previous Page"
-              aria-label="Previous Page"
-              type="button"
+              className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
-              </svg>
-              <span>Previous</span>
+              <FaChevronLeft />
+              Previous
             </button>
-
-            {/* Page Info */}
-            <div className="px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
-              <span className="text-sm font-bold text-blue-700">
-                Page <span className="text-blue-600">{page + 1}</span> of <span className="text-blue-600">{totalPages}</span>
-              </span>
+            <div className="text-sm font-semibold text-gray-700">
+              Page {page + 1} of {totalPages}
             </div>
-
-            {/* Next Button */}
             <button
               onClick={handleNextPage}
               disabled={page >= totalPages - 1}
-              className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
-              title="Next Page"
-              aria-label="Next Page"
-              type="button"
+              className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
             >
-              <span>Next</span>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-              </svg>
+              Next
+              <FaChevronRight />
             </button>
           </div>
-
-          {/* Item Count Text */}
-          <div className="text-center mt-3">
-            <div className="inline-flex items-center px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
-              <span className="text-sm text-gray-700">
-                Showing <span className="font-bold text-blue-600">{startItem}</span> to <span className="font-bold text-blue-600">{endItem}</span> of <span className="font-bold text-blue-600">{totalCount}</span> results
-              </span>
-            </div>
+          <div className="text-center text-sm text-gray-600 mt-2">
+            Showing <span className="font-medium">{startItem}</span> to <span className="font-medium">{endItem}</span> of{' '}
+            <span className="font-medium">{totalCount}</span> results
           </div>
         </div>
       )}
@@ -1076,29 +1043,17 @@ export default function EventMediaListPage() {
             <div className="mt-6 flex justify-center gap-4">
               <button
                 onClick={() => setDeletingMedia(null)}
-                className="flex-shrink-0 h-14 rounded-xl bg-teal-100 hover:bg-teal-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-teal-100 disabled:cursor-not-allowed disabled:hover:scale-100"
+                className="bg-teal-100 hover:bg-teal-200 text-teal-800 px-4 py-2 rounded-md flex items-center gap-2"
                 disabled={isPending}
-                title="Cancel"
-                aria-label="Cancel"
-                type="button"
               >
-                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
-                  <FaBan className="w-6 h-6 text-teal-600" />
-                </div>
-                <span className="font-semibold text-teal-700">Cancel</span>
+                <FaBan /> Cancel
               </button>
               <button
                 onClick={confirmDelete}
-                className="flex-shrink-0 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-red-100 disabled:cursor-not-allowed disabled:hover:scale-100"
+                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md flex items-center gap-2"
                 disabled={isPending}
-                title={isPending ? 'Deleting...' : 'Confirm Delete'}
-                aria-label={isPending ? 'Deleting...' : 'Confirm Delete'}
-                type="button"
               >
-                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-200 flex items-center justify-center">
-                  <FaTrashAlt className="w-6 h-6 text-red-600" />
-                </div>
-                <span className="font-semibold text-red-700">{isPending ? 'Deleting...' : 'Confirm Delete'}</span>
+                <FaTrashAlt /> {isPending ? 'Deleting...' : 'Confirm Delete'}
               </button>
             </div>
           </div>
