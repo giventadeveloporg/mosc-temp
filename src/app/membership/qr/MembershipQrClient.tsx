@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { PlanFeaturesList } from '@/components/membership/PlanFeaturesList';
 import type { MembershipSubscriptionDTO, MembershipPlanDTO } from '@/types';
 
 interface MembershipQrClientProps {
@@ -611,6 +612,15 @@ export function MembershipQrClient({ session_id, payment_intent }: MembershipQrC
         </div>
 
         {/* Subscription Plan Summary */}
+        {/* CRITICAL: Debug logging for production */}
+        {typeof window !== 'undefined' && console.log('[MEMBERSHIP-QR UI] Rendering with subscription and plan:', {
+          hasSubscription: !!subscription,
+          hasPlan: !!plan,
+          planId: plan?.id,
+          planName: plan?.planName,
+          subscriptionId: subscription?.id,
+          subscriptionStatus: subscription?.subscriptionStatus,
+        })}
         {plan && (
           <div className="max-w-2xl mx-auto mb-8">
             <div className="bg-white rounded-lg shadow-md p-8 border border-border">
@@ -655,6 +665,104 @@ export function MembershipQrClient({ session_id, payment_intent }: MembershipQrC
                     </span>
                   </div>
                 )}
+              </div>
+
+              {/* Plan Features */}
+              {plan.featuresJson && (() => {
+                try {
+                  const featuresObj = typeof plan.featuresJson === 'string'
+                    ? JSON.parse(plan.featuresJson)
+                    : plan.featuresJson;
+
+                  const features = Object.entries(featuresObj)
+                    .filter(([key, value]) => {
+                      const valueStr = String(value).trim();
+                      return (
+                        valueStr !== '' &&
+                        valueStr !== '0' &&
+                        valueStr !== '{' &&
+                        valueStr !== '}' &&
+                        valueStr !== '[]' &&
+                        valueStr !== '{}' &&
+                        valueStr !== 'null' &&
+                        valueStr !== 'undefined' &&
+                        !key.startsWith('_') &&
+                        value !== null &&
+                        value !== undefined &&
+                        value !== 0
+                      );
+                    })
+                    .map(([key, value]) => ({
+                      key,
+                      value: String(value),
+                    }));
+
+                  if (features.length > 0) {
+                    return (
+                      <div className="mb-6">
+                        <h3 className="text-lg font-heading font-semibold text-foreground mb-4">
+                          Plan Features
+                        </h3>
+                        <PlanFeaturesList features={features} />
+                      </div>
+                    );
+                  }
+                } catch (e) {
+                  console.error('Error parsing featuresJson:', e);
+                }
+                return null;
+              })()}
+
+              {/* Additional Plan Details */}
+              <div className="space-y-4 pt-6 border-t border-border">
+                {plan.maxEventsPerMonth && plan.maxEventsPerMonth > 0 && (
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                      <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-body text-sm font-semibold text-foreground">Max Events</p>
+                      <p className="font-body text-sm text-muted-foreground">
+                        {plan.maxEventsPerMonth} per month
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {plan.maxAttendeesPerEvent && plan.maxAttendeesPerEvent > 0 && (
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+                      <svg className="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-body text-sm font-semibold text-foreground">Max Attendees</p>
+                      <p className="font-body text-sm text-muted-foreground">
+                        {plan.maxAttendeesPerEvent} per event
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
+                    <svg className="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-body text-sm font-semibold text-foreground">Billing</p>
+                    <p className="font-body text-sm text-muted-foreground">
+                      {plan.billingInterval === 'MONTHLY' && 'Monthly'}
+                      {plan.billingInterval === 'QUARTERLY' && 'Quarterly'}
+                      {plan.billingInterval === 'YEARLY' && 'Yearly'}
+                      {plan.billingInterval === 'ONE_TIME' && 'One-time'} • {plan.currency}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -712,7 +820,7 @@ export function MembershipQrClient({ session_id, payment_intent }: MembershipQrC
 
                 {/* Next Payment */}
                 {subscription.currentPeriodEnd && plan && plan.billingInterval !== 'ONE_TIME' && (
-                  <div className="flex items-start gap-3">
+                  <div className="flex items-start gap-3 pb-4 border-b border-border">
                     <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
                       <svg className="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -730,19 +838,101 @@ export function MembershipQrClient({ session_id, payment_intent }: MembershipQrC
                     </div>
                   </div>
                 )}
+
+                {/* Stripe Subscription ID */}
+                {subscription.stripeSubscriptionId && (
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                      <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l4-4-4-4" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-body text-sm font-semibold text-foreground">Subscription ID</p>
+                      <p className="font-body text-xs text-muted-foreground font-mono break-all">
+                        {subscription.stripeSubscriptionId}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         )}
 
-        {/* Action Button */}
-        <div className="max-w-2xl mx-auto text-center">
-          <button
-            onClick={() => router.push('/membership')}
-            className="px-6 py-3 bg-primary text-white rounded-lg hover:opacity-90 transition-opacity w-full sm:w-auto sm:min-w-[200px] font-semibold"
-          >
-            Manage Membership
-          </button>
+        {/* Action Buttons */}
+        <div className="max-w-2xl mx-auto mt-8">
+          <div className="bg-white rounded-lg shadow-md p-8 border border-border">
+            <h2 className="text-xl font-heading font-semibold text-foreground mb-6 text-center">
+              What's Next?
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Manage Subscription Button (Blue) */}
+              <button
+                onClick={() => router.push('/membership')}
+                className="w-full flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                title="Manage Subscription"
+                aria-label="Manage Subscription"
+                type="button"
+              >
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-blue-700">Manage Subscription</span>
+              </button>
+
+              {/* View All Plans Button (Green) */}
+              <button
+                onClick={() => router.push('/membership')}
+                className="w-full flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                title="View All Plans"
+                aria-label="View All Plans"
+                type="button"
+              >
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-green-700">View All Plans</span>
+              </button>
+
+              {/* My Profile Button (Purple) */}
+              <button
+                onClick={() => router.push('/profile')}
+                className="w-full flex-shrink-0 h-14 rounded-xl bg-purple-100 hover:bg-purple-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                title="My Profile"
+                aria-label="My Profile"
+                type="button"
+              >
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-200 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-purple-700">My Profile</span>
+              </button>
+
+              {/* Go Home Button (Indigo) */}
+              <button
+                onClick={() => router.push('/')}
+                className="w-full flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                title="Go Home"
+                aria-label="Go Home"
+                type="button"
+              >
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-indigo-700">Go Home</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
