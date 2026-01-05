@@ -53,6 +53,13 @@ async function getSessionIdFromPaymentIntent(paymentIntentId: string): Promise<s
  * CRITICAL: Desktop flow - creates subscription immediately if payment succeeded (webhook fallback)
  */
 export async function GET(req: NextRequest) {
+  // CRITICAL: Log immediately when GET endpoint is called (before any processing)
+  console.log('[MEMBERSHIP-PROCESS GET] ============================================');
+  console.log('[MEMBERSHIP-PROCESS GET] ENDPOINT CALLED AT:', new Date().toISOString());
+  console.log('[MEMBERSHIP-PROCESS GET] Request URL:', req.url);
+  console.log('[MEMBERSHIP-PROCESS GET] Request method:', req.method);
+  console.log('[MEMBERSHIP-PROCESS GET] ============================================');
+
   try {
     const { searchParams } = new URL(req.url);
     const session_id = searchParams.get('session_id');
@@ -113,9 +120,11 @@ export async function GET(req: NextRequest) {
 
               if (userProfile?.id) {
                 const tenantId = getTenantId();
+                // CRITICAL: Do NOT add tenantId.equals when calling proxy - proxy handler adds it automatically
+                // According to nextjs_api_routes.mdc: "Do NOT add tenantId.equals in your client/server code when calling the proxy"
                 const params = new URLSearchParams({
                   'userProfileId.equals': String(userProfile.id),
-                  'tenantId.equals': tenantId, // Explicitly include tenantId (proxy handler also adds it, but explicit is fine)
+                  // tenantId.equals removed - proxy handler will add it automatically
                   'subscriptionStatus.in': 'ACTIVE,TRIAL', // Only look for active subscriptions
                   'sort': 'createdAt,desc', // Get most recent first
                   'size': '1', // Only need one result
@@ -367,12 +376,27 @@ export async function GET(req: NextRequest) {
           }
         }
 
-        return NextResponse.json({
+        const responseData = {
           subscription: existingSubscription,
           plan: details?.plan || null,
           amount: details?.amount || null,
           currency: details?.currency || null,
+        };
+
+        console.log('[MEMBERSHIP-PROCESS GET] ============================================');
+        console.log('[MEMBERSHIP-PROCESS GET] FINAL RESPONSE DATA:', JSON.stringify(responseData, null, 2));
+        console.log('[MEMBERSHIP-PROCESS GET] Response summary:', {
+          hasSubscription: !!responseData.subscription,
+          subscriptionId: responseData.subscription?.id,
+          hasPlan: !!responseData.plan,
+          planId: responseData.plan?.id,
+          planName: responseData.plan?.planName,
+          amount: responseData.amount,
+          currency: responseData.currency,
         });
+        console.log('[MEMBERSHIP-PROCESS GET] ============================================');
+
+        return NextResponse.json(responseData);
       }
     }
 
@@ -477,9 +501,11 @@ export async function GET(req: NextRequest) {
 
                   if (userProfile?.id) {
                     const tenantId = getTenantId();
+                    // CRITICAL: Do NOT add tenantId.equals when calling proxy - proxy handler adds it automatically
+                    // According to nextjs_api_routes.mdc: "Do NOT add tenantId.equals in your client/server code when calling the proxy"
                     const params = new URLSearchParams({
                       'userProfileId.equals': String(userProfile.id),
-                      'tenantId.equals': tenantId,
+                      // tenantId.equals removed - proxy handler will add it automatically
                       'subscriptionStatus.in': 'ACTIVE,TRIAL', // Only look for active subscriptions
                       'sort': 'createdAt,desc', // Get most recent first
                       'size': '1', // Only need one result
@@ -875,10 +901,11 @@ export async function POST(req: NextRequest) {
               const userProfile = await fetchUserProfileServer(userId);
 
               if (userProfile?.id) {
-                const tenantId = getTenantId();
+                // CRITICAL: Do NOT add tenantId.equals when calling proxy - proxy handler adds it automatically
+                // According to nextjs_api_routes.mdc: "Do NOT add tenantId.equals in your client/server code when calling the proxy"
                 const params = new URLSearchParams({
                   'userProfileId.equals': String(userProfile.id),
-                  'tenantId.equals': tenantId,
+                  // tenantId.equals removed - proxy handler will add it automatically
                   'subscriptionStatus.in': 'ACTIVE,TRIAL',
                   'sort': 'createdAt,desc',
                   'size': '1',
@@ -1005,10 +1032,11 @@ export async function POST(req: NextRequest) {
             const userProfile = await fetchUserProfileServer(userId);
 
             if (userProfile?.id) {
-              const tenantId = getTenantId();
+              // CRITICAL: Do NOT add tenantId.equals when calling proxy - proxy handler adds it automatically
+              // According to nextjs_api_routes.mdc: "Do NOT add tenantId.equals in your client/server code when calling the proxy"
               const params = new URLSearchParams({
                 'userProfileId.equals': String(userProfile.id),
-                'tenantId.equals': tenantId,
+                // tenantId.equals removed - proxy handler will add it automatically
                 'subscriptionStatus.in': 'ACTIVE,TRIAL',
                 'sort': 'createdAt,desc',
                 'size': '1',
