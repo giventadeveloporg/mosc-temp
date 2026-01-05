@@ -189,14 +189,46 @@ export function MembershipQrClient({ session_id, payment_intent }: MembershipQrC
 
           if (postRes.ok) {
             const postData = await postRes.json();
+            console.log('[MEMBERSHIP-QR] POST response data (FULL):', JSON.stringify(postData, null, 2));
+
             if (postData.subscription) {
               // CRITICAL: Only accept ACTIVE or TRIAL subscriptions
               // If subscription is CANCELLED or EXPIRED, continue polling or show warning
               const subscriptionStatus = postData.subscription.subscriptionStatus;
               if (subscriptionStatus === 'ACTIVE' || subscriptionStatus === 'TRIAL') {
-                console.log('[MEMBERSHIP-QR] ✅✅✅ POST FALLBACK SUCCESS! Active subscription created:', postData.subscription.id, 'Status:', subscriptionStatus);
+                console.log('[MEMBERSHIP-QR] ✅✅✅ POST FALLBACK SUCCESS! Active subscription created:', {
+                  subscriptionId: postData.subscription.id,
+                  status: subscriptionStatus,
+                  hasPlan: !!postData.plan,
+                  planId: postData.plan?.id,
+                  planName: postData.plan?.planName,
+                  amount: postData.amount,
+                  currency: postData.currency,
+                });
+
+                // CRITICAL: Ensure plan is set - if not provided, try to fetch it
+                let planToSet = postData.plan;
+                if (!planToSet && postData.subscription.membershipPlanId) {
+                  console.log('[MEMBERSHIP-QR] ⚠️ Plan not in response - attempting to fetch:', postData.subscription.membershipPlanId);
+                  try {
+                    // Fetch plan from backend
+                    const planRes = await fetch(`/api/proxy/membership-plans/${postData.subscription.membershipPlanId}`, {
+                      cache: 'no-store',
+                    });
+                    if (planRes.ok) {
+                      planToSet = await planRes.json();
+                      console.log('[MEMBERSHIP-QR] ✅ Fetched plan details:', {
+                        planId: planToSet?.id,
+                        planName: planToSet?.planName,
+                      });
+                    }
+                  } catch (planError) {
+                    console.error('[MEMBERSHIP-QR] ⚠️ Failed to fetch plan (non-fatal):', planError);
+                  }
+                }
+
                 setSubscription(postData.subscription);
-                setPlan(postData.plan || null);
+                setPlan(planToSet || null);
                 setLoading(false);
                 return; // Success - exit polling
               } else {
@@ -226,9 +258,35 @@ export function MembershipQrClient({ session_id, payment_intent }: MembershipQrC
               if (errorData.subscription) {
                 const subscriptionStatus = errorData.subscription.subscriptionStatus;
                 if (subscriptionStatus === 'ACTIVE' || subscriptionStatus === 'TRIAL') {
-                  console.log('[MEMBERSHIP-QR] ✅✅✅ POST FALLBACK SUCCESS! Active subscription found in error response:', errorData.subscription.id, 'Status:', subscriptionStatus);
+                  console.log('[MEMBERSHIP-QR] ✅✅✅ POST FALLBACK SUCCESS! Active subscription found in error response:', {
+                    subscriptionId: errorData.subscription.id,
+                    status: subscriptionStatus,
+                    hasPlan: !!errorData.plan,
+                    planId: errorData.plan?.id,
+                  });
+
+                  // CRITICAL: Ensure plan is set - if not provided, try to fetch it
+                  let planToSet = errorData.plan;
+                  if (!planToSet && errorData.subscription.membershipPlanId) {
+                    console.log('[MEMBERSHIP-QR] ⚠️ Plan not in error response - attempting to fetch:', errorData.subscription.membershipPlanId);
+                    try {
+                      const planRes = await fetch(`/api/proxy/membership-plans/${errorData.subscription.membershipPlanId}`, {
+                        cache: 'no-store',
+                      });
+                      if (planRes.ok) {
+                        planToSet = await planRes.json();
+                        console.log('[MEMBERSHIP-QR] ✅ Fetched plan details from error response:', {
+                          planId: planToSet?.id,
+                          planName: planToSet?.planName,
+                        });
+                      }
+                    } catch (planError) {
+                      console.error('[MEMBERSHIP-QR] ⚠️ Failed to fetch plan from error response (non-fatal):', planError);
+                    }
+                  }
+
                   setSubscription(errorData.subscription);
-                  setPlan(errorData.plan || null);
+                  setPlan(planToSet || null);
                   setLoading(false);
                   return; // Success - exit polling
                 } else {
