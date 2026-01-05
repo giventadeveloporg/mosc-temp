@@ -193,6 +193,15 @@ export async function GET(req: NextRequest) {
     // We must reject these and create a new subscription instead
     if (existingSubscription) {
       const subscriptionStatus = existingSubscription.subscriptionStatus;
+      console.log('[MEMBERSHIP-PROCESS GET] 🔍 Checking subscription status after lookup:', {
+        subscriptionId: existingSubscription.id,
+        status: subscriptionStatus,
+        statusType: typeof subscriptionStatus,
+        hasMembershipPlan: !!existingSubscription.membershipPlan,
+        hasUserProfile: !!existingSubscription.userProfile,
+        note: 'Backend may return CANCELLED subscriptions with expanded relations - must filter here',
+      });
+
       if (subscriptionStatus === 'CANCELLED' || subscriptionStatus === 'EXPIRED') {
         console.log('[MEMBERSHIP-PROCESS GET] ⚠️⚠️⚠️ CRITICAL: Found CANCELLED/EXPIRED subscription - REJECTING and will create new one:', {
           subscriptionId: existingSubscription.id,
@@ -212,7 +221,15 @@ export async function GET(req: NextRequest) {
           note: 'Unexpected status - setting to null to create new subscription',
         });
         existingSubscription = null;
+      } else {
+        console.log('[MEMBERSHIP-PROCESS GET] ✅ Subscription passed status check:', {
+          subscriptionId: existingSubscription.id,
+          status: subscriptionStatus,
+          note: 'Subscription is ACTIVE or TRIAL - will proceed to return it',
+        });
       }
+    } else {
+      console.log('[MEMBERSHIP-PROCESS GET] ℹ️ No existing subscription found - will create new one if payment succeeded');
     }
 
     // CRITICAL: Only proceed with existing subscription if it's ACTIVE or TRIAL
@@ -435,28 +452,49 @@ export async function GET(req: NextRequest) {
             console.log('[MEMBERSHIP-PROCESS GET] No valid subscription to return - will proceed to create new one below');
             // Don't return here - let the code below handle creation of new subscription
           } else {
-            const responseData = {
-              subscription: existingSubscription,
-              plan: details?.plan || null,
-              amount: details?.amount || null,
-              currency: details?.currency || null,
-            };
-
-            console.log('[MEMBERSHIP-PROCESS GET] ============================================');
-            console.log('[MEMBERSHIP-PROCESS GET] FINAL RESPONSE DATA:', JSON.stringify(responseData, null, 2));
-            console.log('[MEMBERSHIP-PROCESS GET] Response summary:', {
-              hasSubscription: !!responseData.subscription,
-              subscriptionId: responseData.subscription?.id,
-              subscriptionStatus: responseData.subscription?.subscriptionStatus,
-              hasPlan: !!responseData.plan,
-              planId: responseData.plan?.id,
-              planName: responseData.plan?.planName,
-              amount: responseData.amount,
-              currency: responseData.currency,
+            // CRITICAL: Final check before returning - ensure subscription is ACTIVE or TRIAL
+            // This is a safety net in case the subscription status changed or was not properly filtered
+            const finalStatus = existingSubscription.subscriptionStatus;
+            console.log('[MEMBERSHIP-PROCESS GET] 🔍 Final status check before returning:', {
+              subscriptionId: existingSubscription.id,
+              status: finalStatus,
+              statusType: typeof finalStatus,
+              isValid: finalStatus === 'ACTIVE' || finalStatus === 'TRIAL',
             });
-            console.log('[MEMBERSHIP-PROCESS GET] ============================================');
 
-            return NextResponse.json(responseData);
+            if (finalStatus !== 'ACTIVE' && finalStatus !== 'TRIAL') {
+              console.error('[MEMBERSHIP-PROCESS GET] ⚠️⚠️⚠️ CRITICAL: Attempted to return subscription with invalid status - REJECTING:', {
+                subscriptionId: existingSubscription.id,
+                status: finalStatus,
+                note: 'This should never happen - subscription was filtered earlier. Setting to null and will create new one.',
+              });
+              existingSubscription = null;
+              console.log('[MEMBERSHIP-PROCESS GET] No valid subscription to return - will proceed to create new one below');
+              // Don't return here - let the code below handle creation of new subscription
+            } else {
+              const responseData = {
+                subscription: existingSubscription,
+                plan: details?.plan || null,
+                amount: details?.amount || null,
+                currency: details?.currency || null,
+              };
+
+              console.log('[MEMBERSHIP-PROCESS GET] ============================================');
+              console.log('[MEMBERSHIP-PROCESS GET] FINAL RESPONSE DATA:', JSON.stringify(responseData, null, 2));
+              console.log('[MEMBERSHIP-PROCESS GET] Response summary:', {
+                hasSubscription: !!responseData.subscription,
+                subscriptionId: responseData.subscription?.id,
+                subscriptionStatus: responseData.subscription?.subscriptionStatus,
+                hasPlan: !!responseData.plan,
+                planId: responseData.plan?.id,
+                planName: responseData.plan?.planName,
+                amount: responseData.amount,
+                currency: responseData.currency,
+              });
+              console.log('[MEMBERSHIP-PROCESS GET] ============================================');
+
+              return NextResponse.json(responseData);
+            }
           }
         }
       }
@@ -942,11 +980,27 @@ export async function POST(req: NextRequest) {
           });
           existingSubscription = null;
         } else {
+          // CRITICAL: Ensure plan is included in response for mobile flow
+          let planDetails = details?.plan;
+          if (!planDetails && existingSubscription.membershipPlanId) {
+            // Fallback: Fetch plan directly if not included in details
+            try {
+              const { fetchMembershipPlanById } = await import('@/app/membership/success/ApiServerActions');
+              planDetails = await fetchMembershipPlanById(existingSubscription.membershipPlanId);
+              console.log('[MEMBERSHIP-PROCESS POST] Fetched plan details as fallback for existing subscription:', {
+                planId: planDetails?.id,
+                planName: planDetails?.planName,
+              });
+            } catch (planError) {
+              console.error('[MEMBERSHIP-PROCESS POST] ⚠️ Failed to fetch plan details for existing subscription (non-fatal):', planError);
+            }
+          }
+
           return NextResponse.json({
             subscription: existingSubscription,
-            plan: details?.plan || null,
-            amount: details?.amount || null,
-            currency: details?.currency || 'USD',
+            plan: planDetails || details?.plan || null,
+            amount: details?.amount || planDetails?.price || null,
+            currency: details?.currency || planDetails?.currency || 'USD',
           });
         }
       }
@@ -994,12 +1048,44 @@ export async function POST(req: NextRequest) {
 
         if (result && result.subscription) {
           console.log('[MEMBERSHIP-PROCESS POST] ✅ Successfully created subscription from Payment Intent:', result.subscription.id);
+
+          // CRITICAL: Final safety check - NEVER return CANCELLED/EXPIRED subscriptions
+          if (result.subscription.subscriptionStatus === 'CANCELLED' || result.subscription.subscriptionStatus === 'EXPIRED') {
+            console.error('[MEMBERSHIP-PROCESS POST] ⚠️⚠️⚠️ CRITICAL: Attempted to return CANCELLED/EXPIRED subscription - REJECTING:', {
+              subscriptionId: result.subscription.id,
+              status: result.subscription.subscriptionStatus,
+              note: 'This should never happen - subscription was filtered earlier. Will return error.',
+            });
+            return NextResponse.json({
+              subscription: null,
+              plan: null,
+              message: 'Subscription was cancelled. Please try again.',
+              error: 'Subscription status is CANCELLED or EXPIRED',
+            }, { status: 400 });
+          }
+
+          // CRITICAL: Ensure plan is included in response for mobile flow
+          let planDetails = result.plan;
+          if (!planDetails && result.subscription.membershipPlanId) {
+            // Fallback: Fetch plan directly if not included in result
+            try {
+              const { fetchMembershipPlanById } = await import('@/app/membership/success/ApiServerActions');
+              planDetails = await fetchMembershipPlanById(result.subscription.membershipPlanId);
+              console.log('[MEMBERSHIP-PROCESS POST] Fetched plan details as fallback:', {
+                planId: planDetails?.id,
+                planName: planDetails?.planName,
+              });
+            } catch (planError) {
+              console.error('[MEMBERSHIP-PROCESS POST] ⚠️ Failed to fetch plan details (non-fatal):', planError);
+            }
+          }
+
           return NextResponse.json({
             subscription: result.subscription,
-            plan: result.plan,
-            userProfile: result.userProfile,
-            amount: result.plan?.price || null,
-            currency: result.plan?.currency || 'USD',
+            plan: planDetails || null,
+            userProfile: result.userProfile || null,
+            amount: planDetails?.price || result.subscription.amount || null,
+            currency: planDetails?.currency || result.subscription.currency || 'USD',
           });
         } else {
           console.error('[MEMBERSHIP-PROCESS POST] ❌ Failed to create subscription from Payment Intent:', {
