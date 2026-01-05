@@ -173,22 +173,37 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
         console.log('[DESKTOP FLOW] Desktop flow uses GET-only (no POST fallback)');
         console.log('[DESKTOP FLOW] Already processed:', hasBeenProcessed());
 
+        console.log('[DESKTOP FLOW] About to fetch:', getUrl);
         const getRes = await fetch(getUrl, {
           cache: 'no-store',
         });
 
         console.log('[DESKTOP FLOW] GET response status:', getRes.status);
+        console.log('[DESKTOP FLOW] GET response headers:', {
+          contentType: getRes.headers.get('content-type'),
+          statusText: getRes.statusText,
+        });
 
         if (getRes.ok) {
           const data = await getRes.json();
-          console.log('[DESKTOP FLOW] GET response data:', {
+          console.log('[DESKTOP FLOW] ============================================');
+          console.log('[DESKTOP FLOW] GET response data (FULL):', JSON.stringify(data, null, 2));
+          console.log('[DESKTOP FLOW] GET response data (SUMMARY):', {
             hasSubscription: !!data.subscription,
             subscriptionId: data.subscription?.id,
+            subscriptionStatus: data.subscription?.subscriptionStatus,
+            hasPlan: !!data.plan,
+            planId: data.plan?.id,
+            planName: data.plan?.planName,
+            planPrice: data.plan?.price,
+            amount: data.amount,
+            currency: data.currency,
             error: data.error,
             message: data.message,
             responseKeys: Object.keys(data),
             timestamp: new Date().toISOString()
           });
+          console.log('[DESKTOP FLOW] ============================================');
 
           if (data.subscription) {
             // CRITICAL: Only accept ACTIVE or TRIAL subscriptions
@@ -646,6 +661,18 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
         </div>
 
         {/* Subscription Plan Summary */}
+        {/* CRITICAL: Debug logging for production */}
+        {typeof window !== 'undefined' && console.log('[MEMBERSHIP-SUCCESS UI] Rendering with subscriptionDetails:', {
+          hasSubscriptionDetails: !!subscriptionDetails,
+          hasPlan: !!subscriptionDetails?.plan,
+          planId: subscriptionDetails?.plan?.id,
+          planName: subscriptionDetails?.plan?.planName,
+          hasSubscription: !!subscriptionDetails?.subscription,
+          subscriptionId: subscriptionDetails?.subscription?.id,
+          amount: subscriptionDetails?.amount,
+          currency: subscriptionDetails?.currency,
+          isMobileDevice,
+        })}
         {subscriptionDetails?.plan && !isMobileDevice && (
           <div className="max-w-2xl mx-auto">
             <div className="bg-white rounded-lg shadow-md p-8 border border-border">
