@@ -761,6 +761,74 @@ export async function POST(req: NextRequest) {
             paymentIntentId: pi,
             result: result === null ? 'null' : 'no subscription',
           });
+
+          // CRITICAL: Try final lookup by userProfileId if creation failed
+          // This handles the case where subscription exists but wasn't found in processMembershipSubscriptionFromPaymentIntent
+          try {
+            const userId = paymentIntent.metadata?.userId;
+            if (userId) {
+              const { fetchUserProfileServer } = await import('@/app/profile/ApiServerActions');
+              const userProfile = await fetchUserProfileServer(userId);
+
+              if (userProfile?.id) {
+                const tenantId = getTenantId();
+                const params = new URLSearchParams({
+                  'userProfileId.equals': String(userProfile.id),
+                  'tenantId.equals': tenantId,
+                  'subscriptionStatus.in': 'ACTIVE,TRIAL',
+                  'sort': 'createdAt,desc',
+                  'size': '1',
+                });
+
+                console.log('[MEMBERSHIP-PROCESS POST] Trying final lookup by userProfileId:', userProfile.id);
+                const lookupRes = await fetchWithJwtRetry(
+                  `${getAppUrl()}/api/proxy/membership-subscriptions?${params.toString()}`,
+                  { cache: 'no-store' }
+                );
+
+                if (lookupRes.ok) {
+                  const items: MembershipSubscriptionDTO[] = await lookupRes.json();
+                  // CRITICAL: Filter out CANCELLED/EXPIRED subscriptions - backend filter may not work correctly
+                  const activeSubscriptions = items.filter(sub =>
+                    sub.subscriptionStatus === 'ACTIVE' || sub.subscriptionStatus === 'TRIAL'
+                  );
+                  if (activeSubscriptions.length > 0) {
+                    const finalLookup = activeSubscriptions[0];
+                    console.log('[MEMBERSHIP-PROCESS POST] ✅ Found existing ACTIVE subscription for user:', {
+                      id: finalLookup.id,
+                      status: finalLookup.subscriptionStatus,
+                      planId: finalLookup.membershipPlanId,
+                    });
+
+                    const details = await fetchMembershipSubscriptionDetailsServer(
+                      undefined,
+                      pi
+                    );
+
+                    return NextResponse.json({
+                      subscription: finalLookup,
+                      plan: details?.plan || null,
+                      amount: details?.amount || null,
+                      currency: details?.currency || 'USD',
+                    });
+                  }
+                }
+              }
+            }
+          } catch (lookupErr) {
+            console.error('[MEMBERSHIP-PROCESS POST] Error in final lookup:', lookupErr);
+          }
+
+          // CRITICAL: If the error is about active subscription existing, return 400 so client can detect it
+          if (result === null || (result as any)?.error?.includes('activesubscriptionexists')) {
+            return NextResponse.json({
+              subscription: null,
+              plan: null,
+              message: 'error.activesubscriptionexists',
+              error: 'An active subscription already exists for this user. Please check your membership page.',
+            }, { status: 400 });
+          }
+
           return NextResponse.json({
             subscription: null,
             plan: null,
@@ -778,6 +846,17 @@ export async function POST(req: NextRequest) {
           stack: createErr?.stack,
           paymentIntentId: pi,
         });
+
+        // CRITICAL: If the error is about active subscription existing, return 400 so client can detect it
+        if (createErr?.message?.includes('activesubscriptionexists') || createErr?.message?.includes('active subscription')) {
+          return NextResponse.json({
+            subscription: null,
+            plan: null,
+            message: 'error.activesubscriptionexists',
+            error: 'An active subscription already exists for this user. Please check your membership page.',
+          }, { status: 400 });
+        }
+
         return NextResponse.json({
           subscription: null,
           plan: null,
@@ -799,19 +878,133 @@ export async function POST(req: NextRequest) {
     }
 
     console.log('[MEMBERSHIP-PROCESS POST] No subscription found, creating from session:', resolvedSessionId);
-    const result = await processMembershipSubscriptionSessionServer(resolvedSessionId);
+    try {
+      const result = await processMembershipSubscriptionSessionServer(resolvedSessionId);
 
-    if (!result || !result.subscription) {
-      console.error('[MEMBERSHIP-PROCESS POST] ❌ Failed to create subscription from session:', {
-        sessionId: resolvedSessionId,
-        result: result === null ? 'null' : 'no subscription',
+      if (!result || !result.subscription) {
+        console.error('[MEMBERSHIP-PROCESS POST] ❌ Failed to create subscription from session:', {
+          sessionId: resolvedSessionId,
+          result: result === null ? 'null' : 'no subscription',
+        });
+
+        // CRITICAL: Try final lookup by userProfileId if creation failed
+        // This handles the case where subscription exists but wasn't found in processMembershipSubscriptionSessionServer
+        try {
+          const { stripe } = await import('@/lib/stripe');
+          const session = await stripe().checkout.sessions.retrieve(resolvedSessionId, {
+            expand: ['subscription'],
+          });
+
+          const userId = session.metadata?.userId;
+          if (userId) {
+            const { fetchUserProfileServer } = await import('@/app/profile/ApiServerActions');
+            const userProfile = await fetchUserProfileServer(userId);
+
+            if (userProfile?.id) {
+              const tenantId = getTenantId();
+              const params = new URLSearchParams({
+                'userProfileId.equals': String(userProfile.id),
+                'tenantId.equals': tenantId,
+                'subscriptionStatus.in': 'ACTIVE,TRIAL',
+                'sort': 'createdAt,desc',
+                'size': '1',
+              });
+
+              console.log('[MEMBERSHIP-PROCESS POST] Trying final lookup by userProfileId:', userProfile.id);
+              const lookupRes = await fetchWithJwtRetry(
+                `${getAppUrl()}/api/proxy/membership-subscriptions?${params.toString()}`,
+                { cache: 'no-store' }
+              );
+
+              if (lookupRes.ok) {
+                const items: MembershipSubscriptionDTO[] = await lookupRes.json();
+                // CRITICAL: Filter out CANCELLED/EXPIRED subscriptions - backend filter may not work correctly
+                const activeSubscriptions = items.filter(sub =>
+                  sub.subscriptionStatus === 'ACTIVE' || sub.subscriptionStatus === 'TRIAL'
+                );
+                if (activeSubscriptions.length > 0) {
+                  const finalLookup = activeSubscriptions[0];
+                  console.log('[MEMBERSHIP-PROCESS POST] ✅ Found existing ACTIVE subscription for user:', {
+                    id: finalLookup.id,
+                    status: finalLookup.subscriptionStatus,
+                    planId: finalLookup.membershipPlanId,
+                  });
+
+                  const details = await fetchMembershipSubscriptionDetailsServer(
+                    resolvedSessionId || undefined,
+                    pi || undefined
+                  );
+
+                  return NextResponse.json({
+                    subscription: finalLookup,
+                    plan: details?.plan || null,
+                    amount: details?.amount || null,
+                    currency: details?.currency || 'USD',
+                  });
+                }
+              }
+            }
+          }
+        } catch (lookupErr) {
+          console.error('[MEMBERSHIP-PROCESS POST] Error in final lookup:', lookupErr);
+        }
+
+        // CRITICAL: If the error is about active subscription existing, return 400 so client can detect it
+        if (result === null || (result as any)?.error?.includes('activesubscriptionexists')) {
+          return NextResponse.json({
+            subscription: null,
+            plan: null,
+            message: 'error.activesubscriptionexists',
+            error: 'An active subscription already exists for this user. Please check your membership page.',
+          }, { status: 400 });
+        }
+
+        return NextResponse.json({
+          subscription: null,
+          plan: null,
+          message: 'Failed to create subscription. Please contact support.',
+          error: result === null ? 'processMembershipSubscriptionSessionServer returned null' : 'Unknown error',
+        });
+      }
+
+      // Fetch amount and currency from session details
+      const details = await fetchMembershipSubscriptionDetailsServer(
+        resolvedSessionId || undefined,
+        pi || undefined
+      );
+
+      return NextResponse.json({
+        subscription: result.subscription,
+        plan: result.plan,
+        userProfile: result.userProfile,
+        amount: details?.amount || result.plan?.price || null,
+        currency: details?.currency || result.plan?.currency || 'USD',
       });
+    } catch (createErr: any) {
+      console.error('[MEMBERSHIP-PROCESS POST] ❌ Error creating subscription from session:', {
+        error: createErr,
+        message: createErr?.message,
+        stack: createErr?.stack,
+        sessionId: resolvedSessionId,
+      });
+
+      // CRITICAL: If the error is about active subscription existing, return 400 so client can detect it
+      if (createErr?.message?.includes('activesubscriptionexists') || createErr?.message?.includes('active subscription')) {
+        return NextResponse.json({
+          subscription: null,
+          plan: null,
+          message: 'error.activesubscriptionexists',
+          error: 'An active subscription already exists for this user. Please check your membership page.',
+        }, { status: 400 });
+      }
+
       return NextResponse.json({
         subscription: null,
         plan: null,
         message: 'Failed to create subscription. Please contact support.',
-        error: result === null ? 'processMembershipSubscriptionSessionServer returned null' : 'Unknown error',
-      });
+        error: createErr?.message || 'Unknown error during subscription creation',
+        errorType: createErr?.name || 'Error',
+      }, { status: 500 });
     }
 
     // Fetch amount and currency from session details
