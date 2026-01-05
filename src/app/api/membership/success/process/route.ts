@@ -71,7 +71,17 @@ export async function GET(req: NextRequest) {
     const platformMatch = /iPhone|iPad|iPod|Android|BlackBerry|Windows Phone/i.test(userAgent);
     const isMobile = mobileRegexMatch || platformMatch || cloudfrontMobile || cloudfrontAndroid || cloudfrontIOS;
 
+    // CRITICAL: Log environment variables for debugging production issues
+    const appUrl = getAppUrl();
+    console.log('[MEMBERSHIP-PROCESS GET] ============================================');
     console.log('[MEMBERSHIP-PROCESS GET] Received:', { session_id, pi, skip_qr, _poll, isMobile });
+    console.log('[MEMBERSHIP-PROCESS GET] Environment check:', {
+      NODE_ENV: process.env.NODE_ENV,
+      appUrl: appUrl || 'EMPTY',
+      AMPLIFY_NEXT_PUBLIC_APP_URL: process.env.AMPLIFY_NEXT_PUBLIC_APP_URL ? 'SET' : 'NOT SET',
+      NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL ? 'SET' : 'NOT SET',
+    });
+    console.log('[MEMBERSHIP-PROCESS GET] ============================================');
 
     if (!session_id && !pi) {
       return NextResponse.json({ error: 'Missing session_id or pi (payment_intent)' }, { status: 400 });
@@ -294,7 +304,7 @@ export async function GET(req: NextRequest) {
           membershipPlanId: existingSubscription.membershipPlanId,
         });
 
-        const details = await fetchMembershipSubscriptionDetailsServer(
+        let details = await fetchMembershipSubscriptionDetailsServer(
           session_id || undefined,
           pi || undefined
         );
@@ -308,6 +318,54 @@ export async function GET(req: NextRequest) {
           currency: details?.currency,
           sessionId: details?.sessionId,
         });
+
+        // CRITICAL: Fallback - if fetchMembershipSubscriptionDetailsServer returns null but we have a subscription with membershipPlanId,
+        // fetch the plan directly from the backend using the subscription's membershipPlanId
+        if (!details?.plan && existingSubscription.membershipPlanId) {
+          console.log('[MEMBERSHIP-PROCESS GET] ⚠️ Plan details fetch returned null, attempting fallback fetch using subscription.membershipPlanId:', existingSubscription.membershipPlanId);
+
+          try {
+            const planId = typeof existingSubscription.membershipPlanId === 'number'
+              ? existingSubscription.membershipPlanId
+              : parseInt(String(existingSubscription.membershipPlanId), 10);
+
+            if (!isNaN(planId) && planId > 0) {
+              const planUrl = `${getAppUrl()}/api/proxy/membership-plans/${planId}`;
+              console.log('[MEMBERSHIP-PROCESS GET] Fallback: Fetching plan directly from:', planUrl);
+
+              const planRes = await fetchWithJwtRetry(planUrl, { cache: 'no-store' });
+
+              if (planRes.ok) {
+                const plan = await planRes.json();
+                console.log('[MEMBERSHIP-PROCESS GET] ✅ Fallback: Successfully fetched plan:', {
+                  planId: plan.id,
+                  planName: plan.name,
+                  planPrice: plan.price,
+                });
+
+                // Use the fetched plan and subscription data to build details
+                details = {
+                  plan,
+                  sessionId: session_id || null,
+                  amount: existingSubscription.amountPaid || plan.price || null,
+                  currency: plan.currency || 'USD',
+                };
+              } else {
+                const errorText = await planRes.text().catch(() => 'Unable to read error response');
+                console.error('[MEMBERSHIP-PROCESS GET] ❌ Fallback: Failed to fetch plan:', {
+                  status: planRes.status,
+                  error: errorText,
+                  planId,
+                  url: planUrl,
+                });
+              }
+            } else {
+              console.error('[MEMBERSHIP-PROCESS GET] ❌ Fallback: Invalid membershipPlanId:', existingSubscription.membershipPlanId);
+            }
+          } catch (fallbackError) {
+            console.error('[MEMBERSHIP-PROCESS GET] ❌ Fallback: Error fetching plan:', fallbackError);
+          }
+        }
 
         return NextResponse.json({
           subscription: existingSubscription,

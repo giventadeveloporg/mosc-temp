@@ -206,6 +206,27 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
               }
 
               if (!cancelledRef.current) {
+                // CRITICAL: Log plan details before setting state
+                console.log('[DESKTOP FLOW] Setting subscription details:', {
+                  hasPlan: !!data.plan,
+                  planId: data.plan?.id,
+                  planName: data.plan?.planName,
+                  planPrice: data.plan?.price,
+                  amount: data.amount,
+                  currency: data.currency,
+                  hasSubscription: !!data.subscription,
+                  subscriptionId: data.subscription?.id,
+                });
+
+                // CRITICAL: If plan is null but subscription exists, log error and try to fetch plan separately
+                if (!data.plan && data.subscription) {
+                  console.error('[DESKTOP FLOW] ⚠️ CRITICAL: Subscription exists but plan is null!', {
+                    subscriptionId: data.subscription.id,
+                    membershipPlanId: data.subscription.membershipPlanId,
+                    note: 'Plan details fetch may have failed - subscription details will be incomplete',
+                  });
+                }
+
                 setSubscriptionDetails({
                   plan: data.plan,
                   amount: data.amount || data.plan?.price || null,
@@ -285,6 +306,27 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
                       }
 
                       if (!cancelledRef.current) {
+                        // CRITICAL: Log plan details before setting state
+                        console.log('[DESKTOP FLOW] Setting subscription details (from polling):', {
+                          hasPlan: !!pollData.plan,
+                          planId: pollData.plan?.id,
+                          planName: pollData.plan?.planName,
+                          planPrice: pollData.plan?.price,
+                          amount: pollData.amount,
+                          currency: pollData.currency,
+                          hasSubscription: !!pollData.subscription,
+                          subscriptionId: pollData.subscription?.id,
+                        });
+
+                        // CRITICAL: If plan is null but subscription exists, log error
+                        if (!pollData.plan && pollData.subscription) {
+                          console.error('[DESKTOP FLOW] ⚠️ CRITICAL: Subscription exists but plan is null (from polling)!', {
+                            subscriptionId: pollData.subscription.id,
+                            membershipPlanId: pollData.subscription.membershipPlanId,
+                            note: 'Plan details fetch may have failed - subscription details will be incomplete',
+                          });
+                        }
+
                         setSubscriptionDetails({
                           plan: pollData.plan,
                           amount: pollData.amount || pollData.plan?.price || null,

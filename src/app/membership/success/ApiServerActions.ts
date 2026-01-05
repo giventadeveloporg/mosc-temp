@@ -2404,6 +2404,13 @@ export async function fetchMembershipSubscriptionDetailsServer(
   currency: string | null;
 } | null> {
   try {
+    console.log('[MEMBERSHIP-SUCCESS] fetchMembershipSubscriptionDetailsServer called:', {
+      sessionId,
+      paymentIntentId,
+      hasSessionId: !!sessionId,
+      hasPaymentIntentId: !!paymentIntentId,
+    });
+
     let resolvedSessionId: string | null = null;
 
     // Resolve session ID from payment intent if needed
