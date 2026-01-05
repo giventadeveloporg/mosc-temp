@@ -110,6 +110,20 @@ export function MembershipQrClient({ session_id, payment_intent }: MembershipQrC
             }
           }
         } else {
+          // CRITICAL: Handle 400 error with "error.activesubscriptionexists" message
+          // This happens when an active subscription already exists for the user
+          if (response.status === 400) {
+            const errorData = await response.json().catch(() => ({}));
+            if (errorData.message === 'error.activesubscriptionexists') {
+              console.log('[MEMBERSHIP-QR] Active subscription already exists - redirecting to membership page');
+              // Stop polling and redirect after a short delay
+              setTimeout(() => {
+                router.push('/membership');
+              }, 2000);
+              return; // Exit polling
+            }
+          }
+
           const errorText = await response.text();
           console.error(`[MEMBERSHIP-QR] GET request failed (attempt ${attempt}):`, {
             status: response.status,
@@ -148,6 +162,20 @@ export function MembershipQrClient({ session_id, payment_intent }: MembershipQrC
               });
             }
           } else {
+            // CRITICAL: Handle 400 error with "error.activesubscriptionexists" message
+            // This happens when an active subscription already exists for the user
+            if (postRes.status === 400) {
+              const errorData = await postRes.json().catch(() => ({}));
+              if (errorData.message === 'error.activesubscriptionexists') {
+                console.log('[MEMBERSHIP-QR] Active subscription already exists (POST) - redirecting to membership page');
+                // Stop polling and redirect after a short delay
+                setTimeout(() => {
+                  router.push('/membership');
+                }, 2000);
+                return; // Exit polling
+              }
+            }
+
             const errorText = await postRes.text();
             let errorData: any = null;
             try {
