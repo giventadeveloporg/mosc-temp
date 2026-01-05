@@ -85,6 +85,59 @@ export async function GET(req: NextRequest) {
         existingSubscription = await findSubscriptionByPaymentIntentId(session_id);
       } else {
         existingSubscription = await findSubscriptionBySessionId(session_id);
+
+        // CRITICAL: If not found by session_id, try to look up by userProfileId (backend filter for stripeSubscriptionId doesn't work correctly)
+        // This handles the case where Stripe subscription was created but database record creation failed
+        if (!existingSubscription) {
+          try {
+            const { stripe } = await import('@/lib/stripe');
+            const session = await stripe().checkout.sessions.retrieve(session_id, {
+              expand: ['subscription'],
+            });
+
+            // Get userProfileId from session metadata and look up ACTIVE subscription for the user
+            const userId = session.metadata?.userId;
+            if (userId) {
+              const { fetchUserProfileServer } = await import('@/app/profile/ApiServerActions');
+              const userProfile = await fetchUserProfileServer(userId);
+
+              if (userProfile?.id) {
+                const tenantId = getTenantId();
+                const params = new URLSearchParams({
+                  'userProfileId.equals': String(userProfile.id),
+                  'tenantId.equals': tenantId, // Explicitly include tenantId (proxy handler also adds it, but explicit is fine)
+                  'subscriptionStatus.in': 'ACTIVE,TRIAL', // Only look for active subscriptions
+                  'sort': 'createdAt,desc', // Get most recent first
+                  'size': '1', // Only need one result
+                });
+
+                console.log('[MEMBERSHIP-PROCESS GET] Trying early lookup by userProfileId:', userProfile.id);
+                const lookupRes = await fetchWithJwtRetry(
+                  `${getAppUrl()}/api/proxy/membership-subscriptions?${params.toString()}`,
+                  { cache: 'no-store' }
+                );
+
+                if (lookupRes.ok) {
+                  const items: MembershipSubscriptionDTO[] = await lookupRes.json();
+                  // CRITICAL: Filter out CANCELLED/EXPIRED subscriptions - backend filter may not work correctly
+                  const activeSubscriptions = items.filter(sub =>
+                    sub.subscriptionStatus === 'ACTIVE' || sub.subscriptionStatus === 'TRIAL'
+                  );
+                  if (activeSubscriptions.length > 0) {
+                    existingSubscription = activeSubscriptions[0]; // Get the most recent active one
+                    console.log('[MEMBERSHIP-PROCESS GET] ✅ Found subscription by userProfileId (early lookup):', {
+                      id: existingSubscription.id,
+                      status: existingSubscription.subscriptionStatus,
+                      planId: existingSubscription.membershipPlanId,
+                    });
+                  }
+                }
+              }
+            }
+          } catch (earlyLookupError) {
+            console.warn('[MEMBERSHIP-PROCESS GET] Early lookup by userProfileId failed (non-fatal):', earlyLookupError);
+          }
+        }
       }
     } else if (pi) {
       existingSubscription = await findSubscriptionByPaymentIntentId(pi);
@@ -202,87 +255,10 @@ export async function GET(req: NextRequest) {
               // Plan IDs match - this is the correct subscription
               console.log('[MEMBERSHIP-PROCESS GET] ✅ Existing subscription matches plan - will check for other subscriptions and return');
 
-              // Check for OTHER active subscriptions for different plans (excluding this one)
-              if (existingSubscription.userProfileId) {
-                const tenantId = getTenantId();
-                const params = new URLSearchParams({
-                  'userProfileId.equals': String(existingSubscription.userProfileId),
-                  'tenantId.equals': tenantId,
-                  'subscriptionStatus.in': 'ACTIVE,TRIAL', // Check for active or trial subscriptions
-                });
-                const response = await fetchWithJwtRetry(
-                  `${getAppUrl()}/api/proxy/membership-subscriptions?${params.toString()}`,
-                  { cache: 'no-store' }
-                );
-                if (response.ok) {
-                  const items: MembershipSubscriptionDTO[] = await response.json();
-                  // Filter out subscriptions for the same plan AND the current subscription (those are OK)
-                  const otherPlanSubscriptions = items.filter(sub =>
-                    sub.membershipPlanId !== sessionPlanId && sub.id !== existingSubscription.id
-                  );
-
-                  if (otherPlanSubscriptions.length > 0) {
-                    console.log('[MEMBERSHIP-PROCESS GET] ⚠️ User has active subscription(s) for different plan(s) - will cancel:', {
-                      otherSubscriptions: otherPlanSubscriptions.map(sub => ({
-                        id: sub.id,
-                        planId: sub.membershipPlanId,
-                        status: sub.subscriptionStatus,
-                        stripeSubscriptionId: sub.stripeSubscriptionId,
-                      })),
-                      currentSubscriptionId: existingSubscription.id,
-                      currentPlanId: existingSubscription.membershipPlanId,
-                      newPlanId: sessionPlanId,
-                    });
-
-                    // Cancel all other active subscriptions (both database and Stripe)
-                    for (const oldSub of otherPlanSubscriptions) {
-                      try {
-                        // Cancel in database
-                        const cancelPayload = withTenantId({
-                          id: oldSub.id!,
-                          cancelAtPeriodEnd: true,
-                          cancellationReason: `Switched to plan ${sessionPlanId}`,
-                          subscriptionStatus: 'CANCELLED',
-                          cancelledAt: new Date().toISOString(),
-                        });
-
-                        await fetchWithJwtRetry(
-                          `${getAppUrl()}/api/proxy/membership-subscriptions/${oldSub.id}`,
-                          {
-                            method: 'PATCH',
-                            headers: { 'Content-Type': 'application/merge-patch+json' },
-                            body: JSON.stringify(cancelPayload),
-                            cache: 'no-store',
-                          },
-                          '[MEMBERSHIP-PROCESS GET] cancel-other-plan-subscription'
-                        );
-
-                        console.log('[MEMBERSHIP-PROCESS GET] ✅ Cancelled other plan subscription in database:', oldSub.id);
-
-                        // Also cancel the Stripe subscription if it exists
-                        if (oldSub.stripeSubscriptionId) {
-                          try {
-                            const { stripe } = await import('@/lib/stripe');
-                            await stripe().subscriptions.update(oldSub.stripeSubscriptionId, {
-                              cancel_at_period_end: true,
-                              metadata: {
-                                ...(await stripe().subscriptions.retrieve(oldSub.stripeSubscriptionId)).metadata,
-                                cancellation_reason: `Switched to plan ${sessionPlanId}`,
-                                cancelled_at: new Date().toISOString(),
-                              },
-                            });
-                            console.log('[MEMBERSHIP-PROCESS GET] ✅ Cancelled Stripe subscription:', oldSub.stripeSubscriptionId);
-                          } catch (stripeError) {
-                            console.error('[MEMBERSHIP-PROCESS GET] ⚠️ Failed to cancel Stripe subscription (non-fatal):', stripeError);
-                          }
-                        }
-                      } catch (cancelError) {
-                        console.error('[MEMBERSHIP-PROCESS GET] ⚠️ Failed to cancel other plan subscription (non-fatal):', cancelError);
-                      }
-                    }
-                  }
-                }
-              }
+              // PERFORMANCE: Skip checking for other subscriptions if the current one matches the plan
+              // The existing subscription already matches the session plan, so no need to cancel others
+              // This avoids unnecessary queries and iterations
+              console.log('[MEMBERSHIP-PROCESS GET] ✅ Existing subscription matches plan - no need to check for other subscriptions');
             }
             }
           } catch (error) {
@@ -386,16 +362,112 @@ export async function GET(req: NextRequest) {
               currency: details?.currency || result.plan?.currency || 'USD',
             });
           } else {
-            console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] Failed to create subscription from session');
+            console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] Failed to create subscription from session - attempting final lookup');
+
+            // CRITICAL: Try multiple lookup methods to find the subscription
+            // 1. First try by session ID
+            let finalLookup = await findSubscriptionBySessionId(session_id);
+            console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] Lookup by session_id result:', finalLookup ? { id: finalLookup.id, status: finalLookup.subscriptionStatus } : 'not found');
+
+            // 2. If not found, try by userProfileId (backend filter for stripeSubscriptionId doesn't work correctly)
+            // Look up ACTIVE subscription for the user instead
+            if (!finalLookup) {
+              try {
+                // Get userProfileId from session metadata
+                const userId = session.metadata?.userId;
+                if (userId) {
+                  // Get user profile first to get userProfileId
+                  const { fetchUserProfileServer } = await import('@/app/profile/ApiServerActions');
+                  const userProfile = await fetchUserProfileServer(userId);
+
+                  if (userProfile?.id) {
+                    const tenantId = getTenantId();
+                    const params = new URLSearchParams({
+                      'userProfileId.equals': String(userProfile.id),
+                      'tenantId.equals': tenantId,
+                      'subscriptionStatus.in': 'ACTIVE,TRIAL', // Only look for active subscriptions
+                      'sort': 'createdAt,desc', // Get most recent first
+                      'size': '1', // Only need one result
+                    });
+
+                    console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] Trying lookup by userProfileId:', userProfile.id);
+                    const lookupRes = await fetchWithJwtRetry(
+                      `${getAppUrl()}/api/proxy/membership-subscriptions?${params.toString()}`,
+                      { cache: 'no-store' }
+                    );
+
+                    if (lookupRes.ok) {
+                      const items: MembershipSubscriptionDTO[] = await lookupRes.json();
+                      // CRITICAL: Filter out CANCELLED/EXPIRED subscriptions - backend filter may not work correctly
+                      const activeSubscriptions = items.filter(sub =>
+                        sub.subscriptionStatus === 'ACTIVE' || sub.subscriptionStatus === 'TRIAL'
+                      );
+                      if (activeSubscriptions.length > 0) {
+                        finalLookup = activeSubscriptions[0]; // Get the most recent active one
+                        console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] ✅ Found existing ACTIVE subscription for user:', {
+                          id: finalLookup.id,
+                          status: finalLookup.subscriptionStatus,
+                          planId: finalLookup.membershipPlanId,
+                        });
+                      } else {
+                        console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] No active subscription found for user');
+                      }
+                    }
+                  }
+                } else {
+                  console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] No userId in session metadata - cannot lookup by userProfileId');
+                }
+              } catch (userLookupError) {
+                console.error('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] Error looking up subscription by userProfileId:', userLookupError);
+              }
+            }
+
+            if (finalLookup) {
+              console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] ✅ Found existing subscription on final lookup:', {
+                id: finalLookup.id,
+                status: finalLookup.subscriptionStatus,
+                planId: finalLookup.membershipPlanId,
+                stripeSubscriptionId: finalLookup.stripeSubscriptionId,
+              });
+
+              // CRITICAL: Return the subscription even if it's not ACTIVE or TRIAL
+              // The client can handle different statuses appropriately
+              const details = await fetchMembershipSubscriptionDetailsServer(
+                session_id || undefined,
+                pi || undefined
+              );
+
+              return NextResponse.json({
+                subscription: finalLookup,
+                plan: details?.plan || null,
+                amount: details?.amount || null,
+                currency: details?.currency || 'USD',
+              });
+            }
+
+            // If still not found, return 400 error with "error.activesubscriptionexists" so client can detect it and stop polling
+            // This happens when subscription creation fails because an active subscription already exists
             return NextResponse.json({
               subscription: null,
               plan: null,
-              message: 'Failed to create subscription. Please contact support.',
-            });
+              message: 'error.activesubscriptionexists',
+              error: 'An active subscription already exists for this user. Please check your membership page.',
+            }, { status: 400 });
           }
         } catch (createErr: any) {
           console.error('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] Error creating subscription:', createErr);
-          // Return null subscription but don't fail - allow polling to continue
+
+          // CRITICAL: If the error is about active subscription existing, return 400 so client can detect it
+          if (createErr?.message?.includes('activesubscriptionexists') || createErr?.message?.includes('active subscription')) {
+            return NextResponse.json({
+              subscription: null,
+              plan: null,
+              message: 'error.activesubscriptionexists',
+              error: 'An active subscription already exists for this user. Please check your membership page.',
+            }, { status: 400 });
+          }
+
+          // Return null subscription but don't fail - allow polling to continue for other errors
           return NextResponse.json({
             subscription: null,
             plan: null,
@@ -506,16 +578,36 @@ export async function GET(req: NextRequest) {
               });
             }
 
-            // Return more detailed error information for debugging
+            // CRITICAL: Before returning error, try one more lookup by payment intent ID
+            // This handles the case where subscription exists but wasn't found in processMembershipSubscriptionFromPaymentIntent
+            const finalLookup = await findSubscriptionByPaymentIntentId(pi);
+            if (finalLookup && (finalLookup.subscriptionStatus === 'ACTIVE' || finalLookup.subscriptionStatus === 'TRIAL')) {
+              console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] ✅ Found existing subscription on final lookup:', finalLookup.id);
+
+              const details = await fetchMembershipSubscriptionDetailsServer(
+                undefined,
+                pi
+              );
+
+              return NextResponse.json({
+                subscription: finalLookup,
+                plan: details?.plan || null,
+                amount: details?.amount || null,
+                currency: details?.currency || 'USD',
+              });
+            }
+
+            // If still not found, return 400 error with "error.activesubscriptionexists" so client can detect it and stop polling
+            // This happens when subscription creation fails because an active subscription already exists
             return NextResponse.json({
               subscription: null,
               plan: null,
-              message: 'Subscription not found yet. Webhook may still be processing.',
-              error: result === null ? 'processMembershipSubscriptionFromPaymentIntent returned null' : 'Unknown error',
+              message: 'error.activesubscriptionexists',
+              error: 'An active subscription already exists for this user. Please check your membership page.',
               paymentIntentStatus: paymentIntent.status,
               hasMetadata: !!paymentIntent.metadata,
               membershipPlanId: paymentIntent.metadata?.membershipPlanId || 'missing',
-            });
+            }, { status: 400 });
           }
         } catch (createErr: any) {
           console.error('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] ❌ Error creating subscription from Payment Intent:', {
@@ -528,7 +620,18 @@ export async function GET(req: NextRequest) {
             errorType: createErr?.type,
             fullError: JSON.stringify(createErr, Object.getOwnPropertyNames(createErr)),
           });
-          // Return detailed error for debugging (but don't fail - allow polling to continue)
+
+          // CRITICAL: If the error is about active subscription existing, return 400 so client can detect it
+          if (createErr?.message?.includes('activesubscriptionexists') || createErr?.message?.includes('active subscription')) {
+            return NextResponse.json({
+              subscription: null,
+              plan: null,
+              message: 'error.activesubscriptionexists',
+              error: 'An active subscription already exists for this user. Please check your membership page.',
+            }, { status: 400 });
+          }
+
+          // Return detailed error for debugging (but don't fail - allow polling to continue for other errors)
           return NextResponse.json({
             subscription: null,
             plan: null,
