@@ -160,6 +160,8 @@ export async function findSubscriptionByPaymentIntentId(
 
 /**
  * Find subscription by Stripe subscription ID (backend field: stripeSubscriptionId)
+ * CRITICAL: Filters out CANCELLED and EXPIRED subscriptions - they should not be returned
+ * Caller should create a new subscription instead
  */
 async function findSubscriptionByStripeSubscriptionId(
   stripeSubscriptionId: string,
@@ -176,7 +178,19 @@ async function findSubscriptionByStripeSubscriptionId(
     );
     if (!response.ok) return null;
     const items: MembershipSubscriptionDTO[] = await response.json();
-    return items.length > 0 ? items[0] : null;
+
+    // CRITICAL: Filter out cancelled/expired subscriptions - they should not be returned
+    // Caller should create a new subscription instead
+    const activeSubscriptions = items.filter(sub =>
+      sub.subscriptionStatus !== 'CANCELLED' && sub.subscriptionStatus !== 'EXPIRED'
+    );
+
+    if (activeSubscriptions.length > 0) {
+      return activeSubscriptions[0];
+    }
+
+    // No active subscription found
+    return null;
   } catch (error) {
     console.error('[MEMBERSHIP-SUCCESS] Error finding subscription by Stripe subscription ID:', error);
     return null;
@@ -205,42 +219,81 @@ async function fetchUserProfileByUserId(userId: string): Promise<UserProfileDTO 
 export async function processMembershipSubscriptionSessionServer(
   sessionId: string,
 ): Promise<{ subscription: MembershipSubscriptionDTO | null; plan: MembershipPlanDTO | null; userProfile: UserProfileDTO | null } | null> {
+  console.log('[MEMBERSHIP-SUCCESS] 🔵 START: processMembershipSubscriptionSessionServer', {
+    sessionId,
+    timestamp: new Date().toISOString(),
+  });
+
   try {
+    console.log('[MEMBERSHIP-SUCCESS] Step 1: Retrieving Checkout Session from Stripe...', { sessionId });
     const session = await stripe().checkout.sessions.retrieve(sessionId, {
       expand: ['line_items', 'subscription', 'customer'],
     });
 
+    console.log('[MEMBERSHIP-SUCCESS] Step 1: Checkout Session retrieved:', {
+      sessionId: session.id,
+      payment_status: session.payment_status,
+      hasMetadata: !!session.metadata,
+      metadata: session.metadata,
+    });
+
     if (session.payment_status !== 'paid' || !session.metadata) {
-      console.error('[MEMBERSHIP-SUCCESS] Session not paid or missing metadata:', {
+      console.error('[MEMBERSHIP-SUCCESS] ❌ RETURN NULL #1: Session not paid or missing metadata:', {
         payment_status: session.payment_status,
         hasMetadata: !!session.metadata,
       });
       return null;
     }
 
-    // CRITICAL: Check if subscription already exists (backend webhook may have created it)
-    const existingSubscription = await findSubscriptionBySessionId(sessionId);
-    if (existingSubscription) {
-      console.log('[MEMBERSHIP-SUCCESS] Subscription already exists for session:', {
-        sessionId,
-        subscriptionId: existingSubscription.id,
-        timestamp: new Date().toISOString(),
-        message: 'Backend webhook already created subscription - returning existing subscription'
-      });
-      // Fetch plan and user profile for return
-      const plan = existingSubscription.membershipPlan || await fetchMembershipPlanById(existingSubscription.membershipPlanId);
-      const userProfile = existingSubscription.userProfile || await fetchUserProfileById(existingSubscription.userProfileId);
-      return { subscription: existingSubscription, plan, userProfile };
-    }
-
-    // Extract metadata
+    // Extract metadata FIRST (before checking for existing subscriptions)
     const membershipPlanId = session.metadata.membershipPlanId;
     const userId = session.metadata.userId;
     const tenantId = session.metadata.tenantId || getTenantId();
 
     if (!membershipPlanId || !userId) {
-      console.error('[MEMBERSHIP-SUCCESS] Missing required metadata:', { membershipPlanId, userId });
+      console.error('[MEMBERSHIP-SUCCESS] ❌ RETURN NULL #2: Missing required metadata:', { membershipPlanId, userId });
       return null;
+    }
+
+    // CRITICAL: Check if subscription already exists (backend webhook may have created it)
+    // But we must verify it's for the SAME plan - if it's for a different plan, we need to handle plan switch
+    const existingSubscription = await findSubscriptionBySessionId(sessionId);
+    if (existingSubscription) {
+      // CRITICAL: Verify that the existing subscription is for the SAME plan as the session
+      const existingPlanId = typeof existingSubscription.membershipPlanId === 'number'
+        ? existingSubscription.membershipPlanId
+        : parseInt(String(existingSubscription.membershipPlanId), 10);
+      const newPlanId = parseInt(membershipPlanId, 10);
+
+      console.log('[MEMBERSHIP-SUCCESS] Step 2: Found existing subscription, checking plan match...', {
+        sessionId,
+        existingSubscriptionId: existingSubscription.id,
+        existingPlanId,
+        newPlanId,
+        planIdsMatch: existingPlanId === newPlanId,
+        timestamp: new Date().toISOString(),
+      });
+
+      if (existingPlanId === newPlanId) {
+        // Same plan - this is the correct subscription
+        console.log('[MEMBERSHIP-SUCCESS] ✅ Step 2: Existing subscription matches plan - returning existing subscription');
+        // Fetch plan and user profile for return
+        const plan = existingSubscription.membershipPlan || await fetchMembershipPlanById(existingSubscription.membershipPlanId);
+        const userProfile = existingSubscription.userProfile || await fetchUserProfileById(existingSubscription.userProfileId);
+        return { subscription: existingSubscription, plan, userProfile };
+      } else {
+        // DIFFERENT plan - this is a plan switch, so we should NOT return the existing subscription
+        // We'll cancel it and create a new one below
+        console.log('[MEMBERSHIP-SUCCESS] ⚠️ Step 2: Existing subscription is for DIFFERENT plan - will cancel and create new one:', {
+          existingSubscriptionId: existingSubscription.id,
+          existingPlanId,
+          newPlanId,
+          message: 'Plan switch detected - will cancel old subscription and create new one'
+        });
+        // Don't return - continue to plan switch handling logic below
+      }
+    } else {
+      console.log('[MEMBERSHIP-SUCCESS] Step 2: No existing subscription found for session ID');
     }
 
     // Fetch user profile
@@ -307,19 +360,139 @@ export async function processMembershipSubscriptionSessionServer(
 
     // CRITICAL: Double-check by stripeSubscriptionId before creating (race condition fix)
     // This prevents duplicates when multiple requests come in simultaneously
+    // CRITICAL: Also verify plan ID matches - if it's different, we need to handle plan switch
     if (stripeSubscriptionId) {
       const existingByStripeId = await findSubscriptionByStripeSubscriptionId(stripeSubscriptionId);
       if (existingByStripeId) {
-        console.log('[MEMBERSHIP-SUCCESS] Subscription already exists by Stripe subscription ID:', {
+        // CRITICAL: Verify that the existing subscription is for the SAME plan as the session
+        const existingPlanId = typeof existingByStripeId.membershipPlanId === 'number'
+          ? existingByStripeId.membershipPlanId
+          : parseInt(String(existingByStripeId.membershipPlanId), 10);
+        const newPlanId = parseInt(membershipPlanId, 10);
+
+        console.log('[MEMBERSHIP-SUCCESS] Step 8: Found existing subscription by Stripe ID, checking plan match...', {
           stripeSubscriptionId,
           existingSubscriptionId: existingByStripeId.id,
+          existingPlanId,
+          newPlanId,
+          planIdsMatch: existingPlanId === newPlanId,
           timestamp: new Date().toISOString(),
-          message: 'Duplicate prevented - subscription already exists with this Stripe subscription ID'
         });
-        // Fetch plan and user profile for return
-        const plan = existingByStripeId.membershipPlan || await fetchMembershipPlanById(existingByStripeId.membershipPlanId);
-        const userProfile = existingByStripeId.userProfile || await fetchUserProfileById(existingByStripeId.userProfileId);
-        return { subscription: existingByStripeId, plan, userProfile };
+
+        if (existingPlanId === newPlanId) {
+          // Same plan - this is the correct subscription
+          console.log('[MEMBERSHIP-SUCCESS] ✅ Step 8: Existing subscription matches plan - returning existing subscription');
+          // Fetch plan and user profile for return
+          const plan = existingByStripeId.membershipPlan || await fetchMembershipPlanById(existingByStripeId.membershipPlanId);
+          const userProfile = existingByStripeId.userProfile || await fetchUserProfileById(existingByStripeId.userProfileId);
+          return { subscription: existingByStripeId, plan, userProfile };
+        } else {
+          // DIFFERENT plan - this is a plan switch, so we should NOT return the existing subscription
+          // We'll cancel it and create a new one below
+          console.log('[MEMBERSHIP-SUCCESS] ⚠️ Step 8: Existing subscription is for DIFFERENT plan - will cancel and create new one:', {
+            existingSubscriptionId: existingByStripeId.id,
+            existingPlanId,
+            newPlanId,
+            message: 'Plan switch detected - will cancel old subscription and create new one'
+          });
+          // Don't return - continue to plan switch handling logic below
+        }
+      } else {
+        console.log('[MEMBERSHIP-SUCCESS] Step 8: No existing subscription found by Stripe subscription ID');
+      }
+    }
+
+    // CRITICAL: Before creating new subscription, check if user has other active subscriptions for DIFFERENT plans
+    // If user has an active subscription for a DIFFERENT plan, cancel it first (both database and Stripe)
+    // This handles plan switches (e.g., switching from Plan 1 to Plan 2)
+    console.log('[MEMBERSHIP-SUCCESS] Step 9: Checking for other active subscriptions for different plans...', {
+      userProfileId: userProfile.id,
+      newPlanId: parseInt(membershipPlanId, 10),
+    });
+    if (userProfile.id) {
+      try {
+        const tenantId = getTenantId();
+        const params = new URLSearchParams({
+          'userProfileId.equals': String(userProfile.id),
+          'tenantId.equals': tenantId,
+          'subscriptionStatus.in': 'ACTIVE,TRIAL', // Check for active or trial subscriptions
+        });
+        const response = await fetchWithJwtRetry(
+          `${getAppUrl()}/api/proxy/membership-subscriptions?${params.toString()}`,
+          { cache: 'no-store' }
+        );
+        if (response.ok) {
+          const items: MembershipSubscriptionDTO[] = await response.json();
+          // Filter out subscriptions for the same plan (those are OK - duplicates will be handled above)
+          const otherPlanSubscriptions = items.filter(sub =>
+            sub.membershipPlanId !== parseInt(membershipPlanId, 10)
+          );
+
+          if (otherPlanSubscriptions.length > 0) {
+            console.log('[MEMBERSHIP-SUCCESS] ⚠️ Step 9: User has active subscription(s) for different plan(s) - will cancel:', {
+              otherSubscriptions: otherPlanSubscriptions.map(sub => ({
+                id: sub.id,
+                planId: sub.membershipPlanId,
+                status: sub.subscriptionStatus,
+                stripeSubscriptionId: sub.stripeSubscriptionId,
+              })),
+              newPlanId: parseInt(membershipPlanId, 10),
+            });
+
+            // Cancel all other active subscriptions (both database and Stripe)
+            for (const oldSub of otherPlanSubscriptions) {
+              try {
+                // Cancel in database
+                const cancelPayload = withTenantId({
+                  id: oldSub.id!,
+                  cancelAtPeriodEnd: true,
+                  cancellationReason: `Switched to plan ${membershipPlanId}`,
+                  subscriptionStatus: 'CANCELLED',
+                  cancelledAt: new Date().toISOString(),
+                });
+
+                await fetchWithJwtRetry(
+                  `${getAppUrl()}/api/proxy/membership-subscriptions/${oldSub.id}`,
+                  {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/merge-patch+json' },
+                    body: JSON.stringify(cancelPayload),
+                    cache: 'no-store',
+                  },
+                  '[MEMBERSHIP-SUCCESS] cancel-other-plan-subscription-session'
+                );
+
+                console.log('[MEMBERSHIP-SUCCESS] ✅ Step 9: Cancelled other plan subscription in database:', oldSub.id);
+
+                // Also cancel the Stripe subscription if it exists
+                if (oldSub.stripeSubscriptionId) {
+                  try {
+                    const stripeSub = await stripe().subscriptions.retrieve(oldSub.stripeSubscriptionId);
+                    await stripe().subscriptions.update(oldSub.stripeSubscriptionId, {
+                      cancel_at_period_end: true,
+                      metadata: {
+                        ...stripeSub.metadata,
+                        cancellation_reason: `Switched to plan ${membershipPlanId}`,
+                        cancelled_at: new Date().toISOString(),
+                      },
+                    });
+                    console.log('[MEMBERSHIP-SUCCESS] ✅ Step 9: Cancelled Stripe subscription:', oldSub.stripeSubscriptionId);
+                  } catch (stripeError: any) {
+                    console.error('[MEMBERSHIP-SUCCESS] ⚠️ Step 9: Failed to cancel Stripe subscription (non-fatal):', stripeError.message);
+                  }
+                }
+              } catch (cancelError: any) {
+                console.error('[MEMBERSHIP-SUCCESS] ⚠️ Step 9: Failed to cancel other plan subscription (non-fatal):', cancelError.message);
+                // Continue - will still create new subscription
+              }
+            }
+          } else {
+            console.log('[MEMBERSHIP-SUCCESS] Step 9: No other active subscriptions found for different plans.');
+          }
+        }
+      } catch (error: any) {
+        console.error('[MEMBERSHIP-SUCCESS] ⚠️ Step 9: Error checking for other plan subscriptions (non-fatal):', error.message);
+        // Continue with creation if check fails
       }
     }
 

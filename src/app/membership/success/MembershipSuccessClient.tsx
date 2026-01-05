@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { fetchMembershipSubscriptionDetailsServer } from './ApiServerActions';
 import { PlanFeaturesList } from '@/components/membership/PlanFeaturesList';
 import type { MembershipPlanDTO, MembershipSubscriptionDTO } from '@/types';
@@ -421,7 +422,7 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex flex-col">
+      <div className="min-h-screen bg-gray-100 flex flex-col" style={{ overflowX: 'hidden' }}>
         {/* Hero Image Section - Same as event success page */}
         <section className="hero-section" style={{
           position: 'relative',
@@ -453,15 +454,20 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
           />
         </section>
 
-        {/* Loading Message Overlay */}
-        <div className="flex-grow flex flex-col items-center justify-center min-h-[400px] p-6" style={{
-          marginTop: '-300px',
-          position: 'relative',
-          zIndex: 10
-        }}>
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Processing...</p>
+        {/* Loading Animation in Center - Same as manage-events page */}
+        <div className="flex justify-center items-center min-h-[600px] w-full" style={{ marginTop: '-300px', position: 'relative', zIndex: 10 }}>
+          <div className="relative w-full max-w-6xl">
+            <Image
+              src="/images/loading_events.jpg"
+              alt="Loading membership subscription..."
+              width={800}
+              height={600}
+              className="w-full h-auto rounded-lg shadow-2xl animate-pulse zoom-loading"
+              priority
+            />
+            <div className="absolute inset-0 rounded-lg overflow-hidden">
+              <div className="wavy-animation"></div>
+            </div>
           </div>
         </div>
       </div>
