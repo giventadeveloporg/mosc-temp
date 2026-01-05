@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import type { MembershipSubscriptionDTO, MembershipPlanDTO } from '@/types';
 
 interface MembershipQrClientProps {
@@ -63,6 +64,9 @@ export function MembershipQrClient({ session_id, payment_intent }: MembershipQrC
     const pollForSubscription = async () => {
       if (cancelledRef.current) return;
 
+      // CRITICAL: Ensure loading state is true during polling
+      setLoading(true);
+
       pollAttemptRef.current += 1;
       const attempt = pollAttemptRef.current;
 
@@ -112,11 +116,24 @@ export function MembershipQrClient({ session_id, payment_intent }: MembershipQrC
         } else {
           // CRITICAL: Handle 400 error with "error.activesubscriptionexists" message
           // This happens when an active subscription already exists for the user
+          // BUT: Only redirect if we truly don't have a subscription (after checking response)
           if (response.status === 400) {
             const errorData = await response.json().catch(() => ({}));
+
+            // CRITICAL: Check if errorData actually contains a subscription (GET endpoint might return it)
+            if (errorData.subscription) {
+              console.log('[MEMBERSHIP-QR] ✅✅✅ SUCCESS! Subscription found in error response:', errorData.subscription.id);
+              setSubscription(errorData.subscription);
+              setPlan(errorData.plan || null);
+              setLoading(false);
+              return; // Success - exit polling
+            }
+
+            // Only redirect if we truly don't have a subscription and the error is "activesubscriptionexists"
             if (errorData.message === 'error.activesubscriptionexists') {
-              console.log('[MEMBERSHIP-QR] Active subscription already exists - redirecting to membership page');
+              console.log('[MEMBERSHIP-QR] Active subscription already exists but not returned - redirecting to membership page');
               // Stop polling and redirect after a short delay
+              setLoading(false);
               setTimeout(() => {
                 router.push('/membership');
               }, 2000);
@@ -164,11 +181,24 @@ export function MembershipQrClient({ session_id, payment_intent }: MembershipQrC
           } else {
             // CRITICAL: Handle 400 error with "error.activesubscriptionexists" message
             // This happens when an active subscription already exists for the user
+            // BUT: Only redirect if we truly don't have a subscription (after checking response)
             if (postRes.status === 400) {
               const errorData = await postRes.json().catch(() => ({}));
+
+              // CRITICAL: Check if errorData actually contains a subscription (POST endpoint might return it)
+              if (errorData.subscription) {
+                console.log('[MEMBERSHIP-QR] ✅✅✅ POST FALLBACK SUCCESS! Subscription found in error response:', errorData.subscription.id);
+                setSubscription(errorData.subscription);
+                setPlan(errorData.plan || null);
+                setLoading(false);
+                return; // Success - exit polling
+              }
+
+              // Only redirect if we truly don't have a subscription and the error is "activesubscriptionexists"
               if (errorData.message === 'error.activesubscriptionexists') {
-                console.log('[MEMBERSHIP-QR] Active subscription already exists (POST) - redirecting to membership page');
+                console.log('[MEMBERSHIP-QR] Active subscription already exists (POST) but not returned - redirecting to membership page');
                 // Stop polling and redirect after a short delay
+                setLoading(false);
                 setTimeout(() => {
                   router.push('/membership');
                 }, 2000);
@@ -193,7 +223,10 @@ export function MembershipQrClient({ session_id, payment_intent }: MembershipQrC
         }
 
         // If not found and we haven't reached max attempts, continue polling
+        // CRITICAL: Keep loading state true during polling
         if (attempt < MAX_POLL_ATTEMPTS) {
+          // Ensure loading state remains true for next poll
+          setLoading(true);
           setTimeout(pollForSubscription, POLL_INTERVAL_MS);
         } else {
           // Get last error details before showing error
@@ -238,6 +271,8 @@ export function MembershipQrClient({ session_id, payment_intent }: MembershipQrC
       } catch (err) {
         console.error('[MEMBERSHIP-QR] Poll error:', err);
         if (attempt < MAX_POLL_ATTEMPTS) {
+          // CRITICAL: Keep loading state true during polling even after error
+          setLoading(true);
           setTimeout(pollForSubscription, POLL_INTERVAL_MS);
         } else {
           setError('Failed to load subscription. Please try again later.');
@@ -250,13 +285,57 @@ export function MembershipQrClient({ session_id, payment_intent }: MembershipQrC
     pollForSubscription();
   }, [session_id, payment_intent]);
 
+  // Default hero image URL - same as desktop success page
+  const defaultHeroImageUrl = '/images/default_placeholder_hero_image.jpeg';
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading your membership...</p>
-          <p className="text-sm text-muted-foreground mt-2">Please wait while we process your subscription...</p>
+      <div className="min-h-screen bg-gray-100 flex flex-col" style={{ overflowX: 'hidden' }}>
+        {/* Hero Image Section - Same as desktop success page */}
+        <section className="hero-section" style={{
+          position: 'relative',
+          marginTop: '0',
+          backgroundColor: 'transparent',
+          minHeight: '400px',
+          overflow: 'hidden',
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '80px 0 0 0'
+        }}>
+          <img
+            src={defaultHeroImageUrl}
+            alt="Membership Hero"
+            className="hero-image"
+            style={{
+              margin: '0 auto',
+              padding: '0',
+              display: 'block',
+              width: '100%',
+              maxWidth: '100%',
+              height: 'auto',
+              objectFit: 'cover',
+              borderRadius: '0'
+            }}
+          />
+        </section>
+
+        {/* Loading Animation in Body - Below Hero Section */}
+        <div className="flex justify-center items-center min-h-[600px] w-full py-12 px-4" style={{ position: 'relative' }}>
+          <div className="relative w-full max-w-6xl">
+            <Image
+              src="/images/loading_events.jpg"
+              alt="Loading membership subscription..."
+              width={800}
+              height={600}
+              className="w-full h-auto rounded-lg shadow-2xl animate-pulse zoom-loading"
+              priority
+            />
+            <div className="absolute inset-0 rounded-lg overflow-hidden">
+              <div className="wavy-animation"></div>
+            </div>
+          </div>
         </div>
       </div>
     );
