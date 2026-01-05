@@ -287,10 +287,27 @@ export async function GET(req: NextRequest) {
           }
 
         // Fetch plan details
+        console.log('[MEMBERSHIP-PROCESS GET] Fetching subscription details for:', {
+          session_id,
+          pi,
+          subscriptionId: existingSubscription.id,
+          membershipPlanId: existingSubscription.membershipPlanId,
+        });
+
         const details = await fetchMembershipSubscriptionDetailsServer(
           session_id || undefined,
           pi || undefined
         );
+
+        console.log('[MEMBERSHIP-PROCESS GET] Subscription details result:', {
+          hasDetails: !!details,
+          hasPlan: !!details?.plan,
+          planId: details?.plan?.id,
+          planName: details?.plan?.name,
+          amount: details?.amount,
+          currency: details?.currency,
+          sessionId: details?.sessionId,
+        });
 
         return NextResponse.json({
           subscription: existingSubscription,

@@ -56,14 +56,25 @@ export function getPaymentMethodDomainId() {
  *
  * IMPORTANT: This function should NOT have hardcoded fallbacks. The actual host should be
  * determined from the request context or environment variables to avoid hardcoding issues.
+ *
+ * CRITICAL: In AWS Amplify production, environment variables are prefixed with AMPLIFY_
+ * This function prioritizes AMPLIFY_NEXT_PUBLIC_APP_URL for production compatibility.
  */
 export function getAppUrl(): string {
+  // Prioritize AMPLIFY_ prefix for AWS Amplify production (matches next.config.mjs pattern)
+  const appUrl =
+    process.env.AMPLIFY_NEXT_PUBLIC_APP_URL ||
+    process.env.NEXT_PUBLIC_APP_URL;
+
   // In production, use the actual domain from environment variable
   if (process.env.NODE_ENV === 'production') {
-    return process.env.NEXT_PUBLIC_APP_URL || '';
+    if (!appUrl) {
+      console.error('[getAppUrl] CRITICAL: NEXT_PUBLIC_APP_URL not set in production. Check AMPLIFY_NEXT_PUBLIC_APP_URL or NEXT_PUBLIC_APP_URL environment variable.');
+    }
+    return appUrl || '';
   }
   // In development, use localhost with dynamic port detection
-  return process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  return appUrl || 'http://localhost:3000';
 }
 
 /**
@@ -73,14 +84,25 @@ export function getAppUrl(): string {
  *
  * IMPORTANT: This function should NOT have hardcoded fallbacks. The actual host should be
  * determined from the request context or environment variables to avoid hardcoding issues.
+ *
+ * CRITICAL: In AWS Amplify production, environment variables are prefixed with AMPLIFY_
+ * This function prioritizes AMPLIFY_NEXT_PUBLIC_APP_URL for production compatibility.
  */
 export function getEmailHostUrlPrefix(): string {
+  // Prioritize AMPLIFY_ prefix for AWS Amplify production (matches next.config.mjs pattern)
+  const appUrl =
+    process.env.AMPLIFY_NEXT_PUBLIC_APP_URL ||
+    process.env.NEXT_PUBLIC_APP_URL;
+
   // In production, use the actual domain from environment variable
   if (process.env.NODE_ENV === 'production') {
-    return process.env.NEXT_PUBLIC_APP_URL || '';
+    if (!appUrl) {
+      console.error('[getEmailHostUrlPrefix] CRITICAL: NEXT_PUBLIC_APP_URL not set in production. Check AMPLIFY_NEXT_PUBLIC_APP_URL or NEXT_PUBLIC_APP_URL environment variable.');
+    }
+    return appUrl || '';
   }
   // In development, use localhost with dynamic port detection
-  return process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  return appUrl || 'http://localhost:3000';
 }
 
 /**
