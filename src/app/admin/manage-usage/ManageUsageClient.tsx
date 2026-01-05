@@ -548,9 +548,9 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Manage Users</h1>
         <div className="flex items-center gap-2">
-          <button 
-            onClick={() => fileInputRef.current?.click()} 
-            disabled={bulkLoading} 
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={bulkLoading}
             className="flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             title="Bulk Upload User List"
             aria-label="Bulk Upload User List"
@@ -564,9 +564,9 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
             <span className="font-semibold text-green-700">{bulkLoading ? 'Uploading...' : 'Bulk Upload User List'}</span>
           </button>
           <input type="file" ref={fileInputRef} onChange={handleBulkUpload} className="hidden" accept=".xlsx" />
-          <a 
-            href="https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/media/users_profile_list_bulk_upload_template/users_profile_list_bulk_upload_template.xlsx" 
-            download="users_profile_list_bulk_upload_template.xlsx" 
+          <a
+            href="https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/media/users_profile_list_bulk_upload_template/users_profile_list_bulk_upload_template.xlsx"
+            download="users_profile_list_bulk_upload_template.xlsx"
             className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
             title="Download Bulk Upload Template File"
             aria-label="Download Bulk Upload Template File"
@@ -812,4 +812,4 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
       )}
     </div>
   );
-}}
+}
