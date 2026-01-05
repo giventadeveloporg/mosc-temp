@@ -34,11 +34,11 @@ const HeroSection = () => {
 
           {/* Church Cross */}
           <div className="flex flex-col items-center">
-            <div className="w-48 h-48 lg:w-56 lg:h-56 overflow-hidden flex justify-center bg-transparent">
+            <div className="w-48 h-48 lg:w-56 lg:h-56 overflow-hidden flex items-center justify-center bg-transparent p-2">
               <AppImage
                 src="/images/logos/inner_header_img.png"
                 alt="MOSC Hero Image"
-                className="max-w-full max-h-full object-contain"
+                className="w-full h-full object-contain scale-110"
                 style={{ background: 'transparent' }}
               />
             </div>
@@ -48,11 +48,12 @@ const HeroSection = () => {
 
           {/* Christ Iconography */}
           <div className="flex flex-col items-center">
-            <div className="w-48 h-48 lg:w-56 lg:h-56 rounded-full overflow-hidden sacred-shadow-lg bg-muted flex items-center justify-center p-3">
+            <div className="w-48 h-48 lg:w-56 lg:h-56 overflow-hidden flex items-center justify-center sacred-shadow-lg rounded-full p-3" style={{ background: 'transparent' }}>
               <AppImage
                 src="/images/event_1/mosc_email/logo-mosc.png"
                 alt="Religious iconography of Christ blessing"
-                className="max-w-full max-h-full object-contain"
+                className="w-full h-full object-contain"
+                style={{ background: 'transparent' }}
               />
             </div>
             <h3 className="mt-4 font-heading font-medium text-lg text-foreground text-center">

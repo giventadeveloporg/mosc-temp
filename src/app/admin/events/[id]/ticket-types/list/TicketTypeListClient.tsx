@@ -480,14 +480,9 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
         <h2 className="text-xl font-bold text-gray-800 break-words flex-1 min-w-0">Ticket Types for {eventDetails?.title}</h2>
         <button
           onClick={handleAddNewClick}
-          className="flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 w-full sm:w-auto whitespace-nowrap"
-          title="Add New Ticket Type"
-          aria-label="Add New Ticket Type"
+          className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors w-full sm:w-auto whitespace-nowrap"
         >
-          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
-            <FaPlus className="w-6 h-6 text-green-600" />
-          </div>
-          <span className="font-semibold text-green-700">Add New Ticket Type</span>
+          <FaPlus /> Add New Ticket Type
         </button>
       </div>
 
@@ -837,28 +832,20 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
             <button
               type="button"
               onClick={handleModalClose}
-              className="flex-shrink-0 h-14 rounded-xl bg-teal-100 hover:bg-teal-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-teal-100 disabled:cursor-not-allowed disabled:hover:scale-100"
+              className="bg-teal-100 hover:bg-teal-200 text-teal-800 px-4 py-2 rounded-md flex items-center gap-2"
               disabled={isPending}
-              title="Cancel"
-              aria-label="Cancel"
             >
-              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
-                <FaBan className="w-6 h-6 text-teal-600" />
-              </div>
-              <span className="font-semibold text-teal-700">Cancel</span>
+              <FaBan />
+              Cancel
             </button>
             <button
               type="submit"
               onClick={handleSubmit}
-              className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-blue-100 disabled:cursor-not-allowed disabled:hover:scale-100"
+              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2"
               disabled={isPending}
-              title={isPending ? (editingTicketType ? 'Saving...' : 'Creating...') : (editingTicketType ? 'Save Changes' : 'Create Ticket Type')}
-              aria-label={isPending ? (editingTicketType ? 'Saving...' : 'Creating...') : (editingTicketType ? 'Save Changes' : 'Create Ticket Type')}
             >
-              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
-                <FaSave className="w-6 h-6 text-blue-600" />
-              </div>
-              <span className="font-semibold text-blue-700">{isPending ? (editingTicketType ? 'Saving...' : 'Creating...') : (editingTicketType ? 'Save Changes' : 'Create Ticket Type')}</span>
+              <FaSave />
+              {isPending ? (editingTicketType ? 'Saving...' : 'Creating...') : (editingTicketType ? 'Save Changes' : 'Create Ticket Type')}
             </button>
           </div>
         </form>

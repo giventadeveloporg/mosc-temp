@@ -188,14 +188,9 @@ export default function DiscountCodeListClient({
           </div>
           <button
             onClick={handleAddNewClick}
-            className="flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 w-full sm:w-auto whitespace-nowrap"
-            title="Add New Discount Code"
-            aria-label="Add New Discount Code"
+            className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 sm:px-6 rounded-lg flex items-center justify-center gap-2 sm:gap-3 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 w-full sm:w-auto whitespace-nowrap"
           >
-            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
-              <FaPlus className="w-6 h-6 text-green-600" />
-            </div>
-            <span className="font-semibold text-green-700">Add New Discount Code</span>
+            <FaPlus className="text-xl sm:text-lg" /> <span>Add New Discount Code</span>
           </button>
         </div>
 
@@ -565,26 +560,22 @@ function DiscountCodeModal({ open, onClose, onSave, code, isPending, error }: {
             type="button"
             onClick={onClose}
             disabled={isPending}
-            className="flex-shrink-0 h-14 rounded-xl bg-teal-100 hover:bg-teal-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-teal-100 disabled:cursor-not-allowed disabled:hover:scale-100"
+            className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 text-base font-medium shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             title="Cancel"
             aria-label="Cancel"
           >
-            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
-              <FaBan className="w-6 h-6 text-teal-600" />
-            </div>
-            <span className="font-semibold text-teal-700">Cancel</span>
+            <FaBan className="mr-2" />
+            Cancel
           </button>
           <button
             type="submit"
             disabled={isPending}
-            className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-blue-100 disabled:cursor-not-allowed disabled:hover:scale-100"
+            className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-green-600 hover:bg-green-700 text-white text-base font-medium shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             title={isPending ? 'Saving...' : 'Save'}
             aria-label={isPending ? 'Saving...' : 'Save'}
           >
-            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
-              <FaSave className="w-6 h-6 text-blue-600" />
-            </div>
-            <span className="font-semibold text-blue-700">{isPending ? 'Saving...' : 'Save'}</span>
+            <FaSave className="mr-2" />
+            {isPending ? 'Saving...' : 'Save'}
           </button>
         </div>
       </form>
