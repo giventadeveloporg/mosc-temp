@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import type { MembershipSubscriptionDTO, MembershipPlanDTO } from '@/types';
 
 interface MembershipQrClientProps {
@@ -63,6 +64,9 @@ export function MembershipQrClient({ session_id, payment_intent }: MembershipQrC
     const pollForSubscription = async () => {
       if (cancelledRef.current) return;
 
+      // CRITICAL: Ensure loading state is true during polling
+      setLoading(true);
+
       pollAttemptRef.current += 1;
       const attempt = pollAttemptRef.current;
 
@@ -87,11 +91,24 @@ export function MembershipQrClient({ session_id, payment_intent }: MembershipQrC
         if (response.ok) {
           const data = await response.json();
           if (data.subscription) {
-            console.log('[MEMBERSHIP-QR] ✅✅✅ SUCCESS! Subscription found:', data.subscription.id);
-            setSubscription(data.subscription);
-            setPlan(data.plan || null);
-            setLoading(false);
-            return; // Success - exit polling
+            // CRITICAL: Only accept ACTIVE or TRIAL subscriptions
+            // If subscription is CANCELLED or EXPIRED, continue polling or show warning
+            const subscriptionStatus = data.subscription.subscriptionStatus;
+            if (subscriptionStatus === 'ACTIVE' || subscriptionStatus === 'TRIAL') {
+              console.log('[MEMBERSHIP-QR] ✅✅✅ SUCCESS! Active subscription found:', data.subscription.id, 'Status:', subscriptionStatus);
+              setSubscription(data.subscription);
+              setPlan(data.plan || null);
+              setLoading(false);
+              return; // Success - exit polling
+            } else {
+              console.warn('[MEMBERSHIP-QR] ⚠️ Subscription found but status is not ACTIVE/TRIAL:', {
+                id: data.subscription.id,
+                status: subscriptionStatus,
+                note: 'This subscription may have been cancelled. Continuing to poll for active subscription...'
+              });
+              // Continue polling - don't set subscription if it's CANCELLED/EXPIRED
+              // The user will see a warning if polling fails
+            }
           } else {
             // Log why subscription wasn't found with detailed error information
             console.log(`[MEMBERSHIP-QR] Poll attempt ${attempt}: Subscription not found yet`, {
@@ -110,6 +127,44 @@ export function MembershipQrClient({ session_id, payment_intent }: MembershipQrC
             }
           }
         } else {
+          // CRITICAL: Handle 400 error with "error.activesubscriptionexists" message
+          // This happens when an active subscription already exists for the user
+          // BUT: Only redirect if we truly don't have a subscription (after checking response)
+          if (response.status === 400) {
+            const errorData = await response.json().catch(() => ({}));
+
+            // CRITICAL: Check if errorData actually contains a subscription (GET endpoint might return it)
+            // Only accept ACTIVE or TRIAL subscriptions
+            if (errorData.subscription) {
+              const subscriptionStatus = errorData.subscription.subscriptionStatus;
+              if (subscriptionStatus === 'ACTIVE' || subscriptionStatus === 'TRIAL') {
+                console.log('[MEMBERSHIP-QR] ✅✅✅ SUCCESS! Active subscription found in error response:', errorData.subscription.id, 'Status:', subscriptionStatus);
+                setSubscription(errorData.subscription);
+                setPlan(errorData.plan || null);
+                setLoading(false);
+                return; // Success - exit polling
+              } else {
+                console.warn('[MEMBERSHIP-QR] ⚠️ Subscription in error response is not ACTIVE/TRIAL:', {
+                  id: errorData.subscription.id,
+                  status: subscriptionStatus,
+                  note: 'Continuing to poll for active subscription...'
+                });
+                // Continue polling - don't set subscription if it's CANCELLED/EXPIRED
+              }
+            }
+
+            // Only redirect if we truly don't have a subscription and the error is "activesubscriptionexists"
+            if (errorData.message === 'error.activesubscriptionexists') {
+              console.log('[MEMBERSHIP-QR] Active subscription already exists but not returned - redirecting to membership page');
+              // Stop polling and redirect after a short delay
+              setLoading(false);
+              setTimeout(() => {
+                router.push('/membership');
+              }, 2000);
+              return; // Exit polling
+            }
+          }
+
           const errorText = await response.text();
           console.error(`[MEMBERSHIP-QR] GET request failed (attempt ${attempt}):`, {
             status: response.status,
@@ -135,11 +190,23 @@ export function MembershipQrClient({ session_id, payment_intent }: MembershipQrC
           if (postRes.ok) {
             const postData = await postRes.json();
             if (postData.subscription) {
-              console.log('[MEMBERSHIP-QR] ✅✅✅ POST FALLBACK SUCCESS! Subscription created:', postData.subscription.id);
-              setSubscription(postData.subscription);
-              setPlan(postData.plan || null);
-              setLoading(false);
-              return; // Success - exit polling
+              // CRITICAL: Only accept ACTIVE or TRIAL subscriptions
+              // If subscription is CANCELLED or EXPIRED, continue polling or show warning
+              const subscriptionStatus = postData.subscription.subscriptionStatus;
+              if (subscriptionStatus === 'ACTIVE' || subscriptionStatus === 'TRIAL') {
+                console.log('[MEMBERSHIP-QR] ✅✅✅ POST FALLBACK SUCCESS! Active subscription created:', postData.subscription.id, 'Status:', subscriptionStatus);
+                setSubscription(postData.subscription);
+                setPlan(postData.plan || null);
+                setLoading(false);
+                return; // Success - exit polling
+              } else {
+                console.warn('[MEMBERSHIP-QR] ⚠️ POST subscription created but status is not ACTIVE/TRIAL:', {
+                  id: postData.subscription.id,
+                  status: subscriptionStatus,
+                  note: 'This subscription may have been cancelled. Continuing to poll for active subscription...'
+                });
+                // Continue polling - don't set subscription if it's CANCELLED/EXPIRED
+              }
             } else {
               console.error('[MEMBERSHIP-QR] POST fallback returned OK but no subscription:', {
                 error: postData.error,
@@ -148,6 +215,44 @@ export function MembershipQrClient({ session_id, payment_intent }: MembershipQrC
               });
             }
           } else {
+            // CRITICAL: Handle 400 error with "error.activesubscriptionexists" message
+            // This happens when an active subscription already exists for the user
+            // BUT: Only redirect if we truly don't have a subscription (after checking response)
+            if (postRes.status === 400) {
+              const errorData = await postRes.json().catch(() => ({}));
+
+              // CRITICAL: Check if errorData actually contains a subscription (POST endpoint might return it)
+              // Only accept ACTIVE or TRIAL subscriptions
+              if (errorData.subscription) {
+                const subscriptionStatus = errorData.subscription.subscriptionStatus;
+                if (subscriptionStatus === 'ACTIVE' || subscriptionStatus === 'TRIAL') {
+                  console.log('[MEMBERSHIP-QR] ✅✅✅ POST FALLBACK SUCCESS! Active subscription found in error response:', errorData.subscription.id, 'Status:', subscriptionStatus);
+                  setSubscription(errorData.subscription);
+                  setPlan(errorData.plan || null);
+                  setLoading(false);
+                  return; // Success - exit polling
+                } else {
+                  console.warn('[MEMBERSHIP-QR] ⚠️ POST subscription in error response is not ACTIVE/TRIAL:', {
+                    id: errorData.subscription.id,
+                    status: subscriptionStatus,
+                    note: 'Continuing to poll for active subscription...'
+                  });
+                  // Continue polling - don't set subscription if it's CANCELLED/EXPIRED
+                }
+              }
+
+              // Only redirect if we truly don't have a subscription and the error is "activesubscriptionexists"
+              if (errorData.message === 'error.activesubscriptionexists') {
+                console.log('[MEMBERSHIP-QR] Active subscription already exists (POST) but not returned - redirecting to membership page');
+                // Stop polling and redirect after a short delay
+                setLoading(false);
+                setTimeout(() => {
+                  router.push('/membership');
+                }, 2000);
+                return; // Exit polling
+              }
+            }
+
             const errorText = await postRes.text();
             let errorData: any = null;
             try {
@@ -165,7 +270,10 @@ export function MembershipQrClient({ session_id, payment_intent }: MembershipQrC
         }
 
         // If not found and we haven't reached max attempts, continue polling
+        // CRITICAL: Keep loading state true during polling
         if (attempt < MAX_POLL_ATTEMPTS) {
+          // Ensure loading state remains true for next poll
+          setLoading(true);
           setTimeout(pollForSubscription, POLL_INTERVAL_MS);
         } else {
           // Get last error details before showing error
@@ -210,6 +318,8 @@ export function MembershipQrClient({ session_id, payment_intent }: MembershipQrC
       } catch (err) {
         console.error('[MEMBERSHIP-QR] Poll error:', err);
         if (attempt < MAX_POLL_ATTEMPTS) {
+          // CRITICAL: Keep loading state true during polling even after error
+          setLoading(true);
           setTimeout(pollForSubscription, POLL_INTERVAL_MS);
         } else {
           setError('Failed to load subscription. Please try again later.');
@@ -222,13 +332,57 @@ export function MembershipQrClient({ session_id, payment_intent }: MembershipQrC
     pollForSubscription();
   }, [session_id, payment_intent]);
 
+  // Default hero image URL - same as desktop success page
+  const defaultHeroImageUrl = '/images/default_placeholder_hero_image.jpeg';
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading your membership...</p>
-          <p className="text-sm text-muted-foreground mt-2">Please wait while we process your subscription...</p>
+      <div className="min-h-screen bg-gray-100 flex flex-col" style={{ overflowX: 'hidden' }}>
+        {/* Hero Image Section - Same as desktop success page */}
+        <section className="hero-section" style={{
+          position: 'relative',
+          marginTop: '0',
+          backgroundColor: 'transparent',
+          minHeight: '400px',
+          overflow: 'hidden',
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '80px 0 0 0'
+        }}>
+          <img
+            src={defaultHeroImageUrl}
+            alt="Membership Hero"
+            className="hero-image"
+            style={{
+              margin: '0 auto',
+              padding: '0',
+              display: 'block',
+              width: '100%',
+              maxWidth: '100%',
+              height: 'auto',
+              objectFit: 'cover',
+              borderRadius: '0'
+            }}
+          />
+        </section>
+
+        {/* Loading Animation in Body - Below Hero Section */}
+        <div className="flex justify-center items-center min-h-[600px] w-full py-12 px-4" style={{ position: 'relative' }}>
+          <div className="relative w-full max-w-6xl">
+            <Image
+              src="/images/loading_events.jpg"
+              alt="Loading membership subscription..."
+              width={800}
+              height={600}
+              className="w-full h-auto rounded-lg shadow-2xl animate-pulse zoom-loading"
+              priority
+            />
+            <div className="absolute inset-0 rounded-lg overflow-hidden">
+              <div className="wavy-animation"></div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -256,49 +410,278 @@ export function MembershipQrClient({ session_id, payment_intent }: MembershipQrC
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gray-100 p-4">
-      <div className="max-w-md mx-auto">
-        <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
+  // CRITICAL: Filter out CANCELLED/EXPIRED subscriptions - only show ACTIVE/TRIAL
+  const isActiveSubscription = subscription && (
+    subscription.subscriptionStatus === 'ACTIVE' ||
+    subscription.subscriptionStatus === 'TRIAL'
+  );
+
+  // If subscription is CANCELLED or EXPIRED, show warning
+  if (subscription && !isActiveSubscription) {
+    return (
+      <div className="min-h-screen bg-gray-100" style={{ overflowX: 'hidden' }}>
+        {/* Hero Image Section */}
+        <section className="hero-section" style={{
+          position: 'relative',
+          marginTop: '0',
+          backgroundColor: 'transparent',
+          minHeight: '300px',
+          overflow: 'hidden',
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '60px 0 0 0'
+        }}>
+          <img
+            src={defaultHeroImageUrl}
+            alt="Membership Hero"
+            className="hero-image"
+            style={{
+              margin: '0 auto',
+              padding: '0',
+              display: 'block',
+              width: '100%',
+              maxWidth: '100%',
+              height: 'auto',
+              objectFit: 'cover',
+              borderRadius: '0'
+            }}
+          />
+        </section>
+
+        {/* Warning Message */}
+        <div className="max-w-2xl mx-auto px-4 py-8">
+          <div className="bg-white rounded-lg shadow-md p-8 text-center">
+            <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-10 h-10 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-heading font-semibold text-foreground mb-2">
+              Subscription Status: {subscription.subscriptionStatus}
+            </h1>
+            <p className="text-muted-foreground mb-6">
+              Your subscription is currently {subscription.subscriptionStatus.toLowerCase()}. Please check your membership page for details.
+            </p>
+            <button
+              onClick={() => router.push('/membership')}
+              className="px-6 py-2 bg-primary text-white rounded-lg hover:opacity-90 transition-opacity w-full"
+            >
+              Go to Membership
+            </button>
           </div>
-          <h1 className="text-2xl font-heading font-semibold text-foreground mb-2">
-            Membership Activated!
-          </h1>
-          <p className="text-muted-foreground mb-6">
-            Your subscription has been successfully activated.
-          </p>
-          {subscription && plan && (
-            <div className="mt-6 space-y-3 text-left bg-gray-50 rounded-lg p-4">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Plan:</span>
-                <span className="font-semibold text-foreground">{plan.planName}</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-100" style={{ overflowX: 'hidden' }}>
+      {/* HERO SECTION - Full width bleeding to header - Same as desktop success page */}
+      <section className="hero-section" style={{
+        position: 'relative',
+        marginTop: '0',
+        backgroundColor: 'transparent',
+        minHeight: '400px',
+        overflow: 'hidden',
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '80px 0 0 0'
+      }}>
+        <img
+          src={defaultHeroImageUrl}
+          alt="Membership Hero"
+          className="hero-image"
+          style={{
+            margin: '0 auto',
+            padding: '0',
+            display: 'block',
+            width: '100%',
+            maxWidth: '100%',
+            height: 'auto',
+            objectFit: 'cover',
+            borderRadius: '0'
+          }}
+        />
+        <div className="hero-overlay" style={{ opacity: 0.1, height: '5px', padding: '20' }}></div>
+      </section>
+
+      {/* Responsive Hero Image CSS - Same as desktop success page */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .hero-image {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+            margin: 0 auto;
+          }
+          @media (max-width: 768px) {
+            .hero-section {
+              min-height: 300px;
+              padding-top: 60px !important;
+            }
+            .hero-image {
+              min-height: 300px;
+            }
+          }
+        `
+      }} />
+
+      {/* Main content container */}
+      <div className="max-w-5xl mx-auto px-8 py-8" style={{ marginTop: '80px' }}>
+        {/* Success Message */}
+        <div className="max-w-2xl mx-auto mb-8">
+          <div className="bg-white rounded-lg shadow-md p-8 text-center">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h1 className="text-3xl font-heading font-semibold text-foreground mb-2">
+              Subscription Successful!
+            </h1>
+            <p className="text-lg font-body text-muted-foreground">
+              Your membership subscription has been activated successfully.
+            </p>
+          </div>
+        </div>
+
+        {/* Subscription Plan Summary */}
+        {plan && (
+          <div className="max-w-2xl mx-auto mb-8">
+            <div className="bg-white rounded-lg shadow-md p-8 border border-border">
+              <h2 className="text-2xl font-heading font-semibold text-foreground mb-6 text-center">
+                Your Subscription Plan
+              </h2>
+
+              {/* Plan Name */}
+              <div className="mb-6 pb-6 border-b border-border">
+                <h3 className="text-xl font-heading font-semibold text-foreground mb-2">
+                  {plan.planName}
+                </h3>
+                {plan.description && (
+                  <p className="font-body text-muted-foreground">
+                    {plan.description}
+                  </p>
+                )}
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Status:</span>
-                <span className={`font-semibold ${subscription.subscriptionStatus === 'ACTIVE' || subscription.subscriptionStatus === 'TRIAL'
-                    ? 'text-green-600'
-                    : 'text-gray-600'
-                  }`}>
-                  {subscription.subscriptionStatus}
-                </span>
-              </div>
-              {subscription.currentPeriodEnd && (
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Renews:</span>
-                  <span className="font-semibold text-foreground">
-                    {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
+
+              {/* Price and Billing */}
+              <div className="mb-6 pb-6 border-b border-border">
+                <div className="flex items-baseline gap-2 mb-2">
+                  <span className="text-3xl font-bold text-primary">
+                    {new Intl.NumberFormat('en-US', {
+                      style: 'currency',
+                      currency: plan.currency || 'USD',
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).format(plan.price || 0)}
+                  </span>
+                  <span className="text-sm text-muted-foreground">
+                    {plan.billingInterval === 'MONTHLY' && 'per month'}
+                    {plan.billingInterval === 'QUARTERLY' && 'per quarter'}
+                    {plan.billingInterval === 'YEARLY' && 'per year'}
+                    {plan.billingInterval === 'ONE_TIME' && 'one-time'}
                   </span>
                 </div>
-              )}
+                {plan.trialDays != null && plan.trialDays > 0 && (
+                  <div className="mt-2">
+                    <span className="inline-block px-3 py-1 text-xs font-semibold bg-green-100 text-green-700 rounded-full">
+                      {plan.trialDays} day{plan.trialDays !== 1 ? 's' : ''} free trial
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
-          )}
+          </div>
+        )}
+
+        {/* Subscription Status & Details */}
+        {subscription && isActiveSubscription && (
+          <div className="max-w-2xl mx-auto mb-8">
+            <div className="bg-white rounded-lg shadow-md p-8 border border-border">
+              <h2 className="text-2xl font-heading font-semibold text-foreground mb-6 text-center">
+                Subscription Details
+              </h2>
+
+              <div className="space-y-4">
+                {/* Subscription Status */}
+                <div className="flex items-start gap-3 pb-4 border-b border-border">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                    <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-body text-sm font-semibold text-foreground">Status</p>
+                    <p className="font-body text-sm text-green-600 capitalize">
+                      {subscription.subscriptionStatus?.toLowerCase() || 'Active'}
+                      {subscription.cancelAtPeriodEnd && ' (Cancels at period end)'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Current Period */}
+                {subscription.currentPeriodStart && (
+                  <div className="flex items-start gap-3 pb-4 border-b border-border">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                      <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-body text-sm font-semibold text-foreground">Current Period</p>
+                      <p className="font-body text-sm text-muted-foreground">
+                        {new Date(subscription.currentPeriodStart).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })} - {subscription.currentPeriodEnd ? new Date(subscription.currentPeriodEnd).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        }) : 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Next Payment */}
+                {subscription.currentPeriodEnd && plan && plan.billingInterval !== 'ONE_TIME' && (
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+                      <svg className="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-body text-sm font-semibold text-foreground">Next Payment</p>
+                      <p className="font-body text-sm text-muted-foreground">
+                        {new Date(subscription.currentPeriodEnd).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Action Button */}
+        <div className="max-w-2xl mx-auto text-center">
           <button
-            onClick={() => router.push('/membership/manage')}
-            className="mt-6 px-6 py-2 bg-primary text-white rounded-lg hover:opacity-90 transition-opacity w-full"
+            onClick={() => router.push('/membership')}
+            className="px-6 py-3 bg-primary text-white rounded-lg hover:opacity-90 transition-opacity w-full sm:w-auto sm:min-w-[200px] font-semibold"
           >
             Manage Membership
           </button>

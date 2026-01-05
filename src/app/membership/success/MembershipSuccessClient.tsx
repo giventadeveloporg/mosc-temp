@@ -191,26 +191,38 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
           });
 
           if (data.subscription) {
-            console.log('[DESKTOP FLOW] ✅ Subscription found in GET response:', data.subscription.id);
-            console.log('[DESKTOP FLOW] ✅ Desktop flow successful - subscription loaded via GET');
+            // CRITICAL: Only accept ACTIVE or TRIAL subscriptions
+            // Filter out CANCELLED/EXPIRED subscriptions
+            const subscriptionStatus = data.subscription.subscriptionStatus;
+            if (subscriptionStatus === 'ACTIVE' || subscriptionStatus === 'TRIAL') {
+              console.log('[DESKTOP FLOW] ✅ Active subscription found in GET response:', data.subscription.id, 'Status:', subscriptionStatus);
+              console.log('[DESKTOP FLOW] ✅ Desktop flow successful - subscription loaded via GET');
 
-            // CRITICAL: Mark as processed in sessionStorage to prevent duplicate processing on refresh
-            if (!hasBeenProcessed()) {
-              markAsProcessed();
-              processedRef.current = true;
-              console.log('[MEMBERSHIP-SUCCESS] Marked subscription as processed in sessionStorage');
-            }
+              // CRITICAL: Mark as processed in sessionStorage to prevent duplicate processing on refresh
+              if (!hasBeenProcessed()) {
+                markAsProcessed();
+                processedRef.current = true;
+                console.log('[MEMBERSHIP-SUCCESS] Marked subscription as processed in sessionStorage');
+              }
 
-            if (!cancelledRef.current) {
-              setSubscriptionDetails({
-                plan: data.plan,
-                amount: data.amount || data.plan?.price || null,
-                currency: data.currency || data.plan?.currency || 'USD',
-                subscription: data.subscription,
+              if (!cancelledRef.current) {
+                setSubscriptionDetails({
+                  plan: data.plan,
+                  amount: data.amount || data.plan?.price || null,
+                  currency: data.currency || data.plan?.currency || 'USD',
+                  subscription: data.subscription,
+                });
+              }
+              setLoading(false);
+              return;
+            } else {
+              console.warn('[DESKTOP FLOW] ⚠️ Subscription found but status is not ACTIVE/TRIAL:', {
+                id: data.subscription.id,
+                status: subscriptionStatus,
+                note: 'Will continue polling for active subscription'
               });
+              // Continue polling - don't set subscription if it's CANCELLED/EXPIRED
             }
-            setLoading(false);
-            return;
           } else {
             // Log why subscription wasn't found
             console.log('[DESKTOP FLOW] Initial GET: Subscription not found', {
@@ -258,26 +270,38 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
                   });
 
                   if (pollData.subscription) {
-                    console.log('[DESKTOP FLOW] ✅ Subscription found after polling:', pollData.subscription.id);
-                    console.log('[DESKTOP FLOW] ✅ Desktop flow successful - subscription loaded via GET polling');
+                    // CRITICAL: Only accept ACTIVE or TRIAL subscriptions
+                    // Filter out CANCELLED/EXPIRED subscriptions
+                    const subscriptionStatus = pollData.subscription.subscriptionStatus;
+                    if (subscriptionStatus === 'ACTIVE' || subscriptionStatus === 'TRIAL') {
+                      console.log('[DESKTOP FLOW] ✅ Active subscription found after polling:', pollData.subscription.id, 'Status:', subscriptionStatus);
+                      console.log('[DESKTOP FLOW] ✅ Desktop flow successful - subscription loaded via GET polling');
 
-                    // CRITICAL: Mark as processed in sessionStorage to prevent duplicate processing on refresh
-                    if (!hasBeenProcessed()) {
-                      markAsProcessed();
-                      processedRef.current = true;
-                      console.log('[MEMBERSHIP-SUCCESS] Marked subscription as processed in sessionStorage (from polling)');
-                    }
+                      // CRITICAL: Mark as processed in sessionStorage to prevent duplicate processing on refresh
+                      if (!hasBeenProcessed()) {
+                        markAsProcessed();
+                        processedRef.current = true;
+                        console.log('[MEMBERSHIP-SUCCESS] Marked subscription as processed in sessionStorage (from polling)');
+                      }
 
-                    if (!cancelledRef.current) {
-                      setSubscriptionDetails({
-                        plan: pollData.plan,
-                        amount: pollData.amount || pollData.plan?.price || null,
-                        currency: pollData.currency || pollData.plan?.currency || 'USD',
-                        subscription: pollData.subscription,
+                      if (!cancelledRef.current) {
+                        setSubscriptionDetails({
+                          plan: pollData.plan,
+                          amount: pollData.amount || pollData.plan?.price || null,
+                          currency: pollData.currency || pollData.plan?.currency || 'USD',
+                          subscription: pollData.subscription,
+                        });
+                      }
+                      setLoading(false);
+                      return;
+                    } else {
+                      console.warn('[DESKTOP FLOW] ⚠️ Subscription found after polling but status is not ACTIVE/TRIAL:', {
+                        id: pollData.subscription.id,
+                        status: subscriptionStatus,
+                        note: 'Will continue polling for active subscription'
                       });
+                      // Continue polling - don't set subscription if it's CANCELLED/EXPIRED
                     }
-                    setLoading(false);
-                    return;
                   } else {
                     // Log why subscription wasn't found with detailed error information
                     console.log(`[DESKTOP FLOW] Poll attempt ${pollAttempt}: Subscription not found yet`, {
@@ -394,6 +418,34 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
           }
         } else {
           const errorText = await getRes.text();
+          let errorData: any = null;
+          try {
+            errorData = JSON.parse(errorText);
+          } catch {
+            // Not JSON, use as string
+          }
+
+          // CRITICAL: Handle "active subscription exists" error gracefully - redirect to membership page
+          if (getRes.status === 400 && (errorData?.message === 'error.activesubscriptionexists' || errorText.includes('error.activesubscriptionexists'))) {
+            console.log('[DESKTOP FLOW] Active subscription already exists - redirecting to membership page:', {
+              errorData,
+              timestamp: new Date().toISOString()
+            });
+
+            // Mark as processed
+            markAsProcessed();
+            processedRef.current = true;
+
+            if (!cancelledRef.current) {
+              // Redirect to membership page where subscription will be visible
+              setTimeout(() => {
+                router.push('/membership');
+              }, 2000);
+            }
+            setLoading(false);
+            return;
+          }
+
           console.error('[DESKTOP FLOW] ❌ GET request failed:', getRes.status, errorText);
           if (!cancelledRef.current) {
             setError(`Failed to load subscription details: ${errorText || 'Unknown error'}`);
@@ -434,8 +486,7 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: '80px 0 0 0',
-          opacity: 0.7
+          padding: '80px 0 0 0'
         }}>
           <img
             src={defaultHeroImageUrl}
@@ -454,8 +505,8 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
           />
         </section>
 
-        {/* Loading Animation in Center - Same as manage-events page */}
-        <div className="flex justify-center items-center min-h-[600px] w-full" style={{ marginTop: '-300px', position: 'relative', zIndex: 10 }}>
+        {/* Loading Animation in Body - Below Hero Section */}
+        <div className="flex justify-center items-center min-h-[600px] w-full py-12 px-4" style={{ position: 'relative' }}>
           <div className="relative w-full max-w-6xl">
             <Image
               src="/images/loading_events.jpg"
