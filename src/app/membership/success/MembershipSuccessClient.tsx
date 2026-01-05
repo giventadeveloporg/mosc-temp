@@ -394,6 +394,34 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
           }
         } else {
           const errorText = await getRes.text();
+          let errorData: any = null;
+          try {
+            errorData = JSON.parse(errorText);
+          } catch {
+            // Not JSON, use as string
+          }
+
+          // CRITICAL: Handle "active subscription exists" error gracefully - redirect to membership page
+          if (getRes.status === 400 && (errorData?.message === 'error.activesubscriptionexists' || errorText.includes('error.activesubscriptionexists'))) {
+            console.log('[DESKTOP FLOW] Active subscription already exists - redirecting to membership page:', {
+              errorData,
+              timestamp: new Date().toISOString()
+            });
+
+            // Mark as processed
+            markAsProcessed();
+            processedRef.current = true;
+
+            if (!cancelledRef.current) {
+              // Redirect to membership page where subscription will be visible
+              setTimeout(() => {
+                router.push('/membership');
+              }, 2000);
+            }
+            setLoading(false);
+            return;
+          }
+
           console.error('[DESKTOP FLOW] ❌ GET request failed:', getRes.status, errorText);
           if (!cancelledRef.current) {
             setError(`Failed to load subscription details: ${errorText || 'Unknown error'}`);
@@ -434,8 +462,7 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: '80px 0 0 0',
-          opacity: 0.7
+          padding: '80px 0 0 0'
         }}>
           <img
             src={defaultHeroImageUrl}
@@ -454,8 +481,8 @@ export function MembershipSuccessClient({ session_id, payment_intent }: Membersh
           />
         </section>
 
-        {/* Loading Animation in Center - Same as manage-events page */}
-        <div className="flex justify-center items-center min-h-[600px] w-full" style={{ marginTop: '-300px', position: 'relative', zIndex: 10 }}>
+        {/* Loading Animation in Body - Below Hero Section */}
+        <div className="flex justify-center items-center min-h-[600px] w-full py-12 px-4" style={{ position: 'relative' }}>
           <div className="relative w-full max-w-6xl">
             <Image
               src="/images/loading_events.jpg"
