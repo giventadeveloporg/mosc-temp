@@ -2434,17 +2434,55 @@ export async function fetchMembershipSubscriptionDetailsServer(
 
     // Fetch membership plan details from backend
     const baseUrl = getAppUrl();
+
+    // CRITICAL: Log baseUrl in production to debug empty URL issues
+    if (!baseUrl || baseUrl === '') {
+      console.error('[MEMBERSHIP-SUCCESS] CRITICAL: getAppUrl() returned empty string. Check AMPLIFY_NEXT_PUBLIC_APP_URL or NEXT_PUBLIC_APP_URL environment variable.');
+      console.error('[MEMBERSHIP-SUCCESS] Environment check:', {
+        NODE_ENV: process.env.NODE_ENV,
+        AMPLIFY_NEXT_PUBLIC_APP_URL: process.env.AMPLIFY_NEXT_PUBLIC_APP_URL ? 'SET' : 'NOT SET',
+        NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL ? 'SET' : 'NOT SET',
+      });
+      return null;
+    }
+
+    const planUrl = `${baseUrl}/api/proxy/membership-plans/${membershipPlanId}`;
+    console.log('[MEMBERSHIP-SUCCESS] Fetching plan from:', planUrl);
+
     const planRes = await fetchWithJwtRetry(
-      `${baseUrl}/api/proxy/membership-plans/${membershipPlanId}`,
+      planUrl,
       { cache: 'no-store' }
     );
 
     if (!planRes.ok) {
-      console.error('[MEMBERSHIP-SUCCESS] Failed to fetch membership plan:', planRes.status);
+      const errorText = await planRes.text().catch(() => 'Unable to read error response');
+      console.error('[MEMBERSHIP-SUCCESS] Failed to fetch membership plan:', {
+        status: planRes.status,
+        statusText: planRes.statusText,
+        url: planUrl,
+        error: errorText,
+        membershipPlanId,
+      });
       return null;
     }
 
     const plan: MembershipPlanDTO = await planRes.json();
+
+    if (!plan || !plan.id) {
+      console.error('[MEMBERSHIP-SUCCESS] Invalid plan data received:', {
+        plan,
+        membershipPlanId,
+        url: planUrl,
+      });
+      return null;
+    }
+
+    console.log('[MEMBERSHIP-SUCCESS] Successfully fetched plan:', {
+      planId: plan.id,
+      planName: plan.name,
+      planPrice: plan.price,
+      planCurrency: plan.currency,
+    });
 
     // Get amount and currency from session
     // For subscriptions, amount_total might be 0 if it's a free trial or first payment deferred
