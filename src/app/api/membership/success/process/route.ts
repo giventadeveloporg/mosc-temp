@@ -129,7 +129,27 @@ export async function GET(req: NextRequest) {
                       id: existingSubscription.id,
                       status: existingSubscription.subscriptionStatus,
                       planId: existingSubscription.membershipPlanId,
+                      stripeSubscriptionId: existingSubscription.stripeSubscriptionId,
+                      userProfileId: existingSubscription.userProfileId,
+                      tenantId: existingSubscription.tenantId,
                     });
+
+                    // CRITICAL: Verify payment status from Stripe if we have a stripeSubscriptionId
+                    if (existingSubscription.stripeSubscriptionId) {
+                      try {
+                        const { stripe } = await import('@/lib/stripe');
+                        const stripeSub = await stripe().subscriptions.retrieve(existingSubscription.stripeSubscriptionId);
+                        console.log('[MEMBERSHIP-PROCESS GET] ✅ Payment verification from Stripe:', {
+                          stripeSubscriptionId: existingSubscription.stripeSubscriptionId,
+                          stripeStatus: stripeSub.status,
+                          stripeCurrentPeriodEnd: new Date(stripeSub.current_period_end * 1000).toISOString(),
+                          databaseStatus: existingSubscription.subscriptionStatus,
+                          paymentVerified: stripeSub.status === 'active' || stripeSub.status === 'trialing',
+                        });
+                      } catch (stripeError) {
+                        console.warn('[MEMBERSHIP-PROCESS GET] ⚠️ Could not verify payment status from Stripe:', stripeError);
+                      }
+                    }
                   }
                 }
               }
@@ -423,26 +443,35 @@ export async function GET(req: NextRequest) {
             }
 
             if (finalLookup) {
-              console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] ✅ Found existing subscription on final lookup:', {
-                id: finalLookup.id,
-                status: finalLookup.subscriptionStatus,
-                planId: finalLookup.membershipPlanId,
-                stripeSubscriptionId: finalLookup.stripeSubscriptionId,
-              });
+              // CRITICAL: Only return ACTIVE or TRIAL subscriptions
+              // Filter out CANCELLED/EXPIRED subscriptions - backend filter may not work correctly
+              if (finalLookup.subscriptionStatus === 'ACTIVE' || finalLookup.subscriptionStatus === 'TRIAL') {
+                console.log('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] ✅ Found existing ACTIVE subscription on final lookup:', {
+                  id: finalLookup.id,
+                  status: finalLookup.subscriptionStatus,
+                  planId: finalLookup.membershipPlanId,
+                  stripeSubscriptionId: finalLookup.stripeSubscriptionId,
+                });
 
-              // CRITICAL: Return the subscription even if it's not ACTIVE or TRIAL
-              // The client can handle different statuses appropriately
-              const details = await fetchMembershipSubscriptionDetailsServer(
-                session_id || undefined,
-                pi || undefined
-              );
+                const details = await fetchMembershipSubscriptionDetailsServer(
+                  session_id || undefined,
+                  pi || undefined
+                );
 
-              return NextResponse.json({
-                subscription: finalLookup,
-                plan: details?.plan || null,
-                amount: details?.amount || null,
-                currency: details?.currency || 'USD',
-              });
+                return NextResponse.json({
+                  subscription: finalLookup,
+                  plan: details?.plan || null,
+                  amount: details?.amount || null,
+                  currency: details?.currency || 'USD',
+                });
+              } else {
+                console.warn('[MEMBERSHIP-PROCESS GET] [DESKTOP FLOW] ⚠️ Found subscription but status is not ACTIVE/TRIAL:', {
+                  id: finalLookup.id,
+                  status: finalLookup.subscriptionStatus,
+                  note: 'Will continue to create new subscription or return error'
+                });
+                // Don't return CANCELLED/EXPIRED subscription - continue to create new one or return error
+              }
             }
 
             // If still not found, return 400 error with "error.activesubscriptionexists" so client can detect it and stop polling
