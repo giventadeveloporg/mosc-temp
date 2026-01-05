@@ -131,23 +131,29 @@ export async function GET(req: NextRequest) {
                 });
 
                 console.log('[MEMBERSHIP-PROCESS GET] Trying early lookup by userProfileId:', userProfile.id);
+                const lookupUrl = `${getAppUrl()}/api/proxy/membership-subscriptions?${params.toString()}`;
+                console.log('[MEMBERSHIP-PROCESS GET] Early lookup URL:', lookupUrl);
                 const lookupRes = await fetchWithJwtRetry(
-                  `${getAppUrl()}/api/proxy/membership-subscriptions?${params.toString()}`,
+                  lookupUrl,
                   { cache: 'no-store' }
                 );
 
+                console.log('[MEMBERSHIP-PROCESS GET] Early lookup response status:', lookupRes.status);
                 if (lookupRes.ok) {
                   const items: MembershipSubscriptionDTO[] = await lookupRes.json();
+                  console.log('[MEMBERSHIP-PROCESS GET] Early lookup returned items:', items.length);
                   // CRITICAL: Filter out CANCELLED/EXPIRED subscriptions - backend filter may not work correctly
                   const activeSubscriptions = items.filter(sub =>
                     sub.subscriptionStatus === 'ACTIVE' || sub.subscriptionStatus === 'TRIAL'
                   );
+                  console.log('[MEMBERSHIP-PROCESS GET] Active subscriptions after filtering:', activeSubscriptions.length);
                   if (activeSubscriptions.length > 0) {
                     existingSubscription = activeSubscriptions[0]; // Get the most recent active one
-                    console.log('[MEMBERSHIP-PROCESS GET] ✅ Found subscription by userProfileId (early lookup):', {
+                    console.log('[MEMBERSHIP-PROCESS GET] ✅✅✅ Found subscription by userProfileId (early lookup):', {
                       id: existingSubscription.id,
                       status: existingSubscription.subscriptionStatus,
                       planId: existingSubscription.membershipPlanId,
+                      planIdType: typeof existingSubscription.membershipPlanId,
                       stripeSubscriptionId: existingSubscription.stripeSubscriptionId,
                       userProfileId: existingSubscription.userProfileId,
                       tenantId: existingSubscription.tenantId,
@@ -195,7 +201,19 @@ export async function GET(req: NextRequest) {
         // Reset to null so we proceed to create a new subscription
         existingSubscription = null;
       } else {
-        console.log('[MEMBERSHIP-PROCESS GET] Subscription found:', existingSubscription.id, 'Status:', existingSubscription.subscriptionStatus);
+        console.log('[MEMBERSHIP-PROCESS GET] ============================================');
+        console.log('[MEMBERSHIP-PROCESS GET] ✅✅✅ SUBSCRIPTION FOUND:', {
+          subscriptionId: existingSubscription.id,
+          status: existingSubscription.subscriptionStatus,
+          membershipPlanId: existingSubscription.membershipPlanId,
+          membershipPlanIdType: typeof existingSubscription.membershipPlanId,
+          stripeSubscriptionId: existingSubscription.stripeSubscriptionId,
+          userProfileId: existingSubscription.userProfileId,
+          tenantId: existingSubscription.tenantId,
+          amountPaid: existingSubscription.amountPaid,
+          currency: existingSubscription.currency,
+        });
+        console.log('[MEMBERSHIP-PROCESS GET] ============================================');
 
         // CRITICAL: First check if the existing subscription's plan ID matches the session's plan ID
         // If they DON'T match, the existing subscription itself is for a different plan and should be cancelled
