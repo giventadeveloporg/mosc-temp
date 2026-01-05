@@ -1571,8 +1571,110 @@ export async function processMembershipSubscriptionFromPaymentIntent(
             errorCode: createError.code,
             errorType: createError.type,
           });
+
+          // Check if error is due to price mode mismatch (test price with live key or vice versa)
+          // NOTE: This fix primarily affects mobile flow (payment intent), but desktop flow can also use payment intents in some cases
+          // Desktop flow typically uses checkout sessions (processMembershipSubscriptionSessionServer), which doesn't create new subscriptions
+          if (createError?.code === 'resource_missing' &&
+              createError?.type === 'StripeInvalidRequestError' &&
+              (createError.message?.includes('No such price') ||
+               createError.message?.includes('test mode') ||
+               createError.message?.includes('live mode'))) {
+            console.warn('[MEMBERSHIP-SUCCESS] ⚠️ Price ID mode mismatch detected, creating new price with correct mode:', {
+              oldPriceId: finalStripePriceId,
+              error: createError.message,
+              membershipPlanId: plan.id,
+              flow: 'payment_intent', // This fix is for payment intent flow (primarily mobile, but desktop can use it too)
+            });
+
+            try {
+              // Get or create Stripe Product
+              let stripeProductId: string;
+              try {
+                const existingProducts = await stripe().products.search({
+                  query: `metadata['membershipPlanId']:'${membershipPlanId}' AND metadata['tenantId']:'${tenantId}'`,
+                  limit: 1,
+                });
+                if (existingProducts.data.length > 0) {
+                  stripeProductId = existingProducts.data[0].id;
+                  console.log('[MEMBERSHIP-SUCCESS] Found existing Stripe Product:', stripeProductId);
+                } else {
+                  // Create new product
+                  const product = await stripe().products.create({
+                    name: plan.planName || `Membership Plan ${membershipPlanId}`,
+                    description: `Membership subscription - ${plan.billingInterval || 'Monthly'}`,
+                    metadata: {
+                      membershipPlanId: String(membershipPlanId),
+                      tenantId: tenantId,
+                    },
+                  });
+                  stripeProductId = product.id;
+                  console.log('[MEMBERSHIP-SUCCESS] Created new Stripe Product:', stripeProductId);
+                }
+              } catch (productError: any) {
+                console.error('[MEMBERSHIP-SUCCESS] ❌ Error getting/creating Stripe Product:', productError.message);
+                throw new Error(`Failed to get/create Stripe Product: ${productError.message}`);
+              }
+
+              // Determine billing interval
+              const priceInterval = plan.billingInterval === 'YEARLY' ? 'year' :
+                                   plan.billingInterval === 'QUARTERLY' ? 'month' : 'month';
+
+              // Create new Stripe Price with correct mode
+              const priceParams: any = {
+                product: stripeProductId,
+                unit_amount: Math.round((plan.price || 0) * 100), // Convert to cents
+                currency: (plan.currency || 'USD').toLowerCase(),
+                recurring: {
+                  interval: priceInterval,
+                  ...(plan.billingInterval === 'QUARTERLY' ? { interval_count: 3 } : {}),
+                },
+                metadata: {
+                  membershipPlanId: String(membershipPlanId),
+                  tenantId: tenantId,
+                },
+              };
+
+              const newStripePrice = await stripe().prices.create(priceParams);
+              const newPriceId = newStripePrice.id;
+              console.log('[MEMBERSHIP-SUCCESS] ✅ Created new Stripe Price with correct mode:', {
+                newPriceId,
+                productId: stripeProductId,
+                amount: plan.price,
+                currency: plan.currency,
+                interval: priceInterval,
+              });
+
+              // Update subscription params with new price ID
+              subscriptionParams.items[0].price = newPriceId;
+              finalStripePriceId = newPriceId; // Update for later use
+
+              // Retry subscription creation with new price
+              stripeSubscription = await stripe().subscriptions.create(subscriptionParams);
+              console.log('[MEMBERSHIP-SUCCESS] ✅ Created subscription with new price after mode mismatch retry:', {
+                subscriptionId: stripeSubscription.id,
+                newPriceId,
+                status: stripeSubscription.status,
+                customerId: stripeCustomerId,
+                note: 'Price mode mismatch resolved - subscription created successfully',
+              });
+              // CRITICAL: Ensure stripeSubscriptionId is set for database persistence
+              // This will be set again below, but set it here to ensure it's available
+              stripeSubscriptionId = stripeSubscription.id;
+            } catch (retryError: any) {
+              console.error('[MEMBERSHIP-SUCCESS] ❌ Failed to create new price and retry subscription:', {
+                error: retryError.message,
+                errorCode: retryError.code,
+                errorType: retryError.type,
+                oldPriceId: finalStripePriceId,
+                membershipPlanId: plan.id,
+                customerId: stripeCustomerId,
+              });
+              throw new Error(`Failed to create Stripe subscription after price mode mismatch: ${retryError.message}`);
+            }
+          }
           // If subscription creation fails because payment method isn't attached, retry with default_incomplete
-          if (createError.message?.includes('payment method') || createError.message?.includes('must be attached')) {
+          else if (createError.message?.includes('payment method') || createError.message?.includes('must be attached')) {
             console.warn('[MEMBERSHIP-SUCCESS] ⚠️ Subscription creation failed with payment method, retrying with default_incomplete:', createError.message);
             // Remove default_payment_method and use default_incomplete instead
             delete subscriptionParams.default_payment_method;
