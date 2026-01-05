@@ -80,22 +80,29 @@ export async function findSubscriptionByPaymentIntentId(
 ): Promise<MembershipSubscriptionDTO | null> {
   try {
     // First, try to find by stripePaymentIntentId field (for Payment Intents created directly)
-    const tenantId = getTenantId();
+    // CRITICAL: Do NOT add tenantId.equals when calling proxy - proxy handler adds it automatically
+    // According to nextjs_api_routes.mdc: "Do NOT add tenantId.equals in your client/server code when calling the proxy"
     const params = new URLSearchParams({
       'stripePaymentIntentId.equals': paymentIntentId,
-      'tenantId.equals': tenantId,
+      // CRITICAL: Filter by status on server side - don't fetch all records and filter in memory
+      'subscriptionStatus.in': 'ACTIVE,TRIAL', // Only fetch ACTIVE or TRIAL subscriptions
+      'size': '1', // Only need one result
+      'sort': 'createdAt,desc', // Get most recent first
     });
     const response = await fetchWithJwtRetry(
       `${getAppUrl()}/api/proxy/membership-subscriptions?${params.toString()}`,
       { cache: 'no-store' }
     );
     if (response.ok) {
-      const items: MembershipSubscriptionDTO[] = await response.json();
+      // Handle both array and paginated response formats
+      const data = await response.json();
+      const items: MembershipSubscriptionDTO[] = Array.isArray(data) ? data : (data.content || []);
+
       if (items.length > 0) {
-        // CRITICAL: Filter out cancelled/expired subscriptions - they should not be returned
-        // Caller should create a new subscription instead
+        // CRITICAL: Server-side filtering should have already filtered out CANCELLED/EXPIRED
+        // But add safety check in case backend doesn't honor the filter
         const activeSubscriptions = items.filter(sub =>
-          sub.subscriptionStatus !== 'CANCELLED' && sub.subscriptionStatus !== 'EXPIRED'
+          sub.subscriptionStatus === 'ACTIVE' || sub.subscriptionStatus === 'TRIAL'
         );
 
         if (activeSubscriptions.length > 0) {
@@ -167,10 +174,14 @@ export async function findSubscriptionByStripeSubscriptionId(
   stripeSubscriptionId: string,
 ): Promise<MembershipSubscriptionDTO | null> {
   try {
-    const tenantId = getTenantId();
+    // CRITICAL: Do NOT add tenantId.equals when calling proxy - proxy handler adds it automatically
+    // According to nextjs_api_routes.mdc: "Do NOT add tenantId.equals in your client/server code when calling the proxy"
     const params = new URLSearchParams({
       'stripeSubscriptionId.equals': stripeSubscriptionId,
-      'tenantId.equals': tenantId,
+      // CRITICAL: Filter by status on server side - don't fetch all records and filter in memory
+      'subscriptionStatus.in': 'ACTIVE,TRIAL', // Only fetch ACTIVE or TRIAL subscriptions
+      'size': '1', // Only need one result
+      'sort': 'createdAt,desc', // Get most recent first
     });
     const response = await fetchWithJwtRetry(
       `${getAppUrl()}/api/proxy/membership-subscriptions?${params.toString()}`,
@@ -194,21 +205,14 @@ export async function findSubscriptionByStripeSubscriptionId(
     const items: MembershipSubscriptionDTO[] = Array.isArray(data) ? data : (data.content || []);
 
     if (items.length === 0) {
-      console.log('[MEMBERSHIP-SUCCESS] No subscriptions found by stripeSubscriptionId:', stripeSubscriptionId);
+      console.log('[MEMBERSHIP-SUCCESS] No ACTIVE/TRIAL subscriptions found by stripeSubscriptionId:', stripeSubscriptionId);
       return null;
     }
 
-    console.log('[MEMBERSHIP-SUCCESS] Found subscriptions by stripeSubscriptionId:', items.map(sub => ({
-      id: sub.id,
-      status: sub.subscriptionStatus,
-      planId: sub.membershipPlanId,
-      stripeSubscriptionId: sub.stripeSubscriptionId,
-    })));
-
-    // CRITICAL: Filter out cancelled/expired subscriptions - they should not be returned
-    // Caller should create a new subscription instead
+    // CRITICAL: Server-side filtering should have already filtered out CANCELLED/EXPIRED
+    // But add safety check in case backend doesn't honor the filter
     const activeSubscriptions = items.filter(sub =>
-      sub.subscriptionStatus !== 'CANCELLED' && sub.subscriptionStatus !== 'EXPIRED'
+      sub.subscriptionStatus === 'ACTIVE' || sub.subscriptionStatus === 'TRIAL'
     );
 
     if (activeSubscriptions.length > 0) {
@@ -216,12 +220,13 @@ export async function findSubscriptionByStripeSubscriptionId(
         id: activeSubscriptions[0].id,
         status: activeSubscriptions[0].subscriptionStatus,
         planId: activeSubscriptions[0].membershipPlanId,
+        stripeSubscriptionId: activeSubscriptions[0].stripeSubscriptionId,
       });
       return activeSubscriptions[0];
     }
 
-    // No active subscription found (all were cancelled/expired)
-    console.log('[MEMBERSHIP-SUCCESS] All subscriptions found were CANCELLED or EXPIRED');
+    // No active subscription found (backend may have returned CANCELLED despite filter)
+    console.log('[MEMBERSHIP-SUCCESS] ⚠️ No ACTIVE/TRIAL subscriptions found (backend may have returned CANCELLED despite filter)');
     return null;
   } catch (error) {
     console.error('[MEMBERSHIP-SUCCESS] Error finding subscription by Stripe subscription ID:', error);
