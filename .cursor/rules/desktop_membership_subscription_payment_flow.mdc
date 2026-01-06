@@ -1744,7 +1744,7 @@ if (customerId) {
 
 **Issue**: When users upgraded to a new plan, the system was creating duplicate subscriptions instead of cancelling the old one first. Additionally, Stripe API was the source of truth but database could be out of sync.
 
-**Root Cause**: 
+**Root Cause**:
 1. System was only checking database for existing subscriptions
 2. Stripe API could have active subscriptions that weren't reflected in database
 3. No cancellation of existing active subscriptions before creating new ones
