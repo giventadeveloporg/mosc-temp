@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Edit, Trash2, Eye, Plus, Search } from 'lucide-react';
+import { Edit, Trash2, Eye, Search } from 'lucide-react';
 import type { EventPollDTO } from '@/types';
 
 interface PollListProps {
@@ -77,10 +77,20 @@ export function PollList({
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold">Polls</h2>
-          <Button onClick={onCreate}>
-            <Plus className="h-4 w-4 mr-2" />
-            Create Poll
-          </Button>
+          <button
+            onClick={onCreate}
+            className="flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+            title="Create Poll"
+            aria-label="Create Poll"
+            type="button"
+          >
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
+              <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+            </div>
+            <span className="font-semibold text-indigo-700">Create Poll</span>
+          </button>
         </div>
         <div className="grid gap-4">
           {[...Array(3)].map((_, i) => (
@@ -110,17 +120,20 @@ export function PollList({
         <h2 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-cyan-600 bg-clip-text text-transparent">
           Poll Management
         </h2>
-        <Button 
+        <button
           onClick={onCreate}
           className="flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
           title="Create Poll"
           aria-label="Create Poll"
+          type="button"
         >
           <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
-            <Plus className="h-6 w-6 text-indigo-600" />
+            <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
           </div>
           <span className="font-semibold text-indigo-700">Create Poll</span>
-        </Button>
+        </button>
       </div>
 
       <div className="relative">
@@ -140,10 +153,20 @@ export function PollList({
               {searchTerm ? 'No polls found matching your search.' : 'No polls created yet.'}
             </p>
             {!searchTerm && (
-              <Button onClick={onCreate} className="mt-4">
-                <Plus className="h-4 w-4 mr-2" />
-                Create Your First Poll
-              </Button>
+              <button
+                onClick={onCreate}
+                className="mt-4 flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                title="Create Your First Poll"
+                aria-label="Create Your First Poll"
+                type="button"
+              >
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-indigo-700">Create Your First Poll</span>
+              </button>
             )}
           </CardContent>
         </Card>

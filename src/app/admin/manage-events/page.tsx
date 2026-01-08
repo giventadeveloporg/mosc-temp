@@ -42,6 +42,11 @@ export default function ManageEventsPage() {
   const [searchField, setSearchField] = useState<'title' | 'id' | 'caption'>('title');
   const [searchId, setSearchId] = useState('');
   const [showPastEvents, setShowPastEvents] = useState(false);
+  // Track event counts for both future and past to determine auto-switch and messages
+  const [futureEventCount, setFutureEventCount] = useState<number | null>(null);
+  const [pastEventCount, setPastEventCount] = useState<number | null>(null);
+  const [hasCheckedInitialLoad, setHasCheckedInitialLoad] = useState(false);
+  const [isAutoSwitching, setIsAutoSwitching] = useState(false);
   // Delete confirmation dialog state
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteStatus, setDeleteStatus] = useState<DeleteStatus>('idle');
@@ -57,22 +62,59 @@ export default function ManageEventsPage() {
   const [eventToActivate, setEventToActivate] = useState<EventDetailsDTO | null>(null);
   const [activateChildEventCount, setActivateChildEventCount] = useState(0);
 
-  async function loadAll(pageNum = 0) {
+  async function loadAll(pageNum = 0, checkInitialLoad = false) {
     setLoading(true);
     setError(null);
     try {
       // Build date filtering based on toggle
       const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
 
+      // Determine which view we're loading (future or past)
+      let loadingPastEvents = showPastEvents;
+
+      // On initial load, check both future and past event counts
+      if (checkInitialLoad && !hasCheckedInitialLoad && pageNum === 0 && !searchTitle && !searchId && !searchCaption && !searchStartDate && !searchEndDate) {
+        // Check future events count
+        const futureParams: any = {
+          admissionType: searchAdmissionType,
+          sort: 'startDate,asc',
+          pageNum: 0,
+          pageSize: 1, // Just need count, not data
+          startDate: today,
+        };
+        const { totalCount: futureCount } = await fetchEventsFilteredServer(futureParams);
+        setFutureEventCount(futureCount);
+
+        // Check past events count
+        const pastParams: any = {
+          admissionType: searchAdmissionType,
+          sort: 'startDate,desc',
+          pageNum: 0,
+          pageSize: 1, // Just need count, not data
+          endDate: today,
+        };
+        const { totalCount: pastCount } = await fetchEventsFilteredServer(pastParams);
+        setPastEventCount(pastCount);
+
+        setHasCheckedInitialLoad(true);
+
+        // Auto-switch to past events if no future events but past events exist
+        if (futureCount === 0 && pastCount > 0) {
+          setIsAutoSwitching(true);
+          setShowPastEvents(true);
+          loadingPastEvents = true; // Load past events data in this same call
+        }
+      }
+
       const filterParams: any = {
         admissionType: searchAdmissionType,
-        sort: showPastEvents ? 'startDate,desc' : 'startDate,asc', // Override sort based on toggle
+        sort: loadingPastEvents ? 'startDate,desc' : 'startDate,asc', // Override sort based on toggle
         pageNum,
         pageSize,
       };
 
-      // Apply date filtering based on toggle
-      if (showPastEvents) {
+      // Apply date filtering based on toggle (use loadingPastEvents which respects auto-switch)
+      if (loadingPastEvents) {
         // Show events that ended before today
         filterParams.endDate = today;
       } else {
@@ -105,7 +147,14 @@ export default function ManageEventsPage() {
 
   useEffect(() => {
     if (userId) {
-      loadAll(page);
+      // Skip reload if we're currently auto-switching (prevents double-load)
+      if (isAutoSwitching) {
+        setIsAutoSwitching(false); // Reset flag after skipping
+        return;
+      }
+      // On initial load (first render), check both future and past counts
+      const isInitialLoad = !hasCheckedInitialLoad && page === 0 && !searchTitle && !searchId && !searchCaption && !searchStartDate && !searchEndDate;
+      loadAll(page, isInitialLoad);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, searchTitle, searchId, searchCaption, searchField, searchStartDate, searchEndDate, searchAdmissionType, sort, showPastEvents]);
@@ -550,6 +599,80 @@ export default function ManageEventsPage() {
       {error && (
         <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
           {error}
+        </div>
+      )}
+
+      {/* Info box when there are no events at all (both future and past) */}
+      {!loading && hasCheckedInitialLoad && futureEventCount === 0 && pastEventCount === 0 && (
+        <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              <svg className="h-6 w-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-base font-medium text-blue-800 mb-1">
+                There are no events listed yet.
+              </h3>
+              <p className="text-sm text-blue-700">
+                Please check back again. New events will appear here once they are created. Please use future / past events switch above.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Message above table when showing past events because no future events exist */}
+      {!loading && hasCheckedInitialLoad && showPastEvents && futureEventCount === 0 && pastEventCount > 0 && (
+        <div className="mb-4 bg-amber-50 border border-amber-200 rounded-lg p-4">
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm font-medium text-amber-800">
+                Here is the list of recent events. New future events will be added soon. Please use future / past events switch above.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Info box when showing future events but there are no future events */}
+      {!loading && hasCheckedInitialLoad && !showPastEvents && futureEventCount === 0 && (
+        <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              <svg className="h-6 w-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div className="ml-3 flex-1">
+              <h3 className="text-base font-medium text-blue-800 mb-1">
+                No future events created.
+              </h3>
+              <p className="text-sm text-blue-700 mb-4">
+                Please use future / past events switch above.
+              </p>
+              {/* Create New Event Button */}
+              <Link
+                href="/admin/events/new"
+                className="inline-flex items-center gap-2 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                title="Create Event"
+                aria-label="Create Event"
+              >
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-blue-700">Create New Event</span>
+              </Link>
+            </div>
+          </div>
         </div>
       )}
 
