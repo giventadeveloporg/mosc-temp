@@ -2,271 +2,230 @@
   "meta": {
     "projectName": "nextjs-template",
     "version": "1.5.0",
-    "source": ".task-master/FRONTEND_PRD.html",
+    "source": ".task-master/qr_scanner_and_enhanced_reporting_prd.html",
     "description": "Tasks generated from PRD",
-    "totalTasksGenerated": 20,
-    "tasksIncluded": 20
+    "totalTasksGenerated": 18,
+    "tasksIncluded": 18
   },
   "tasks": [
     {
       "id": 1,
-      "title": "Add DTOs to TypeScript Types",
-      "description": "Create TypeScript interfaces matching backend DTOs for the promotion email management system.",
+      "title": "Set up QR Scanner dependencies",
+      "description": "Install and configure the necessary libraries for QR code scanning functionality.",
       "status": "pending",
       "dependencies": [],
       "priority": "high",
-      "details": "Add TypeScript interfaces to src/types/index.ts:\n- PromotionEmailTemplateDTO - Full template data\n- PromotionEmailTemplateFormDTO - Form data for create/update\n- SendPromotionEmailDTO - Email sending request\n- PromotionEmailSentLogDTO - Sent email log entry\n\nEnsure interfaces match backend OpenAPI schema exactly, include optional fields with proper types, add JSDoc comments, and export all interfaces.",
-      "testStrategy": "Verify that all TypeScript interfaces match the backend OpenAPI schema exactly. Test with sample data to ensure type safety."
+      "details": "Install the required dependencies for QR code scanning:\n- Install react-qr-reader or @zxing/library and @zxing/browser\n- Configure dynamic imports to avoid SSR issues\n- Test basic camera access using MediaDevices API",
+      "testStrategy": "Verify that the dependencies are properly installed and can be imported without errors."
     },
     {
       "id": 2,
-      "title": "Create Template List/Create Proxy",
-      "description": "Create proxy handler for GET (list) and POST (create) operations for promotion email templates.",
+      "title": "Create QrScanner component",
+      "description": "Build a reusable QR scanner component with camera access and scanning functionality.",
       "status": "pending",
       "dependencies": [
         1
       ],
       "priority": "high",
-      "details": "Create proxy handler in src/pages/api/proxy/promotion-email-templates/index.ts:\n- Use createProxyHandler from @/lib/proxyHandler\n- Set backendPath: '/api/promotion-email-templates'\n- Support query parameters: eventId.equals, isActive.equals, sort, page, size\n- Follow cursor rules: no local DTO declarations, use fetchWithJwtRetry",
-      "testStrategy": "Test the proxy by making GET and POST requests and verifying the correct responses. Test with various query parameters."
+      "details": "Create a client-side QrScanner component that:\n- Requests camera permissions\n- Supports both front-facing and rear-facing cameras\n- Allows switching between cameras\n- Provides visual feedback during scanning\n- Handles camera permission errors\n- Works on desktop and mobile devices",
+      "testStrategy": "Test the component with various devices and browsers to ensure camera access works correctly. Verify the component provides appropriate feedback when permissions are denied."
     },
     {
       "id": 3,
-      "title": "Create Template Get/Update/Delete Proxy",
-      "description": "Create proxy handler for single template operations (GET, PATCH, DELETE).",
+      "title": "Implement QR verification API route",
+      "description": "Create an API endpoint to validate QR codes and return ticket information.",
       "status": "pending",
       "dependencies": [
         1
       ],
       "priority": "high",
-      "details": "Create proxy handler in src/pages/api/proxy/promotion-email-templates/[...slug].ts:\n- Use createProxyHandler from @/lib/proxyHandler\n- Set backendPath: '/api/promotion-email-templates'\n- Support GET (by ID), PATCH (update), DELETE operations\n- Handle slug pattern: ['id'] or ['id', 'send-test'] or ['id', 'send-bulk']",
-      "testStrategy": "Test GET, PATCH, and DELETE operations with valid and invalid IDs. Verify correct handling of different slug patterns."
+      "details": "Implement the /api/qr/verify route that:\n- Parses QR code data (transaction ID, URL, or JSON)\n- Fetches transaction details from the backend\n- Validates ticket status (not REFUNDED or CANCELLED)\n- Returns validation result with transaction details\n- Handles errors gracefully",
+      "testStrategy": "Test with various QR code formats, valid and invalid tickets, and network error scenarios."
     },
     {
       "id": 4,
-      "title": "Create Email Sending Proxy Routes",
-      "description": "Create proxy handlers for test and bulk email sending endpoints.",
-      "status": "pending",
-      "dependencies": [
-        1
-      ],
-      "priority": "high",
-      "details": "Create proxy handlers for email sending:\n- src/pages/api/proxy/promotion-email-templates/[id]/send-test.ts\n- src/pages/api/proxy/promotion-email-templates/[id]/send-bulk.ts\n\nRequirements:\n- Use createProxyHandler or custom handler\n- POST method only\n- Forward request body to backend\n- Handle errors gracefully",
-      "testStrategy": "Test sending test and bulk emails with valid and invalid data. Verify error handling for various scenarios."
-    },
-    {
-      "id": 5,
-      "title": "Create Email Log Proxy",
-      "description": "Create proxy handler for querying email logs with filtering and pagination.",
-      "status": "pending",
-      "dependencies": [
-        1
-      ],
-      "priority": "medium",
-      "details": "Create proxy handler in src/pages/api/proxy/promotion-email-sent-logs/index.ts:\n- Use createProxyHandler\n- Set backendPath: '/api/promotion-email-sent-logs'\n- Support filtering: eventId.equals, templateId.equals, sentAt.greaterThanOrEqual, sentAt.lessThanOrEqual, emailStatus.equals\n- Support pagination: sort, page, size",
-      "testStrategy": "Test the proxy with various filter combinations and pagination parameters. Verify correct data is returned."
-    },
-    {
-      "id": 6,
-      "title": "Create ApiServerActions.ts",
-      "description": "Create server actions for all API calls related to promotion email templates.",
+      "title": "Create Admin QR Scanner page",
+      "description": "Build the admin page for scanning QR codes and validating tickets.",
       "status": "pending",
       "dependencies": [
         2,
-        3,
-        4,
-        5
+        3
       ],
       "priority": "high",
-      "details": "Create server actions in src/app/admin/promotion-emails/ApiServerActions.ts with functions:\n- fetchPromotionEmailTemplatesServer(params)\n- fetchPromotionEmailTemplateServer(id)\n- createPromotionEmailTemplateServer(formData)\n- updatePromotionEmailTemplateServer(id, formData)\n- deletePromotionEmailTemplateServer(id)\n- sendTestEmailServer(templateId, recipientEmail)\n- sendBulkEmailServer(templateId, recipientEmails?)\n- fetchPromotionEmailSentLogsServer(params)\n\nAll functions must use fetchWithJwtRetry, getAppUrl for absolute URLs, handle errors with try-catch, return typed responses, and use withTenantId for DTOs.",
-      "testStrategy": "Test each server action with valid and invalid inputs. Verify correct error handling and response types."
+      "details": "Create the /admin/qr-scanner page that:\n- Integrates the QrScanner component\n- Handles scan results and sends them to the verification API\n- Displays validation results with clear visual feedback\n- Redirects to the check-in page for valid tickets\n- Handles errors with appropriate messages",
+      "testStrategy": "Test the complete flow from scanning to verification to redirection. Verify all error states are handled properly."
+    },
+    {
+      "id": 5,
+      "title": "Update Check-In Flow",
+      "description": "Enhance the existing check-in page to work seamlessly with QR scanner.",
+      "status": "pending",
+      "dependencies": [
+        4
+      ],
+      "priority": "high",
+      "details": "Update the existing check-in page to:\n- Pre-populate form when accessed via QR scan\n- Add \"Scan Another QR Code\" button\n- Improve check-in success feedback\n- Update the database with check-in status, time, and number of guests",
+      "testStrategy": "Test the entire check-in process using the QR scanner to verify that tickets are properly checked in and the UI provides clear feedback."
+    },
+    {
+      "id": 6,
+      "title": "Create Check-In History Server Actions",
+      "description": "Implement server actions to fetch check-in history and analytics data.",
+      "status": "pending",
+      "dependencies": [
+        5
+      ],
+      "priority": "medium",
+      "details": "Create server actions that:\n- Fetch check-in history with pagination and filtering\n- Calculate check-in analytics (total, percentage, timeline)\n- Support date range filtering\n- Use fetchWithJwtRetry for backend calls",
+      "testStrategy": "Test with various filter parameters and verify the data matches what's in the database."
     },
     {
       "id": 7,
-      "title": "Create PromotionEmailTemplateList Component",
-      "description": "Build a component to display a list of email templates with filtering, sorting, and pagination.",
+      "title": "Implement Check-In Analytics Dashboard",
+      "description": "Create a dashboard to visualize check-in statistics and history.",
       "status": "pending",
       "dependencies": [
         6
       ],
-      "priority": "high",
-      "details": "Create component in src/app/admin/promotion-emails/components/PromotionEmailTemplateList.tsx with features:\n- Display template name, event, subject, status\n- Filter by event (dropdown)\n- Search by template name\n- Sort by created date, name\n- Pagination\n- Actions: Edit, Duplicate, Delete, Send Test, Send Bulk\n\nUI Requirements:\n- Responsive design (mobile-friendly)\n- Loading states\n- Empty state message\n- Error handling display\n- Confirmation dialogs for delete",
-      "testStrategy": "Test component rendering with various data sets. Test filtering, sorting, pagination, and all action buttons."
+      "priority": "medium",
+      "details": "Build the check-in analytics dashboard that shows:\n- Real-time check-in count\n- Check-in percentage\n- Check-in timeline chart\n- Check-ins by ticket type\n- Filterable check-in history list\n- Date range selector",
+      "testStrategy": "Verify that all charts and statistics accurately reflect the data. Test date range filtering."
     },
     {
       "id": 8,
-      "title": "Create PromotionEmailTemplateForm Component",
-      "description": "Build a form component for creating and editing email templates with all required fields.",
+      "title": "Implement Check-In Export functionality",
+      "description": "Add the ability to export check-in data to CSV and Excel formats.",
       "status": "pending",
       "dependencies": [
-        6
+        7
       ],
-      "priority": "high",
-      "details": "Create component in src/app/admin/promotion-emails/components/PromotionEmailTemplateForm.tsx with fields:\n- Event (Select, required)\n- Template Name (Text Input, required)\n- Subject (Text Input, required)\n- Discount Code (Select, optional)\n- Header Image (Image Upload, optional)\n- Footer Image (Image Upload, optional)\n- Body HTML (Rich Text Editor, required)\n- Active Status (Toggle, optional)\n\nRequirements:\n- Form validation\n- Event selector loads events from API\n- Discount code selector updates when event changes\n- Option to create new discount code inline\n- Image upload with drag-and-drop\n- Image preview before saving\n- Rich text editor for HTML body\n- Live preview of email template\n- Save, Cancel, Send Test buttons",
-      "testStrategy": "Test form submission with valid and invalid data. Test field validation, image uploads, and dynamic field updates."
+      "priority": "medium",
+      "details": "Create export functionality that:\n- Exports check-in data to CSV format\n- Exports check-in data to Excel format\n- Includes attendee details, check-in time, and ticket type\n- Supports date range filtering\n- Handles large datasets efficiently",
+      "testStrategy": "Test exports with various data sizes and verify the exported files contain the correct information."
     },
     {
       "id": 9,
-      "title": "Create ImageUpload Component",
-      "description": "Build a reusable component for image uploading with drag-and-drop and preview functionality.",
+      "title": "Create Sales Analytics Server Actions",
+      "description": "Implement server actions to fetch sales analytics data.",
       "status": "pending",
-      "dependencies": [],
-      "priority": "high",
-      "details": "Create component in src/app/admin/promotion-emails/components/ImageUpload.tsx with features:\n- Drag-and-drop file upload\n- File selection via button\n- Image preview\n- Image validation (size, format)\n- Upload progress indicator\n- Error handling\n- Remove/replace image\n\nIntegration:\n- Use existing media upload API or S3 upload service\n- Return S3 URL after upload\n- Store URL in form state",
-      "testStrategy": "Test image uploads with various file types and sizes. Test drag-and-drop, file selection, preview, and error handling."
+      "dependencies": [
+        5
+      ],
+      "priority": "medium",
+      "details": "Create server actions that:\n- Fetch sales data with filtering\n- Calculate revenue metrics (gross, net, fees)\n- Generate sales trends over time\n- Break down sales by ticket type\n- Support date range filtering",
+      "testStrategy": "Test with various filter parameters and verify the calculations are accurate."
     },
     {
       "id": 10,
-      "title": "Create PromotionEmailHistory Component",
-      "description": "Build a component to display sent email logs with filtering and details view.",
+      "title": "Implement Enhanced Sales Dashboard",
+      "description": "Create an improved sales dashboard with charts and detailed analytics.",
+      "status": "pending",
+      "dependencies": [
+        9
+      ],
+      "priority": "medium",
+      "details": "Build the enhanced sales dashboard that shows:\n- Sales trends over time (line chart)\n- Revenue by ticket type (pie/bar chart)\n- Daily/hourly sales breakdown\n- Discount code usage statistics\n- Refund statistics\n- Average ticket price\n- Customizable date ranges",
+      "testStrategy": "Verify that all charts and statistics accurately reflect the data. Test date range filtering."
+    },
+    {
+      "id": 11,
+      "title": "Implement Sales Report Export functionality",
+      "description": "Add the ability to export sales data to multiple formats.",
+      "status": "pending",
+      "dependencies": [
+        10
+      ],
+      "priority": "medium",
+      "details": "Create export functionality that:\n- Exports sales data to CSV format\n- Exports sales data to Excel format\n- Exports sales data to PDF format (optional)\n- Includes transaction details, amounts, discounts, refunds\n- Supports date range filtering\n- Handles large datasets efficiently",
+      "testStrategy": "Test exports with various data sizes and verify the exported files contain the correct information."
+    },
+    {
+      "id": 12,
+      "title": "Implement Mobile Optimization for QR Scanner",
+      "description": "Ensure the QR scanner works well on mobile devices.",
+      "status": "pending",
+      "dependencies": [
+        4
+      ],
+      "priority": "high",
+      "details": "Optimize the QR scanner for mobile devices:\n- Test and fix issues on iOS Safari\n- Test and fix issues on Android Chrome\n- Handle mobile camera orientation changes\n- Optimize for mobile performance (battery, processing)\n- Provide touch-friendly controls",
+      "testStrategy": "Test on various mobile devices and browsers to ensure consistent performance."
+    },
+    {
+      "id": 13,
+      "title": "Implement Error Handling for QR Scanner",
+      "description": "Add comprehensive error handling for the QR scanner.",
+      "status": "pending",
+      "dependencies": [
+        4
+      ],
+      "priority": "high",
+      "details": "Implement error handling for:\n- Camera permission denial\n- Invalid QR codes\n- Network errors during validation\n- Duplicate check-ins\n- Expired or invalid tickets\n- Provide clear error messages for each case",
+      "testStrategy": "Test each error scenario to verify appropriate error messages are displayed."
+    },
+    {
+      "id": 14,
+      "title": "Create Custom Date Range Selector component",
+      "description": "Build a reusable date range selector for analytics dashboards.",
+      "status": "pending",
+      "dependencies": [],
+      "priority": "medium",
+      "details": "Create a date range selector component that:\n- Allows selection of custom date ranges\n- Provides preset options (last 7 days, last 30 days, etc.)\n- Updates parent components when range changes\n- Has a clean, intuitive interface",
+      "testStrategy": "Test with various date selections and verify the component correctly updates."
+    },
+    {
+      "id": 15,
+      "title": "Implement Check-In History View",
+      "description": "Create a filterable, paginated view of check-in history.",
       "status": "pending",
       "dependencies": [
         6
       ],
       "priority": "medium",
-      "details": "Create component in src/app/admin/promotion-emails/components/PromotionEmailHistory.tsx with features:\n- Table showing: recipient, subject, sent date, status\n- Filter by event, date range, status\n- Search by recipient email\n- Pagination\n- View email details modal\n- Resend failed emails\n\nStatus Indicators:\n- SENT - Green badge\n- FAILED - Red badge\n- BOUNCED - Orange badge",
-      "testStrategy": "Test component with various log data. Test filtering, pagination, details view, and resend functionality."
-    },
-    {
-      "id": 11,
-      "title": "Redesign Promotion Emails Page",
-      "description": "Implement the main promotion emails page with all components integrated.",
-      "status": "pending",
-      "dependencies": [
-        7,
-        8,
-        10
-      ],
-      "priority": "high",
-      "details": "Redesign page in src/app/admin/promotion-emails/page.tsx with structure:\n\n1. Header Section\n   - Page title: \"Promotion Email Management\"\n   - Create New Template button\n   - Admin Navigation component\n\n2. Template Management Section\n   - Template list component\n   - Filters and search\n   - Template actions\n\n3. Template Form Section\n   - Show/hide based on create/edit mode\n   - Template form component\n   - Form actions\n\n4. Email History Section\n   - Tab or accordion for history\n   - Email history component\n\nState Management:\n- Selected template (for edit mode)\n- Form mode (create/edit/view)\n- Loading states\n- Error messages\n- Success messages",
-      "testStrategy": "Test the complete page flow including creating, editing, and deleting templates. Test navigation between different sections."
-    },
-    {
-      "id": 12,
-      "title": "Integrate Event Selector",
-      "description": "Integrate existing event selection functionality with the template form.",
-      "status": "pending",
-      "dependencies": [
-        8
-      ],
-      "priority": "high",
-      "details": "Integrate event selector with the template form:\n- Reuse fetchEventsFilteredServer from admin API\n- Filter events by tenant\n- Display event title and date\n- Handle event selection\n- Update dependent fields when event changes",
-      "testStrategy": "Test event selection with various tenant filters. Test that dependent fields update correctly when event changes."
-    },
-    {
-      "id": 13,
-      "title": "Integrate Discount Code Selector",
-      "description": "Integrate discount code selection functionality with the template form.",
-      "status": "pending",
-      "dependencies": [
-        8,
-        12
-      ],
-      "priority": "high",
-      "details": "Integrate discount code selector with the template form:\n- Use fetchDiscountCodesForEvent from discount code API\n- Update dropdown when event changes\n- Display code, type, value, validity\n- Option to create new discount code (link to discount code page)",
-      "testStrategy": "Test discount code selection with various events. Test that the dropdown updates correctly when event changes."
-    },
-    {
-      "id": 14,
-      "title": "Integrate Rich Text Editor",
-      "description": "Integrate a rich text editor for the email body HTML field.",
-      "status": "pending",
-      "dependencies": [
-        8
-      ],
-      "priority": "medium",
-      "details": "Integrate rich text editor for HTML body:\n- Use React Quill, TinyMCE, or similar library\n- Support HTML editing\n- Preview mode\n- Sanitize HTML output\n- Handle content changes in form state",
-      "testStrategy": "Test rich text editor functionality including formatting, HTML editing, and preview. Test that content is correctly saved in form state."
-    },
-    {
-      "id": 15,
-      "title": "Add Loading States",
-      "description": "Implement loading states for all asynchronous operations.",
-      "status": "pending",
-      "dependencies": [
-        7,
-        8,
-        10,
-        11
-      ],
-      "priority": "medium",
-      "details": "Add loading states throughout the application:\n- Loading spinners for API calls\n- Skeleton loaders for lists\n- Disabled buttons during operations\n- Implement consistent loading state management",
-      "testStrategy": "Test loading states by simulating slow network responses. Verify that UI elements are appropriately disabled during loading."
+      "details": "Build a check-in history view that:\n- Displays a chronological list of check-ins\n- Shows attendee name, ticket type, check-in time, number of guests\n- Supports filtering by date range and ticket type\n- Includes pagination for large datasets\n- Allows searching by attendee name or email",
+      "testStrategy": "Test pagination, filtering, and search functionality with various datasets."
     },
     {
       "id": 16,
-      "title": "Add Error Handling",
-      "description": "Implement comprehensive error handling for all operations.",
+      "title": "Implement Revenue Analytics Components",
+      "description": "Create components to display detailed revenue statistics.",
       "status": "pending",
       "dependencies": [
-        6,
-        7,
-        8,
-        10,
-        11
+        9
       ],
       "priority": "medium",
-      "details": "Add error handling throughout the application:\n- Display error messages clearly\n- Handle validation errors\n- Handle network errors\n- Implement retry mechanisms\n- Show user-friendly error messages",
-      "testStrategy": "Test error handling by simulating various error conditions including validation errors, network errors, and server errors."
+      "details": "Create components that display:\n- Gross revenue (total sales)\n- Net revenue (after discounts, refunds)\n- Platform fees\n- Tax amounts\n- Revenue by payment method\n- Revenue trends (daily, weekly, monthly)",
+      "testStrategy": "Verify that all revenue calculations are accurate and reflect the data in the database."
     },
     {
       "id": 17,
-      "title": "Add Success Feedback",
-      "description": "Implement success feedback for all user actions.",
+      "title": "Add Navigation Links to Admin Menu",
+      "description": "Update the admin menu to include links to new features.",
       "status": "pending",
       "dependencies": [
+        4,
         7,
-        8,
-        10,
-        11
+        10
       ],
       "priority": "low",
-      "details": "Add success feedback throughout the application:\n- Success toast notifications\n- Confirmation messages\n- Auto-refresh lists after operations\n- Clear feedback for completed actions",
-      "testStrategy": "Test success feedback for all user actions including create, update, delete, and send operations."
+      "details": "Add navigation links to:\n- QR Scanner page\n- Check-In Analytics dashboard\n- Enhanced Sales Reports\n- Ensure proper access control for admin-only routes",
+      "testStrategy": "Verify that the links appear correctly in the admin menu and lead to the right pages."
     },
     {
       "id": 18,
-      "title": "Add Form Validation",
-      "description": "Implement comprehensive form validation for the template form.",
+      "title": "Implement Comprehensive Testing",
+      "description": "Conduct thorough testing of all implemented features.",
       "status": "pending",
       "dependencies": [
-        8
+        5,
+        8,
+        11,
+        12,
+        13
       ],
       "priority": "high",
-      "details": "Add form validation to the template form:\n- Client-side validation\n- Real-time error messages\n- Required field indicators\n- Format validation (email, URLs)\n- Prevent submission of invalid forms",
-      "testStrategy": "Test form validation with various invalid inputs. Test that submission is prevented for invalid forms and that error messages are displayed correctly."
-    },
-    {
-      "id": 19,
-      "title": "Implement Responsive Design",
-      "description": "Ensure all components are responsive across different screen sizes.",
-      "status": "pending",
-      "dependencies": [
-        7,
-        8,
-        9,
-        10,
-        11
-      ],
-      "priority": "medium",
-      "details": "Implement responsive design throughout the application:\n- Mobile-first approach\n- Support breakpoints: sm (640px), md (768px), lg (1024px), xl (1280px)\n- Table should scroll horizontally on mobile\n- Form should stack vertically on mobile\n- Buttons should be full-width on mobile\n- Image upload should work on touch devices",
-      "testStrategy": "Test the application at various screen sizes and breakpoints. Verify that all components are usable on mobile devices."
-    },
-    {
-      "id": 20,
-      "title": "Implement Accessibility Features",
-      "description": "Ensure the application meets accessibility standards.",
-      "status": "pending",
-      "dependencies": [
-        7,
-        8,
-        9,
-        10,
-        11
-      ],
-      "priority": "medium",
-      "details": "Implement accessibility features throughout the application:\n- Proper ARIA labels on all interactive elements\n- Keyboard navigation support\n- Focus indicators\n- Screen reader support\n- Color contrast compliance (WCAG AA)\n- Alt text for images",
-      "testStrategy": "Test accessibility using screen readers and keyboard navigation. Verify color contrast compliance with WCAG AA standards."
+      "details": "Test all features according to the testing strategy:\n- QR Scanner testing on multiple devices and browsers\n- Check-In Analytics data accuracy and filtering\n- Sales Reports calculations and exports\n- Error handling in all components\n- Performance testing for large datasets",
+      "testStrategy": "Follow the testing strategy outlined in the PRD for each feature."
     }
   ]
 }

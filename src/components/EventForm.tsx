@@ -1826,17 +1826,17 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
         </button>
         <button
           type="button"
-          className="flex-1 sm:flex-1 flex-shrink-0 h-14 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center gap-0 sm:gap-3 transition-all duration-300 hover:scale-105"
+          className="flex-1 sm:flex-1 flex-shrink-0 h-14 rounded-xl bg-orange-100 hover:bg-orange-200 flex items-center justify-center gap-0 sm:gap-3 transition-all duration-300 hover:scale-105"
           onClick={handleReset}
           title="Reset Form"
           aria-label="Reset Form"
         >
-          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center">
-            <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-200 flex items-center justify-center">
+            <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
           </div>
-          <span className="font-semibold text-gray-700 hidden sm:inline">Reset</span>
+          <span className="font-semibold text-orange-700 hidden sm:inline">Reset</span>
         </button>
         <button
           type="button"

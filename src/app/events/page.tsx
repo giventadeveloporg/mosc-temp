@@ -37,23 +37,23 @@ function DescriptionDisplay({ description }: { description: string }) {
           e.stopPropagation();
           setIsExpanded(!isExpanded);
         }}
-        className="mt-3 inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-full border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 font-medium text-sm"
+        className="mt-3 flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+        title={isExpanded ? "Show Less" : "Read More"}
+        aria-label={isExpanded ? "Show Less" : "Read More"}
+        type="button"
       >
-        {isExpanded ? (
-          <>
-            <span>Show Less</span>
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+          {isExpanded ? (
+            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
             </svg>
-          </>
-        ) : (
-          <>
-            <span>Read More</span>
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          ) : (
+            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
-          </>
-        )}
+          )}
+        </div>
+        <span className="font-semibold text-blue-700">{isExpanded ? "Show Less" : "Read More"}</span>
       </button>
     </div>
   );
@@ -74,6 +74,11 @@ export default function EventsPage() {
   const [searchDateFrom, setSearchDateFrom] = useState("");
   const [searchDateTo, setSearchDateTo] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  // Track event counts for both future and past to determine auto-switch and messages
+  const [futureEventCount, setFutureEventCount] = useState<number | null>(null);
+  const [pastEventCount, setPastEventCount] = useState<number | null>(null);
+  const [hasCheckedInitialLoad, setHasCheckedInitialLoad] = useState(false);
+  const [isAutoSwitching, setIsAutoSwitching] = useState(false);
 
   // Array of modern background colors inspired by the Dribbble design
   const cardBackgrounds = [
@@ -95,6 +100,12 @@ export default function EventsPage() {
   };
 
   useEffect(() => {
+    // Skip reload if we're currently auto-switching (prevents double-load)
+    if (isAutoSwitching) {
+      setIsAutoSwitching(false); // Reset flag after skipping
+      return;
+    }
+
     async function fetchEvents() {
       setLoading(true);
       setFetchError(false);
@@ -103,8 +114,48 @@ export default function EventsPage() {
         // Fetch more events from backend to account for recurring event filtering
         // We fetch BACKEND_FETCH_SIZE events to ensure we have at least EVENTS_PAGE_SIZE after filtering
         const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+
+        // Determine which view we're loading (future or past)
+        let loadingPastEvents = showPastEvents;
+
+        // On initial load, check both future and past event counts
+        if (!hasCheckedInitialLoad && page === 0 && !searchTitle && !searchDateFrom && !searchDateTo) {
+          // Check future events count
+          const futureQueryParams = new URLSearchParams({
+            sort: 'startDate,asc',
+            page: '0',
+            size: '1', // Just need count, not data
+            'isActive.equals': 'true',
+            'startDate.greaterThanOrEqual': today
+          });
+          const futureRes = await fetch(`/api/proxy/event-details?${futureQueryParams.toString()}`);
+          const finalFutureCount = futureRes.ok ? parseInt(futureRes.headers.get('x-total-count') || '0', 10) : 0;
+          setFutureEventCount(finalFutureCount);
+
+          // Check past events count
+          const pastQueryParams = new URLSearchParams({
+            sort: 'startDate,desc',
+            page: '0',
+            size: '1', // Just need count, not data
+            'isActive.equals': 'true',
+            'endDate.lessThan': today
+          });
+          const pastRes = await fetch(`/api/proxy/event-details?${pastQueryParams.toString()}`);
+          const finalPastCount = pastRes.ok ? parseInt(pastRes.headers.get('x-total-count') || '0', 10) : 0;
+          setPastEventCount(finalPastCount);
+
+          setHasCheckedInitialLoad(true);
+
+          // Auto-switch to past events if no future events but past events exist
+          if (finalFutureCount === 0 && finalPastCount > 0) {
+            setIsAutoSwitching(true);
+            setShowPastEvents(true);
+            loadingPastEvents = true; // Load past events data in this same call
+          }
+        }
+
         const queryParams = new URLSearchParams({
-          sort: showPastEvents ? 'startDate,desc' : 'startDate,asc',
+          sort: loadingPastEvents ? 'startDate,desc' : 'startDate,asc',
           page: page.toString(),
           size: BACKEND_FETCH_SIZE.toString(), // Fetch more to account for filtering
           'isActive.equals': 'true' // Only show active events
@@ -125,8 +176,8 @@ export default function EventsPage() {
             queryParams.append('startDate.lessThanOrEqual', searchDateTo);
           }
         } else {
-          // No search date range specified, use toggle logic
-          if (showPastEvents) {
+          // No search date range specified, use toggle logic (use loadingPastEvents which respects auto-switch)
+          if (loadingPastEvents) {
             // Show events that ended before today
             queryParams.append('endDate.lessThan', today);
           } else {
@@ -283,6 +334,7 @@ export default function EventsPage() {
       }
     }
     fetchEvents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, showPastEvents, searchTitle, searchDateFrom, searchDateTo]);
 
   // Helper to generate Google Calendar URL
@@ -781,38 +833,45 @@ export default function EventsPage() {
                 <button
                   onClick={handleSearch}
                   disabled={loading || isSearching}
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-xl border-2 border-blue-400 transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 w-fit"
-                  aria-label="Search events"
+                  className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  title="Search Events"
+                  aria-label="Search Events"
+                  type="button"
                 >
                   {loading || isSearching ? (
                     <>
-                      <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center">
-                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                        <svg className="animate-spin w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
                       </div>
-                      <span className="text-lg">Searching...</span>
+                      <span className="font-semibold text-blue-700">Searching...</span>
                     </>
                   ) : (
                     <>
-                      <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                        <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                        <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                       </div>
-                      <span className="text-lg">Search Events</span>
+                      <span className="font-semibold text-blue-700">Search Events</span>
                     </>
                   )}
                 </button>
                 <button
                   onClick={clearSearch}
-                  className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-medium py-3 px-6 rounded-xl border-2 border-emerald-400 transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-3 w-fit"
-                  aria-label="Clear search filters"
+                  className="flex-shrink-0 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                  title="Clear Search"
+                  aria-label="Clear Search"
+                  type="button"
                 >
-                  <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-200 flex items-center justify-center">
+                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </div>
-                  <span className="text-lg">Clear Search</span>
+                  <span className="font-semibold text-red-700">Clear Search</span>
                 </button>
               </div>
             </div>
@@ -837,6 +896,67 @@ export default function EventsPage() {
             )}
           </div>
         </div>
+
+        {/* Info box when there are no events at all (both future and past) */}
+        {!loading && hasCheckedInitialLoad && futureEventCount === 0 && pastEventCount === 0 && events.length === 0 && !fetchError && (
+          <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-6 w-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-base font-medium text-blue-800 mb-1">
+                  There are no events listed yet.
+                </h3>
+                <p className="text-sm text-blue-700">
+                  Please check back again. New events will appear here once they are created. Please use future / past events switch above.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Message above table when showing past events because no future events exist */}
+        {!loading && hasCheckedInitialLoad && showPastEvents && futureEventCount === 0 && pastEventCount > 0 && !fetchError && (
+          <div className="mb-4 bg-amber-50 border border-amber-200 rounded-lg p-4">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-amber-800">
+                  Here is the list of recent events. New future events will be added soon. Please use future / past events switch above.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Info box when showing future events but there are no future events */}
+        {!loading && hasCheckedInitialLoad && !showPastEvents && futureEventCount === 0 && events.length === 0 && !fetchError && (
+          <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-6 w-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-base font-medium text-blue-800 mb-1">
+                  No future events created.
+                </h3>
+                <p className="text-sm text-blue-700">
+                  Please use future / past events switch above.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {loading ? (
           <div className="flex justify-center items-center min-h-[400px]">
             <div className="relative">
@@ -857,7 +977,7 @@ export default function EventsPage() {
           <div className="text-center text-red-600 font-bold py-8">
             Sorry, we couldn't load events at this time. Please try again later.
           </div>
-        ) : events.length === 0 ? (
+        ) : events.length === 0 && (hasCheckedInitialLoad && !(futureEventCount === 0 && pastEventCount === 0) && !(futureEventCount === 0 && !showPastEvents)) ? (
           <div className="text-center text-gray-500 py-8">
             No events found.
           </div>
@@ -1183,15 +1303,17 @@ export default function EventsPage() {
                         {/* See Event Details Button - Links to event details page */}
                         <Link
                           href={`/events/${event.id}`}
-                          className="bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-3 px-6 rounded-xl border-2 border-emerald-400 transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-3"
+                          className="flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                          title="See Event Details"
+                          aria-label="See Event Details"
                         >
-                          <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                            <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+                            <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                             </svg>
                           </div>
-                          <span className="text-lg">See Event Details</span>
+                          <span className="font-semibold text-green-700">See Event Details</span>
                         </Link>
                       </div>
                     </div>

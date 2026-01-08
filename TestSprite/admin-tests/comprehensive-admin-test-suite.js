@@ -359,6 +359,15 @@ const dynamicEventPages = [
     validation: ['Media management page loads', 'Upload controls visible', 'Media grid/list displayed']
   },
   {
+    id: 'admin-event-003b',
+    name: 'Event Media Upload',
+    urlPattern: '/admin/events/{eventId}/media',
+    category: 'events',
+    priority: 'high',
+    expectedElements: ['h1', 'input[type="file"]', 'button', '[class*="upload"]'],
+    validation: ['Media upload page loads', 'Upload controls visible', 'Upload form displayed']
+  },
+  {
     id: 'admin-event-004',
     name: 'Event Sponsors',
     urlPattern: '/admin/events/{eventId}/sponsors',
@@ -457,8 +466,48 @@ async function runTest(page, test, config) {
     error: null,
     screenshot: null,
     elementsFound: [],
-    validations: []
+    validations: [],
+    jsErrors: [],
+    consoleErrors: []
   };
+
+  // Track JavaScript errors and console errors
+  const jsErrors = [];
+  const consoleErrors = [];
+
+  // Set up error listeners before navigation
+  page.on('pageerror', (error) => {
+    jsErrors.push({
+      type: 'pageerror',
+      message: error.message,
+      stack: error.stack
+    });
+    console.error(`   ⚠️  JavaScript Error: ${error.message}`);
+  });
+
+  page.on('console', (msg) => {
+    const type = msg.type();
+    const text = msg.text();
+    
+    // Capture console errors and warnings
+    if (type === 'error' || type === 'warning') {
+      consoleErrors.push({
+        type: type,
+        message: text
+      });
+      
+      // Log critical errors (ReferenceError, TypeError, etc.)
+      if (type === 'error' && (
+        text.includes('ReferenceError') ||
+        text.includes('TypeError') ||
+        text.includes('is not defined') ||
+        text.includes('Cannot read') ||
+        text.includes('Failed to')
+      )) {
+        console.error(`   ⚠️  Console ${type}: ${text}`);
+      }
+    }
+  });
 
   try {
     console.log(`\n🧪 [${test.id}] ${test.name}`);
@@ -508,6 +557,47 @@ async function runTest(page, test, config) {
       await page.waitForTimeout(2000);
     } catch (waitError) {
       console.warn(`   ⚠️  Could not wait for main content: ${waitError.message}`);
+    }
+
+    // Check for JavaScript errors after page load
+    // Wait a bit more to catch errors that occur during component rendering
+    await page.waitForTimeout(1000);
+    
+    // Store JavaScript errors in result
+    result.jsErrors = jsErrors;
+    result.consoleErrors = consoleErrors;
+
+    // Fail test if critical JavaScript errors are detected
+    if (jsErrors.length > 0) {
+      const criticalErrors = jsErrors.filter(err => {
+        const msg = err.message.toLowerCase();
+        return msg.includes('referenceerror') ||
+               msg.includes('typeerror') ||
+               msg.includes('is not defined') ||
+               msg.includes('cannot read');
+      });
+
+      if (criticalErrors.length > 0) {
+        const errorMessages = criticalErrors.map(err => err.message).join('; ');
+        throw new Error(`JavaScript runtime error detected: ${errorMessages}`);
+      }
+    }
+
+    // Check for critical console errors
+    const criticalConsoleErrors = consoleErrors.filter(err => {
+      const msg = err.message.toLowerCase();
+      return err.type === 'error' && (
+        msg.includes('referenceerror') ||
+        msg.includes('typeerror') ||
+        msg.includes('is not defined') ||
+        msg.includes('cannot read') ||
+        msg.includes('failed to')
+      );
+    });
+
+    if (criticalConsoleErrors.length > 0) {
+      const errorMessages = criticalConsoleErrors.map(err => err.message).join('; ');
+      throw new Error(`Console error detected: ${errorMessages}`);
     }
 
     // Check for expected elements
@@ -841,6 +931,22 @@ function generateReport() {
             <span class="test-status ${test.status.toLowerCase()}">${test.status}</span>
           </div>
           ${test.error ? `<div class="test-error">❌ ${test.error}</div>` : ''}
+          ${test.jsErrors && test.jsErrors.length > 0 ? `
+            <div class="test-error">
+              ⚠️ JavaScript Errors (${test.jsErrors.length}):
+              <ul style="margin: 5px 0; padding-left: 20px;">
+                ${test.jsErrors.map(err => `<li>${err.message}</li>`).join('')}
+              </ul>
+            </div>
+          ` : ''}
+          ${test.consoleErrors && test.consoleErrors.length > 0 ? `
+            <div class="test-details" style="color: #f59e0b;">
+              ⚠️ Console Warnings/Errors (${test.consoleErrors.length}):
+              <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
+                ${test.consoleErrors.slice(0, 5).map(err => `<li>[${err.type}] ${err.message.substring(0, 100)}${err.message.length > 100 ? '...' : ''}</li>`).join('')}
+              </ul>
+            </div>
+          ` : ''}
           ${test.elementsFound.length > 0 ? `
             <div class="test-details">
               📊 Elements found: ${test.elementsFound.length}/${test.expectedElements?.length || 0}

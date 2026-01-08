@@ -1,7 +1,9 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { useAuth, useUser } from '@clerk/nextjs';
+import { usePathname } from 'next/navigation';
 import HeroSection from '../components/HeroSection';
 import LiveEventsSection from '../components/LiveEventsSection';
 import FeaturedEventsSection from '../components/FeaturedEventsSection';
@@ -15,6 +17,7 @@ import ProjectsSection from '../components/ProjectsSection';
 import TestimonialsSection from '../components/TestimonialsSection';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { useTenantSettings } from '@/components/TenantSettingsProvider';
+import { bootstrapUserProfile } from '@/components/ProfileBootstrapperApiServerActions';
 
 // Fallback components for when data is not available
 const EventsFallback = () => (
@@ -513,5 +516,65 @@ function HomePageContent() {
 // Main HomePage component
 // Note: TenantSettingsProvider is now in root layout, so no need to wrap here
 export default function HomePage() {
+  const pathname = usePathname();
+  const { isSignedIn, userId, isLoaded } = useAuth();
+  const { user } = useUser();
+  const [hasCheckedRedirect, setHasCheckedRedirect] = useState(false);
+
+  // CRITICAL: Redirect new sign-ups from home page to /profile
+  // This catches cases where Clerk redirects to home page after signup
+  // IMPORTANT: Only redirect if the 'signup-redirected' flag is set (user just signed up)
+  // Clear the flag after redirect to prevent affecting subsequent logins
+  useEffect(() => {
+    if (isLoaded && isSignedIn && userId && user && !hasCheckedRedirect && typeof window !== 'undefined') {
+      const currentPath = pathname || window.location.pathname;
+      
+      // Only redirect if we're on the home page AND user just signed up (flag is set)
+      // Fix: Changed from !sessionStorage.getItem to check if flag IS set
+      const hasJustSignedUp = sessionStorage.getItem('signup-redirected') === 'true';
+      
+      if (currentPath === '/' && hasJustSignedUp) {
+        console.log('[HomePage] 🔄 New sign-up detected on home page, redirecting to /profile');
+        
+        // Mark that we've checked to prevent multiple redirects
+        setHasCheckedRedirect(true);
+        
+        // Clear the flag immediately to prevent it from affecting subsequent logins
+        sessionStorage.removeItem('signup-redirected');
+        
+        // Extract serializable data from user object (client reference)
+        const userData = {
+          email: user.primaryEmailAddress?.emailAddress || user.emailAddresses?.[0]?.emailAddress || "",
+          firstName: user.firstName || "",
+          lastName: user.lastName || "",
+          imageUrl: user.imageUrl || "",
+        };
+        
+        // Bootstrap profile in background, then redirect
+        bootstrapUserProfile({ userId, userData })
+          .then(() => {
+            console.log('[HomePage] ✅ Bootstrap completed, redirecting to /profile');
+          })
+          .catch((err) => {
+            console.error('[HomePage] ⚠️ Bootstrap failed, but still redirecting:', err);
+          })
+          .finally(() => {
+            // Always redirect to /profile after signup (never to home page)
+            console.log('[HomePage] 🎯 Redirecting to /profile');
+            setTimeout(() => {
+              window.location.href = '/profile';
+            }, 100);
+          });
+      } else {
+        // Not a new sign-up, mark as checked
+        // Also clear any stale signup-redirected flags from previous sessions
+        if (hasJustSignedUp && currentPath !== '/') {
+          sessionStorage.removeItem('signup-redirected');
+        }
+        setHasCheckedRedirect(true);
+      }
+    }
+  }, [isLoaded, isSignedIn, userId, user, pathname, hasCheckedRedirect]);
+
   return <HomePageContent />;
 }

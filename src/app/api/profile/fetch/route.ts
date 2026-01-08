@@ -74,6 +74,28 @@ export async function POST(request: NextRequest) {
           await new Promise(resolve => setTimeout(resolve, 200));
           // Fetch the newly created profile (with Clerk data to avoid extra calls)
           profile = await fetchUserProfileServer(clerkUserId, clerkUserData);
+        } else if (syncResponse.status === 500) {
+          // Check if error is due to duplicate key (profile already exists)
+          try {
+            const errorBody = JSON.parse(syncResponseText);
+            if (errorBody.error && errorBody.error.includes('duplicate key value violates unique constraint')) {
+              console.log('[PROFILE-FETCH-API] ℹ️ Profile already exists (duplicate key), fetching existing profile...');
+              // Profile already exists - fetch it instead of treating as error
+              await new Promise(resolve => setTimeout(resolve, 200));
+              profile = await fetchUserProfileServer(clerkUserId, clerkUserData);
+            } else {
+              console.error('[PROFILE-FETCH-API] ❌ Failed to create user:', syncResponse.status, syncResponseText);
+            }
+          } catch (parseError) {
+            // If response is not JSON, check if it contains duplicate key error string
+            if (syncResponseText.includes('duplicate key value violates unique constraint')) {
+              console.log('[PROFILE-FETCH-API] ℹ️ Profile already exists (duplicate key), fetching existing profile...');
+              await new Promise(resolve => setTimeout(resolve, 200));
+              profile = await fetchUserProfileServer(clerkUserId, clerkUserData);
+            } else {
+              console.error('[PROFILE-FETCH-API] ❌ Failed to create user:', syncResponse.status, syncResponseText);
+            }
+          }
         } else {
           console.error('[PROFILE-FETCH-API] ❌ Failed to create user:', syncResponse.status, syncResponseText);
         }
