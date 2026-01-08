@@ -24,6 +24,9 @@
     "test:comprehensive": "node TestSprite/sanity-tests/run-comprehensive-sanity-tests-with-testsprite.js",
     "test:public": "node TestSprite/sanity-tests/run-public-pages-tests.js",
     "test:admin": "node TestSprite/admin-tests/comprehensive-admin-test-suite.js",
+    "test:admin:dynamic": "node TestSprite/admin-tests/dynamic-event-test-suite.js",
+    "test:admin:all": "npm run test:admin && npm run test:admin:dynamic",
+    "test:admin:diagnose": "node TestSprite/admin-tests/diagnose-event-discovery.js",
     "test:install-playwright": "npx playwright install chromium"
   },
   "dependencies": {
