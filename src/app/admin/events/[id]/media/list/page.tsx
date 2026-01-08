@@ -1,7 +1,7 @@
 "use client";
 import React, { useRef, useState, useEffect, useCallback, useTransition } from "react";
 import { EventMediaDTO, EventDetailsDTO } from "@/types";
-import { FaEdit, FaTrashAlt, FaUsers, FaPhotoVideo, FaCalendarAlt, FaSave, FaTimes, FaChevronLeft, FaChevronRight, FaTicketAlt, FaUpload, FaBan, FaTags, FaHome } from 'react-icons/fa';
+import { FaEdit, FaTrashAlt, FaUsers, FaPhotoVideo, FaCalendarAlt, FaTimes, FaTicketAlt, FaBan, FaTags, FaHome } from 'react-icons/fa';
 import { deleteMediaServer, editMediaServer, fetchMediaFilteredServer } from '../ApiServerActions';
 import { fetchEventDetailsServer } from '@/app/admin/ApiServerActions';
 import { createPortal } from "react-dom";
@@ -408,24 +408,43 @@ function EditMediaModal({ media, onClose, onSave, loading }: EditMediaModalProps
           </div>
         </div>
 
-        <div className="flex justify-end space-x-4 pt-4">
+        <div className="flex flex-row gap-3 sm:gap-4 pt-4">
           <button
             type="button"
             onClick={onClose}
-            className="bg-teal-100 hover:bg-teal-200 text-teal-800 px-4 py-2 rounded-md flex items-center gap-2"
+            className="flex-1 flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             disabled={loading}
+            title="Cancel"
+            aria-label="Cancel"
           >
-            <FaBan />
-            Cancel
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </div>
+            <span className="font-semibold text-blue-700">Cancel</span>
           </button>
           <button
             type="button"
             onClick={(e) => handleSubmit(e)}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2"
+            className="flex-1 flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             disabled={loading}
+            title={loading ? 'Saving...' : 'Save Changes'}
+            aria-label={loading ? 'Saving...' : 'Save Changes'}
           >
-            <FaSave />
-            {loading ? 'Saving...' : 'Save Changes'}
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+              {loading ? (
+                <svg className="animate-spin w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              ) : (
+                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              )}
+            </div>
+            <span className="font-semibold text-green-700">{loading ? 'Saving...' : 'Save Changes'}</span>
           </button>
         </div>
       </form>
@@ -731,9 +750,18 @@ export default function EventMediaListPage() {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Media Files for Event</h1>
         <div className="flex space-x-2">
-          <Link href={`/admin/events/${eventId}/media`} className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 flex items-center gap-2">
-            <FaUpload />
-            Upload New Media
+          <Link
+            href={`/admin/events/${eventId}/media`}
+            className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+            title="Upload New Media"
+            aria-label="Upload New Media"
+          >
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+            </div>
+            <span className="font-semibold text-blue-700">Upload New Media</span>
           </Link>
         </div>
       </div>
@@ -777,15 +805,22 @@ export default function EventMediaListPage() {
             </div>
             <button
               onClick={handleScrollToSerialNumber}
-              className="mt-6 sm:mt-0 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg flex items-center gap-2 transition-colors"
+              className="mt-6 sm:mt-0 flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+              title="Go to Image"
+              aria-label="Go to Image"
+              type="button"
             >
-              <FaUsers />
-              Go to Image
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <span className="font-semibold text-blue-700">Go to Image</span>
             </button>
           </div>
 
           {/* Boolean field filters */}
-          <div className="flex flex-wrap items-center gap-4 mt-4">
+          <div className="flex flex-wrap items-center gap-4 mt-4 pl-10">
             <label className="flex items-center gap-2 cursor-pointer">
               <span className="relative flex items-center justify-center">
                 <input
@@ -1003,35 +1038,66 @@ export default function EventMediaListPage() {
         </div>
       )}
 
-      {!loading && totalCount > 0 && (
-        <div className="mt-8">
-          <div className="flex justify-between items-center">
-            <button
-              onClick={handlePrevPage}
-              disabled={page === 0}
-              className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
-            >
-              <FaChevronLeft />
-              Previous
-            </button>
-            <div className="text-sm font-semibold text-gray-700">
-              Page {page + 1} of {totalPages}
-            </div>
-            <button
-              onClick={handleNextPage}
-              disabled={page >= totalPages - 1}
-              className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
-            >
-              Next
-              <FaChevronRight />
-            </button>
+      {/* Pagination Controls - Always visible, matching admin page style */}
+      <div className="mt-8">
+        <div className="flex justify-between items-center gap-2">
+          {/* Previous Button */}
+          <button
+            onClick={handlePrevPage}
+            disabled={page === 0 || loading}
+            className="px-3 sm:px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+            title="Previous Page"
+            aria-label="Previous Page"
+            type="button"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+            </svg>
+            <span className="hidden sm:inline">Previous</span>
+          </button>
+
+          {/* Page Info */}
+          <div className="px-2 sm:px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm flex-shrink-0">
+            <span className="text-xs sm:text-sm font-bold text-blue-700">
+              Page <span className="text-blue-600">{page + 1}</span> of <span className="text-blue-600">{totalPages}</span>
+            </span>
           </div>
-          <div className="text-center text-sm text-gray-600 mt-2">
-            Showing <span className="font-medium">{startItem}</span> to <span className="font-medium">{endItem}</span> of{' '}
-            <span className="font-medium">{totalCount}</span> results
-          </div>
+
+          {/* Next Button */}
+          <button
+            onClick={handleNextPage}
+            disabled={page >= totalPages - 1 || loading}
+            className="px-3 sm:px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+            title="Next Page"
+            aria-label="Next Page"
+            type="button"
+          >
+            <span className="hidden sm:inline">Next</span>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
         </div>
-      )}
+
+        {/* Item Count Text */}
+        <div className="text-center mt-3">
+          {totalCount > 0 ? (
+            <div className="inline-flex items-center px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+              <span className="text-sm text-gray-700">
+                Showing <span className="font-bold text-blue-600">{startItem}</span> to <span className="font-bold text-blue-600">{endItem}</span> of <span className="font-bold text-blue-600">{totalCount}</span> results
+              </span>
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 border-2 border-orange-300 rounded-lg shadow-sm">
+              <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="text-sm font-medium text-orange-700">No media found</span>
+              <span className="text-sm text-orange-600">[No media match your criteria]</span>
+            </div>
+          )}
+        </div>
+      </div>
 
       {deletingMedia && (
         <Modal open={!!deletingMedia} onClose={() => setDeletingMedia(null)} title="Confirm Deletion">

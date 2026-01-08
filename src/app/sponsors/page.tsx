@@ -227,13 +227,13 @@ export default function SponsorsPage() {
                 ))}
               </div>
 
-              {/* Pagination Controls - MOSC Styling */}
+              {/* Pagination Controls - Standard Admin Style */}
               <div className="mt-8">
                 <div className="flex justify-between items-center">
                   <button
                     onClick={handlePrevPage}
                     disabled={!hasPrevPage}
-                    className="px-5 py-2.5 bg-primary hover:bg-accent text-primary-foreground font-semibold rounded-lg sacred-shadow border-2 border-primary hover:border-accent disabled:bg-muted disabled:border-border disabled:text-muted-foreground disabled:cursor-not-allowed flex items-center gap-2 reverent-transition hover:scale-105 hover:sacred-shadow-lg"
+                    className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
                     title="Previous Page"
                     aria-label="Previous Page"
                     type="button"
@@ -241,25 +241,25 @@ export default function SponsorsPage() {
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
                     </svg>
-                    <span className="font-body">Previous</span>
+                    <span>Previous</span>
                   </button>
 
                   {/* Page Info */}
-                  <div className="px-4 py-2 bg-muted border-2 border-border rounded-lg sacred-shadow-sm">
-                    <span className="font-body text-sm font-bold text-foreground">
-                      Page <span className="text-primary">{currentPage}</span> of <span className="text-primary">{Math.max(totalPages, 1)}</span>
+                  <div className="px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+                    <span className="text-sm font-bold text-blue-700">
+                      Page <span className="text-blue-600">{currentPage}</span> of <span className="text-blue-600">{Math.max(totalPages, 1)}</span>
                     </span>
                   </div>
 
                   <button
                     onClick={handleNextPage}
                     disabled={!hasNextPage}
-                    className="px-5 py-2.5 bg-primary hover:bg-accent text-primary-foreground font-semibold rounded-lg sacred-shadow border-2 border-primary hover:border-accent disabled:bg-muted disabled:border-border disabled:text-muted-foreground disabled:cursor-not-allowed flex items-center gap-2 reverent-transition hover:scale-105 hover:sacred-shadow-lg"
+                    className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
                     title="Next Page"
                     aria-label="Next Page"
                     type="button"
                   >
-                    <span className="font-body">Next</span>
+                    <span>Next</span>
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                     </svg>
@@ -267,12 +267,22 @@ export default function SponsorsPage() {
                 </div>
 
                 {/* Item Count Text */}
-                <div className="text-center mt-4">
-                  <div className="inline-flex items-center px-4 py-2 bg-muted border-2 border-border rounded-lg sacred-shadow-sm">
-                    <span className="font-body text-sm text-muted-foreground">
-                      Showing <span className="font-bold text-primary">{filteredSponsors.length > 0 ? startItem : 0}</span> to <span className="font-bold text-primary">{filteredSponsors.length > 0 ? endItem : 0}</span> of <span className="font-bold text-primary">{totalCount}</span> sponsors
-                    </span>
-                  </div>
+                <div className="text-center mt-3">
+                  {totalCount > 0 ? (
+                    <div className="inline-flex items-center px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+                      <span className="text-sm text-gray-700">
+                        Showing <span className="font-bold text-blue-600">{filteredSponsors.length > 0 ? startItem : 0}</span> to <span className="font-bold text-blue-600">{filteredSponsors.length > 0 ? endItem : 0}</span> of <span className="font-bold text-blue-600">{totalCount}</span> sponsors
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 border-2 border-orange-300 rounded-lg shadow-sm">
+                      <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span className="text-sm font-medium text-orange-700">No sponsors found</span>
+                      <span className="text-sm text-orange-600">[No sponsors match your criteria]</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </>

@@ -6,6 +6,7 @@ import { UserProfileDTO } from '@/types';
 import ProfileForm from '@/components/ProfileForm';
 import { ProfileReconciliationTrigger } from '@/components/ProfileReconciliationTrigger';
 import ErrorDialog from '@/components/ErrorDialog';
+import { ProfileBootstrapper } from '@/components/ProfileBootstrapper';
 import Image from 'next/image';
 
 /**
@@ -21,6 +22,19 @@ export default function ProfilePageWithLoading() {
   const [showErrorDialog, setShowErrorDialog] = useState(false);
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
   const [lastResponseStatus, setLastResponseStatus] = useState<number | null>(null);
+
+  // Clear the signup-redirected flag when user successfully lands on profile page
+  // This prevents the flag from persisting and affecting subsequent logins
+  useEffect(() => {
+    if (typeof window !== 'undefined' && isLoaded && userId) {
+      // Clear the flag if it exists (user completed signup flow)
+      const hasJustSignedUp = sessionStorage.getItem('signup-redirected') === 'true';
+      if (hasJustSignedUp) {
+        console.log('[ProfilePage] ✅ User successfully reached profile page, clearing signup-redirected flag');
+        sessionStorage.removeItem('signup-redirected');
+      }
+    }
+  }, [isLoaded, userId]);
 
   useEffect(() => {
     if (isLoaded && userId) {
@@ -140,6 +154,9 @@ export default function ProfilePageWithLoading() {
   // Show profile form
   return (
     <>
+      {/* Bootstrap user profile on page load (creates profile if it doesn't exist) */}
+      <ProfileBootstrapper />
+      
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Profile</h1>
@@ -155,6 +172,27 @@ export default function ProfilePageWithLoading() {
             <p className="text-blue-800 text-sm">
               🔄 Profile data is being loaded. If you continue to see this message, please refresh the page.
             </p>
+          </div>
+        )}
+
+        {/* Show registration completion message for new users */}
+        {!profile && lastResponseStatus !== 401 && userId && (
+          <div className="mb-6 p-4 bg-blue-50 border-2 border-blue-400 rounded-lg shadow-sm">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="ml-3 flex-1">
+                <p className="text-base font-semibold text-blue-900">
+                  Please complete your registration
+                </p>
+                <p className="text-sm text-blue-700 mt-1">
+                  Fill in your profile information below to finish setting up your account.
+                </p>
+              </div>
+            </div>
           </div>
         )}
 

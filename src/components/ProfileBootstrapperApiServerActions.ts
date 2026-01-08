@@ -4,7 +4,18 @@ import { getTenantId } from '@/lib/env';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-export async function bootstrapUserProfile({ userId, user }: { userId: string, user: any }) {
+export async function bootstrapUserProfile({ 
+  userId, 
+  userData 
+}: { 
+  userId: string, 
+  userData?: { 
+    email?: string;
+    firstName?: string;
+    lastName?: string;
+    imageUrl?: string;
+  } 
+}) {
   if (!userId) return;
   try {
     const tenantId = getTenantId();
@@ -40,10 +51,7 @@ export async function bootstrapUserProfile({ userId, user }: { userId: string, u
 
     // 2. Fallback: lookup by email
     if (res.status === 404) {
-      let email = "";
-      if (user) {
-        email = user.primaryEmailAddress?.emailAddress || user.emailAddresses?.[0]?.emailAddress || "";
-      }
+      const email = userData?.email || "";
       if (email) {
         let emailToken = token;
         let emailRes = await fetch(`${API_BASE_URL}/api/user-profiles?email.equals=${encodeURIComponent(email)}&tenantId.equals=${tenantId}`, {
@@ -66,10 +74,10 @@ export async function bootstrapUserProfile({ userId, user }: { userId: string, u
             const updatedProfile = {
               ...userProfile,
               userId,
-              firstName: user?.firstName || userProfile.firstName || "",
-              lastName: user?.lastName || userProfile.lastName || "",
+              firstName: userData?.firstName || userProfile.firstName || "",
+              lastName: userData?.lastName || userProfile.lastName || "",
               email,
-              profileImageUrl: user?.imageUrl || userProfile.profileImageUrl || "",
+              profileImageUrl: userData?.imageUrl || userProfile.profileImageUrl || "",
               updatedAt: now,
               tenantId,
             };
@@ -96,9 +104,9 @@ export async function bootstrapUserProfile({ userId, user }: { userId: string, u
       const profile = {
         userId,
         email,
-        firstName: user?.firstName || "",
-        lastName: user?.lastName || "",
-        profileImageUrl: user?.imageUrl || "",
+        firstName: userData?.firstName || "",
+        lastName: userData?.lastName || "",
+        profileImageUrl: userData?.imageUrl || "",
         tenantId,
         createdAt: now,
         updatedAt: now,

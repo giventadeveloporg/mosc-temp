@@ -25,9 +25,10 @@ const MOSCFooter = () => {
         {/* Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 items-start">
           {/* Church Info */}
-          <div className="space-y-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-16 h-16 bg-transparent rounded-full flex items-center justify-center overflow-hidden p-2 flex-shrink-0" style={{ background: 'transparent' }}>
+          <div className="justify-items-center">
+            {/* Logo - Larger and Centered */}
+            <div className="flex justify-center justify-items-center md:justify-start">
+              <div className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 bg-transparent rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0" style={{ background: 'transparent' }}>
                 <AppImage
                   src="/images/event_1/mosc_email/logo-mosc.png"
                   alt="Malankara Orthodox Syrian Church emblem"
@@ -35,12 +36,9 @@ const MOSCFooter = () => {
                   style={{ background: 'transparent' }}
                 />
               </div>
-              <div>
-                <h3 className="font-heading font-semibold text-lg text-foreground">Malankara Orthodox Syrian Church</h3>
-                <p className="text-sm text-muted-foreground">Saint Thomas Christian Community</p>
-              </div>
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            {/* Historical Text */}
+            <p className="text-sm text-muted-foreground leading-relaxed text-justify">
               The Malankara Orthodox Syrian Church traces its origins to the apostolic mission of St. Thomas,
               one of the twelve apostles of Jesus Christ, who established Christianity in India in 52 AD.
             </p>

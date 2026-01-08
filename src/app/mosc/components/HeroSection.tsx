@@ -18,9 +18,9 @@ const HeroSection = () => {
         </div>
 
         {/* Three Circular Images */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 mb-16 items-center">
           {/* Patriarch Image */}
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center justify-center">
             <div className="w-48 h-48 lg:w-56 lg:h-56 rounded-full overflow-hidden sacred-shadow-lg bg-muted flex items-center justify-center">
               <AppImage
                 src="/images/logos/Hero-Section-Image-MOSC.jpg"
@@ -33,10 +33,10 @@ const HeroSection = () => {
           </div>
 
           {/* Church Cross */}
-          <div className="flex flex-col items-center">
-            <div className="w-48 h-48 lg:w-56 lg:h-56 overflow-hidden flex items-center justify-center bg-transparent p-2">
+          <div className="flex flex-col items-center justify-center">
+            <div className="w-48 h-48 lg:w-96 lg:h-96 overflow-hidden flex items-center justify-center bg-transparent p-2">
               <AppImage
-                src="/images/logos/inner_header_img.png"
+                src="/images/logos/MOSC-cross-image.png"
                 alt="MOSC Hero Image"
                 className="w-full h-full object-contain scale-110"
                 style={{ background: 'transparent' }}
@@ -47,7 +47,7 @@ const HeroSection = () => {
           </div>
 
           {/* Christ Iconography */}
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center justify-center">
             <div className="w-48 h-48 lg:w-56 lg:h-56 overflow-hidden flex items-center justify-center sacred-shadow-lg rounded-full p-3" style={{ background: 'transparent' }}>
               <AppImage
                 src="/images/event_1/mosc_email/logo-mosc.png"

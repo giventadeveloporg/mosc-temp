@@ -2,7 +2,7 @@
 import React, { useState, useTransition, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import Link from 'next/link';
-import { FaUsers, FaCalendarAlt, FaEdit, FaTrashAlt, FaPlus, FaSave, FaTimes, FaBan, FaPhotoVideo, FaTicketAlt, FaTags } from 'react-icons/fa';
+import { FaUsers, FaCalendarAlt, FaTrashAlt, FaSave, FaTimes, FaBan, FaPhotoVideo, FaTicketAlt, FaTags } from 'react-icons/fa';
 import type { EventDetailsDTO, EventTicketTypeDTO, EventTicketTypeFormDTO } from '@/types';
 import { Modal } from '@/components/Modal';
 import SaveStatusDialog, { SaveStatus } from '@/components/SaveStatusDialog';
@@ -480,9 +480,17 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
         <h2 className="text-xl font-bold text-gray-800 break-words flex-1 min-w-0">Ticket Types for {eventDetails?.title}</h2>
         <button
           onClick={handleAddNewClick}
-          className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors w-full sm:w-auto whitespace-nowrap"
+          className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 w-full sm:w-auto whitespace-nowrap"
+          title="Add New Ticket Type"
+          aria-label="Add New Ticket Type"
+          type="button"
         >
-          <FaPlus /> Add New Ticket Type
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+          </div>
+          <span className="font-semibold text-blue-700">Add New Ticket Type</span>
         </button>
       </div>
 
@@ -537,12 +545,32 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center justify-center gap-4">
-                    <button onClick={() => handleEditClick(ticketType)} className="flex flex-col items-center text-blue-600 hover:text-blue-800 focus:outline-none">
-                      <FaEdit className="w-7 h-7" />
+                    <button
+                      onClick={() => handleEditClick(ticketType)}
+                      className="flex flex-col items-center focus:outline-none transition-all duration-300 hover:scale-110"
+                      title="Edit Ticket Type"
+                      aria-label="Edit Ticket Type"
+                      type="button"
+                    >
+                      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                        <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </div>
                       <span className="text-[10px] text-gray-600 mt-1 block font-bold">Edit</span>
                     </button>
-                    <button onClick={() => handleDeleteClick(ticketType)} className="flex flex-col items-center text-red-600 hover:text-red-800 focus:outline-none">
-                      <FaTrashAlt className="w-7 h-7" />
+                    <button
+                      onClick={() => handleDeleteClick(ticketType)}
+                      className="flex flex-col items-center focus:outline-none transition-all duration-300 hover:scale-110"
+                      title="Delete Ticket Type"
+                      aria-label="Delete Ticket Type"
+                      type="button"
+                    >
+                      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-200 flex items-center justify-center">
+                        <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </div>
                       <span className="text-[10px] text-gray-600 mt-1 block font-bold">Delete</span>
                     </button>
                   </div>
