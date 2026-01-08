@@ -27,7 +27,12 @@ export async function fetchUserProfileServer(
     if (response.ok) {
       const data = await response.json();
       console.log('[Profile Server] ✅ Profile found by userId');
-      return Array.isArray(data) ? data[0] : data;
+      // Handle empty array case - return null if no profile found
+      if (Array.isArray(data)) {
+        return data.length > 0 ? data[0] : null;
+      }
+      // Handle single object case
+      return data && data.id ? data : null;
     }
 
     // Step 2: Fallback to email lookup (only if userId lookup fails)
@@ -65,7 +70,13 @@ export async function fetchUserProfileServer(
 
       if (emailRes.ok) {
         const emailData = await emailRes.json();
-        const profile = Array.isArray(emailData) ? emailData[0] : emailData;
+        // Handle empty array case - return null if no profile found
+        let profile = null;
+        if (Array.isArray(emailData)) {
+          profile = emailData.length > 0 ? emailData[0] : null;
+        } else {
+          profile = emailData && emailData.id ? emailData : null;
+        }
 
         if (profile && profile.id) {
           console.log('[Profile Server] ✅ Profile found by email');
