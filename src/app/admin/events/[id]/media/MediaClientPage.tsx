@@ -1,7 +1,7 @@
 "use client";
 import React, { useRef, useState, useEffect } from "react";
 import { EventMediaDTO, EventDetailsDTO } from "@/types";
-import { FaEdit, FaTrashAlt, FaUpload, FaFolderOpen, FaSpinner, FaBan, FaTimes, FaCheckCircle } from 'react-icons/fa';
+import { FaEdit, FaTrashAlt, FaUpload, FaFolderOpen, FaSpinner, FaBan, FaTimes, FaCheckCircle, FaPhotoVideo } from 'react-icons/fa';
 import { deleteMediaServer, editMediaServer } from './ApiServerActions';
 import { createPortal } from "react-dom";
 import Link from 'next/link';

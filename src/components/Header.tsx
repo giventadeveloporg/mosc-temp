@@ -685,7 +685,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
   // 2. Settings exist (not null)
   // 3. showTeamSection is explicitly true
   if (!settingsLoading && settings && showTeamSection) {
-    aboutDropdown.push({ name: 'Team', href: '/#team-section' });
+    aboutDropdown.push({ name: 'Team', href: '/team' });
   }
   // Always add Sponsors menu item
   aboutDropdown.push({ name: 'Sponsors', href: '/sponsors' });
@@ -737,7 +737,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                     const isAboutActive = hasDropdown && item.name === 'About' && item.dropdown.some(
                       (subItem: any) => subItem.href === pathname ||
                         (subItem.href === '/#about-us' && typeof window !== 'undefined' && window.location.hash === '#about-us') ||
-                        (subItem.href === '/#team-section' && typeof window !== 'undefined' && window.location.hash === '#team-section') ||
+                        (subItem.href === '/team' && pathname === '/team') ||
                         (subItem.href === '/sponsors' && pathname === '/sponsors')
                     );
                     const isFeaturesActive = hasDropdown && item.name === 'Features' && item.dropdown.some(
@@ -792,7 +792,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                                   const isSubItemActive = subItem.href === pathname ||
                                     (subItem.href === '/membership' && pathname?.startsWith('/membership')) ||
                                     (subItem.href === '/#about-us' && typeof window !== 'undefined' && window.location.hash === '#about-us') ||
-                                    (subItem.href === '/#team-section' && typeof window !== 'undefined' && window.location.hash === '#team-section');
+                                    (subItem.href === '/team' && pathname === '/team');
 
                                   return (
                                     <Link
@@ -1170,7 +1170,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                               (subItem.href === '/membership' && pathname?.startsWith('/membership')) ||
                               (subItem.href === '/mosc' && pathname?.startsWith('/mosc')) ||
                               (subItem.href === '/#about-us' && typeof window !== 'undefined' && window.location.hash === '#about-us') ||
-                              (subItem.href === '/#team-section' && typeof window !== 'undefined' && window.location.hash === '#team-section') ||
+                              (subItem.href === '/team' && pathname === '/team') ||
                               (subItem.href === '/sponsors' && pathname === '/sponsors');
 
                             return (

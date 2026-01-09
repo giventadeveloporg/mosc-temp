@@ -73,8 +73,27 @@ export function GalleryEventCard({ eventWithMedia }: GalleryEventCardProps) {
   return (
     <>
       <div className={`${getCardBackground(event.id!)} rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border border-white/50 flex flex-col`}>
-        {/* Hero Image */}
-        <div className="relative h-48 bg-gray-200">
+        {/* Hero Image - Clickable to open slideshow */}
+        <div 
+          className={`relative h-48 bg-gray-200 ${media.length > 0 ? 'cursor-pointer hover:opacity-90 transition-opacity duration-200' : ''}`}
+          onClick={() => {
+            if (media.length > 0) {
+              console.log('Banner image clicked for event:', event.title, 'Media count:', media.length);
+              setShowSlideshow(true);
+            }
+          }}
+          role={media.length > 0 ? 'button' : undefined}
+          tabIndex={media.length > 0 ? 0 : undefined}
+          onKeyDown={(e) => {
+            if (media.length > 0 && (e.key === 'Enter' || e.key === ' ')) {
+              e.preventDefault();
+              console.log('Banner image activated via keyboard for event:', event.title, 'Media count:', media.length);
+              setShowSlideshow(true);
+            }
+          }}
+          aria-label={media.length > 0 ? 'View Gallery' : undefined}
+          title={media.length > 0 ? 'Click to view gallery' : undefined}
+        >
           {heroImage?.fileUrl ? (
             <Image
               src={heroImage.fileUrl}

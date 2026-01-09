@@ -13,8 +13,15 @@ const EVENTS_PAGE_SIZE = 20; // Minimum events to display per page
 const BACKEND_FETCH_SIZE = 50; // Fetch more from backend to account for recurring event filtering
 
 // Component for handling long descriptions with expand/collapse
-function DescriptionDisplay({ description }: { description: string }) {
-  const [isExpanded, setIsExpanded] = useState(false);
+function DescriptionDisplay({ 
+  description,
+  isExpanded,
+  onToggle
+}: { 
+  description: string;
+  isExpanded: boolean;
+  onToggle: () => void;
+}) {
   const maxLength = 200; // characters
 
   if (description.length <= maxLength) {
@@ -32,29 +39,6 @@ function DescriptionDisplay({ description }: { description: string }) {
       <div className="whitespace-pre-wrap">
         {isExpanded ? description : `${truncatedText}...`}
       </div>
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          setIsExpanded(!isExpanded);
-        }}
-        className="mt-3 flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
-        title={isExpanded ? "Show Less" : "Read More"}
-        aria-label={isExpanded ? "Show Less" : "Read More"}
-        type="button"
-      >
-        <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
-          {isExpanded ? (
-            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-            </svg>
-          ) : (
-            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          )}
-        </div>
-        <span className="font-semibold text-blue-700">{isExpanded ? "Show Less" : "Read More"}</span>
-      </button>
     </div>
   );
 }
@@ -79,6 +63,7 @@ export default function EventsPage() {
   const [pastEventCount, setPastEventCount] = useState<number | null>(null);
   const [hasCheckedInitialLoad, setHasCheckedInitialLoad] = useState(false);
   const [isAutoSwitching, setIsAutoSwitching] = useState(false);
+  const [expandedDescriptions, setExpandedDescriptions] = useState<Record<number, boolean>>({});
 
   // Array of modern background colors inspired by the Dribbble design
   const cardBackgrounds = [
@@ -1213,15 +1198,53 @@ export default function EventsPage() {
                         </div>
                       </div>
 
-                      {/* Description with modern button */}
+                      {/* Description */}
                       {event.description && (
                         <div className="mb-4 px-4 lg:max-w-4xl lg:mx-auto">
-                          <DescriptionDisplay description={event.description} />
+                          <DescriptionDisplay 
+                            description={event.description} 
+                            isExpanded={expandedDescriptions[event.id!] || false}
+                            onToggle={() => {
+                              setExpandedDescriptions(prev => ({
+                                ...prev,
+                                [event.id!]: !prev[event.id!]
+                              }));
+                            }}
+                          />
                         </div>
                       )}
 
                       {/* Action Buttons */}
-                      <div className="flex flex-col sm:flex-row gap-4 px-4">
+                      <div className="flex flex-col md:flex-row gap-3 sm:gap-4 px-4">
+                        {/* Read More Button - Only show if description is longer than 200 characters */}
+                        {event.description && event.description.length > 200 && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setExpandedDescriptions(prev => ({
+                                ...prev,
+                                [event.id!]: !prev[event.id!]
+                              }));
+                            }}
+                            className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                            title={expandedDescriptions[event.id!] ? "Show Less" : "Read More"}
+                            aria-label={expandedDescriptions[event.id!] ? "Show Less" : "Read More"}
+                            type="button"
+                          >
+                            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                              {expandedDescriptions[event.id!] ? (
+                                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                                </svg>
+                              ) : (
+                                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                </svg>
+                              )}
+                            </div>
+                            <span className="font-semibold text-blue-700">{expandedDescriptions[event.id!] ? "Show Less" : "Read More"}</span>
+                          </button>
+                        )}
 
                         {/* Calendar Link - Only for future events */}
                         {(() => {
