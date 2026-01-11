@@ -1,5 +1,5 @@
 import { EventTicketTransactionDTO, EventTicketTransactionStatisticsDTO, EventDetailsDTO, EventTicketTypeDTO } from '@/types';
-import { FaSearch, FaTicketAlt, FaEnvelope, FaUser, FaHashtag, FaCalendarAlt, FaChevronLeft, FaChevronRight, FaUsers, FaPhotoVideo, FaTags, FaPercent, FaHome, FaInfoCircle } from 'react-icons/fa';
+import { FaSearch, FaTicketAlt, FaEnvelope, FaUser, FaHashtag, FaCalendarAlt, FaChevronLeft, FaChevronRight, FaUsers, FaPhotoVideo, FaTags, FaPercent, FaHome, FaInfoCircle, FaClipboardCheck, FaChartLine } from 'react-icons/fa';
 import Link from 'next/link';
 import TicketTableClient from './TicketTableClient';
 import { fetchEventDetailsServer } from '@/app/admin/ApiServerActions';
@@ -205,7 +205,7 @@ export default async function TicketListPage({ params, searchParams }: { params:
             title="Manage Usage"
             aria-label="Manage Usage"
           >
-              <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-indigo-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-indigo-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
               <FaUsers className="w-8 h-8 text-indigo-500" />
             </div>
             <span className="font-semibold text-center leading-tight">Manage Usage</span>
@@ -264,6 +264,28 @@ export default async function TicketListPage({ params, searchParams }: { params:
               <FaPercent className="w-8 h-8 text-pink-500" />
             </div>
             <span className="font-semibold text-center leading-tight">Manage Discount Codes</span>
+          </Link>
+          <Link
+            href={`/admin/check-in-analytics?eventId=${eventId}`}
+            className="flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 text-slate-800 rounded-lg shadow-md p-3 text-xs transition-all group"
+            title="Check-In Analytics"
+            aria-label="Check-In Analytics"
+          >
+            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-slate-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+              <FaClipboardCheck className="w-8 h-8 text-slate-500" />
+            </div>
+            <span className="font-semibold text-center leading-tight">Check-In Analytics</span>
+          </Link>
+          <Link
+            href={`/admin/sales-analytics?eventId=${eventId}`}
+            className="flex flex-col items-center justify-center bg-stone-50 hover:bg-stone-100 text-stone-800 rounded-lg shadow-md p-3 text-xs transition-all group"
+            title="Sales Analytics"
+            aria-label="Sales Analytics"
+          >
+            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-stone-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+              <FaChartLine className="w-8 h-8 text-stone-500" />
+            </div>
+            <span className="font-semibold text-center leading-tight">Sales Analytics</span>
           </Link>
         </div>
       </div>
@@ -385,22 +407,18 @@ export default async function TicketListPage({ params, searchParams }: { params:
                         </div>
                       )}
 
-                      {ticketType.maxQuantityPerOrder && (
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Max per Order:</span>
-                          <span className="font-medium text-gray-800">{ticketType.maxQuantityPerOrder}</span>
-                        </div>
-                      )}
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Max per Order:</span>
+                        <span className="font-medium text-gray-800">{ticketType.maxQuantityPerOrder ?? 0}</span>
+                      </div>
 
-                      {ticketType.serviceFee && (
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Service Fee:</span>
-                          <span className="font-medium text-gray-800">
-                            ${ticketType.serviceFee.toFixed(2)}
-                            {ticketType.isServiceFeeIncluded && <span className="text-green-600 ml-1">(Included)</span>}
-                          </span>
-                        </div>
-                      )}
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Service Fee:</span>
+                        <span className="font-medium text-gray-800">
+                          ${(ticketType.serviceFee ?? 0).toFixed(2)}
+                          {ticketType.isServiceFeeIncluded && <span className="text-green-600 ml-1">(Included)</span>}
+                        </span>
+                      </div>
                     </div>
 
                     {/* Progress bar for sales */}
@@ -471,31 +489,31 @@ export default async function TicketListPage({ params, searchParams }: { params:
         </form>
       </div>
       <div className="bg-white rounded-lg shadow p-4 overflow-x-auto">
-      {error && (
-        <div className="text-red-500 font-semibold mb-4">
-          {error}
-          {!hasTickets && (
-            <span className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-sm font-medium ml-2">[No tickets sold yet]</span>
-          )}
-        </div>
-      )}
-      {!error && statistics && statistics.totalTicketsSold > 0 && rows.length === 0 && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-          <div className="flex items-start gap-2">
-            <svg className="w-5 h-5 text-yellow-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            <div>
-              <p className="text-yellow-800 font-semibold mb-1">Data Mismatch Detected</p>
-              <p className="text-yellow-700 text-sm">
-                Statistics show <strong>{statistics.totalTicketsSold} ticket(s)</strong> sold, but the list query returned no results.
-                This may indicate a tenantId mismatch or the tickets may be associated with a different event/tenant.
-                Check the browser console for detailed query logs.
-              </p>
+        {error && (
+          <div className="text-red-500 font-semibold mb-4">
+            {error}
+            {!hasTickets && (
+              <span className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-sm font-medium ml-2">[No tickets sold yet]</span>
+            )}
+          </div>
+        )}
+        {!error && statistics && statistics.totalTicketsSold > 0 && rows.length === 0 && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+            <div className="flex items-start gap-2">
+              <svg className="w-5 h-5 text-yellow-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <div>
+                <p className="text-yellow-800 font-semibold mb-1">Data Mismatch Detected</p>
+                <p className="text-yellow-700 text-sm">
+                  Statistics show <strong>{statistics.totalTicketsSold} ticket(s)</strong> sold, but the list query returned no results.
+                  This may indicate a tenantId mismatch or the tickets may be associated with a different event/tenant.
+                  Check the browser console for detailed query logs.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
         <div className="text-xs text-gray-500 mb-2">Hover over the <b>ID</b> or <b>Name</b> columns to see full ticket details.</div>
         <table className="min-w-full divide-y divide-gray-300 border border-gray-300">
           <thead className="bg-gray-50">

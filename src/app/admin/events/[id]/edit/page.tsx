@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { EventForm } from '@/components/EventForm';
 import type { EventDetailsDTO, EventTypeDetailsDTO } from '@/types';
 import Link from 'next/link';
-import { FaUsers, FaPhotoVideo, FaCalendarAlt, FaTags, FaTicketAlt, FaHome, FaMicrophone, FaAddressBook, FaHandshake, FaEnvelope, FaUserTie } from 'react-icons/fa';
+import { FaUsers, FaPhotoVideo, FaCalendarAlt, FaTags, FaTicketAlt, FaHome, FaMicrophone, FaAddressBook, FaHandshake, FaEnvelope, FaUserTie, FaClipboardCheck, FaChartLine } from 'react-icons/fa';
 import SaveStatusDialog, { type SaveStatus } from '@/components/SaveStatusDialog';
 
 export default function EditEventPage() {
@@ -176,6 +176,28 @@ export default function EditEventPage() {
                 </Link>
               </>
             )}
+            <Link
+              href={`/admin/check-in-analytics?eventId=${eventId}`}
+              className="flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 text-slate-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+              title="Check-In Analytics"
+              aria-label="Check-In Analytics"
+            >
+              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-slate-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <FaClipboardCheck className="w-10 h-10 text-slate-500" />
+              </div>
+              <span className="font-semibold text-center leading-tight">Check-In Analytics</span>
+            </Link>
+            <Link
+              href={`/admin/sales-analytics?eventId=${eventId}`}
+              className="flex flex-col items-center justify-center bg-stone-50 hover:bg-stone-100 text-stone-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+              title="Sales Analytics"
+              aria-label="Sales Analytics"
+            >
+              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-stone-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <FaChartLine className="w-10 h-10 text-stone-500" />
+              </div>
+              <span className="font-semibold text-center leading-tight">Sales Analytics</span>
+            </Link>
           </div>
         </div>
       </div>

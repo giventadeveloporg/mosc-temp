@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Image from 'next/image';
 import {
   FaCheckCircle, FaTicketAlt, FaCalendarAlt, FaUser, FaEnvelope,
@@ -1505,13 +1506,20 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
         </div>
 
         {/* Back to Home */}
-        <div className="text-center">
-          <button
-            onClick={() => router.push('/')}
-            className="px-8 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
+        <div className="text-center mt-6">
+          <Link
+            href="/"
+            className="inline-flex flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+            title="Return to Home"
+            aria-label="Return to Home"
           >
-            Return to Home
-          </button>
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
+              <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+            </div>
+            <span className="font-semibold text-indigo-700">Return to Home</span>
+          </Link>
         </div>
       </div>
 

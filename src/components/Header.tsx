@@ -61,6 +61,9 @@ const adminSubmenuItems = [
   { name: 'Manage Events', href: '/admin/manage-events' },
   { name: 'Event Analytics', href: '/admin/events/dashboard' },
   { name: 'Registrations', href: '/admin/events/registrations' },
+  { name: 'QR Scanner', href: '/admin/qr-scanner' },
+  { name: 'Check-In Analytics', href: '/admin/check-in-analytics' },
+  { name: 'Sales Analytics', href: '/admin/sales-analytics' },
   { name: 'Poll Management', href: '/admin/polls' },
   { name: 'Focus Groups', href: '/admin/focus-groups' },
   {

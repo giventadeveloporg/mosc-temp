@@ -48,6 +48,8 @@
     "@trpc/react-query": "^11.1.0",
     "@trpc/server": "^11.1.0",
     "@types/jsonwebtoken": "^9.0.9",
+    "@zxing/browser": "^0.1.5",
+    "@zxing/library": "^0.21.3",
     "class-variance-authority": "^0.7.1",
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
