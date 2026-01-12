@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, BarChart3, Users, Clock, MessageSquare, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, BarChart3, Users, Clock, MessageSquare, ExternalLink } from 'lucide-react';
 import type { EventPollDTO, EventPollOptionDTO } from '@/types';
 import { fetchEventPollsServer, fetchEventPollOptionsServer } from '@/app/admin/polls/ApiServerActions';
 
@@ -322,44 +322,62 @@ export function PollList({ eventId, userId, onPollSelect }: PollListProps) {
         </div>
       )}
 
-      {/* Pagination Controls - Always visible */}
+      {/* Pagination Controls - Always visible, matching admin page style */}
       <div className="mt-8">
         <div className="flex justify-between items-center">
+          {/* Previous Button */}
           <button
             onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
             disabled={currentPage === 0 || isLoading}
-            className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+            className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+            title="Previous Page"
+            aria-label="Previous Page"
+            type="button"
           >
-            <ChevronLeft className="h-5 w-5" />
-            Previous
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+            </svg>
+            <span>Previous</span>
           </button>
-          <div className="text-sm font-semibold text-gray-700">
-            Page {currentPage + 1} of {Math.max(1, Math.ceil(totalCount / pageSize))}
+
+          {/* Page Info */}
+          <div className="px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+            <span className="text-sm font-bold text-blue-700">
+              Page <span className="text-blue-600">{currentPage + 1}</span> of <span className="text-blue-600">{Math.max(1, Math.ceil(totalCount / pageSize))}</span>
+            </span>
           </div>
+
+          {/* Next Button */}
           <button
             onClick={() => setCurrentPage(prev => prev + 1)}
             disabled={currentPage >= Math.ceil(totalCount / pageSize) - 1 || isLoading}
-            className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+            className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+            title="Next Page"
+            aria-label="Next Page"
+            type="button"
           >
-            Next
-            <ChevronRight className="h-5 w-5" />
+            <span>Next</span>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+            </svg>
           </button>
         </div>
-        <div className="text-center text-sm text-gray-600 mt-2">
+
+        {/* Item Count Text */}
+        <div className="text-center mt-3">
           {totalCount > 0 ? (
-            <>
-              Showing <span className="font-medium">{currentPage * pageSize + 1}</span> to{' '}
-              <span className="font-medium">
-                {Math.min((currentPage + 1) * pageSize, totalCount)}
-              </span>{' '}
-              of <span className="font-medium">{totalCount}</span> items
-            </>
-          ) : (
-            <div className="flex items-center justify-center gap-2">
-              <span>No items found</span>
-              <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-sm font-medium">
-                [No items match your criteria]
+            <div className="inline-flex items-center px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+              <span className="text-sm text-gray-700">
+                Showing <span className="font-bold text-blue-600">{currentPage * pageSize + 1}</span> to <span className="font-bold text-blue-600">{Math.min((currentPage + 1) * pageSize, totalCount)}</span> of <span className="font-bold text-blue-600">{totalCount}</span> polls
               </span>
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 border-2 border-orange-300 rounded-lg shadow-sm">
+              <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="text-sm font-medium text-orange-700">No polls found</span>
+              <span className="text-sm text-orange-600">[No polls match your criteria]</span>
             </div>
           )}
         </div>

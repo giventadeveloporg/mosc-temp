@@ -142,8 +142,8 @@ export async function fetchEventDashboardData(eventId: number | null): Promise<E
     // Special requirements
     const specialRequirements = calculateSpecialRequirements(attendeesArray, guestsArray);
 
-    // Recent registrations (last 10)
-    const recentRegistrations = attendeesArray.slice(0, 10);
+    // Recent registrations (all attendees, sorted by registration date descending)
+    const recentRegistrations = attendeesArray;
 
     // Top events by attendance
     const topEvents = calculateTopEvents(eventsArray, attendeesArray);

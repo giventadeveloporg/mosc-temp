@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { FaPlus, FaSearch, FaArrowLeft, FaUserPlus, FaHandshake, FaBan, FaFolderOpen, FaChevronLeft, FaChevronRight, FaEdit, FaTrashAlt, FaImage, FaImages, FaUpload, FaUnlink, FaHome, FaUsers, FaCalendarAlt, FaPhotoVideo, FaTags, FaTicketAlt, FaPercent } from 'react-icons/fa';
+import { FaPlus, FaSearch, FaArrowLeft, FaUserPlus, FaHandshake, FaChevronLeft, FaChevronRight, FaEdit, FaTrashAlt, FaImage, FaImages, FaUpload, FaUnlink, FaHome, FaUsers, FaCalendarAlt, FaPhotoVideo, FaTags, FaTicketAlt, FaPercent } from 'react-icons/fa';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -828,10 +828,14 @@ export default function EventSponsorsPage() {
                 e.stopPropagation();
                 openEditModal(row);
               }}
-              className="icon-btn icon-btn-edit bg-blue-700 hover:bg-blue-800 text-white p-4 shadow-lg"
+              className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
               title="Edit sponsor details"
+              aria-label="Edit sponsor details"
+              type="button"
             >
-              <FaEdit className="text-xl text-white" />
+              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
             </button>
             {sponsorId && (
               <>
@@ -846,10 +850,14 @@ export default function EventSponsorsPage() {
                     });
                     setPosterUploadOpen(true);
                   }}
-                  className="icon-btn bg-blue-500 hover:bg-blue-600 text-white p-4"
+                  className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
                   title="Upload banners in this particular event for this sponsor"
+                  aria-label="Upload banners in this particular event for this sponsor"
+                  type="button"
                 >
-                  <FaUpload className="text-xl" />
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                  </svg>
                 </button>
                 <button
                   onClick={(e) => {
@@ -859,10 +867,14 @@ export default function EventSponsorsPage() {
                       sponsorId,
                     });
                   }}
-                  className="icon-btn bg-purple-500 hover:bg-purple-600 text-white p-4"
+                  className="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-100 hover:bg-purple-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
                   title="View all the media files associated with this sponsor"
+                  aria-label="View all the media files associated with this sponsor"
+                  type="button"
                 >
-                  <FaImages className="text-xl" />
+                  <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
                 </button>
               </>
             )}
@@ -871,20 +883,28 @@ export default function EventSponsorsPage() {
                 e.stopPropagation();
                 openDisassociateModal(row);
               }}
-              className="icon-btn icon-btn-delete bg-yellow-500 hover:bg-yellow-600 text-white p-4"
+              className="flex-shrink-0 w-10 h-10 rounded-lg bg-yellow-100 hover:bg-yellow-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
               title="Disassociate this sponsor with this event"
+              aria-label="Disassociate this sponsor with this event"
+              type="button"
             >
-              <FaUnlink className="text-xl" />
+              <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+              </svg>
             </button>
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 openDeleteModal(row);
               }}
-              className="icon-btn icon-btn-delete bg-red-700 hover:bg-red-800 text-white p-4 shadow-lg"
+              className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
               title="Permanently delete this sponsor"
+              aria-label="Permanently delete this sponsor"
+              type="button"
             >
-              <FaTrashAlt className="text-xl text-white" />
+              <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
             </button>
           </div>
         );
@@ -914,10 +934,16 @@ export default function EventSponsorsPage() {
       <div className="flex items-center mb-6">
         <Link
           href={`/admin/events/${eventId}/edit`}
-          className="flex items-center text-blue-600 hover:text-blue-800 mr-4"
+          className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+          title="Back to Event"
+          aria-label="Back to Event"
         >
-          <FaArrowLeft className="mr-2" />
-          Back to Event
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+          </div>
+          <span className="font-semibold text-blue-700">Back to Event</span>
         </Link>
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
@@ -943,34 +969,40 @@ export default function EventSponsorsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           <Link
             href="/admin"
-            className="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg shadow-md p-3 text-xs transition-all group"
+            className="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg shadow-md p-4 text-xs transition-all group"
             title="Admin Home"
             aria-label="Admin Home"
           >
-            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-blue-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
-              <FaHome className="w-8 h-8 text-blue-500" />
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
             </div>
             <span className="font-semibold text-center leading-tight">Admin Home</span>
           </Link>
           <Link
             href="/admin/manage-usage"
-            className="flex flex-col items-center justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-800 rounded-lg shadow-md p-3 text-xs transition-all group"
+            className="flex flex-col items-center justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-800 rounded-lg shadow-md p-4 text-xs transition-all group"
             title="Manage Usage"
             aria-label="Manage Usage"
           >
-            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-indigo-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
-              <FaUsers className="w-8 h-8 text-indigo-500" />
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-indigo-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-10 h-10 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
             </div>
             <span className="font-semibold text-center leading-tight">Manage Usage</span>
           </Link>
           <Link
             href={`/admin/events/${eventId}/media/list`}
-            className="flex flex-col items-center justify-center bg-yellow-50 hover:bg-yellow-100 text-yellow-800 rounded-lg shadow-md p-3 text-xs transition-all group"
+            className="flex flex-col items-center justify-center bg-yellow-50 hover:bg-yellow-100 text-yellow-800 rounded-lg shadow-md p-4 text-xs transition-all group"
             title="Manage Media Files"
             aria-label="Manage Media Files"
           >
-            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-yellow-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
-              <FaPhotoVideo className="w-8 h-8 text-yellow-500" />
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-yellow-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-10 h-10 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
             </div>
             <span className="font-semibold text-center leading-tight">Manage Media Files</span>
           </Link>
@@ -1038,10 +1070,17 @@ export default function EventSponsorsPage() {
           </div>
           <button
             onClick={() => setIsCreateSponsorModalOpen(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow font-bold flex items-center gap-2 hover:bg-blue-700 transition whitespace-nowrap"
+            className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+            title="Add Sponsor"
+            aria-label="Add Sponsor"
+            type="button"
           >
-            <FaPlus />
-            Add Sponsor
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+            </div>
+            <span className="font-semibold text-blue-700">Add Sponsor</span>
           </button>
         </div>
       </div>
@@ -1112,10 +1151,17 @@ export default function EventSponsorsPage() {
           </div>
           <button
             onClick={() => setIsCreateSponsorModalOpen(true)}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg shadow font-bold flex items-center gap-2 hover:bg-green-700 transition"
+            className="flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+            title="Create New Sponsor"
+            aria-label="Create New Sponsor"
+            type="button"
           >
-            <FaPlus />
-            Create New Sponsor
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+            </div>
+            <span className="font-semibold text-green-700">Create New Sponsor</span>
           </button>
         </div>
 
@@ -1535,23 +1581,42 @@ function SponsorJoinForm({ formData, setFormData, onSubmit, onCancel, loading, s
         </div>
       </div>
 
-      <div className="flex justify-end space-x-3 pt-4">
+      <div className="flex flex-row gap-3 sm:gap-4 pt-4">
         <button
           type="button"
           onClick={onCancel || (() => window.history.back())}
-          className="bg-teal-100 hover:bg-teal-200 text-teal-800 px-4 py-2 rounded-md flex items-center gap-2"
+          className="flex-1 flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           disabled={loading}
+          title="Cancel"
+          aria-label="Cancel"
         >
-          <FaBan />
-          Cancel
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </div>
+          <span className="font-semibold text-blue-700">Cancel</span>
         </button>
         <button
           type="submit"
           disabled={loading}
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 disabled:opacity-50"
+          className="flex-1 flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+          title={submitText}
+          aria-label={submitText}
         >
-          <FaFolderOpen />
-          {loading ? 'Processing...' : submitText}
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+            {loading ? (
+              <svg className="animate-spin w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            ) : (
+              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+          </div>
+          <span className="font-semibold text-green-700">{loading ? 'Processing...' : submitText}</span>
         </button>
       </div>
     </form>
@@ -1868,23 +1933,42 @@ function SponsorForm({ formData, setFormData, onSubmit, onCancel, loading, submi
         </div>
       )}
 
-      <div className="flex justify-end space-x-3 pt-4">
+      <div className="flex flex-row gap-3 sm:gap-4 pt-4">
         <button
           type="button"
           onClick={onCancel || (() => window.history.back())}
-          className="bg-teal-100 hover:bg-teal-200 text-teal-800 px-4 py-2 rounded-md flex items-center gap-2"
+          className="flex-1 flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           disabled={loading}
+          title="Cancel"
+          aria-label="Cancel"
         >
-          <FaBan />
-          Cancel
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </div>
+          <span className="font-semibold text-blue-700">Cancel</span>
         </button>
         <button
           type="submit"
           disabled={loading}
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 disabled:opacity-50"
+          className="flex-1 flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+          title={submitText}
+          aria-label={submitText}
         >
-          <FaFolderOpen />
-          {loading ? 'Saving...' : submitText}
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+            {loading ? (
+              <svg className="animate-spin w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            ) : (
+              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+          </div>
+          <span className="font-semibold text-green-700">{loading ? 'Saving...' : submitText}</span>
         </button>
       </div>
     </form>

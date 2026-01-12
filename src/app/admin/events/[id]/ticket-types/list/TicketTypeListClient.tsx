@@ -2,7 +2,7 @@
 import React, { useState, useTransition, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import Link from 'next/link';
-import { FaUsers, FaCalendarAlt, FaTrashAlt, FaSave, FaTimes, FaBan, FaPhotoVideo, FaTicketAlt, FaTags } from 'react-icons/fa';
+import { FaUsers, FaCalendarAlt, FaTimes, FaPhotoVideo, FaTicketAlt, FaTags } from 'react-icons/fa';
 import type { EventDetailsDTO, EventTicketTypeDTO, EventTicketTypeFormDTO } from '@/types';
 import { Modal } from '@/components/Modal';
 import SaveStatusDialog, { SaveStatus } from '@/components/SaveStatusDialog';
@@ -147,6 +147,7 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
   const [deletingTicketType, setDeletingTicketType] = useState<EventTicketTypeDTO | null>(null);
 
   const [formData, setFormData] = useState<Partial<EventTicketTypeFormDTO>>({});
+  const [displayPrice, setDisplayPrice] = useState<string>('');
 
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
@@ -169,6 +170,7 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
         minQuantityPerOrder: editingTicketType.minQuantityPerOrder,
         maxQuantityPerOrder: editingTicketType.maxQuantityPerOrder,
       });
+      setDisplayPrice(editingTicketType.price ? editingTicketType.price.toFixed(2) : '0.00');
       setIsModalOpen(true);
     } else {
       setFormData({
@@ -183,6 +185,7 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
         minQuantityPerOrder: 1,
         maxQuantityPerOrder: 10,
       });
+      setDisplayPrice('');
     }
   }, [editingTicketType]);
 
@@ -191,7 +194,28 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
     const isCheckbox = type === 'checkbox';
     const checked = isCheckbox ? (e.target as HTMLInputElement).checked : undefined;
 
-    setFormData(prev => ({ ...prev, [name]: isCheckbox ? checked : value }));
+    // Special handling for price field: prefix decimal values with 0
+    let processedValue: string | number = value;
+    if (name === 'price' && type === 'number') {
+      // Convert to string to check if it starts with decimal point
+      const stringValue = String(value);
+      // If value starts with a decimal point (e.g., ".70"), prefix with "0"
+      if (stringValue.startsWith('.')) {
+        processedValue = '0' + stringValue;
+        // Update the input's value immediately for visual feedback
+        e.target.value = processedValue;
+        // Convert to number for formData
+        processedValue = parseFloat(processedValue) || 0;
+      } else if (stringValue === '' || stringValue === '-') {
+        // Allow empty or negative sign during typing
+        processedValue = stringValue;
+      } else {
+        // Convert to number for formData
+        processedValue = parseFloat(stringValue) || 0;
+      }
+    }
+
+    setFormData(prev => ({ ...prev, [name]: isCheckbox ? checked : processedValue }));
 
     // Clear validation errors when user starts typing
     if (validationErrors[name as keyof ValidationErrors]) {
@@ -200,8 +224,8 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
 
     // Real-time validation for maxQuantityPerOrder vs availableQuantity
     if (name === 'maxQuantityPerOrder' || name === 'availableQuantity') {
-      const availableQty = Number(name === 'availableQuantity' ? value : formData.availableQuantity);
-      const maxQtyPerOrder = Number(name === 'maxQuantityPerOrder' ? value : formData.maxQuantityPerOrder);
+      const availableQty = Number(name === 'availableQuantity' ? processedValue : formData.availableQuantity);
+      const maxQtyPerOrder = Number(name === 'maxQuantityPerOrder' ? processedValue : formData.maxQuantityPerOrder);
 
       if (availableQty > 0 && maxQtyPerOrder > 0 && maxQtyPerOrder > availableQty) {
         setValidationErrors(prev => ({
@@ -287,6 +311,87 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
     );
   };
 
+  // Validate a single field on blur
+  const validateField = (fieldName: keyof ValidationErrors) => {
+    const newErrors: ValidationErrors = { ...validationErrors };
+
+    switch (fieldName) {
+      case 'name':
+        if (!formData.name?.trim()) {
+          newErrors.name = 'Name is required.';
+        } else {
+          // Check for duplicate name
+          const isDuplicateName = checkDuplicateName(formData.name.trim(), editingTicketType?.id);
+          if (isDuplicateName) {
+            newErrors.name = 'A ticket type with this name already exists for this event.';
+          } else {
+            delete newErrors.name;
+          }
+        }
+        break;
+
+      case 'code':
+        if (!formData.code?.trim()) {
+          newErrors.code = 'Code is required.';
+        } else {
+          // Check for duplicate code
+          const isDuplicate = checkDuplicateCode(formData.code.trim(), editingTicketType?.id);
+          if (isDuplicate) {
+            newErrors.code = 'A ticket type with this code already exists for this event.';
+          } else {
+            delete newErrors.code;
+          }
+        }
+        break;
+
+      case 'description':
+        if (!formData.description?.trim()) {
+          newErrors.description = 'Description is required.';
+        } else {
+          delete newErrors.description;
+        }
+        break;
+
+      case 'price':
+        if (Number(formData.price) <= 0) {
+          newErrors.price = 'Price must be greater than zero.';
+        } else {
+          delete newErrors.price;
+        }
+        break;
+
+      case 'availableQuantity': {
+        const availableQty = Number(formData.availableQuantity);
+        if (!formData.availableQuantity || availableQty <= 0) {
+          newErrors.availableQuantity = 'Available quantity is required and must be greater than zero.';
+        } else {
+          delete newErrors.availableQuantity;
+          // Re-validate maxQuantityPerOrder if it exists
+          const maxQtyPerOrder = Number(formData.maxQuantityPerOrder);
+          if (maxQtyPerOrder > 0 && maxQtyPerOrder > availableQty) {
+            newErrors.maxQuantityPerOrder = `Maximum quantity per order (${maxQtyPerOrder}) cannot exceed available quantity (${availableQty}).`;
+          }
+        }
+        break;
+      }
+
+      case 'maxQuantityPerOrder': {
+        const maxQtyPerOrder = Number(formData.maxQuantityPerOrder);
+        const availableQtyForMax = Number(formData.availableQuantity);
+        if (!formData.maxQuantityPerOrder || maxQtyPerOrder <= 0) {
+          newErrors.maxQuantityPerOrder = 'Maximum quantity per order is required and must be greater than zero.';
+        } else if (availableQtyForMax > 0 && maxQtyPerOrder > availableQtyForMax) {
+          newErrors.maxQuantityPerOrder = `Maximum quantity per order (${maxQtyPerOrder}) cannot exceed available quantity (${availableQtyForMax}).`;
+        } else {
+          delete newErrors.maxQuantityPerOrder;
+        }
+        break;
+      }
+    }
+
+    setValidationErrors(newErrors);
+  };
+
   const validateForm = (): boolean => {
     const newErrors: ValidationErrors = {};
     if (!formData.name?.trim()) newErrors.name = 'Name is required.';
@@ -339,6 +444,9 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
 
   const handleNameBlur = () => {
     // Validate name on blur for immediate feedback
+    validateField('name');
+
+    // Also check for duplicates if name is not empty
     if (formData.name?.trim()) {
       setIsCheckingCode(true);
 
@@ -350,6 +458,11 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
             ...prev,
             name: 'A ticket type with this name already exists for this event.'
           }));
+        } else {
+          // Only clear error if it's not a required field error
+          if (validationErrors.name !== 'Name is required.') {
+            setValidationErrors(prev => ({ ...prev, name: undefined }));
+          }
         }
         setIsCheckingCode(false);
       }, 300);
@@ -367,6 +480,9 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
 
   const handleCodeBlur = () => {
     // Validate code on blur for immediate feedback
+    validateField('code');
+
+    // Also check for duplicates if code is not empty
     if (formData.code?.trim()) {
       setIsCheckingCode(true);
 
@@ -378,6 +494,11 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
             ...prev,
             code: 'A ticket type with this code already exists for this event.'
           }));
+        } else {
+          // Only clear error if it's not a required field error
+          if (validationErrors.code !== 'Code is required.') {
+            setValidationErrors(prev => ({ ...prev, code: undefined }));
+          }
         }
         setIsCheckingCode(false);
       }, 300);
@@ -619,20 +740,43 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
               Are you sure you want to delete the ticket type: <strong>{deletingTicketType.name}</strong>?
             </p>
             <p className="text-sm text-gray-500 mt-2">This action cannot be undone.</p>
-            <div className="mt-6 flex justify-center gap-4">
+            <div className="mt-6 flex flex-row gap-3 sm:gap-4">
               <button
                 onClick={() => setDeletingTicketType(null)}
-                className="bg-teal-100 hover:bg-teal-200 text-teal-800 px-4 py-2 rounded-md flex items-center gap-2"
                 disabled={isPending}
+                className="flex-1 flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                title="Cancel"
+                aria-label="Cancel"
+                type="button"
               >
-                <FaBan /> Cancel
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-blue-700">Cancel</span>
               </button>
               <button
                 onClick={confirmDelete}
-                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md flex items-center gap-2"
                 disabled={isPending}
+                className="flex-1 flex-shrink-0 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                title="Confirm Delete"
+                aria-label="Confirm Delete"
+                type="button"
               >
-                <FaTrashAlt /> {isPending ? 'Deleting...' : 'Confirm Delete'}
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-200 flex items-center justify-center">
+                  {isPending ? (
+                    <svg className="animate-spin w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  ) : (
+                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  )}
+                </div>
+                <span className="font-semibold text-red-700">{isPending ? 'Deleting...' : 'Confirm Delete'}</span>
               </button>
             </div>
           </div>
@@ -657,7 +801,11 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
                 value={formData.name || ''}
                 onChange={(e) => handleNameChange(e.target.value)}
                 onBlur={handleNameBlur}
-                className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base pr-10"
+                className={`mt-1 block w-full border rounded-xl focus:ring-blue-500 px-4 py-3 text-base pr-10 ${
+                  validationErrors.name
+                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                    : 'border-gray-400 focus:border-blue-500'
+                }`}
                 required
               />
               {isCheckingCode && (
@@ -677,7 +825,11 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
                 value={formData.code || ''}
                 onChange={(e) => handleCodeChange(e.target.value)}
                 onBlur={handleCodeBlur}
-                className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base pr-10"
+                className={`mt-1 block w-full border rounded-xl focus:ring-blue-500 px-4 py-3 text-base pr-10 ${
+                  validationErrors.code
+                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                    : 'border-gray-400 focus:border-blue-500'
+                }`}
                 required
               />
               {isCheckingCode && (
@@ -694,7 +846,12 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
               name="description"
               value={formData.description || ''}
               onChange={handleInputChange}
-              className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
+              onBlur={() => validateField('description')}
+              className={`mt-1 block w-full border rounded-xl focus:ring-blue-500 px-4 py-3 text-base ${
+                validationErrors.description
+                  ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                  : 'border-gray-400 focus:border-blue-500'
+              }`}
               rows={3}
             />
             {validationErrors.description && <p className="text-red-500 text-xs mt-1">{validationErrors.description}</p>}
@@ -703,13 +860,63 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
             <div>
               <label className="block text-sm font-medium text-gray-700">Price</label>
               <input
-                type="number"
+                type="text"
                 name="price"
-                value={formData.price || 0}
-                onChange={handleInputChange}
-                className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
-                min="0"
-                step="0.01"
+                inputMode="decimal"
+                value={displayPrice}
+                onChange={(e) => {
+                  const inputValue = e.target.value;
+
+                  // Update display value immediately to allow free typing
+                  setDisplayPrice(inputValue);
+
+                  // If value starts with a decimal point (e.g., ".70"), prefix with "0"
+                  let processedValue = inputValue;
+                  if (inputValue.startsWith('.')) {
+                    processedValue = '0' + inputValue;
+                    setDisplayPrice(processedValue);
+                  }
+
+                  // Parse and update formData with numeric value
+                  if (inputValue === '' || inputValue === '.') {
+                    setFormData(prev => ({ ...prev, price: 0 }));
+                  } else {
+                    const numValue = parseFloat(processedValue);
+                    if (!isNaN(numValue)) {
+                      setFormData(prev => ({ ...prev, price: numValue }));
+                    } else {
+                      setFormData(prev => ({ ...prev, price: 0 }));
+                    }
+                  }
+
+                  // Clear validation errors when user starts typing
+                  if (validationErrors.price) {
+                    setValidationErrors(prev => ({ ...prev, price: undefined }));
+                  }
+                }}
+                onBlur={(e) => {
+                  // Ensure decimal values are properly formatted on blur
+                  const value = e.target.value;
+                  let finalValue = value;
+
+                  if (value && value.startsWith('.')) {
+                    finalValue = '0' + value;
+                  }
+
+                  const numValue = parseFloat(finalValue) || 0;
+                  setFormData(prev => ({ ...prev, price: numValue }));
+                  setDisplayPrice(numValue.toFixed(2));
+
+                  // Validate price on blur
+                  validateField('price');
+                }}
+                className={`mt-1 block w-full border rounded-xl focus:ring-blue-500 px-4 py-3 text-base ${
+                  validationErrors.price
+                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                    : 'border-gray-400 focus:border-blue-500'
+                }`}
+                pattern="[0-9]*\.?[0-9]*"
+                placeholder="0.00"
                 required
               />
               {validationErrors.price && <p className="text-red-500 text-xs mt-1">{validationErrors.price}</p>}
@@ -721,7 +928,12 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
                 name="availableQuantity"
                 value={formData.availableQuantity || ''}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
+                onBlur={() => validateField('availableQuantity')}
+                className={`mt-1 block w-full border rounded-xl focus:ring-blue-500 px-4 py-3 text-base ${
+                  validationErrors.availableQuantity
+                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                    : 'border-gray-400 focus:border-blue-500'
+                }`}
                 min="1"
                 required
               />
@@ -780,7 +992,12 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
                 name="maxQuantityPerOrder"
                 value={formData.maxQuantityPerOrder ?? ''}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
+                onBlur={() => validateField('maxQuantityPerOrder')}
+                className={`mt-1 block w-full border rounded-xl focus:ring-blue-500 px-4 py-3 text-base ${
+                  validationErrors.maxQuantityPerOrder
+                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                    : 'border-gray-400 focus:border-blue-500'
+                }`}
                 min="1"
                 required
               />
@@ -856,24 +1073,43 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
             </label>
           </div>
 
-          <div className="flex justify-end space-x-4 pt-4">
+          <div className="flex flex-row gap-3 sm:gap-4 pt-4">
             <button
               type="button"
               onClick={handleModalClose}
-              className="bg-teal-100 hover:bg-teal-200 text-teal-800 px-4 py-2 rounded-md flex items-center gap-2"
               disabled={isPending}
+              className="flex-1 flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              title="Cancel"
+              aria-label="Cancel"
             >
-              <FaBan />
-              Cancel
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </div>
+              <span className="font-semibold text-blue-700">Cancel</span>
             </button>
             <button
               type="submit"
               onClick={handleSubmit}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2"
               disabled={isPending}
+              className="flex-1 flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              title={editingTicketType ? 'Save Changes' : 'Create Ticket Type'}
+              aria-label={editingTicketType ? 'Save Changes' : 'Create Ticket Type'}
             >
-              <FaSave />
-              {isPending ? (editingTicketType ? 'Saving...' : 'Creating...') : (editingTicketType ? 'Save Changes' : 'Create Ticket Type')}
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+                {isPending ? (
+                  <svg className="animate-spin w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                ) : (
+                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+              </div>
+              <span className="font-semibold text-green-700">{isPending ? (editingTicketType ? 'Saving...' : 'Creating...') : (editingTicketType ? 'Save Changes' : 'Create Ticket Type')}</span>
             </button>
           </div>
         </form>

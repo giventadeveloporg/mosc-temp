@@ -439,17 +439,25 @@ async function authenticatePage(page, baseUrl, credentials) {
         console.log(`   🔍 Still on sign-in page, checking authentication state...`);
 
         // Try navigating to admin page to see if we're actually authenticated
-        await page.goto(`${baseUrl}/admin`, { waitUntil: 'domcontentloaded', timeout: 10000 });
+        await page.goto(`${baseUrl}/admin/manage-events`, { waitUntil: 'domcontentloaded', timeout: 10000 });
         await page.waitForTimeout(2000);
 
         const adminUrl = page.url();
-        if (!adminUrl.includes('/sign-in') && !adminUrl.includes('/sign-up')) {
-          console.log(`   ✅ Authentication successful! Can access admin page: ${adminUrl}`);
-          return true;
-        } else {
+        if (adminUrl.includes('/sign-in') || adminUrl.includes('/sign-up')) {
           console.error(`   ❌ Cannot access admin page - redirected to: ${adminUrl}`);
           await page.screenshot({ path: 'debug-auth-failed.png', fullPage: true });
           return false;
+        } else if (adminUrl === baseUrl + '/' || adminUrl === baseUrl) {
+          console.error(`   ❌ CRITICAL: Redirected to homepage!`);
+          console.error(`   ⚠️  User authenticated but does not have ADMIN role.`);
+          await page.screenshot({ path: 'debug-admin-access-failed.png', fullPage: true });
+          return false;
+        } else if (adminUrl.includes('/admin/manage-events')) {
+          console.log(`   ✅ Authentication and admin access verified! Can access admin page: ${adminUrl}`);
+          return true;
+        } else {
+          console.log(`   ✅ Authentication successful! Can access admin page: ${adminUrl}`);
+          return true;
         }
       }
 
@@ -514,14 +522,14 @@ async function authenticatePage(page, baseUrl, credentials) {
     if (isAuthenticated) {
       console.log(`   ✅ Authentication successful! Redirected to: ${currentUrl}`);
 
-      // CRITICAL: Verify authentication actually works by trying to access an admin page
-      console.log(`   🔍 Verifying authentication by accessing admin page...`);
+      // CRITICAL: Verify authentication AND admin access by trying to access an admin page
+      console.log(`   🔍 Verifying authentication and admin access by accessing admin page...`);
       try {
-        await page.goto(`${baseUrl}/admin`, {
+        await page.goto(`${baseUrl}/admin/manage-events`, {
           waitUntil: 'domcontentloaded',
           timeout: 15000
         });
-        await page.waitForTimeout(2000);
+        await page.waitForTimeout(2000); // Wait for any redirects
 
         const adminUrl = page.url();
         if (adminUrl.includes('/sign-in') || adminUrl.includes('/sign-up')) {
@@ -535,11 +543,26 @@ async function authenticatePage(page, baseUrl, credentials) {
           console.error(`      4. User must log out and log back in after role change`);
           await page.screenshot({ path: 'debug-admin-access-failed.png', fullPage: true });
           return false;
+        } else if (adminUrl === baseUrl + '/' || adminUrl === baseUrl) {
+          console.error(`   ❌ CRITICAL: Redirected to homepage!`);
+          console.error(`   ⚠️  User authenticated successfully but cannot access admin pages.`);
+          console.error(`   💡 This means the user does not have ADMIN role in the database.`);
+          console.error(`   💡 The admin layout redirects non-admin users to homepage.`);
+          console.error(`   💡 Solutions:`);
+          console.error(`      1. Check database: SELECT * FROM user_profile WHERE user_id = '...' AND user_role = 'ADMIN';`);
+          console.error(`      2. Update role: UPDATE user_profile SET user_role = 'ADMIN' WHERE user_id = '...' AND tenant_id = '...';`);
+          console.error(`      3. Or use Admin Dashboard: /admin/manage-usage → Edit user → Set Role to ADMIN`);
+          console.error(`      4. User must log out and log back in after role change`);
+          await page.screenshot({ path: 'debug-admin-access-failed.png', fullPage: true });
+          return false;
+        } else if (adminUrl.includes('/admin/manage-events')) {
+          console.log(`   ✅ Admin access verified! Can access manage-events page: ${adminUrl}`);
+          return true;
         } else {
           console.log(`   ✅ Admin access verified! Can access admin page: ${adminUrl}`);
           // Navigate back to home page
           await page.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout: 10000 });
-      return true;
+          return true;
         }
       } catch (verifyError) {
         console.error(`   ❌ Authentication verification error: ${verifyError.message}`);

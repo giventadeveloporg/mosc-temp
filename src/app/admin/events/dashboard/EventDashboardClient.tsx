@@ -11,6 +11,8 @@ interface EventDashboardClientProps {
 
 export default function EventDashboardClient({ data }: EventDashboardClientProps) {
   const [selectedTimeRange, setSelectedTimeRange] = useState('30d');
+  const [currentPage, setCurrentPage] = useState(0); // 0-based pagination
+  const pageSize = 20; // Show 20 registrations per page
 
   const {
     eventDetails,
@@ -24,6 +26,33 @@ export default function EventDashboardClient({ data }: EventDashboardClientProps
     recentRegistrations,
     topEvents
   } = data;
+
+  // Calculate pagination values
+  const totalCount = recentRegistrations.length;
+  const totalPages = Math.ceil(totalCount / pageSize) || 1;
+  const displayPage = currentPage + 1; // Display as 1-based
+  const startItem = totalCount > 0 ? currentPage * pageSize + 1 : 0;
+  const endItem = totalCount > 0 ? Math.min((currentPage + 1) * pageSize, totalCount) : 0;
+  const isPrevDisabled = currentPage === 0;
+  const isNextDisabled = currentPage >= totalPages - 1;
+
+  // Get paginated registrations
+  const paginatedRegistrations = recentRegistrations.slice(
+    currentPage * pageSize,
+    (currentPage + 1) * pageSize
+  );
+
+  const handlePrevPage = () => {
+    if (!isPrevDisabled) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (!isNextDisabled) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-8 py-8">
@@ -339,8 +368,8 @@ export default function EventDashboardClient({ data }: EventDashboardClientProps
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {recentRegistrations.map((attendee, index) => (
-                <tr key={index}>
+              {paginatedRegistrations.map((attendee, index) => (
+                <tr key={attendee.id || index}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {attendee.firstName} {attendee.lastName}
                   </td>
@@ -375,6 +404,69 @@ export default function EventDashboardClient({ data }: EventDashboardClientProps
           </table>
         </div>
         </div>
+
+        {/* Pagination Controls - Always visible, matching admin page style */}
+        {totalCount > 0 && (
+          <div className="mt-8">
+            <div className="flex justify-between items-center">
+              {/* Previous Button */}
+              <button
+                onClick={handlePrevPage}
+                disabled={isPrevDisabled}
+                className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+                title="Previous Page"
+                aria-label="Previous Page"
+                type="button"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                </svg>
+                <span>Previous</span>
+              </button>
+
+              {/* Page Info */}
+              <div className="px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+                <span className="text-sm font-bold text-blue-700">
+                  Page <span className="text-blue-600">{displayPage}</span> of <span className="text-blue-600">{totalPages}</span>
+                </span>
+              </div>
+
+              {/* Next Button */}
+              <button
+                onClick={handleNextPage}
+                disabled={isNextDisabled}
+                className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+                title="Next Page"
+                aria-label="Next Page"
+                type="button"
+              >
+                <span>Next</span>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Item Count Text */}
+            <div className="text-center mt-3">
+              {totalCount > 0 ? (
+                <div className="inline-flex items-center px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+                  <span className="text-sm text-gray-700">
+                    Showing <span className="font-bold text-blue-600">{startItem}</span> to <span className="font-bold text-blue-600">{endItem}</span> of <span className="font-bold text-blue-600">{totalCount}</span> registrations
+                  </span>
+                </div>
+              ) : (
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 border-2 border-orange-300 rounded-lg shadow-sm">
+                  <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="text-sm font-medium text-orange-700">No registrations found</span>
+                  <span className="text-sm text-orange-600">[No registrations match your criteria]</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Action Buttons */}

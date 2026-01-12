@@ -3,7 +3,7 @@
 import React, { useState, useTransition } from 'react';
 import type { DiscountCodeDTO, EventDetailsDTO } from '@/types';
 import Link from 'next/link';
-import { FaPhotoVideo, FaTicketAlt, FaTags, FaPlus, FaEdit, FaTrashAlt, FaSave, FaBan, FaTimes } from 'react-icons/fa';
+import { FaPhotoVideo, FaTicketAlt, FaTags, FaEdit, FaTrashAlt, FaTimes } from 'react-icons/fa';
 import { Modal } from '@/components/Modal';
 import { deleteDiscountCodeServer, patchDiscountCodeServer, createDiscountCodeServer } from './ApiServerActions';
 
@@ -188,9 +188,17 @@ export default function DiscountCodeListClient({
           </div>
           <button
             onClick={handleAddNewClick}
-            className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 sm:px-6 rounded-lg flex items-center justify-center gap-2 sm:gap-3 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 w-full sm:w-auto whitespace-nowrap"
+            className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 w-full sm:w-auto whitespace-nowrap"
+            title="Add New Discount Code"
+            aria-label="Add New Discount Code"
+            type="button"
           >
-            <FaPlus className="text-xl sm:text-lg" /> <span>Add New Discount Code</span>
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+            </div>
+            <span className="font-semibold text-blue-700">Add New Discount Code</span>
           </button>
         </div>
 
@@ -411,9 +419,16 @@ function DiscountCodeModal({ open, onClose, onSave, code, isPending, error }: {
             <button
               type="button"
               onClick={generateRandomCode}
-              className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-3 rounded-md text-sm transition-colors"
+              className="w-full flex-shrink-0 h-14 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105"
+              title="Generate Code"
+              aria-label="Generate Code"
             >
-              Generate Code
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center">
+                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </div>
+              <span className="font-semibold text-gray-700">Generate Code</span>
             </button>
           </div>
         </div>
@@ -555,27 +570,42 @@ function DiscountCodeModal({ open, onClose, onSave, code, isPending, error }: {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-wrap justify-end gap-3 pt-4 border-t border-gray-200">
+        <div className="flex flex-row gap-3 sm:gap-4 pt-4 border-t border-gray-200">
           <button
             type="button"
             onClick={onClose}
             disabled={isPending}
-            className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 text-base font-medium shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             title="Cancel"
             aria-label="Cancel"
           >
-            <FaBan className="mr-2" />
-            Cancel
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </div>
+            <span className="font-semibold text-blue-700">Cancel</span>
           </button>
           <button
             type="submit"
             disabled={isPending}
-            className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-green-600 hover:bg-green-700 text-white text-base font-medium shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             title={isPending ? 'Saving...' : 'Save'}
             aria-label={isPending ? 'Saving...' : 'Save'}
           >
-            <FaSave className="mr-2" />
-            {isPending ? 'Saving...' : 'Save'}
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+              {isPending ? (
+                <svg className="animate-spin w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              ) : (
+                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              )}
+            </div>
+            <span className="font-semibold text-green-700">{isPending ? 'Saving...' : 'Save'}</span>
           </button>
         </div>
       </form>

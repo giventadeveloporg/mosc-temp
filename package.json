@@ -24,6 +24,9 @@
     "test:comprehensive": "node TestSprite/sanity-tests/run-comprehensive-sanity-tests-with-testsprite.js",
     "test:public": "node TestSprite/sanity-tests/run-public-pages-tests.js",
     "test:admin": "node TestSprite/admin-tests/comprehensive-admin-test-suite.js",
+    "test:admin:dynamic": "node TestSprite/admin-tests/dynamic-event-test-suite.js",
+    "test:admin:all": "npm run test:admin && npm run test:admin:dynamic",
+    "test:admin:diagnose": "node TestSprite/admin-tests/diagnose-event-discovery.js",
     "test:install-playwright": "npx playwright install chromium"
   },
   "dependencies": {
@@ -45,6 +48,8 @@
     "@trpc/react-query": "^11.1.0",
     "@trpc/server": "^11.1.0",
     "@types/jsonwebtoken": "^9.0.9",
+    "@zxing/browser": "^0.1.5",
+    "@zxing/library": "^0.21.3",
     "class-variance-authority": "^0.7.1",
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",

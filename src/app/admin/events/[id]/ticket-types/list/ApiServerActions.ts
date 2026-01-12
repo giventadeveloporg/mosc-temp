@@ -216,15 +216,71 @@ export async function updateTicketTypeInventoryServer(
 }
 
 export async function fetchEventDetailsForTicketListPage(eventId: number): Promise<EventDetailsDTO | null> {
-    const url = `${APP_URL}/api/proxy/event-details/${eventId}`;
-    const response = await fetch(url, { cache: 'no-store' });
-    if (!response.ok) return null;
-    return response.json();
+    try {
+        const url = `${APP_URL}/api/proxy/event-details/${eventId}`;
+        const response = await fetch(url, { cache: 'no-store' });
+        if (!response.ok) {
+            // If it's a 500 error, it might be a backend connection issue
+            if (response.status === 500) {
+                try {
+                    // Proxy handler returns JSON errors, so parse as JSON
+                    const errorJson = await response.json();
+                    const errorMessage = errorJson.error || errorJson.details || errorJson.message || '';
+                    // Check if it's a network/backend connection error
+                    if (errorMessage.includes('Network error') || errorMessage.includes('Unable to reach') || errorMessage.includes('authentication server') || errorMessage.includes('ECONNREFUSED')) {
+                        throw new Error('Network error: Unable to reach backend server. Please ensure the backend is running.');
+                    }
+                } catch (jsonError: any) {
+                    // If JSON parsing fails or it's a network error, re-throw network errors
+                    if (jsonError?.message?.includes('Network error')) {
+                        throw jsonError;
+                    }
+                }
+            }
+            return null;
+        }
+        return response.json();
+    } catch (error: any) {
+        // Re-throw network errors so they can be handled by the page
+        if (error?.message?.includes('Network error') || error?.message?.includes('Unable to reach') || error?.message?.includes('fetch failed') || error?.message?.includes('ECONNREFUSED')) {
+            throw error;
+        }
+        // For other errors, return null (graceful degradation)
+        return null;
+    }
 }
 
 export async function fetchTicketTypesForTicketListPage(eventId: number): Promise<EventTicketTypeDTO[]> {
-    const url = `${APP_URL}/api/proxy/event-ticket-types?eventId.equals=${eventId}`;
-    const response = await fetch(url, { cache: 'no-store' });
-    if (!response.ok) return [];
-    return response.json();
+    try {
+        const url = `${APP_URL}/api/proxy/event-ticket-types?eventId.equals=${eventId}`;
+        const response = await fetch(url, { cache: 'no-store' });
+        if (!response.ok) {
+            // If it's a 500 error, it might be a backend connection issue
+            if (response.status === 500) {
+                try {
+                    // Proxy handler returns JSON errors, so parse as JSON
+                    const errorJson = await response.json();
+                    const errorMessage = errorJson.error || errorJson.details || errorJson.message || '';
+                    // Check if it's a network/backend connection error
+                    if (errorMessage.includes('Network error') || errorMessage.includes('Unable to reach') || errorMessage.includes('authentication server') || errorMessage.includes('ECONNREFUSED')) {
+                        throw new Error('Network error: Unable to reach backend server. Please ensure the backend is running.');
+                    }
+                } catch (jsonError: any) {
+                    // If JSON parsing fails or it's a network error, re-throw network errors
+                    if (jsonError?.message?.includes('Network error')) {
+                        throw jsonError;
+                    }
+                }
+            }
+            return [];
+        }
+        return response.json();
+    } catch (error: any) {
+        // Re-throw network errors so they can be handled by the page
+        if (error?.message?.includes('Network error') || error?.message?.includes('Unable to reach') || error?.message?.includes('fetch failed') || error?.message?.includes('ECONNREFUSED')) {
+            throw error;
+        }
+        // For other errors, return empty array (graceful degradation)
+        return [];
+    }
 }
