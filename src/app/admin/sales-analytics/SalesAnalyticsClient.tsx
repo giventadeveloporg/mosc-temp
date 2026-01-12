@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import DateRangeSelector, { type DateRange } from '@/components/admin/DateRangeSelector';
 import EventSearchSelector from '@/components/admin/EventSearchSelector';
-import { fetchSalesDataServer, calculateSalesMetricsServer, type SalesMetrics } from './ApiServerActions';
+import { fetchSalesDataServer, calculateSalesMetricsServer, triggerStripeFeesTaxUpdateServer, type SalesMetrics, type StripeFeesTaxUpdateRequest, type StripeFeesTaxUpdateResponse } from './ApiServerActions';
 import type { EventTicketTransactionDTO } from '@/types';
-import { FaDollarSign, FaChartLine, FaSpinner, FaDownload, FaSearch, FaPercent, FaMoneyBillWave } from 'react-icons/fa';
+import { FaDollarSign, FaChartLine, FaSpinner, FaDownload, FaSearch, FaPercent, FaMoneyBillWave, FaSync, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
 
 interface SalesAnalyticsClientProps {
   initialEventId?: string;
@@ -38,6 +38,15 @@ export default function SalesAnalyticsClient({
   const [page, setPage] = useState(0);
   const [pageSize] = useState(20);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Batch Job State
+  const [batchJobLoading, setBatchJobLoading] = useState(false);
+  const [batchJobSuccess, setBatchJobSuccess] = useState(false);
+  const [batchJobError, setBatchJobError] = useState<string | null>(null);
+  const [batchJobResponse, setBatchJobResponse] = useState<StripeFeesTaxUpdateResponse | null>(null);
+  const [showBatchJobSection, setShowBatchJobSection] = useState(false);
+  const [batchJobTenantId, setBatchJobTenantId] = useState<string>('');
+  const [batchJobForceUpdate, setBatchJobForceUpdate] = useState(false);
 
   useEffect(() => {
     if (eventId) {
@@ -202,6 +211,78 @@ export default function SalesAnalyticsClient({
     XLSX.writeFile(workbook, `sales-report-${eventId || 'all'}-${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
+  const handleTriggerBatchJob = async () => {
+    setBatchJobLoading(true);
+    setBatchJobError(null);
+    setBatchJobSuccess(false);
+    setBatchJobResponse(null);
+
+    try {
+      // Prepare request payload
+      const request: StripeFeesTaxUpdateRequest = {};
+
+      // Use tenant ID if provided, otherwise let backend process all tenants
+      if (batchJobTenantId.trim()) {
+        request.tenantId = batchJobTenantId.trim();
+      } else {
+        // If not provided, use current tenant from environment (optional - backend will process all if not provided)
+        const currentTenantId = typeof window !== 'undefined' ? process.env.NEXT_PUBLIC_TENANT_ID : undefined;
+        if (currentTenantId) {
+          request.tenantId = currentTenantId;
+        }
+      }
+
+      // Use date range from current filter if available
+      if (dateRange.startDate) {
+        // Convert to ISO 8601 format with milliseconds and timezone
+        const startDate = new Date(dateRange.startDate);
+        request.startDate = startDate.toISOString();
+      }
+
+      if (dateRange.endDate) {
+        // Convert to ISO 8601 format, set to end of day
+        const endDate = new Date(dateRange.endDate);
+        endDate.setHours(23, 59, 59, 999);
+        request.endDate = endDate.toISOString();
+      }
+
+      // Force update flag
+      if (batchJobForceUpdate) {
+        request.forceUpdate = true;
+      }
+
+      // Validate date range if both dates are provided
+      if (request.startDate && request.endDate) {
+        const start = new Date(request.startDate);
+        const end = new Date(request.endDate);
+        if (start > end) {
+          setBatchJobError('Start date must be before or equal to end date');
+          setBatchJobLoading(false);
+          return;
+        }
+      }
+
+      // Trigger batch job
+      const response = await triggerStripeFeesTaxUpdateServer(request);
+
+      setBatchJobResponse(response);
+      setBatchJobSuccess(true);
+
+      // Reload metrics after successful batch job trigger (optional - can be removed if not needed)
+      // The batch job runs asynchronously, so metrics won't update immediately
+      // setTimeout(() => {
+      //   if (eventId) {
+      //     loadMetrics();
+      //   }
+      // }, 5000); // Wait 5 seconds before reloading (optional)
+    } catch (err: any) {
+      console.error('[SalesAnalyticsClient] Batch job error:', err);
+      setBatchJobError(err.message || 'Failed to trigger batch job. Please try again.');
+    } finally {
+      setBatchJobLoading(false);
+    }
+  };
+
   const filteredSalesData = searchQuery
     ? salesData.filter(t => {
         const searchLower = searchQuery.toLowerCase();
@@ -233,6 +314,124 @@ export default function SalesAnalyticsClient({
           defaultRange={dateRange}
         />
       )}
+
+      {/* Batch Job Trigger Section */}
+      <div className="bg-white border-2 border-gray-200 rounded-lg p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Stripe Fees and Tax Update Batch Job</h3>
+          <button
+            onClick={() => setShowBatchJobSection(!showBatchJobSection)}
+            className="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg transition-colors flex items-center gap-2"
+            type="button"
+          >
+            <FaSync className="w-4 h-4" />
+            {showBatchJobSection ? 'Hide' : 'Show'} Batch Job Options
+          </button>
+        </div>
+
+        {showBatchJobSection && (
+          <div className="space-y-4">
+            <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+              <p className="text-sm text-blue-800">
+                This batch job retrieves missing Stripe fee and tax data from Stripe's API and updates transaction records.
+                The job runs asynchronously in the background and will return a job ID when started.
+              </p>
+            </div>
+
+            {/* Tenant ID Input */}
+            <div>
+              <label htmlFor="batchJobTenantId" className="block text-sm font-medium text-gray-700 mb-2">
+                Tenant ID (optional - leave empty to process all tenants)
+              </label>
+              <input
+                type="text"
+                id="batchJobTenantId"
+                value={batchJobTenantId}
+                onChange={(e) => setBatchJobTenantId(e.target.value)}
+                placeholder={typeof window !== 'undefined' && process.env.NEXT_PUBLIC_TENANT_ID
+                  ? `Current: ${process.env.NEXT_PUBLIC_TENANT_ID}`
+                  : 'Leave empty to process all tenants'}
+                className="w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                {dateRange.startDate && dateRange.endDate
+                  ? `Date range from current filter will be applied: ${dateRange.startDate} to ${dateRange.endDate}`
+                  : 'No date range filter will be applied (processes all dates)'}
+              </p>
+            </div>
+
+            {/* Force Update Checkbox */}
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="batchJobForceUpdate"
+                checked={batchJobForceUpdate}
+                onChange={(e) => setBatchJobForceUpdate(e.target.checked)}
+                className="w-5 h-5 rounded border-gray-400 text-blue-600 focus:ring-blue-500"
+              />
+              <label htmlFor="batchJobForceUpdate" className="text-sm font-medium text-gray-700">
+                Force update (reprocess transactions that already have Stripe fee data)
+              </label>
+            </div>
+
+            {/* Batch Job Status Messages */}
+            {batchJobSuccess && batchJobResponse && (
+              <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <FaCheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-green-800 font-semibold mb-2">Batch job started successfully!</p>
+                    <div className="text-sm text-green-700 space-y-1">
+                      <p><strong>Job ID:</strong> {batchJobResponse.jobId}</p>
+                      <p><strong>Status:</strong> {batchJobResponse.status}</p>
+                      {batchJobResponse.estimatedRecords !== null && (
+                        <p><strong>Estimated Records:</strong> {batchJobResponse.estimatedRecords}</p>
+                      )}
+                      {batchJobResponse.estimatedCompletionTime && (
+                        <p><strong>Estimated Completion:</strong> {new Date(batchJobResponse.estimatedCompletionTime).toLocaleString()}</p>
+                      )}
+                      <p className="mt-2 text-xs">{batchJobResponse.message}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {batchJobError && (
+              <div className="bg-red-50 border-2 border-red-200 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <FaExclamationTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-red-800 font-semibold mb-1">Error</p>
+                    <p className="text-sm text-red-700">{batchJobError}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Trigger Button */}
+            <button
+              onClick={handleTriggerBatchJob}
+              disabled={batchJobLoading}
+              className="w-full flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 px-6"
+              title="Trigger Stripe Fees and Tax Update Batch Job"
+              aria-label="Trigger Stripe Fees and Tax Update Batch Job"
+              type="button"
+            >
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                {batchJobLoading ? (
+                  <FaSpinner className="w-6 h-6 text-blue-600 animate-spin" />
+                ) : (
+                  <FaSync className="w-6 h-6 text-blue-600" />
+                )}
+              </div>
+              <span className="font-semibold text-blue-700">
+                {batchJobLoading ? 'Starting Batch Job...' : 'Trigger Batch Job'}
+              </span>
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* Loading State */}
       {loading && (

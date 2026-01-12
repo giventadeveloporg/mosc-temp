@@ -45,6 +45,28 @@ export interface SalesMetrics {
 }
 
 /**
+ * Batch Job Request/Response Interfaces for Stripe Fees and Tax Update
+ */
+export interface StripeFeesTaxUpdateRequest {
+  tenantId?: string;
+  startDate?: string; // ISO 8601 format: "2025-01-01T00:00:00.000Z"
+  endDate?: string;   // ISO 8601 format: "2025-01-31T23:59:59.999Z"
+  forceUpdate?: boolean; // Default: false
+}
+
+export interface StripeFeesTaxUpdateResponse {
+  jobId: string;
+  status: 'STARTED' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED';
+  tenantId: string | null;
+  startDate: string | null;
+  endDate: string | null;
+  forceUpdate: boolean;
+  estimatedRecords: number | null;
+  estimatedCompletionTime: string | null;
+  message: string;
+}
+
+/**
  * Fetch sales data with pagination and filtering
  */
 export async function fetchSalesDataServer(
@@ -277,4 +299,82 @@ export async function calculateSalesMetricsServer(
     })),
     discountCodeUsage,
   };
+}
+
+/**
+ * Trigger Stripe Fees and Tax Update Batch Job
+ * This server action calls the backend batch job API to retrieve missing Stripe fee and tax data
+ * and update transaction records asynchronously.
+ *
+ * @param request - Batch job request parameters (all optional)
+ * @returns Response with job ID and status (HTTP 202 Accepted)
+ */
+export async function triggerStripeFeesTaxUpdateServer(
+  request: StripeFeesTaxUpdateRequest = {}
+): Promise<StripeFeesTaxUpdateResponse> {
+  try {
+    // Validate date range if both dates are provided
+    if (request.startDate && request.endDate) {
+      const start = new Date(request.startDate);
+      const end = new Date(request.endDate);
+      if (start > end) {
+        throw new Error('Start date must be before or equal to end date');
+      }
+    }
+
+    // Prepare request payload (only include defined fields)
+    const payload: StripeFeesTaxUpdateRequest = {};
+    if (request.tenantId) {
+      payload.tenantId = request.tenantId;
+    }
+    if (request.startDate) {
+      payload.startDate = request.startDate;
+    }
+    if (request.endDate) {
+      payload.endDate = request.endDate;
+    }
+    if (request.forceUpdate !== undefined) {
+      payload.forceUpdate = request.forceUpdate;
+    }
+
+    // Call backend batch job API endpoint (NOT a proxy endpoint - direct backend call)
+    const url = `${API_BASE_URL}/api/cron/stripe-fees-tax-update`;
+    const response = await fetchWithJwtRetry(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+      cache: 'no-store',
+    });
+
+    // Handle error responses
+    if (!response.ok) {
+      let errorMessage = `Failed to trigger batch job: ${response.status} ${response.statusText}`;
+
+      try {
+        const errorData = await response.json();
+        if (errorData.message) {
+          errorMessage = errorData.message;
+        } else if (errorData.error) {
+          errorMessage = errorData.error;
+        }
+      } catch {
+        // If JSON parsing fails, use the default error message
+        const errorText = await response.text().catch(() => '');
+        if (errorText) {
+          errorMessage = errorText;
+        }
+      }
+
+      throw new Error(errorMessage);
+    }
+
+    // Parse and return response (should be 202 Accepted)
+    const data: StripeFeesTaxUpdateResponse = await response.json();
+    return data;
+  } catch (error: any) {
+    console.error('[triggerStripeFeesTaxUpdateServer] Error:', error);
+    throw error;
+  }
 }
