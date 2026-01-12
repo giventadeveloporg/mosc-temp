@@ -376,11 +376,11 @@ export default function NewsletterEmailTemplateEditClient({
 
       // Show success message
       setSaveStatus('success');
-      setSaveMessage('Your template has been saved successfully. Redirecting to promotion emails...');
+      setSaveMessage('Your template has been saved successfully. Redirecting...');
 
       // Redirect after a brief delay
       setTimeout(() => {
-        router.push('/admin/promotion-emails');
+        router.push('/admin/newsletter-emails');
       }, 1500);
     } catch (err: any) {
       setSaveStatus('error');

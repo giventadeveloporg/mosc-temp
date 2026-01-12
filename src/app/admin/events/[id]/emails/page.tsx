@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FaPlus, FaSearch, FaArrowLeft, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaSearch } from 'react-icons/fa';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -429,10 +429,16 @@ export default function EventEmailsPage() {
       <div className="flex items-center mb-6">
         <Link
           href={`/admin/events/${eventId}/edit`}
-          className="flex items-center text-blue-600 hover:text-blue-800 mr-4 transition-colors"
+          className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+          title="Back to Event"
+          aria-label="Back to Event"
         >
-          <FaArrowLeft className="mr-2" />
-          Back to Event
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+          </div>
+          <span className="font-semibold text-blue-700">Back to Event</span>
         </Link>
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
@@ -567,10 +573,17 @@ export default function EventEmailsPage() {
           </div>
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2 transition-colors font-semibold whitespace-nowrap"
+            className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+            title="Add Email"
+            aria-label="Add Email"
+            type="button"
           >
-            <FaPlus />
-            Add Email
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+            </div>
+            <span className="font-semibold text-blue-700">Add Email</span>
           </button>
         </div>
       </div>
@@ -660,9 +673,14 @@ export default function EventEmailsPage() {
                         <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
                           <button
                             onClick={() => handleAddEmailToEvent(email)}
-                            className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition whitespace-nowrap"
+                            className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                            title="Add email to event"
+                            aria-label="Add email to event"
+                            type="button"
                           >
-                            Add
+                            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
                           </button>
                         </td>
                       </tr>
@@ -677,32 +695,49 @@ export default function EventEmailsPage() {
                   <button
                     onClick={() => handleAvailableEmailsPageChange(availableEmailsPage - 1)}
                     disabled={availableEmailsPage === 0 || loading}
-                    className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+                    className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+                    title="Previous Page"
+                    aria-label="Previous Page"
+                    type="button"
                   >
-                    <FaChevronLeft />
-                    Previous
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                    </svg>
+                    <span>Previous</span>
                   </button>
-                  <div className="text-sm font-semibold text-gray-700">
-                    Page {availableEmailsTotalPages === 0 ? 0 : availableEmailsPage + 1} of {availableEmailsTotalPages}
+                  <div className="px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+                    <span className="text-sm font-bold text-blue-700">
+                      Page <span className="text-blue-600">{availableEmailsTotalPages === 0 ? 0 : availableEmailsPage + 1}</span> of <span className="text-blue-600">{availableEmailsTotalPages}</span>
+                    </span>
                   </div>
                   <button
                     onClick={() => handleAvailableEmailsPageChange(availableEmailsPage + 1)}
                     disabled={availableEmailsPage >= availableEmailsTotalPages - 1 || loading}
-                    className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+                    className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+                    title="Next Page"
+                    aria-label="Next Page"
+                    type="button"
                   >
-                    Next
-                    <FaChevronRight />
+                    <span>Next</span>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                    </svg>
                   </button>
                 </div>
-                <div className="text-center text-sm text-gray-600 mt-2">
+                <div className="text-center mt-3">
                   {availableEmailsTotalElements > 0 ? (
-                    <>Showing <span className="font-medium">{(availableEmailsPage * 20) + 1}</span> to <span className="font-medium">{Math.min((availableEmailsPage * 20) + availableEmails.length, availableEmailsTotalElements)}</span> of <span className="font-medium">{availableEmailsTotalElements}</span> available emails</>
-                  ) : (
-                    <div className="flex items-center justify-center gap-2">
-                      <span>No available emails found</span>
-                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-sm font-medium">
-                        [All tenant emails are mapped to this event]
+                    <div className="inline-flex items-center px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+                      <span className="text-sm text-gray-700">
+                        Showing <span className="font-bold text-blue-600">{(availableEmailsPage * 20) + 1}</span> to <span className="font-bold text-blue-600">{Math.min((availableEmailsPage * 20) + availableEmails.length, availableEmailsTotalElements)}</span> of <span className="font-bold text-blue-600">{availableEmailsTotalElements}</span> available emails
                       </span>
+                    </div>
+                  ) : (
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 border-2 border-orange-300 rounded-lg shadow-sm">
+                      <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span className="text-sm font-medium text-orange-700">No available emails found</span>
+                      <span className="text-sm text-orange-600">[All tenant emails are mapped to this event]</span>
                     </div>
                   )}
                 </div>
@@ -826,20 +861,42 @@ function EmailForm({ formData, setFormData, onSubmit, loading, submitText }: Ema
         />
       </div>
 
-      <div className="flex justify-end space-x-3 pt-4">
+      <div className="flex flex-row gap-3 sm:gap-4 pt-4">
         <button
           type="button"
           onClick={() => window.history.back()}
-          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          className="flex-1 flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+          disabled={loading}
+          title="Cancel"
+          aria-label="Cancel"
         >
-          Cancel
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </div>
+          <span className="font-semibold text-blue-700">Cancel</span>
         </button>
         <button
           type="submit"
           disabled={loading}
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+          className="flex-1 flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+          title={submitText}
+          aria-label={submitText}
         >
-          {loading ? 'Saving...' : submitText}
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+            {loading ? (
+              <svg className="animate-spin w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            ) : (
+              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+          </div>
+          <span className="font-semibold text-green-700">{loading ? 'Saving...' : submitText}</span>
         </button>
       </div>
     </form>
