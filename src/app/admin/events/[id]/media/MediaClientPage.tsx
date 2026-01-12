@@ -612,20 +612,39 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
               <button
                 type="button"
                 onClick={onClose}
-                className="bg-teal-100 hover:bg-teal-200 text-teal-800 px-4 py-2 rounded-md flex items-center gap-2"
+                className="flex-1 flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 disabled={isSubmitting}
+                title="Cancel"
+                aria-label="Cancel"
               >
-                <FaBan />
-                Cancel
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-blue-700">Cancel</span>
               </button>
               <button
                 type="button"
                 onClick={handleSaveClick}
                 disabled={isSubmitting}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-2"
+                className="flex-1 flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                title={isSubmitting ? 'Saving...' : 'Save Changes'}
+                aria-label={isSubmitting ? 'Saving...' : 'Save Changes'}
               >
-                {isSubmitting ? <FaSpinner className="animate-spin" /> : <FaFolderOpen />}
-                {isSubmitting ? 'Saving...' : 'Save Changes'}
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                  {isSubmitting ? (
+                    <svg className="animate-spin w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  ) : (
+                    <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </div>
+                <span className="font-semibold text-blue-700">{isSubmitting ? 'Saving...' : 'Save Changes'}</span>
               </button>
             </div>
           </div>
@@ -737,21 +756,31 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
       <div className="flex justify-end mb-4 gap-2">
         <button
           type="button"
-          className="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded shadow-sm border border-green-700 transition-colors flex items-center gap-2"
+          className="flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
           onClick={() => uploadFormDivRef.current?.scrollIntoView({ behavior: 'smooth' })}
+          title="Upload Files"
+          aria-label="Upload Files"
         >
-          <FaUpload className="w-5 h-5 mr-1" />
-          Upload Files
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+            <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+          </div>
+          <span className="font-semibold text-green-700">Upload Files</span>
         </button>
         <button
           type="button"
-          className="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold px-4 py-2 rounded shadow-sm border border-yellow-700 transition-colors flex items-center gap-2"
+          className="flex-shrink-0 h-14 rounded-xl bg-yellow-100 hover:bg-yellow-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
           onClick={() => uploadedMediaSectionRef.current?.scrollIntoView({ behavior: 'smooth' })}
+          title="Go to Uploaded Media Files"
+          aria-label="Go to Uploaded Media Files"
         >
-          <FaPhotoVideo className="w-5 h-5 mr-1" />
-          <span className="text-left">
-            Go to / View<br />Uploaded Media Files<br />Full Files List
-          </span>
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-yellow-200 flex items-center justify-center">
+            <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <span className="font-semibold text-yellow-700">Go to Uploaded Media Files</span>
         </button>
       </div>
       <h1 className="text-2xl font-bold mb-4">
@@ -1178,11 +1207,24 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
           </div>
           <button
             type="submit"
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded shadow-sm border border-blue-700 transition-colors flex items-center gap-2 disabled:bg-blue-300 disabled:cursor-not-allowed"
+            className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             disabled={uploading}
+            title={uploading ? 'Uploading...' : 'Upload Images'}
+            aria-label={uploading ? 'Uploading...' : 'Upload Images'}
           >
-            <FaUpload className="w-5 h-5" />
-            {uploading ? 'Uploading...' : 'Upload Images'}
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+              {uploading ? (
+                <svg className="animate-spin w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              ) : (
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+              )}
+            </div>
+            <span className="font-semibold text-blue-700">{uploading ? 'Uploading...' : 'Upload Images'}</span>
           </button>
           {message && (
             <div className={`mt-4 text-2xl font-extrabold italic drop-shadow-sm tracking-wide ${message.includes('successful') ? 'text-green-600' : 'text-blue-700'}`}
@@ -1285,23 +1327,77 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
               </tbody>
             </table>
             {/* Pagination for official docs */}
-            <div className="flex justify-between items-center mt-2">
-              <button
-                className="px-3 py-1 rounded bg-blue-100 border border-blue-300 text-blue-700 disabled:opacity-50"
-                onClick={() => setOfficialDocsPage(p => Math.max(0, p - 1))}
-                disabled={officialDocsPage === 0}
-              >
-                Previous
-              </button>
-              <span>Page {officialDocsPage + 1}</span>
-              <button
-                className="px-3 py-1 rounded bg-blue-100 border border-blue-300 text-blue-700 disabled:opacity-50"
-                onClick={() => setOfficialDocsPage(p => p + 1)}
-                disabled={!hasNextOfficialDocsPage}
-              >
-                Next
-              </button>
-            </div>
+            {(() => {
+              const totalCount = officialDocsList.length;
+              const totalPages = Math.ceil(totalCount / officialDocsPageSize) || 1;
+              const displayPage = officialDocsPage + 1;
+              const startItem = totalCount > 0 ? officialDocsPage * officialDocsPageSize + 1 : 0;
+              const endItem = totalCount > 0 ? Math.min((officialDocsPage + 1) * officialDocsPageSize, totalCount) : 0;
+              const isPrevDisabled = officialDocsPage === 0;
+              const isNextDisabled = !hasNextOfficialDocsPage;
+
+              return (
+                <div className="mt-8">
+                  <div className="flex justify-between items-center">
+                    {/* Previous Button */}
+                    <button
+                      onClick={() => setOfficialDocsPage(p => Math.max(0, p - 1))}
+                      disabled={isPrevDisabled}
+                      className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+                      title="Previous Page"
+                      aria-label="Previous Page"
+                      type="button"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                      </svg>
+                      <span>Previous</span>
+                    </button>
+
+                    {/* Page Info */}
+                    <div className="px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+                      <span className="text-sm font-bold text-blue-700">
+                        Page <span className="text-blue-600">{displayPage}</span> of <span className="text-blue-600">{totalPages}</span>
+                      </span>
+                    </div>
+
+                    {/* Next Button */}
+                    <button
+                      onClick={() => setOfficialDocsPage(p => p + 1)}
+                      disabled={isNextDisabled}
+                      className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+                      title="Next Page"
+                      aria-label="Next Page"
+                      type="button"
+                    >
+                      <span>Next</span>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Item Count Text */}
+                  <div className="text-center mt-3">
+                    {totalCount > 0 ? (
+                      <div className="inline-flex items-center px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+                        <span className="text-sm text-gray-700">
+                          Showing <span className="font-bold text-blue-600">{startItem}</span> to <span className="font-bold text-blue-600">{endItem}</span> of <span className="font-bold text-blue-600">{totalCount}</span> documents
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 border-2 border-orange-300 rounded-lg shadow-sm">
+                        <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="text-sm font-medium text-orange-700">No documents found</span>
+                        <span className="text-sm text-orange-600">[No documents match your criteria]</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         )}
       </div>
@@ -1314,16 +1410,18 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
         <div className="mb-4 flex justify-between items-center">
           <div className="flex items-center gap-4">
             <h2 className="text-2xl font-bold text-gray-900">Uploaded Media Files</h2>
-            <Link href={`/admin/events/${eventId}/media/list`}>
-              <button
-                type="button"
-                className="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold px-4 py-2 rounded shadow-sm border border-yellow-700 transition-colors flex items-center gap-2"
-              >
-                <FaPhotoVideo className="w-5 h-5 mr-1" />
-                <span className="text-left">
-                  Go to / View<br />Uploaded Media Files<br />Full Files List
-                </span>
-              </button>
+            <Link
+              href={`/admin/events/${eventId}/media/list`}
+              className="flex-shrink-0 h-14 rounded-xl bg-yellow-100 hover:bg-yellow-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+              title="View Full Files List"
+              aria-label="View Full Files List"
+            >
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-yellow-200 flex items-center justify-center">
+                <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <span className="font-semibold text-yellow-700">View Full Files List</span>
             </Link>
           </div>
           <div className="flex items-center gap-4">

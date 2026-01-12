@@ -483,8 +483,13 @@ export default async function TicketListPage({ params, searchParams }: { params:
             <FaUser className="text-gray-400" />
             <input name="name" placeholder="Name" defaultValue={name} className="border rounded px-2 py-1 text-sm" />
           </div>
-          <button type="submit" className="ml-2 bg-teal-600 hover:bg-teal-700 text-white px-3 py-1 rounded flex items-center gap-1 text-sm">
-            <FaSearch /> Search
+          <button type="submit" className="ml-2 flex-shrink-0 h-14 rounded-xl bg-teal-100 hover:bg-teal-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-4" title="Search" aria-label="Search">
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
+              <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <span className="font-semibold text-teal-700">Search</span>
           </button>
         </form>
       </div>

@@ -6,7 +6,7 @@ import DateRangeSelector, { type DateRange } from '@/components/admin/DateRangeS
 import EventSearchSelector from '@/components/admin/EventSearchSelector';
 import { fetchSalesDataServer, calculateSalesMetricsServer, type SalesMetrics } from './ApiServerActions';
 import type { EventTicketTransactionDTO } from '@/types';
-import { FaDollarSign, FaChartLine, FaSpinner, FaDownload, FaSearch, FaPercent, FaMoneyBillWave } from 'react-icons/fa';
+import { FaDollarSign, FaChartLine, FaSpinner, FaSearch, FaPercent, FaMoneyBillWave } from 'react-icons/fa';
 
 interface SalesAnalyticsClientProps {
   initialEventId?: string;
@@ -464,19 +464,31 @@ export default function SalesAnalyticsClient({
                 <div className="flex gap-2">
                   <button
                     onClick={handleExportCSV}
-                    className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-semibold transition-colors flex items-center gap-2"
+                    className="flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
                     type="button"
+                    title="Export to CSV"
+                    aria-label="Export to CSV"
                   >
-                    <FaDownload className="w-4 h-4" />
-                    CSV
+                    <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+                      <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    <span className="font-semibold text-green-700">CSV</span>
                   </button>
                   <button
                     onClick={handleExportExcel}
-                    className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold transition-colors flex items-center gap-2"
+                    className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
                     type="button"
+                    title="Export to Excel"
+                    aria-label="Export to Excel"
                   >
-                    <FaDownload className="w-4 h-4" />
-                    Excel
+                    <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                      <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    <span className="font-semibold text-blue-700">Excel</span>
                   </button>
                 </div>
               )}
@@ -551,32 +563,66 @@ export default function SalesAnalyticsClient({
                 </table>
               </div>
 
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="mt-6 flex items-center justify-between">
-                  <div className="text-sm text-gray-700">
-                    Showing {startItem} to {endItem} of {totalCount} transactions
+              {/* Pagination Controls - Always visible, matching admin page style */}
+              <div className="mt-8">
+                <div className="flex justify-between items-center">
+                  {/* Previous Button */}
+                  <button
+                    onClick={() => setPage(Math.max(0, page - 1))}
+                    disabled={page === 0 || loading}
+                    className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+                    title="Previous Page"
+                    aria-label="Previous Page"
+                    type="button"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                    </svg>
+                    <span>Previous</span>
+                  </button>
+
+                  {/* Page Info */}
+                  <div className="px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+                    <span className="text-sm font-bold text-blue-700">
+                      Page <span className="text-blue-600">{page + 1}</span> of <span className="text-blue-600">{Math.max(1, totalPages)}</span>
+                    </span>
                   </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setPage(Math.max(0, page - 1))}
-                      disabled={page === 0}
-                      className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      type="button"
-                    >
-                      Previous
-                    </button>
-                    <button
-                      onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
-                      disabled={page >= totalPages - 1}
-                      className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      type="button"
-                    >
-                      Next
-                    </button>
-                  </div>
+
+                  {/* Next Button */}
+                  <button
+                    onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
+                    disabled={page >= totalPages - 1 || loading}
+                    className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+                    title="Next Page"
+                    aria-label="Next Page"
+                    type="button"
+                  >
+                    <span>Next</span>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
                 </div>
-              )}
+
+                {/* Item Count Text */}
+                <div className="text-center mt-3">
+                  {totalCount > 0 ? (
+                    <div className="inline-flex items-center px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+                      <span className="text-sm text-gray-700">
+                        Showing <span className="font-bold text-blue-600">{startItem}</span> to <span className="font-bold text-blue-600">{endItem}</span> of <span className="font-bold text-blue-600">{totalCount}</span> transactions
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 border-2 border-orange-300 rounded-lg shadow-sm">
+                      <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span className="text-sm font-medium text-orange-700">No transactions found</span>
+                      <span className="text-sm text-orange-600">[No transactions match your criteria]</span>
+                    </div>
+                  )}
+                </div>
+              </div>
             </>
           ) : (
             <div className="text-center py-8 text-gray-500">

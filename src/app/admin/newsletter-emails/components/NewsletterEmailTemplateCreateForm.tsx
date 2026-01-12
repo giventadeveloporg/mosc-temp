@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import type {
   PromotionEmailTemplateFormDTO,
   DiscountCodeDTO,
@@ -47,7 +46,6 @@ export default function NewsletterEmailTemplateCreateForm({
     isActive: true,
   });
 
-  const router = useRouter();
   const [discountCodes, setDiscountCodes] = useState<DiscountCodeDTO[]>([]);
   const [loadingDiscountCodes, setLoadingDiscountCodes] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -123,11 +121,11 @@ export default function NewsletterEmailTemplateCreateForm({
       if (createdTemplate.id) {
         // Show success message
         setSaveStatus('success');
-        setSaveMessage('Your template has been created successfully. Redirecting to promotion emails...');
+        setSaveMessage('Your template has been created successfully. Redirecting...');
 
-        // Redirect after a brief delay
+        // Call onSave callback after a brief delay
         setTimeout(() => {
-          router.push('/admin/promotion-emails');
+          onSave(createdTemplate.id);
         }, 1500);
       } else {
         throw new Error('Template created but no ID returned');

@@ -246,8 +246,8 @@ export default function NewsletterEmailsPage() {
     setSuccessMessage('Template created successfully!');
     setTimeout(() => {
       setSuccessMessage(null);
-      // Navigate to edit page for image uploads
-      window.location.href = `/admin/newsletter-emails/${templateId}`;
+      // Redirect to newsletter emails list page
+      window.location.href = '/admin/newsletter-emails';
     }, 1500);
   };
 

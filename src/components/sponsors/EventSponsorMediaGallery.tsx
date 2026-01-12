@@ -131,10 +131,17 @@ export default function EventSponsorMediaGallery({
         {allowUpload && onUploadClick && (
           <button
             onClick={onUploadClick}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-md reverent-transition inline-flex items-center gap-2"
+            className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+            title="Upload Media"
+            aria-label="Upload Media"
+            type="button"
           >
-            <FaPlus className="w-4 h-4" />
-            Upload Media
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+            </div>
+            <span className="font-semibold text-blue-700">Upload Media</span>
           </button>
         )}
       </div>

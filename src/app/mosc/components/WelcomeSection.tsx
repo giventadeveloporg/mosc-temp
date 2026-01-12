@@ -43,9 +43,9 @@ const WelcomeSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features?.map((feature, index) => (
             <div key={index} className="text-center group">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 reverent-transition">
-                <AppIcon name={feature?.icon} size={32} className="text-primary" />
-              </div>
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 reverent-transition">
+                  <AppIcon name={feature?.icon} size={32} className="text-primary" />
+                </div>
               <h3 className="font-heading font-medium text-xl text-foreground mb-3">
                 {feature?.title}
               </h3>
