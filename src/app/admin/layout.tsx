@@ -41,7 +41,17 @@ export default async function AdminLayout({
     try {
       const u = await currentUser();
       if (u) {
-        await bootstrapUserProfile({ userId, user: u });
+        // Map Clerk user object to userData format expected by bootstrapUserProfile
+        // CRITICAL: Only pass data that exists - don't pass empty strings
+        await bootstrapUserProfile({
+          userId,
+          userData: {
+            email: u.emailAddresses?.[0]?.emailAddress || undefined,
+            firstName: u.firstName || undefined,
+            lastName: u.lastName || undefined,
+            imageUrl: u.imageUrl || undefined,
+          }
+        });
       }
     } catch (error) {
       console.error('[AdminLayout] Error bootstrapping user profile (non-fatal):', error);

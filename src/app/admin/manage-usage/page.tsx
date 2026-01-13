@@ -22,8 +22,18 @@ export default async function ManageUsagePage() {
       ]);
 
       if (u) {
+        // Map Clerk user object to userData format expected by bootstrapUserProfile
+        // CRITICAL: Only pass data that exists - don't pass empty strings
         await Promise.race([
-          bootstrapUserProfile({ userId, user: u }),
+          bootstrapUserProfile({
+            userId,
+            userData: {
+              email: u.emailAddresses?.[0]?.emailAddress || undefined,
+              firstName: u.firstName || undefined,
+              lastName: u.lastName || undefined,
+              imageUrl: u.imageUrl || undefined,
+            }
+          }),
           new Promise<void>((resolve) =>
             setTimeout(() => {
               console.warn('[ManageUsage] bootstrapUserProfile() timeout after 15 seconds');

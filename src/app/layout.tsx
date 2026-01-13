@@ -181,23 +181,58 @@ export default async function RootLayout({
                 if (existingProfile && existingProfile.userId !== userId) {
                   // Step 3: Email + tenantId exists but with different userId
                   // UPDATE the existing record's userId to match current Clerk userId
+                  // CRITICAL: Preserve all existing fields - only update userId and clerkUserId
+                  // DO NOT overwrite firstName, lastName, email if they already have values
                   console.log('[Layout] Found existing profile with same email but different userId. Updating userId...');
                   console.log('[Layout] Old userId:', existingProfile.userId, '→ New userId:', userId);
+                  console.log('[Layout] Preserving existing profile data:', {
+                    firstName: existingProfile.firstName,
+                    lastName: existingProfile.lastName,
+                    email: existingProfile.email
+                  });
 
                   // Use direct backend call with JWT (not proxy) for PATCH operations
                   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-                  const updatePayload = {
+
+                  // CRITICAL: Build update payload that ONLY updates userId/clerkUserId
+                  // Preserve ALL existing fields - do NOT include fields that might overwrite existing data
+                  const updatePayload: any = {
                     id: existingProfile.id, // MUST include id in PATCH payload per backend requirements
                     userId: userId, // Update to current Clerk userId
                     clerkUserId: userId, // Also update clerkUserId
                     tenantId: tenantId, // Include tenantId
                     updatedAt: new Date().toISOString(),
-                    // Keep other fields from existing profile
-                    email: userEmail,
-                    firstName: u?.firstName || existingProfile.firstName,
-                    lastName: u?.lastName || existingProfile.lastName,
-                    profileImageUrl: u?.imageUrl || existingProfile.profileImageUrl,
                   };
+
+                  // ONLY update firstName/lastName/email if they are missing/empty in existing profile
+                  // This prevents overwriting existing data with empty values from Clerk
+                  if (!existingProfile.firstName || existingProfile.firstName.trim() === '') {
+                    if (u?.firstName && u.firstName.trim() !== '') {
+                      updatePayload.firstName = u.firstName;
+                    }
+                  }
+                  // Preserve existing firstName - do NOT update
+
+                  if (!existingProfile.lastName || existingProfile.lastName.trim() === '') {
+                    if (u?.lastName && u.lastName.trim() !== '') {
+                      updatePayload.lastName = u.lastName;
+                    }
+                  }
+                  // Preserve existing lastName - do NOT update
+
+                  if (!existingProfile.email || existingProfile.email.trim() === '') {
+                    if (userEmail && userEmail.trim() !== '') {
+                      updatePayload.email = userEmail;
+                    }
+                  }
+                  // Preserve existing email - do NOT update
+
+                  if (!existingProfile.profileImageUrl || existingProfile.profileImageUrl.trim() === '') {
+                    if (u?.imageUrl && u.imageUrl.trim() !== '') {
+                      updatePayload.profileImageUrl = u.imageUrl;
+                    }
+                  }
+                  // Preserve existing profileImageUrl - do NOT update
 
                   console.log('[Layout] Sending PATCH request with payload:', JSON.stringify(updatePayload, null, 2));
 
