@@ -30,7 +30,7 @@ const MOSCFooter = () => {
             <div className="flex justify-center justify-items-center md:justify-start">
               <div className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 bg-transparent rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0" style={{ background: 'transparent' }}>
                 <AppImage
-                  src="/images/event_1/mosc_email/logo-mosc.png"
+                  src="/images/logos/Current_Edits/Mosc_logo_jan2026.png"
                   alt="Malankara Orthodox Syrian Church emblem"
                   className="w-full h-full object-contain"
                   style={{ background: 'transparent' }}

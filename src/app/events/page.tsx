@@ -26,7 +26,7 @@ function DescriptionDisplay({
 
   if (description.length <= maxLength) {
     return (
-      <div className="text-lg font-semibold text-gray-700 leading-relaxed whitespace-pre-wrap">
+      <div className="text-base sm:text-lg font-semibold text-gray-700 leading-relaxed whitespace-pre-wrap break-words max-w-full">
         {description}
       </div>
     );
@@ -35,8 +35,8 @@ function DescriptionDisplay({
   const truncatedText = description.substring(0, maxLength).trim();
 
   return (
-    <div className="text-lg font-semibold text-gray-700 leading-relaxed">
-      <div className="whitespace-pre-wrap">
+    <div className="text-base sm:text-lg font-semibold text-gray-700 leading-relaxed">
+      <div className="whitespace-pre-wrap break-words max-w-full">
         {isExpanded ? description : `${truncatedText}...`}
       </div>
     </div>
@@ -1153,45 +1153,45 @@ export default function EventsPage() {
 
                           {/* Location */}
                           {event.location && (
-                            <div className="flex items-center gap-3 text-gray-700 w-full sm:w-auto sm:min-w-[280px]">
-                              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                <svg className="w-10 h-10 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <span className="text-lg font-semibold truncate">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 text-gray-700 w-full sm:w-auto sm:min-w-[280px]">
+                              <div className="flex items-center gap-3 min-w-0 flex-1 sm:flex-initial">
+                                <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                  <svg className="w-10 h-10 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                  </svg>
+                                </div>
+                                <span className="text-base sm:text-lg font-semibold break-words min-w-0">
                                   {event.location}
                                 </span>
-                                {/* Copy and Navigate Icons */}
-                                <div className="flex gap-1">
-                                  <button
-                                    onClick={() => {
-                                      navigator.clipboard.writeText(event.location || '');
-                                      alert('Address copied to clipboard!');
-                                    }}
-                                    className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-colors"
-                                    title="Copy Address"
-                                    aria-label="Copy address to clipboard"
-                                  >
-                                    <svg className="w-6 h-6 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                    </svg>
-                                  </button>
-                                  <a
-                                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location || '')}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 hover:bg-green-200 flex items-center justify-center transition-colors"
-                                    title="Open in Google Maps"
-                                    aria-label="Open location in Google Maps"
-                                  >
-                                    <svg className="w-6 h-6 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                                    </svg>
-                                  </a>
-                                </div>
+                              </div>
+                              {/* Copy and Navigate Icons */}
+                              <div className="flex gap-1 flex-shrink-0 ml-[68px] sm:ml-0">
+                                <button
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(event.location || '');
+                                    alert('Address copied to clipboard!');
+                                  }}
+                                  className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-colors"
+                                  title="Copy Address"
+                                  aria-label="Copy address to clipboard"
+                                >
+                                  <svg className="w-6 h-6 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                  </svg>
+                                </button>
+                                <a
+                                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location || '')}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 hover:bg-green-200 flex items-center justify-center transition-colors"
+                                  title="Open in Google Maps"
+                                  aria-label="Open location in Google Maps"
+                                >
+                                  <svg className="w-6 h-6 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                                  </svg>
+                                </a>
                               </div>
                             </div>
                           )}
@@ -1200,7 +1200,7 @@ export default function EventsPage() {
 
                       {/* Description */}
                       {event.description && (
-                        <div className="mb-4 px-4 lg:max-w-4xl lg:mx-auto">
+                        <div className="mb-4 px-4 lg:max-w-4xl lg:mx-auto w-full max-w-full overflow-hidden">
                           <DescriptionDisplay 
                             description={event.description} 
                             isExpanded={expandedDescriptions[event.id!] || false}

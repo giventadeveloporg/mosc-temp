@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FaSearch } from 'react-icons/fa';
+import { FaSearch, FaMicrophone, FaAddressBook, FaHandshake, FaEnvelope, FaUserTie } from 'react-icons/fa';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -46,6 +46,10 @@ export default function EventEmailsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortKey, setSortKey] = useState<string>('');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
+  // Pagination state for main emails table
+  const [emailsPage, setEmailsPage] = useState(0);
+  const emailsPageSize = 20;
 
   // Available emails state (tenant-level emails not mapped to this event)
   const [availableEmails, setAvailableEmails] = useState<EventEmailsDTO[]>([]);
@@ -356,52 +360,85 @@ export default function EventEmailsPage() {
     email.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Pagination calculations for main emails table
+  const emailsTotalPages = Math.ceil(filteredEmails.length / emailsPageSize) || 1;
+  const paginatedEmails = filteredEmails.slice(
+    emailsPage * emailsPageSize,
+    (emailsPage + 1) * emailsPageSize
+  );
+  const emailsStartEntry = filteredEmails.length > 0 ? emailsPage * emailsPageSize + 1 : 0;
+  const emailsEndEntry = filteredEmails.length > 0 ? Math.min((emailsPage + 1) * emailsPageSize, filteredEmails.length) : 0;
+
+  // Reset to first page when search term or sort changes
+  useEffect(() => {
+    setEmailsPage(0);
+  }, [searchTerm, sortKey, sortDirection]);
+
+  // Ensure current page doesn't exceed total pages after filtering
+  useEffect(() => {
+    if (emailsPage >= emailsTotalPages && emailsTotalPages > 0) {
+      setEmailsPage(Math.max(0, emailsTotalPages - 1));
+    }
+  }, [emailsTotalPages, emailsPage]);
+
   const columns: Column<EventEmailsDTO>[] = [
     { key: 'email', label: 'Email Address', sortable: true },
     {
       key: 'actions',
       label: 'Actions',
       render: (value, email) => (
-        <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              openEditModal(email);
-            }}
-            className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
-            title="Edit"
-            aria-label="Edit"
-          >
-            <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              openDisassociateModal(email);
-            }}
-            className="flex-shrink-0 w-14 h-14 rounded-xl bg-yellow-100 hover:bg-yellow-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
-            title="Disassociate from Event"
-            aria-label="Disassociate from Event"
-          >
-            <svg className="w-10 h-10 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              openDeleteModal(email);
-            }}
-            className="flex-shrink-0 w-14 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
-            title="Permanently Delete"
-            aria-label="Permanently Delete"
-          >
-            <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-          </button>
+        <div className="flex flex-wrap gap-3 items-start" onClick={(e) => e.stopPropagation()}>
+          <div className="flex flex-col items-center gap-1">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                openEditModal(email);
+              }}
+              className="instant-tooltip flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+              data-tooltip="Edit"
+              aria-label="Edit"
+              type="button"
+            >
+              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </button>
+            <span className="text-xs text-gray-600 text-center whitespace-nowrap">Edit</span>
+          </div>
+          <div className="flex flex-col items-center gap-1">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                openDisassociateModal(email);
+              }}
+              className="instant-tooltip flex-shrink-0 w-10 h-10 rounded-lg bg-yellow-100 hover:bg-yellow-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+              data-tooltip="Disassociate"
+              aria-label="Disassociate from Event"
+              type="button"
+            >
+              <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+              </svg>
+            </button>
+            <span className="text-xs text-gray-600 text-center whitespace-nowrap">Disassociate</span>
+          </div>
+          <div className="flex flex-col items-center gap-1">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                openDeleteModal(email);
+              }}
+              className="instant-tooltip flex-shrink-0 w-10 h-10 rounded-lg bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+              data-tooltip="Delete"
+              aria-label="Permanently Delete"
+              type="button"
+            >
+              <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+            <span className="text-xs text-gray-600 text-center whitespace-nowrap">Delete</span>
+          </div>
         </div>
       )
     },
@@ -464,12 +501,12 @@ export default function EventEmailsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           <Link
             href="/admin"
-            className="flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 text-gray-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+            className="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg shadow-md p-3 text-xs transition-all group"
             title="Admin Home"
             aria-label="Admin Home"
           >
-            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-gray-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-              <svg className="w-10 h-10 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-blue-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
               </svg>
             </div>
@@ -477,12 +514,12 @@ export default function EventEmailsPage() {
           </Link>
           <Link
             href="/admin/manage-usage"
-            className="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+            className="flex flex-col items-center justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-800 rounded-lg shadow-md p-3 text-xs transition-all group"
             title="Manage Usage"
             aria-label="Manage Usage"
           >
-            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-              <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-indigo-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-8 h-8 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
             </div>
@@ -490,12 +527,12 @@ export default function EventEmailsPage() {
           </Link>
           <Link
             href={`/admin/events/${eventId}/media/list`}
-            className="flex flex-col items-center justify-center bg-yellow-50 hover:bg-yellow-100 text-yellow-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+            className="flex flex-col items-center justify-center bg-yellow-50 hover:bg-yellow-100 text-yellow-800 rounded-lg shadow-md p-3 text-xs transition-all group"
             title="Manage Media Files"
             aria-label="Manage Media Files"
           >
-            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-yellow-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-              <svg className="w-10 h-10 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-yellow-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-8 h-8 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
               </svg>
             </div>
@@ -503,12 +540,12 @@ export default function EventEmailsPage() {
           </Link>
           <Link
             href="/admin/manage-events"
-            className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+            className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-lg shadow-md p-3 text-xs transition-all group"
             title="Manage Events"
             aria-label="Manage Events"
           >
-            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-              <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
@@ -516,12 +553,12 @@ export default function EventEmailsPage() {
           </Link>
           <Link
             href={`/admin/events/${eventId}/ticket-types/list`}
-            className="flex flex-col items-center justify-center bg-purple-50 hover:bg-purple-100 text-purple-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+            className="flex flex-col items-center justify-center bg-purple-50 hover:bg-purple-100 text-purple-800 rounded-lg shadow-md p-3 text-xs transition-all group"
             title="Manage Ticket Types"
             aria-label="Manage Ticket Types"
           >
-            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-              <svg className="w-10 h-10 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-purple-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-8 h-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
               </svg>
             </div>
@@ -529,12 +566,12 @@ export default function EventEmailsPage() {
           </Link>
           <Link
             href={`/admin/events/${eventId}/tickets/list`}
-            className="flex flex-col items-center justify-center bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+            className="flex flex-col items-center justify-center bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-lg shadow-md p-3 text-xs transition-all group"
             title="Manage Tickets"
             aria-label="Manage Tickets"
           >
-            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-teal-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-              <svg className="w-10 h-10 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-teal-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-8 h-8 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4v-3a2 2 0 00-2-2H5z" />
               </svg>
             </div>
@@ -542,17 +579,84 @@ export default function EventEmailsPage() {
           </Link>
           <Link
             href={`/admin/events/${eventId}/discount-codes/list`}
-            className="flex flex-col items-center justify-center bg-pink-50 hover:bg-pink-100 text-pink-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+            className="flex flex-col items-center justify-center bg-pink-50 hover:bg-pink-100 text-pink-800 rounded-lg shadow-md p-3 text-xs transition-all group"
             title="Manage Discount Codes"
             aria-label="Manage Discount Codes"
           >
-            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-pink-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-              <svg className="w-10 h-10 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-pink-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-8 h-8 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
               </svg>
             </div>
             <span className="font-semibold text-center leading-tight">Manage Discount Codes</span>
           </Link>
+        </div>
+      </div>
+
+      {/* Special Event Management Features Card */}
+      <div className="flex justify-center mb-8">
+        <div className="bg-gradient-to-br from-purple-50 to-blue-50 border-2 border-purple-200 rounded-xl shadow-lg p-6 w-full max-w-4xl">
+          <div className="text-center mb-4">
+            <h2 className="text-xl font-bold text-purple-800 mb-2">🎭 Event Management Features</h2>
+            <p className="text-sm text-purple-600">Manage performers, contacts, sponsors, emails, and program directors for this event</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <Link
+              href={`/admin/events/${eventId}/performers`}
+              className="flex flex-col items-center justify-center bg-pink-50 hover:bg-pink-100 text-pink-800 rounded-lg shadow-md p-3 text-xs transition-all group"
+              title="Featured Performers"
+              aria-label="Featured Performers"
+            >
+              <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-pink-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+                <FaMicrophone className="w-8 h-8 text-pink-500" />
+              </div>
+              <span className="font-semibold text-center leading-tight">Featured Performers</span>
+            </Link>
+            <Link
+              href={`/admin/events/${eventId}/contacts`}
+              className="flex flex-col items-center justify-center bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-lg shadow-md p-3 text-xs transition-all group"
+              title="Event Contacts"
+              aria-label="Event Contacts"
+            >
+              <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-emerald-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+                <FaAddressBook className="w-8 h-8 text-emerald-500" />
+              </div>
+              <span className="font-semibold text-center leading-tight">Event Contacts</span>
+            </Link>
+            <Link
+              href={`/admin/events/${eventId}/sponsors`}
+              className="flex flex-col items-center justify-center bg-amber-50 hover:bg-amber-100 text-amber-800 rounded-lg shadow-md p-3 text-xs transition-all group"
+              title="Event Sponsors"
+              aria-label="Event Sponsors"
+            >
+              <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-amber-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+                <FaHandshake className="w-8 h-8 text-amber-500" />
+              </div>
+              <span className="font-semibold text-center leading-tight">Event Sponsors</span>
+            </Link>
+            <Link
+              href={`/admin/events/${eventId}/emails`}
+              className="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg shadow-md p-3 text-xs transition-all group"
+              title="Event Emails"
+              aria-label="Event Emails"
+            >
+              <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-blue-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+                <FaEnvelope className="w-8 h-8 text-blue-500" />
+              </div>
+              <span className="font-semibold text-center leading-tight">Event Emails</span>
+            </Link>
+            <Link
+              href={`/admin/events/${eventId}/program-directors`}
+              className="flex flex-col items-center justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-800 rounded-lg shadow-md p-3 text-xs transition-all group"
+              title="Program Directors"
+              aria-label="Program Directors"
+            >
+              <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-indigo-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+                <FaUserTie className="w-8 h-8 text-indigo-500" />
+              </div>
+              <span className="font-semibold text-center leading-tight">Program Directors</span>
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -601,7 +705,7 @@ export default function EventEmailsPage() {
         </h2>
         <div className="overflow-x-auto">
           <DataTable
-            data={filteredEmails}
+            data={paginatedEmails}
             columns={columns}
             loading={loading}
             onSort={handleSort}
@@ -609,6 +713,67 @@ export default function EventEmailsPage() {
             sortDirection={sortDirection}
             emptyMessage="No emails found for this event"
           />
+        </div>
+
+        {/* Pagination Controls - Always visible, matching admin page style */}
+        <div className="mt-8">
+          <div className="flex justify-between items-center">
+            {/* Previous Button */}
+            <button
+              onClick={() => setEmailsPage(prev => Math.max(0, prev - 1))}
+              disabled={emailsPage === 0 || loading}
+              className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+              title="Previous Page"
+              aria-label="Previous Page"
+              type="button"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+              </svg>
+              <span>Previous</span>
+            </button>
+
+            {/* Page Info */}
+            <div className="px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+              <span className="text-sm font-bold text-blue-700">
+                Page <span className="text-blue-600">{emailsPage + 1}</span> of <span className="text-blue-600">{emailsTotalPages}</span>
+              </span>
+            </div>
+
+            {/* Next Button */}
+            <button
+              onClick={() => setEmailsPage(prev => Math.min(emailsTotalPages - 1, prev + 1))}
+              disabled={emailsPage >= emailsTotalPages - 1 || loading}
+              className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+              title="Next Page"
+              aria-label="Next Page"
+              type="button"
+            >
+              <span>Next</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Item Count Text */}
+          <div className="text-center mt-3">
+            {filteredEmails.length > 0 ? (
+              <div className="inline-flex items-center px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+                <span className="text-sm text-gray-700">
+                  Showing <span className="font-bold text-blue-600">{emailsStartEntry}</span> to <span className="font-bold text-blue-600">{emailsEndEntry}</span> of <span className="font-bold text-blue-600">{filteredEmails.length}</span> emails
+                </span>
+              </div>
+            ) : (
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 border-2 border-orange-300 rounded-lg shadow-sm">
+                <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="text-sm font-medium text-orange-700">No emails found</span>
+                <span className="text-sm text-orange-600">[No emails match your criteria]</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -673,8 +838,8 @@ export default function EventEmailsPage() {
                         <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
                           <button
                             onClick={() => handleAddEmailToEvent(email)}
-                            className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
-                            title="Add email to event"
+                            className="instant-tooltip flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                            data-tooltip="Add"
                             aria-label="Add email to event"
                             type="button"
                           >
