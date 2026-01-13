@@ -232,7 +232,15 @@ export async function processStripeSessionServer(
 
         <h2>2. Update Sales Analytics to Display Net Revenue</h2>
 
-        <h3>2.1 Files to Modify</h3>
+        <h3>2.1 Add Net Revenue Before Tax Metric</h3>
+        <div class="recommendation">
+            <h4>Net Revenue Before Tax Display (Option A: Calculate On-the-Fly)</h4>
+            <p><strong>Formula:</strong> <code>net_revenue_before_tax = final_amount - stripe_fee_amount</code></p>
+            <p><strong>Approach:</strong> Backend calculates and returns in metrics, frontend displays</p>
+            <p><strong>No Database Changes:</strong> Calculated on-the-fly in backend service, no need to store in database</p>
+        </div>
+
+        <h3>2.2 Files to Modify</h3>
         <table>
             <thead>
                 <tr>
@@ -328,6 +336,7 @@ export interface SalesMetrics {
   totalStripeFees: number;     // NEW: Sum of stripeFeeAmount
   totalStripeTax: number;      // NEW: Sum of stripeAmountTax
   organizerNetRevenue: number; // NEW: Net Payout - Platform Fees
+  netRevenueBeforeTax: number; // NEW: Sum of (finalAmount - stripeFeeAmount)
   totalDiscounts: number;
   totalRefunds: number;
   platformFees: number;
@@ -335,6 +344,11 @@ export interface SalesMetrics {
   averageTicketPrice: number;
   // ... other metrics ...
 }
+        </div>
+
+        <div class="info-box">
+            <h4>Note:</h4>
+            <p>The <code>netRevenueBeforeTax</code> field is calculated by the backend service (no frontend calculation needed). The backend uses the formula: <code>net_revenue_before_tax = final_amount - stripe_fee_amount</code> for each transaction and sums the results.</p>
         </div>
 
         <h3>2.3 Update Sales Analytics UI</h3>
@@ -417,6 +431,25 @@ export interface SalesMetrics {
         &lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
+
+    {/* NEW: Net Revenue Before Tax Metric Card */}
+    &lt;div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4"&gt;
+      {/* Net Revenue Before Tax Card */}
+      &lt;div className="bg-cyan-50 border-2 border-cyan-200 rounded-lg p-6"&gt;
+        &lt;div className="flex items-center justify-between"&gt;
+          &lt;div&gt;
+            &lt;p className="text-cyan-600 text-sm font-medium"&gt;Net Revenue Before Tax&lt;/p&gt;
+            &lt;p className="text-3xl font-bold text-cyan-900 mt-2"&gt;
+              ${metrics.netRevenueBeforeTax?.toFixed(2) || '0.00'}
+            &lt;/p&gt;
+            &lt;p className="text-xs text-cyan-600 mt-1"&gt;
+              After Stripe fees, before tax
+            &lt;/p&gt;
+          &lt;/div&gt;
+          &lt;FaMoneyBillWave className="w-10 h-10 text-cyan-500" /&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
   &lt;/&gt;
 )}
         </div>
@@ -425,8 +458,10 @@ export interface SalesMetrics {
             <h4>Required Imports:</h4>
             <div class="code-block">
 // Add to imports in SalesAnalyticsClient.tsx
+// Note: FaMoneyBillWave is already imported for Net Payout card, reuse for Net Revenue Before Tax
 import { FaMoneyBillWave, FaPercent, FaChartLine } from 'react-icons/fa';
             </div>
+            <p><strong>Note:</strong> The <code>FaMoneyBillWave</code> icon is already imported for the "Net Payout to Bank" card. You can reuse it for the "Net Revenue Before Tax" card, or use a different icon like <code>FaDollarSign</code> if preferred.</p>
         </div>
 
         <h2>3. Update Batch Job Trigger UI</h2>
@@ -635,6 +670,8 @@ export interface EventTicketTransactionDTO {
             <li>✅ Verify total Stripe fees metric displays correctly</li>
             <li>✅ Verify total Stripe tax metric displays correctly</li>
             <li>✅ Verify organizer net revenue metric displays correctly</li>
+            <li>✅ Verify net revenue before tax metric displays correctly</li>
+            <li>✅ Verify net revenue before tax = finalAmount - stripeFeeAmount (per transaction)</li>
             <li>✅ Verify calculations match expected formulas</li>
             <li>✅ Verify metrics update after batch job runs</li>
         </ul>
@@ -666,12 +703,12 @@ export interface EventTicketTransactionDTO {
                 </tr>
                 <tr>
                     <td><span class="file-path">src/app/admin/sales-analytics/ApiServerActions.ts</span></td>
-                    <td>Add net payout and organizer revenue calculations, update request interface</td>
+                    <td>Add net payout and organizer revenue calculations, update request interface, add netRevenueBeforeTax to SalesMetrics interface</td>
                     <td>HIGH</td>
                 </tr>
                 <tr>
                     <td><span class="file-path">src/app/admin/sales-analytics/SalesAnalyticsClient.tsx</span></td>
-                    <td>Add net payout metrics UI, add eventId input to batch job form</td>
+                    <td>Add net payout metrics UI, add net revenue before tax metric card, add eventId input to batch job form</td>
                     <td>HIGH</td>
                 </tr>
                 <tr>

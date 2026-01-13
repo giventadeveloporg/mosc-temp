@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { fetchEventsFilteredServer } from '@/app/admin/ApiServerActions';
 import type { EventDetailsDTO } from '@/types';
 
@@ -26,8 +26,9 @@ export default function EventSearchSelector({
   const [events, setEvents] = useState<EventDetailsDTO[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasInitializedFromSelectedId, setHasInitializedFromSelectedId] = useState(false);
 
-  const loadEvents = async () => {
+  const loadEvents = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -39,12 +40,21 @@ export default function EventSearchSelector({
       };
 
       // Apply date filtering - show future events by default, but allow override
+      // EXCEPTION: When searching by ID, don't apply date filter (we want to find the event regardless of date)
       const today = new Date().toISOString().split('T')[0];
-      if (!searchStartDate && !searchEndDate) {
-        filterParams.startDate = today; // Default to future events
+      if (searchField === 'id' && searchId) {
+        // When searching by ID, don't apply date filters - we want to find the event regardless of date
+        // Only apply date filters if explicitly provided
+        if (searchStartDate) filterParams.startDate = searchStartDate;
+        if (searchEndDate) filterParams.endDate = searchEndDate;
+      } else {
+        // For other search types, default to future events
+        if (!searchStartDate && !searchEndDate) {
+          filterParams.startDate = today; // Default to future events
+        }
+        if (searchStartDate) filterParams.startDate = searchStartDate;
+        if (searchEndDate) filterParams.endDate = searchEndDate;
       }
-      if (searchStartDate) filterParams.startDate = searchStartDate;
-      if (searchEndDate) filterParams.endDate = searchEndDate;
 
       // Add search filters based on selected field
       if (searchField === 'title' && searchTitle) filterParams.title = searchTitle;
@@ -59,24 +69,41 @@ export default function EventSearchSelector({
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchField, searchId, searchTitle, searchCaption, searchStartDate, searchEndDate, searchAdmissionType, sort]);
+
+  // Initialize search fields when selectedEventId is provided (from URL query params)
+  useEffect(() => {
+    if (selectedEventId && !hasInitializedFromSelectedId) {
+      // Auto-populate search fields when eventId comes from URL
+      setSearchField('id');
+      setSearchId(selectedEventId);
+      setHasInitializedFromSelectedId(true);
+    }
+  }, [selectedEventId, hasInitializedFromSelectedId]);
 
   useEffect(() => {
+    // Skip if we're initializing from selectedEventId (handled by the effect above)
+    if (selectedEventId && !hasInitializedFromSelectedId) {
+      return;
+    }
+
     // Only auto-load if there's at least one search parameter
     const hasSearchCriteria = searchTitle || searchId || searchCaption || searchStartDate || searchEndDate;
 
     if (hasSearchCriteria) {
       // Auto-load events when filters change (with debounce for text inputs)
+      // No debounce for ID search (instant results)
+      const debounceDelay = searchField === 'id' ? 0 : 300;
       const timer = setTimeout(() => {
         loadEvents();
-      }, 300); // 300ms debounce
+      }, debounceDelay);
 
       return () => clearTimeout(timer);
     } else {
       // Clear events if no search criteria
       setEvents([]);
     }
-  }, [searchField, searchTitle, searchId, searchCaption, searchStartDate, searchEndDate, searchAdmissionType, sort]);
+  }, [searchField, searchTitle, searchId, searchCaption, searchStartDate, searchEndDate, searchAdmissionType, sort, selectedEventId, hasInitializedFromSelectedId, loadEvents]);
 
   const handleEventClick = (event: EventDetailsDTO) => {
     if (event.id) {

@@ -358,14 +358,21 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
     // For date validation, compare strings directly to avoid timezone issues
     // YYYY-MM-DD format can be compared lexicographically
 
-    if (startDateStr && startDateStr < todayStr) {
-      errs.startDate = 'Start date must be today or in the future';
-    }
-    if (endDateStr && endDateStr < todayStr) {
-      errs.endDate = 'End date must be today or in the future';
-    }
-    if (promotionStartDateStr && promotionStartDateStr < todayStr) {
-      errs.promotionStartDate = 'Promotion start date must be today or in the future';
+    // CRITICAL: Only validate "must be today or in the future" when creating a NEW event
+    // When editing an existing event (event.id exists), skip this validation to allow past dates
+    const isEditing = event?.id !== undefined && event?.id !== null;
+
+    if (!isEditing) {
+      // Only apply "future date" validation for new events
+      if (startDateStr && startDateStr < todayStr) {
+        errs.startDate = 'Start date must be today or in the future';
+      }
+      if (endDateStr && endDateStr < todayStr) {
+        errs.endDate = 'End date must be today or in the future';
+      }
+      if (promotionStartDateStr && promotionStartDateStr < todayStr) {
+        errs.promotionStartDate = 'Promotion start date must be today or in the future';
+      }
     }
     if (startDateStr && endDateStr && endDateStr < startDateStr) {
       errs.endDate = 'End date cannot be before start date';
@@ -375,9 +382,11 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
     }
 
     // Time validations
+    // CRITICAL: Only validate "must be in the future" when creating a NEW event
+    // When editing an existing event, skip this validation to allow past times
     const startTimeStr = form.startTime;
     const endTimeStr = form.endTime;
-    if (startDateStr && startTimeStr) {
+    if (!isEditing && startDateStr && startTimeStr) {
       const now = new Date();
       const startDateTime = new Date(`${startDateStr}T${convertTo24Hour(startTimeStr)}`);
       if (startDateStr === todayStr && startDateTime < now) {

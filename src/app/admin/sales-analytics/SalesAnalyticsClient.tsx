@@ -251,6 +251,14 @@ export default function SalesAnalyticsClient({
         request.forceUpdate = true;
       }
 
+      // Include eventId if available (from current event context)
+      if (eventId) {
+        const eventIdNum = typeof eventId === 'string' ? parseInt(eventId, 10) : eventId;
+        if (!isNaN(eventIdNum)) {
+          request.eventId = eventIdNum;
+        }
+      }
+
       // Validate date range if both dates are provided
       if (request.startDate && request.endDate) {
         const start = new Date(request.startDate);
@@ -522,6 +530,24 @@ export default function SalesAnalyticsClient({
             <div className="bg-indigo-50 border-2 border-indigo-200 rounded-lg p-4">
               <p className="text-indigo-600 text-sm font-medium">Platform Fees</p>
               <p className="text-2xl font-bold text-indigo-900 mt-1">${metrics.platformFees.toFixed(2)}</p>
+            </div>
+          </div>
+
+          {/* Net Revenue Before Tax Metric Card */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+            <div className="bg-cyan-50 border-2 border-cyan-200 rounded-lg p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-cyan-600 text-sm font-medium">Net Revenue Before Tax</p>
+                  <p className="text-3xl font-bold text-cyan-900 mt-2">
+                    ${metrics.netRevenueBeforeTax?.toFixed(2) || '0.00'}
+                  </p>
+                  <p className="text-xs text-cyan-600 mt-1">
+                    After Stripe fees, before tax
+                  </p>
+                </div>
+                <FaMoneyBillWave className="w-10 h-10 text-cyan-500" />
+              </div>
             </div>
           </div>
 

@@ -490,6 +490,7 @@ export interface EventTicketTransactionDTO {
   stripeAmountDiscount?: number;
   stripeAmountTax?: number;
   stripeFeeAmount?: number;
+  netPayoutAmount?: number; // Net payout to bank (finalAmount - stripeFeeAmount - stripeAmountTax)
   eventId?: number;
   userId?: number;
   createdAt: string;

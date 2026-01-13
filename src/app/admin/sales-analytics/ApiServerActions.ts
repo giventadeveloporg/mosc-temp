@@ -35,6 +35,7 @@ export interface SalesMetrics {
   platformFees: number;
   taxAmount: number;
   averageTicketPrice: number;
+  netRevenueBeforeTax: number; // NEW: Sum of (finalAmount - stripeFeeAmount) per transaction
   salesByTicketType: Array<{ ticketTypeName: string; count: number; revenue: number }>;
   salesByDay: Array<{ date: string; count: number; revenue: number }>;
   salesByHour: Array<{ hour: string; count: number; revenue: number }>;
@@ -49,15 +50,18 @@ export interface SalesMetrics {
  */
 export interface StripeFeesTaxUpdateRequest {
   tenantId?: string;
+  eventId?: number; // Optional: Filter by specific event ID
   startDate?: string; // ISO 8601 format: "2025-01-01T00:00:00.000Z"
   endDate?: string;   // ISO 8601 format: "2025-01-31T23:59:59.999Z"
   forceUpdate?: boolean; // Default: false
+  useDefaultDateRange?: boolean; // Default: false - If true, automatically calculate date range for normal batch runs
 }
 
 export interface StripeFeesTaxUpdateResponse {
   jobId: string;
   status: 'STARTED' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED';
   tenantId: string | null;
+  eventId: number | null; // Optional: Event ID that was processed
   startDate: string | null;
   endDate: string | null;
   forceUpdate: boolean;
@@ -162,10 +166,35 @@ export async function calculateSalesMetricsServer(
   const totalRefunds = confirmedTransactions.reduce((sum, t) => sum + (t.refundAmount || 0), 0);
   const platformFees = confirmedTransactions.reduce((sum, t) => sum + (t.platformFeeAmount || 0), 0);
   const taxAmount = confirmedTransactions.reduce((sum, t) => sum + (t.taxAmount || 0), 0);
-  // Net Revenue = Gross Revenue - Discounts - Refunds - Platform Fees (what event organizer receives after platform fees)
-  const netRevenue = grossRevenue - totalDiscounts - totalRefunds - platformFees;
   // Total Revenue = Sum of finalAmount (what customer paid, after discounts, may include taxes)
   const totalRevenue = confirmedTransactions.reduce((sum, t) => sum + (t.finalAmount || 0), 0);
+
+  // Net Revenue = Sum of netPayoutAmount (what event organizer receives after Stripe fees and tax)
+  // If netPayoutAmount is available from batch job, use it directly
+  // Otherwise, calculate as: finalAmount - stripeFeeAmount - stripeAmountTax
+  const netRevenue = confirmedTransactions.reduce((sum, t) => {
+    if (t.netPayoutAmount !== undefined && t.netPayoutAmount !== null) {
+      // Use stored netPayoutAmount from batch job (most accurate)
+      return sum + t.netPayoutAmount;
+    } else {
+      // Fallback calculation if netPayoutAmount not available
+      const finalAmount = t.finalAmount || 0;
+      const stripeFee = t.stripeFeeAmount || 0;
+      const stripeTax = t.stripeAmountTax || 0;
+      // Net revenue = final_amount - stripe_fee_amount - stripe_amount_tax
+      return sum + (finalAmount - stripeFee - stripeTax);
+    }
+  }, 0);
+
+  // Net Revenue Before Tax = Sum of (finalAmount - stripeFeeAmount) per transaction
+  // Formula: net_revenue_before_tax = final_amount - stripe_fee_amount
+  // This represents what you'd receive if tax wasn't part of the transaction
+  const netRevenueBeforeTax = confirmedTransactions.reduce((sum, t) => {
+    const finalAmount = t.finalAmount || 0;
+    const stripeFee = t.stripeFeeAmount || 0;
+    // Net revenue before tax = final_amount - stripe_fee_amount
+    return sum + (finalAmount - stripeFee);
+  }, 0);
   const averageTicketPrice = totalTransactions > 0 ? totalRevenue / totalTransactions : 0;
 
   // Group by day
@@ -288,6 +317,7 @@ export async function calculateSalesMetricsServer(
     platformFees,
     taxAmount,
     averageTicketPrice,
+    netRevenueBeforeTax,
     salesByTicketType,
     salesByDay,
     salesByHour,
@@ -327,6 +357,9 @@ export async function triggerStripeFeesTaxUpdateServer(
     if (request.tenantId) {
       payload.tenantId = request.tenantId;
     }
+    if (request.eventId !== undefined && request.eventId !== null) {
+      payload.eventId = request.eventId;
+    }
     if (request.startDate) {
       payload.startDate = request.startDate;
     }
@@ -335,6 +368,9 @@ export async function triggerStripeFeesTaxUpdateServer(
     }
     if (request.forceUpdate !== undefined) {
       payload.forceUpdate = request.forceUpdate;
+    }
+    if (request.useDefaultDateRange !== undefined) {
+      payload.useDefaultDateRange = request.useDefaultDateRange;
     }
 
     // Call backend batch job API endpoint (NOT a proxy endpoint - direct backend call)
@@ -350,20 +386,87 @@ export async function triggerStripeFeesTaxUpdateServer(
 
     // Handle error responses
     if (!response.ok) {
-      let errorMessage = `Failed to trigger batch job: ${response.status} ${response.statusText}`;
+      let errorMessage = 'Failed to trigger batch job. Please try again.';
 
       try {
         const errorData = await response.json();
-        if (errorData.message) {
-          errorMessage = errorData.message;
-        } else if (errorData.error) {
-          errorMessage = errorData.error;
+
+        // Extract user-friendly error message from response
+        if (errorData.message && typeof errorData.message === 'string') {
+          // Check if it's a user-friendly message or a technical error code
+          if (errorData.message.includes('error.') || errorData.message.includes('Error:') ||
+              errorData.message.toLowerCase().includes('batchjob') ||
+              errorData.message.toLowerCase().includes('batch')) {
+            // Map technical error codes to user-friendly messages
+            const messageLower = errorData.message.toLowerCase();
+            if (messageLower.includes('batchjobhttperror') || messageLower.includes('batchjobunavailable')) {
+              errorMessage = 'Unable to start the batch job. The batch job service may be unavailable. Please try again later or contact support.';
+            } else if (messageLower.includes('batchjobsubmissionfailed')) {
+              errorMessage = 'Failed to submit the batch job. The batch job service may be experiencing issues. Please try again in a few moments or contact support if the problem persists.';
+            } else if (messageLower.includes('batchjob')) {
+              errorMessage = 'An error occurred while starting the batch job. Please try again later or contact support.';
+            } else if (errorData.message.includes('Invalid request')) {
+              errorMessage = 'Invalid request parameters. Please check your input and try again.';
+            } else if (errorData.message.includes('startDate') || errorData.message.includes('endDate')) {
+              errorMessage = 'Invalid date range. Please ensure the start date is before or equal to the end date.';
+            } else {
+              // Try to extract a more user-friendly message
+              errorMessage = errorData.message.replace(/error\./g, '').replace(/Error:/g, '').trim();
+              if (!errorMessage || errorMessage.length < 10) {
+                errorMessage = 'An error occurred while starting the batch job. Please try again.';
+              }
+            }
+          } else {
+            // Use the message as-is if it looks user-friendly
+            errorMessage = errorData.message;
+          }
+        } else if (errorData.error && typeof errorData.error === 'string') {
+          // Handle error field
+          const errorLower = errorData.error.toLowerCase();
+          if (errorData.error.includes('error.') || errorData.error.includes('Error:') ||
+              errorLower.includes('batchjob') || errorLower.includes('batch')) {
+            if (errorLower.includes('batchjobhttperror') || errorLower.includes('batchjobunavailable')) {
+              errorMessage = 'Unable to start the batch job. The batch job service may be unavailable. Please try again later or contact support.';
+            } else if (errorLower.includes('batchjobsubmissionfailed')) {
+              errorMessage = 'Failed to submit the batch job. The batch job service may be experiencing issues. Please try again in a few moments or contact support if the problem persists.';
+            } else if (errorLower.includes('batchjob')) {
+              errorMessage = 'An error occurred while starting the batch job. Please try again later or contact support.';
+            } else {
+              errorMessage = errorData.error.replace(/error\./g, '').replace(/Error:/g, '').trim();
+              if (!errorMessage || errorMessage.length < 10) {
+                errorMessage = 'An error occurred while starting the batch job. Please try again.';
+              }
+            }
+          } else {
+            errorMessage = errorData.error;
+          }
+        } else if (response.status === 400) {
+          errorMessage = 'Invalid request. Please check your parameters and try again.';
+        } else if (response.status === 401) {
+          errorMessage = 'Authentication failed. Please refresh the page and try again.';
+        } else if (response.status === 403) {
+          errorMessage = 'You do not have permission to trigger this batch job.';
+        } else if (response.status === 404) {
+          errorMessage = 'Batch job service not found. Please contact support.';
+        } else if (response.status === 500) {
+          errorMessage = 'Server error occurred. Please try again later or contact support.';
+        } else if (response.status >= 500) {
+          errorMessage = 'Server error occurred. Please try again later or contact support.';
         }
-      } catch {
-        // If JSON parsing fails, use the default error message
-        const errorText = await response.text().catch(() => '');
-        if (errorText) {
-          errorMessage = errorText;
+      } catch (parseError) {
+        // If JSON parsing fails, use status-based error messages
+        if (response.status === 400) {
+          errorMessage = 'Invalid request. Please check your parameters and try again.';
+        } else if (response.status === 401) {
+          errorMessage = 'Authentication failed. Please refresh the page and try again.';
+        } else if (response.status === 403) {
+          errorMessage = 'You do not have permission to trigger this batch job.';
+        } else if (response.status === 404) {
+          errorMessage = 'Batch job service not found. Please contact support.';
+        } else if (response.status >= 500) {
+          errorMessage = 'Server error occurred. Please try again later or contact support.';
+        } else {
+          errorMessage = `Failed to trigger batch job (${response.status}). Please try again.`;
         }
       }
 

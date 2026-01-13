@@ -209,8 +209,23 @@ export default async function RootLayout({
 
                   if (updateRes.ok) {
                     const updated = await updateRes.json();
+                    console.log('[Layout] 🔍 Updated profile data:', {
+                      id: updated?.id,
+                      userId: updated?.userId,
+                      email: updated?.email,
+                      userRole: updated?.userRole,
+                      userStatus: updated?.userStatus,
+                      tenantId: updated?.tenantId,
+                      rawProfile: JSON.stringify(updated, null, 2)
+                    });
                     isTenantAdmin = updated?.userRole === 'ADMIN';
-                    console.log('[Layout] Successfully updated userId. Admin status:', isTenantAdmin);
+                    console.log('[Layout] ✅ Successfully updated userId. Admin status:', {
+                      isTenantAdmin,
+                      userRole: updated?.userRole,
+                      roleMatch: updated?.userRole === 'ADMIN',
+                      roleType: typeof updated?.userRole,
+                      roleValue: JSON.stringify(updated?.userRole)
+                    });
                   } else {
                     const errorText = await updateRes.text();
                     console.error('[Layout] Failed to update userId:', updateRes.status);
@@ -255,8 +270,23 @@ export default async function RootLayout({
           }
         } else {
           // Step 5: Profile found by userId + tenantId - check admin status
+          console.log('[Layout] 🔍 Profile data:', {
+            id: p?.id,
+            userId: p?.userId,
+            email: p?.email,
+            userRole: p?.userRole,
+            userStatus: p?.userStatus,
+            tenantId: p?.tenantId,
+            rawProfile: JSON.stringify(p, null, 2)
+          });
           isTenantAdmin = p?.userRole === 'ADMIN';
-          console.log('[Layout] Found existing profile. Admin status:', isTenantAdmin);
+          console.log('[Layout] ✅ Found existing profile. Admin status:', {
+            isTenantAdmin,
+            userRole: p?.userRole,
+            roleMatch: p?.userRole === 'ADMIN',
+            roleType: typeof p?.userRole,
+            roleValue: JSON.stringify(p?.userRole)
+          });
         }
       }
       }

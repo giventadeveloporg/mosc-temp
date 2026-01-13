@@ -511,8 +511,25 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
         if (resp.ok) {
           const data = await resp.json();
           const profile = Array.isArray(data) ? data[0] : data;
+          console.log('[Header] 🔍 Profile data from API:', {
+            id: profile?.id,
+            userId: profile?.userId,
+            email: profile?.email,
+            userRole: profile?.userRole,
+            userStatus: profile?.userStatus,
+            tenantId: profile?.tenantId,
+            rawProfile: JSON.stringify(profile, null, 2)
+          });
           const isAdminUser = profile?.userRole === 'ADMIN';
-          console.log('[Header] Admin status check:', { userId, isAdminUser, userRole: profile?.userRole });
+          console.log('[Header] ✅ Admin status check result:', {
+            userId,
+            isAdminUser,
+            userRole: profile?.userRole,
+            roleMatch: profile?.userRole === 'ADMIN',
+            roleType: typeof profile?.userRole,
+            roleValue: JSON.stringify(profile?.userRole),
+            isTenantAdminProp: isTenantAdmin
+          });
           setIsAdmin(isAdminUser);
         } else {
           console.warn('[Header] Failed to check admin status:', resp.status);
