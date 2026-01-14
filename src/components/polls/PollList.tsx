@@ -4,9 +4,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, BarChart3, Users, Clock, MessageSquare, ExternalLink } from 'lucide-react';
+import { Search, Users, Clock, MessageSquare } from 'lucide-react';
 import type { EventPollDTO, EventPollOptionDTO } from '@/types';
 import { fetchEventPollsServer, fetchEventPollOptionsServer } from '@/app/admin/polls/ApiServerActions';
 
@@ -167,12 +166,20 @@ export function PollList({ eventId, userId, onPollSelect }: PollListProps) {
     return (
       <div className="space-y-4">
         <div className="flex items-center space-x-4">
-          <Button
+          <button
             onClick={() => setSelectedPoll(null)}
-            className="bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
+            className="flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+            title="Back to Polls"
+            aria-label="Back to Polls"
+            type="button"
           >
-            ← Back to Polls
-          </Button>
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
+              <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </div>
+            <span className="font-semibold text-indigo-700">Back to Polls</span>
+          </button>
           <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             {selectedPoll.title}
           </h2>
@@ -284,35 +291,47 @@ export function PollList({ eventId, userId, onPollSelect }: PollListProps) {
                     </div>
 
                     <div className="flex justify-end space-x-2">
-                      <Button
-                        className={`${
+                      <button
+                        className={`flex-shrink-0 h-14 rounded-xl flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 ${
                           active 
-                            ? 'bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300' 
-                            : 'bg-gray-100 text-gray-500 border-gray-200'
+                            ? 'bg-blue-100 hover:bg-blue-200' 
+                            : 'bg-gray-100 hover:bg-gray-200'
                         }`}
-                        size="sm"
                         disabled={!active}
                         onClick={(e) => {
                           e.stopPropagation();
                           handlePollClick(poll);
                         }}
+                        title={active ? 'Vote Now' : 'View Details'}
+                        aria-label={active ? 'Vote Now' : 'View Details'}
+                        type="button"
                       >
-                        <BarChart3 className="h-4 w-4 mr-2" />
-                        {active ? 'Vote Now' : 'View Details'}
-                      </Button>
+                        <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
+                          active ? 'bg-blue-200' : 'bg-gray-200'
+                        }`}>
+                          <svg className={`w-6 h-6 ${active ? 'text-blue-600' : 'text-gray-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                          </svg>
+                        </div>
+                        <span className={`font-semibold ${active ? 'text-blue-700' : 'text-gray-700'}`}>
+                          {active ? 'Vote Now' : 'View Details'}
+                        </span>
+                      </button>
                       
-                      <Button
-                        asChild
-                        variant="outline"
-                        size="sm"
-                        className="border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300"
+                      <Link
+                        href={`/polls/${poll.id}`}
+                        className="flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                        title="View Full Page"
+                        aria-label="View Full Page"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <Link href={`/polls/${poll.id}`}>
-                          <ExternalLink className="h-4 w-4 mr-2" />
-                          Full Page
-                        </Link>
-                      </Button>
+                        <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+                          <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                        </div>
+                        <span className="font-semibold text-green-700">Full Page</span>
+                      </Link>
                     </div>
                   </div>
                 </CardContent>

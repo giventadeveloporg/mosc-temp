@@ -42,14 +42,20 @@ export function PollDetailsPage({ poll, options, userId }: PollDetailsPageProps)
     <div className="container mx-auto py-6 max-w-6xl">
       {/* Header */}
       <div className="mb-6">
-        <Button
-          variant="outline"
+        <button
           onClick={() => window.history.back()}
-          className="mb-4"
+          className="flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 mb-4"
+          title="Back to Polls"
+          aria-label="Back to Polls"
+          type="button"
         >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Polls
-        </Button>
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
+            <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </div>
+          <span className="font-semibold text-indigo-700">Back to Polls</span>
+        </button>
         
         <div className="space-y-2">
           <h1 className="text-3xl font-bold">{poll.title}</h1>

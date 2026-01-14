@@ -3,7 +3,7 @@
 import React, { useState, useTransition } from 'react';
 import type { DiscountCodeDTO, EventDetailsDTO } from '@/types';
 import Link from 'next/link';
-import { FaPhotoVideo, FaTicketAlt, FaTags, FaEdit, FaTrashAlt, FaTimes } from 'react-icons/fa';
+import { FaPhotoVideo, FaTicketAlt, FaTags, FaTrashAlt, FaTimes } from 'react-icons/fa';
 import { Modal } from '@/components/Modal';
 import { deleteDiscountCodeServer, patchDiscountCodeServer, createDiscountCodeServer } from './ApiServerActions';
 
@@ -25,6 +25,8 @@ export default function DiscountCodeListClient({
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [page, setPage] = useState(0); // 0-based for calculations
+  const pageSize = 10;
 
   const handleAddNewClick = () => {
     setEditingCode(null);
@@ -124,6 +126,18 @@ export default function DiscountCodeListClient({
       }
     });
   };
+
+  // Pagination calculations
+  const totalCount = discountCodes.length;
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+  const currentPage = page + 1; // 1-based for display
+  const startItem = totalCount > 0 ? page * pageSize + 1 : 0;
+  const endItem = totalCount > 0 ? page * pageSize + Math.min(pageSize, totalCount - page * pageSize) : 0;
+  const isPrevDisabled = page === 0;
+  const isNextDisabled = page >= totalPages - 1 || totalCount === 0;
+  const prevPage = Math.max(0, page - 1);
+  const nextPage = page + 1 < totalPages ? page + 1 : page;
+  const paginatedCodes = discountCodes.slice(page * pageSize, (page + 1) * pageSize);
 
   return (
     <div className="max-w-5xl mx-auto px-8" style={{ paddingTop: '118px', paddingBottom: '32px' }}>
@@ -226,62 +240,228 @@ export default function DiscountCodeListClient({
           </div>
         )}
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Value</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Uses</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Active</th>
-                <th scope="col" className="relative px-6 py-3"><span className="sr-only">Actions</span></th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {discountCodes.map((code) => (
-                <tr key={code.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{code.code}</div>
-                    <div className="text-sm text-gray-500">{code.description}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{code.discountType}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{code.discountValue}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{code.usesCount} / {code.maxUses || '∞'}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${code.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                      {code.isActive ? 'Active' : 'Inactive'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex items-center justify-end gap-4">
-                      <button
-                        onClick={() => handleEditClick(code)}
-                        className="flex flex-col items-center text-indigo-600 hover:text-indigo-900 focus:outline-none transition-colors"
-                        aria-label="Edit discount code"
-                      >
-                        <FaEdit className="w-7 h-7" />
-                        <span className="text-[10px] text-gray-600 mt-1 block font-bold">Edit</span>
-                      </button>
-                      <button
-                        onClick={() => handleDeleteClick(code)}
-                        className="flex flex-col items-center text-red-600 hover:text-red-900 focus:outline-none transition-colors"
-                        aria-label="Delete discount code"
-                      >
-                        <FaTrashAlt className="w-7 h-7" />
-                        <span className="text-[10px] text-gray-600 mt-1 block font-bold">Delete</span>
-                      </button>
-                    </div>
-                  </td>
+        {/* Rainbow Gradient Scrollbar CSS */}
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            .table-scroll-container {
+              overflow-x: scroll !important;
+              overflow-y: visible !important;
+              scrollbar-width: thin !important;
+              scrollbar-color: #EC4899 #FCE7F3 !important; /* Pink thumb, pink track (Firefox) */
+              -ms-overflow-style: -ms-autohiding-scrollbar !important;
+            }
+
+            /* WebKit browsers (Chrome, Safari, Edge) */
+            .table-scroll-container::-webkit-scrollbar {
+              height: 20px !important; /* Larger for visibility */
+              display: block !important;
+              -webkit-appearance: none !important;
+              appearance: none !important;
+            }
+
+            .table-scroll-container::-webkit-scrollbar-track {
+              background: linear-gradient(90deg, #DBEAFE, #E9D5FF, #FCE7F3, #FED7AA) !important;
+              border-radius: 10px !important;
+              -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.15) !important;
+              box-shadow: inset 0 0 6px rgba(0,0,0,0.15) !important;
+            }
+
+            .table-scroll-container::-webkit-scrollbar-thumb {
+              background: linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899, #F97316) !important;
+              border-radius: 10px !important;
+              border: 4px solid #F3F4F6 !important;
+              -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.4) !important;
+              box-shadow: inset 0 0 6px rgba(0,0,0,0.4) !important;
+              min-width: 50px !important; /* CRITICAL: Ensures thumb is always visible */
+              background-clip: padding-box !important;
+            }
+
+            .table-scroll-container::-webkit-scrollbar-thumb:hover {
+              background: linear-gradient(90deg, #2563EB, #7C3AED, #DB2777, #EA580C) !important;
+              border-color: #E5E7EB !important;
+            }
+
+            .table-scroll-container::-webkit-scrollbar-thumb:active {
+              background: linear-gradient(90deg, #1D4ED8, #6D28D9, #BE185D, #C2410C) !important;
+              border-color: #D1D5DB !important;
+            }
+
+            .table-scroll-container::-webkit-scrollbar-button {
+              display: none !important;
+            }
+
+            .table-scroll-container::-webkit-scrollbar-corner {
+              background: #E0E7FF !important;
+            }
+
+            /* Flexbox spacer for right-side centering */
+            .table-scroll-container::after {
+              content: '';
+              display: block;
+              width: 100vw; /* Full viewport width of scrollable space */
+              height: 1px;
+              flex-shrink: 0;
+            }
+
+            .table-scroll-container {
+              display: flex !important;
+            }
+          `
+        }} />
+
+        {/* Outer wrapper with gradient border */}
+        <div className="rounded-lg shadow w-full overflow-hidden" style={{
+          background: 'linear-gradient(to right, #3B82F6, #8B5CF6, #EC4899, #F97316)',
+          padding: '4px'
+        }}>
+          {/* Inner scroll container with gradient background */}
+          <div
+            className="w-full table-scroll-container"
+            style={{
+              overflowX: 'scroll',
+              overflowY: 'visible',
+              WebkitOverflowScrolling: 'touch',
+              maxWidth: '100%',
+              display: 'flex',
+              position: 'relative',
+              width: '100%',
+              minHeight: '1px',
+              scrollbarGutter: 'stable',
+              background: 'linear-gradient(to right, #3B82F6, #8B5CF6, #EC4899, #F97316)',
+              borderRadius: '8px',
+              padding: '20px'
+            }}
+          >
+            {/* Table with semi-transparent white background */}
+            <table
+              className="divide-y divide-gray-200"
+              style={{
+                width: 'max-content',
+                minWidth: 'fit-content', /* Responsive: fits content naturally */
+                flexShrink: 0,
+                background: 'rgba(255, 255, 255, 0.95)', /* Semi-transparent white */
+                borderRadius: '8px',
+                overflow: 'hidden'
+              }}
+            >
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Value</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Uses</th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Active</th>
+                  <th scope="col" className="relative px-6 py-3"><span className="sr-only">Actions</span></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {paginatedCodes.map((code) => (
+                  <tr key={code.id}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">{code.code}</div>
+                      <div className="text-sm text-gray-500">{code.description}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{code.discountType}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{code.discountValue}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{code.usesCount} / {code.maxUses || '∞'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-3 py-1.5 inline-flex text-sm leading-5 font-semibold rounded-full ${code.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                        {code.isActive ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex items-center justify-end gap-3">
+                        <button
+                          onClick={() => handleEditClick(code)}
+                          className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                          title="Edit Discount Code"
+                          aria-label="Edit Discount Code"
+                          type="button"
+                        >
+                          <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => handleDeleteClick(code)}
+                          className="flex-shrink-0 w-14 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                          title="Delete Discount Code"
+                          aria-label="Delete Discount Code"
+                          type="button"
+                        >
+                          <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        {discountCodes.length === 0 && (
-          <p className="mt-4 text-center text-gray-500">No discount codes found for this event.</p>
-        )}
+        {/* Pagination Controls - Always visible, matching admin page style */}
+        <div className="mt-8">
+          <div className="flex justify-between items-center">
+            {/* Previous Button */}
+            <button
+              onClick={() => setPage(prevPage)}
+              disabled={isPrevDisabled}
+              className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+              title="Previous Page"
+              aria-label="Previous Page"
+              type="button"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+              </svg>
+              <span>Previous</span>
+            </button>
+
+            {/* Page Info */}
+            <div className="px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+              <span className="text-sm font-bold text-blue-700">
+                Page <span className="text-blue-600">{currentPage}</span> of <span className="text-blue-600">{totalPages}</span>
+              </span>
+            </div>
+
+            {/* Next Button */}
+            <button
+              onClick={() => setPage(nextPage)}
+              disabled={isNextDisabled}
+              className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+              title="Next Page"
+              aria-label="Next Page"
+              type="button"
+            >
+              <span>Next</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Item Count Text */}
+          <div className="text-center mt-3">
+            {totalCount > 0 ? (
+              <div className="inline-flex items-center px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+                <span className="text-sm text-gray-700">
+                  Showing <span className="font-bold text-blue-600">{startItem}</span> to <span className="font-bold text-blue-600">{endItem}</span> of <span className="font-bold text-blue-600">{totalCount}</span> discount codes
+                </span>
+              </div>
+            ) : (
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 border-2 border-orange-300 rounded-lg shadow-sm">
+                <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="text-sm font-medium text-orange-700">No discount codes found</span>
+                <span className="text-sm text-orange-600">[No discount codes match your criteria]</span>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       <DiscountCodeModal

@@ -101,17 +101,23 @@ function EditUserModal({ user, open, onClose, onSave }: {
   }, [user]);
   if (!open || !user) return null;
   return ReactDOM.createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg relative">
-        <button className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-lg font-bold" onClick={onClose}>&times;</button>
-        <h2 className="text-xl font-bold mb-4">Edit User</h2>
-        <form
-          onSubmit={e => {
-            e.preventDefault();
-            onSave(form);
-          }}
-          className="space-y-4"
-        >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 p-4 overflow-y-auto">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-lg relative my-auto max-h-[90vh] flex flex-col">
+        <div className="flex-shrink-0 px-6 pt-6 pb-4 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold">Edit User</h2>
+            <button className="text-gray-400 hover:text-red-500 text-lg font-bold transition-colors" onClick={onClose} aria-label="Close modal">&times;</button>
+          </div>
+        </div>
+        <div className="flex-1 overflow-y-auto px-6 py-4">
+          <form
+            id="edit-user-form"
+            onSubmit={e => {
+              e.preventDefault();
+              onSave(form);
+            }}
+            className="space-y-4"
+          >
           {/* Editable fields */}
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -221,21 +227,32 @@ function EditUserModal({ user, open, onClose, onSave }: {
               </select>
             </div>
           </div>
-          <div className="flex justify-end gap-2 mt-4">
+          </form>
+        </div>
+        <div className="flex-shrink-0 px-6 py-4 border-t border-gray-200 bg-gray-50">
+          <div className="flex justify-end gap-2">
             <button type="button" className="bg-teal-100 hover:bg-teal-200 text-teal-800 font-bold px-4 py-2 rounded-md flex items-center gap-2 transition-colors" onClick={onClose}>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
               Cancel
             </button>
-            <button type="submit" className="px-4 py-2 rounded bg-blue-600 text-white font-bold hover:bg-blue-700 flex items-center gap-2 transition-colors">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              Save
+            <button 
+              type="submit" 
+              form="edit-user-form" 
+              className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+              title="Save Changes"
+              aria-label="Save Changes"
+            >
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <span className="font-semibold text-blue-700">Save</span>
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>,
     document.body
@@ -637,19 +654,121 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
 
       {/* Users Table */}
       <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-600 border border-gray-300 dark:border-gray-600">
-            <thead className="bg-gray-50 dark:bg-gray-700">
-              <tr>
-                <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">Name</th>
-                <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">Contact</th>
-                <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">Role</th>
-                <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">Status</th>
-                <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">Joined</th>
-                <th scope="col" className="px-8 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-300 dark:border-gray-600">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-300 dark:divide-gray-600">
+        {/* Rainbow Gradient Scrollbar CSS */}
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            .table-scroll-container {
+              overflow-x: scroll !important;
+              overflow-y: visible !important;
+              scrollbar-width: thin !important;
+              scrollbar-color: #EC4899 #FCE7F3 !important; /* Pink thumb, pink track (Firefox) */
+              -ms-overflow-style: -ms-autohiding-scrollbar !important;
+            }
+
+            /* WebKit browsers (Chrome, Safari, Edge) */
+            .table-scroll-container::-webkit-scrollbar {
+              height: 20px !important; /* Larger for visibility */
+              display: block !important;
+              -webkit-appearance: none !important;
+              appearance: none !important;
+            }
+
+            .table-scroll-container::-webkit-scrollbar-track {
+              background: linear-gradient(90deg, #DBEAFE, #E9D5FF, #FCE7F3, #FED7AA) !important;
+              border-radius: 10px !important;
+              -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.15) !important;
+              box-shadow: inset 0 0 6px rgba(0,0,0,0.15) !important;
+            }
+
+            .table-scroll-container::-webkit-scrollbar-thumb {
+              background: linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899, #F97316) !important;
+              border-radius: 10px !important;
+              border: 4px solid #F3F4F6 !important;
+              -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.4) !important;
+              box-shadow: inset 0 0 6px rgba(0,0,0,0.4) !important;
+              min-width: 50px !important; /* CRITICAL: Ensures thumb is always visible */
+              background-clip: padding-box !important;
+            }
+
+            .table-scroll-container::-webkit-scrollbar-thumb:hover {
+              background: linear-gradient(90deg, #2563EB, #7C3AED, #DB2777, #EA580C) !important;
+              border-color: #E5E7EB !important;
+            }
+
+            .table-scroll-container::-webkit-scrollbar-thumb:active {
+              background: linear-gradient(90deg, #1D4ED8, #6D28D9, #BE185D, #C2410C) !important;
+              border-color: #D1D5DB !important;
+            }
+
+            .table-scroll-container::-webkit-scrollbar-button {
+              display: none !important;
+            }
+
+            .table-scroll-container::-webkit-scrollbar-corner {
+              background: #E0E7FF !important;
+            }
+
+            /* Flexbox spacer for right-side centering */
+            .table-scroll-container::after {
+              content: '';
+              display: block;
+              width: 100vw; /* Full viewport width of scrollable space */
+              height: 1px;
+              flex-shrink: 0;
+            }
+
+            .table-scroll-container {
+              display: flex !important;
+            }
+          `
+        }} />
+
+        {/* Outer wrapper with gradient border */}
+        <div className="rounded-lg shadow w-full overflow-hidden" style={{
+          background: 'linear-gradient(to right, #3B82F6, #8B5CF6, #EC4899, #F97316)',
+          padding: '4px'
+        }}>
+          {/* Inner scroll container with gradient background */}
+          <div
+            className="w-full table-scroll-container"
+            style={{
+              overflowX: 'scroll',
+              overflowY: 'visible',
+              WebkitOverflowScrolling: 'touch',
+              maxWidth: '100%',
+              display: 'flex',
+              position: 'relative',
+              width: '100%',
+              minHeight: '1px',
+              scrollbarGutter: 'stable',
+              background: 'linear-gradient(to right, #3B82F6, #8B5CF6, #EC4899, #F97316)',
+              borderRadius: '8px',
+              padding: '20px'
+            }}
+          >
+            {/* Table with semi-transparent white background */}
+            <table
+              className="divide-y divide-gray-300 dark:divide-gray-600 border border-gray-300 dark:border-gray-600"
+              style={{
+                width: 'max-content',
+                minWidth: 'fit-content', /* Responsive: fits content naturally */
+                flexShrink: 0,
+                background: 'rgba(255, 255, 255, 0.95)', /* Semi-transparent white */
+                borderRadius: '8px',
+                overflow: 'hidden'
+              }}
+            >
+              <thead className="bg-gray-50 dark:bg-gray-700">
+                <tr>
+                  <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">Name</th>
+                  <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">Contact</th>
+                  <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">Role</th>
+                  <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">Status</th>
+                  <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">Joined</th>
+                  <th scope="col" className="px-8 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-300 dark:border-gray-600">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-300 dark:divide-gray-600">
               {loading && Array.from({ length: pageSize }).map((_, i) => (
                 <tr key={`skel-${i}`} className={`${i % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-blue-50 dark:bg-gray-700'} border-b border-gray-300 dark:border-gray-600`}>
                   <td className="px-8 py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600"><div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 animate-pulse"></div></td>
@@ -738,6 +857,7 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
               ))}
             </tbody>
           </table>
+          </div>
         </div>
         {/* Pagination Controls - Always visible, matching admin page style */}
         <div className="mt-8">

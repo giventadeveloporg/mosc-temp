@@ -285,47 +285,55 @@ function AdminEventsContent() {
         <div className="flex flex-wrap gap-4">
           <Link
             href="/admin/events/new"
-            className="flex items-center gap-3 px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 hover:scale-105 shadow-md"
+            className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+            title="Create New Event"
+            aria-label="Create New Event"
           >
-            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-500 flex items-center justify-center">
-              <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
             </div>
-            <span className="font-semibold">Create New Event</span>
+            <span className="font-semibold text-blue-700">Create New Event</span>
           </Link>
           <Link
             href="/admin/events/dashboard"
-            className="flex items-center gap-3 px-6 py-4 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all duration-300 hover:scale-105 shadow-md"
+            className="flex-shrink-0 h-14 rounded-xl bg-teal-100 hover:bg-teal-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+            title="View Analytics"
+            aria-label="View Analytics"
           >
-            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-teal-500 flex items-center justify-center">
-              <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
+              <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
             </div>
-            <span className="font-semibold">View Analytics</span>
+            <span className="font-semibold text-teal-700">View Analytics</span>
           </Link>
           <Link
             href="/admin/events/registrations"
-            className="flex items-center gap-3 px-6 py-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all duration-300 hover:scale-105 shadow-md"
+            className="flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+            title="Manage Registrations"
+            aria-label="Manage Registrations"
           >
-            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-indigo-500 flex items-center justify-center">
-              <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
+              <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
             </div>
-            <span className="font-semibold">Manage Registrations</span>
+            <span className="font-semibold text-indigo-700">Manage Registrations</span>
           </Link>
           <Link
             href="/admin/events/registrations?export=true"
-            className="flex items-center gap-3 px-6 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-300 hover:scale-105 shadow-md"
+            className="flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+            title="Export Data"
+            aria-label="Export Data"
           >
-            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-500 flex items-center justify-center">
-              <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
             </div>
-            <span className="font-semibold">Export Data</span>
+            <span className="font-semibold text-green-700">Export Data</span>
           </Link>
         </div>
       </div>

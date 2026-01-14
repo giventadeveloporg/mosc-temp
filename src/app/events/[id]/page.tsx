@@ -546,14 +546,16 @@ export default function EventDetailsPage() {
                     {showRegisterButton && (
                       <Link
                         href={`/events/${event.id}/register`}
-                        className="transition-transform hover:scale-105"
+                        className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
                         title="Register Here"
+                        aria-label="Register Here"
                       >
-                        <img
-                          src="/images/register_here_button.jpg"
-                          alt="Register Here"
-                          className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
-                        />
+                        <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                          <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                        </div>
+                        <span className="font-semibold text-blue-700">Register Here</span>
                       </Link>
                     )}
 
@@ -561,14 +563,16 @@ export default function EventDetailsPage() {
                     {showBuyTicketsButton && (
                     <Link
                       href={`/events/${event.id}/checkout`}
-                      className={`transition-transform hover:scale-105 ${isPast ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
-                      title="Buy Tickets (New Payment Flow)"
+                      className={`flex-shrink-0 h-14 rounded-xl bg-orange-100 hover:bg-orange-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 ${isPast ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      title="Buy Tickets"
+                      aria-label="Buy Tickets"
                     >
-                      <img
-                        src="/images/buy_tickets_click_here_red.webp"
-                        alt="Buy Tickets"
-                        className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
-                      />
+                      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-200 flex items-center justify-center">
+                        <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                        </svg>
+                      </div>
+                      <span className="font-semibold text-orange-700">Buy Tickets</span>
                     </Link>
                     )}
                   </div>
@@ -1039,14 +1043,16 @@ export default function EventDetailsPage() {
                     href={calendarLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-xl border-2 border-blue-400 transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-3"
+                    className="flex-shrink-0 h-14 rounded-xl bg-orange-100 hover:bg-orange-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                    title="Add to Calendar"
+                    aria-label="Add to Calendar"
                   >
-                    <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-orange-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                      <svg className="w-10 h-10 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-200 flex items-center justify-center">
+                      <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                     </div>
-                    <span className="text-lg">Add to Calendar</span>
+                    <span className="font-semibold text-orange-700">Add to Calendar</span>
                   </a>
                 )}
               </div>
@@ -1214,8 +1220,18 @@ export default function EventDetailsPage() {
           />
         )}
         <div className="mt-8 text-center">
-          <Link href="/events" className="inline-block bg-yellow-400 text-gray-900 px-8 py-3 rounded-lg font-semibold text-lg shadow hover:bg-yellow-300 transition">
-            View All Events
+          <Link
+            href="/events"
+            className="inline-flex flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+            title="View All Events"
+            aria-label="View All Events"
+          >
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
+              <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+            <span className="font-semibold text-indigo-700">View All Events</span>
           </Link>
         </div>
       </div>

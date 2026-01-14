@@ -51,6 +51,7 @@ export default function EventsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [displayedCount, setDisplayedCount] = useState(0); // Actual count after filtering recurring events
+  const [hasMoreEvents, setHasMoreEvents] = useState(false); // Track if there are more events available
   const [heroImageUrl, setHeroImageUrl] = useState<string>("/images/default_placeholder_hero_image.jpeg");
   const [fetchError, setFetchError] = useState(false);
   const [showPastEvents, setShowPastEvents] = useState(false);
@@ -187,6 +188,9 @@ export default function EventsPage() {
 
         const events: EventDetailsDTO[] = await eventsRes.json();
         let eventList = Array.isArray(events) ? events : [events];
+        
+        // Check if we got a full page of events (indicates there might be more)
+        setHasMoreEvents(eventList.length === BACKEND_FETCH_SIZE);
 
         // Process recurring events to show only next occurrence (same logic as HeroSection)
         const todayDate = new Date();
@@ -1022,19 +1026,17 @@ export default function EventsPage() {
                           }}
                         />
                       ) : (
-                        <div
-                          className="w-full h-80 flex items-center justify-center"
+                        <Image
+                          src="/images/default event image.png"
+                          alt={event.title || "Default Event Image"}
+                          width={800}
+                          height={600}
+                          className="w-full h-auto object-contain group-hover:scale-105 transition-transform duration-300"
                           style={{
                             backgroundColor: 'transparent',
                             borderRadius: '1rem 1rem 0 0'
                           }}
-                        >
-                          <div className="w-16 h-16 rounded-xl bg-gray-100 flex items-center justify-center">
-                            <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                          </div>
-                        </div>
+                        />
                       )}
                       {/* Past Event Badge */}
                       {showPastEvents && (
@@ -1311,14 +1313,16 @@ export default function EventsPage() {
                               href={calendarLink}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-xl border-2 border-blue-400 transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-3"
+                              className="flex-shrink-0 h-14 rounded-xl bg-orange-100 hover:bg-orange-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                              title="Add to Calendar"
+                              aria-label="Add to Calendar"
                             >
-                              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-orange-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                <svg className="w-10 h-10 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-200 flex items-center justify-center">
+                                <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
                               </div>
-                              <span className="text-lg">Add to Calendar</span>
+                              <span className="font-semibold text-orange-700">Add to Calendar</span>
                             </a>
                           );
                         })()}
@@ -1373,8 +1377,8 @@ export default function EventsPage() {
 
                   {/* Next Button */}
                   <button
-                    onClick={() => setPage((p) => (p + 1 < totalPages ? p + 1 : p))}
-                    disabled={page >= totalPages - 1 || loading}
+                    onClick={() => setPage((p) => p + 1)}
+                    disabled={!hasMoreEvents || loading}
                     className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
                     title="Next Page"
                     aria-label="Next Page"

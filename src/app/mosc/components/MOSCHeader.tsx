@@ -47,7 +47,7 @@ const MOSCHeader = () => {
             <Link href="/mosc" className="flex items-center space-x-2 group" style={{ background: 'transparent' }}>
               <div className="w-36 h-[92px] sm:w-42 sm:h-[112px] md:w-52 md:h-[140px] lg:w-72 lg:h-[192px] rounded-lg flex items-center justify-center group-hover:reverent-hover reverent-transition overflow-hidden" style={{ background: 'transparent' }}>
                 <Image
-                  src="/images/logos/MOSC-logo-Brand-section.jpeg"
+                  src="/images/logos/Current_Edits/MOSC-Header-Logo1.png"
                   alt="MOSC Logo"
                   width={288}
                   height={192}

@@ -50,8 +50,8 @@ const HeroSection = () => {
           <div className="flex flex-col items-center justify-center">
             <div className="w-48 h-48 lg:w-56 lg:h-56 overflow-hidden flex items-center justify-center sacred-shadow-lg rounded-full p-3" style={{ background: 'transparent' }}>
               <AppImage
-                src="/images/event_1/mosc_email/logo-mosc.png"
-                alt="Religious iconography of Christ blessing"
+                src="/images/logos/Current_Edits/Mosc_logo_jan2026.png"
+                alt="MOSC Logo"
                 className="w-full h-full object-contain"
                 style={{ background: 'transparent' }}
               />

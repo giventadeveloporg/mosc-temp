@@ -1,5 +1,5 @@
 import { EventTicketTransactionDTO, EventTicketTransactionStatisticsDTO, EventDetailsDTO, EventTicketTypeDTO } from '@/types';
-import { FaSearch, FaTicketAlt, FaEnvelope, FaUser, FaHashtag, FaCalendarAlt, FaChevronLeft, FaChevronRight, FaUsers, FaPhotoVideo, FaTags, FaPercent, FaHome, FaInfoCircle, FaClipboardCheck, FaChartLine } from 'react-icons/fa';
+import { FaSearch, FaTicketAlt, FaEnvelope, FaUser, FaHashtag, FaCalendarAlt, FaUsers, FaPhotoVideo, FaTags, FaPercent, FaHome, FaInfoCircle, FaClipboardCheck, FaChartLine } from 'react-icons/fa';
 import Link from 'next/link';
 import TicketTableClient from './TicketTableClient';
 import { fetchEventDetailsServer } from '@/app/admin/ApiServerActions';
@@ -190,100 +190,100 @@ export default async function TicketListPage({ params, searchParams }: { params:
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           <Link
             href="/admin"
-            className="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg shadow-md p-3 text-xs transition-all group"
+            className="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg shadow-md p-4 text-xs transition-all group"
             title="Admin Home"
             aria-label="Admin Home"
           >
-            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-blue-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
-              <FaHome className="w-8 h-8 text-blue-500" />
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+              <FaHome className="w-10 h-10 text-blue-500" />
             </div>
             <span className="font-semibold text-center leading-tight">Admin Home</span>
           </Link>
           <Link
             href="/admin/manage-usage"
-            className="flex flex-col items-center justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-800 rounded-lg shadow-md p-3 text-xs transition-all group"
+            className="flex flex-col items-center justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-800 rounded-lg shadow-md p-4 text-xs transition-all group"
             title="Manage Usage"
             aria-label="Manage Usage"
           >
-            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-indigo-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
-              <FaUsers className="w-8 h-8 text-indigo-500" />
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-indigo-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+              <FaUsers className="w-10 h-10 text-indigo-500" />
             </div>
             <span className="font-semibold text-center leading-tight">Manage Usage</span>
           </Link>
           <Link
             href={`/admin/events/${eventId}/media/list`}
-            className="flex flex-col items-center justify-center bg-yellow-50 hover:bg-yellow-100 text-yellow-800 rounded-lg shadow-md p-3 text-xs transition-all group"
+            className="flex flex-col items-center justify-center bg-yellow-50 hover:bg-yellow-100 text-yellow-800 rounded-lg shadow-md p-4 text-xs transition-all group"
             title="Manage Media Files"
             aria-label="Manage Media Files"
           >
-            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-yellow-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
-              <FaPhotoVideo className="w-8 h-8 text-yellow-500" />
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-yellow-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+              <FaPhotoVideo className="w-10 h-10 text-yellow-500" />
             </div>
             <span className="font-semibold text-center leading-tight">Manage Media Files</span>
           </Link>
           <Link
             href="/admin/manage-events"
-            className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-lg shadow-md p-3 text-xs transition-all group"
+            className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-lg shadow-md p-4 text-xs transition-all group"
             title="Manage Events"
             aria-label="Manage Events"
           >
-            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
-              <FaCalendarAlt className="w-8 h-8 text-green-500" />
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+              <FaCalendarAlt className="w-10 h-10 text-green-500" />
             </div>
             <span className="font-semibold text-center leading-tight">Manage Events</span>
           </Link>
           <Link
             href={`/admin/events/${eventId}/ticket-types/list`}
-            className="flex flex-col items-center justify-center bg-purple-50 hover:bg-purple-100 text-purple-800 rounded-lg shadow-md p-3 text-xs transition-all group"
+            className="flex flex-col items-center justify-center bg-purple-50 hover:bg-purple-100 text-purple-800 rounded-lg shadow-md p-4 text-xs transition-all group"
             title="Manage Ticket Types"
             aria-label="Manage Ticket Types"
           >
-            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-purple-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
-              <FaTags className="w-8 h-8 text-purple-500" />
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+              <FaTags className="w-10 h-10 text-purple-500" />
             </div>
             <span className="font-semibold text-center leading-tight">Manage Ticket Types</span>
           </Link>
           <Link
             href={`/admin/events/${eventId}/tickets/list`}
-            className="flex flex-col items-center justify-center bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-lg shadow-md p-3 text-xs transition-all group"
+            className="flex flex-col items-center justify-center bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-lg shadow-md p-4 text-xs transition-all group"
             title="Manage Tickets"
             aria-label="Manage Tickets"
           >
-            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-teal-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
-              <FaTicketAlt className="w-8 h-8 text-teal-500" />
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-teal-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+              <FaTicketAlt className="w-10 h-10 text-teal-500" />
             </div>
             <span className="font-semibold text-center leading-tight">Manage Tickets</span>
           </Link>
           <Link
             href={`/admin/events/${eventId}/discount-codes/list`}
-            className="flex flex-col items-center justify-center bg-pink-50 hover:bg-pink-100 text-pink-800 rounded-lg shadow-md p-3 text-xs transition-all group"
+            className="flex flex-col items-center justify-center bg-pink-50 hover:bg-pink-100 text-pink-800 rounded-lg shadow-md p-4 text-xs transition-all group"
             title="Manage Discount Codes"
             aria-label="Manage Discount Codes"
           >
-            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-pink-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
-              <FaPercent className="w-8 h-8 text-pink-500" />
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-pink-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+              <FaPercent className="w-10 h-10 text-pink-500" />
             </div>
             <span className="font-semibold text-center leading-tight">Manage Discount Codes</span>
           </Link>
           <Link
             href={`/admin/check-in-analytics?eventId=${eventId}`}
-            className="flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 text-slate-800 rounded-lg shadow-md p-3 text-xs transition-all group"
+            className="flex flex-col items-center justify-center bg-cyan-50 hover:bg-cyan-100 text-cyan-800 rounded-lg shadow-md p-4 text-xs transition-all group"
             title="Check-In Analytics"
             aria-label="Check-In Analytics"
           >
-            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-slate-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
-              <FaClipboardCheck className="w-8 h-8 text-slate-500" />
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-cyan-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+              <FaClipboardCheck className="w-10 h-10 text-cyan-500" />
             </div>
             <span className="font-semibold text-center leading-tight">Check-In Analytics</span>
           </Link>
           <Link
             href={`/admin/sales-analytics?eventId=${eventId}`}
-            className="flex flex-col items-center justify-center bg-stone-50 hover:bg-stone-100 text-stone-800 rounded-lg shadow-md p-3 text-xs transition-all group"
+            className="flex flex-col items-center justify-center bg-sky-50 hover:bg-sky-100 text-sky-800 rounded-lg shadow-md p-4 text-xs transition-all group"
             title="Sales Analytics"
             aria-label="Sales Analytics"
           >
-            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-stone-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
-              <FaChartLine className="w-8 h-8 text-stone-500" />
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-sky-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+              <FaChartLine className="w-10 h-10 text-sky-500" />
             </div>
             <span className="font-semibold text-center leading-tight">Sales Analytics</span>
           </Link>
@@ -493,7 +493,76 @@ export default async function TicketListPage({ params, searchParams }: { params:
           </button>
         </form>
       </div>
-      <div className="bg-white rounded-lg shadow p-4 overflow-x-auto">
+      <div className="bg-white rounded-lg shadow p-4">
+        {/* Rainbow Gradient Scrollbar CSS */}
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            .table-scroll-container {
+              overflow-x: scroll !important;
+              overflow-y: visible !important;
+              scrollbar-width: thin !important;
+              scrollbar-color: #EC4899 #FCE7F3 !important; /* Pink thumb, pink track (Firefox) */
+              -ms-overflow-style: -ms-autohiding-scrollbar !important;
+            }
+
+            /* WebKit browsers (Chrome, Safari, Edge) */
+            .table-scroll-container::-webkit-scrollbar {
+              height: 20px !important; /* Larger for visibility */
+              display: block !important;
+              -webkit-appearance: none !important;
+              appearance: none !important;
+            }
+
+            .table-scroll-container::-webkit-scrollbar-track {
+              background: linear-gradient(90deg, #DBEAFE, #E9D5FF, #FCE7F3, #FED7AA) !important;
+              border-radius: 10px !important;
+              -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.15) !important;
+              box-shadow: inset 0 0 6px rgba(0,0,0,0.15) !important;
+            }
+
+            .table-scroll-container::-webkit-scrollbar-thumb {
+              background: linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899, #F97316) !important;
+              border-radius: 10px !important;
+              border: 4px solid #F3F4F6 !important;
+              -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.4) !important;
+              box-shadow: inset 0 0 6px rgba(0,0,0,0.4) !important;
+              min-width: 50px !important; /* CRITICAL: Ensures thumb is always visible */
+              background-clip: padding-box !important;
+            }
+
+            .table-scroll-container::-webkit-scrollbar-thumb:hover {
+              background: linear-gradient(90deg, #2563EB, #7C3AED, #DB2777, #EA580C) !important;
+              border-color: #E5E7EB !important;
+            }
+
+            .table-scroll-container::-webkit-scrollbar-thumb:active {
+              background: linear-gradient(90deg, #1D4ED8, #6D28D9, #BE185D, #C2410C) !important;
+              border-color: #D1D5DB !important;
+            }
+
+            .table-scroll-container::-webkit-scrollbar-button {
+              display: none !important;
+            }
+
+            .table-scroll-container::-webkit-scrollbar-corner {
+              background: #E0E7FF !important;
+            }
+
+            /* Flexbox spacer for right-side centering */
+            .table-scroll-container::after {
+              content: '';
+              display: block;
+              width: 100vw; /* Full viewport width of scrollable space */
+              height: 1px;
+              flex-shrink: 0;
+            }
+
+            .table-scroll-container {
+              display: flex !important;
+            }
+          `
+        }} />
+
         {error && (
           <div className="text-red-500 font-semibold mb-4">
             {error}
@@ -520,52 +589,141 @@ export default async function TicketListPage({ params, searchParams }: { params:
           </div>
         )}
         <div className="text-xs text-gray-500 mb-2">Hover over the <b>ID</b> or <b>Name</b> columns to see full ticket details.</div>
-        <table className="min-w-full divide-y divide-gray-300 border border-gray-300">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-b border-r border-gray-300">ID</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-b border-r border-gray-300">Name</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-b border-r border-gray-300">Email</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-b border-r border-gray-300">Quantity</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-b border-r border-gray-300">Total</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-b border-r border-gray-300">Date</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-b border-gray-300">Status</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-300 bg-white">
-            <TicketTableClient rows={rows} />
-          </tbody>
-        </table>
-        {/* Pagination Controls */}
+
+        {/* Outer wrapper with gradient border */}
+        <div className="rounded-lg shadow w-full overflow-hidden" style={{
+          background: 'linear-gradient(to right, #3B82F6, #8B5CF6, #EC4899, #F97316)',
+          padding: '4px'
+        }}>
+          {/* Inner scroll container with gradient background */}
+          <div
+            className="w-full table-scroll-container"
+            style={{
+              overflowX: 'scroll',
+              overflowY: 'visible',
+              WebkitOverflowScrolling: 'touch',
+              maxWidth: '100%',
+              display: 'flex',
+              position: 'relative',
+              width: '100%',
+              minHeight: '1px',
+              scrollbarGutter: 'stable',
+              background: 'linear-gradient(to right, #3B82F6, #8B5CF6, #EC4899, #F97316)',
+              borderRadius: '8px',
+              padding: '20px'
+            }}
+          >
+            {/* Table with semi-transparent white background */}
+            <table
+              className="divide-y divide-gray-300 border border-gray-300"
+              style={{
+                width: 'max-content',
+                minWidth: 'fit-content', /* Responsive: fits content naturally */
+                flexShrink: 0,
+                background: 'rgba(255, 255, 255, 0.95)', /* Semi-transparent white */
+                borderRadius: '8px',
+                overflow: 'hidden'
+              }}
+            >
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-b border-r border-gray-300">ID</th>
+                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-b border-r border-gray-300">Name</th>
+                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-b border-r border-gray-300">Email</th>
+                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-b border-r border-gray-300">Quantity</th>
+                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-b border-r border-gray-300">Total</th>
+                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-b border-r border-gray-300">Date</th>
+                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-b border-gray-300">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-300 bg-white">
+                <TicketTableClient rows={rows} />
+              </tbody>
+            </table>
+          </div>
+        </div>
+        {/* Pagination Controls - Always visible, matching admin page style */}
         <div className="mt-8">
           <div className="flex justify-between items-center">
-            <Link
-              href={`?${buildQueryString({ ...sp, page: page - 1 })}`}
-              className={`px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors${!hasPrevPage ? ' pointer-events-none opacity-50' : ''}`}
-              aria-disabled={!hasPrevPage}
-              tabIndex={!hasPrevPage ? -1 : 0}
-            >
-              <FaChevronLeft /> Previous
-            </Link>
-            <div className="text-sm font-semibold text-gray-700">
-              Page {currentPage} of {totalPages}
-            </div>
-            <Link
-              href={`?${buildQueryString({ ...sp, page: page + 1 })}`}
-              className={`px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors${!hasNextPage ? ' pointer-events-none opacity-50' : ''}`}
-              aria-disabled={!hasNextPage}
-              tabIndex={!hasNextPage ? -1 : 0}
-            >
-              Next <FaChevronRight />
-            </Link>
-          </div>
-          <div className="text-center text-sm text-gray-600 mt-2">
-            {rows.length > 0 ? (
-              <>Showing <span className="font-medium">{startItemControl}</span> to <span className="font-medium">{endItemControl}</span> of <span className="font-medium">{totalCount}</span> tickets</>
+            {/* Previous Button */}
+            {hasPrevPage ? (
+              <Link
+                href={`?${buildQueryString({ ...sp, page: prevPage })}`}
+                className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+                title="Previous Page"
+                aria-label="Previous Page"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                </svg>
+                <span>Previous</span>
+              </Link>
             ) : (
-              <div className="flex items-center justify-center gap-2">
-                <span>No tickets found</span>
-                <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-sm font-medium">[No tickets sold yet]</span>
+              <button
+                disabled
+                className="px-5 py-2.5 bg-blue-100 border-2 border-blue-300 text-blue-500 font-semibold rounded-lg shadow-sm flex items-center gap-2 transition-all duration-300 disabled:cursor-not-allowed"
+                title="Previous Page"
+                aria-label="Previous Page"
+                type="button"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                </svg>
+                <span>Previous</span>
+              </button>
+            )}
+
+            {/* Page Info */}
+            <div className="px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+              <span className="text-sm font-bold text-blue-700">
+                Page <span className="text-blue-600">{currentPage}</span> of <span className="text-blue-600">{totalPages}</span>
+              </span>
+            </div>
+
+            {/* Next Button */}
+            {hasNextPage ? (
+              <Link
+                href={`?${buildQueryString({ ...sp, page: nextPage })}`}
+                className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+                title="Next Page"
+                aria-label="Next Page"
+              >
+                <span>Next</span>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
+            ) : (
+              <button
+                disabled
+                className="px-5 py-2.5 bg-blue-100 border-2 border-blue-300 text-blue-500 font-semibold rounded-lg shadow-sm flex items-center gap-2 transition-all duration-300 disabled:cursor-not-allowed"
+                title="Next Page"
+                aria-label="Next Page"
+                type="button"
+              >
+                <span>Next</span>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            )}
+          </div>
+
+          {/* Item Count Text */}
+          <div className="text-center mt-3">
+            {totalCount > 0 ? (
+              <div className="inline-flex items-center px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+                <span className="text-sm text-gray-700">
+                  Showing <span className="font-bold text-blue-600">{startItemControl}</span> to <span className="font-bold text-blue-600">{endItemControl}</span> of <span className="font-bold text-blue-600">{totalCount}</span> tickets
+                </span>
+              </div>
+            ) : (
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 border-2 border-orange-300 rounded-lg shadow-sm">
+                <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="text-sm font-medium text-orange-700">No tickets found</span>
+                <span className="text-sm text-orange-600">[No tickets match your criteria]</span>
               </div>
             )}
           </div>

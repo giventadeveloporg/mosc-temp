@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import type { ExecutiveCommitteeTeamMemberDTO } from '@/types';
 import { getAppUrl } from '@/lib/env';
 import styles from './TeamSection.module.css';
@@ -147,8 +148,9 @@ const TeamSection: React.FC = () => {
 
         {/* Dynamic Team Grid with Perfect Equal Distribution */}
         {teamMembers.length > 0 ? (
-          <div className={`${styles.teamGrid} gap-8 lg:gap-10`}>
-            {teamMembers.map((member, index) => (
+          <>
+            <div className={`${styles.teamGrid} gap-8 lg:gap-10`}>
+              {teamMembers.slice(0, 6).map((member, index) => (
               <div
                 key={member.id}
                 className={`${styles.teamCard} group relative rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 ease-out hover:-translate-y-3 ${getLastRowClasses(index, teamMembers.length)}`}
@@ -284,7 +286,25 @@ const TeamSection: React.FC = () => {
                 </div>
               </div>
             ))}
-          </div>
+            </div>
+
+            {/* Show More Button - Only show if there are more than 6 team members */}
+            {teamMembers.length > 6 && (
+              <div className="mt-12 text-center">
+                <Link
+                  href="/team"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                  title="View All Team Members"
+                  aria-label="View All Team Members"
+                >
+                  <span>Show More</span>
+                  <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              </div>
+            )}
+          </>
         ) : (
           <div className="text-center text-gray-500 py-8">
             <div className="bg-white rounded-lg shadow-sm p-8 max-w-md mx-auto">

@@ -5,6 +5,7 @@ import { FaEdit, FaTrashAlt, FaUpload, FaFolderOpen, FaSpinner, FaBan, FaTimes, 
 import { deleteMediaServer, editMediaServer } from './ApiServerActions';
 import { createPortal } from "react-dom";
 import Link from 'next/link';
+import { ConfirmModal } from '@/components/ui/Modal';
 
 interface MediaClientPageProps {
   eventId: string;
@@ -109,6 +110,8 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
   const [popoverUploadedMediaAnchor, setPopoverUploadedMediaAnchor] = useState<DOMRect | null>(null);
   const [popoverUploadedMediaMedia, setPopoverUploadedMediaMedia] = useState<EventMediaDTO | null>(null);
   const [isHeroImage, setIsHeroImage] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedMedia, setSelectedMedia] = useState<EventMediaDTO | null>(null);
   const [isActiveHeroImage, setIsActiveHeroImage] = useState(false);
   const [isFeaturedEventImage, setIsFeaturedEventImage] = useState(false);
   const [isLiveEventImage, setIsLiveEventImage] = useState(false);
@@ -330,15 +333,27 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
     }
   };
 
-  const handleDelete = async (mediaId: number | string) => {
+  const handleDelete = (mediaId: number | string) => {
     if (!mediaId) return;
-    if (!confirm('Are you sure you want to delete this media?')) return;
+    const media = mediaList.find((m) => m.id === mediaId);
+    if (media) {
+      setSelectedMedia(media);
+      setIsDeleteModalOpen(true);
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedMedia || !selectedMedia.id) return;
     try {
-      await deleteMediaServer(mediaId);
-      setMediaList((prev) => prev.filter((m) => m.id !== mediaId));
+      await deleteMediaServer(selectedMedia.id);
+      setMediaList((prev) => prev.filter((m) => m.id !== selectedMedia.id));
       setMessage('Media deleted successfully.');
+      setIsDeleteModalOpen(false);
+      setSelectedMedia(null);
     } catch (err: any) {
       setMessage(`Delete error: ${err.message}`);
+      setIsDeleteModalOpen(false);
+      setSelectedMedia(null);
     }
   };
 
@@ -1352,26 +1367,79 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
               })}
             </div>
 
-            {/* Pagination */}
-            <div className="flex justify-between items-center mt-8">
-              <button
-                onClick={() => setMediaPage(p => Math.max(0, p - 1))}
-                disabled={mediaPage === 0}
-                className="px-4 py-2 bg-blue-600 text-white font-semibold rounded shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-              >
-                ← Previous
-              </button>
-              <span className="text-sm font-semibold text-gray-700">
-                Page {mediaPage + 1} of {Math.ceil(filteredMediaList.length / mediaPageSize)}
-              </span>
-              <button
-                onClick={() => setMediaPage(p => p + 1)}
-                disabled={!hasNextMediaPage}
-                className="px-4 py-2 bg-blue-600 text-white font-semibold rounded shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-              >
-                Next →
-              </button>
-            </div>
+            {/* Pagination Controls - Always visible, matching admin page style */}
+            {(() => {
+              const totalCount = filteredMediaList.length;
+              const totalPages = Math.ceil(totalCount / mediaPageSize) || 1;
+              const displayPage = mediaPage + 1; // Convert 0-based to 1-based for display
+              const currentPageZeroBased = mediaPage;
+              const startItem = totalCount > 0 ? currentPageZeroBased * mediaPageSize + 1 : 0;
+              const endItem = totalCount > 0 ? currentPageZeroBased * mediaPageSize + Math.min(mediaPageSize, totalCount - currentPageZeroBased * mediaPageSize) : 0;
+              const isPrevDisabled = currentPageZeroBased === 0;
+              const isNextDisabled = currentPageZeroBased >= totalPages - 1;
+
+              return (
+                <div className="mt-8">
+                  <div className="flex justify-between items-center">
+                    {/* Previous Button */}
+                    <button
+                      onClick={() => setMediaPage(p => Math.max(0, p - 1))}
+                      disabled={isPrevDisabled}
+                      className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+                      title="Previous Page"
+                      aria-label="Previous Page"
+                      type="button"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                      </svg>
+                      <span>Previous</span>
+                    </button>
+
+                    {/* Page Info */}
+                    <div className="px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+                      <span className="text-sm font-bold text-blue-700">
+                        Page <span className="text-blue-600">{displayPage}</span> of <span className="text-blue-600">{totalPages}</span>
+                      </span>
+                    </div>
+
+                    {/* Next Button */}
+                    <button
+                      onClick={() => setMediaPage(p => p + 1)}
+                      disabled={isNextDisabled}
+                      className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+                      title="Next Page"
+                      aria-label="Next Page"
+                      type="button"
+                    >
+                      <span>Next</span>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Item Count Text */}
+                  <div className="text-center mt-3">
+                    {totalCount > 0 ? (
+                      <div className="inline-flex items-center px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+                        <span className="text-sm text-gray-700">
+                          Showing <span className="font-bold text-blue-600">{startItem}</span> to <span className="font-bold text-blue-600">{endItem}</span> of <span className="font-bold text-blue-600">{totalCount}</span> media items
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 border-2 border-orange-300 rounded-lg shadow-sm">
+                        <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="text-sm font-medium text-orange-700">No media found</span>
+                        <span className="text-sm text-orange-600">[No media items match your criteria]</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         )}
       </div>
@@ -1444,6 +1512,20 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
         </div>,
         document.body
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setSelectedMedia(null);
+        }}
+        onConfirm={confirmDelete}
+        title="Delete Media"
+        message={`Are you sure you want to delete "${selectedMedia?.title || 'this media item'}"? This action cannot be undone.`}
+        confirmText="Delete"
+        variant="danger"
+      />
     </div>
   );
 }
