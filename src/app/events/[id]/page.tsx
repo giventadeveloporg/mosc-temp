@@ -360,6 +360,8 @@ export default function EventDetailsPage() {
   const heroImage = media.find((m) => m.isHomePageHeroImage && m.fileUrl) ||
                     media.find((m) => m.eventFlyer && m.fileUrl) ||
                     media.find((m) => m.fileUrl);
+  // Use default hero image if no hero image found (same as events page)
+  const heroImageUrl = heroImage?.fileUrl || "/images/default_placeholder_hero_image.jpeg";
   const gallery = media.filter((m) => m.fileUrl && (!heroImage || m.id !== heroImage.id));
 
   // Get preview images (first 12 media items for grid display)
@@ -454,50 +456,46 @@ export default function EventDetailsPage() {
       <section className="relative w-full bg-transparent" style={{ marginTop: '100px', paddingTop: '20px', paddingBottom: '20px' }}>
         <div className="w-full relative">
           {/* Main hero image container - Full image display with max height constraint */}
-          {heroImage && heroImage.fileUrl ? (
-            <div className="relative w-full flex items-center justify-center" style={{ maxWidth: '100%', minHeight: '200px' }}>
-              {/* Blurred background image for width fill - positioned behind main image */}
-              <div className="absolute inset-0 w-full h-full" style={{ zIndex: 0 }}>
-                <Image
-                  src={heroImage.fileUrl}
-                  alt="Hero blurred background"
-                  fill
-                  className="object-cover w-full h-full blur-lg scale-105"
-                  style={{
-                    filter: 'blur(24px) brightness(1.1)',
-                    objectPosition: 'center',
-                  }}
-                  aria-hidden="true"
-                  priority
-                />
-              </div>
-
-              {/* Main hero image - Full image display with max height constraint */}
-              <div className="relative w-full flex items-center justify-center" style={{ zIndex: 1, maxWidth: '100%' }}>
-                <Image
-                  src={heroImage.fileUrl}
-                  alt="Event Hero"
-                  width={1920}
-                  height={1900}
-                  className="w-full h-auto"
-                  style={{
-                    maxHeight: '1900px',
-                    maxWidth: '100%',
-                    objectFit: 'contain',
-                    objectPosition: 'center',
-                    display: 'block',
-                  }}
-                  priority
-                />
-              </div>
-
-              {/* Fade overlays for top and bottom borders */}
-              <div className="pointer-events-none absolute left-0 top-0 w-full h-16" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%)', zIndex: 20 }} />
-              <div className="pointer-events-none absolute left-0 bottom-0 w-full h-16" style={{ background: 'linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%)', zIndex: 20 }} />
+          <div className="relative w-full flex items-center justify-center" style={{ maxWidth: '100%', minHeight: '200px' }}>
+            {/* Blurred background image for width fill - positioned behind main image */}
+            <div className="absolute inset-0 w-full h-full" style={{ zIndex: 0 }}>
+              <Image
+                src={heroImageUrl}
+                alt="Hero blurred background"
+                fill
+                className="object-cover w-full h-full blur-lg scale-105"
+                style={{
+                  filter: 'blur(24px) brightness(1.1)',
+                  objectPosition: 'center',
+                }}
+                aria-hidden="true"
+                priority
+              />
             </div>
-          ) : (
-            <div className="w-full h-64 bg-gradient-to-br from-gray-100 to-gray-200" />
-          )}
+
+            {/* Main hero image - Full image display with max height constraint */}
+            <div className="relative w-full flex items-center justify-center" style={{ zIndex: 1, maxWidth: '100%' }}>
+              <Image
+                src={heroImageUrl}
+                alt="Event Hero"
+                width={1920}
+                height={1900}
+                className="w-full h-auto"
+                style={{
+                  maxHeight: '1900px',
+                  maxWidth: '100%',
+                  objectFit: 'contain',
+                  objectPosition: 'center',
+                  display: 'block',
+                }}
+                priority
+              />
+            </div>
+
+            {/* Fade overlays for top and bottom borders */}
+            <div className="pointer-events-none absolute left-0 top-0 w-full h-16" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%)', zIndex: 20 }} />
+            <div className="pointer-events-none absolute left-0 bottom-0 w-full h-16" style={{ background: 'linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%)', zIndex: 20 }} />
+          </div>
         </div>
       </section>
 
@@ -559,20 +557,19 @@ export default function EventDetailsPage() {
                       </Link>
                     )}
 
-                    {/* Buy Tickets Button - Show only for non-FREE events */}
+                    {/* Buy Tickets Image - Show only for TICKETED events */}
                     {showBuyTicketsButton && (
                     <Link
-                      href={`/events/${event.id}/checkout`}
-                      className={`flex-shrink-0 h-14 rounded-xl bg-orange-100 hover:bg-orange-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 ${isPast ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      href={`/events/${event.id}/tickets`}
+                      className={`transition-transform hover:scale-105 ${isPast ? 'opacity-50 cursor-not-allowed' : ''}`}
                       title="Buy Tickets"
                       aria-label="Buy Tickets"
                     >
-                      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-200 flex items-center justify-center">
-                        <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
-                        </svg>
-                      </div>
-                      <span className="font-semibold text-orange-700">Buy Tickets</span>
+                      <img
+                        alt="Buy Tickets"
+                        className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
+                        src="/images/buy_tickets_click_here_red.webp"
+                      />
                     </Link>
                     )}
                   </div>
@@ -1055,6 +1052,45 @@ export default function EventDetailsPage() {
                     <span className="font-semibold text-orange-700">Add to Calendar</span>
                   </a>
                 )}
+
+                {/* Buy Tickets Image - Show only for TICKETED events */}
+                {(() => {
+                  if (!event.startDate) return null;
+
+                  // Get today's date in YYYY-MM-DD format using local timezone
+                  const today = new Date();
+                  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+                  // Compare dates as strings to avoid timezone parsing issues
+                  const eventDateStr = event.startDate ? event.startDate.split('T')[0] : null;
+
+                  if (!eventDateStr) return null;
+
+                  // Check if event date is today or in the future
+                  const isToday = eventDateStr === todayStr;
+                  const isFuture = eventDateStr > todayStr;
+                  const isUpcomingLocal = isToday || isFuture;
+
+                  // Only show Buy Tickets image for TICKETED events (case-insensitive check)
+                  const showBuyTicketsButton = event.admissionType?.toUpperCase() === 'TICKETED' && isUpcomingLocal;
+
+                  if (!showBuyTicketsButton) return null;
+
+                  return (
+                    <Link
+                      href={`/events/${event.id}/tickets`}
+                      className="transition-transform hover:scale-105"
+                      title="Buy Tickets"
+                      aria-label="Buy Tickets"
+                    >
+                      <img
+                        alt="Buy Tickets"
+                        className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
+                        src="/images/buy_tickets_click_here_red.webp"
+                      />
+                    </Link>
+                  );
+                })()}
               </div>
             </div>
           </div>

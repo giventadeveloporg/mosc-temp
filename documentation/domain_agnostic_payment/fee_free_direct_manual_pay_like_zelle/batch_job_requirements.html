@@ -85,32 +85,75 @@
   <body>
     <main>
       <span class="tag">Batch Jobs · January 14, 2026</span>
-      <h1>Batch Job Requirements: Fee-Free Manual Payments</h1>
+      <h1>PRD: Batch Job Requirements for Manual Payment Reporting</h1>
       <p>
-        This document outlines batch job requirements in
-        <code class="inline">event-site-manager-batch-jobs</code> to support manual payment reporting and reminders.
+        This PRD defines the batch job scope for aggregating fee-free manual payment data into a reporting table,
+        exposing summary APIs for the admin dashboard, and ensuring the backend can serve summary metrics. It applies
+        to the batch job repository at <code class="inline">E:\project_workspace\event-site-manager-batch-jobs</code>
+        and integrates with the backend at <code class="inline">E:\project_workspace\malayalees-us-site-boot</code>.
+        Notification features are out of scope.
       </p>
 
       <div class="divider"></div>
 
-      <h2>1. Reminder Job</h2>
+      <h2>1. Goals &amp; Non-Goals</h2>
+      <h3>Goals</h3>
       <ul>
-        <li>Nightly job to notify organizers about open manual requests.</li>
-        <li>Group by event, include requester count and total amount.</li>
-        <li>No auto-void or expiry enforcement (open-ended requests).</li>
+        <li>Nightly aggregation of manual payment data into a reporting table.</li>
+        <li>Provide dashboard-ready summaries grouped by event, status, and payment method.</li>
+        <li>Expose backend APIs to fetch summary data for admin dashboards.</li>
+        <li>Keep data consistent with tenant isolation.</li>
+      </ul>
+      <h3>Non-Goals</h3>
+      <ul>
+        <li>No reminder/notification emails for pending requests.</li>
+        <li>No auto-void or expiry enforcement for manual payments.</li>
+        <li>No cross-tenant aggregation.</li>
       </ul>
 
-      <h2>2. Reconciliation Report</h2>
+      <h2>2. Data Sources &amp; Tables</h2>
       <ul>
-        <li>Weekly report per event with requested vs received totals.</li>
-        <li>Breakdown by manual method (Zelle, Venmo, Cash App, Cash, Check, Other).</li>
-        <li>Export to CSV for finance teams.</li>
+        <li><code class="inline">manual_payment_request</code> (source of manual payment records)</li>
+        <li><code class="inline">event_details</code> (to verify event_id and manual payment eligibility)</li>
+        <li><code class="inline">manual_payment_summary_report</code> (target reporting table)</li>
       </ul>
 
-      <h2>3. Audit & Monitoring</h2>
+      <h2>3. Batch Job: Manual Payment Summary Aggregation</h2>
       <ul>
-        <li>Log failed email or report generation runs.</li>
-        <li>Surface batch job status in admin analytics dashboard.</li>
+        <li>Schedule: nightly (e.g., 2:00 AM tenant-local).</li>
+        <li>Input: manual_payment_request rows where event_id is not null.</li>
+        <li>Grouping keys: tenant_id, event_id, payment_method_type, status, snapshot_date.</li>
+        <li>Metrics: total_amount (sum of amount_due), transaction_count (row count).</li>
+        <li>Filtering: only include events with manual payments enabled.</li>
+        <li>Output: insert new snapshot rows into <code class="inline">manual_payment_summary_report</code>.</li>
+      </ul>
+
+      <h2>4. Backend APIs (to be implemented)</h2>
+      <p>These APIs live in the backend and are consumed via proxy routes in the frontend.</p>
+      <ul>
+        <li><code class="inline">GET /api/manual-payment-summary</code></li>
+        <li>Query params: <code class="inline">tenantId.equals</code>, <code class="inline">eventId.equals</code>, <code class="inline">snapshotDate.equals</code>, <code class="inline">status.equals</code></li>
+        <li>Returns summary rows for the admin dashboard.</li>
+      </ul>
+
+      <h2>5. Admin Dashboard Consumption</h2>
+      <ul>
+        <li>Frontend uses proxy routes per <code class="inline">cursor_rules/nextjs_api_routes.mdc</code>.</li>
+        <li>Dashboard should show totals grouped by status and method per event.</li>
+        <li>UI must follow <code class="inline">@ui_style_guide.mdc</code> styling.</li>
+      </ul>
+
+      <h2>6. Retention Policy</h2>
+      <ul>
+        <li>Keep daily snapshots for 18 months; archive thereafter.</li>
+        <li>Retention policy is documented in the schema for <code class="inline">manual_payment_summary_report</code>.</li>
+      </ul>
+
+      <h2>7. Audit & Monitoring</h2>
+      <ul>
+        <li>Log failed aggregation runs and store job status metadata.</li>
+        <li>Surface batch job health in admin analytics dashboard.</li>
+        <li>Record last successful snapshot date per tenant for monitoring.</li>
       </ul>
     </main>
   </body>

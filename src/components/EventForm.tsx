@@ -47,6 +47,8 @@ export const defaultEvent: EventDetailsDTO = {
   featuredEventPriorityRanking: 0,
   liveEventPriorityRanking: 0,
   fromEmail: '',
+  paymentFlowMode: 'STRIPE_ONLY',
+  manualPaymentEnabled: false,
   createdBy: undefined,
   createdAt: '',
   updatedAt: '',
@@ -984,6 +986,8 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
       isFeaturedEvent: !!form.isFeaturedEvent,
       featuredEventPriorityRanking: Number(form.featuredEventPriorityRanking) || 0,
       liveEventPriorityRanking: Number(form.liveEventPriorityRanking) || 0,
+      paymentFlowMode: form.paymentFlowMode || 'STRIPE_ONLY',
+      manualPaymentEnabled: !!form.manualPaymentEnabled,
     };
     onSubmit(sanitizedForm);
   }
@@ -1388,6 +1392,74 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
             </label>
           </div>
         ))}
+      </div>
+
+      {/* Payment Configuration Section */}
+      <div className="border-t border-gray-200 pt-6 mt-6 bg-gradient-to-br from-green-50 via-teal-50 to-blue-50 rounded-lg p-6">
+        <h3 className="text-lg font-semibold mb-4 text-gray-800 flex items-center gap-2">
+          <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          Payment Configuration
+        </h3>
+        <p className="text-sm text-gray-600 mb-4">
+          Configure how payments are processed for this event. Choose between Stripe-only, Manual-only (Zelle, Venmo, Cash App, etc.), or Hybrid mode.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label className="block font-medium mb-2">Payment Flow Mode *</label>
+            <select
+              ref={(el) => { if (el) fieldRefs.current.paymentFlowMode = el; }}
+              name="paymentFlowMode"
+              value={form.paymentFlowMode || 'STRIPE_ONLY'}
+              onChange={handleChange}
+              className={`w-full border rounded-xl focus:ring-blue-500 px-4 py-3 text-base ${errors.paymentFlowMode ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-400 focus:border-blue-500'}`}
+            >
+              <option value="STRIPE_ONLY">Stripe Only</option>
+              <option value="MANUAL_ONLY">Manual Only (Zelle, Venmo, Cash App, etc.)</option>
+              <option value="HYBRID">Hybrid (Both Stripe and Manual)</option>
+            </select>
+            {errors.paymentFlowMode && <div className="text-red-500 text-sm mt-1">{errors.paymentFlowMode}</div>}
+            <p className="text-xs text-gray-500 mt-1">
+              <strong>Stripe Only:</strong> All payments processed through Stripe checkout<br />
+              <strong>Manual Only:</strong> All payments use fee-free methods (Zelle, Venmo, Cash App, Cash, Check)<br />
+              <strong>Hybrid:</strong> Users can choose between Stripe or manual payment methods
+            </p>
+          </div>
+
+          <div className="flex flex-col justify-start">
+            <label className="block font-medium mb-2">Manual Payment Enabled</label>
+            <div className="custom-grid-cell">
+              <label className="flex flex-col items-center">
+                <span className="relative flex items-center justify-center">
+                  <input
+                    ref={(el) => { if (el) fieldRefs.current.manualPaymentEnabled = el; }}
+                    type="checkbox"
+                    name="manualPaymentEnabled"
+                    checked={form.manualPaymentEnabled ?? false}
+                    onChange={e => setForm(f => ({ ...f, manualPaymentEnabled: e.target.checked }))}
+                    className="custom-checkbox"
+                    disabled={form.paymentFlowMode === 'STRIPE_ONLY'}
+                  />
+                  <span className="custom-checkbox-tick">
+                    {(form.manualPaymentEnabled ?? false) && (
+                      <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l5 5L19 7" />
+                      </svg>
+                    )}
+                  </span>
+                </span>
+                <span className="mt-2 text-xs text-center select-none break-words max-w-[6rem]">Enable Manual Payment</span>
+              </label>
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              {form.paymentFlowMode === 'STRIPE_ONLY'
+                ? 'Enable manual payments by selecting "Manual Only" or "Hybrid" mode above.'
+                : 'When enabled, users can pay via Zelle, Venmo, Cash App, Cash, Check, or other manual methods.'}
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Fundraiser & Charity Configuration Section */}

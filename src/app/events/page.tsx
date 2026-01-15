@@ -13,11 +13,11 @@ const EVENTS_PAGE_SIZE = 20; // Minimum events to display per page
 const BACKEND_FETCH_SIZE = 50; // Fetch more from backend to account for recurring event filtering
 
 // Component for handling long descriptions with expand/collapse
-function DescriptionDisplay({ 
+function DescriptionDisplay({
   description,
   isExpanded,
   onToggle
-}: { 
+}: {
   description: string;
   isExpanded: boolean;
   onToggle: () => void;
@@ -188,7 +188,7 @@ export default function EventsPage() {
 
         const events: EventDetailsDTO[] = await eventsRes.json();
         let eventList = Array.isArray(events) ? events : [events];
-        
+
         // Check if we got a full page of events (indicates there might be more)
         setHasMoreEvents(eventList.length === BACKEND_FETCH_SIZE);
 
@@ -1091,12 +1091,18 @@ export default function EventsPage() {
                             </Link>
                             )}
 
-                            {/* Buy Tickets Button - Show only for non-FREE events */}
+                            {/* Buy Tickets Button - Show only for TICKETED events */}
                             {showBuyTicketsButton && (
                             <Link
-                                href={`/events/${event.id}/checkout`}
+                                href={
+                                  // Route to manual checkout if manual payment is enabled, otherwise Stripe checkout (latest)
+                                  event.manualPaymentEnabled === true &&
+                                  (event.paymentFlowMode === 'MANUAL_ONLY' || event.paymentFlowMode === 'HYBRID')
+                                    ? `/events/${event.id}/manual-checkout`
+                                    : `/events/${event.id}/checkout`
+                                }
                               className={`transition-transform hover:scale-105 ${isPast ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
-                                title="Buy Tickets (New Payment Flow)"
+                                title="Buy Tickets"
                             >
                               <img
                                 src="/images/buy_tickets_click_here_red.webp"
@@ -1203,8 +1209,8 @@ export default function EventsPage() {
                       {/* Description */}
                       {event.description && (
                         <div className="mb-4 px-4 lg:max-w-4xl lg:mx-auto w-full max-w-full overflow-hidden">
-                          <DescriptionDisplay 
-                            description={event.description} 
+                          <DescriptionDisplay
+                            description={event.description}
                             isExpanded={expandedDescriptions[event.id!] || false}
                             onToggle={() => {
                               setExpandedDescriptions(prev => ({
@@ -1342,6 +1348,52 @@ export default function EventsPage() {
                           </div>
                           <span className="font-semibold text-green-700">See Event Details</span>
                         </Link>
+
+                        {/* Buy Tickets Image - Show only for TICKETED events */}
+                        {(() => {
+                          if (!event.startDate) return null;
+
+                          // Get today's date in YYYY-MM-DD format using local timezone
+                          const today = new Date();
+                          const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+                          // Compare dates as strings to avoid timezone parsing issues
+                          const eventDateStr = event.startDate ? event.startDate.split('T')[0] : null;
+
+                          if (!eventDateStr) return null;
+
+                          // Check if event date is today or in the future
+                          const isToday = eventDateStr === todayStr;
+                          const isFuture = eventDateStr > todayStr;
+                          const isUpcomingLocal = isToday || isFuture;
+
+                          // Only show Buy Tickets image for TICKETED events (case-insensitive check)
+                          const showBuyTicketsButton = event.admissionType?.toUpperCase() === 'TICKETED' && isUpcomingLocal;
+
+                          if (!showBuyTicketsButton) return null;
+
+                          // Route to manual checkout if manual payment is enabled, otherwise Stripe checkout (latest)
+                          const checkoutRoute =
+                            event.manualPaymentEnabled === true &&
+                            (event.paymentFlowMode === 'MANUAL_ONLY' || event.paymentFlowMode === 'HYBRID')
+                              ? `/events/${event.id}/manual-checkout`
+                              : `/events/${event.id}/checkout`;
+
+                          return (
+                            <Link
+                              href={checkoutRoute}
+                              className="transition-transform hover:scale-105"
+                              title="Buy Tickets"
+                              aria-label="Buy Tickets"
+                            >
+                              <img
+                                alt="Buy Tickets"
+                                className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
+                                src="/images/buy_tickets_click_here_red.webp"
+                              />
+                            </Link>
+                          );
+                        })()}
                       </div>
                     </div>
                   </div>

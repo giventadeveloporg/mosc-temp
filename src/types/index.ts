@@ -135,6 +135,10 @@ export interface EventDetailsDTO {
   emailHeaderImageUrl?: string;
   /** From email address for event-related emails */
   fromEmail?: string;
+  /** Payment flow mode: STRIPE_ONLY, MANUAL_ONLY, or HYBRID */
+  paymentFlowMode?: 'STRIPE_ONLY' | 'MANUAL_ONLY' | 'HYBRID';
+  /** Is manual payment enabled for this event */
+  manualPaymentEnabled?: boolean;
   /** Created at (ISO date-time) */
   createdAt: string;
   /** Updated at (ISO date-time) */
@@ -1457,6 +1461,61 @@ export interface PlatformInvoiceDTO {
   dueDate: string;
   paidAt?: string;
   settlementBatchIds?: string[]; // Related settlement batches
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/**
+ * Manual Payment Method Type
+ */
+export type ManualPaymentMethodType =
+  | 'ZELLE_MANUAL'
+  | 'VENMO_MANUAL'
+  | 'CASH_APP_MANUAL'
+  | 'CASH'
+  | 'CHECK'
+  | 'OTHER_MANUAL';
+
+/**
+ * Manual Payment Status
+ */
+export type ManualPaymentStatus = 'REQUESTED' | 'RECEIVED' | 'VOIDED' | 'CANCELLED';
+
+/**
+ * Manual Payment Request DTO
+ */
+export interface ManualPaymentRequestDTO {
+  id?: number;
+  tenantId?: string;
+  eventId: number;
+  ticketTransactionId?: number;
+  amountDue: number;
+  manualPaymentMethodType: ManualPaymentMethodType;
+  paymentHandle?: string;
+  paymentInstructions?: string;
+  status: ManualPaymentStatus;
+  proofOfPaymentFileKey?: string;
+  proofOfPaymentFileUrl?: string;
+  proofOfPaymentUploadedAt?: string;
+  receivedAt?: string;
+  receivedBy?: string;
+  voidReason?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/**
+ * Manual Payment Summary Report DTO
+ */
+export interface ManualPaymentSummaryReportDTO {
+  id?: number;
+  tenantId: string;
+  eventId: number;
+  snapshotDate: string; // DATE format: YYYY-MM-DD
+  manualPaymentMethodType: ManualPaymentMethodType;
+  status: ManualPaymentStatus;
+  totalAmount: number;
+  requestCount: number;
   createdAt?: string;
   updatedAt?: string;
 }

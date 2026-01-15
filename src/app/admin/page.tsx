@@ -192,6 +192,13 @@ export default function AdminPage() {
       label: 'Sales Analytics',
       color: 'sky',
       key: 'sales-analytics'
+    },
+    {
+      href: '/admin/manual-payments',
+      icon: 'moneyBill',
+      label: 'Manual Payments',
+      color: 'mintGreen',
+      key: 'manual-payments'
     }
   ];
 
@@ -221,7 +228,8 @@ export default function AdminPage() {
       softPink: 'bg-pink-50 hover:bg-pink-100 text-pink-800',
       brightYellow: 'bg-yellow-50 hover:bg-yellow-100 text-yellow-800',
       deepTeal: 'bg-teal-50 hover:bg-teal-100 text-teal-800',
-      lightCyan: 'bg-cyan-50 hover:bg-cyan-100 text-cyan-800'
+      lightCyan: 'bg-cyan-50 hover:bg-cyan-100 text-cyan-800',
+      mintGreen: 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800'
     };
     return colorMap[color] || colorMap.blue;
   };
@@ -252,7 +260,8 @@ export default function AdminPage() {
       softPink: 'bg-pink-100',
       brightYellow: 'bg-yellow-100',
       deepTeal: 'bg-teal-100',
-      lightCyan: 'bg-cyan-100'
+      lightCyan: 'bg-cyan-100',
+      mintGreen: 'bg-emerald-100'
     };
     return colorMap[color] || colorMap.blue;
   };
@@ -283,7 +292,8 @@ export default function AdminPage() {
       softPink: 'text-pink-500',
       brightYellow: 'text-yellow-500',
       deepTeal: 'text-teal-500',
-      lightCyan: 'text-cyan-500'
+      lightCyan: 'text-cyan-500',
+      mintGreen: 'text-emerald-500'
     };
     return colorMap[color] || colorMap.blue;
   };
@@ -336,6 +346,8 @@ export default function AdminPage() {
         return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>;
       case 'chartLine':
         return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" /></svg>;
+      case 'moneyBill':
+        return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>;
       default:
         return null;
     }

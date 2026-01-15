@@ -412,8 +412,9 @@
         <div class="divider"></div>
         <h2>9. Batch Jobs &amp; Reconciliation</h2>
         <ul>
-          <li><strong>Reminder Job:</strong> nightly job to email organizers about pending manual requests older than N days.</li>
-          <li><strong>Reconciliation Report:</strong> weekly summary by event and payment method with totals received.</li>
+          <li><strong>Summary Aggregation Job:</strong> nightly totals grouped by event, status, and payment method.</li>
+          <li><strong>Reporting Table:</strong> store daily snapshots for admin dashboard reporting.</li>
+          <li><strong>Reconciliation Export:</strong> optional CSV output for finance teams.</li>
           <li><strong>Stale Cleanup:</strong> no auto-void; pending requests remain open until manually cancelled.</li>
           <li>Batch job implementations live in <code class="inline">event-site-manager-batch-jobs</code>.</li>
         </ul>

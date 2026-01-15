@@ -107,16 +107,23 @@ export default function ProfilePageWithLoading() {
   // Show loading state
   if (!isLoaded || loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen w-full py-8">
+      <div className="flex flex-col justify-center items-center min-h-screen w-full py-8">
         <div className="relative w-full max-w-6xl">
-            <Image
+          {/* Loading message text */}
+          <div className="text-center mb-6">
+            <p className="text-2xl font-semibold text-teal-600 animate-pulse">
+              Please wait while your profile is being loaded..
+            </p>
+          </div>
+
+          <Image
             src="/images/loading_user_profile.jpeg"
-              alt="Loading profile..."
+            alt="Loading profile..."
             width={800}
             height={600}
             className="w-full h-auto rounded-lg shadow-2xl animate-pulse zoom-loading"
-              priority
-            />
+            priority
+          />
           <div className="absolute inset-0 rounded-lg overflow-hidden">
             <div className="wavy-animation"></div>
           </div>
@@ -146,7 +153,7 @@ export default function ProfilePageWithLoading() {
     <>
       {/* Bootstrap user profile on page load (creates profile if it doesn't exist) */}
       <ProfileBootstrapper />
-      
+
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Profile</h1>
