@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Batch Job Requirements: Fee-Free Manual Payments</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body {
+        font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+        background: #f3f1ec;
+        color: #2d2a26;
+        margin: 0;
+        padding: 2.5rem 0;
+      }
+
+      main {
+        max-width: 960px;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 25px 50px -20px rgba(43, 34, 28, 0.25);
+        padding: 3rem;
+      }
+
+      h1,
+      h2,
+      h3 {
+        font-family: "Crimson Text", Georgia, serif;
+        color: #2d2a26;
+      }
+
+      h1 {
+        font-size: 2.1rem;
+        margin-bottom: 0.75rem;
+      }
+
+      h2 {
+        font-size: 1.6rem;
+        margin-top: 2.5rem;
+      }
+
+      h3 {
+        font-size: 1.2rem;
+        margin-top: 1.6rem;
+      }
+
+      p,
+      li {
+        line-height: 1.75;
+        font-size: 1rem;
+      }
+
+      ul,
+      ol {
+        margin-left: 1.4rem;
+      }
+
+      code.inline {
+        font-family: "JetBrains Mono", "Fira Code", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        background: #f5f1e8;
+        border-radius: 8px;
+        padding: 0.15rem 0.35rem;
+        font-size: 0.95rem;
+        display: inline-block;
+      }
+
+      .tag {
+        display: inline-block;
+        background: #8b7d6b;
+        color: #ffffff;
+        padding: 0.2rem 0.65rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      .divider {
+        height: 1px;
+        background: rgba(42, 32, 23, 0.12);
+        margin: 2rem 0;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <span class="tag">Batch Jobs · January 14, 2026</span>
+      <h1>Batch Job Requirements: Fee-Free Manual Payments</h1>
+      <p>
+        This document outlines batch job requirements in
+        <code class="inline">event-site-manager-batch-jobs</code> to support manual payment reporting and reminders.
+      </p>
+
+      <div class="divider"></div>
+
+      <h2>1. Reminder Job</h2>
+      <ul>
+        <li>Nightly job to notify organizers about open manual requests.</li>
+        <li>Group by event, include requester count and total amount.</li>
+        <li>No auto-void or expiry enforcement (open-ended requests).</li>
+      </ul>
+
+      <h2>2. Reconciliation Report</h2>
+      <ul>
+        <li>Weekly report per event with requested vs received totals.</li>
+        <li>Breakdown by manual method (Zelle, Venmo, Cash App, Cash, Check, Other).</li>
+        <li>Export to CSV for finance teams.</li>
+      </ul>
+
+      <h2>3. Audit & Monitoring</h2>
+      <ul>
+        <li>Log failed email or report generation runs.</li>
+        <li>Surface batch job status in admin analytics dashboard.</li>
+      </ul>
+    </main>
+  </body>
+</html>
