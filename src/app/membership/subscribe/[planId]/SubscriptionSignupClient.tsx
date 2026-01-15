@@ -486,14 +486,28 @@ export function SubscriptionSignupClient({ plan, error, userProfile: initialUser
                   <p className="font-body text-muted-foreground mb-6">
                     You will be redirected to our secure Stripe Checkout page to complete your subscription. Stripe Checkout automatically shows Apple Pay, Google Pay, and other payment methods based on your device and browser.
                   </p>
-                  <Button
+                  <button
                     onClick={handleSubscribe}
                     disabled={isLoading}
-                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                    size="lg"
+                    className="w-full flex-shrink-0 h-14 rounded-xl bg-orange-100 hover:bg-orange-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                    title={isLoading ? 'Processing...' : 'Proceed to Checkout'}
+                    aria-label={isLoading ? 'Processing...' : 'Proceed to Checkout'}
+                    type="button"
                   >
-                    {isLoading ? 'Processing...' : 'Proceed to Checkout'}
-                  </Button>
+                    <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-200 flex items-center justify-center">
+                      {isLoading ? (
+                        <svg className="animate-spin w-6 h-6 text-orange-600" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                      ) : (
+                        <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                      )}
+                    </div>
+                    <span className="font-semibold text-orange-700">{isLoading ? 'Processing...' : 'Proceed to Checkout'}</span>
+                  </button>
                   <p className="mt-3 text-sm text-muted-foreground text-center">
                     Stripe Checkout automatically optimizes for your device and shows Apple Pay, Google Pay, and Link when available
                   </p>
@@ -504,14 +518,28 @@ export function SubscriptionSignupClient({ plan, error, userProfile: initialUser
                   <p className="font-body text-muted-foreground mb-6">
                     You will be redirected to our secure payment processor to complete your subscription.
                   </p>
-                  <Button
+                  <button
                     onClick={handleSubscribe}
                     disabled={isLoading}
-                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                    size="lg"
+                    className="w-full flex-shrink-0 h-14 rounded-xl bg-orange-100 hover:bg-orange-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                    title={isLoading ? 'Processing...' : 'Proceed to Checkout'}
+                    aria-label={isLoading ? 'Processing...' : 'Proceed to Checkout'}
+                    type="button"
                   >
-                    {isLoading ? 'Processing...' : 'Proceed to Checkout'}
-                  </Button>
+                    <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-200 flex items-center justify-center">
+                      {isLoading ? (
+                        <svg className="animate-spin w-6 h-6 text-orange-600" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                      ) : (
+                        <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                      )}
+                    </div>
+                    <span className="font-semibold text-orange-700">{isLoading ? 'Processing...' : 'Proceed to Checkout'}</span>
+                  </button>
                 </>
               )}
             </>

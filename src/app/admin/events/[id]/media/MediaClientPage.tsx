@@ -1382,42 +1382,42 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
                 <div className="mt-8">
                   <div className="flex justify-between items-center">
                     {/* Previous Button */}
-                    <button
-                      onClick={() => setMediaPage(p => Math.max(0, p - 1))}
+              <button
+                onClick={() => setMediaPage(p => Math.max(0, p - 1))}
                       disabled={isPrevDisabled}
                       className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
                       title="Previous Page"
                       aria-label="Previous Page"
                       type="button"
-                    >
+              >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
                       </svg>
                       <span>Previous</span>
-                    </button>
+              </button>
 
                     {/* Page Info */}
                     <div className="px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
                       <span className="text-sm font-bold text-blue-700">
                         Page <span className="text-blue-600">{displayPage}</span> of <span className="text-blue-600">{totalPages}</span>
-                      </span>
+              </span>
                     </div>
 
                     {/* Next Button */}
-                    <button
-                      onClick={() => setMediaPage(p => p + 1)}
+              <button
+                onClick={() => setMediaPage(p => p + 1)}
                       disabled={isNextDisabled}
                       className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
                       title="Next Page"
                       aria-label="Next Page"
                       type="button"
-                    >
+              >
                       <span>Next</span>
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                       </svg>
-                    </button>
-                  </div>
+              </button>
+            </div>
 
                   {/* Item Count Text */}
                   <div className="text-center mt-3">

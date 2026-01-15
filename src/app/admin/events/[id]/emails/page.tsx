@@ -394,12 +394,12 @@ export default function EventEmailsPage() {
                 e.stopPropagation();
                 openEditModal(email);
               }}
-              className="instant-tooltip flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+              className="instant-tooltip flex-shrink-0 w-14 h-14 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
               data-tooltip="Edit"
               aria-label="Edit"
               type="button"
             >
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="text-blue-600 p-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
             </button>
@@ -411,12 +411,12 @@ export default function EventEmailsPage() {
                 e.stopPropagation();
                 openDisassociateModal(email);
               }}
-              className="instant-tooltip flex-shrink-0 w-10 h-10 rounded-lg bg-yellow-100 hover:bg-yellow-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+              className="instant-tooltip flex-shrink-0 w-14 h-14 rounded-lg bg-yellow-100 hover:bg-yellow-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
               data-tooltip="Disassociate"
               aria-label="Disassociate from Event"
               type="button"
             >
-              <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="text-yellow-600 p-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
               </svg>
             </button>
@@ -428,12 +428,12 @@ export default function EventEmailsPage() {
                 e.stopPropagation();
                 openDeleteModal(email);
               }}
-              className="instant-tooltip flex-shrink-0 w-10 h-10 rounded-lg bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+              className="instant-tooltip flex-shrink-0 w-14 h-14 rounded-lg bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
               data-tooltip="Delete"
               aria-label="Permanently Delete"
               type="button"
             >
-              <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="text-red-600 p-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
               </svg>
             </button>
@@ -461,32 +461,30 @@ export default function EventEmailsPage() {
   }
 
   return (
-    <div className="w-full overflow-x-hidden box-border" style={{ paddingTop: '120px' }}>
-      {/* Navigation Section - Full Width, Separate Responsive Container */}
-      <div className="w-full px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 mb-6 sm:mb-8">
-        {/* Header with back button */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-6">
-          <Link
-            href={`/admin/events/${eventId}/edit`}
-            className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-4 sm:px-6"
-            title="Back to Event"
-            aria-label="Back to Event"
-          >
-            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-            </div>
-            <span className="font-semibold text-blue-700 text-sm sm:text-base">Back to Event</span>
-          </Link>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 flex flex-wrap items-center gap-2">
-              <span>📧 Event Emails</span>
-              {event && <span className="text-base sm:text-lg font-normal text-gray-600">- {event.title}</span>}
-            </h1>
-            <p className="text-gray-600 text-sm sm:text-base mt-1">Manage emails for this event</p>
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ paddingTop: '180px' }}>
+      {/* Header with back button */}
+      <div className="flex items-center mb-6">
+        <Link
+          href={`/admin/events/${eventId}/edit`}
+          className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+          title="Back to Event"
+          aria-label="Back to Event"
+        >
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
           </div>
+          <span className="font-semibold text-blue-700">Back to Event</span>
+        </Link>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">
+            📧 Event Emails
+            {event && <span className="text-lg font-normal text-gray-600 ml-2">- {event.title}</span>}
+          </h1>
+          <p className="text-gray-600">Manage emails for this event</p>
         </div>
+      </div>
 
       {/* Toast Message */}
       {toastMessage && (
@@ -498,174 +496,172 @@ export default function EventEmailsPage() {
         </div>
       )}
 
-        {/* Responsive Button Group */}
-        <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8">
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+      {/* Responsive Button Group */}
+      <div className="w-full mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             <Link
               href="/admin"
-              className="flex flex-col items-center justify-center rounded-lg border-2 p-2.5 sm:p-3 lg:p-4 transition-all duration-300 hover:scale-105 hover:shadow-md group bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200"
+              className="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg shadow-md p-4 text-xs transition-all group"
               title="Admin Home"
               aria-label="Admin Home"
             >
-              <div className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-blue-100 flex items-center justify-center mb-1.5 sm:mb-2 group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
               </div>
-              <span className="font-semibold text-center text-xs sm:text-sm lg:text-base leading-tight px-1">Admin Home</span>
+              <span className="font-semibold text-center leading-tight">Admin Home</span>
             </Link>
             <Link
               href="/admin/manage-usage"
-              className="flex flex-col items-center justify-center rounded-lg border-2 p-2.5 sm:p-3 lg:p-4 transition-all duration-300 hover:scale-105 hover:shadow-md group bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border-indigo-200"
+              className="flex flex-col items-center justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-800 rounded-lg shadow-md p-4 text-xs transition-all group"
               title="Manage Usage"
               aria-label="Manage Usage"
             >
-              <div className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-indigo-100 flex items-center justify-center mb-1.5 sm:mb-2 group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-indigo-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-10 h-10 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
               </div>
-              <span className="font-semibold text-center text-xs sm:text-sm lg:text-base leading-tight px-1">Manage Usage</span>
+              <span className="font-semibold text-center leading-tight">Manage Usage</span>
             </Link>
             <Link
               href={`/admin/events/${eventId}/media/list`}
-              className="flex flex-col items-center justify-center rounded-lg border-2 p-2.5 sm:p-3 lg:p-4 transition-all duration-300 hover:scale-105 hover:shadow-md group bg-yellow-50 hover:bg-yellow-100 text-yellow-700 border-yellow-200"
+              className="flex flex-col items-center justify-center bg-yellow-50 hover:bg-yellow-100 text-yellow-800 rounded-lg shadow-md p-4 text-xs transition-all group"
               title="Manage Media Files"
               aria-label="Manage Media Files"
             >
-              <div className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-yellow-100 flex items-center justify-center mb-1.5 sm:mb-2 group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-yellow-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-10 h-10 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                 </svg>
               </div>
-              <span className="font-semibold text-center text-xs sm:text-sm lg:text-base leading-tight px-1">Manage Media Files</span>
+              <span className="font-semibold text-center leading-tight">Manage Media Files</span>
             </Link>
             <Link
               href="/admin/manage-events"
-              className="flex flex-col items-center justify-center rounded-lg border-2 p-2.5 sm:p-3 lg:p-4 transition-all duration-300 hover:scale-105 hover:shadow-md group bg-green-50 hover:bg-green-100 text-green-700 border-green-200"
+              className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-lg shadow-md p-4 text-xs transition-all group"
               title="Manage Events"
               aria-label="Manage Events"
             >
-              <div className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-green-100 flex items-center justify-center mb-1.5 sm:mb-2 group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </div>
-              <span className="font-semibold text-center text-xs sm:text-sm lg:text-base leading-tight px-1">Manage Events</span>
+              <span className="font-semibold text-center leading-tight">Manage Events</span>
             </Link>
             <Link
               href={`/admin/events/${eventId}/ticket-types/list`}
-              className="flex flex-col items-center justify-center rounded-lg border-2 p-2.5 sm:p-3 lg:p-4 transition-all duration-300 hover:scale-105 hover:shadow-md group bg-purple-50 hover:bg-purple-100 text-purple-700 border-purple-200"
+              className="flex flex-col items-center justify-center bg-purple-50 hover:bg-purple-100 text-purple-800 rounded-lg shadow-md p-4 text-xs transition-all group"
               title="Manage Ticket Types"
               aria-label="Manage Ticket Types"
             >
-              <div className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-purple-100 flex items-center justify-center mb-1.5 sm:mb-2 group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-10 h-10 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                 </svg>
               </div>
-              <span className="font-semibold text-center text-xs sm:text-sm lg:text-base leading-tight px-1">Manage Ticket Types</span>
+              <span className="font-semibold text-center leading-tight">Manage Ticket Types</span>
             </Link>
             <Link
               href={`/admin/events/${eventId}/tickets/list`}
-              className="flex flex-col items-center justify-center rounded-lg border-2 p-2.5 sm:p-3 lg:p-4 transition-all duration-300 hover:scale-105 hover:shadow-md group bg-teal-50 hover:bg-teal-100 text-teal-700 border-teal-200"
+              className="flex flex-col items-center justify-center bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-lg shadow-md p-4 text-xs transition-all group"
               title="Manage Tickets"
               aria-label="Manage Tickets"
             >
-              <div className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-teal-100 flex items-center justify-center mb-1.5 sm:mb-2 group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-teal-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-10 h-10 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4v-3a2 2 0 00-2-2H5z" />
                 </svg>
               </div>
-              <span className="font-semibold text-center text-xs sm:text-sm lg:text-base leading-tight px-1">Manage Tickets</span>
+              <span className="font-semibold text-center leading-tight">Manage Tickets</span>
             </Link>
             <Link
               href={`/admin/events/${eventId}/discount-codes/list`}
-              className="flex flex-col items-center justify-center rounded-lg border-2 p-2.5 sm:p-3 lg:p-4 transition-all duration-300 hover:scale-105 hover:shadow-md group bg-pink-50 hover:bg-pink-100 text-pink-700 border-pink-200"
+              className="flex flex-col items-center justify-center bg-pink-50 hover:bg-pink-100 text-pink-800 rounded-lg shadow-md p-4 text-xs transition-all group"
               title="Manage Discount Codes"
               aria-label="Manage Discount Codes"
             >
-              <div className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-pink-100 flex items-center justify-center mb-1.5 sm:mb-2 group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-pink-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-10 h-10 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                 </svg>
               </div>
-              <span className="font-semibold text-center text-xs sm:text-sm lg:text-base leading-tight px-1">Manage Discount Codes</span>
+              <span className="font-semibold text-center leading-tight">Manage Discount Codes</span>
             </Link>
           </div>
         </div>
 
-        {/* Special Event Management Features Card */}
-        <div className="bg-gradient-to-br from-purple-50 to-blue-50 border-2 border-purple-200 rounded-xl shadow-lg p-4 sm:p-6 lg:p-8 w-full">
+      {/* Special Event Management Features Card */}
+      <div className="flex justify-center mb-8">
+        <div className="bg-gradient-to-br from-purple-50 to-blue-50 border-2 border-purple-200 rounded-xl shadow-lg p-6 w-full max-w-4xl">
           <div className="text-center mb-4">
-            <h2 className="text-lg sm:text-xl font-bold text-purple-800 mb-2">🎭 Event Management Features</h2>
-            <p className="text-xs sm:text-sm text-purple-600">Manage performers, contacts, sponsors, emails, and program directors for this event</p>
+            <h2 className="text-xl font-bold text-purple-800 mb-2">🎭 Event Management Features</h2>
+            <p className="text-sm text-purple-600">Manage performers, contacts, sponsors, emails, and program directors for this event</p>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             <Link
               href={`/admin/events/${eventId}/performers`}
-              className="flex flex-col items-center justify-center rounded-lg border-2 p-2.5 sm:p-3 lg:p-4 transition-all duration-300 hover:scale-105 hover:shadow-md group bg-pink-50 hover:bg-pink-100 text-pink-700 border-pink-200"
+              className="flex flex-col items-center justify-center bg-pink-50 hover:bg-pink-100 text-pink-800 rounded-lg shadow-md p-4 text-xs transition-all group"
               title="Featured Performers"
               aria-label="Featured Performers"
             >
-              <div className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-pink-100 flex items-center justify-center mb-1.5 sm:mb-2 group-hover:scale-110 transition-transform duration-300">
-                <FaMicrophone className="w-6 h-6 sm:w-8 sm:h-8 text-pink-500" />
+              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-pink-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <FaMicrophone className="w-10 h-10 text-pink-500" />
               </div>
-              <span className="font-semibold text-center text-xs sm:text-sm lg:text-base leading-tight px-1">Featured Performers</span>
+              <span className="font-semibold text-center leading-tight">Featured Performers</span>
             </Link>
             <Link
               href={`/admin/events/${eventId}/contacts`}
-              className="flex flex-col items-center justify-center rounded-lg border-2 p-2.5 sm:p-3 lg:p-4 transition-all duration-300 hover:scale-105 hover:shadow-md group bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200"
+              className="flex flex-col items-center justify-center bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-lg shadow-md p-4 text-xs transition-all group"
               title="Event Contacts"
               aria-label="Event Contacts"
             >
-              <div className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-emerald-100 flex items-center justify-center mb-1.5 sm:mb-2 group-hover:scale-110 transition-transform duration-300">
-                <FaAddressBook className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-500" />
+              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-emerald-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <FaAddressBook className="w-10 h-10 text-emerald-500" />
               </div>
-              <span className="font-semibold text-center text-xs sm:text-sm lg:text-base leading-tight px-1">Event Contacts</span>
+              <span className="font-semibold text-center leading-tight">Event Contacts</span>
             </Link>
             <Link
               href={`/admin/events/${eventId}/sponsors`}
-              className="flex flex-col items-center justify-center rounded-lg border-2 p-2.5 sm:p-3 lg:p-4 transition-all duration-300 hover:scale-105 hover:shadow-md group bg-amber-50 hover:bg-amber-100 text-amber-700 border-amber-200"
+              className="flex flex-col items-center justify-center bg-amber-50 hover:bg-amber-100 text-amber-800 rounded-lg shadow-md p-4 text-xs transition-all group"
               title="Event Sponsors"
               aria-label="Event Sponsors"
             >
-              <div className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-amber-100 flex items-center justify-center mb-1.5 sm:mb-2 group-hover:scale-110 transition-transform duration-300">
-                <FaHandshake className="w-6 h-6 sm:w-8 sm:h-8 text-amber-500" />
+              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-amber-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <FaHandshake className="w-10 h-10 text-amber-500" />
               </div>
-              <span className="font-semibold text-center text-xs sm:text-sm lg:text-base leading-tight px-1">Event Sponsors</span>
+              <span className="font-semibold text-center leading-tight">Event Sponsors</span>
             </Link>
             <Link
               href={`/admin/events/${eventId}/emails`}
-              className="flex flex-col items-center justify-center rounded-lg border-2 p-2.5 sm:p-3 lg:p-4 transition-all duration-300 hover:scale-105 hover:shadow-md group bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200"
+              className="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg shadow-md p-4 text-xs transition-all group"
               title="Event Emails"
               aria-label="Event Emails"
             >
-              <div className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-blue-100 flex items-center justify-center mb-1.5 sm:mb-2 group-hover:scale-110 transition-transform duration-300">
-                <FaEnvelope className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500" />
+              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <FaEnvelope className="w-10 h-10 text-blue-500" />
               </div>
-              <span className="font-semibold text-center text-xs sm:text-sm lg:text-base leading-tight px-1">Event Emails</span>
+              <span className="font-semibold text-center leading-tight">Event Emails</span>
             </Link>
             <Link
               href={`/admin/events/${eventId}/program-directors`}
-              className="flex flex-col items-center justify-center rounded-lg border-2 p-2.5 sm:p-3 lg:p-4 transition-all duration-300 hover:scale-105 hover:shadow-md group bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border-indigo-200"
+              className="flex flex-col items-center justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-800 rounded-lg shadow-md p-4 text-xs transition-all group"
               title="Program Directors"
               aria-label="Program Directors"
             >
-              <div className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-indigo-100 flex items-center justify-center mb-1.5 sm:mb-2 group-hover:scale-110 transition-transform duration-300">
-                <FaUserTie className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-500" />
+              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-indigo-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <FaUserTie className="w-10 h-10 text-indigo-500" />
               </div>
-              <span className="font-semibold text-center text-xs sm:text-sm lg:text-base leading-tight px-1">Program Directors</span>
+              <span className="font-semibold text-center leading-tight">Program Directors</span>
             </Link>
           </div>
         </div>
       </div>
 
-      {/* Main Content Section - Constrained Width */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-8">
-
-        {/* Search and Filter Bar */}
-        <div className="mb-6 bg-white rounded-lg shadow-md p-4 sm:p-6">
+      {/* Search and Filter Bar */}
+      <div className="mb-6 bg-white rounded-lg shadow-md p-6">
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center">
             <div className="flex-1 min-w-0">
               <div className="relative">
@@ -842,12 +838,12 @@ export default function EventEmailsPage() {
                         <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
                           <button
                             onClick={() => handleAddEmailToEvent(email)}
-                            className="instant-tooltip flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                            className="instant-tooltip flex-shrink-0 w-14 h-14 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
                             data-tooltip="Add"
                             aria-label="Add email to event"
                             type="button"
                           >
-                            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="text-blue-600 p-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                             </svg>
                           </button>
@@ -914,7 +910,6 @@ export default function EventEmailsPage() {
             </>
           )}
         </div>
-      </div>
       </div>
 
       {/* Create Modal */}

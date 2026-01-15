@@ -269,23 +269,17 @@ export function SponsorCard({
                       <Link
                         href={`/sponsors/${sponsor.id}`}
                         onClick={(event) => event.stopPropagation()}
-                        className="inline-flex items-center gap-2 px-5 py-2 bg-white text-gray-800 font-semibold text-sm rounded-full shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-white"
+                        className="flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                        title={`View sponsor details for ${sponsor.name}`}
                         aria-label={`View sponsor details for ${sponsor.name}`}
                       >
-                        <span>View Sponsor Details</span>
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={1.8}
-                            d="M7 17l9-9m0 0H8m8 0v8"
-                          />
-                        </svg>
+                        <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+                          <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                        </div>
+                        <span className="font-semibold text-green-700">View Sponsor Details</span>
                       </Link>
                     </div>
                   )}

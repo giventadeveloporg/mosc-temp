@@ -109,14 +109,14 @@ export default function ProfilePageWithLoading() {
     return (
       <div className="flex justify-center items-center min-h-screen w-full py-8">
         <div className="relative w-full max-w-6xl">
-          <Image
+            <Image
             src="/images/loading_user_profile.jpeg"
-            alt="Loading profile..."
+              alt="Loading profile..."
             width={800}
             height={600}
             className="w-full h-auto rounded-lg shadow-2xl animate-pulse zoom-loading"
-            priority
-          />
+              priority
+            />
           <div className="absolute inset-0 rounded-lg overflow-hidden">
             <div className="wavy-animation"></div>
           </div>

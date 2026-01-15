@@ -831,7 +831,7 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
               </tr>
             )}
           </tbody>
-          </table>
+        </table>
         </div>
       </div>
 

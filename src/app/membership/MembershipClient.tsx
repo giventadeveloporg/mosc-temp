@@ -565,27 +565,29 @@ export function MembershipClient({ plans, error, userSubscription, isAuthenticat
                             router.push(`/membership/subscribe/${plan.id}`);
                           }}
                           disabled={isLoadingPlan}
-                          className="w-full flex-shrink-0 h-14 rounded-xl bg-orange-500 hover:bg-orange-600 disabled:bg-orange-400 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 border-2 border-orange-600 hover:border-orange-700 shadow-md hover:shadow-lg"
+                          className="w-full flex-shrink-0 h-14 rounded-xl bg-orange-100 hover:bg-orange-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 px-6"
                           title="Subscribe Now"
                           aria-label="Subscribe Now"
                           type="button"
                         >
                           {isLoadingPlan ? (
-                            <span className="flex items-center gap-2">
-                              <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                              </svg>
-                              <span className="font-semibold text-white">Processing...</span>
-                            </span>
+                            <>
+                              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-200 flex items-center justify-center">
+                                <svg className="animate-spin w-6 h-6 text-orange-600" fill="none" viewBox="0 0 24 24">
+                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                              </div>
+                              <span className="font-semibold text-orange-700">Processing...</span>
+                            </>
                           ) : (
                             <>
-                              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-600 flex items-center justify-center">
-                                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-200 flex items-center justify-center">
+                                <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                               </div>
-                              <span className="font-semibold text-white">Subscribe Now</span>
+                              <span className="font-semibold text-orange-700">Subscribe Now</span>
                             </>
                           )}
                         </button>

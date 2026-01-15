@@ -362,7 +362,7 @@ function EditMediaModal({ media, onClose, onSave, loading }: EditMediaModalProps
                     />
                     <span className="custom-checkbox-tick">
                       {Boolean(form[name]) && (
-                        <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
+                        <svg className="text-black" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l5 5L19 7" />
                         </svg>
                       )}
@@ -375,43 +375,43 @@ function EditMediaModal({ media, onClose, onSave, loading }: EditMediaModalProps
           </div>
         </div>
 
-        <div className="flex flex-row gap-3 sm:gap-4 pt-4">
+        <div className="flex flex-row gap-4 sm:gap-6 pt-4">
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            className="flex-1 flex-shrink-0 h-24 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-4 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 px-12"
             disabled={loading}
             title="Cancel"
             aria-label="Cancel"
           >
-            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex-shrink-0 w-14 h-14 rounded-lg bg-blue-200 flex items-center justify-center">
+              <svg className="w-20 h-20 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </div>
-            <span className="font-semibold text-blue-700">Cancel</span>
+            <span className="font-semibold text-blue-700 text-xl">Cancel</span>
           </button>
           <button
             type="button"
             onClick={(e) => handleSubmit(e)}
-            className="flex-1 flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            className="flex-1 flex-shrink-0 h-24 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-4 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 px-12"
             disabled={loading}
             title={loading ? 'Saving...' : 'Save Changes'}
             aria-label={loading ? 'Saving...' : 'Save Changes'}
           >
-            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+            <div className="flex-shrink-0 w-14 h-14 rounded-lg bg-green-200 flex items-center justify-center">
               {loading ? (
-                <svg className="animate-spin w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24">
+                <svg className="animate-spin w-20 h-20 text-green-600" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
               ) : (
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-20 h-20 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               )}
             </div>
-            <span className="font-semibold text-green-700">{loading ? 'Saving...' : 'Save Changes'}</span>
+            <span className="font-semibold text-green-700 text-xl">{loading ? 'Saving...' : 'Save Changes'}</span>
           </button>
         </div>
       </form>
@@ -685,7 +685,7 @@ export default function AdminMediaPage() {
             aria-label="Upload New Media"
           >
             <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
-              <FaUpload className="w-6 h-6 text-blue-600" />
+              <FaUpload className="w-10 h-10 text-blue-600 p-2" />
             </div>
             <span className="font-semibold text-blue-700 hidden sm:inline">Upload New Media</span>
           </Link>
@@ -729,17 +729,14 @@ export default function AdminMediaPage() {
             </div>
             <button
               onClick={handleScrollToSerialNumber}
-              className="mt-6 sm:mt-0 flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-3 sm:px-6"
+              className="mt-6 sm:mt-0 flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110 mx-auto"
               title="Go to Image"
               aria-label="Go to Image"
               type="button"
             >
-              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-              <span className="font-semibold text-blue-700 hidden sm:inline">Go to Image</span>
+              <svg className="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
             </button>
           </div>
 
@@ -756,7 +753,7 @@ export default function AdminMediaPage() {
                 />
                 <span className="custom-checkbox-tick">
                   {eventFlyerOnly && (
-                    <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
+                    <svg className="text-black" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l5 5L19 7" />
                     </svg>
                   )}
@@ -831,24 +828,24 @@ export default function AdminMediaPage() {
                   {/* Edit Button */}
                   <button
                     onClick={() => handleEditClick(item)}
-                    className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                    className="flex-shrink-0 w-14 h-14 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
                     title="Edit Media"
                     aria-label="Edit Media"
                     type="button"
                   >
-                    <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="text-blue-600 p-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                   </button>
                   {/* Delete Button */}
                   <button
                     onClick={() => handleDelete(item)}
-                    className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                    className="flex-shrink-0 w-14 h-14 rounded-lg bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
                     title="Delete Media"
                     aria-label="Delete Media"
                     type="button"
                   >
-                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="text-red-600 p-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                   </button>
@@ -939,7 +936,7 @@ export default function AdminMediaPage() {
                 type="button"
               >
                 <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </div>
@@ -954,7 +951,7 @@ export default function AdminMediaPage() {
                 type="button"
               >
                 <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-200 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
                 </div>

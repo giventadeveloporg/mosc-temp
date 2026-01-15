@@ -625,21 +625,21 @@ export default async function TicketListPage({ params, searchParams }: { params:
                 overflow: 'hidden'
               }}
             >
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-b border-r border-gray-300">ID</th>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-b border-r border-gray-300">Name</th>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-b border-r border-gray-300">Email</th>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-b border-r border-gray-300">Quantity</th>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-b border-r border-gray-300">Total</th>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-b border-r border-gray-300">Date</th>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-b border-gray-300">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-300 bg-white">
-                <TicketTableClient rows={rows} />
-              </tbody>
-            </table>
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-b border-r border-gray-300">ID</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-b border-r border-gray-300">Name</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-b border-r border-gray-300">Email</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-b border-r border-gray-300">Quantity</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-b border-r border-gray-300">Total</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-b border-r border-gray-300">Date</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-700 border-b border-gray-300">Status</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-300 bg-white">
+            <TicketTableClient rows={rows} />
+          </tbody>
+        </table>
           </div>
         </div>
         {/* Pagination Controls - Always visible, matching admin page style */}
@@ -647,7 +647,7 @@ export default async function TicketListPage({ params, searchParams }: { params:
           <div className="flex justify-between items-center">
             {/* Previous Button */}
             {hasPrevPage ? (
-              <Link
+            <Link
                 href={`?${buildQueryString({ ...sp, page: prevPage })}`}
                 className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
                 title="Previous Page"
@@ -657,7 +657,7 @@ export default async function TicketListPage({ params, searchParams }: { params:
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
                 </svg>
                 <span>Previous</span>
-              </Link>
+            </Link>
             ) : (
               <button
                 disabled
@@ -682,7 +682,7 @@ export default async function TicketListPage({ params, searchParams }: { params:
 
             {/* Next Button */}
             {hasNextPage ? (
-              <Link
+            <Link
                 href={`?${buildQueryString({ ...sp, page: nextPage })}`}
                 className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
                 title="Next Page"
@@ -692,7 +692,7 @@ export default async function TicketListPage({ params, searchParams }: { params:
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                 </svg>
-              </Link>
+            </Link>
             ) : (
               <button
                 disabled
