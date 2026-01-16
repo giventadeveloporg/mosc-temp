@@ -89,6 +89,13 @@ type HeaderProps = {
   isTenantAdmin?: boolean;
 };
 
+const getNavAriaLabel = (itemName: string) => {
+  if (itemName === 'Calendar') {
+    return 'Navigate to Schedule';
+  }
+  return `Navigate to ${itemName}`;
+};
+
 const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
   console.log('[Header] handleSmoothScroll called with:', href);
 
@@ -859,7 +866,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                               }
                             `}
                             onClick={(e) => handleSmoothScroll(e, item.href)}
-                            aria-label={`Navigate to ${item.name}`}
+                            aria-label={getNavAriaLabel(item.name)}
                             aria-current={item.active ? 'page' : undefined}
                           >
                             <span className="tracking-[0.025em]">{item.name}</span>
@@ -1245,7 +1252,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                         closeMobileMenu();
                         handleSmoothScroll(e, item.href);
                       }}
-                      aria-label={`Navigate to ${item.name}`}
+                      aria-label={getNavAriaLabel(item.name)}
                       aria-current={item.active ? 'page' : undefined}
                     >
                       {item.name}

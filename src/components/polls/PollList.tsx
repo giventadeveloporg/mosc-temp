@@ -199,35 +199,39 @@ export function PollList({ eventId, userId, onPollSelect }: PollListProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-          Available Polls
-        </h2>
-        {totalCount > 0 && (
-          <Badge className="bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0 px-4 py-2">
-            {totalCount} poll{totalCount !== 1 ? 's' : ''} available
-          </Badge>
-        )}
-      </div>
+      {polls.length > 0 && (
+        <>
+          <div className="flex justify-between items-center">
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Available Polls
+            </h2>
+            {totalCount > 0 && (
+              <Badge className="bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0 px-4 py-2">
+                {totalCount} poll{totalCount !== 1 ? 's' : ''} available
+              </Badge>
+            )}
+          </div>
 
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-500 h-5 w-5" />
-        <Input
-          placeholder="Search polls..."
-          value={searchTerm}
-          onChange={(e) => handleSearchChange(e.target.value)}
-          className="pl-12 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-all"
-        />
-      </div>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-500 h-5 w-5" />
+            <Input
+              placeholder="Search polls..."
+              value={searchTerm}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              className="pl-12 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-blue-500 transition-all"
+            />
+          </div>
+        </>
+      )}
 
       {polls.length === 0 && !isLoading ? (
-        <Card>
-          <CardContent className="p-6 text-center">
-            <p className="text-gray-500">
-              {searchTerm ? 'No polls found matching your search.' : 'No polls available at the moment.'}
-            </p>
-          </CardContent>
-        </Card>
+        <div className="flex flex-col items-center justify-center">
+          <img
+            src="/images/No-Polls-Available.png"
+            alt="No Polls Available"
+            className="max-w-md w-full h-auto object-contain"
+          />
+        </div>
       ) : (
         <div className="grid gap-4">
           {polls.map((poll) => {
@@ -341,7 +345,8 @@ export function PollList({ eventId, userId, onPollSelect }: PollListProps) {
         </div>
       )}
 
-      {/* Pagination Controls - Always visible, matching admin page style */}
+      {/* Pagination Controls - Only visible when there are polls */}
+      {polls.length > 0 && (
       <div className="mt-8">
         <div className="flex justify-between items-center">
           {/* Previous Button */}
@@ -401,6 +406,7 @@ export function PollList({ eventId, userId, onPollSelect }: PollListProps) {
           )}
         </div>
       </div>
+      )}
     </div>
   );
 }

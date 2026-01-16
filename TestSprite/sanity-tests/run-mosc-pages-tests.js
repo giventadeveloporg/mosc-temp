@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
 /**
- * Public Pages Test Runner
- * Fast, focused test suite for public pages only
- * Expected Duration: ~3-5 minutes
+ * MOSC Pages Test Runner
+ * Fast, focused test suite for /mosc pages only
+ * Expected Duration: ~2-4 minutes
  *
  * This script uses Playwright for real browser automation.
- * Tests only public pages (no authentication required).
+ * Tests only MOSC public pages (no authentication required).
  */
 
 import fs from 'fs';
@@ -28,217 +28,18 @@ const config = {
   baseUrl: process.env.TEST_BASE_URL || 'http://localhost:3000',
   timeout: 30000, // 30 seconds per test
   retries: 1,
-  testDuration: '3-5 minutes',
+  testDuration: '2-4 minutes',
   screenshotOnFailure: true,
   performanceTiming: false, // Disabled for faster execution
 };
 
-// Public pages test scenarios
-const publicPageTests = [
+// MOSC pages test scenarios
+const moscPageTests = [
   {
-    id: 'public-001',
-    name: 'Homepage Load Test',
-    url: '/',
-    priority: 'critical',
-    expectedElements: [
-      'nav, header, [class*="nav"]',
-      'main, [class*="main"], [class*="content"]',
-      'h1, h2, h3, [class*="title"], [class*="heading"]',
-      'a[href*="/events"], a[href="/events"]',
-      'a[href*="/gallery"], a[href="/gallery"]'
-    ],
-    validation: [
-      'Page loads without errors',
-      'Navigation menu is visible',
-      'Main content area is present',
-      'No JavaScript console errors'
-    ],
-    interactions: [
-      { type: 'wait', selector: 'main', timeout: 5000 },
-      { type: 'check', selector: 'nav', visible: true }
-    ]
-  },
-  {
-    id: 'public-002',
-    name: 'Events Listing Page Test',
-    url: '/events',
-    priority: 'critical',
-    expectedElements: [
-      'h1',
-      '.grid, [class*="grid"]',
-      '[class*="event"], [class*="card"]',
-      'input[type="search"], input[type="text"]',
-      'button, a[href*="/events/"]',
-      'a[href*="/events/"][title*="Event Details"], a[href*="/events/"][aria-label*="Event Details"]',
-      'a[href*="calendar.google.com"], a[title*="Calendar"], a[aria-label*="Calendar"]',
-      'a[href*="/checkout"], a[href*="/manual-checkout"], img[alt*="Buy Tickets"], img[alt*="buy tickets"]'
-    ],
-    validation: [
-      'Events page loads successfully',
-      'Event cards or list items are visible',
-      'Search/filter functionality accessible',
-      'At least 2 events have "See Event Details" buttons',
-      'At least 2 events have "Add to Calendar" buttons (for future events)',
-      'Buy Tickets buttons link to correct checkout routes',
-      'No JavaScript errors'
-    ],
-    interactions: [
-      { type: 'wait', selector: '[class*="event"], [class*="card"]', timeout: 5000 },
-      { type: 'check', selector: 'h1', visible: true },
-      { 
-        type: 'verify-buttons',
-        description: 'Verify event action buttons exist and have correct links',
-        checks: [
-          {
-            name: 'See Event Details buttons',
-            selector: 'a[href*="/events/"][title*="Event Details"], a[href*="/events/"][aria-label*="Event Details"]',
-            minCount: 2,
-            validateLink: (href) => {
-              // Should match pattern /events/{id} where id is a number
-              const match = href.match(/\/events\/(\d+)$/);
-              return match !== null && match[1] !== undefined;
-            }
-          },
-          {
-            name: 'Add to Calendar buttons',
-            selector: 'a[href*="calendar.google.com"], a[title*="Calendar"], a[aria-label*="Calendar"]',
-            minCount: 2,
-            validateLink: (href) => {
-              // Should be a Google Calendar link
-              return href.includes('calendar.google.com') && href.includes('action=TEMPLATE');
-            }
-          },
-          {
-            name: 'Buy Tickets buttons',
-            selector: 'a[href*="/checkout"], a[href*="/manual-checkout"], img[alt*="Buy Tickets"], img[alt*="buy tickets"]',
-            minCount: 0, // Optional - only for TICKETED events
-            validateLink: (href) => {
-              // Should match either /events/{id}/checkout or /events/{id}/manual-checkout
-              const checkoutMatch = href.match(/\/events\/(\d+)\/checkout$/);
-              const manualMatch = href.match(/\/events\/(\d+)\/manual-checkout$/);
-              return checkoutMatch !== null || manualMatch !== null;
-            },
-            checkParentLink: true // Check parent <a> tag if selector matches img
-          }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'public-003',
-    name: 'Event Details Page Test',
-    url: '/events/1',
-    priority: 'critical',
-    expectedElements: [
-      'h1',
-      '[class*="event"]',
-      'a[href*="/tickets"], button',
-      '[class*="date"], [class*="time"], [class*="location"]',
-      'img, [class*="image"]'
-    ],
-    validation: [
-      'Event details page loads',
-      'Event information is displayed',
-      'Registration/ticket button is present',
-      'No 404 errors'
-    ],
-    interactions: [
-      { type: 'wait', selector: 'h1', timeout: 5000 }
-    ]
-  },
-  {
-    id: 'public-004',
-    name: 'Sponsors Listing Page Test',
-    url: '/sponsors',
-    priority: 'high',
-    expectedElements: [
-      'h1, h2, [class*="title"], [class*="heading"]',
-      '[class*="sponsor"], [class*="card"], [class*="grid"], main, [class*="container"]',
-      'img, [class*="logo"], [class*="image"]'
-    ],
-    validation: [
-      'Sponsors page loads successfully',
-      'Sponsor cards are visible',
-      'Sponsor logos/images load'
-    ]
-  },
-  {
-    id: 'public-005',
-    name: 'Sponsor Details Page Test',
-    url: '/sponsors/1',
-    priority: 'medium',
-    expectedElements: [
-      'h1',
-      '[class*="sponsor"]',
-      'img, [class*="image"]',
-      '[class*="contact"], [class*="address"]'
-    ],
-    validation: [
-      'Sponsor details page loads',
-      'Sponsor information displayed',
-      'Logo/image displayed'
-    ]
-  },
-  {
-    id: 'public-006',
-    name: 'Gallery Page Test',
-    url: '/gallery',
-    priority: 'high',
-    expectedElements: [
-      'h1, h2, [class*="title"], [class*="heading"]',
-      '[class*="gallery"], [class*="grid"], [class*="container"], main',
-      'img, [class*="image"], [class*="photo"]'
-    ],
-    validation: [
-      'Gallery page loads successfully',
-      'Media items are displayed',
-      'Images load without errors'
-    ],
-    interactions: [
-      { type: 'wait', selector: 'img', timeout: 5000 },
-      { type: 'check', selector: 'img', count: { min: 1 } }
-    ]
-  },
-  {
-    id: 'public-007',
-    name: 'Polls Listing Page Test',
-    url: '/polls',
-    priority: 'medium',
-    expectedElements: [
-      'h1',
-      '[class*="poll"], [class*="card"]',
-      'button, a[href*="/polls/"]',
-      '[class*="vote"], [class*="option"]'
-    ],
-    validation: [
-      'Polls page loads successfully',
-      'Poll cards are visible',
-      'Vote buttons are accessible',
-      'No JavaScript errors'
-    ]
-  },
-  {
-    id: 'public-008',
-    name: 'Calendar Page Test',
-    url: '/calendar',
-    priority: 'medium',
-    expectedElements: [
-      'h1',
-      '[class*="calendar"]',
-      'button, [class*="month"], [class*="day"]',
-      '[class*="event"]'
-    ],
-    validation: [
-      'Calendar page loads successfully',
-      'Calendar widget is visible',
-      'Navigation controls work'
-    ]
-  },
-  {
-    id: 'public-009',
+    id: 'mosc-001',
     name: 'MOSC Homepage Test',
     url: '/mosc',
-    priority: 'medium',
+    priority: 'critical',
     expectedElements: [
       'h1, h2',
       'nav',
@@ -250,93 +51,309 @@ const publicPageTests = [
       'Navigation menu visible',
       'Content sections displayed',
       'No layout errors'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'main', timeout: 5000 },
+      { type: 'check', selector: 'nav', visible: true }
     ]
   },
   {
-    id: 'public-010',
+    id: 'mosc-002',
     name: 'MOSC Holy Synod Page Test',
     url: '/mosc/holy-synod',
-    priority: 'medium',
+    priority: 'high',
     expectedElements: [
       'h1',
       '[class*="synod"], [class*="member"]',
-      'img, [class*="image"]',
-      'a[href*="/holy-synod/"]'
+      'img, [class*="image"]'
     ],
     validation: [
       'Holy Synod page loads',
       'Synod members displayed',
-      'Member images load',
-      'No broken links'
+      'Member images load'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'h1', timeout: 5000 }
     ]
   },
   {
-    id: 'public-011',
+    id: 'mosc-003',
     name: 'MOSC Gallery Page Test',
     url: '/mosc/gallery',
-    priority: 'medium',
+    priority: 'high',
     expectedElements: [
       'h1',
-      '[class*="gallery"], [class*="album"]',
-      'img, [class*="image"]',
-      'a[href*="/gallery/"]'
+      '[class*="gallery"], [class*="album"], [class*="grid"]',
+      'img, [class*="image"]'
     ],
     validation: [
       'MOSC Gallery page loads',
       'Photo albums displayed',
       'Images load correctly'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'img', timeout: 5000 }
     ]
   },
   {
-    id: 'public-012',
-    name: 'MOSC Directory Page Test',
-    url: '/mosc/directory',
+    id: 'mosc-004',
+    name: 'MOSC Photo Gallery Page Test',
+    url: '/mosc/photo-gallery',
     priority: 'medium',
     expectedElements: [
       'h1',
-      '[class*="directory"], [class*="list"]',
+      '[class*="gallery"], [class*="grid"], [class*="photo"]',
+      'img, [class*="image"]'
+    ],
+    validation: [
+      'MOSC Photo Gallery page loads',
+      'Gallery items displayed'
+    ]
+  },
+  {
+    id: 'mosc-005',
+    name: 'MOSC Directory Page Test',
+    url: '/mosc/directory',
+    priority: 'high',
+    expectedElements: [
+      'h1',
+      '[class*="directory"], [class*="list"], main',
       'input[type="search"], input[type="text"]',
       'a, button'
     ],
     validation: [
       'Directory page loads',
       'Directory listings visible',
-      'Search functionality works'
+      'Search functionality accessible'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'main', timeout: 5000 }
     ]
   },
   {
-    id: 'public-013',
-    name: 'Charity Theme Page Test',
-    url: '/charity-theme',
-    priority: 'low',
+    id: 'mosc-006',
+    name: 'MOSC Calendar Page Test',
+    url: '/mosc/calendar',
+    priority: 'medium',
+    expectedElements: [
+      'h1, h2',
+      'main',
+      'a[href*="calendar"], a[href*="mosc.in"]'
+    ],
+    validation: [
+      'Calendar page loads',
+      'Calendar links present'
+    ]
+  },
+  {
+    id: 'mosc-007',
+    name: 'MOSC Contact Info Page Test',
+    url: '/mosc/contact-info',
+    priority: 'medium',
+    expectedElements: [
+      'h1',
+      '[class*="contact"], [class*="address"], [class*="info"]',
+      'a[href^="mailto:"], a[href^="tel:"]'
+    ],
+    validation: [
+      'Contact info page loads',
+      'Contact details visible'
+    ]
+  },
+  {
+    id: 'mosc-008',
+    name: 'MOSC Dioceses Page Test',
+    url: '/mosc/dioceses',
+    priority: 'medium',
+    expectedElements: [
+      'h1',
+      '[class*="diocese"], [class*="card"], [class*="grid"]'
+    ],
+    validation: [
+      'Dioceses page loads',
+      'Diocese listings visible'
+    ]
+  },
+  {
+    id: 'mosc-009',
+    name: 'MOSC The Church Page Test',
+    url: '/mosc/the-church',
+    priority: 'medium',
     expectedElements: [
       'h1',
       'main',
-      '[class*="charity"]'
+      'a[href*="/mosc/the-church/"], [class*="card"]'
     ],
     validation: [
-      'Charity theme page loads',
-      'Content is displayed',
-      'No errors'
+      'The Church page loads',
+      'Navigation to church sections visible'
     ]
   },
   {
-    id: 'public-014',
-    name: 'Pricing Page Test',
-    url: '/pricing',
+    id: 'mosc-010',
+    name: 'MOSC Spiritual Organizations Page Test',
+    url: '/mosc/spiritual-organizations',
     priority: 'medium',
-    // Note: Pricing page is now public and accessible without authentication
-    // Unauthenticated users can view pricing plans, authenticated users see personalized pricing
     expectedElements: [
-      'h1, [class*="title"], [class*="heading"]',
-      'main, [class*="content"], [class*="container"], [class*="pricing"]',
-      '[class*="pricing"], [class*="plan"]'
+      'h1',
+      '[class*="organization"], [class*="card"], [class*="grid"]',
+      'a[href*="/mosc/spiritual-organizations/"]'
     ],
     validation: [
-      'Pricing page loads successfully',
-      'Pricing plans are visible',
-      'No redirect errors',
-      'Page structure is correct'
+      'Spiritual organizations page loads',
+      'Organization listings visible'
+    ]
+  },
+  {
+    id: 'mosc-011',
+    name: 'MOSC Training Page Test',
+    url: '/mosc/training',
+    priority: 'medium',
+    expectedElements: [
+      'h1',
+      '[class*="training"], [class*="card"], [class*="grid"]',
+      'a[href*="/mosc/training/"]'
+    ],
+    validation: [
+      'Training page loads',
+      'Training listings visible'
+    ]
+  },
+  {
+    id: 'mosc-012',
+    name: 'MOSC Theological Seminaries Page Test',
+    url: '/mosc/theological-seminaries',
+    priority: 'medium',
+    expectedElements: [
+      'h1',
+      '[class*="seminary"], [class*="card"], [class*="grid"]',
+      'a[href*="/mosc/theological-seminaries/"]'
+    ],
+    validation: [
+      'Seminaries page loads',
+      'Seminary listings visible'
+    ]
+  },
+  {
+    id: 'mosc-013',
+    name: 'MOSC Pilgrim Centres Page Test',
+    url: '/mosc/pilgrim-centres',
+    priority: 'low',
+    expectedElements: [
+      'h1',
+      '[class*="pilgrim"], [class*="card"], [class*="grid"]',
+      'a[href*="/mosc/pilgrim-centres/"]'
+    ],
+    validation: [
+      'Pilgrim centres page loads',
+      'Pilgrim centres listings visible'
+    ]
+  },
+  {
+    id: 'mosc-014',
+    name: 'MOSC Institutions Page Test',
+    url: '/mosc/institutions',
+    priority: 'low',
+    expectedElements: [
+      'h1',
+      '[class*="institution"], [class*="card"], [class*="grid"]'
+    ],
+    validation: [
+      'Institutions page loads',
+      'Institutions listings visible'
+    ]
+  },
+  {
+    id: 'mosc-015',
+    name: 'MOSC Saints Page Test',
+    url: '/mosc/saints',
+    priority: 'low',
+    expectedElements: [
+      'h1',
+      '[class*="saint"], [class*="card"], [class*="grid"]',
+      'img, [class*="image"]'
+    ],
+    validation: [
+      'Saints page loads',
+      'Saints listings visible'
+    ]
+  },
+  {
+    id: 'mosc-016',
+    name: 'MOSC Sitemap Page Test',
+    url: '/mosc/sitemap',
+    priority: 'low',
+    expectedElements: [
+      'h1',
+      'a[href*="/mosc/"]',
+      'main, [class*="container"]'
+    ],
+    validation: [
+      'Sitemap page loads',
+      'MOSC links visible'
+    ]
+  },
+  {
+    id: 'mosc-017',
+    name: 'MOSC Catholicate Main Page Test',
+    url: '/mosc/catholicate',
+    priority: 'high',
+    expectedElements: [
+      'h1',
+      '[class*="catholicate"], [class*="catholicos"], main',
+      'a[href*="/mosc/catholicate/"], [class*="card"], [class*="grid"]',
+      'img, [class*="image"]'
+    ],
+    validation: [
+      'Catholicate main page loads',
+      'Catholicos history listings visible',
+      'Biography links present',
+      'Images load correctly'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'h1', timeout: 5000 }
+    ]
+  },
+  {
+    id: 'mosc-018',
+    name: 'MOSC Catholicate Biography Page Test',
+    url: '/mosc/catholicate/h-h-baselios-marthoma-paulose-ii',
+    priority: 'medium',
+    expectedElements: [
+      'h1, h2, h3',
+      '[class*="biography"], [class*="catholicos"], main',
+      'img, [class*="image"]',
+      'a[href*="/mosc/catholicate/"]'
+    ],
+    validation: [
+      'Catholicate biography page loads',
+      'Biography content displayed',
+      'Catholicos image loads',
+      'Navigation links present'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'h1', timeout: 5000 }
+    ]
+  },
+  {
+    id: 'mosc-019',
+    name: 'MOSC Speeches Page Test',
+    url: '/mosc/speeches',
+    priority: 'medium',
+    expectedElements: [
+      'h1',
+      '[class*="speech"], [class*="message"], [class*="address"], main',
+      '[class*="card"], [class*="grid"]',
+      'button, a[href*="/speeches"]'
+    ],
+    validation: [
+      'Speeches page loads',
+      'Speech listings visible',
+      'Categories/filters accessible',
+      'No JavaScript errors'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'main', timeout: 5000 }
     ]
   }
 ];
@@ -427,7 +444,7 @@ async function executeTestWithPlaywright(test, testUrl, startTime) {
       }
     }
 
-    // Check for redirects (pricing page is now public, should not redirect)
+    // Check for redirects
     const finalUrl = page.url();
     if (finalUrl.includes('/sign-in') && !testUrl.includes('/sign-in')) {
       throw new Error(`Page redirected to sign-in (401 Unauthorized). Original URL: ${testUrl}`);
@@ -466,8 +483,8 @@ async function executeTestWithPlaywright(test, testUrl, startTime) {
     if (reactWarnings.length > 0) {
       warnings.push(`React warnings (non-critical): ${reactWarnings.join(', ')}`);
     }
+
     // Filter out Clerk auth() errors for pages that are expected to have them
-    // These are warnings, not errors, since the pages handle auth gracefully
     const clerkAuthErrors = pageErrors.filter(err =>
       err.includes('auth() was called but Clerk can\'t detect usage of authMiddleware()')
     );
@@ -476,7 +493,6 @@ async function executeTestWithPlaywright(test, testUrl, startTime) {
     );
 
     if (clerkAuthErrors.length > 0) {
-      // These indicate middleware configuration issues - treat as errors
       errors.push(`Clerk middleware error: ${clerkAuthErrors.join(', ')}`);
     }
     if (otherPageErrors.length > 0) {
@@ -536,70 +552,6 @@ async function executeTestWithPlaywright(test, testUrl, startTime) {
               const count = await page.locator(interaction.selector).count();
               if (interaction.count.min && count < interaction.count.min) {
                 errors.push(`Element ${interaction.selector} count ${count} is less than minimum ${interaction.count.min}`);
-              }
-            }
-          } else if (interaction.type === 'verify-buttons') {
-            // Verify event action buttons exist and have correct links
-            if (interaction.checks) {
-              for (const check of interaction.checks) {
-                try {
-                  const elements = await page.locator(check.selector).all();
-                  const count = elements.length;
-                  
-                  if (check.minCount !== undefined && count < check.minCount) {
-                    if (check.minCount > 0) {
-                      errors.push(`${check.name}: Found ${count}, expected at least ${check.minCount}`);
-                    } else {
-                      // Optional check - only warn if found but invalid
-                      warnings.push(`${check.name}: Found ${count} (optional)`);
-                    }
-                  } else if (count > 0) {
-                    // Verify links if validateLink function is provided
-                    if (check.validateLink) {
-                      let validCount = 0;
-                      let invalidLinks = [];
-                      
-                      for (const element of elements) {
-                        let href = null;
-                        
-                        // If checking parent link for images
-                        if (check.checkParentLink) {
-                          const tagName = await element.evaluate(el => el.tagName.toLowerCase());
-                          if (tagName === 'img') {
-                            const parent = await element.locator('..').first();
-                            const parentTagName = await parent.evaluate(el => el.tagName.toLowerCase());
-                            if (parentTagName === 'a') {
-                              href = await parent.getAttribute('href');
-                            }
-                          } else {
-                            href = await element.getAttribute('href');
-                          }
-                        } else {
-                          href = await element.getAttribute('href');
-                        }
-                        
-                        if (href && check.validateLink(href)) {
-                          validCount++;
-                        } else if (href) {
-                          invalidLinks.push(href);
-                        }
-                      }
-                      
-                      if (validCount < count && invalidLinks.length > 0) {
-                        errors.push(`${check.name}: ${invalidLinks.length} invalid link(s) found: ${invalidLinks.slice(0, 3).join(', ')}${invalidLinks.length > 3 ? '...' : ''}`);
-                      } else if (validCount > 0) {
-                        // Log success for debugging
-                        console.log(`   ✓ ${check.name}: ${validCount} valid link(s) found`);
-                      }
-                    }
-                    
-                    if (count >= check.minCount) {
-                      console.log(`   ✓ ${check.name}: Found ${count} (required: ${check.minCount})`);
-                    }
-                  }
-                } catch (checkError) {
-                  warnings.push(`${check.name} verification failed: ${checkError.message}`);
-                }
               }
             }
           }
@@ -670,16 +622,16 @@ async function executeTest(test) {
 }
 
 // Main test runner
-async function runPublicPageTests() {
-  console.log('🚀 Starting Public Pages Test Suite');
+async function runMoscPageTests() {
+  console.log('🚀 Starting MOSC Pages Test Suite');
   console.log(`📍 Base URL: ${config.baseUrl}`);
   console.log(`⏱️  Expected Duration: ${config.testDuration}`);
   console.log(`🧪 Test Engine: Playwright (Browser automation)`);
-  console.log(`📦 Testing: Public pages only (no authentication required)`);
+  console.log(`📦 Testing: MOSC pages only (no authentication required)`);
   console.log('='.repeat(70));
 
   const results = {
-    total: publicPageTests.length,
+    total: moscPageTests.length,
     passed: 0,
     failed: 0,
     skipped: 0,
@@ -700,7 +652,7 @@ async function runPublicPageTests() {
     process.exit(1);
   }
 
-  for (const test of publicPageTests) {
+  for (const test of moscPageTests) {
     console.log(`\n🧪 [${test.id}] Running: ${test.name}`);
     console.log(`   Priority: ${test.priority}`);
     console.log(`   URL: ${config.baseUrl}${test.url}`);
@@ -723,7 +675,7 @@ async function runPublicPageTests() {
 
     try {
       // Add small delay between tests
-      if (test.id !== 'public-001') {
+      if (test.id !== 'mosc-001') {
         await new Promise(resolve => setTimeout(resolve, 500));
       }
 
@@ -830,7 +782,7 @@ async function generateHTMLReport(results) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Public Pages Test Report - Malayalees US Site</title>
+    <title>MOSC Pages Test Report</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -1029,8 +981,8 @@ async function generateHTMLReport(results) {
 <body>
     <div class="container">
         <div class="header">
-            <h1>🧪 Public Pages Test Report</h1>
-            <p>Malayalees US Site Event Registration Platform</p>
+            <h1>🧪 MOSC Pages Test Report</h1>
+            <p>MOSC Public Site Pages</p>
             <p style="margin-top: 10px; font-size: 0.9em;">Test Engine: Playwright (Local) | ${results.total} Tests | ${successRate}% Success Rate</p>
         </div>
 
@@ -1063,7 +1015,6 @@ async function generateHTMLReport(results) {
         <div class="tests-section">
             <h2 style="margin-bottom: 20px; color: #333;">Test Results</h2>
             ${results.testResults.map(test => {
-              // Screenshot path is already relative to __dirname (screenshots folder)
               const screenshotPath = test.screenshot ? path.basename(test.screenshot) : null;
               return `
                 <div class="test-item ${test.status}">
@@ -1113,7 +1064,7 @@ async function generateHTMLReport(results) {
         </div>
 
         <div class="footer">
-            <p>Generated by Public Pages Test Suite</p>
+            <p>Generated by MOSC Pages Test Suite</p>
             <p class="timestamp">Report generated on: ${timestamp}</p>
             <p class="timestamp">Base URL: ${config.baseUrl}</p>
             <p class="timestamp">Test Engine: Playwright (Local Browser Execution)</p>
@@ -1122,7 +1073,7 @@ async function generateHTMLReport(results) {
 </body>
 </html>`;
 
-  const reportPath = path.join(__dirname, 'public-pages-test-report.html');
+  const reportPath = path.join(__dirname, 'mosc-pages-test-report.html');
 
   try {
     await fs.promises.writeFile(reportPath, htmlContent, 'utf8');
@@ -1133,8 +1084,7 @@ async function generateHTMLReport(results) {
 }
 
 // Run tests
-runPublicPageTests().catch(error => {
+runMoscPageTests().catch(error => {
   console.error('💥 Fatal error:', error);
   process.exit(1);
 });
-

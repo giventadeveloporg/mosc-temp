@@ -36,7 +36,7 @@ const HeroSection = () => {
           <div className="flex flex-col items-center justify-center">
             <div className="w-48 h-48 lg:w-96 lg:h-96 overflow-hidden flex items-center justify-center bg-transparent p-2">
               <AppImage
-                src="/images/logos/MOSC-cross-image.png"
+                src="/images/logos/Current_Edits/MOSC-Center-Image.png"
                 alt="MOSC Hero Image"
                 className="w-full h-full object-contain scale-110"
                 style={{ background: 'transparent' }}
@@ -48,11 +48,17 @@ const HeroSection = () => {
 
           {/* Christ Iconography */}
           <div className="flex flex-col items-center justify-center">
-            <div className="w-48 h-48 lg:w-56 lg:h-56 overflow-hidden flex items-center justify-center sacred-shadow-lg rounded-full p-3" style={{ background: 'transparent' }}>
+            <div className="w-48 h-48 lg:w-56 lg:h-56 overflow-hidden flex flex-col items-center justify-center sacred-shadow-lg rounded-full p-3 gap-1" style={{ background: 'transparent' }}>
               <AppImage
-                src="/images/logos/Current_Edits/Mosc_logo_jan2026.png"
+                src="/images/logos/Current_Edits/MOSC-Logo-only.png"
                 alt="MOSC Logo"
-                className="w-full h-full object-contain"
+                className="w-full h-40 object-contain relative top-[-5px]"
+                style={{ background: 'transparent' }}
+              />
+              <AppImage
+                src="/images/logos/Current_Edits/MOSC-Text-only.png"
+                alt="MOSC Text"
+                className="w-40 h-auto max-h-[40%] object-contain relative top-[-20px]"
                 style={{ background: 'transparent' }}
               />
             </div>
