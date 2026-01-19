@@ -100,14 +100,27 @@ export default function DateRangeSelector({
             <button
               key={preset.label}
               onClick={() => handlePresetClick(preset)}
-              className={`px-3 py-1.5 text-sm rounded-lg font-medium transition-colors ${
+              className={`flex-shrink-0 h-14 rounded-xl flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 ${
                 selectedPreset === preset.label
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-blue-100 hover:bg-blue-200'
+                  : 'bg-gray-100 hover:bg-gray-200'
               }`}
+              title={preset.label}
+              aria-label={preset.label}
               type="button"
             >
-              {preset.label}
+              <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
+                selectedPreset === preset.label
+                  ? 'bg-blue-200'
+                  : 'bg-gray-200'
+              }`}>
+                <svg className={`w-6 h-6 ${selectedPreset === preset.label ? 'text-blue-600' : 'text-gray-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <span className={`font-semibold ${selectedPreset === preset.label ? 'text-blue-700' : 'text-gray-700'}`}>
+                {preset.label}
+              </span>
             </button>
           ))}
         </div>
@@ -122,7 +135,7 @@ export default function DateRangeSelector({
               value={startDate}
               onChange={handleStartDateChange}
               max={endDate || undefined}
-              className="border border-gray-400 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
+              className="border-2 border-gray-400 rounded-xl px-4 py-3 text-base focus:border-blue-500 focus:ring-blue-500 transition-all"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -133,7 +146,7 @@ export default function DateRangeSelector({
               onChange={handleEndDateChange}
               min={startDate || undefined}
               max={new Date().toISOString().split('T')[0]}
-              className="border border-gray-400 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
+              className="border-2 border-gray-400 rounded-xl px-4 py-3 text-base focus:border-blue-500 focus:ring-blue-500 transition-all"
             />
           </div>
         </div>

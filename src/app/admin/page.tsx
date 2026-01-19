@@ -402,12 +402,12 @@ export default function AdminPage() {
               <Link
                 key={button.key}
                 href={button.href}
-                className={`flex flex-col items-center justify-center ${colorClasses} rounded-lg shadow-md p-3 text-xs transition-all group`}
+                className={`flex flex-col items-center justify-center ${colorClasses} rounded-lg shadow-md p-4 text-xs transition-all group`}
                 title={button.label}
                 aria-label={button.label}
               >
-                <div className={`flex-shrink-0 w-11 h-11 rounded-xl ${iconBgColor} flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300`}>
-                  {renderIcon(button.icon, `w-8 h-8 ${iconTextColor}`)}
+                <div className={`flex-shrink-0 w-14 h-14 rounded-xl ${iconBgColor} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300`}>
+                  {renderIcon(button.icon, `w-10 h-10 ${iconTextColor}`)}
                 </div>
                 <span className="font-semibold text-center leading-tight">{button.label}</span>
               </Link>

@@ -272,24 +272,28 @@ export default function CheckInAnalyticsClient({
             <div className="flex flex-col sm:flex-row gap-3">
               {/* Search */}
               <div className="relative">
-                <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-500 h-5 w-5" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search by name, email, or ID..."
-                  className="pl-10 pr-4 py-2 border border-gray-400 rounded-lg focus:border-blue-500 focus:ring-blue-500 w-full sm:w-64"
+                  className="pl-12 pr-4 py-3 border-2 border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 w-full sm:w-64 text-base transition-all"
                 />
               </div>
               {/* Export Button */}
               {history.length > 0 && (
                 <button
                   onClick={handleExportCSV}
-                  className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-semibold transition-colors flex items-center gap-2"
+                  className="flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                  title="Export to CSV"
+                  aria-label="Export to CSV"
                   type="button"
                 >
-                  <FaDownload className="w-4 h-4" />
-                  Export CSV
+                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+                    <FaDownload className="w-6 h-6 text-green-600" />
+                  </div>
+                  <span className="font-semibold text-green-700">Export CSV</span>
                 </button>
               )}
             </div>

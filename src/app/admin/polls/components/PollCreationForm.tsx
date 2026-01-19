@@ -223,26 +223,25 @@ export function PollCreationForm({
                 placeholder={`Option ${index + 1}`}
                 className="flex-1"
               />
-              <Button
+              <button
                 type="button"
-                variant="outline"
-                size="sm"
                 onClick={() => removeOption(index)}
                 disabled={options.length <= 2}
-                className="text-red-500 hover:text-red-700"
+                className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                title="Delete Option"
+                aria-label="Delete Option"
               >
-                <Trash2 className="h-4 w-4" />
-              </Button>
+                <Trash2 className="w-6 h-6 text-red-600" />
+              </button>
             </div>
           ))}
           
           {errors.options && <p className="text-sm text-red-500">{errors.options}</p>}
           
-          <Button
+          <button
             type="button"
-            variant="outline"
             onClick={addOption}
-            className="w-full flex-shrink-0 h-14 rounded-xl bg-purple-100 hover:bg-purple-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105"
+            className="w-full flex-shrink-0 h-14 rounded-xl bg-purple-100 hover:bg-purple-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
             title="Add Option"
             aria-label="Add Option"
           >
@@ -250,7 +249,7 @@ export function PollCreationForm({
               <Plus className="h-6 w-6 text-purple-600" />
             </div>
             <span className="font-semibold text-purple-700">Add Option</span>
-          </Button>
+          </button>
         </CardContent>
       </Card>
 
