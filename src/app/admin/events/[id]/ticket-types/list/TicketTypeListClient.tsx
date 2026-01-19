@@ -981,7 +981,9 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
           {error && <div className="text-red-500 bg-red-100 p-3 rounded-md">{error}</div>}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Name</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Name <span className="text-red-500">*</span>
+            </label>
             <div className="relative">
               <input
                 type="text"
@@ -1005,7 +1007,9 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
             {validationErrors.name && <p className="text-red-500 text-xs mt-1">{validationErrors.name}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Code</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Code <span className="text-red-500">*</span>
+            </label>
             <div className="relative">
               <input
                 type="text"
@@ -1029,7 +1033,9 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
             {validationErrors.code && <p className="text-red-500 text-xs mt-1">{validationErrors.code}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Description</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Description <span className="text-red-500">*</span>
+            </label>
             <textarea
               name="description"
               value={formData.description || ''}
@@ -1046,7 +1052,9 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Price</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Price <span className="text-red-500">*</span>
+              </label>
               <input
                 type="text"
                 name="price"
@@ -1161,7 +1169,9 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Minimum Quantity Per Order</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Minimum Quantity Per Order <span className="text-red-500">*</span>
+              </label>
               <input
                 type="number"
                 name="minQuantityPerOrder"

@@ -4024,7 +4024,7 @@ CREATE TABLE public.manual_payment_request (
                                              requester_last_name character varying(255),
                                              requester_phone character varying(100),
                                              amount_due numeric(21,2) NOT NULL,
-                                             payment_method_type public.manual_payment_method_type NOT NULL,
+                                             payment_method_type VARCHAR(70) NOT NULL,
                                              payment_handle character varying(255),
                                              payment_instructions text,
                                              status character varying(30) DEFAULT 'REQUESTED' NOT NULL,

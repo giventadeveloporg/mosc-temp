@@ -45,8 +45,70 @@ export async function createTicketTypeServer(eventId: string, formData: EventTic
     });
 
     if (!response.ok) {
-      const errorData = await response.text();
-      return { success: false, error: `Failed to create ticket type: ${errorData}` };
+      let errorData: any = {};
+      try {
+        const text = await response.text();
+        try {
+          errorData = text ? JSON.parse(text) : {};
+        } catch (parseError) {
+          // If JSON parsing fails, use the raw text as message
+          errorData = { message: text || 'Unknown error occurred' };
+        }
+      } catch (e) {
+        // If reading response fails, use generic error
+        errorData = { message: 'Unknown error occurred' };
+      }
+
+      console.error('[createTicketTypeServer] Backend error:', {
+        status: response.status,
+        errorData,
+      });
+
+      // Extract user-friendly error message from backend response
+      let userMessage = 'Failed to create ticket type. Please try again.';
+
+      if (response.status === 400) {
+        // Validation errors
+        if (errorData.message) {
+          if (errorData.message.includes('validation') || errorData.message.includes('Validation')) {
+            userMessage = 'Please check all required fields and try again.';
+          } else {
+            userMessage = errorData.message;
+          }
+        } else if (errorData.fieldErrors && Array.isArray(errorData.fieldErrors)) {
+          const fieldErrors = errorData.fieldErrors.map((err: any) => {
+            if (err.field === 'name' && err.message === 'must not be null') {
+              return 'Name is required.';
+            } else if (err.field === 'code' && err.message === 'must not be null') {
+              return 'Code is required.';
+            } else if (err.field === 'price' && err.message === 'must not be null') {
+              return 'Price is required.';
+            }
+            return err.defaultMessage || err.message || 'Please check this field.';
+          });
+          userMessage = fieldErrors.join(' ');
+        } else {
+          userMessage = 'Please check all required fields and try again.';
+        }
+      } else if (response.status === 500) {
+        // Server errors - check for specific error types
+        const errorText = JSON.stringify(errorData);
+        if (errorText.includes('duplicate key') || errorText.includes('already exists') || errorText.includes('unique constraint')) {
+          userMessage = 'A database error occurred. This may be due to a sequence issue. Please refresh the page and try again. If the problem persists, contact support.';
+        } else if (errorText.includes('Network error') || errorText.includes('Unable to reach') || errorText.includes('ECONNREFUSED')) {
+          userMessage = 'Unable to connect to the server. Please check your internet connection and ensure the backend server is running.';
+        } else {
+          userMessage = 'A server error occurred. Please try again in a few moments. If the problem persists, please contact support.';
+        }
+      } else if (response.status === 401 || response.status === 403) {
+        userMessage = 'Authentication error. Please refresh the page and log in again.';
+      } else if (response.status >= 500) {
+        userMessage = 'The server is temporarily unavailable. Please try again later.';
+      } else if (errorData.message) {
+        userMessage = errorData.message;
+      }
+
+      return { success: false, error: userMessage };
     }
 
     const data: EventTicketTypeDTO = await response.json();
@@ -121,9 +183,72 @@ export async function updateTicketTypeServer(ticketTypeId: number, eventId: stri
     console.log('[updateTicketTypeServer] Response ok:', response.ok);
 
     if (!response.ok) {
-      const errorData = await response.text();
-      console.error('[updateTicketTypeServer] Update failed:', errorData);
-      return { success: false, error: `Failed to update ticket type: ${errorData}` };
+      let errorData: any = {};
+      try {
+        const text = await response.text();
+        try {
+          errorData = text ? JSON.parse(text) : {};
+        } catch (parseError) {
+          // If JSON parsing fails, use the raw text as message
+          errorData = { message: text || 'Unknown error occurred' };
+        }
+      } catch (e) {
+        // If reading response fails, use generic error
+        errorData = { message: 'Unknown error occurred' };
+      }
+
+      console.error('[updateTicketTypeServer] Backend error:', {
+        status: response.status,
+        errorData,
+      });
+
+      // Extract user-friendly error message from backend response
+      let userMessage = 'Failed to update ticket type. Please try again.';
+
+      if (response.status === 400) {
+        // Validation errors
+        if (errorData.message) {
+          if (errorData.message.includes('validation') || errorData.message.includes('Validation')) {
+            userMessage = 'Please check all required fields and try again.';
+          } else {
+            userMessage = errorData.message;
+          }
+        } else if (errorData.fieldErrors && Array.isArray(errorData.fieldErrors)) {
+          const fieldErrors = errorData.fieldErrors.map((err: any) => {
+            if (err.field === 'name' && err.message === 'must not be null') {
+              return 'Name is required.';
+            } else if (err.field === 'code' && err.message === 'must not be null') {
+              return 'Code is required.';
+            } else if (err.field === 'price' && err.message === 'must not be null') {
+              return 'Price is required.';
+            }
+            return err.defaultMessage || err.message || 'Please check this field.';
+          });
+          userMessage = fieldErrors.join(' ');
+        } else {
+          userMessage = 'Please check all required fields and try again.';
+        }
+      } else if (response.status === 500) {
+        // Server errors - check for specific error types
+        const errorText = JSON.stringify(errorData);
+        if (errorText.includes('duplicate key') || errorText.includes('already exists') || errorText.includes('unique constraint')) {
+          userMessage = 'A database error occurred. This may be due to a sequence issue. Please refresh the page and try again. If the problem persists, contact support.';
+        } else if (errorText.includes('Network error') || errorText.includes('Unable to reach') || errorText.includes('ECONNREFUSED')) {
+          userMessage = 'Unable to connect to the server. Please check your internet connection and ensure the backend server is running.';
+        } else {
+          userMessage = 'A server error occurred. Please try again in a few moments. If the problem persists, please contact support.';
+        }
+      } else if (response.status === 401 || response.status === 403) {
+        userMessage = 'Authentication error. Please refresh the page and log in again.';
+      } else if (response.status === 404) {
+        userMessage = 'Ticket type not found. It may have been deleted. Please refresh the page.';
+      } else if (response.status >= 500) {
+        userMessage = 'The server is temporarily unavailable. Please try again later.';
+      } else if (errorData.message) {
+        userMessage = errorData.message;
+      }
+
+      return { success: false, error: userMessage };
     }
 
     const data: EventTicketTypeDTO = await response.json();
@@ -144,8 +269,48 @@ export async function deleteTicketTypeServer(ticketTypeId: number, eventId: stri
       },
     });
     if (!response.ok) {
-      const errorData = await response.text();
-      return { success: false, error: `Failed to delete ticket type: ${errorData}` };
+      let errorData: any = {};
+      try {
+        const text = await response.text();
+        try {
+          errorData = text ? JSON.parse(text) : {};
+        } catch (parseError) {
+          // If JSON parsing fails, use the raw text as message
+          errorData = { message: text || 'Unknown error occurred' };
+        }
+      } catch (e) {
+        // If reading response fails, use generic error
+        errorData = { message: 'Unknown error occurred' };
+      }
+
+      console.error('[deleteTicketTypeServer] Backend error:', {
+        status: response.status,
+        errorData,
+      });
+
+      // Extract user-friendly error message from backend response
+      let userMessage = 'Failed to delete ticket type. Please try again.';
+
+      if (response.status === 404) {
+        userMessage = 'Ticket type not found. It may have already been deleted. Please refresh the page.';
+      } else if (response.status === 400) {
+        userMessage = errorData.message || 'Cannot delete this ticket type. It may be in use.';
+      } else if (response.status === 500) {
+        const errorText = JSON.stringify(errorData);
+        if (errorText.includes('Network error') || errorText.includes('Unable to reach') || errorText.includes('ECONNREFUSED')) {
+          userMessage = 'Unable to connect to the server. Please check your internet connection and ensure the backend server is running.';
+        } else {
+          userMessage = 'A server error occurred. Please try again in a few moments. If the problem persists, please contact support.';
+        }
+      } else if (response.status === 401 || response.status === 403) {
+        userMessage = 'Authentication error. Please refresh the page and log in again.';
+      } else if (response.status >= 500) {
+        userMessage = 'The server is temporarily unavailable. Please try again later.';
+      } else if (errorData.message) {
+        userMessage = errorData.message;
+      }
+
+      return { success: false, error: userMessage };
     }
     return { success: true };
   } catch (error) {

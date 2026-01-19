@@ -64,6 +64,7 @@ const adminSubmenuItems = [
   { name: 'QR Scanner', href: '/admin/qr-scanner' },
   { name: 'Check-In Analytics', href: '/admin/check-in-analytics' },
   { name: 'Sales Analytics', href: '/admin/sales-analytics' },
+  { name: 'Manual Payments', href: '/admin/manual-payments' },
   { name: 'Poll Management', href: '/admin/polls' },
   { name: 'Focus Groups', href: '/admin/focus-groups' },
   {

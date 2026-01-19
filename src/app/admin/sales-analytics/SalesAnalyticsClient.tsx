@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import DateRangeSelector, { type DateRange } from '@/components/admin/DateRangeSelector';
 import EventSearchSelector from '@/components/admin/EventSearchSelector';
-import { fetchSalesDataServer, calculateSalesMetricsServer, triggerStripeFeesTaxUpdateServer, type SalesMetrics, type StripeFeesTaxUpdateRequest, type StripeFeesTaxUpdateResponse } from './ApiServerActions';
-import type { EventTicketTransactionDTO } from '@/types';
+import { fetchSalesDataServer, calculateSalesMetricsServer, triggerStripeFeesTaxUpdateServer, fetchEventDetailsForPaymentFlow, type SalesMetrics, type StripeFeesTaxUpdateRequest, type StripeFeesTaxUpdateResponse } from './ApiServerActions';
+import type { EventTicketTransactionDTO, EventDetailsDTO } from '@/types';
 import { FaDollarSign, FaChartLine, FaSpinner, FaDownload, FaSearch, FaPercent, FaMoneyBillWave, FaSync, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
 
 interface SalesAnalyticsClientProps {
@@ -39,6 +39,10 @@ export default function SalesAnalyticsClient({
   const [pageSize] = useState(20);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Event Details State (for payment flow detection)
+  const [eventDetails, setEventDetails] = useState<EventDetailsDTO | null>(null);
+  const [eventDetailsLoading, setEventDetailsLoading] = useState(false);
+
   // Batch Job State
   const [batchJobLoading, setBatchJobLoading] = useState(false);
   const [batchJobSuccess, setBatchJobSuccess] = useState(false);
@@ -48,12 +52,52 @@ export default function SalesAnalyticsClient({
   const [batchJobTenantId, setBatchJobTenantId] = useState<string>('');
   const [batchJobForceUpdate, setBatchJobForceUpdate] = useState(false);
 
+  // Determine payment flow mode for batch job differentiation
+  //
+  // Payment Flow Modes:
+  // - STRIPE_ONLY: All payments go through Stripe → Show Stripe batch job
+  // - MANUAL_ONLY: All payments are manual (Zelle, Venmo, etc.) → Don't show Stripe batch job (no Stripe fees)
+  // - HYBRID: Can use both Stripe and manual payments
+  //   - If manualPaymentEnabled=true → Show message that Stripe batch job only applies to Stripe payments
+  //   - If manualPaymentEnabled=false → Show Stripe batch job (effectively Stripe-only)
+  //
+  // Batch Job Logic:
+  // - Stripe batch job (/api/cron/stripe-fees-tax-update) filters for stripe_payment_intent_id IS NOT NULL
+  // - Manual payments don't have Stripe fees, so they don't need this batch job
+  // - For hybrid events, the batch job will only process Stripe transactions (manual payments are filtered out)
+  const isManualPaymentOnly = eventDetails?.paymentFlowMode === 'MANUAL_ONLY';
+  const isHybridWithManual = eventDetails?.paymentFlowMode === 'HYBRID' && eventDetails?.manualPaymentEnabled === true;
+  const isStripeOnly = eventDetails?.paymentFlowMode === 'STRIPE_ONLY';
+  const isHybridStripeOnly = eventDetails?.paymentFlowMode === 'HYBRID' && !eventDetails?.manualPaymentEnabled;
+  const shouldShowStripeBatchJob = isStripeOnly || isHybridStripeOnly;
+  const shouldShowManualPaymentMessage = isManualPaymentOnly || isHybridWithManual;
+
   useEffect(() => {
     if (eventId) {
       loadMetrics();
       loadSalesData();
+      loadEventDetails();
+    } else {
+      setEventDetails(null);
     }
   }, [eventId, dateRange, page]);
+
+  const loadEventDetails = async () => {
+    if (!eventId) return;
+    setEventDetailsLoading(true);
+    try {
+      const eventIdNum = typeof eventId === 'string' ? parseInt(eventId, 10) : eventId;
+      if (!isNaN(eventIdNum)) {
+        const details = await fetchEventDetailsForPaymentFlow(eventIdNum);
+        setEventDetails(details);
+      }
+    } catch (err: any) {
+      console.error('[SalesAnalyticsClient] Error loading event details:', err);
+      setEventDetails(null);
+    } finally {
+      setEventDetailsLoading(false);
+    }
+  };
 
   const loadMetrics = async () => {
     if (!eventId) return;
@@ -78,17 +122,54 @@ export default function SalesAnalyticsClient({
     setLoading(true);
     setError(null);
     try {
+      // Fetch all transactions (no status filter) to include PENDING manual payments
       const result = await fetchSalesDataServer({
         eventId,
         startDate: dateRange.startDate || undefined,
         endDate: dateRange.endDate || undefined,
-        status: 'COMPLETED', // Only show completed transactions (per database schema)
+        status: undefined, // Don't filter by status - include COMPLETED and PENDING manual payments
         page,
         pageSize,
         sort: 'purchaseDate,desc',
       });
-      setSalesData(result.transactions);
-      setTotalCount(result.totalCount);
+
+      // Filter to include COMPLETED transactions and PENDING manual payments
+      //
+      // STRIPE PAYMENT FLOW (preserved existing logic):
+      // - Includes: All COMPLETED transactions (Stripe payments are always COMPLETED immediately)
+      // - Stripe payments never have PENDING status, so they're caught by the COMPLETED check
+      //
+      // MANUAL PAYMENT FLOW (new support):
+      // - Includes: PENDING transactions without Stripe fields (pending requests)
+      // - Also includes: COMPLETED transactions (after admin confirmation)
+      // - Manual payments are identified by:
+      //   1. transaction_reference starting with "MANUAL-" (if backend uses this format), OR
+      //   2. stripePaymentIntentId is null/empty AND stripeCheckoutSessionId is null/empty
+      //      (Stripe payments always populate these fields, manual payments don't)
+      //
+      // This ensures:
+      // 1. Existing Stripe payment analytics continue to work unchanged
+      // 2. Manual payment transactions are included in analytics
+      // 3. No breaking changes to existing functionality
+      const filteredTransactions = result.transactions.filter(t => {
+        // Include COMPLETED transactions (all payment types: Stripe + confirmed Manual payments)
+        if (t.status === 'COMPLETED') return true;
+        // Include PENDING transactions that are manual payments only
+        // Stripe payments never have PENDING status (they're COMPLETED immediately)
+        // Manual payments are identified by missing Stripe fields (stripePaymentIntentId and stripeCheckoutSessionId are null)
+        const isManualPayment =
+          t.transactionReference?.startsWith('MANUAL-') ||
+          (!t.stripePaymentIntentId && !t.stripeCheckoutSessionId);
+
+        if (t.status === 'PENDING' && isManualPayment) {
+          return true;
+        }
+        return false;
+      });
+
+      setSalesData(filteredTransactions);
+      // Update total count to reflect filtered results
+      setTotalCount(filteredTransactions.length);
     } catch (err: any) {
       setError(err.message || 'Failed to load sales data');
     } finally {
@@ -212,6 +293,12 @@ export default function SalesAnalyticsClient({
   };
 
   const handleTriggerBatchJob = async () => {
+    // Prevent calling Stripe batch job for manual-only payment events
+    if (isManualPaymentOnly) {
+      setBatchJobError('This batch job is only applicable to Stripe payments. Manual payment events do not require Stripe fee updates.');
+      return;
+    }
+
     setBatchJobLoading(true);
     setBatchJobError(null);
     setBatchJobSuccess(false);
@@ -293,14 +380,14 @@ export default function SalesAnalyticsClient({
 
   const filteredSalesData = searchQuery
     ? salesData.filter(t => {
-        const searchLower = searchQuery.toLowerCase();
-        return (
-          t.email?.toLowerCase().includes(searchLower) ||
-          t.firstName?.toLowerCase().includes(searchLower) ||
-          t.lastName?.toLowerCase().includes(searchLower) ||
-          t.id?.toString().includes(searchQuery)
-        );
-      })
+      const searchLower = searchQuery.toLowerCase();
+      return (
+        t.email?.toLowerCase().includes(searchLower) ||
+        t.firstName?.toLowerCase().includes(searchLower) ||
+        t.lastName?.toLowerCase().includes(searchLower) ||
+        t.id?.toString().includes(searchQuery)
+      );
+    })
     : salesData;
 
   const totalPages = Math.ceil(totalCount / pageSize);
@@ -323,123 +410,156 @@ export default function SalesAnalyticsClient({
         />
       )}
 
-      {/* Batch Job Trigger Section */}
-      <div className="bg-white border-2 border-gray-200 rounded-lg p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Stripe Fees and Tax Update Batch Job</h3>
-          <button
-            onClick={() => setShowBatchJobSection(!showBatchJobSection)}
-            className="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg transition-colors flex items-center gap-2"
-            type="button"
-          >
-            <FaSync className="w-4 h-4" />
-            {showBatchJobSection ? 'Hide' : 'Show'} Batch Job Options
-          </button>
-        </div>
+      {/* Batch Job Trigger Section - Only show for Stripe payments */}
+      {eventId && (
+        <div className="bg-white border-2 border-gray-200 rounded-lg p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">
+              {shouldShowStripeBatchJob ? 'Stripe Fees and Tax Update Batch Job' : 'Batch Job Options'}
+            </h3>
+            {shouldShowStripeBatchJob && (
+              <button
+                onClick={() => setShowBatchJobSection(!showBatchJobSection)}
+                className="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg transition-colors flex items-center gap-2"
+                type="button"
+              >
+                <FaSync className="w-4 h-4" />
+                {showBatchJobSection ? 'Hide' : 'Show'} Batch Job Options
+              </button>
+            )}
+          </div>
 
-        {showBatchJobSection && (
-          <div className="space-y-4">
-            <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
-              <p className="text-sm text-blue-800">
-                This batch job retrieves missing Stripe fee and tax data from Stripe's API and updates transaction records.
-                The job runs asynchronously in the background and will return a job ID when started.
-              </p>
+          {/* Manual Payment Message */}
+          {shouldShowManualPaymentMessage && (
+            <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4 mb-4">
+              <div className="flex items-start gap-3">
+                <FaExclamationTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-yellow-800 font-semibold mb-2">Manual Payment Event Detected</p>
+                  <div className="text-sm text-yellow-700 space-y-1">
+                    <p>
+                      This event is configured for <strong>{isManualPaymentOnly ? 'manual payments only' : 'hybrid payments (Stripe + Manual)'}</strong>.
+                    </p>
+                    <p>
+                      The Stripe Fees and Tax Update batch job is <strong>only applicable to Stripe payments</strong>.
+                      Manual payments (Zelle, Venmo, Cash App, etc.) do not have Stripe fees and do not require this batch job.
+                    </p>
+                    {isHybridWithManual && (
+                      <p className="mt-2 text-xs">
+                        <strong>Note:</strong> If this event has Stripe payments, you can still trigger the batch job to update Stripe fee data for those transactions.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
+          )}
 
-            {/* Tenant ID Input */}
-            <div>
-              <label htmlFor="batchJobTenantId" className="block text-sm font-medium text-gray-700 mb-2">
-                Tenant ID (optional - leave empty to process all tenants)
-              </label>
-              <input
-                type="text"
-                id="batchJobTenantId"
-                value={batchJobTenantId}
-                onChange={(e) => setBatchJobTenantId(e.target.value)}
-                placeholder={typeof window !== 'undefined' && process.env.NEXT_PUBLIC_TENANT_ID
-                  ? `Current: ${process.env.NEXT_PUBLIC_TENANT_ID}`
-                  : 'Leave empty to process all tenants'}
-                className="w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
-              />
-              <p className="mt-1 text-xs text-gray-500">
-                {dateRange.startDate && dateRange.endDate
-                  ? `Date range from current filter will be applied: ${dateRange.startDate} to ${dateRange.endDate}`
-                  : 'No date range filter will be applied (processes all dates)'}
-              </p>
-            </div>
+          {/* Stripe Batch Job Section - Only show if applicable */}
+          {shouldShowStripeBatchJob && showBatchJobSection && (
+            <div className="space-y-4">
+              <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+                <p className="text-sm text-blue-800">
+                  This batch job retrieves missing Stripe fee and tax data from Stripe's API and updates transaction records.
+                  The job runs asynchronously in the background and will return a job ID when started.
+                </p>
+              </div>
 
-            {/* Force Update Checkbox */}
-            <div className="flex items-center gap-3">
-              <input
-                type="checkbox"
-                id="batchJobForceUpdate"
-                checked={batchJobForceUpdate}
-                onChange={(e) => setBatchJobForceUpdate(e.target.checked)}
-                className="w-5 h-5 rounded border-gray-400 text-blue-600 focus:ring-blue-500"
-              />
-              <label htmlFor="batchJobForceUpdate" className="text-sm font-medium text-gray-700">
-                Force update (reprocess transactions that already have Stripe fee data)
-              </label>
-            </div>
+              {/* Tenant ID Input */}
+              <div>
+                <label htmlFor="batchJobTenantId" className="block text-sm font-medium text-gray-700 mb-2">
+                  Tenant ID (optional - leave empty to process all tenants)
+                </label>
+                <input
+                  type="text"
+                  id="batchJobTenantId"
+                  value={batchJobTenantId}
+                  onChange={(e) => setBatchJobTenantId(e.target.value)}
+                  placeholder={typeof window !== 'undefined' && process.env.NEXT_PUBLIC_TENANT_ID
+                    ? `Current: ${process.env.NEXT_PUBLIC_TENANT_ID}`
+                    : 'Leave empty to process all tenants'}
+                  className="w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  {dateRange.startDate && dateRange.endDate
+                    ? `Date range from current filter will be applied: ${dateRange.startDate} to ${dateRange.endDate}`
+                    : 'No date range filter will be applied (processes all dates)'}
+                </p>
+              </div>
 
-            {/* Batch Job Status Messages */}
-            {batchJobSuccess && batchJobResponse && (
-              <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  <FaCheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <div className="flex-1">
-                    <p className="text-green-800 font-semibold mb-2">Batch job started successfully!</p>
-                    <div className="text-sm text-green-700 space-y-1">
-                      <p><strong>Job ID:</strong> {batchJobResponse.jobId}</p>
-                      <p><strong>Status:</strong> {batchJobResponse.status}</p>
-                      {batchJobResponse.estimatedRecords !== null && (
-                        <p><strong>Estimated Records:</strong> {batchJobResponse.estimatedRecords}</p>
-                      )}
-                      {batchJobResponse.estimatedCompletionTime && (
-                        <p><strong>Estimated Completion:</strong> {new Date(batchJobResponse.estimatedCompletionTime).toLocaleString()}</p>
-                      )}
-                      <p className="mt-2 text-xs">{batchJobResponse.message}</p>
+              {/* Force Update Checkbox */}
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="batchJobForceUpdate"
+                  checked={batchJobForceUpdate}
+                  onChange={(e) => setBatchJobForceUpdate(e.target.checked)}
+                  className="w-5 h-5 rounded border-gray-400 text-blue-600 focus:ring-blue-500"
+                />
+                <label htmlFor="batchJobForceUpdate" className="text-sm font-medium text-gray-700">
+                  Force update (reprocess transactions that already have Stripe fee data)
+                </label>
+              </div>
+
+              {/* Batch Job Status Messages */}
+              {batchJobSuccess && batchJobResponse && (
+                <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <FaCheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="text-green-800 font-semibold mb-2">Batch job started successfully!</p>
+                      <div className="text-sm text-green-700 space-y-1">
+                        <p><strong>Job ID:</strong> {batchJobResponse.jobId}</p>
+                        <p><strong>Status:</strong> {batchJobResponse.status}</p>
+                        {batchJobResponse.estimatedRecords !== null && (
+                          <p><strong>Estimated Records:</strong> {batchJobResponse.estimatedRecords}</p>
+                        )}
+                        {batchJobResponse.estimatedCompletionTime && (
+                          <p><strong>Estimated Completion:</strong> {new Date(batchJobResponse.estimatedCompletionTime).toLocaleString()}</p>
+                        )}
+                        <p className="mt-2 text-xs">{batchJobResponse.message}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {batchJobError && (
-              <div className="bg-red-50 border-2 border-red-200 rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  <FaExclamationTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                  <div className="flex-1">
-                    <p className="text-red-800 font-semibold mb-1">Error</p>
-                    <p className="text-sm text-red-700">{batchJobError}</p>
+              {batchJobError && (
+                <div className="bg-red-50 border-2 border-red-200 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <FaExclamationTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="text-red-800 font-semibold mb-1">Error</p>
+                      <p className="text-sm text-red-700">{batchJobError}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Trigger Button */}
-            <button
-              onClick={handleTriggerBatchJob}
-              disabled={batchJobLoading}
-              className="w-full flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 px-6"
-              title="Trigger Stripe Fees and Tax Update Batch Job"
-              aria-label="Trigger Stripe Fees and Tax Update Batch Job"
-              type="button"
-            >
-              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
-                {batchJobLoading ? (
-                  <FaSpinner className="w-6 h-6 text-blue-600 animate-spin" />
-                ) : (
-                  <FaSync className="w-6 h-6 text-blue-600" />
-                )}
-              </div>
-              <span className="font-semibold text-blue-700">
-                {batchJobLoading ? 'Starting Batch Job...' : 'Trigger Batch Job'}
-              </span>
-            </button>
-          </div>
-        )}
-      </div>
+              {/* Trigger Button */}
+              <button
+                onClick={handleTriggerBatchJob}
+                disabled={batchJobLoading}
+                className="w-full flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 px-6"
+                title="Trigger Stripe Fees and Tax Update Batch Job"
+                aria-label="Trigger Stripe Fees and Tax Update Batch Job"
+                type="button"
+              >
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                  {batchJobLoading ? (
+                    <FaSpinner className="w-6 h-6 text-blue-600 animate-spin" />
+                  ) : (
+                    <FaSync className="w-6 h-6 text-blue-600" />
+                  )}
+                </div>
+                <span className="font-semibold text-blue-700">
+                  {batchJobLoading ? 'Starting Batch Job...' : 'Trigger Batch Job'}
+                </span>
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Loading State */}
       {loading && (
@@ -556,13 +676,256 @@ export default function SalesAnalyticsClient({
             <div className="bg-white border-2 border-gray-200 rounded-lg p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Revenue by Payment Method</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {metrics.revenueByPaymentMethod.map((item, idx) => (
-                  <div key={idx} className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                    <p className="text-sm text-gray-600 font-medium mb-1">{item.method}</p>
-                    <p className="text-2xl font-bold text-gray-900">${item.revenue.toFixed(2)}</p>
-                    <p className="text-xs text-gray-500 mt-1">{item.count} transactions</p>
-                  </div>
-                ))}
+                {metrics.revenueByPaymentMethod.map((item, idx) => {
+                  // Helper function to get payment method colors and icon
+                  const getPaymentMethodStyle = (method: string) => {
+                    const methodLower = method.toLowerCase();
+
+                    // Zelle - Purple/Blue
+                    if (methodLower.includes('zelle')) {
+                      return {
+                        bg: 'bg-purple-50',
+                        border: 'border-purple-200',
+                        text: 'text-purple-900',
+                        label: 'text-purple-600',
+                        iconBg: 'bg-purple-100',
+                        icon: (
+                          <svg className="w-8 h-8 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M13.5 2C8.8 2 5 5.8 5 10.5c0 2.2.9 4.2 2.3 5.7L2 22l5.8-5.3c1.5 1.4 3.5 2.3 5.7 2.3 4.7 0 8.5-3.8 8.5-8.5S18.2 2 13.5 2zm0 15c-3.6 0-6.5-2.9-6.5-6.5S9.9 4 13.5 4 20 6.9 20 10.5 17.1 17 13.5 17z" />
+                            <circle cx="10.5" cy="10.5" r="1.5" />
+                            <circle cx="13.5" cy="10.5" r="1.5" />
+                            <circle cx="16.5" cy="10.5" r="1.5" />
+                          </svg>
+                        ),
+                      };
+                    }
+
+                    // Venmo - Blue
+                    if (methodLower.includes('venmo')) {
+                      return {
+                        bg: 'bg-blue-50',
+                        border: 'border-blue-200',
+                        text: 'text-blue-900',
+                        label: 'text-blue-600',
+                        iconBg: 'bg-blue-100',
+                        icon: (
+                          <svg className="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M19.5 3.5L18 2l-1.5 1.5L15 2l-1.5 1.5L12 2l-1.5 1.5L9 2 7.5 3.5 6 2v14H3v3c0 1.66 1.34 3 3 3h12c1.66 0 3-1.34 3-3V2l-1.5 1.5zM19 19c0 .55-.45 1-1 1s-1-.45-1-1v-3H8V5h11v14z" />
+                            <path d="M9 7h6v2H9zm0 3h6v2H9zm0 3h4v2H9z" />
+                          </svg>
+                        ),
+                      };
+                    }
+
+                    // Cash App - Green
+                    if (methodLower.includes('cash app')) {
+                      return {
+                        bg: 'bg-green-50',
+                        border: 'border-green-200',
+                        text: 'text-green-900',
+                        label: 'text-green-600',
+                        iconBg: 'bg-green-100',
+                        icon: (
+                          <svg className="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M23.59 3.59c-.38-.38-.9-.59-1.41-.59H20V1c0-.55-.45-1-1-1s-1 .45-1 1v2h-2V1c0-.55-.45-1-1-1s-1 .45-1 1v2h-2V1c0-.55-.45-1-1-1s-1 .45-1 1v2H9V1c0-.55-.45-1-1-1S7 .45 7 1v2H5V1c0-.55-.45-1-1-1S3 .45 3 1v2H1.82c-.51 0-1.02.21-1.41.59C.21 3.98 0 4.49 0 5v14c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V5c0-.51-.21-1.02-.41-1.41zM22 19H2V8h20v11z" />
+                            <path d="M12 10.5c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5z" />
+                          </svg>
+                        ),
+                      };
+                    }
+
+                    // PayPal - Blue
+                    if (methodLower.includes('paypal')) {
+                      return {
+                        bg: 'bg-blue-50',
+                        border: 'border-blue-300',
+                        text: 'text-blue-900',
+                        label: 'text-blue-700',
+                        iconBg: 'bg-blue-100',
+                        icon: (
+                          <svg className="w-8 h-8 text-blue-700" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.185zm.092-7.35l.868-5.565c.05-.32.33-.553.65-.553h3.88c3.135 0 5.586-1.677 6.48-4.818.007-.031.013-.062.02-.095.48-2.29.242-3.545-.64-4.21-.885-.664-2.366-1.01-4.287-1.01H6.6L5.098 13.987z" />
+                          </svg>
+                        ),
+                      };
+                    }
+
+                    // Apple Pay - Black/Gray
+                    if (methodLower.includes('apple pay')) {
+                      return {
+                        bg: 'bg-gray-50',
+                        border: 'border-gray-300',
+                        text: 'text-gray-900',
+                        label: 'text-gray-700',
+                        iconBg: 'bg-gray-100',
+                        icon: (
+                          <svg className="w-8 h-8 text-gray-900" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
+                          </svg>
+                        ),
+                      };
+                    }
+
+                    // Google Pay - Multi-color
+                    if (methodLower.includes('google pay')) {
+                      return {
+                        bg: 'bg-blue-50',
+                        border: 'border-blue-200',
+                        text: 'text-blue-900',
+                        label: 'text-blue-600',
+                        iconBg: 'bg-blue-100',
+                        icon: (
+                          <svg className="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M3.983 14.988l1.407-5.136L1.406 8.05 17.903 0l1.41 5.136-3.653 1.314-1.407 5.136-1.407-5.136L9.42 6.45l1.406 5.136-5.843 2.103L3.983 14.988zm.822-5.245l2.849-1.025 1.406-5.136 2.85-1.024L7.06 7.718l-2.255.81zm12.992 9.132c-1.268 0-2.297-1.03-2.297-2.297s1.03-2.297 2.297-2.297 2.297 1.03 2.297 2.297-1.03 2.297-2.297 2.297zm-8.182 0c-1.268 0-2.297-1.03-2.297-2.297s1.03-2.297 2.297-2.297 2.297 1.03 2.297 2.297-1.03 2.297-2.297 2.297z" />
+                          </svg>
+                        ),
+                      };
+                    }
+
+                    // Cash - Green
+                    if (methodLower.includes('cash') && !methodLower.includes('cash app')) {
+                      return {
+                        bg: 'bg-green-50',
+                        border: 'border-green-200',
+                        text: 'text-green-900',
+                        label: 'text-green-600',
+                        iconBg: 'bg-green-100',
+                        icon: (
+                          <FaMoneyBillWave className="w-8 h-8 text-green-600" />
+                        ),
+                      };
+                    }
+
+                    // Check - Orange
+                    if (methodLower.includes('check')) {
+                      return {
+                        bg: 'bg-orange-50',
+                        border: 'border-orange-200',
+                        text: 'text-orange-900',
+                        label: 'text-orange-600',
+                        iconBg: 'bg-orange-100',
+                        icon: (
+                          <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                        ),
+                      };
+                    }
+
+                    // Wire Transfer - Indigo
+                    if (methodLower.includes('wire')) {
+                      return {
+                        bg: 'bg-indigo-50',
+                        border: 'border-indigo-200',
+                        text: 'text-indigo-900',
+                        label: 'text-indigo-600',
+                        iconBg: 'bg-indigo-100',
+                        icon: (
+                          <svg className="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                          </svg>
+                        ),
+                      };
+                    }
+
+                    // ACH - Teal
+                    if (methodLower.includes('ach')) {
+                      return {
+                        bg: 'bg-teal-50',
+                        border: 'border-teal-200',
+                        text: 'text-teal-900',
+                        label: 'text-teal-600',
+                        iconBg: 'bg-teal-100',
+                        icon: (
+                          <svg className="w-8 h-8 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                          </svg>
+                        ),
+                      };
+                    }
+
+                    // Stripe payment methods - Blue
+                    if (methodLower.includes('card') || methodLower.includes('stripe') || methodLower.includes('visa') || methodLower.includes('mastercard') || methodLower.includes('amex') || methodLower.includes('discover')) {
+                      return {
+                        bg: 'bg-blue-50',
+                        border: 'border-blue-300',
+                        text: 'text-blue-900',
+                        label: 'text-blue-700',
+                        iconBg: 'bg-blue-100',
+                        icon: (
+                          <svg className="w-8 h-8 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                          </svg>
+                        ),
+                      };
+                    }
+
+                    // Default - Gray
+                    return {
+                      bg: 'bg-gray-50',
+                      border: 'border-gray-200',
+                      text: 'text-gray-900',
+                      label: 'text-gray-600',
+                      iconBg: 'bg-gray-100',
+                      icon: (
+                        <FaDollarSign className="w-8 h-8 text-gray-600" />
+                      ),
+                    };
+                  };
+
+                  const style = getPaymentMethodStyle(item.method);
+
+                  return (
+                    <div key={idx} className={`${style.bg} ${style.border} border-2 rounded-lg p-4 flex items-start gap-4 transition-all duration-300 hover:scale-105 hover:shadow-md`}>
+                      {/* Icon */}
+                      <div className={`${style.iconBg} rounded-lg p-2 flex-shrink-0`}>
+                        {style.icon}
+                      </div>
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-sm ${style.label} font-semibold mb-1 truncate`}>{item.method}</p>
+                        <p className={`text-2xl font-bold ${style.text}`}>${item.revenue.toFixed(2)}</p>
+                        <p className={`text-xs ${style.label} mt-1`}>{item.count} transaction{item.count !== 1 ? 's' : ''}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Manual Payment Status Breakdown */}
+          {metrics.manualPaymentStatusBreakdown && metrics.manualPaymentStatusBreakdown.length > 0 && (
+            <div className="bg-white border-2 border-gray-200 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Manual Payment Status Breakdown</h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Breakdown of manual payment transactions (Zelle, Venmo, Cash, etc.) by status
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {metrics.manualPaymentStatusBreakdown.map((item, idx) => {
+                  // Color coding based on status
+                  const getStatusColor = (status: string) => {
+                    const statusUpper = status.toUpperCase();
+                    if (statusUpper === 'PENDING' || statusUpper === 'REQUESTED') {
+                      return { bg: 'bg-yellow-50', border: 'border-yellow-200', text: 'text-yellow-900', label: 'text-yellow-600' };
+                    } else if (statusUpper === 'RECEIVED' || statusUpper === 'CONFIRMED' || statusUpper === 'COMPLETED') {
+                      return { bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-900', label: 'text-green-600' };
+                    } else if (statusUpper === 'CANCELLED' || statusUpper === 'VOIDED') {
+                      return { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-900', label: 'text-red-600' };
+                    } else if (statusUpper === 'REFUNDED') {
+                      return { bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-900', label: 'text-orange-600' };
+                    }
+                    return { bg: 'bg-gray-50', border: 'border-gray-200', text: 'text-gray-900', label: 'text-gray-600' };
+                  };
+                  const colors = getStatusColor(item.status);
+                  return (
+                    <div key={idx} className={`${colors.bg} border-2 ${colors.border} rounded-lg p-4`}>
+                      <p className={`text-sm ${colors.label} font-medium mb-1`}>{item.status}</p>
+                      <p className={`text-2xl font-bold ${colors.text} mt-2`}>${item.revenue.toFixed(2)}</p>
+                      <p className={`text-xs ${colors.label} mt-1`}>{item.count} transaction{item.count !== 1 ? 's' : ''}</p>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}

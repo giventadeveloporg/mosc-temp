@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import DateRangeSelector, { type DateRange } from '@/components/admin/DateRangeSelector';
 import EventSearchSelector from '@/components/admin/EventSearchSelector';
@@ -11,7 +11,8 @@ import {
   type ManualPaymentListResponse,
 } from './ApiServerActions';
 import type { ManualPaymentRequestDTO, ManualPaymentSummaryReportDTO } from '@/types';
-import { FaDollarSign, FaSpinner, FaSearch, FaCheckCircle, FaTimesCircle, FaBan, FaDownload } from 'react-icons/fa';
+import { FaDollarSign, FaSpinner, FaSearch, FaCheckCircle, FaTimesCircle, FaBan, FaDownload, FaEye } from 'react-icons/fa';
+import Link from 'next/link';
 
 interface ManualPaymentsClientProps {
   initialEventId?: string;
@@ -39,7 +40,8 @@ export default function ManualPaymentsClient({
   });
   const [payments, setPayments] = useState<ManualPaymentListResponse | null>(initialPayments);
   const [summary, setSummary] = useState<ManualPaymentSummaryReportDTO[] | null>(initialSummary);
-  const [loading, setLoading] = useState(false);
+  // Don't show loading if we have initial data
+  const [loading, setLoading] = useState(!initialPayments && !initialSummary);
   const [error, setError] = useState<string | null>(initialError);
   const [page, setPage] = useState(0);
   const [pageSize] = useState(20);
@@ -47,48 +49,227 @@ export default function ManualPaymentsClient({
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [methodFilter, setMethodFilter] = useState<string>('');
   const [updatingStatus, setUpdatingStatus] = useState<number | null>(null);
+  const isFetchingRef = useRef(false);
+  const hasMountedRef = useRef(false);
+  const prevFiltersRef = useRef<string>('');
+  const currentlyLoadingFilterKeyRef = useRef<string>('');
 
+  // Store latest values in refs to avoid dependency issues
+  const eventIdRef = useRef(eventId);
+  const statusFilterRef = useRef(statusFilter);
+  const methodFilterRef = useRef(methodFilter);
+  const pageRef = useRef(page);
+  const dateRangeRef = useRef(dateRange);
+  const startDateRef = useRef(dateRange.startDate);
+  const endDateRef = useRef(dateRange.endDate);
+
+  // Update refs when values change (use stringified date values to avoid object reference issues)
   useEffect(() => {
-    if (eventId) {
-      loadPayments();
-      loadSummary();
-    }
-  }, [eventId, dateRange, page, statusFilter, methodFilter]);
+    eventIdRef.current = eventId;
+    statusFilterRef.current = statusFilter;
+    methodFilterRef.current = methodFilter;
+    pageRef.current = page;
+    dateRangeRef.current = dateRange;
+    startDateRef.current = dateRange.startDate;
+    endDateRef.current = dateRange.endDate;
+  }, [eventId, statusFilter, methodFilter, page, dateRange.startDate, dateRange.endDate]);
 
-  const loadPayments = async () => {
-    if (!eventId) return;
+  const loadPayments = useCallback(async (filterKey?: string) => {
+    const currentEventId = eventIdRef.current;
+    const currentStatusFilter = statusFilterRef.current;
+    const currentMethodFilter = methodFilterRef.current;
+    const currentPage = pageRef.current;
+
+    if (!currentEventId) {
+      setPayments(null);
+      setLoading(false);
+      isFetchingRef.current = false;
+      currentlyLoadingFilterKeyRef.current = '';
+      return;
+    }
+
+    // Create filter key if not provided
+    const currentFilterKey = filterKey || `${currentEventId}-${currentStatusFilter}-${currentMethodFilter}-${currentPage}`;
+
+    // Prevent loading the same filter key twice
+    if (currentlyLoadingFilterKeyRef.current === currentFilterKey) {
+      console.log('[ManualPayments] Already loading this filter key, skipping...', currentFilterKey);
+      return;
+    }
+
+    // Prevent concurrent fetches
+    if (isFetchingRef.current) {
+      console.log('[ManualPayments] Already fetching, skipping...');
+      return;
+    }
+
+    console.log('[ManualPayments] Loading payments for filterKey:', currentFilterKey);
+    isFetchingRef.current = true;
+    currentlyLoadingFilterKeyRef.current = currentFilterKey;
     setLoading(true);
     setError(null);
+
+    // Track if response was received
+    const responseReceivedRef = { current: false };
+
+    // Safety timeout to ensure loading is cleared even if fetch hangs
+    const timeoutId = setTimeout(() => {
+      if (!responseReceivedRef.current) {
+        console.warn('[ManualPayments] Load timeout - clearing loading state (response not received)');
+        setLoading(false);
+        isFetchingRef.current = false;
+        if (currentlyLoadingFilterKeyRef.current === currentFilterKey) {
+          currentlyLoadingFilterKeyRef.current = '';
+        }
+      } else {
+        console.log('[ManualPayments] Timeout fired but response already received, ignoring');
+      }
+    }, 30000); // 30 second timeout
+
     try {
+      console.log('[ManualPayments] Calling fetchManualPaymentsServer...');
       const data = await fetchManualPaymentsServer({
-        eventId,
-        status: statusFilter || undefined,
-        manualPaymentMethodType: methodFilter || undefined,
-        page,
+        eventId: currentEventId,
+        status: currentStatusFilter || undefined,
+        manualPaymentMethodType: currentMethodFilter || undefined,
+        page: currentPage,
         pageSize,
         sort: 'createdAt,desc',
       });
-      setPayments(data);
+      responseReceivedRef.current = true;
+      console.log('[ManualPayments] Payments loaded:', {
+        paymentsCount: data?.payments?.length || 0,
+        totalCount: data?.totalCount || 0,
+        dataStructure: data ? Object.keys(data) : 'null',
+        firstPayment: data?.payments?.[0] ? { id: data.payments[0].id, eventId: data.payments[0].eventId, status: data.payments[0].status } : 'none'
+      });
+
+      // Only update state if we got valid data
+      if (data && (data.payments || data.totalCount !== undefined)) {
+        setPayments(data);
+        console.log('[ManualPayments] State updated with payments:', data?.payments?.length || 0);
+      } else {
+        console.warn('[ManualPayments] Invalid data structure received:', data);
+        setError('Invalid data structure received from server');
+      }
     } catch (err: any) {
+      responseReceivedRef.current = true;
+      console.error('[ManualPayments] Error loading payments:', err);
       setError(err.message || 'Failed to load manual payments');
     } finally {
+      // Clear timeout
+      clearTimeout(timeoutId);
+      // Always clear loading state and fetch flag
       setLoading(false);
+      isFetchingRef.current = false;
+      // Clear the filter key when done
+      if (currentlyLoadingFilterKeyRef.current === currentFilterKey) {
+        currentlyLoadingFilterKeyRef.current = '';
+      }
     }
-  };
+  }, [pageSize]);
 
-  const loadSummary = async () => {
-    if (!eventId) return;
+  const loadSummary = useCallback(async () => {
+    const currentEventId = eventIdRef.current;
+    const currentDateRange = dateRangeRef.current;
+
+    if (!currentEventId) return;
     try {
       const data = await fetchManualPaymentSummaryServer(
-        eventId,
-        dateRange.startDate || undefined,
-        dateRange.endDate || undefined
+        currentEventId,
+        currentDateRange.startDate || undefined,
+        currentDateRange.endDate || undefined
       );
       setSummary(data);
     } catch (err: any) {
       console.error('Failed to load summary:', err);
     }
-  };
+  }, []);
+
+  // Create stable date string values to avoid object reference issues
+  const startDateStr = useMemo(() => dateRange.startDate || '', [dateRange.startDate]);
+  const endDateStr = useMemo(() => dateRange.endDate || '', [dateRange.endDate]);
+
+  // Track if we should skip the initial load (because we have server-side data)
+  const skipInitialLoadRef = useRef(!!(initialPayments || initialSummary));
+
+  useEffect(() => {
+    // Prevent running if already fetching
+    if (isFetchingRef.current) {
+      console.log('[ManualPayments] useEffect: Already fetching, skipping...');
+      return;
+    }
+
+    if (!eventId) {
+      // Only clear if we don't have initial data to preserve
+      if (!initialPayments) {
+        setPayments(null);
+        setSummary(null);
+      }
+      setLoading(false);
+      skipInitialLoadRef.current = false;
+      prevFiltersRef.current = '';
+      isFetchingRef.current = false;
+      return;
+    }
+
+    // Create a filter key to detect actual changes (use stable date strings)
+    const filterKey = `${eventId}-${statusFilter}-${methodFilter}-${page}-${startDateStr}-${endDateStr}`;
+
+    // On first mount: use initial data if available, otherwise load
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+      prevFiltersRef.current = filterKey;
+
+      // Check if we have initial data (either payments or summary)
+      const hasInitialData = (initialPayments && initialPayments.payments && initialPayments.payments.length > 0) ||
+                            (initialSummary && initialSummary.length > 0);
+
+      if (hasInitialData) {
+        // We have initial data from server, don't reload
+        console.log('[ManualPayments] Using initial data from server', {
+          paymentsCount: initialPayments?.payments?.length || 0,
+          summaryCount: initialSummary?.length || 0,
+          totalCount: initialPayments?.totalCount || 0
+        });
+        // Ensure loading is false since we have initial data
+        setLoading(false);
+        isFetchingRef.current = false;
+        return;
+      } else {
+        // No initial data, load it
+        console.log('[ManualPayments] No initial data, loading...', {
+          hasInitialPayments: !!initialPayments,
+          hasInitialSummary: !!initialSummary
+        });
+        loadPayments(filterKey);
+        loadSummary();
+        return;
+      }
+    }
+
+    // After mount: only reload if filters actually changed
+    if (prevFiltersRef.current !== filterKey) {
+      console.log('[ManualPayments] Filters changed, reloading...', { old: prevFiltersRef.current, new: filterKey });
+      prevFiltersRef.current = filterKey;
+      // Only load if not already loading this filter key
+      if (currentlyLoadingFilterKeyRef.current !== filterKey && !isFetchingRef.current) {
+        loadPayments(filterKey);
+        loadSummary();
+      } else {
+        console.log('[ManualPayments] Already loading this filter key, skipping...', filterKey);
+      }
+    } else {
+      console.log('[ManualPayments] Filters unchanged, skipping reload. Current filterKey:', filterKey, 'Has payments:', !!payments, 'Payments count:', payments?.payments?.length || 0);
+      // If filters unchanged but we don't have data, load it
+      if (!payments && !isFetchingRef.current && currentlyLoadingFilterKeyRef.current !== filterKey) {
+        console.log('[ManualPayments] Filters unchanged but no data, loading...');
+        loadPayments(filterKey);
+        loadSummary();
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [eventId, statusFilter, methodFilter, page, startDateStr, endDateStr]);
 
   const handleDateRangeChange = (range: DateRange) => {
     setDateRange(range);
@@ -172,6 +353,19 @@ export default function ManualPaymentsClient({
         );
       })
     : payments?.payments || [];
+
+  // Debug logging for render
+  useEffect(() => {
+    console.log('[ManualPayments] Render state:', {
+      hasPayments: !!payments,
+      paymentsCount: payments?.payments?.length || 0,
+      totalCount: payments?.totalCount || 0,
+      filteredCount: filteredPayments.length,
+      loading,
+      eventId,
+      searchQuery
+    });
+  }, [payments, filteredPayments.length, loading, eventId, searchQuery]);
 
   const totalPages = payments ? Math.ceil(payments.totalCount / pageSize) : 0;
   const startItem = payments && payments.totalCount > 0 ? page * pageSize + 1 : 0;
@@ -345,6 +539,13 @@ export default function ManualPaymentsClient({
             </div>
           </div>
 
+          {/* Debug Info - Remove after fixing */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="mb-4 p-4 bg-gray-100 rounded-lg text-xs">
+              <p>Debug: payments={payments ? 'exists' : 'null'}, payments.payments={payments?.payments?.length || 0}, totalCount={payments?.totalCount || 0}, filteredCount={filteredPayments.length}, loading={loading ? 'true' : 'false'}</p>
+            </div>
+          )}
+
           {/* Payments Table */}
           {filteredPayments.length > 0 ? (
             <>
@@ -405,51 +606,66 @@ export default function ManualPaymentsClient({
                             : '-'}
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
-                          {payment.status === 'REQUESTED' && (
-                            <div className="flex gap-2">
-                              <button
-                                onClick={() => handleStatusUpdate(payment.id!, 'RECEIVED')}
-                                disabled={updatingStatus === payment.id}
-                                className="px-3 py-1 bg-green-100 hover:bg-green-200 text-green-700 font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                title="Mark as Received"
-                                type="button"
-                              >
-                                {updatingStatus === payment.id ? (
-                                  <FaSpinner className="w-4 h-4 animate-spin" />
-                                ) : (
-                                  'Mark Received'
-                                )}
-                              </button>
-                              <button
-                                onClick={() => {
-                                  const reason = prompt('Enter cancellation reason (optional):');
-                                  handleStatusUpdate(payment.id!, 'CANCELLED', reason || undefined);
-                                }}
-                                disabled={updatingStatus === payment.id}
-                                className="px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                title="Cancel Payment"
-                                type="button"
-                              >
-                                {updatingStatus === payment.id ? (
-                                  <FaSpinner className="w-4 h-4 animate-spin" />
-                                ) : (
-                                  'Cancel'
-                                )}
-                              </button>
-                            </div>
-                          )}
-                          {payment.proofOfPaymentFileUrl && (
-                            <a
-                              href={payment.proofOfPaymentFileUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg transition-colors"
-                              title="View Proof of Payment"
+                          <div className="flex flex-wrap gap-2">
+                            {/* View Details Link */}
+                            <Link
+                              href={`/admin/manual-payments/${payment.id}`}
+                              className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 hover:bg-green-200 text-green-700 font-semibold rounded-lg transition-colors"
+                              title="View Details"
                             >
-                              <FaDownload className="w-4 h-4" />
-                              Proof
-                            </a>
-                          )}
+                              <FaEye className="w-4 h-4" />
+                              View
+                            </Link>
+
+                            {/* Status Update Buttons */}
+                            {payment.status === 'REQUESTED' && (
+                              <>
+                                <button
+                                  onClick={() => handleStatusUpdate(payment.id!, 'RECEIVED')}
+                                  disabled={updatingStatus === payment.id}
+                                  className="px-3 py-1 bg-green-100 hover:bg-green-200 text-green-700 font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                  title="Mark as Received"
+                                  type="button"
+                                >
+                                  {updatingStatus === payment.id ? (
+                                    <FaSpinner className="w-4 h-4 animate-spin" />
+                                  ) : (
+                                    'Mark Received'
+                                  )}
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    const reason = prompt('Enter cancellation reason (optional):');
+                                    handleStatusUpdate(payment.id!, 'CANCELLED', reason || undefined);
+                                  }}
+                                  disabled={updatingStatus === payment.id}
+                                  className="px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                  title="Cancel Payment"
+                                  type="button"
+                                >
+                                  {updatingStatus === payment.id ? (
+                                    <FaSpinner className="w-4 h-4 animate-spin" />
+                                  ) : (
+                                    'Cancel'
+                                  )}
+                                </button>
+                              </>
+                            )}
+
+                            {/* Proof of Payment Link */}
+                            {payment.proofOfPaymentFileUrl && (
+                              <a
+                                href={payment.proofOfPaymentFileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg transition-colors"
+                                title="View Proof of Payment"
+                              >
+                                <FaDownload className="w-4 h-4" />
+                                Proof
+                              </a>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))}

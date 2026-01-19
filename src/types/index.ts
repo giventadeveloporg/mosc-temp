@@ -1502,6 +1502,15 @@ export interface ManualPaymentRequestDTO {
   voidReason?: string;
   createdAt?: string;
   updatedAt?: string;
+  // Requester information (sent to backend but may not be in response DTO)
+  requesterEmail?: string;
+  requesterName?: string;
+  requesterPhone?: string;
+  // Backend supports selectedTickets as JSON string for transaction item creation
+  // Format: '[{"ticketTypeId": 4151, "quantity": 1}, {"ticketTypeId": 4152, "quantity": 2}]'
+  selectedTickets?: string;
+  // Backend also supports cart array format (alternative to selectedTickets)
+  cart?: Array<{ ticketTypeId: number; quantity: number }>;
 }
 
 /**

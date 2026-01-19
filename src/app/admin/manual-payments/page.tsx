@@ -18,15 +18,24 @@ export default async function ManualPaymentsPage({
   let error = null;
   if (eventId) {
     try {
+      console.log('[ManualPaymentsPage SERVER] Fetching initial data for eventId:', eventId);
       const [paymentsResult, summaryResult] = await Promise.all([
         fetchManualPaymentsServer({ eventId, page: 0, pageSize: 20 }),
         fetchManualPaymentSummaryServer(eventId, startDate || undefined, endDate || undefined),
       ]);
+      console.log('[ManualPaymentsPage SERVER] Initial data fetched:', {
+        paymentsCount: paymentsResult?.payments?.length || 0,
+        totalCount: paymentsResult?.totalCount || 0,
+        summaryCount: Array.isArray(summaryResult) ? summaryResult.length : 0
+      });
       payments = paymentsResult;
       summary = summaryResult;
     } catch (err: any) {
+      console.error('[ManualPaymentsPage SERVER] Error fetching initial data:', err);
       error = err.message || 'Failed to load manual payments';
     }
+  } else {
+    console.log('[ManualPaymentsPage SERVER] No eventId provided, skipping initial fetch');
   }
 
   return (

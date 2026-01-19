@@ -1,7 +1,8 @@
 "use server";
 
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
-import type { EventTicketTransactionDTO } from '@/types';
+import { getTenantId } from '@/lib/env';
+import type { EventTicketTransactionDTO, EventDetailsDTO, ManualPaymentRequestDTO, ManualPaymentMethodType } from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -43,6 +44,8 @@ export interface SalesMetrics {
   salesByMonth: Array<{ month: string; count: number; revenue: number }>;
   revenueByPaymentMethod: Array<{ method: string; count: number; revenue: number }>;
   discountCodeUsage: Array<{ code: string; usageCount: number; totalDiscount: number }>;
+  // Manual payment status breakdown (for manual payments only)
+  manualPaymentStatusBreakdown: Array<{ status: string; count: number; revenue: number }>;
 }
 
 /**
@@ -153,9 +156,173 @@ export async function calculateSalesMetricsServer(
   const transactions: EventTicketTransactionDTO[] = await response.json();
   const allTransactions = Array.isArray(transactions) ? transactions : [];
 
-  // Filter only completed transactions (per database schema: transaction_status enum)
+  // Fetch manual payment requests to map payment methods
+  // Create mapping from transaction ID and transaction reference to payment method type
+  const manualPaymentMethodMapByTransactionId: Record<number, ManualPaymentMethodType> = {};
+  const manualPaymentMethodMapByReference: Record<string, ManualPaymentMethodType> = {};
+  try {
+    const tenantId = getTenantId();
+    const manualPaymentsUrl = `${API_BASE_URL}/api/manual-payments?eventId.equals=${eventId}&tenantId.equals=${tenantId}&size=1000`;
+    const manualPaymentsResponse = await fetchWithJwtRetry(manualPaymentsUrl, { cache: 'no-store' });
+    if (manualPaymentsResponse.ok) {
+      const manualPayments: ManualPaymentRequestDTO[] = await manualPaymentsResponse.json();
+      const manualPaymentsArray = Array.isArray(manualPayments) ? manualPayments : [];
+
+      // Create mappings:
+      // 1. Transaction ID -> payment method type (via ticketTransactionId)
+      // 2. Transaction reference -> payment method type (via "MANUAL-{id}" or "TKTN{id}" format)
+      manualPaymentsArray.forEach(payment => {
+        // Handle both field names: manualPaymentMethodType (frontend DTO) and paymentMethodType (backend response)
+        const paymentMethodType = (payment as any).manualPaymentMethodType || (payment as any).paymentMethodType;
+
+        if (payment.id && paymentMethodType) {
+          // Map transaction ID if ticketTransactionId is set (most reliable mapping)
+          if (payment.ticketTransactionId) {
+            manualPaymentMethodMapByTransactionId[payment.ticketTransactionId] = paymentMethodType as ManualPaymentMethodType;
+            console.log(`[Sales Analytics] Mapped transaction ID ${payment.ticketTransactionId} to payment method ${paymentMethodType}`);
+          }
+
+          // Map transaction reference formats: "MANUAL-{id}" or "TKTN{id}" (no hyphen in TKTN format)
+          manualPaymentMethodMapByReference[`MANUAL-${payment.id}`] = paymentMethodType as ManualPaymentMethodType;
+          if (payment.ticketTransactionId) {
+            manualPaymentMethodMapByReference[`TKTN${payment.ticketTransactionId}`] = paymentMethodType as ManualPaymentMethodType;
+          }
+
+          // Also check all transactions to find ones linked to this payment request
+          allTransactions.forEach(transaction => {
+            if (transaction.id === payment.ticketTransactionId && transaction.transactionReference) {
+              manualPaymentMethodMapByReference[transaction.transactionReference] = paymentMethodType as ManualPaymentMethodType;
+              console.log(`[Sales Analytics] Mapped transaction reference ${transaction.transactionReference} to payment method ${paymentMethodType}`);
+            }
+          });
+        }
+      });
+
+      console.log(`[Sales Analytics] Created payment method mappings: ${Object.keys(manualPaymentMethodMapByTransactionId).length} by transaction ID, ${Object.keys(manualPaymentMethodMapByReference).length} by reference`);
+    }
+  } catch (error) {
+    console.error('Error fetching manual payment requests for payment method mapping:', error);
+    // Continue without mapping - will show as "Unknown" for manual payments
+  }
+
+  // Helper function to map payment method type to display name
+  const getPaymentMethodDisplayName = (transaction: EventTicketTransactionDTO): string => {
+    // If transaction has paymentMethod set (Stripe payments), use it
+    if (transaction.paymentMethod) {
+      return transaction.paymentMethod;
+    }
+
+    // Map manual payment method types to user-friendly names (shared logic)
+    const getMethodDisplayName = (methodType: string): string => {
+      const methodNameMap: Record<string, string> = {
+        'ZELLE_MANUAL': 'Zelle',
+        'VENMO_MANUAL': 'Venmo',
+        'CASH_APP_MANUAL': 'Cash App',
+        'PAYPAL_MANUAL': 'PayPal',
+        'APPLE_PAY_MANUAL': 'Apple Pay',
+        'GOOGLE_PAY_MANUAL': 'Google Pay',
+        'CASH': 'Cash',
+        'CASH_MANUAL': 'Cash',
+        'CHECK': 'Check',
+        'CHECK_MANUAL': 'Check',
+        'WIRE_TRANSFER_MANUAL': 'Wire Transfer',
+        'ACH_MANUAL': 'ACH',
+        'OTHER_MANUAL': 'Other Manual Payment',
+      };
+      return methodNameMap[methodType] || methodType;
+    };
+
+    // For manual payments, look up payment method from manual payment request
+    // Try transaction ID first (most reliable)
+    if (transaction.id && manualPaymentMethodMapByTransactionId[transaction.id]) {
+      const methodType = manualPaymentMethodMapByTransactionId[transaction.id];
+      console.log(`[Sales Analytics] Found payment method by transaction ID ${transaction.id}: ${methodType}`);
+      return getMethodDisplayName(methodType);
+    }
+
+    // Try transaction reference as fallback
+    const transactionRef = transaction.transactionReference;
+    if (transactionRef) {
+      // Try exact match first
+      if (manualPaymentMethodMapByReference[transactionRef]) {
+        const methodType = manualPaymentMethodMapByReference[transactionRef];
+        console.log(`[Sales Analytics] Found payment method by transaction reference ${transactionRef}: ${methodType}`);
+        return getMethodDisplayName(methodType);
+      }
+
+      // Try extracting transaction ID from "TKTN{id}" format (e.g., "TKTN7508" -> 7508)
+      if (transactionRef.startsWith('TKTN')) {
+        const extractedId = parseInt(transactionRef.replace('TKTN', ''), 10);
+        if (!isNaN(extractedId) && manualPaymentMethodMapByTransactionId[extractedId]) {
+          const methodType = manualPaymentMethodMapByTransactionId[extractedId];
+          console.log(`[Sales Analytics] Found payment method by extracted transaction ID ${extractedId} from ${transactionRef}: ${methodType}`);
+          return getMethodDisplayName(methodType);
+        }
+      }
+
+      // Try extracting transaction ID from "MANUAL-{id}" format (e.g., "MANUAL-7451" -> 7451)
+      if (transactionRef.startsWith('MANUAL-')) {
+        const extractedId = parseInt(transactionRef.replace('MANUAL-', ''), 10);
+        if (!isNaN(extractedId) && manualPaymentMethodMapByTransactionId[extractedId]) {
+          const methodType = manualPaymentMethodMapByTransactionId[extractedId];
+          console.log(`[Sales Analytics] Found payment method by extracted transaction ID ${extractedId} from ${transactionRef}: ${methodType}`);
+          return getMethodDisplayName(methodType);
+        }
+      }
+    }
+
+    // Check if this is a manual payment (no Stripe fields)
+    const isManualPayment =
+      transactionRef?.startsWith('MANUAL-') ||
+      transactionRef?.startsWith('TKTN') ||
+      (!transaction.stripePaymentIntentId && !transaction.stripeCheckoutSessionId);
+
+    if (isManualPayment) {
+      console.log(`[Sales Analytics] Manual payment detected but no mapping found. Transaction ID: ${transaction.id}, Reference: ${transactionRef}`);
+      return 'Unknown Manual Payment';
+    }
+
+    return 'Unknown';
+  };
+
+  // Filter transactions by status and payment type
+  //
+  // STRIPE PAYMENT FLOW (preserved existing logic):
+  // - Status: COMPLETED immediately after successful payment
+  // - Identification: stripePaymentIntentId populated, stripeCheckoutSessionId populated
+  // - Includes: All COMPLETED transactions (Stripe payments are always COMPLETED)
+  //
+  // MANUAL PAYMENT FLOW (new support):
+  // - Status: PENDING initially, COMPLETED after admin confirmation
+  // - Identification: stripePaymentIntentId is NULL, stripeCheckoutSessionId is NULL
+  //   (Backend may use "TKTN" prefix or "MANUAL-" prefix for transactionReference)
+  // - Includes: PENDING transactions without Stripe fields (pending requests) + COMPLETED transactions (confirmed requests)
+  //
+  // This differentiation ensures:
+  // 1. Stripe payments continue to work as before (COMPLETED status check)
+  // 2. Manual payments are included in analytics (both PENDING and COMPLETED)
+  // 3. No breaking changes to existing Stripe functionality
   const confirmedTransactions = allTransactions.filter(
-    t => t.status === 'COMPLETED'
+    t => {
+      // Include COMPLETED transactions (all payment types: Stripe + confirmed Manual payments)
+      if (t.status === 'COMPLETED') return true;
+
+      // Include PENDING transactions that are manual payments only
+      // Stripe payments never have PENDING status (they're COMPLETED immediately)
+      // Manual payments are identified by:
+      //   1. transaction_reference starting with "MANUAL-" (if backend uses this format), OR
+      //   2. stripePaymentIntentId is null/empty AND stripeCheckoutSessionId is null/empty
+      //      (Stripe payments always populate these fields, manual payments don't)
+      const isManualPayment =
+        t.transactionReference?.startsWith('MANUAL-') ||
+        (!t.stripePaymentIntentId && !t.stripeCheckoutSessionId);
+
+      if (t.status === 'PENDING' && isManualPayment) {
+        return true;
+      }
+
+      return false;
+    }
   );
 
   // Calculate metrics
@@ -170,18 +337,33 @@ export async function calculateSalesMetricsServer(
   const totalRevenue = confirmedTransactions.reduce((sum, t) => sum + (t.finalAmount || 0), 0);
 
   // Net Revenue = Sum of netPayoutAmount (what event organizer receives after Stripe fees and tax)
-  // If netPayoutAmount is available from batch job, use it directly
-  // Otherwise, calculate as: finalAmount - stripeFeeAmount - stripeAmountTax
+  //
+  // STRIPE PAYMENTS:
+  // - Uses netPayoutAmount from batch job if available (most accurate)
+  // - Otherwise: finalAmount - stripeFeeAmount - stripeAmountTax
+  // - Stripe fees and taxes are deducted from final amount
+  //
+  // MANUAL PAYMENTS:
+  // - stripeFeeAmount = NULL/0 (no Stripe fees)
+  // - stripeAmountTax = NULL/0 (no Stripe tax)
+  // - netPayoutAmount = NULL (not applicable)
+  // - Net Revenue = finalAmount - 0 - 0 = finalAmount (correct - no fees deducted)
+  //
+  // This calculation correctly handles both payment types:
+  // - Stripe: Deducts fees and taxes
+  // - Manual: No fees deducted (fee-free payment method)
   const netRevenue = confirmedTransactions.reduce((sum, t) => {
     if (t.netPayoutAmount !== undefined && t.netPayoutAmount !== null) {
-      // Use stored netPayoutAmount from batch job (most accurate)
+      // Use stored netPayoutAmount from batch job (most accurate - Stripe payments only)
       return sum + t.netPayoutAmount;
     } else {
       // Fallback calculation if netPayoutAmount not available
       const finalAmount = t.finalAmount || 0;
-      const stripeFee = t.stripeFeeAmount || 0;
-      const stripeTax = t.stripeAmountTax || 0;
+      const stripeFee = t.stripeFeeAmount || 0;  // NULL/0 for manual payments
+      const stripeTax = t.stripeAmountTax || 0;  // NULL/0 for manual payments
       // Net revenue = final_amount - stripe_fee_amount - stripe_amount_tax
+      // For Stripe: Deducts fees and taxes
+      // For Manual: finalAmount - 0 - 0 = finalAmount (correct)
       return sum + (finalAmount - stripeFee - stripeTax);
     }
   }, 0);
@@ -189,10 +371,20 @@ export async function calculateSalesMetricsServer(
   // Net Revenue Before Tax = Sum of (finalAmount - stripeFeeAmount) per transaction
   // Formula: net_revenue_before_tax = final_amount - stripe_fee_amount
   // This represents what you'd receive if tax wasn't part of the transaction
+  //
+  // STRIPE PAYMENTS:
+  // - Net Revenue Before Tax = finalAmount - stripeFeeAmount
+  // - Stripe processing fees are deducted
+  //
+  // MANUAL PAYMENTS:
+  // - stripeFeeAmount = NULL/0 (no Stripe fees)
+  // - Net Revenue Before Tax = finalAmount - 0 = finalAmount (correct - no fees)
   const netRevenueBeforeTax = confirmedTransactions.reduce((sum, t) => {
     const finalAmount = t.finalAmount || 0;
-    const stripeFee = t.stripeFeeAmount || 0;
+    const stripeFee = t.stripeFeeAmount || 0;  // NULL/0 for manual payments
     // Net revenue before tax = final_amount - stripe_fee_amount
+    // For Stripe: Deducts Stripe fees
+    // For Manual: finalAmount - 0 = finalAmount (correct)
     return sum + (finalAmount - stripeFee);
   }, 0);
   const averageTicketPrice = totalTransactions > 0 ? totalRevenue / totalTransactions : 0;
@@ -260,7 +452,7 @@ export async function calculateSalesMetricsServer(
   // Revenue by payment method
   const revenueByPaymentMethod: Record<string, { count: number; revenue: number }> = {};
   confirmedTransactions.forEach(t => {
-    const method = t.paymentMethod || 'Unknown';
+    const method = getPaymentMethodDisplayName(t);
     if (!revenueByPaymentMethod[method]) {
       revenueByPaymentMethod[method] = { count: 0, revenue: 0 };
     }
@@ -306,6 +498,45 @@ export async function calculateSalesMetricsServer(
     .map(([month, data]) => ({ month, ...data }))
     .sort((a, b) => a.month.localeCompare(b.month));
 
+  // Manual payment status breakdown
+  // Filter to only manual payments (identified by missing Stripe fields)
+  const manualPaymentTransactions = allTransactions.filter(t => {
+    const isManualPayment =
+      t.transactionReference?.startsWith('MANUAL-') ||
+      (!t.stripePaymentIntentId && !t.stripeCheckoutSessionId);
+    return isManualPayment;
+  });
+
+  // Group by status
+  const statusBreakdownMap: Record<string, { count: number; revenue: number }> = {};
+  manualPaymentTransactions.forEach(t => {
+    const status = t.status || 'UNKNOWN';
+    if (!statusBreakdownMap[status]) {
+      statusBreakdownMap[status] = { count: 0, revenue: 0 };
+    }
+    statusBreakdownMap[status].count += 1;
+    statusBreakdownMap[status].revenue += t.finalAmount || 0;
+  });
+
+  // Convert to array and sort by status (PENDING, RECEIVED, CONFIRMED, CANCELLED, REFUNDED, etc.)
+  const statusOrder: Record<string, number> = {
+    'PENDING': 1,
+    'REQUESTED': 2,
+    'RECEIVED': 3,
+    'CONFIRMED': 4,
+    'COMPLETED': 5,
+    'CANCELLED': 6,
+    'VOIDED': 7,
+    'REFUNDED': 8,
+  };
+  const manualPaymentStatusBreakdown = Object.entries(statusBreakdownMap)
+    .map(([status, data]) => ({ status, ...data }))
+    .sort((a, b) => {
+      const orderA = statusOrder[a.status] || 999;
+      const orderB = statusOrder[b.status] || 999;
+      return orderA - orderB;
+    });
+
   return {
     eventId: parseInt(eventId, 10),
     totalTransactions,
@@ -328,13 +559,36 @@ export async function calculateSalesMetricsServer(
       ...data,
     })),
     discountCodeUsage,
+    manualPaymentStatusBreakdown,
   };
+}
+
+/**
+ * Fetch event details to determine payment flow mode
+ */
+export async function fetchEventDetailsForPaymentFlow(eventId: number): Promise<EventDetailsDTO | null> {
+  try {
+    const tenantId = getTenantId();
+    const url = `${API_BASE_URL}/api/event-details/${eventId}?tenantId.equals=${tenantId}`;
+    const res = await fetchWithJwtRetry(url, { cache: 'no-store' });
+    if (!res.ok) {
+      console.error(`Failed to fetch event details for eventId ${eventId}:`, res.status);
+      return null;
+    }
+    return await res.json();
+  } catch (error) {
+    console.error(`Error fetching event details for eventId ${eventId}:`, error);
+    return null;
+  }
 }
 
 /**
  * Trigger Stripe Fees and Tax Update Batch Job
  * This server action calls the backend batch job API to retrieve missing Stripe fee and tax data
  * and update transaction records asynchronously.
+ *
+ * NOTE: This batch job is ONLY for Stripe payments. It filters for transactions with stripe_payment_intent_id.
+ * Manual payments do not need this batch job as they don't have Stripe fees.
  *
  * @param request - Batch job request parameters (all optional)
  * @returns Response with job ID and status (HTTP 202 Accepted)
