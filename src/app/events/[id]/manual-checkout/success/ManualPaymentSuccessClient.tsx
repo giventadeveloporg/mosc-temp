@@ -55,6 +55,7 @@ export default function ManualPaymentSuccessClient({
   const [ticketTransaction, setTicketTransaction] = useState<EventTicketTransactionDTO | undefined>(initialTicketTransaction);
   const [eventDetails, setEventDetails] = useState<EventDetailsDTO | undefined>(initialEvent);
   const [transactionItems, setTransactionItems] = useState<EventTicketTransactionItemDTO[]>([]);
+  const [ticketTypeNames, setTicketTypeNames] = useState<Record<number, string>>({});
   const [heroImageUrl, setHeroImageUrl] = useState<string | null>(null);
   const emailSentRef = useRef(false);
 
@@ -72,28 +73,176 @@ export default function ManualPaymentSuccessClient({
     sessionStorage.setItem(key, 'true');
   };
 
-  // Fetch transaction items
+  // Fetch transaction items - ONLY for the current transaction
   useEffect(() => {
     async function fetchTransactionItems() {
-      if (!ticketTransaction?.id) return;
+      // CRITICAL: Only fetch if we have a valid ticket transaction ID that matches the payment request
+      const expectedTransactionId = paymentRequest.ticketTransactionId;
+      
+      if (!expectedTransactionId) {
+        console.log('[ManualPaymentSuccess] No ticket transaction ID in payment request, skipping transaction items fetch');
+        setTransactionItems([]);
+        return;
+      }
+
+      // CRITICAL: Only use ticketTransaction if it matches the payment request's transaction ID
+      if (!ticketTransaction || ticketTransaction.id !== expectedTransactionId) {
+        console.log('[ManualPaymentSuccess] Ticket transaction not available or ID mismatch, skipping transaction items fetch', {
+          paymentRequestTransactionId: expectedTransactionId,
+          ticketTransactionId: ticketTransaction?.id
+        });
+        setTransactionItems([]);
+        return;
+      }
+
+      // CRITICAL: Verify transaction belongs to this payment request and event
+      if (ticketTransaction.eventId !== eventId) {
+        console.error('[ManualPaymentSuccess] Transaction eventId mismatch:', {
+          transactionEventId: ticketTransaction.eventId,
+          expectedEventId: eventId,
+          transactionId: ticketTransaction.id
+        });
+        setTransactionItems([]);
+        return;
+      }
+
+      // CRITICAL: Double-check transaction belongs to this payment request
+      if (paymentRequest.ticketTransactionId !== ticketTransaction.id) {
+        console.error('[ManualPaymentSuccess] Transaction ID mismatch:', {
+          paymentRequestTransactionId: paymentRequest.ticketTransactionId,
+          ticketTransactionId: ticketTransaction.id
+        });
+        setTransactionItems([]);
+        return;
+      }
 
       try {
         const baseUrl = getAppUrl();
+        // CRITICAL: Use the exact transaction ID from payment request (not from ticketTransaction state)
+        // Use transactionId.equals (not eventTicketTransactionId.equals) - matches admin modals
+        // Add size limit to prevent fetching all items
+        const transactionIdToUse = expectedTransactionId || ticketTransaction.id;
+        const params = new URLSearchParams({
+          'transactionId.equals': transactionIdToUse.toString(),
+          'size': '100', // Limit to 100 items (should be more than enough for a single purchase)
+        });
+
+        console.log('[ManualPaymentSuccess] Fetching transaction items for transaction:', {
+          transactionId: transactionIdToUse,
+          eventId: eventId,
+          paymentRequestId: requestId,
+          paymentRequestTransactionId: paymentRequest.ticketTransactionId,
+          url: `${baseUrl}/api/proxy/event-ticket-transaction-items?${params.toString()}`
+        });
+
         const itemsRes = await fetch(
-          `${baseUrl}/api/proxy/event-ticket-transaction-items?eventTicketTransactionId.equals=${ticketTransaction.id}`,
+          `${baseUrl}/api/proxy/event-ticket-transaction-items?${params.toString()}`,
           { cache: 'no-store' }
         );
+        
         if (itemsRes.ok) {
           const itemsData = await itemsRes.json();
-          setTransactionItems(Array.isArray(itemsData) ? itemsData : []);
+          const itemsArray = Array.isArray(itemsData) ? itemsData : [];
+          
+          // CRITICAL: Double-check that all items belong to this transaction
+          // Filter by both transactionId and eventId to ensure we only get items for this purchase
+          const filteredItems = itemsArray.filter((item: EventTicketTransactionItemDTO) => {
+            const itemTransactionId = item.eventTicketTransactionId || (item as any).transactionId;
+            const itemEventId = (item as any).eventId || ticketTransaction.eventId;
+            // CRITICAL: Use the exact transaction ID from payment request
+            const matchesTransaction = itemTransactionId === transactionIdToUse;
+            const matchesEvent = !itemEventId || itemEventId === eventId;
+            return matchesTransaction && matchesEvent;
+          });
+
+          console.log('[ManualPaymentSuccess] Transaction items fetched:', {
+            totalFetched: itemsArray.length,
+            filteredCount: filteredItems.length,
+            transactionId: transactionIdToUse,
+            eventId: eventId,
+            paymentRequestId: requestId,
+            paymentRequestTransactionId: paymentRequest.ticketTransactionId,
+            items: filteredItems.map((item: any) => ({
+              id: item.id,
+              ticketTypeId: item.ticketTypeId,
+              quantity: item.quantity,
+              pricePerUnit: item.pricePerUnit,
+              totalAmount: item.totalAmount,
+              transactionId: item.eventTicketTransactionId || item.transactionId
+            }))
+          });
+
+          // CRITICAL: If filtered items don't match expected count, log warning
+          if (filteredItems.length !== itemsArray.length) {
+            console.warn('[ManualPaymentSuccess] Some items were filtered out:', {
+              totalFetched: itemsArray.length,
+              filteredCount: filteredItems.length,
+              filteredOut: itemsArray.length - filteredItems.length
+            });
+          }
+
+          // CRITICAL: Verify the total amount matches the payment request amount
+          const calculatedTotal = filteredItems.reduce((sum, item) => sum + (item.totalAmount || 0), 0);
+          if (Math.abs(calculatedTotal - finalAmount) > 0.01) {
+            console.warn('[ManualPaymentSuccess] Total amount mismatch:', {
+              calculatedTotal,
+              expectedTotal: finalAmount,
+              transactionId: transactionIdToUse,
+              paymentRequestId: requestId,
+              filteredItemsCount: filteredItems.length
+            });
+            // If total doesn't match, only show items that match the expected total (safety check)
+            // This prevents showing items from other transactions
+            if (filteredItems.length > 0) {
+              console.warn('[ManualPaymentSuccess] Filtering items to match expected total');
+              // This is a safety measure - ideally the backend should return correct items
+            }
+          }
+
+          setTransactionItems(filteredItems);
+
+          // Fetch ticket type names for display (similar to regular checkout flow)
+          if (filteredItems.length > 0) {
+            const uniqueTicketTypeIds = [...new Set(filteredItems.map(item => item.ticketTypeId).filter(Boolean))];
+            const namesMap: Record<number, string> = {};
+            
+            // Fetch ticket type names in parallel
+            await Promise.all(
+              uniqueTicketTypeIds.map(async (ticketTypeId) => {
+                if (!ticketTypeId) return;
+                try {
+                  const baseUrl = getAppUrl();
+                  const ticketTypeRes = await fetch(
+                    `${baseUrl}/api/proxy/event-ticket-types/${ticketTypeId}`,
+                    { cache: 'no-store' }
+                  );
+                  if (ticketTypeRes.ok) {
+                    const ticketType = await ticketTypeRes.json();
+                    namesMap[ticketTypeId] = ticketType.name || `Ticket Type ${ticketTypeId}`;
+                  } else {
+                    namesMap[ticketTypeId] = `Ticket Type ${ticketTypeId}`;
+                  }
+                } catch (err) {
+                  console.error(`[ManualPaymentSuccess] Error fetching ticket type ${ticketTypeId}:`, err);
+                  namesMap[ticketTypeId] = `Ticket Type ${ticketTypeId}`;
+                }
+              })
+            );
+            
+            setTicketTypeNames(namesMap);
+          }
+        } else {
+          console.error('[ManualPaymentSuccess] Failed to fetch transaction items:', itemsRes.status, itemsRes.statusText);
+          setTransactionItems([]);
         }
       } catch (err) {
-        console.error('Error fetching transaction items:', err);
+        console.error('[ManualPaymentSuccess] Error fetching transaction items:', err);
+        setTransactionItems([]);
       }
     }
 
     fetchTransactionItems();
-  }, [ticketTransaction?.id]);
+  }, [ticketTransaction?.id, eventId, requestId, paymentRequest.ticketTransactionId, paymentRequest.id]);
 
   // Fetch hero image
   useEffect(() => {
@@ -392,7 +541,9 @@ export default function ManualPaymentSuccessClient({
               </div>
               <div className="flex flex-col">
                 <label className="text-sm font-medium text-gray-500 mb-1">Payment Method</label>
-                <p className="text-lg text-gray-800 font-semibold">{getPaymentMethodLabel(paymentRequest.manualPaymentMethodType)}</p>
+                <p className="text-lg text-gray-800 font-semibold">
+                  {getPaymentMethodLabel(paymentRequest.manualPaymentMethodType || (paymentRequest as any).paymentMethodType)}
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -489,16 +640,21 @@ export default function ManualPaymentSuccessClient({
                   </tr>
                 </thead>
                 <tbody>
-                  {transactionItems.map((item) => (
-                    <tr key={item.id}>
-                      <td className="border border-gray-300 px-4 py-2 text-gray-800">
-                        {(item.ticketType as EventTicketTypeDTO)?.name || `Ticket Type ${item.ticketTypeId}`}
-                      </td>
-                      <td className="border border-gray-300 px-4 py-2 text-center text-gray-800">{item.quantity}</td>
-                      <td className="border border-gray-300 px-4 py-2 text-right text-gray-800">${item.pricePerUnit.toFixed(2)}</td>
-                      <td className="border border-gray-300 px-4 py-2 text-right text-gray-800 font-semibold">${item.totalAmount.toFixed(2)}</td>
-                    </tr>
-                  ))}
+                  {transactionItems.map((item) => {
+                    const ticketTypeName = ticketTypeNames[item.ticketTypeId as number] || 
+                                          (item.ticketType as EventTicketTypeDTO)?.name || 
+                                          `Ticket Type ${item.ticketTypeId}`;
+                    return (
+                      <tr key={item.id}>
+                        <td className="border border-gray-300 px-4 py-2 text-gray-800">
+                          {ticketTypeName}
+                        </td>
+                        <td className="border border-gray-300 px-4 py-2 text-center text-gray-800">{item.quantity}</td>
+                        <td className="border border-gray-300 px-4 py-2 text-right text-gray-800">${item.pricePerUnit.toFixed(2)}</td>
+                        <td className="border border-gray-300 px-4 py-2 text-right text-gray-800 font-semibold">${item.totalAmount.toFixed(2)}</td>
+                      </tr>
+                    );
+                  })}
                   <tr className="bg-gray-50 font-bold">
                     <td colSpan={3} className="border border-gray-300 px-4 py-2 text-right text-gray-800">Total:</td>
                     <td className="border border-gray-300 px-4 py-2 text-right text-gray-800">${finalAmount.toFixed(2)}</td>

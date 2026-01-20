@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import DateRangeSelector, { type DateRange } from '@/components/admin/DateRangeSelector';
 import EventSearchSelector from '@/components/admin/EventSearchSelector';
@@ -33,7 +33,8 @@ export default function SalesAnalyticsClient({
   const [metrics, setMetrics] = useState<SalesMetrics | null>(initialMetrics);
   const [salesData, setSalesData] = useState<EventTicketTransactionDTO[]>([]);
   const [totalCount, setTotalCount] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [metricsLoading, setMetricsLoading] = useState(false);
+  const [salesDataLoading, setSalesDataLoading] = useState(false);
   const [error, setError] = useState<string | null>(initialError);
   const [page, setPage] = useState(0);
   const [pageSize] = useState(20);
@@ -72,6 +73,10 @@ export default function SalesAnalyticsClient({
   const shouldShowStripeBatchJob = isStripeOnly || isHybridStripeOnly;
   const shouldShowManualPaymentMessage = isManualPaymentOnly || isHybridWithManual;
 
+  // Memoize date range strings to avoid unnecessary re-renders
+  const startDateStr = useMemo(() => dateRange.startDate || '', [dateRange.startDate]);
+  const endDateStr = useMemo(() => dateRange.endDate || '', [dateRange.endDate]);
+
   useEffect(() => {
     if (eventId) {
       loadMetrics();
@@ -79,8 +84,15 @@ export default function SalesAnalyticsClient({
       loadEventDetails();
     } else {
       setEventDetails(null);
+      setMetrics(null);
+      setSalesData([]);
+      setTotalCount(0);
     }
-  }, [eventId, dateRange, page]);
+    // Cleanup function to prevent race conditions
+    return () => {
+      // Cancel any pending operations if component unmounts
+    };
+  }, [eventId, startDateStr, endDateStr, page]);
 
   const loadEventDetails = async () => {
     if (!eventId) return;
@@ -101,26 +113,44 @@ export default function SalesAnalyticsClient({
 
   const loadMetrics = async () => {
     if (!eventId) return;
-    setLoading(true);
+    setMetricsLoading(true);
     setError(null);
+    
+    // Timeout protection (30 seconds max)
+    const timeoutId = setTimeout(() => {
+      setMetricsLoading(false);
+      setError('Request timed out. Please try again.');
+    }, 30000);
+
     try {
       const data = await calculateSalesMetricsServer(
         eventId,
         dateRange.startDate || undefined,
         dateRange.endDate || undefined
       );
+      clearTimeout(timeoutId);
       setMetrics(data);
     } catch (err: any) {
+      clearTimeout(timeoutId);
+      console.error('[SalesAnalyticsClient] Error loading metrics:', err);
       setError(err.message || 'Failed to load sales metrics');
     } finally {
-      setLoading(false);
+      clearTimeout(timeoutId);
+      setMetricsLoading(false);
     }
   };
 
   const loadSalesData = async () => {
     if (!eventId) return;
-    setLoading(true);
+    setSalesDataLoading(true);
     setError(null);
+    
+    // Timeout protection (30 seconds max)
+    const timeoutId = setTimeout(() => {
+      setSalesDataLoading(false);
+      setError('Request timed out. Please try again.');
+    }, 30000);
+
     try {
       // Fetch all transactions (no status filter) to include PENDING manual payments
       const result = await fetchSalesDataServer({
@@ -142,10 +172,10 @@ export default function SalesAnalyticsClient({
       // MANUAL PAYMENT FLOW (new support):
       // - Includes: PENDING transactions without Stripe fields (pending requests)
       // - Also includes: COMPLETED transactions (after admin confirmation)
-      // - Manual payments are identified by:
-      //   1. transaction_reference starting with "MANUAL-" (if backend uses this format), OR
-      //   2. stripePaymentIntentId is null/empty AND stripeCheckoutSessionId is null/empty
-      //      (Stripe payments always populate these fields, manual payments don't)
+      // - Manual payments are identified by transactionReference prefix:
+      //   1. transaction_reference starting with "MANUAL-" (e.g., "MANUAL-7451"), OR
+      //   2. transaction_reference starting with "TKTN" (e.g., "TKTN7508")
+      //   (Stripe payments have different transactionReference formats or numeric IDs)
       //
       // This ensures:
       // 1. Existing Stripe payment analytics continue to work unchanged
@@ -154,12 +184,13 @@ export default function SalesAnalyticsClient({
       const filteredTransactions = result.transactions.filter(t => {
         // Include COMPLETED transactions (all payment types: Stripe + confirmed Manual payments)
         if (t.status === 'COMPLETED') return true;
+        
         // Include PENDING transactions that are manual payments only
         // Stripe payments never have PENDING status (they're COMPLETED immediately)
-        // Manual payments are identified by missing Stripe fields (stripePaymentIntentId and stripeCheckoutSessionId are null)
+        // Manual payments are identified by transactionReference prefix (MANUAL- or TKTN)
         const isManualPayment =
           t.transactionReference?.startsWith('MANUAL-') ||
-          (!t.stripePaymentIntentId && !t.stripeCheckoutSessionId);
+          t.transactionReference?.startsWith('TKTN');
 
         if (t.status === 'PENDING' && isManualPayment) {
           return true;
@@ -167,13 +198,17 @@ export default function SalesAnalyticsClient({
         return false;
       });
 
+      clearTimeout(timeoutId);
       setSalesData(filteredTransactions);
       // Update total count to reflect filtered results
       setTotalCount(filteredTransactions.length);
     } catch (err: any) {
+      clearTimeout(timeoutId);
+      console.error('[SalesAnalyticsClient] Error loading sales data:', err);
       setError(err.message || 'Failed to load sales data');
     } finally {
-      setLoading(false);
+      clearTimeout(timeoutId);
+      setSalesDataLoading(false);
     }
   };
 
@@ -562,7 +597,7 @@ export default function SalesAnalyticsClient({
       )}
 
       {/* Loading State */}
-      {loading && (
+      {metricsLoading && (
         <div className="flex items-center justify-center py-8">
           <FaSpinner className="w-8 h-8 text-blue-500 animate-spin" />
           <span className="ml-3 text-gray-600">Loading sales analytics...</span>
@@ -577,7 +612,7 @@ export default function SalesAnalyticsClient({
       )}
 
       {/* Metrics Cards */}
-      {metrics && !loading && (
+      {metrics && !metricsLoading && (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Total Revenue */}
@@ -672,7 +707,9 @@ export default function SalesAnalyticsClient({
           </div>
 
           {/* Revenue by Payment Method */}
-          {metrics.revenueByPaymentMethod.length > 0 && (
+          {/* Only show for manual payment flows or hybrid flows with manual payments */}
+          {/* For Stripe-only flows, payment methods are not meaningfully differentiated (showing as pm_xxx IDs) */}
+          {metrics.revenueByPaymentMethod.length > 0 && !isStripeOnly && !isHybridStripeOnly && (
             <div className="bg-white border-2 border-gray-200 rounded-lg p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Revenue by Payment Method</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -895,7 +932,12 @@ export default function SalesAnalyticsClient({
           )}
 
           {/* Manual Payment Status Breakdown */}
-          {metrics.manualPaymentStatusBreakdown && metrics.manualPaymentStatusBreakdown.length > 0 && (
+          {/* Only show for manual payment flows or hybrid flows with manual payments */}
+          {/* Stripe-only flows don't have manual payments, so this section doesn't apply */}
+          {metrics.manualPaymentStatusBreakdown && 
+           metrics.manualPaymentStatusBreakdown.length > 0 && 
+           !isStripeOnly && 
+           !isHybridStripeOnly && (
             <div className="bg-white border-2 border-gray-200 rounded-lg p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Manual Payment Status Breakdown</h3>
               <p className="text-sm text-gray-600 mb-4">
@@ -1157,7 +1199,7 @@ export default function SalesAnalyticsClient({
                   {/* Previous Button */}
                   <button
                     onClick={() => setPage(Math.max(0, page - 1))}
-                    disabled={page === 0 || loading}
+                    disabled={page === 0 || salesDataLoading}
                     className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
                     title="Previous Page"
                     aria-label="Previous Page"
@@ -1179,7 +1221,7 @@ export default function SalesAnalyticsClient({
                   {/* Next Button */}
                   <button
                     onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
-                    disabled={page >= totalPages - 1 || loading}
+                    disabled={page >= totalPages - 1 || salesDataLoading}
                     className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
                     title="Next Page"
                     aria-label="Next Page"
@@ -1214,7 +1256,7 @@ export default function SalesAnalyticsClient({
             </>
           ) : (
             <div className="text-center py-8 text-gray-500">
-              {loading ? 'Loading sales data...' : 'No sales data found for this event.'}
+              {salesDataLoading ? 'Loading sales data...' : 'No sales data found for this event.'}
             </div>
           )}
         </div>

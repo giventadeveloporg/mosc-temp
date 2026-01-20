@@ -29,6 +29,11 @@ export default function EventSearchSelector({
   const [hasInitializedFromSelectedId, setHasInitializedFromSelectedId] = useState(false);
 
   const loadEvents = useCallback(async () => {
+    // Don't show loading if we're just initializing from selectedEventId
+    if (selectedEventId && !hasInitializedFromSelectedId) {
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {
@@ -69,7 +74,7 @@ export default function EventSearchSelector({
     } finally {
       setLoading(false);
     }
-  }, [searchField, searchId, searchTitle, searchCaption, searchStartDate, searchEndDate, searchAdmissionType, sort]);
+  }, [searchField, searchId, searchTitle, searchCaption, searchStartDate, searchEndDate, searchAdmissionType, sort, selectedEventId, hasInitializedFromSelectedId]);
 
   // Initialize search fields when selectedEventId is provided (from URL query params)
   useEffect(() => {
@@ -78,8 +83,13 @@ export default function EventSearchSelector({
       setSearchField('id');
       setSearchId(selectedEventId);
       setHasInitializedFromSelectedId(true);
+      // Load the event immediately when eventId is provided from URL
+      // This ensures the event appears in the list without showing "Loading events..." unnecessarily
+      if (selectedEventId) {
+        loadEvents();
+      }
     }
-  }, [selectedEventId, hasInitializedFromSelectedId]);
+  }, [selectedEventId, hasInitializedFromSelectedId, loadEvents]);
 
   useEffect(() => {
     // Skip if we're initializing from selectedEventId (handled by the effect above)
@@ -101,7 +111,10 @@ export default function EventSearchSelector({
       return () => clearTimeout(timer);
     } else {
       // Clear events if no search criteria
-      setEvents([]);
+      // BUT: If we have a selectedEventId, don't clear - we want to show it
+      if (!selectedEventId) {
+        setEvents([]);
+      }
     }
   }, [searchField, searchTitle, searchId, searchCaption, searchStartDate, searchEndDate, searchAdmissionType, sort, selectedEventId, hasInitializedFromSelectedId, loadEvents]);
 

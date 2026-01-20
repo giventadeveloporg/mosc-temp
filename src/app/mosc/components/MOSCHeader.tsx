@@ -1,23 +1,70 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import Icon from './ui/Icon';
 
+/**
+ * Orthodox Cross SVG Component
+ * A decorative element inspired by traditional Orthodox iconography
+ */
+const OrthodoxCross = ({ className = '' }: { className?: string }) => (
+  <svg
+    viewBox="0 0 24 32"
+    className={className}
+    fill="currentColor"
+    aria-hidden="true"
+  >
+    <path d="M10 0h4v4h6v4h-6v4h-4V8H4V4h6V0zm0 12h4v20h-4V12z" />
+    <path d="M6 22l3 2-3 2v-4zm12 0v4l-3-2 3-2z" opacity="0.7" />
+  </svg>
+);
+
+/**
+ * Decorative Border Pattern
+ * Inspired by Byzantine manuscript illumination
+ */
+const OrnamentalDivider = () => (
+  <div className="flex items-center justify-center gap-3 py-1">
+    <div className="h-px w-8 bg-gradient-to-r from-transparent via-primary/40 to-primary/60" />
+    <div className="w-1.5 h-1.5 rotate-45 bg-primary/50" />
+    <div className="h-px w-16 bg-primary/40" />
+    <OrthodoxCross className="w-3 h-4 text-primary/60" />
+    <div className="h-px w-16 bg-primary/40" />
+    <div className="w-1.5 h-1.5 rotate-45 bg-primary/50" />
+    <div className="h-px w-8 bg-gradient-to-l from-transparent via-primary/40 to-primary/60" />
+  </div>
+);
+
 const MOSCHeader = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
 
+  // Track scroll position for header shadow effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
+
   const navigationItems = [
-    { name: 'THE CATHOLICATE', href: '/mosc/catholicate' },
-    { name: 'ADMINISTRATION', href: '/mosc/administration' },
-    { name: 'THE CHURCH', href: '/mosc/the-church' },
-    { name: 'HOLY SYNOD', href: '/mosc/holy-synod' },
-    { name: 'ECUMENICAL', href: '/mosc/ecumenical' },
-    { name: 'DIOCESES', href: '/mosc/dioceses' },
-    { name: 'SAINTS', href: '/mosc/saints' },
+    { name: 'The Catholicate', href: '/mosc/catholicate' },
+    { name: 'Administration', href: '/mosc/administration' },
+    { name: 'The Church', href: '/mosc/the-church' },
+    { name: 'Holy Synod', href: '/mosc/holy-synod' },
+    { name: 'Ecumenical', href: '/mosc/ecumenical' },
+    { name: 'Dioceses', href: '/mosc/dioceses' },
+    { name: 'Saints', href: '/mosc/saints' },
   ];
 
   const quickLinks: Array<{ name: string; href: string; external?: boolean }> = [
@@ -38,108 +85,226 @@ const MOSCHeader = () => {
   };
 
   return (
-    <header className="bg-card border-b border-border overflow-hidden">
+    <header
+      className={`
+        bg-card border-b border-border overflow-hidden sticky top-0 z-50
+        reverent-transition
+        ${isScrolled ? 'sacred-shadow-lg' : ''}
+      `}
+    >
+      {/* Ornamental Top Border - Thin gold accent line */}
+      <div className="h-1 bg-gradient-to-r from-primary/20 via-accent to-primary/20" />
+
       {/* Main Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-0 pt-0">
-        <div className="flex items-center justify-between py-0 -mb-3 -mt-2">
-          {/* Logo */}
-          <div className="flex items-center space-x-3">
-            <Link href="/mosc" className="flex items-center space-x-2 group" style={{ background: 'transparent' }}>
-              <div className="w-36 h-[92px] sm:w-42 sm:h-[112px] md:w-52 md:h-[140px] lg:w-72 lg:h-[192px] rounded-lg flex items-center justify-center group-hover:reverent-hover reverent-transition overflow-hidden" style={{ background: 'transparent' }}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between py-3 lg:py-4">
+
+          {/* Logo Section */}
+          <Link
+            href="/mosc"
+            className="flex items-center group focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-lg"
+            aria-label="Malankara Orthodox Syrian Church - Home"
+          >
+            <div className="relative">
+              {/* Logo Container with subtle glow on hover */}
+              <div className="
+                w-32 h-[80px] sm:w-40 sm:h-[100px] md:w-48 md:h-[120px] lg:w-64 lg:h-[160px]
+                rounded-lg flex items-center justify-center
+                reverent-transition overflow-hidden
+                group-hover:scale-[1.02]
+              ">
                 <Image
                   src="/images/logos/Current_Edits/MOSC-Header-Logo1.png"
-                  alt="MOSC Logo"
-                  width={288}
-                  height={192}
-                  className="w-full h-full object-contain"
+                  alt="Malankara Orthodox Syrian Church"
+                  width={256}
+                  height={160}
+                  className="w-full h-full object-contain drop-shadow-sm"
                   priority
-                  style={{ background: 'transparent' }}
                 />
               </div>
-            </Link>
-          </div>
+            </div>
+          </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-1" role="navigation" aria-label="Main navigation">
-            {navigationItems.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`px-3 py-1.5 text-xs font-medium rounded-lg reverent-transition ${isActive(item.href)
-                  ? 'bg-primary text-white'
-                  : 'text-foreground hover:bg-muted hover:text-foreground'
-                  }`}
-              >
-                {item.name}
-              </Link>
-            ))}
+          <nav
+            className="hidden lg:flex items-center"
+            role="navigation"
+            aria-label="Primary navigation"
+          >
+            <ul className="flex items-center gap-1">
+              {navigationItems.map((item, index) => (
+                <li key={item.name}>
+                  <Link
+                    href={item.href}
+                    className={`
+                      relative px-4 py-2.5 text-sm font-body font-medium tracking-wide
+                      rounded-lg reverent-transition
+                      focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1
+                      ${isActive(item.href)
+                        ? 'bg-primary text-primary-foreground sacred-shadow-sm'
+                        : 'text-foreground hover:bg-muted hover:text-accent'
+                      }
+                    `}
+                    aria-current={isActive(item.href) ? 'page' : undefined}
+                  >
+                    <span className="relative z-10">{item.name}</span>
+                    {/* Active indicator dot */}
+                    {isActive(item.href) && (
+                      <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary-foreground/70 rounded-full" />
+                    )}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </nav>
 
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="lg:hidden p-1.5 rounded-lg hover:bg-muted reverent-transition flex items-center justify-center"
-            aria-label="Toggle mobile menu"
+            className={`
+              lg:hidden p-3 rounded-lg reverent-transition
+              focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
+              ${isMobileMenuOpen
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted/50 text-foreground hover:bg-muted'
+              }
+            `}
+            aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
             aria-expanded={isMobileMenuOpen}
+            aria-controls="mobile-navigation"
           >
-            <Icon name="menu" size={18} className="text-foreground" />
+            {isMobileMenuOpen ? (
+              <Icon name="close" size={22} className="reverent-transition" />
+            ) : (
+              <Icon name="menu" size={22} className="reverent-transition" />
+            )}
           </button>
         </div>
 
-        {/* Mobile Navigation */}
-        {isMobileMenuOpen && (
-          <div className="lg:hidden border-t border-border py-2">
-            <nav className="space-y-1" role="navigation" aria-label="Mobile navigation">
+        {/* Mobile Navigation Panel */}
+        <div
+          id="mobile-navigation"
+          className={`
+            lg:hidden overflow-y-auto reverent-transition
+            ${isMobileMenuOpen ? 'max-h-[calc(100vh-120px)] opacity-100 pb-6' : 'max-h-0 opacity-0 overflow-hidden'}
+          `}
+          aria-hidden={!isMobileMenuOpen}
+        >
+          <div className="border-t border-border/50 pt-4">
+            <OrnamentalDivider />
+            <nav className="mt-4 space-y-1" role="navigation" aria-label="Mobile navigation">
               {navigationItems.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`block px-3 py-1.5 text-xs font-medium rounded-lg reverent-transition ${isActive(item.href)
-                    ? 'bg-primary text-white'
-                    : 'text-foreground hover:bg-muted'
-                    }`}
+                  className={`
+                    flex items-center gap-3 px-4 py-3 rounded-lg reverent-transition
+                    font-body text-base font-medium
+                    focus:outline-none focus-visible:ring-2 focus-visible:ring-ring
+                    ${isActive(item.href)
+                      ? 'bg-primary text-primary-foreground sacred-shadow-sm'
+                      : 'text-foreground hover:bg-muted active:bg-muted/80'
+                    }
+                  `}
                   onClick={() => setIsMobileMenuOpen(false)}
+                  aria-current={isActive(item.href) ? 'page' : undefined}
                 >
-                  {item.name}
+                  {isActive(item.href) && (
+                    <span className="w-1.5 h-1.5 bg-primary-foreground rounded-full" />
+                  )}
+                  <span>{item.name}</span>
                 </Link>
               ))}
             </nav>
-          </div>
-        )}
-      </div>
 
-      {/* Quick Links Bar */}
-      <div className="bg-muted/50 border-t border-border -mt-5 relative z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="flex flex-wrap items-center justify-center gap-3 text-xs">
-            <span className="font-medium text-foreground">Quick Links:</span>
-            {quickLinks.map((link, index) => (
-              <React.Fragment key={link.name}>
-                {link.external ? (
-                  <a
-                    href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-muted-foreground hover:text-primary reverent-transition"
-                  >
-                    {link.name}
-                  </a>
-                ) : (
+            {/* Mobile Quick Links - All links visible */}
+            <div className="mt-6 pt-4 border-t border-border/30">
+              <p className="px-4 text-xs font-caption font-medium text-muted-foreground uppercase tracking-wider mb-3">
+                Quick Links
+              </p>
+              <div className="grid grid-cols-2 gap-2 px-2">
+                {quickLinks.map((link) => (
                   <Link
+                    key={link.name}
                     href={link.href}
-                    className="text-muted-foreground hover:text-primary reverent-transition"
+                    className="
+                      px-3 py-2.5 text-sm font-body text-muted-foreground
+                      rounded-lg hover:bg-muted hover:text-foreground
+                      reverent-transition text-center
+                      focus:outline-none focus-visible:ring-2 focus-visible:ring-ring
+                    "
+                    onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {link.name}
                   </Link>
-                )}
-                {index < quickLinks.length - 1 && (
-                  <span className="text-muted-foreground/50">|</span>
-                )}
-              </React.Fragment>
-            ))}
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Quick Links Bar - Desktop Only */}
+      <div className="hidden lg:block bg-gradient-to-b from-muted/30 to-muted/60 border-t border-border/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Decorative divider */}
+          <OrnamentalDivider />
+
+          {/* Quick Links */}
+          <div className="py-3">
+            <nav aria-label="Quick links">
+              <ul className="flex flex-wrap items-center justify-center gap-x-1 gap-y-2">
+                <li className="flex items-center">
+                  <span className="text-xs font-caption font-semibold text-accent uppercase tracking-wider mr-3">
+                    Quick Links
+                  </span>
+                  <span className="text-muted-foreground/40 mr-2">│</span>
+                </li>
+                {quickLinks.map((link, index) => (
+                  <li key={link.name} className="flex items-center">
+                    {link.external ? (
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="
+                          text-xs font-body text-muted-foreground
+                          hover:text-primary hover:underline underline-offset-2
+                          reverent-transition px-2 py-1 rounded
+                          focus:outline-none focus-visible:ring-2 focus-visible:ring-ring
+                        "
+                      >
+                        {link.name}
+                        <span className="sr-only">(opens in new tab)</span>
+                      </a>
+                    ) : (
+                      <Link
+                        href={link.href}
+                        className={`
+                          text-xs font-body px-2 py-1 rounded reverent-transition
+                          focus:outline-none focus-visible:ring-2 focus-visible:ring-ring
+                          ${isActive(link.href)
+                            ? 'text-primary font-medium'
+                            : 'text-muted-foreground hover:text-primary hover:underline underline-offset-2'
+                          }
+                        `}
+                      >
+                        {link.name}
+                      </Link>
+                    )}
+                    {index < quickLinks.length - 1 && (
+                      <span className="text-muted-foreground/30 mx-1" aria-hidden="true">•</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom ornamental border */}
+      <div className="h-0.5 bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
     </header>
   );
 };

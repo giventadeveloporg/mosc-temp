@@ -297,3 +297,117 @@
   white-space: nowrap !important;
   border: 0 !important;
 }
+
+/* ========================================
+   MOSC Header Enhanced Styles
+   ======================================== */
+
+/* Smooth header scroll shadow animation */
+.mosc-layout header {
+  transition: box-shadow 300ms ease-out, background-color 200ms ease-out;
+}
+
+/* Navigation link hover underline animation */
+.mosc-layout nav a {
+  position: relative;
+}
+
+.mosc-layout nav a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--color-primary);
+  transition: width 200ms ease-out, left 200ms ease-out;
+}
+
+.mosc-layout nav a:hover::after {
+  width: 80%;
+  left: 10%;
+}
+
+.mosc-layout nav a[aria-current="page"]::after {
+  width: 0;
+}
+
+/* Mobile menu slide animation */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mosc-layout #mobile-navigation nav a {
+  animation: slideDown 200ms ease-out forwards;
+}
+
+.mosc-layout #mobile-navigation nav a:nth-child(1) { animation-delay: 50ms; }
+.mosc-layout #mobile-navigation nav a:nth-child(2) { animation-delay: 100ms; }
+.mosc-layout #mobile-navigation nav a:nth-child(3) { animation-delay: 150ms; }
+.mosc-layout #mobile-navigation nav a:nth-child(4) { animation-delay: 200ms; }
+.mosc-layout #mobile-navigation nav a:nth-child(5) { animation-delay: 250ms; }
+.mosc-layout #mobile-navigation nav a:nth-child(6) { animation-delay: 300ms; }
+.mosc-layout #mobile-navigation nav a:nth-child(7) { animation-delay: 350ms; }
+
+/* Ornamental divider subtle animation */
+@keyframes shimmer {
+  0% { opacity: 0.4; }
+  50% { opacity: 0.7; }
+  100% { opacity: 0.4; }
+}
+
+.mosc-layout header svg[aria-hidden="true"] {
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+/* Quick links hover effect */
+.mosc-layout header nav[aria-label="Quick links"] a {
+  position: relative;
+  transition: color 200ms ease-out, transform 150ms ease-out;
+}
+
+.mosc-layout header nav[aria-label="Quick links"] a:hover {
+  transform: translateY(-1px);
+}
+
+/* Logo hover glow effect */
+.mosc-layout header a[aria-label*="Home"]:hover img {
+  filter: drop-shadow(0 2px 8px rgba(139, 125, 107, 0.25));
+}
+
+/* Sticky header backdrop blur for modern browsers */
+@supports (backdrop-filter: blur(8px)) {
+  .mosc-layout header.sacred-shadow-lg {
+    backdrop-filter: blur(8px);
+    background-color: rgba(255, 255, 255, 0.95);
+  }
+}
+
+/* Active nav item pulse animation */
+@keyframes subtlePulse {
+  0%, 100% { box-shadow: 0 2px 4px rgba(139, 125, 107, 0.15); }
+  50% { box-shadow: 0 2px 8px rgba(139, 125, 107, 0.25); }
+}
+
+.mosc-layout nav a[aria-current="page"] {
+  animation: subtlePulse 3s ease-in-out infinite;
+}
+
+/* Button press effect */
+.mosc-layout header button:active {
+  transform: scale(0.97);
+}
+
+/* Focus visible ring enhancement */
+.mosc-layout header *:focus-visible {
+  outline: none;
+  ring-color: var(--color-ring);
+  box-shadow: 0 0 0 2px var(--color-card), 0 0 0 4px var(--color-ring);
+}

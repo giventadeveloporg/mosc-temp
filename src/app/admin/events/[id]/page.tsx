@@ -274,6 +274,18 @@ export default function EventOverviewPage() {
                 </div>
                 <span className="font-semibold text-center leading-tight">Program Directors</span>
               </Link>
+
+              <Link
+                href={`/admin/manual-payments?eventId=${eventId}`}
+                className="flex flex-col items-center justify-center bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+                title="Manual Payments"
+                aria-label="Manual Payments"
+              >
+                <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-teal-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                  <FaDollarSign className="w-10 h-10 text-teal-500" />
+                </div>
+                <span className="font-semibold text-center leading-tight">Manual Payments</span>
+              </Link>
             </div>
           </div>
         </>

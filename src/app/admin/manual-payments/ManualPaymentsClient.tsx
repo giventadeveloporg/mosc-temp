@@ -8,10 +8,13 @@ import {
   fetchManualPaymentsServer,
   fetchManualPaymentSummaryServer,
   updateManualPaymentStatusServer,
+  triggerManualPaymentSummaryBatchJobServer,
   type ManualPaymentListResponse,
+  type ManualPaymentSummaryBatchJobRequest,
+  type ManualPaymentSummaryBatchJobResponse,
 } from './ApiServerActions';
 import type { ManualPaymentRequestDTO, ManualPaymentSummaryReportDTO } from '@/types';
-import { FaDollarSign, FaSpinner, FaSearch, FaCheckCircle, FaTimesCircle, FaBan, FaDownload, FaEye } from 'react-icons/fa';
+import { FaDollarSign, FaSpinner, FaSearch, FaCheckCircle, FaTimesCircle, FaBan, FaDownload, FaEye, FaSync, FaExclamationTriangle } from 'react-icons/fa';
 import Link from 'next/link';
 
 interface ManualPaymentsClientProps {
@@ -40,8 +43,8 @@ export default function ManualPaymentsClient({
   });
   const [payments, setPayments] = useState<ManualPaymentListResponse | null>(initialPayments);
   const [summary, setSummary] = useState<ManualPaymentSummaryReportDTO[] | null>(initialSummary);
-  // Don't show loading if we have initial data
-  const [loading, setLoading] = useState(!initialPayments && !initialSummary);
+  // Don't show loading if we have initial data (even if empty array - means server already fetched)
+  const [loading, setLoading] = useState(!initialPayments);
   const [error, setError] = useState<string | null>(initialError);
   const [page, setPage] = useState(0);
   const [pageSize] = useState(20);
@@ -53,6 +56,15 @@ export default function ManualPaymentsClient({
   const hasMountedRef = useRef(false);
   const prevFiltersRef = useRef<string>('');
   const currentlyLoadingFilterKeyRef = useRef<string>('');
+
+  // Batch Job State
+  const [batchJobLoading, setBatchJobLoading] = useState(false);
+  const [batchJobSuccess, setBatchJobSuccess] = useState(false);
+  const [batchJobError, setBatchJobError] = useState<string | null>(null);
+  const [batchJobResponse, setBatchJobResponse] = useState<ManualPaymentSummaryBatchJobResponse | null>(null);
+  const [showBatchJobSection, setShowBatchJobSection] = useState(false);
+  const [batchJobTenantId, setBatchJobTenantId] = useState<string>('');
+  const [batchJobForceUpdate, setBatchJobForceUpdate] = useState(false);
 
   // Store latest values in refs to avoid dependency issues
   const eventIdRef = useRef(eventId);
@@ -221,12 +233,10 @@ export default function ManualPaymentsClient({
       hasMountedRef.current = true;
       prevFiltersRef.current = filterKey;
 
-      // Check if we have initial data (either payments or summary)
-      const hasInitialData = (initialPayments && initialPayments.payments && initialPayments.payments.length > 0) ||
-                            (initialSummary && initialSummary.length > 0);
-
-      if (hasInitialData) {
-        // We have initial data from server, don't reload
+      // If initialPayments is not null, server already fetched (even if empty)
+      // We should use it and not reload on mount
+      if (initialPayments !== null) {
+        // Server already fetched data, use it (even if empty)
         console.log('[ManualPayments] Using initial data from server', {
           paymentsCount: initialPayments?.payments?.length || 0,
           summaryCount: initialSummary?.length || 0,
@@ -237,8 +247,8 @@ export default function ManualPaymentsClient({
         isFetchingRef.current = false;
         return;
       } else {
-        // No initial data, load it
-        console.log('[ManualPayments] No initial data, loading...', {
+        // No initial data from server, load it
+        console.log('[ManualPayments] No initial data from server, loading...', {
           hasInitialPayments: !!initialPayments,
           hasInitialSummary: !!initialSummary
         });
@@ -315,6 +325,87 @@ export default function ManualPaymentsClient({
       alert(`Failed to update payment status: ${err.message}`);
     } finally {
       setUpdatingStatus(null);
+    }
+  };
+
+  const handleTriggerBatchJob = async () => {
+    setBatchJobLoading(true);
+    setBatchJobError(null);
+    setBatchJobSuccess(false);
+    setBatchJobResponse(null);
+
+    try {
+      // Prepare request payload
+      const request: ManualPaymentSummaryBatchJobRequest = {};
+
+      // Use tenant ID if provided, otherwise let backend process all tenants
+      if (batchJobTenantId.trim()) {
+        request.tenantId = batchJobTenantId.trim();
+      } else {
+        // If not provided, use current tenant from environment (optional - backend will process all if not provided)
+        const currentTenantId = typeof window !== 'undefined' ? process.env.NEXT_PUBLIC_TENANT_ID : undefined;
+        if (currentTenantId) {
+          request.tenantId = currentTenantId;
+        }
+      }
+
+      // Use date range from current filter if available
+      if (dateRange.startDate) {
+        // Convert to ISO 8601 format with milliseconds and timezone
+        const startDate = new Date(dateRange.startDate);
+        request.startDate = startDate.toISOString();
+      }
+
+      if (dateRange.endDate) {
+        // Convert to ISO 8601 format, set to end of day
+        const endDate = new Date(dateRange.endDate);
+        endDate.setHours(23, 59, 59, 999);
+        request.endDate = endDate.toISOString();
+      }
+
+      // Force update flag
+      if (batchJobForceUpdate) {
+        request.forceUpdate = true;
+      }
+
+      // Include eventId if available (from current event context)
+      if (eventId) {
+        const eventIdNum = typeof eventId === 'string' ? parseInt(eventId, 10) : eventId;
+        if (!isNaN(eventIdNum)) {
+          request.eventId = eventIdNum;
+        }
+      }
+
+      // Validate date range if both dates are provided
+      if (request.startDate && request.endDate) {
+        const start = new Date(request.startDate);
+        const end = new Date(request.endDate);
+        if (start > end) {
+          setBatchJobError('Start date must be before or equal to end date');
+          setBatchJobLoading(false);
+          return;
+        }
+      }
+
+      // Trigger batch job
+      const response = await triggerManualPaymentSummaryBatchJobServer(request);
+
+      setBatchJobResponse(response);
+      setBatchJobSuccess(true);
+
+      // Reload summary after successful batch job trigger
+      // The batch job runs asynchronously, so wait a bit before reloading
+      setTimeout(() => {
+        if (eventId) {
+          console.log('[ManualPayments] Reloading summary after batch job trigger');
+          loadSummary();
+        }
+      }, 3000); // Wait 3 seconds before reloading to allow batch job to start processing
+    } catch (err: any) {
+      console.error('[ManualPaymentsClient] Batch job error:', err);
+      setBatchJobError(err.message || 'Failed to trigger batch job. Please try again.');
+    } finally {
+      setBatchJobLoading(false);
     }
   };
 
@@ -407,6 +498,160 @@ export default function ManualPaymentsClient({
         />
       )}
 
+      {/* Batch Job Trigger Section - Always show when eventId is present */}
+      {eventId && (
+        <div className="bg-white border-2 border-gray-200 rounded-lg p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Manual Payment Summary Batch Job
+            </h3>
+            <button
+              onClick={() => setShowBatchJobSection(!showBatchJobSection)}
+              className="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg transition-colors flex items-center gap-2"
+              type="button"
+            >
+              <FaSync className="w-4 h-4" />
+              {showBatchJobSection ? 'Hide' : 'Show'} Batch Job Options
+            </button>
+          </div>
+
+          {/* Info Message */}
+          {!summary || summary.length === 0 ? (
+            <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4 mb-4">
+              <div className="flex items-start gap-3">
+                <FaExclamationTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-yellow-800 font-semibold mb-2">No Summary Records Found</p>
+                  <div className="text-sm text-yellow-700 space-y-1">
+                    <p>
+                      The manual payment summary report table is empty for this event. Trigger the batch job to aggregate manual payment data into the summary table for analytics and reporting.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 mb-4">
+              <div className="flex items-start gap-3">
+                <FaCheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-blue-800 font-semibold mb-2">Summary Records Available</p>
+                  <div className="text-sm text-blue-700 space-y-1">
+                    <p>
+                      Found {summary.length} summary record{summary.length !== 1 ? 's' : ''} for this event. You can trigger the batch job to update or regenerate the summary data.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Batch Job Section */}
+          {showBatchJobSection && (
+            <div className="space-y-4">
+              <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+                <p className="text-sm text-blue-800">
+                  This batch job aggregates manual payment data from the <code className="bg-blue-100 px-1 rounded">manual_payment_request</code> table into the <code className="bg-blue-100 px-1 rounded">manual_payment_summary_report</code> table for analytics and reporting.
+                  The job runs asynchronously in the background and will return a job ID when started.
+                </p>
+              </div>
+
+              {/* Tenant ID Input */}
+              <div>
+                <label htmlFor="batchJobTenantId" className="block text-sm font-medium text-gray-700 mb-2">
+                  Tenant ID (optional - leave empty to process all tenants)
+                </label>
+                <input
+                  type="text"
+                  id="batchJobTenantId"
+                  value={batchJobTenantId}
+                  onChange={(e) => setBatchJobTenantId(e.target.value)}
+                  placeholder={typeof window !== 'undefined' && process.env.NEXT_PUBLIC_TENANT_ID
+                    ? `Current: ${process.env.NEXT_PUBLIC_TENANT_ID}`
+                    : 'Leave empty to process all tenants'}
+                  className="w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  {dateRange.startDate && dateRange.endDate
+                    ? `Date range from current filter will be applied: ${dateRange.startDate} to ${dateRange.endDate}`
+                    : 'No date range filter will be applied (processes all dates)'}
+                </p>
+              </div>
+
+              {/* Force Update Checkbox */}
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="batchJobForceUpdate"
+                  checked={batchJobForceUpdate}
+                  onChange={(e) => setBatchJobForceUpdate(e.target.checked)}
+                  className="w-5 h-5 rounded border-gray-400 text-blue-600 focus:ring-blue-500"
+                />
+                <label htmlFor="batchJobForceUpdate" className="text-sm font-medium text-gray-700">
+                  Force update (reprocess transactions that already have summary data)
+                </label>
+              </div>
+
+              {/* Batch Job Status Messages */}
+              {batchJobSuccess && batchJobResponse && (
+                <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <FaCheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="text-green-800 font-semibold mb-2">Batch job started successfully!</p>
+                      <div className="text-sm text-green-700 space-y-1">
+                        <p><strong>Job ID:</strong> {batchJobResponse.jobId}</p>
+                        <p><strong>Status:</strong> {batchJobResponse.status}</p>
+                        {batchJobResponse.estimatedRecords !== null && batchJobResponse.estimatedRecords !== undefined && (
+                          <p><strong>Estimated Records:</strong> {batchJobResponse.estimatedRecords}</p>
+                        )}
+                        {batchJobResponse.estimatedCompletionTime && (
+                          <p><strong>Estimated Completion:</strong> {new Date(batchJobResponse.estimatedCompletionTime).toLocaleString()}</p>
+                        )}
+                        <p className="mt-2 text-xs">{batchJobResponse.message}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {batchJobError && (
+                <div className="bg-red-50 border-2 border-red-200 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <FaExclamationTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="text-red-800 font-semibold mb-1">Error</p>
+                      <p className="text-sm text-red-700">{batchJobError}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Trigger Button */}
+              <button
+                onClick={handleTriggerBatchJob}
+                disabled={batchJobLoading}
+                className="w-full flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 px-6"
+                title="Trigger Manual Payment Summary Batch Job"
+                aria-label="Trigger Manual Payment Summary Batch Job"
+                type="button"
+              >
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                  {batchJobLoading ? (
+                    <FaSpinner className="w-6 h-6 text-blue-600 animate-spin" />
+                  ) : (
+                    <FaSync className="w-6 h-6 text-blue-600" />
+                  )}
+                </div>
+                <span className="font-semibold text-blue-700">
+                  {batchJobLoading ? 'Starting Batch Job...' : 'Trigger Batch Job'}
+                </span>
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Loading State */}
       {loading && (
         <div className="flex items-center justify-center py-8">
@@ -422,7 +667,7 @@ export default function ManualPaymentsClient({
         </div>
       )}
 
-      {/* Summary Cards */}
+      {/* Summary Cards and Breakdown - Show ALL records regardless of status */}
       {summary && summary.length > 0 && !loading && (
         <>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -469,19 +714,58 @@ export default function ManualPaymentsClient({
             </div>
           </div>
 
-          {/* Summary by Method */}
+          {/* Detailed Summary Breakdown Table - Shows ALL records regardless of status */}
           <div className="bg-white border-2 border-gray-200 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Summary by Payment Method</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {summary.map((item, idx) => (
-                <div key={idx} className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                  <p className="text-sm text-gray-600 font-medium mb-1">{getMethodDisplayName(item.manualPaymentMethodType)}</p>
-                  <p className="text-lg font-bold text-gray-900">${item.totalAmount.toFixed(2)}</p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {item.requestCount} requests - {item.status}
-                  </p>
-                </div>
-              ))}
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Summary Breakdown</h3>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200 border border-gray-300 rounded-lg">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 border-b border-gray-300">Payment Method</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 border-b border-gray-300">Status</th>
+                    <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700 border-b border-gray-300">Total Amount</th>
+                    <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700 border-b border-gray-300">Transaction Count</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 border-b border-gray-300">Snapshot Date</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {summary.map((item, idx) => (
+                    <tr key={idx} className="hover:bg-gray-50">
+                      <td className="px-4 py-3 text-sm text-gray-900 border-b border-gray-200">
+                        {getMethodDisplayName(item.manualPaymentMethodType)}
+                      </td>
+                      <td className="px-4 py-3 text-sm border-b border-gray-200">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusBadgeColor(item.status)}`}>
+                          {item.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-900 text-right border-b border-gray-200 font-semibold">
+                        ${item.totalAmount.toFixed(2)}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-900 text-right border-b border-gray-200">
+                        {item.requestCount || 0}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600 border-b border-gray-200">
+                        {item.snapshotDate ? new Date(item.snapshotDate).toLocaleDateString() : '-'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot className="bg-gray-50">
+                  <tr>
+                    <td colSpan={2} className="px-4 py-3 text-sm font-bold text-gray-900 border-t-2 border-gray-400">
+                      Total
+                    </td>
+                    <td className="px-4 py-3 text-sm font-bold text-gray-900 text-right border-t-2 border-gray-400">
+                      ${summary.reduce((sum, item) => sum + (item.totalAmount || 0), 0).toFixed(2)}
+                    </td>
+                    <td className="px-4 py-3 text-sm font-bold text-gray-900 text-right border-t-2 border-gray-400">
+                      {summary.reduce((sum, item) => sum + (item.requestCount || 0), 0)}
+                    </td>
+                    <td className="px-4 py-3 border-t-2 border-gray-400"></td>
+                  </tr>
+                </tfoot>
+              </table>
             </div>
           </div>
         </>

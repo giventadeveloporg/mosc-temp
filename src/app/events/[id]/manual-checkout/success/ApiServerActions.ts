@@ -38,18 +38,38 @@ export async function fetchManualPaymentRequestServer(
     const paymentRequest: ManualPaymentRequestDTO = await paymentRes.json();
 
     // Fetch ticket transaction if available
+    // CRITICAL: Only fetch the specific transaction linked to this payment request
     let ticketTransaction: EventTicketTransactionDTO | undefined;
     if (paymentRequest.ticketTransactionId) {
       try {
+        // CRITICAL: Fetch by ID to ensure we get the exact transaction for this payment request
         const ticketRes = await fetch(
           `${baseUrl}/api/proxy/event-ticket-transactions/${paymentRequest.ticketTransactionId}`,
           { cache: 'no-store' }
         );
         if (ticketRes.ok) {
-          ticketTransaction = await ticketRes.json();
+          const fetchedTransaction = await ticketRes.json();
+          
+          // CRITICAL: Verify transaction belongs to this payment request and event
+          if (fetchedTransaction.id === paymentRequest.ticketTransactionId && 
+              fetchedTransaction.eventId === paymentRequest.eventId) {
+            ticketTransaction = fetchedTransaction;
+            console.log('[fetchManualPaymentRequestServer] Transaction verified:', {
+              transactionId: fetchedTransaction.id,
+              eventId: fetchedTransaction.eventId,
+              paymentRequestId: paymentRequest.id
+            });
+          } else {
+            console.error('[fetchManualPaymentRequestServer] Transaction verification failed:', {
+              fetchedTransactionId: fetchedTransaction.id,
+              expectedTransactionId: paymentRequest.ticketTransactionId,
+              fetchedEventId: fetchedTransaction.eventId,
+              expectedEventId: paymentRequest.eventId
+            });
+          }
         }
       } catch (err) {
-        console.error('Error fetching ticket transaction:', err);
+        console.error('[fetchManualPaymentRequestServer] Error fetching ticket transaction:', err);
       }
     }
 
