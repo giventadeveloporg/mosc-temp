@@ -2,6 +2,7 @@ import { EventTicketTransactionDTO, EventTicketTransactionStatisticsDTO, EventDe
 import { FaSearch, FaTicketAlt, FaEnvelope, FaUser, FaHashtag, FaCalendarAlt, FaUsers, FaPhotoVideo, FaTags, FaPercent, FaHome, FaInfoCircle, FaClipboardCheck, FaChartLine } from 'react-icons/fa';
 import Link from 'next/link';
 import TicketTableClient from './TicketTableClient';
+import BatchRefundSection from './BatchRefundSection';
 import { fetchEventDetailsServer } from '@/app/admin/ApiServerActions';
 import { formatInTimeZone } from 'date-fns-tz';
 
@@ -465,6 +466,9 @@ export default async function TicketListPage({ params, searchParams }: { params:
           </div>
         </div>
       ) : null}
+
+      {/* Batch Refund Section */}
+      <BatchRefundSection eventId={Number(eventId)} />
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
         <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
