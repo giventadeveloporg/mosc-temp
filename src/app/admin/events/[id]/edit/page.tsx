@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { EventForm } from '@/components/EventForm';
 import type { EventDetailsDTO, EventTypeDetailsDTO } from '@/types';
 import Link from 'next/link';
-import { FaUsers, FaPhotoVideo, FaCalendarAlt, FaTags, FaTicketAlt, FaHome, FaMicrophone, FaAddressBook, FaHandshake, FaEnvelope, FaUserTie, FaClipboardCheck, FaChartLine } from 'react-icons/fa';
+import { FaUsers, FaPhotoVideo, FaCalendarAlt, FaTags, FaTicketAlt, FaHome, FaMicrophone, FaAddressBook, FaHandshake, FaEnvelope, FaUserTie, FaClipboardCheck, FaChartLine, FaDollarSign } from 'react-icons/fa';
 import SaveStatusDialog, { type SaveStatus } from '@/components/SaveStatusDialog';
 
 export default function EditEventPage() {
@@ -198,6 +198,23 @@ export default function EditEventPage() {
               </div>
               <span className="font-semibold text-center leading-tight">Sales Analytics</span>
             </Link>
+            {/* Manual Payment Button - Only show if event is manual payment type */}
+            {event && (
+              (event.paymentFlowMode === 'MANUAL_ONLY' || 
+               (event.paymentFlowMode === 'HYBRID' && event.manualPaymentEnabled === true)) && (
+                <Link
+                  href={`/admin/manual-payments?eventId=${eventId}`}
+                  className="flex flex-col items-center justify-center bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-lg shadow-md p-3 text-xs transition-all group"
+                  title="Manual Payments [Zelle, Venmo…]"
+                  aria-label="Manual Payments [Zelle, Venmo…]"
+                >
+                  <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-emerald-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+                    <FaDollarSign className="w-8 h-8 text-emerald-500" />
+                  </div>
+                  <span className="font-semibold text-center leading-tight">Manual Payments [Zelle, Venmo…]</span>
+                </Link>
+              )
+            )}
           </div>
         </div>
       </div>

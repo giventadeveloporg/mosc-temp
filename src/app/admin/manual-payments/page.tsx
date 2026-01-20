@@ -2,6 +2,9 @@ import { Suspense } from 'react';
 import ManualPaymentsClient from './ManualPaymentsClient';
 import { fetchManualPaymentsServer, fetchManualPaymentSummaryServer } from './ApiServerActions';
 
+// Increase route timeout to 120 seconds for complex calculations
+export const maxDuration = 120;
+
 export default async function ManualPaymentsPage({
   searchParams,
 }: {

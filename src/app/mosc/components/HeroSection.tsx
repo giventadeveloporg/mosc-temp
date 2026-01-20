@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import AppImage from './AppImage';
 import AppIcon from './AppIcon';
 
@@ -18,9 +19,9 @@ const HeroSection = () => {
         </div>
 
         {/* Three Circular Images */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 mb-16 items-center">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 mb-16 items-start">
           {/* Patriarch Image */}
-          <div className="flex flex-col items-center justify-center">
+          <div className="flex flex-col items-center justify-start">
             <div className="w-48 h-48 lg:w-56 lg:h-56 rounded-full overflow-hidden sacred-shadow-lg bg-muted flex items-center justify-center">
               <AppImage
                 src="/images/logos/Hero-Section-Image-MOSC.jpg"
@@ -28,12 +29,53 @@ const HeroSection = () => {
                 className="max-w-full max-h-full object-contain"
               />
             </div>
-            <h3 className="mt-4 font-heading font-medium text-lg text-foreground text-center">
-            </h3>
+            {/* Patriarch Name and Navigation Links */}
+            <div className="mt-4 px-6 py-4 text-center">
+              {/* Combined Title */}
+              <div 
+                className="leading-tight mb-3"
+                style={{ 
+                  lineHeight: '1.2', 
+                  fontFamily: "'Lora', serif",
+                  color: '#A83C25'
+                }}
+              >
+                <span className="text-xl sm:text-2xl font-bold">
+                  H.H. Baselios <span className="text-xl sm:text-2xl font-bold">Marthoma Mathews III</span>
+                </span>
+              </div>
+              
+              {/* Navigation Links with Pipe Separators */}
+              <div className="flex items-center justify-center gap-1.5 text-sm sm:text-base font-body" style={{ color: '#72553E' }}>
+                <Link
+                  href="/mosc/holy-synod/his-holiness-baselios-marthoma-mathews-iii"
+                  className="hover:underline transition-all duration-200"
+                  style={{ color: '#72553E' }}
+                >
+                  Biography
+                </Link>
+                <span className="mx-1">|</span>
+                <Link
+                  href="/mosc/photo-gallery/reception-to-his-holiness-baselios-marthoma-mathews-iii"
+                  className="hover:underline transition-all duration-200"
+                  style={{ color: '#72553E' }}
+                >
+                  Photos
+                </Link>
+                <span className="mx-1">|</span>
+                <Link
+                  href="/mosc/speeches"
+                  className="hover:underline transition-all duration-200"
+                  style={{ color: '#72553E' }}
+                >
+                  Speeches
+                </Link>
+              </div>
+            </div>
           </div>
 
           {/* Church Cross */}
-          <div className="flex flex-col items-center justify-center">
+          <div className="flex flex-col items-center justify-start">
             <div className="w-48 h-48 lg:w-96 lg:h-96 overflow-hidden flex items-center justify-center bg-transparent p-2">
               <AppImage
                 src="/images/logos/Current_Edits/MOSC-Center-Image.png"
@@ -47,7 +89,7 @@ const HeroSection = () => {
           </div>
 
           {/* Christ Iconography */}
-          <div className="flex flex-col items-center justify-center">
+          <div className="flex flex-col items-center justify-start">
             <div className="w-48 h-48 lg:w-56 lg:h-56 overflow-hidden flex flex-col items-center justify-center sacred-shadow-lg rounded-full p-3 gap-1" style={{ background: 'transparent' }}>
               <AppImage
                 src="/images/logos/Current_Edits/MOSC-Logo-only.png"

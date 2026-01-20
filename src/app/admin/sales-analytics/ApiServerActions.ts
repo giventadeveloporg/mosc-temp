@@ -155,13 +155,46 @@ async function fetchManualPaymentSummaryForAnalytics(
     const summaryResponse = await fetchWithJwtRetry(summaryUrl, { cache: 'no-store' });
 
     if (summaryResponse.ok) {
-      const summaryData: ManualPaymentSummaryReportDTO[] = await summaryResponse.json();
+      const summaryData: any[] = await summaryResponse.json();
       const summaryArray = Array.isArray(summaryData) ? summaryData : [];
       
+      // Map backend field names to frontend DTO field names
+      // Database: payment_method_type → Backend: paymentMethodType → Frontend: manualPaymentMethodType
+      // Database: transaction_count → Backend: transactionCount → Frontend: requestCount
+      const mappedSummary: ManualPaymentSummaryReportDTO[] = summaryArray.map((item: any) => {
+        const mapped: any = { ...item };
+        // Map paymentMethodType → manualPaymentMethodType
+        // Handle both backend DTO field name (paymentMethodType) and potential database field name (payment_method_type)
+        if (mapped.paymentMethodType && !mapped.manualPaymentMethodType) {
+          mapped.manualPaymentMethodType = mapped.paymentMethodType;
+        } else if (mapped.payment_method_type && !mapped.manualPaymentMethodType) {
+          mapped.manualPaymentMethodType = mapped.payment_method_type;
+        }
+        // Map transactionCount → requestCount
+        // Handle both backend DTO field name (transactionCount) and potential database field name (transaction_count)
+        if (mapped.transactionCount !== undefined && mapped.requestCount === undefined) {
+          mapped.requestCount = mapped.transactionCount;
+        } else if (mapped.transaction_count !== undefined && mapped.requestCount === undefined) {
+          mapped.requestCount = mapped.transaction_count;
+        }
+        return mapped as ManualPaymentSummaryReportDTO;
+      });
+      
+      // Log sample record for debugging
+      if (mappedSummary.length > 0) {
+        console.log(`[Sales Analytics] Using manual payment summary table: ${mappedSummary.length} records`);
+        console.log(`[Sales Analytics] Sample summary record:`, {
+          id: mappedSummary[0].id,
+          manualPaymentMethodType: mappedSummary[0].manualPaymentMethodType,
+          status: mappedSummary[0].status,
+          totalAmount: mappedSummary[0].totalAmount,
+          requestCount: mappedSummary[0].requestCount
+        });
+      }
+      
       // If summary has data, return it
-      if (summaryArray.length > 0) {
-        console.log(`[Sales Analytics] Using manual payment summary table: ${summaryArray.length} records`);
-        return { summary: summaryArray, fromFallback: false };
+      if (mappedSummary.length > 0) {
+        return { summary: mappedSummary, fromFallback: false };
       }
     }
 
@@ -229,8 +262,7 @@ export async function calculateSalesMetricsServer(
   try {
     const tenantId = getTenantId();
     
-    // Step 1: Fetch Stripe transactions (identified by transactionReference NOT starting with MANUAL- or TKTN)
-    // We'll filter these after fetching all transactions
+    // Step 1 & 2: Fetch transactions and manual payment summary in parallel for better performance
     const stripeParams = new URLSearchParams({
       'eventId.equals': eventId,
       'size': '1000', // Get all for analytics
@@ -244,7 +276,12 @@ export async function calculateSalesMetricsServer(
     }
 
     const stripeUrl = `${API_BASE_URL}/api/event-ticket-transactions?${stripeParams.toString()}`;
-    const stripeResponse = await fetchWithJwtRetry(stripeUrl, { cache: 'no-store' });
+    
+    // Fetch both in parallel to reduce total time
+    const [stripeResponse, manualPaymentSummaryResult] = await Promise.all([
+      fetchWithJwtRetry(stripeUrl, { cache: 'no-store' }),
+      fetchManualPaymentSummaryForAnalytics(eventId, startDate, endDate)
+    ]);
 
     if (!stripeResponse.ok) {
       console.error(`[Sales Analytics] Failed to fetch transactions: ${stripeResponse.status} ${stripeResponse.statusText}`);
@@ -255,12 +292,8 @@ export async function calculateSalesMetricsServer(
     const transactionsArray = Array.isArray(allTransactions) ? allTransactions : [];
     console.log(`[Sales Analytics] Fetched ${transactionsArray.length} total transactions for eventId ${eventId}`);
 
-    // Step 2: Fetch manual payment summary (with fallback to manual_payment_request)
-    const { summary: manualPaymentSummary, fromFallback } = await fetchManualPaymentSummaryForAnalytics(
-      eventId,
-      startDate,
-      endDate
-    );
+    // Extract manual payment summary from parallel result
+    const { summary: manualPaymentSummary, fromFallback } = manualPaymentSummaryResult;
 
   // Step 3: Separate Stripe and Manual transactions
   // Manual payments are identified by transactionReference prefix (MANUAL- or TKTN)
@@ -286,7 +319,9 @@ export async function calculateSalesMetricsServer(
     manualPaymentSummary.forEach(summary => {
       // Map by payment method type (we'll use this for display)
       // Note: Summary doesn't have transaction references, so we'll use payment method type directly
-      console.log(`[Sales Analytics] Summary record: ${summary.manualPaymentMethodType}, Status: ${summary.status}, Amount: ${summary.totalAmount}, Count: ${summary.requestCount}`);
+      const methodType = summary.manualPaymentMethodType || 'UNKNOWN';
+      const count = summary.requestCount || 0;
+      console.log(`[Sales Analytics] Summary record: ${methodType}, Status: ${summary.status}, Amount: ${summary.totalAmount}, Count: ${count}`);
     });
   } else if (fromFallback) {
     // If we used fallback, fetch manual payment requests to build transaction reference mapping

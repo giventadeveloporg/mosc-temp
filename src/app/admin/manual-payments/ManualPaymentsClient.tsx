@@ -36,10 +36,16 @@ export default function ManualPaymentsClient({
 }: ManualPaymentsClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [eventId, setEventId] = useState(initialEventId);
+  
+  // Get eventId from URL query params (source of truth)
+  const urlEventId = searchParams.get('eventId') || '';
+  const urlStartDate = searchParams.get('startDate') || '';
+  const urlEndDate = searchParams.get('endDate') || '';
+  
+  const [eventId, setEventId] = useState(initialEventId || urlEventId);
   const [dateRange, setDateRange] = useState<DateRange>({
-    startDate: initialStartDate || null,
-    endDate: initialEndDate || null,
+    startDate: initialStartDate || urlStartDate || null,
+    endDate: initialEndDate || urlEndDate || null,
   });
   const [payments, setPayments] = useState<ManualPaymentListResponse | null>(initialPayments);
   const [summary, setSummary] = useState<ManualPaymentSummaryReportDTO[] | null>(initialSummary);
@@ -202,6 +208,23 @@ export default function ManualPaymentsClient({
   const startDateStr = useMemo(() => dateRange.startDate || '', [dateRange.startDate]);
   const endDateStr = useMemo(() => dateRange.endDate || '', [dateRange.endDate]);
 
+  // Sync eventId with URL query params (when URL changes, update state)
+  useEffect(() => {
+    if (urlEventId !== eventId) {
+      setEventId(urlEventId);
+      // Update data from initial props if URL has eventId (server-side fetch completed)
+      if (urlEventId && initialPayments) {
+        setPayments(initialPayments);
+        setSummary(initialSummary);
+        setError(initialError);
+      } else if (!urlEventId) {
+        // Clear data if eventId removed from URL
+        setPayments(null);
+        setSummary(null);
+      }
+    }
+  }, [urlEventId, initialPayments, initialSummary, initialError, eventId]);
+
   // Track if we should skip the initial load (because we have server-side data)
   const skipInitialLoadRef = useRef(!!(initialPayments || initialSummary));
 
@@ -246,6 +269,12 @@ export default function ManualPaymentsClient({
         setLoading(false);
         isFetchingRef.current = false;
         return;
+      } else if (urlEventId && !initialPayments && !initialError) {
+        // URL has eventId but no initial data yet - server-side fetch in progress
+        // Don't fetch from client, wait for server-side fetch to complete
+        // This prevents duplicate fetches and timeout issues
+        console.log('[ManualPayments] URL has eventId but server-side fetch in progress, waiting...');
+        return;
       } else {
         // No initial data from server, load it
         console.log('[ManualPayments] No initial data from server, loading...', {
@@ -258,7 +287,15 @@ export default function ManualPaymentsClient({
       }
     }
 
-    // After mount: only reload if filters actually changed
+    // After mount: only reload if filters actually changed (not when eventId changes via URL)
+    // When eventId changes via URL, the server-side fetch in page.tsx handles it with maxDuration=120
+    const eventIdChangedViaUrl = urlEventId && urlEventId !== eventId;
+    if (eventIdChangedViaUrl) {
+      // EventId changed via URL - wait for server-side fetch, don't fetch from client
+      console.log('[ManualPayments] EventId changed via URL, waiting for server-side fetch...');
+      return;
+    }
+
     if (prevFiltersRef.current !== filterKey) {
       console.log('[ManualPayments] Filters changed, reloading...', { old: prevFiltersRef.current, new: filterKey });
       prevFiltersRef.current = filterKey;
@@ -279,7 +316,7 @@ export default function ManualPaymentsClient({
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [eventId, statusFilter, methodFilter, page, startDateStr, endDateStr]);
+  }, [statusFilter, methodFilter, page, startDateStr, endDateStr, urlEventId, initialPayments, initialSummary, initialError, eventId]); // Removed eventId from main trigger, added urlEventId
 
   const handleDateRangeChange = (range: DateRange) => {
     setDateRange(range);
@@ -299,7 +336,6 @@ export default function ManualPaymentsClient({
   };
 
   const handleEventSelect = (selectedEventId: string) => {
-    setEventId(selectedEventId);
     setPage(0);
     const params = new URLSearchParams(searchParams.toString());
     if (selectedEventId) {
@@ -307,6 +343,8 @@ export default function ManualPaymentsClient({
     } else {
       params.delete('eventId');
     }
+    // Update URL - this will trigger server-side fetch via page.tsx with maxDuration=120
+    // The server-side fetch will populate initialPayments/initialSummary, which we'll use in the component
     router.push(`/admin/manual-payments?${params.toString()}`);
   };
 

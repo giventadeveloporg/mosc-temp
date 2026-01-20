@@ -44,17 +44,45 @@ const moscPageTests = [
       'h1, h2',
       'nav',
       'main',
-      'a[href*="/mosc/"]'
+      'a[href*="/mosc/"]',
+      'a[href="/mosc/gallery"]'
     ],
     validation: [
       'MOSC homepage loads',
       'Navigation menu visible',
       'Content sections displayed',
+      'Quick Links section visible',
+      'Gallery link present in Quick Links',
       'No layout errors'
     ],
     interactions: [
       { type: 'wait', selector: 'main', timeout: 5000 },
-      { type: 'check', selector: 'nav', visible: true }
+      { type: 'check', selector: 'nav', visible: true },
+      { type: 'check', selector: 'a[href="/mosc/gallery"]', visible: true }
+    ]
+  },
+  {
+    id: 'mosc-001a',
+    name: 'MOSC Homepage Quick Links - Gallery Navigation Test',
+    url: '/mosc',
+    priority: 'high',
+    expectedElements: [
+      'a[href="/mosc/gallery"]',
+      'h1, h2',
+      '[class*="gallery"], [class*="album"], [class*="grid"]'
+    ],
+    validation: [
+      'MOSC homepage loads',
+      'Gallery link in Quick Links is clickable',
+      'Clicking Gallery link navigates to /mosc/gallery',
+      'Gallery page loads correctly after navigation'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'main', timeout: 5000 },
+      { type: 'wait', selector: 'a[href="/mosc/gallery"]', timeout: 5000 },
+      { type: 'click', selector: 'a[href="/mosc/gallery"]', waitForNavigation: '/mosc/gallery', navigationTimeout: 10000 },
+      { type: 'verifyUrl', pattern: '/mosc/gallery' },
+      { type: 'wait', selector: '[class*="gallery"], [class*="album"], [class*="grid"]', timeout: 5000 }
     ]
   },
   {
@@ -553,6 +581,20 @@ async function executeTestWithPlaywright(test, testUrl, startTime) {
               if (interaction.count.min && count < interaction.count.min) {
                 errors.push(`Element ${interaction.selector} count ${count} is less than minimum ${interaction.count.min}`);
               }
+            }
+          } else if (interaction.type === 'click') {
+            // Click an element and optionally wait for navigation
+            const element = await page.locator(interaction.selector).first();
+            await element.click({ timeout: interaction.timeout || 5000 });
+            if (interaction.waitForNavigation) {
+              await page.waitForURL(interaction.waitForNavigation, { timeout: interaction.navigationTimeout || 10000 });
+            }
+          } else if (interaction.type === 'verifyUrl') {
+            // Verify current URL matches expected pattern
+            const currentUrl = page.url();
+            const expectedPattern = interaction.pattern;
+            if (!currentUrl.includes(expectedPattern)) {
+              errors.push(`URL verification failed. Expected to contain "${expectedPattern}", got "${currentUrl}"`);
             }
           }
         } catch (interactionError) {

@@ -196,7 +196,7 @@ export default function AdminPage() {
     {
       href: '/admin/manual-payments',
       icon: 'moneyBill',
-      label: 'Manual Payments',
+      label: 'Manual Payments [Zelle, Venmo…]',
       color: 'mintGreen',
       key: 'manual-payments'
     }

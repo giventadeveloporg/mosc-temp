@@ -108,13 +108,13 @@ const MOSCHeader = () => {
             <div className="relative">
               {/* Logo Container with subtle glow on hover */}
               <div className="
-                w-32 h-[80px] sm:w-40 sm:h-[100px] md:w-48 md:h-[120px] lg:w-64 lg:h-[160px]
+                w-40 h-[90px] sm:w-48 sm:h-[110px] md:w-56 md:h-[130px] lg:w-72 lg:h-[180px]
                 rounded-lg flex items-center justify-center
                 reverent-transition overflow-hidden
                 group-hover:scale-[1.02]
               ">
                 <Image
-                  src="/images/logos/Current_Edits/MOSC-Header-Logo1.png"
+                  src="/images/logos/MOSC-logo-Brand-part.png"
                   alt="Malankara Orthodox Syrian Church"
                   width={256}
                   height={160}
@@ -141,8 +141,8 @@ const MOSCHeader = () => {
                       rounded-lg reverent-transition
                       focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1
                       ${isActive(item.href)
-                        ? 'bg-primary text-primary-foreground sacred-shadow-sm'
-                        : 'text-foreground hover:bg-muted hover:text-accent'
+                        ? 'bg-primary text-white sacred-shadow-sm'
+                        : 'text-black hover:bg-muted hover:text-accent'
                       }
                     `}
                     aria-current={isActive(item.href) ? 'page' : undefined}
@@ -150,7 +150,7 @@ const MOSCHeader = () => {
                     <span className="relative z-10">{item.name}</span>
                     {/* Active indicator dot */}
                     {isActive(item.href) && (
-                      <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary-foreground/70 rounded-full" />
+                      <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-white/70 rounded-full" />
                     )}
                   </Link>
                 </li>
@@ -202,15 +202,15 @@ const MOSCHeader = () => {
                     font-body text-base font-medium
                     focus:outline-none focus-visible:ring-2 focus-visible:ring-ring
                     ${isActive(item.href)
-                      ? 'bg-primary text-primary-foreground sacred-shadow-sm'
-                      : 'text-foreground hover:bg-muted active:bg-muted/80'
+                      ? 'bg-primary text-white sacred-shadow-sm'
+                      : 'text-black hover:bg-muted active:bg-muted/80'
                     }
                   `}
                   onClick={() => setIsMobileMenuOpen(false)}
                   aria-current={isActive(item.href) ? 'page' : undefined}
                 >
                   {isActive(item.href) && (
-                    <span className="w-1.5 h-1.5 bg-primary-foreground rounded-full" />
+                    <span className="w-1.5 h-1.5 bg-white rounded-full" />
                   )}
                   <span>{item.name}</span>
                 </Link>

@@ -25,10 +25,16 @@ export default function SalesAnalyticsClient({
 }: SalesAnalyticsClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [eventId, setEventId] = useState(initialEventId);
+  
+  // Get eventId from URL query params (source of truth)
+  const urlEventId = searchParams.get('eventId') || '';
+  const urlStartDate = searchParams.get('startDate') || '';
+  const urlEndDate = searchParams.get('endDate') || '';
+  
+  const [eventId, setEventId] = useState(initialEventId || urlEventId);
   const [dateRange, setDateRange] = useState<DateRange>({
-    startDate: initialStartDate || null,
-    endDate: initialEndDate || null,
+    startDate: initialStartDate || urlStartDate || null,
+    endDate: initialEndDate || urlEndDate || null,
   });
   const [metrics, setMetrics] = useState<SalesMetrics | null>(initialMetrics);
   const [salesData, setSalesData] = useState<EventTicketTransactionDTO[]>([]);
@@ -77,22 +83,70 @@ export default function SalesAnalyticsClient({
   const startDateStr = useMemo(() => dateRange.startDate || '', [dateRange.startDate]);
   const endDateStr = useMemo(() => dateRange.endDate || '', [dateRange.endDate]);
 
+  // Sync eventId with URL query params (when URL changes, update state)
   useEffect(() => {
-    if (eventId) {
+    if (urlEventId !== eventId) {
+      setEventId(urlEventId);
+      // Update metrics from initialMetrics if URL has eventId (server-side fetch completed)
+      if (urlEventId && initialMetrics) {
+        setMetrics(initialMetrics);
+        setError(initialError);
+      } else if (!urlEventId) {
+        // Clear data if eventId removed from URL
+        setEventDetails(null);
+        setMetrics(null);
+        setSalesData([]);
+        setTotalCount(0);
+      }
+    }
+  }, [urlEventId, initialMetrics, initialError, eventId]);
+
+  // Only fetch from client when date range or page changes (not when eventId changes via URL)
+  // When eventId changes via URL, the server-side fetch in page.tsx handles it with maxDuration=120
+  useEffect(() => {
+    // Skip if no eventId
+    if (!eventId) {
+      return;
+    }
+
+    // Check if eventId changed via URL (not via state)
+    const eventIdChangedViaUrl = urlEventId && urlEventId !== eventId;
+    if (eventIdChangedViaUrl) {
+      // EventId changed via URL - wait for server-side fetch, don't fetch from client
+      console.log('[SalesAnalytics] EventId changed via URL, waiting for server-side fetch...');
+      return;
+    }
+
+    // Only fetch from client if:
+    // 1. Date range changed (different from URL params) - client-side filtering
+    // 2. Page changed (pagination) - client-side pagination
+    // 3. We have initialMetrics but date range is different - need to refetch with new dates
+    const dateRangeChanged = startDateStr !== urlStartDate || endDateStr !== urlEndDate;
+    const shouldFetchFromClient = dateRangeChanged || page > 0;
+
+    if (shouldFetchFromClient) {
+      // Client-side fetch for date/page changes
       loadMetrics();
       loadSalesData();
       loadEventDetails();
-    } else {
-      setEventDetails(null);
-      setMetrics(null);
-      setSalesData([]);
-      setTotalCount(0);
+    } else if (initialMetrics) {
+      // Use server-side fetched data (from page.tsx with maxDuration=120)
+      setMetrics(initialMetrics);
+      setError(initialError);
+      // Still need to load sales data and event details (not provided by server)
+      loadSalesData();
+      loadEventDetails();
+    } else if (urlEventId && !initialMetrics && !initialError) {
+      // URL has eventId but no initial data yet - server-side fetch in progress
+      // Don't fetch from client, wait for server-side fetch to complete
+      // This prevents duplicate fetches and timeout issues
+      console.log('[SalesAnalytics] URL has eventId but server-side fetch in progress, waiting...');
     }
     // Cleanup function to prevent race conditions
     return () => {
       // Cancel any pending operations if component unmounts
     };
-  }, [eventId, startDateStr, endDateStr, page]);
+  }, [startDateStr, endDateStr, page, urlEventId, urlStartDate, urlEndDate, initialMetrics, initialError, eventId]); // Removed eventId from main dependencies
 
   const loadEventDetails = async () => {
     if (!eventId) return;
@@ -116,26 +170,32 @@ export default function SalesAnalyticsClient({
     setMetricsLoading(true);
     setError(null);
     
-    // Timeout protection (30 seconds max)
-    const timeoutId = setTimeout(() => {
-      setMetricsLoading(false);
-      setError('Request timed out. Please try again.');
-    }, 30000);
+    // Timeout protection (120 seconds to match server-side maxDuration)
+    let timeoutId: NodeJS.Timeout | null = null;
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      timeoutId = setTimeout(() => {
+        reject(new Error('Request timed out. Please try again.'));
+      }, 120000); // Increased to 120 seconds to match server-side timeout
+    });
 
     try {
-      const data = await calculateSalesMetricsServer(
-        eventId,
-        dateRange.startDate || undefined,
-        dateRange.endDate || undefined
-      );
-      clearTimeout(timeoutId);
+      const data = await Promise.race([
+        calculateSalesMetricsServer(
+          eventId,
+          dateRange.startDate || undefined,
+          dateRange.endDate || undefined
+        ),
+        timeoutPromise
+      ]);
+      
+      if (timeoutId) clearTimeout(timeoutId);
       setMetrics(data);
     } catch (err: any) {
-      clearTimeout(timeoutId);
+      if (timeoutId) clearTimeout(timeoutId);
       console.error('[SalesAnalyticsClient] Error loading metrics:', err);
       setError(err.message || 'Failed to load sales metrics');
     } finally {
-      clearTimeout(timeoutId);
+      if (timeoutId) clearTimeout(timeoutId);
       setMetricsLoading(false);
     }
   };
@@ -145,23 +205,28 @@ export default function SalesAnalyticsClient({
     setSalesDataLoading(true);
     setError(null);
     
-    // Timeout protection (30 seconds max)
-    const timeoutId = setTimeout(() => {
-      setSalesDataLoading(false);
-      setError('Request timed out. Please try again.');
-    }, 30000);
+    // Timeout protection (120 seconds to match server-side maxDuration)
+    let timeoutId: NodeJS.Timeout | null = null;
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      timeoutId = setTimeout(() => {
+        reject(new Error('Request timed out. Please try again.'));
+      }, 120000); // Increased to 120 seconds to match server-side timeout
+    });
 
     try {
       // Fetch all transactions (no status filter) to include PENDING manual payments
-      const result = await fetchSalesDataServer({
-        eventId,
-        startDate: dateRange.startDate || undefined,
-        endDate: dateRange.endDate || undefined,
-        status: undefined, // Don't filter by status - include COMPLETED and PENDING manual payments
-        page,
-        pageSize,
-        sort: 'purchaseDate,desc',
-      });
+      const result = await Promise.race([
+        fetchSalesDataServer({
+          eventId,
+          startDate: dateRange.startDate || undefined,
+          endDate: dateRange.endDate || undefined,
+          status: undefined, // Don't filter by status - include COMPLETED and PENDING manual payments
+          page,
+          pageSize,
+          sort: 'purchaseDate,desc',
+        }),
+        timeoutPromise
+      ]);
 
       // Filter to include COMPLETED transactions and PENDING manual payments
       //
@@ -198,16 +263,16 @@ export default function SalesAnalyticsClient({
         return false;
       });
 
-      clearTimeout(timeoutId);
+      if (timeoutId) clearTimeout(timeoutId);
       setSalesData(filteredTransactions);
       // Update total count to reflect filtered results
       setTotalCount(filteredTransactions.length);
     } catch (err: any) {
-      clearTimeout(timeoutId);
+      if (timeoutId) clearTimeout(timeoutId);
       console.error('[SalesAnalyticsClient] Error loading sales data:', err);
       setError(err.message || 'Failed to load sales data');
     } finally {
-      clearTimeout(timeoutId);
+      if (timeoutId) clearTimeout(timeoutId);
       setSalesDataLoading(false);
     }
   };
@@ -230,7 +295,6 @@ export default function SalesAnalyticsClient({
   };
 
   const handleEventSelect = (selectedEventId: string) => {
-    setEventId(selectedEventId);
     setPage(0);
     const params = new URLSearchParams(searchParams.toString());
     if (selectedEventId) {
@@ -238,6 +302,8 @@ export default function SalesAnalyticsClient({
     } else {
       params.delete('eventId');
     }
+    // Update URL - this will trigger server-side fetch via page.tsx with maxDuration=120
+    // The server-side fetch will populate initialMetrics, which we'll use in the component
     router.push(`/admin/sales-analytics?${params.toString()}`);
   };
 
