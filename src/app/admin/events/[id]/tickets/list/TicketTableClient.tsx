@@ -2,7 +2,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import type { EventTicketTransactionDTO } from '@/types';
-import { FaCheckCircle } from 'react-icons/fa';
 import { refundTicketTransactionServer } from './ApiServerActions';
 import { Modal } from '@/components/Modal';
 import TicketDetailsModal from './TicketDetailsModal';
@@ -110,7 +109,10 @@ function RefundModal({
           <>
             <h2 className="text-xl font-bold mb-2">Refund Ticket Transaction</h2>
             <div className="flex flex-col items-center gap-2 text-green-600 font-semibold mb-4">
-              <FaCheckCircle className="text-2xl" /> Refund complete
+              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Refund complete</span>
             </div>
           </>
         ) : ticket ? (
@@ -325,22 +327,25 @@ export default function TicketTableClient({ rows }: { rows: EventTicketTransacti
                     className="bg-gray-200 border border-blue-500 text-blue-600 px-3 py-1.5 rounded-lg font-semibold cursor-not-allowed w-full mt-2 shadow-sm flex flex-row items-center justify-start gap-2 text-base"
                     disabled
                   >
-                    <FaCheckCircle className="text-green-500" /> Refunded
+                    <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Refunded</span>
                   </button>
                 ) : (
                   <button
-                    className="w-full flex-shrink-0 h-14 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 mt-2"
+                    className="w-full flex-shrink-0 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 mt-2"
                     onClick={() => { setRefundTicket(ticket); setRefundModalOpen(true); setRefundError(null); }}
                     title="Refund"
                     aria-label="Refund"
                     type="button"
                   >
-                    <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center">
-                      <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-200 flex items-center justify-center">
+                      <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                       </svg>
                     </div>
-                    <span className="font-semibold text-gray-700">Refund</span>
+                    <span className="font-semibold text-red-700">Refund</span>
                   </button>
                 )}
                 <button

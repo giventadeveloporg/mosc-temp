@@ -1,5 +1,4 @@
 import { EventTicketTransactionDTO, EventTicketTransactionStatisticsDTO, EventDetailsDTO, EventTicketTypeDTO } from '@/types';
-import { FaSearch, FaTicketAlt, FaEnvelope, FaUser, FaHashtag, FaCalendarAlt, FaUsers, FaPhotoVideo, FaTags, FaPercent, FaHome, FaInfoCircle, FaClipboardCheck, FaChartLine } from 'react-icons/fa';
 import Link from 'next/link';
 import TicketTableClient from './TicketTableClient';
 import BatchRefundSection from './BatchRefundSection';
@@ -173,7 +172,17 @@ export default async function TicketListPage({ params, searchParams }: { params:
   const endItemControl = (currentPage - 1) * pageSize + rows.length;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 pb-8" style={{ paddingTop: '180px' }}>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8" style={{ paddingTop: '120px' }}>
+      {/* Page Header */}
+      <div className="mb-4 sm:mb-6 md:mb-8">
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2 text-center sm:text-left">
+          Tickets Sold
+        </h1>
+        <p className="text-xs sm:text-sm text-gray-600 text-center sm:text-left">
+          Manage and view all ticket transactions for this event
+        </p>
+      </div>
+
       {/* Concise Event Summary */}
       {eventDetails && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
@@ -196,7 +205,9 @@ export default async function TicketListPage({ params, searchParams }: { params:
             aria-label="Admin Home"
           >
             <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-              <FaHome className="w-10 h-10 text-blue-500" />
+              <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
             </div>
             <span className="font-semibold text-center leading-tight">Admin Home</span>
           </Link>
@@ -207,7 +218,9 @@ export default async function TicketListPage({ params, searchParams }: { params:
             aria-label="Manage Usage"
           >
             <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-indigo-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-              <FaUsers className="w-10 h-10 text-indigo-500" />
+              <svg className="w-10 h-10 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
             </div>
             <span className="font-semibold text-center leading-tight">Manage Usage</span>
           </Link>
@@ -218,7 +231,9 @@ export default async function TicketListPage({ params, searchParams }: { params:
             aria-label="Manage Media Files"
           >
             <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-yellow-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-              <FaPhotoVideo className="w-10 h-10 text-yellow-500" />
+              <svg className="w-10 h-10 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
             </div>
             <span className="font-semibold text-center leading-tight">Manage Media Files</span>
           </Link>
@@ -229,7 +244,9 @@ export default async function TicketListPage({ params, searchParams }: { params:
             aria-label="Manage Events"
           >
             <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-              <FaCalendarAlt className="w-10 h-10 text-green-500" />
+              <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
             </div>
             <span className="font-semibold text-center leading-tight">Manage Events</span>
           </Link>
@@ -240,7 +257,9 @@ export default async function TicketListPage({ params, searchParams }: { params:
             aria-label="Manage Ticket Types"
           >
             <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-              <FaTags className="w-10 h-10 text-purple-500" />
+              <svg className="w-10 h-10 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+              </svg>
             </div>
             <span className="font-semibold text-center leading-tight">Manage Ticket Types</span>
           </Link>
@@ -251,7 +270,9 @@ export default async function TicketListPage({ params, searchParams }: { params:
             aria-label="Manage Tickets"
           >
             <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-teal-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-              <FaTicketAlt className="w-10 h-10 text-teal-500" />
+              <svg className="w-10 h-10 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+              </svg>
             </div>
             <span className="font-semibold text-center leading-tight">Manage Tickets</span>
           </Link>
@@ -262,7 +283,9 @@ export default async function TicketListPage({ params, searchParams }: { params:
             aria-label="Manage Discount Codes"
           >
             <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-pink-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-              <FaPercent className="w-10 h-10 text-pink-500" />
+              <svg className="w-10 h-10 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
             </div>
             <span className="font-semibold text-center leading-tight">Manage Discount Codes</span>
           </Link>
@@ -273,7 +296,9 @@ export default async function TicketListPage({ params, searchParams }: { params:
             aria-label="Check-In Analytics"
           >
             <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-cyan-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-              <FaClipboardCheck className="w-10 h-10 text-cyan-500" />
+              <svg className="w-10 h-10 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
             </div>
             <span className="font-semibold text-center leading-tight">Check-In Analytics</span>
           </Link>
@@ -284,50 +309,114 @@ export default async function TicketListPage({ params, searchParams }: { params:
             aria-label="Sales Analytics"
           >
             <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-sky-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-              <FaChartLine className="w-10 h-10 text-sky-500" />
+              <svg className="w-10 h-10 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
             </div>
             <span className="font-semibold text-center leading-tight">Sales Analytics</span>
           </Link>
         </div>
       </div>
-      {/* Statistics Dashboard */}
-      <div className="mb-6">
-        <div className="bg-gradient-to-r from-teal-100 to-blue-100 rounded-lg shadow flex flex-wrap gap-6 p-4 items-center justify-between">
-          <div className="flex flex-col items-center min-w-[120px]">
-            <span className="text-xs text-gray-500">Total Tickets Sold</span>
-            <span className="text-2xl font-bold text-teal-700">{statistics ? statistics.totalTicketsSold : '--'}</span>
-          </div>
-          <div className="flex flex-col items-center min-w-[120px]">
-            <span className="text-xs text-gray-500">Total Amount</span>
-            <span className="text-2xl font-bold text-blue-700">{statistics ? `$${statistics.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '--'}</span>
-          </div>
-          <div className="flex flex-col items-center min-w-[120px]">
-            <span className="text-xs text-gray-500">Net Amount</span>
-            <span className="text-2xl font-bold text-green-700">{statistics ? `$${statistics.netAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '--'}</span>
-          </div>
-          <div className="flex flex-col items-center min-w-[120px]">
-            <span className="text-xs text-gray-500">By Status</span>
-            {statistics ? (
-              <div className="flex flex-col gap-1 text-sm mt-1">
-                {Object.entries(statistics.ticketsByStatus).map(([status, count]) => (
-                  <span key={status} className="text-gray-700">{status}: <span className="font-semibold">{count}</span> ({statistics.amountByStatus[status] !== undefined ? `$${statistics.amountByStatus[status].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '--'})</span>
-                ))}
+      {/* Statistics Dashboard - Stats Cards Pattern */}
+      {statistics && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+          {/* Total Tickets Sold */}
+          <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-teal-100 flex items-center justify-center">
+                  <svg className="w-10 h-10 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                  </svg>
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">Total Tickets Sold</dt>
+                    <dd className="text-lg font-medium text-gray-900">{statistics.totalTicketsSold}</dd>
+                  </dl>
+                </div>
               </div>
-            ) : (
-              <span className="text-gray-400">--</span>
-            )}
+            </div>
+          </div>
+
+          {/* Total Amount */}
+          <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center">
+                  <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">Total Amount</dt>
+                    <dd className="text-lg font-medium text-gray-900">${statistics.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Net Amount */}
+          <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center">
+                  <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">Net Amount</dt>
+                    <dd className="text-lg font-medium text-gray-900">${statistics.netAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Tickets By Status */}
+          <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center">
+                  <svg className="w-10 h-10 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate mb-2">By Status</dt>
+                    <dd className="text-sm text-gray-900 space-y-1">
+                      {Object.entries(statistics.ticketsByStatus).map(([status, count]) => (
+                        <div key={status} className="flex justify-between">
+                          <span className="text-gray-600">{status}:</span>
+                          <span className="font-semibold">{count}</span>
+                        </div>
+                      ))}
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Ticket Type Breakdown */}
       {ticketTypes.length > 0 ? (
         <div className="mb-6">
           <div className="bg-gradient-to-r from-purple-100 to-indigo-100 rounded-lg shadow p-4">
             <div className="flex items-center gap-2 mb-4">
-              <FaTags className="text-purple-600 text-lg" />
+              <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+              </svg>
               <h3 className="text-lg font-semibold text-purple-800">Ticket Type Breakdown</h3>
-              <FaInfoCircle className="text-purple-500 text-sm" title="Detailed breakdown of each ticket type with remaining quantities and sales status" />
+              <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" title="Detailed breakdown of each ticket type with remaining quantities and sales status">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {ticketTypes.map((ticketType) => {
@@ -470,30 +559,75 @@ export default async function TicketListPage({ params, searchParams }: { params:
       {/* Batch Refund Section */}
       <BatchRefundSection eventId={Number(eventId)} />
 
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
-        <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-          <FaTicketAlt className="text-teal-500" /> Tickets Sold
-        </h1>
-        <form className="flex flex-wrap gap-2 items-center bg-white rounded-lg shadow px-4 py-2" method="get">
-          <div className="flex items-center gap-1">
-            <FaEnvelope className="text-gray-400" />
-            <input name="email" placeholder="Search by email" defaultValue={email} className="border rounded px-2 py-1 text-sm" />
+      {/* Search Form */}
+      <div className="bg-white shadow-md rounded-lg p-4 sm:p-6 mb-6">
+        <form className="flex flex-col sm:flex-row flex-wrap gap-4 items-end" method="get">
+          <div className="flex-1 min-w-[200px]">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <input
+                id="email"
+                name="email"
+                type="text"
+                placeholder="Search by email"
+                defaultValue={email}
+                className="mt-1 block w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 pl-10 pr-4 py-3 text-base"
+              />
+            </div>
           </div>
-          <div className="flex items-center gap-1">
-            <FaHashtag className="text-gray-400" />
-            <input name="transactionId" placeholder="Transaction ID" defaultValue={transactionId} className="border rounded px-2 py-1 text-sm" />
+          <div className="flex-1 min-w-[200px]">
+            <label htmlFor="transactionId" className="block text-sm font-medium text-gray-700 mb-1">Transaction ID</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                </svg>
+              </div>
+              <input
+                id="transactionId"
+                name="transactionId"
+                type="text"
+                placeholder="Transaction ID"
+                defaultValue={transactionId}
+                className="mt-1 block w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 pl-10 pr-4 py-3 text-base"
+              />
+            </div>
           </div>
-          <div className="flex items-center gap-1">
-            <FaUser className="text-gray-400" />
-            <input name="name" placeholder="Name" defaultValue={name} className="border rounded px-2 py-1 text-sm" />
+          <div className="flex-1 min-w-[200px]">
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                placeholder="Search by name"
+                defaultValue={name}
+                className="mt-1 block w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 pl-10 pr-4 py-3 text-base"
+              />
+            </div>
           </div>
-          <button type="submit" className="ml-2 flex-shrink-0 h-14 rounded-xl bg-teal-100 hover:bg-teal-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-4" title="Search" aria-label="Search">
+          <button
+            type="submit"
+            className="flex-shrink-0 h-14 rounded-xl bg-teal-100 hover:bg-teal-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+            title="Search"
+            aria-label="Search"
+          >
             <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
               <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
-            <span className="font-semibold text-teal-700">Search</span>
+            <span className="font-semibold text-teal-700 hidden sm:inline">Search</span>
           </button>
         </form>
       </div>

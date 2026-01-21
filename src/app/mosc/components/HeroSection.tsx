@@ -22,12 +22,20 @@ const HeroSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 mb-16 items-start">
           {/* Patriarch Image */}
           <div className="flex flex-col items-center justify-start">
-            <div className="w-48 h-48 lg:w-56 lg:h-56 rounded-full overflow-hidden sacred-shadow-lg bg-muted flex items-center justify-center">
-              <AppImage
-                src="/images/logos/Hero-Section-Image-MOSC.jpg"
-                alt="Malankara Orthodox Syrian Church emblem"
-                className="max-w-full max-h-full object-contain"
-              />
+            <div 
+              className="w-48 h-48 lg:w-56 lg:h-56 rounded-full border-2 border-white p-1 flex items-center justify-center"
+              style={{
+                boxShadow: '0 0 20px rgba(255, 255, 255, 0.6), 0 0 40px rgba(255, 255, 255, 0.4), 0 0 60px rgba(255, 255, 255, 0.2)',
+                filter: 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.5))'
+              }}
+            >
+              <div className="w-full h-full rounded-full overflow-hidden sacred-shadow-lg bg-muted flex items-center justify-center">
+                <AppImage
+                  src="/images/logos/Hero-Section-Image-MOSC.jpg"
+                  alt="Malankara Orthodox Syrian Church emblem"
+                  className="max-w-full max-h-full object-contain"
+                />
+              </div>
             </div>
             {/* Patriarch Name and Navigation Links */}
             <div className="mt-4 px-6 py-4 text-center">
@@ -76,13 +84,21 @@ const HeroSection = () => {
 
           {/* Church Cross */}
           <div className="flex flex-col items-center justify-start">
-            <div className="w-48 h-48 lg:w-96 lg:h-96 overflow-hidden flex items-center justify-center bg-transparent p-2">
-              <AppImage
-                src="/images/logos/Current_Edits/MOSC-Center-Image.png"
-                alt="MOSC Hero Image"
-                className="w-full h-full object-contain scale-110"
-                style={{ background: 'transparent' }}
-              />
+            <div 
+              className="w-48 h-48 lg:w-96 lg:h-96 rounded-full border-2 border-white p-1 flex items-center justify-center"
+              style={{
+                boxShadow: '0 0 20px rgba(255, 255, 255, 0.6), 0 0 40px rgba(255, 255, 255, 0.4), 0 0 60px rgba(255, 255, 255, 0.2)',
+                filter: 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.5))'
+              }}
+            >
+              <div className="w-full h-full rounded-full overflow-hidden flex items-center justify-center bg-transparent p-2">
+                <AppImage
+                  src="/images/logos/Current_Edits/MOSC-Center-Image.png"
+                  alt="MOSC Hero Image"
+                  className="w-full h-full object-contain scale-110"
+                  style={{ background: 'transparent' }}
+                />
+              </div>
             </div>
             <h3 className="mt-4 font-heading font-medium text-lg text-foreground text-center">
             </h3>
@@ -90,19 +106,27 @@ const HeroSection = () => {
 
           {/* Christ Iconography */}
           <div className="flex flex-col items-center justify-start">
-            <div className="w-48 h-48 lg:w-56 lg:h-56 overflow-hidden flex flex-col items-center justify-center sacred-shadow-lg rounded-full p-3 gap-1" style={{ background: 'transparent' }}>
-              <AppImage
-                src="/images/logos/Current_Edits/MOSC-Logo-only.png"
-                alt="MOSC Logo"
-                className="w-full h-40 object-contain relative top-[-5px]"
-                style={{ background: 'transparent' }}
-              />
-              <AppImage
-                src="/images/logos/Current_Edits/MOSC-Text-only.png"
-                alt="MOSC Text"
-                className="w-40 h-auto max-h-[40%] object-contain relative top-[-20px]"
-                style={{ background: 'transparent' }}
-              />
+            <div 
+              className="w-48 h-48 lg:w-56 lg:h-56 rounded-full border-2 border-white p-1 flex items-center justify-center"
+              style={{
+                boxShadow: '0 0 20px rgba(255, 255, 255, 0.6), 0 0 40px rgba(255, 255, 255, 0.4), 0 0 60px rgba(255, 255, 255, 0.2)',
+                filter: 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.5))'
+              }}
+            >
+              <div className="w-full h-full rounded-full overflow-hidden flex flex-col items-center justify-center sacred-shadow-lg p-3 gap-1" style={{ background: 'transparent' }}>
+                <AppImage
+                  src="/images/logos/Current_Edits/MOSC-Logo-only.png"
+                  alt="MOSC Logo"
+                  className="w-full h-40 object-contain relative top-[-5px]"
+                  style={{ background: 'transparent' }}
+                />
+                <AppImage
+                  src="/images/logos/Current_Edits/MOSC-Text-only.png"
+                  alt="MOSC Text"
+                  className="w-40 h-auto max-h-[40%] object-contain relative top-[-20px]"
+                  style={{ background: 'transparent' }}
+                />
+              </div>
             </div>
             <h3 className="mt-4 font-heading font-medium text-lg text-foreground text-center">
             </h3>

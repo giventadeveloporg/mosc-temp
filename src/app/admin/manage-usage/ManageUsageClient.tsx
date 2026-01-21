@@ -89,11 +89,12 @@ function UserDetailsTooltip({ user, anchorRect, onClose }: { user: UserProfileDT
   );
 }
 
-function EditUserModal({ user, open, onClose, onSave }: {
+function EditUserModal({ user, open, onClose, onSave, loading }: {
   user: UserProfileDTO | null,
   open: boolean,
   onClose: () => void,
   onSave: (updated: Partial<UserProfileDTO>) => void,
+  loading?: boolean,
 }) {
   const [form, setForm] = useState<Partial<UserProfileDTO>>(user || {});
   useEffect(() => {
@@ -102,11 +103,20 @@ function EditUserModal({ user, open, onClose, onSave }: {
   if (!open || !user) return null;
   return ReactDOM.createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 p-4 overflow-y-auto">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-lg relative my-auto max-h-[90vh] flex flex-col">
+      <div className="bg-white rounded-lg shadow-md w-full max-w-lg relative my-auto max-h-[90vh] flex flex-col">
         <div className="flex-shrink-0 px-6 pt-6 pb-4 border-b border-gray-200">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold">Edit User</h2>
-            <button className="text-gray-400 hover:text-red-500 text-lg font-bold transition-colors" onClick={onClose} aria-label="Close modal">&times;</button>
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Edit User</h2>
+            <button 
+              className="w-10 h-10 rounded-lg bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110" 
+              onClick={onClose} 
+              aria-label="Close modal"
+              title="Close"
+            >
+              <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
         </div>
         <div className="flex-1 overflow-y-auto px-6 py-4">
@@ -121,90 +131,174 @@ function EditUserModal({ user, open, onClose, onSave }: {
           {/* Editable fields */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block font-semibold mb-1">First Name</label>
-              <input type="text" className="w-full border rounded px-3 py-2" value={form.firstName || ''} onChange={e => setForm(f => ({ ...f, firstName: e.target.value }))} />
+              <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+              <input 
+                type="text" 
+                className="mt-1 block w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base" 
+                value={form.firstName || ''} 
+                onChange={e => setForm(f => ({ ...f, firstName: e.target.value }))} 
+              />
             </div>
             <div>
-              <label className="block font-semibold mb-1">Last Name</label>
-              <input type="text" className="w-full border rounded px-3 py-2" value={form.lastName || ''} onChange={e => setForm(f => ({ ...f, lastName: e.target.value }))} />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block font-semibold mb-1">Email</label>
-              <input type="email" className="w-full border rounded px-3 py-2" value={form.email || ''} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} />
-            </div>
-            <div>
-              <label className="block font-semibold mb-1">Phone</label>
-              <input type="text" className="w-full border rounded px-3 py-2" value={form.phone || ''} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block font-semibold mb-1">Address Line 1</label>
-              <input type="text" className="w-full border rounded px-3 py-2" value={form.addressLine1 || ''} onChange={e => setForm(f => ({ ...f, addressLine1: e.target.value }))} />
-            </div>
-            <div>
-              <label className="block font-semibold mb-1">Address Line 2</label>
-              <input type="text" className="w-full border rounded px-3 py-2" value={form.addressLine2 || ''} onChange={e => setForm(f => ({ ...f, addressLine2: e.target.value }))} />
+              <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+              <input 
+                type="text" 
+                className="mt-1 block w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base" 
+                value={form.lastName || ''} 
+                onChange={e => setForm(f => ({ ...f, lastName: e.target.value }))} 
+              />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block font-semibold mb-1">City</label>
-              <input type="text" className="w-full border rounded px-3 py-2" value={form.city || ''} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} />
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <input 
+                type="email" 
+                className="mt-1 block w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base" 
+                value={form.email || ''} 
+                onChange={e => setForm(f => ({ ...f, email: e.target.value }))} 
+              />
             </div>
             <div>
-              <label className="block font-semibold mb-1">State</label>
-              <input type="text" className="w-full border rounded px-3 py-2" value={form.state || ''} onChange={e => setForm(f => ({ ...f, state: e.target.value }))} />
+              <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+              <input 
+                type="text" 
+                className="mt-1 block w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base" 
+                value={form.phone || ''} 
+                onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} 
+              />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block font-semibold mb-1">Zip Code</label>
-              <input type="text" className="w-full border rounded px-3 py-2" value={form.zipCode || ''} onChange={e => setForm(f => ({ ...f, zipCode: e.target.value }))} />
+              <label className="block text-sm font-medium text-gray-700 mb-1">Address Line 1</label>
+              <input 
+                type="text" 
+                className="mt-1 block w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base" 
+                value={form.addressLine1 || ''} 
+                onChange={e => setForm(f => ({ ...f, addressLine1: e.target.value }))} 
+              />
             </div>
             <div>
-              <label className="block font-semibold mb-1">Country</label>
-              <input type="text" className="w-full border rounded px-3 py-2" value={form.country || ''} onChange={e => setForm(f => ({ ...f, country: e.target.value }))} />
+              <label className="block text-sm font-medium text-gray-700 mb-1">Address Line 2</label>
+              <input 
+                type="text" 
+                className="mt-1 block w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base" 
+                value={form.addressLine2 || ''} 
+                onChange={e => setForm(f => ({ ...f, addressLine2: e.target.value }))} 
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+              <input 
+                type="text" 
+                className="mt-1 block w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base" 
+                value={form.city || ''} 
+                onChange={e => setForm(f => ({ ...f, city: e.target.value }))} 
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
+              <input 
+                type="text" 
+                className="mt-1 block w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base" 
+                value={form.state || ''} 
+                onChange={e => setForm(f => ({ ...f, state: e.target.value }))} 
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Zip Code</label>
+              <input 
+                type="text" 
+                className="mt-1 block w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base" 
+                value={form.zipCode || ''} 
+                onChange={e => setForm(f => ({ ...f, zipCode: e.target.value }))} 
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
+              <input 
+                type="text" 
+                className="mt-1 block w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base" 
+                value={form.country || ''} 
+                onChange={e => setForm(f => ({ ...f, country: e.target.value }))} 
+              />
             </div>
           </div>
           {/* India related details section title */}
           <div className="pt-2 pb-1">
-            <h3 className="text-lg font-semibold text-blue-700 border-b border-blue-200 mb-2">India related details</h3>
+            <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 mb-2">India related details</h3>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block font-semibold mb-1">Family Name</label>
-              <input type="text" className="w-full border rounded px-3 py-2" value={form.familyName || ''} onChange={e => setForm(f => ({ ...f, familyName: e.target.value }))} />
+              <label className="block text-sm font-medium text-gray-700 mb-1">Family Name</label>
+              <input 
+                type="text" 
+                className="mt-1 block w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base" 
+                value={form.familyName || ''} 
+                onChange={e => setForm(f => ({ ...f, familyName: e.target.value }))} 
+              />
             </div>
             <div>
-              <label className="block font-semibold mb-1">City/Town</label>
-              <input type="text" className="w-full border rounded px-3 py-2" value={form.cityTown || ''} onChange={e => setForm(f => ({ ...f, cityTown: e.target.value }))} />
+              <label className="block text-sm font-medium text-gray-700 mb-1">City/Town</label>
+              <input 
+                type="text" 
+                className="mt-1 block w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base" 
+                value={form.cityTown || ''} 
+                onChange={e => setForm(f => ({ ...f, cityTown: e.target.value }))} 
+              />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block font-semibold mb-1">District</label>
-              <input type="text" className="w-full border rounded px-3 py-2" value={form.district || ''} onChange={e => setForm(f => ({ ...f, district: e.target.value }))} />
+              <label className="block text-sm font-medium text-gray-700 mb-1">District</label>
+              <input 
+                type="text" 
+                className="mt-1 block w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base" 
+                value={form.district || ''} 
+                onChange={e => setForm(f => ({ ...f, district: e.target.value }))} 
+              />
             </div>
             <div>
-              <label className="block font-semibold mb-1">Educational Institution</label>
-              <input type="text" className="w-full border rounded px-3 py-2" value={form.educationalInstitution || ''} onChange={e => setForm(f => ({ ...f, educationalInstitution: e.target.value }))} />
+              <label className="block text-sm font-medium text-gray-700 mb-1">Educational Institution</label>
+              <input 
+                type="text" 
+                className="mt-1 block w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base" 
+                value={form.educationalInstitution || ''} 
+                onChange={e => setForm(f => ({ ...f, educationalInstitution: e.target.value }))} 
+              />
             </div>
           </div>
           <div>
-            <label className="block font-semibold mb-1">Profile Image URL</label>
-            <input type="text" className="w-full border rounded px-3 py-2" value={form.profileImageUrl || ''} onChange={e => setForm(f => ({ ...f, profileImageUrl: e.target.value }))} />
+            <label className="block text-sm font-medium text-gray-700 mb-1">Profile Image URL</label>
+            <input 
+              type="text" 
+              className="mt-1 block w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base" 
+              value={form.profileImageUrl || ''} 
+              onChange={e => setForm(f => ({ ...f, profileImageUrl: e.target.value }))} 
+            />
           </div>
           <div>
-            <label className="block font-semibold mb-1">Notes</label>
-            <textarea className="w-full border rounded px-3 py-2" value={form.notes || ''} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
+            <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+            <textarea 
+              className="mt-1 block w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base" 
+              rows={3}
+              value={form.notes || ''} 
+              onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} 
+            />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block font-semibold mb-1">Role</label>
-              <select className="w-full border rounded px-3 py-2" value={form.userRole || ''} onChange={e => setForm(f => ({ ...f, userRole: e.target.value }))}>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+              <select 
+                className="mt-1 block w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base" 
+                value={form.userRole || ''} 
+                onChange={e => setForm(f => ({ ...f, userRole: e.target.value }))}
+              >
                 <option value="">Select Role</option>
                 <option value="SUPER_ADMIN">SUPER ADMIN</option>
                 <option value="ADMIN">ADMIN</option>
@@ -214,8 +308,12 @@ function EditUserModal({ user, open, onClose, onSave }: {
               </select>
             </div>
             <div>
-              <label className="block font-semibold mb-1">Status</label>
-              <select className="w-full border rounded px-3 py-2" value={form.userStatus || ''} onChange={e => setForm(f => ({ ...f, userStatus: e.target.value }))}>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+              <select 
+                className="mt-1 block w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base" 
+                value={form.userStatus || ''} 
+                onChange={e => setForm(f => ({ ...f, userStatus: e.target.value }))}
+              >
                 <option value="">Select Status</option>
                 <option value="ACTIVE">ACTIVE</option>
                 <option value="INACTIVE">INACTIVE</option>
@@ -230,26 +328,46 @@ function EditUserModal({ user, open, onClose, onSave }: {
           </form>
         </div>
         <div className="flex-shrink-0 px-6 py-4 border-t border-gray-200 bg-gray-50">
-          <div className="flex justify-end gap-2">
-            <button type="button" className="bg-teal-100 hover:bg-teal-200 text-teal-800 font-bold px-4 py-2 rounded-md flex items-center gap-2 transition-colors" onClick={onClose}>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-              Cancel
-            </button>
+          {/* Form Action Buttons - Design System Pattern */}
+          <div className="flex flex-row gap-2 sm:gap-3 mt-4">
+            {/* Save Button - Green */}
             <button 
               type="submit" 
-              form="edit-user-form" 
-              className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
-              title="Save Changes"
-              aria-label="Save Changes"
+              form="edit-user-form"
+              disabled={loading}
+              className="flex-1 sm:flex-1 flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-0 sm:gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              title={loading ? 'Saving...' : 'Save Changes'}
+              aria-label={loading ? 'Saving...' : 'Save Changes'}
             >
-              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+                {loading ? (
+                  <svg className="animate-spin w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                ) : (
+                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+              </div>
+              <span className="font-semibold text-green-700 hidden sm:inline">{loading ? 'Saving...' : 'Save'}</span>
+            </button>
+
+            {/* Cancel Button - Red */}
+            <button 
+              type="button" 
+              onClick={onClose}
+              className="flex-1 sm:flex-1 flex-shrink-0 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center gap-0 sm:gap-3 transition-all duration-300 hover:scale-105"
+              title="Cancel"
+              aria-label="Cancel"
+            >
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-200 flex items-center justify-center">
+                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </div>
-              <span className="font-semibold text-blue-700">Save</span>
+              <span className="font-semibold text-red-700 hidden sm:inline">Cancel</span>
             </button>
           </div>
         </div>
@@ -560,10 +678,17 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
   const totalPages = Math.ceil(totalUsers / pageSize) || 1;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ paddingTop: '180px' }}>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8" style={{ paddingTop: '120px' }}>
       <AdminNavigation />
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Manage Users</h1>
+      {/* Page Header */}
+      <div className="mb-4 sm:mb-6 md:mb-8">
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2 text-center sm:text-left">
+          Manage Users
+        </h1>
+        <p className="text-xs sm:text-sm text-gray-600 text-center sm:text-left">
+          Manage user profiles, roles, and statuses for your organization
+        </p>
+      </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => fileInputRef.current?.click()}
@@ -596,17 +721,16 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
             <span className="font-semibold text-blue-700">Download Bulk Upload Template File</span>
           </a>
         </div>
-      </div>
 
       {/* Filter and Action Controls */}
-      <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-4 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="bg-white shadow-md rounded-lg p-4 sm:p-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
           {/* Search Input */}
           <div className="flex items-center gap-2">
             <select
               value={searchField}
               onChange={(e) => setSearchField(e.target.value)}
-              className="h-10 border-gray-300 dark:border-gray-600 rounded-l-md dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+              className="border border-gray-400 rounded-l-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base min-h-[48px]"
             >
               {SEARCH_FIELDS.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
             </select>
@@ -615,7 +739,7 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
               placeholder={`Search by ${SEARCH_FIELDS.find(f => f.value === searchField)?.label}...`}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="block w-full h-10 px-3 border-gray-300 dark:border-gray-600 rounded-r-md dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+              className="block w-full border border-gray-400 rounded-r-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base min-h-[48px]"
             />
           </div>
 
@@ -623,7 +747,7 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value)}
-            className="block w-full h-10 px-3 border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+            className="block w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base min-h-[48px]"
           >
             <option value="">All Statuses</option>
             <option value="ACTIVE">Active</option>
@@ -639,7 +763,7 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
           <select
             value={role}
             onChange={(e) => setRole(e.target.value)}
-            className="block w-full h-10 px-3 border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+            className="block w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base min-h-[48px]"
           >
             <option value="">All Roles</option>
             <option value="SUPER_ADMIN">Super Admin</option>
@@ -649,11 +773,11 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
             <option value="MEMBER">Member</option>
           </select>
         </div>
-        {bulkMessage && <p className="mt-2 text-sm text-center text-red-600 dark:text-red-400">{bulkMessage}</p>}
+        {bulkMessage && <p className="mt-2 text-sm text-center text-red-600">{bulkMessage}</p>}
       </div>
 
       {/* Users Table */}
-      <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
+      <div className="bg-white shadow-md rounded-lg overflow-hidden">
         {/* Rainbow Gradient Scrollbar CSS */}
         <style dangerouslySetInnerHTML={{
           __html: `
@@ -758,52 +882,52 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
                 overflow: 'hidden'
               }}
             >
-              <thead className="bg-gray-50 dark:bg-gray-700">
+              <thead className="bg-gray-50">
                 <tr>
-                  <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">Name</th>
-                  <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">Contact</th>
-                  <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">Role</th>
-                  <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">Status</th>
-                  <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">Joined</th>
-                  <th scope="col" className="px-8 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-300 dark:border-gray-600">Actions</th>
+                  <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-r border-gray-300">Name</th>
+                  <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-r border-gray-300">Contact</th>
+                  <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-r border-gray-300">Role</th>
+                  <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-r border-gray-300">Status</th>
+                  <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-r border-gray-300">Joined</th>
+                  <th scope="col" className="px-8 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-300">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-300 dark:divide-gray-600">
+              <tbody className="divide-y divide-gray-300">
               {loading && Array.from({ length: pageSize }).map((_, i) => (
-                <tr key={`skel-${i}`} className={`${i % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-blue-50 dark:bg-gray-700'} border-b border-gray-300 dark:border-gray-600`}>
-                  <td className="px-8 py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600"><div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 animate-pulse"></div></td>
-                  <td className="px-8 py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600"><div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full animate-pulse"></div></td>
-                  <td className="px-8 py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600"><div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-20 animate-pulse"></div></td>
-                  <td className="px-8 py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600"><div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-20 animate-pulse"></div></td>
-                  <td className="px-8 py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600"><div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse"></div></td>
+                <tr key={`skel-${i}`} className={`${i % 2 === 0 ? 'bg-white' : 'bg-blue-50'} border-b border-gray-300`}>
+                  <td className="px-8 py-4 whitespace-nowrap border-r border-gray-200"><div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div></td>
+                  <td className="px-8 py-4 whitespace-nowrap border-r border-gray-200"><div className="h-4 bg-gray-200 rounded w-full animate-pulse"></div></td>
+                  <td className="px-8 py-4 whitespace-nowrap border-r border-gray-200"><div className="h-6 bg-gray-200 rounded-full w-20 animate-pulse"></div></td>
+                  <td className="px-8 py-4 whitespace-nowrap border-r border-gray-200"><div className="h-6 bg-gray-200 rounded-full w-20 animate-pulse"></div></td>
+                  <td className="px-8 py-4 whitespace-nowrap border-r border-gray-200"><div className="h-4 bg-gray-200 rounded w-24 animate-pulse"></div></td>
                   <td className="px-8 py-4 whitespace-nowrap text-right">
                     <div className="flex justify-end items-center gap-2">
-                      <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"></div>
-                      <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"></div>
+                      <div className="h-8 w-8 bg-gray-200 rounded-full animate-pulse"></div>
+                      <div className="h-8 w-8 bg-gray-200 rounded-full animate-pulse"></div>
                     </div>
                   </td>
                 </tr>
               ))}
               {!loading && users.map((user, index) => (
-                <tr key={user.id} className={`${index % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-blue-50 dark:bg-gray-700'} hover:bg-yellow-100 dark:hover:bg-gray-700/50 transition-colors border-b border-gray-300 dark:border-gray-600`}>
-                  <td className="px-8 py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600" onMouseEnter={(e) => handleMouseEnter(user, e)} onMouseLeave={handleMouseLeave}>
+                <tr key={user.id} className={`${index % 2 === 0 ? 'bg-white' : 'bg-blue-50'} hover:bg-yellow-100 transition-colors border-b border-gray-300`}>
+                  <td className="px-8 py-4 whitespace-nowrap border-r border-gray-200" onMouseEnter={(e) => handleMouseEnter(user, e)} onMouseLeave={handleMouseLeave}>
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
                         <img className="h-10 w-10 rounded-full object-cover" src={user.profileImageUrl || `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=random`} alt={`${user.firstName} ${user.lastName}`} />
                       </div>
                       <div className="ml-4">
-                        <div className="text-xs font-medium text-gray-900 dark:text-white">{user.firstName} {user.lastName}</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">{user.email}</div>
+                        <div className="text-xs font-medium text-gray-900">{user.firstName} {user.lastName}</div>
+                        <div className="text-xs text-gray-500">{user.email}</div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-8 py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600" onMouseEnter={(e) => handleMouseEnter(user, e)} onMouseLeave={handleMouseLeave}>
-                    <div className="text-xs text-gray-900 dark:text-white">{user.phone}</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">{user.city}, {user.state}</div>
+                  <td className="px-8 py-4 whitespace-nowrap border-r border-gray-200" onMouseEnter={(e) => handleMouseEnter(user, e)} onMouseLeave={handleMouseLeave}>
+                    <div className="text-xs text-gray-900">{user.phone}</div>
+                    <div className="text-xs text-gray-500">{user.city}, {user.state}</div>
                   </td>
-                  <td className="px-8 py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600">{renderRoleBadge(user.userRole)}</td>
-                  <td className="px-8 py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600">{renderStatusBadge(user.userStatus)}</td>
-                  <td className="px-8 py-4 whitespace-nowrap text-xs text-gray-500 dark:text-gray-400 border-r border-gray-200 dark:border-gray-600">
+                  <td className="px-8 py-4 whitespace-nowrap border-r border-gray-200">{renderRoleBadge(user.userRole)}</td>
+                  <td className="px-8 py-4 whitespace-nowrap border-r border-gray-200">{renderStatusBadge(user.userStatus)}</td>
+                  <td className="px-8 py-4 whitespace-nowrap text-xs text-gray-500 border-r border-gray-200">
                     {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
                   </td>
                   <td className="px-8 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -946,6 +1070,7 @@ export default function ManageUsageClient({ adminProfile }: { adminProfile: User
           open={!!editUser}
           onClose={() => setEditUser(null)}
           onSave={handleEditSave}
+          loading={editLoading}
         />
       )}
     </div>

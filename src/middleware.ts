@@ -101,6 +101,7 @@ const clerkMiddleware = authMiddleware({
     '/api/diagnostic(.*)',
     '/api/logs(.*)',
     '/mosc(.*)',
+    '/syro(.*)',
     '/events(.*)',
     '/sponsors(.*)',
     '/team(.*)',

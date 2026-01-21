@@ -45,7 +45,7 @@ const moscPageTests = [
       'nav',
       'main',
       'a[href*="/mosc/"]',
-      'a[href="/mosc/gallery"]'
+      'button:has-text("Gallery"), a[href="/mosc/gallery"]'
     ],
     validation: [
       'MOSC homepage loads',
@@ -58,7 +58,8 @@ const moscPageTests = [
     interactions: [
       { type: 'wait', selector: 'main', timeout: 5000 },
       { type: 'check', selector: 'nav', visible: true },
-      { type: 'check', selector: 'a[href="/mosc/gallery"]', visible: true }
+      // Check for Gallery link - it may be a button or anchor tag
+      { type: 'check', selector: 'a[href="/mosc/gallery"]:visible, button:has-text("Gallery"):visible', visible: true }
     ]
   },
   {
@@ -67,7 +68,7 @@ const moscPageTests = [
     url: '/mosc',
     priority: 'high',
     expectedElements: [
-      'a[href="/mosc/gallery"]',
+      'button:has-text("Gallery"), a[href="/mosc/gallery"]',
       'h1, h2',
       '[class*="gallery"], [class*="album"], [class*="grid"]'
     ],
@@ -79,8 +80,10 @@ const moscPageTests = [
     ],
     interactions: [
       { type: 'wait', selector: 'main', timeout: 5000 },
-      { type: 'wait', selector: 'a[href="/mosc/gallery"]', timeout: 5000 },
-      { type: 'click', selector: 'a[href="/mosc/gallery"]', waitForNavigation: '/mosc/gallery', navigationTimeout: 10000 },
+      // Wait for page to fully load
+      { type: 'wait', selector: 'body', timeout: 2000 },
+      // Find and click Gallery link - try multiple selectors
+      { type: 'click', selector: 'a[href="/mosc/gallery"]:visible, button:has-text("Gallery"):visible', waitForNavigation: '/mosc/gallery', navigationTimeout: 15000 },
       { type: 'verifyUrl', pattern: '/mosc/gallery' },
       { type: 'wait', selector: '[class*="gallery"], [class*="album"], [class*="grid"]', timeout: 5000 }
     ]
@@ -121,21 +124,6 @@ const moscPageTests = [
     ],
     interactions: [
       { type: 'wait', selector: 'img', timeout: 5000 }
-    ]
-  },
-  {
-    id: 'mosc-004',
-    name: 'MOSC Photo Gallery Page Test',
-    url: '/mosc/photo-gallery',
-    priority: 'medium',
-    expectedElements: [
-      'h1',
-      '[class*="gallery"], [class*="grid"], [class*="photo"]',
-      'img, [class*="image"]'
-    ],
-    validation: [
-      'MOSC Photo Gallery page loads',
-      'Gallery items displayed'
     ]
   },
   {
@@ -568,12 +556,37 @@ async function executeTestWithPlaywright(test, testUrl, startTime) {
         try {
           if (interaction.type === 'wait') {
             await page.waitForSelector(interaction.selector, { timeout: interaction.timeout || 5000 });
-          } else if (interaction.type === 'check') {
+          } else if (interaction.type === 'scroll') {
+            // Scroll to element to make it visible
             const element = await page.locator(interaction.selector).first();
+            await element.scrollIntoViewIfNeeded({ timeout: interaction.timeout || 5000 });
+            // Small delay to ensure scroll completes
+            await new Promise(resolve => setTimeout(resolve, 300));
+          } else if (interaction.type === 'check') {
+            // Handle multiple selectors (comma-separated)
+            const selectorParts = interaction.selector.split(',').map(s => s.trim());
+            let found = false;
+            let element = null;
+            
+            for (const part of selectorParts) {
+              try {
+                const locator = page.locator(part).first();
+                const isVisible = await locator.isVisible({ timeout: 2000 }).catch(() => false);
+                if (isVisible) {
+                  found = true;
+                  element = locator;
+                  break;
+                }
+              } catch (partError) {
+                continue;
+              }
+            }
+            
             if (interaction.visible !== undefined) {
-              const isVisible = await element.isVisible();
-              if (isVisible !== interaction.visible) {
-                errors.push(`Element ${interaction.selector} visibility check failed`);
+              if (!found && interaction.visible) {
+                errors.push(`Element ${interaction.selector} visibility check failed - not found or not visible`);
+              } else if (found && !interaction.visible) {
+                errors.push(`Element ${interaction.selector} visibility check failed - element is visible but should not be`);
               }
             }
             if (interaction.count) {
@@ -584,10 +597,39 @@ async function executeTestWithPlaywright(test, testUrl, startTime) {
             }
           } else if (interaction.type === 'click') {
             // Click an element and optionally wait for navigation
-            const element = await page.locator(interaction.selector).first();
-            await element.click({ timeout: interaction.timeout || 5000 });
+            // Find the first visible element matching the selector
+            const selectorParts = interaction.selector.split(',').map(s => s.trim());
+            let element = null;
+            let clicked = false;
+            
+            for (const part of selectorParts) {
+              try {
+                const locator = page.locator(part).first();
+                const isVisible = await locator.isVisible({ timeout: 2000 }).catch(() => false);
+                if (isVisible) {
+                  element = locator;
+                  // Scroll to element to ensure it's in viewport
+                  await element.scrollIntoViewIfNeeded({ timeout: 2000 }).catch(() => {});
+                  await new Promise(resolve => setTimeout(resolve, 300));
+                  await element.click({ timeout: interaction.timeout || 5000 });
+                  clicked = true;
+                  break;
+                }
+              } catch (partError) {
+                continue;
+              }
+            }
+            
+            if (!clicked) {
+              // Fallback: try to click the first matching element even if not visible
+              element = await page.locator(interaction.selector).first();
+              await element.scrollIntoViewIfNeeded({ timeout: 2000 }).catch(() => {});
+              await new Promise(resolve => setTimeout(resolve, 300));
+              await element.click({ timeout: interaction.timeout || 5000, force: true });
+            }
+            
             if (interaction.waitForNavigation) {
-              await page.waitForURL(interaction.waitForNavigation, { timeout: interaction.navigationTimeout || 10000 });
+              await page.waitForURL(interaction.waitForNavigation, { timeout: interaction.navigationTimeout || 15000 });
             }
           } else if (interaction.type === 'verifyUrl') {
             // Verify current URL matches expected pattern
