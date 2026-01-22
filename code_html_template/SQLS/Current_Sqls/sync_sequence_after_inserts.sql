@@ -66,6 +66,12 @@ WITH max_ids AS (
     SELECT MAX(id) FROM qr_code_usage
     UNION ALL
     SELECT MAX(id) FROM payment_provider_config
+    UNION ALL
+    SELECT MAX(id) FROM tenant_email_addresses
+    UNION ALL
+    SELECT MAX(id) FROM donation_transaction
+    UNION ALL
+    SELECT MAX(id) FROM donation_statistics
 --    UNION ALL
 --    SELECT MAX(id) FROM user_registration_request
     -- Add any other tables using sequence_generator here

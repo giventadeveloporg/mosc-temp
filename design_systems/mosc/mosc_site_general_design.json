@@ -1,0 +1,832 @@
+{
+  "designSystem": {
+    "name": "Malankara Orthodox Syrian Church (MOSC) Design System",
+    "version": "1.0.0",
+    "description": "Sacred, reverent design system inspired by Orthodox Christian traditions with warm earth tones, elegant typography, and thoughtful spacing. This design system provides comprehensive guidelines for creating consistent, spiritually-inspired UI components that honor the ancient traditions of the Malankara Orthodox Syrian Church.",
+    "basedOn": "MOSC Redesign Project - Styling Standards",
+    "technologyStack": ["Next.js", "React", "Tailwind CSS", "TypeScript"],
+    "designPhilosophy": {
+      "corePrinciple": "Sacred and reverent design that reflects Orthodox Christian traditions",
+      "aesthetic": "Warm earth tones, elegant typography, thoughtful spacing, and Byzantine-inspired ornamental elements",
+      "emotionalTone": "Reverent, contemplative, welcoming, and spiritually grounded",
+      "culturalContext": "Honors the ancient traditions of the Saint Thomas Christian community established in 52 AD"
+    },
+    
+    "colorSystem": {
+      "description": "Warm earth tone palette inspired by Orthodox Christian iconography and traditional manuscripts",
+      "coreColors": {
+        "background": {
+          "hex": "#F5F1E8",
+          "description": "Soft cream - primary background color",
+          "tailwindClass": "bg-background",
+          "usage": "Main page backgrounds, section backgrounds"
+        },
+        "foreground": {
+          "hex": "#2D2A26",
+          "description": "Near-black with warm undertones - primary text color",
+          "tailwindClass": "text-foreground",
+          "usage": "Headings, primary text content"
+        },
+        "border": {
+          "hex": "rgba(139, 125, 107, 0.2)",
+          "description": "Warm earth tone with transparency",
+          "tailwindClass": "border-border",
+          "usage": "Borders, dividers, card edges"
+        },
+        "input": {
+          "hex": "#FFFFFF",
+          "description": "Pure white - form input backgrounds",
+          "tailwindClass": "bg-input",
+          "usage": "Input fields, form elements"
+        },
+        "ring": {
+          "hex": "#8B7D6B",
+          "description": "Warm earth tone - focus ring color",
+          "tailwindClass": "ring-ring",
+          "usage": "Focus states, interactive element indicators"
+        }
+      },
+      "semanticColors": {
+        "primary": {
+          "hex": "#8B7D6B",
+          "description": "Warm earth tone - primary brand color",
+          "tailwindClass": "bg-primary text-primary-foreground",
+          "foreground": "#FFFFFF",
+          "usage": "Primary buttons, active states, navigation highlights, icons",
+          "variants": {
+            "light": "bg-primary/10",
+            "medium": "bg-primary/20",
+            "hover": "bg-primary/90"
+          }
+        },
+        "secondary": {
+          "hex": "#A0926B",
+          "description": "Lighter complement to primary",
+          "tailwindClass": "bg-secondary text-secondary-foreground",
+          "foreground": "#2D2A26",
+          "usage": "Secondary buttons, accents, supporting elements"
+        },
+        "accent": {
+          "hex": "#6B4E3D",
+          "description": "Rich brown - accent color",
+          "tailwindClass": "bg-accent text-accent-foreground",
+          "foreground": "#FFFFFF",
+          "usage": "Accent elements, decorative borders, emphasis"
+        },
+        "success": {
+          "hex": "#4A6741",
+          "description": "Muted sage green",
+          "tailwindClass": "bg-success text-success-foreground",
+          "foreground": "#FFFFFF",
+          "usage": "Success states, positive feedback"
+        },
+        "warning": {
+          "hex": "#A67C52",
+          "description": "Warm amber",
+          "tailwindClass": "bg-warning text-warning-foreground",
+          "foreground": "#FFFFFF",
+          "usage": "Warning states, attention-grabbing elements"
+        },
+        "error": {
+          "hex": "#8B4A42",
+          "description": "Subdued terracotta",
+          "tailwindClass": "bg-error text-error-foreground",
+          "foreground": "#FFFFFF",
+          "usage": "Error states, destructive actions"
+        },
+        "destructive": {
+          "hex": "#8B4A42",
+          "description": "Subdued terracotta (same as error)",
+          "tailwindClass": "bg-destructive text-destructive-foreground",
+          "foreground": "#FFFFFF",
+          "usage": "Destructive actions, delete buttons"
+        },
+        "muted": {
+          "hex": "#EDE7D3",
+          "description": "Lighter complement - subtle backgrounds",
+          "tailwindClass": "bg-muted text-muted-foreground",
+          "foreground": "#5A5550",
+          "usage": "Subtle backgrounds, inactive states, secondary text"
+        }
+      },
+      "surfaceColors": {
+        "card": {
+          "hex": "#FFFFFF",
+          "description": "Pure white - card backgrounds",
+          "tailwindClass": "bg-card text-card-foreground",
+          "foreground": "#2D2A26",
+          "usage": "Cards, panels, elevated surfaces"
+        },
+        "popover": {
+          "hex": "#FFFFFF",
+          "description": "Pure white - popover backgrounds",
+          "tailwindClass": "bg-popover text-popover-foreground",
+          "foreground": "#2D2A26",
+          "usage": "Popovers, dropdowns, tooltips"
+        }
+      },
+      "gradientPatterns": {
+        "heroBackground": {
+          "description": "Subtle gradient for hero sections",
+          "tailwindClasses": "bg-gradient-to-br from-background to-muted",
+          "usage": "Hero sections, large content areas"
+        },
+        "sacredGradient": {
+          "description": "Sacred gradient pattern",
+          "css": "linear-gradient(135deg, #F5F1E8 0%, #EDE7D3 100%)",
+          "tailwindClass": "sacred-gradient",
+          "usage": "Special sections, decorative backgrounds"
+        },
+        "ornamentalBorder": {
+          "description": "Ornamental top border gradient",
+          "tailwindClasses": "bg-gradient-to-r from-primary/20 via-accent to-primary/20",
+          "usage": "Header top border, decorative dividers"
+        },
+        "galleryContainer": {
+          "description": "Conservative gradient for gallery containers",
+          "tailwindClasses": "bg-gradient-to-br from-background via-muted to-background",
+          "overlay": "radial-gradient(circle at top left, rgba(139, 125, 107, 0.08), transparent 55%)",
+          "usage": "Gallery grids, media containers"
+        }
+      }
+    },
+    
+    "typography": {
+      "description": "Elegant typography system with distinct font families for different content types",
+      "fontFamilies": {
+        "heading": {
+          "name": "Crimson Text",
+          "type": "serif",
+          "googleFonts": "https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600&display=swap",
+          "tailwindClass": "font-heading",
+          "usage": "Titles, headings, important text, section headers",
+          "weights": [400, 600],
+          "characteristics": "Elegant serif with traditional, reverent feel"
+        },
+        "body": {
+          "name": "Source Sans Pro",
+          "type": "sans-serif",
+          "googleFonts": "https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;500&display=swap",
+          "tailwindClass": "font-body",
+          "usage": "Paragraphs, general content, body text",
+          "weights": [300, 400, 500],
+          "characteristics": "Clean, readable sans-serif for body content"
+        },
+        "caption": {
+          "name": "Lato",
+          "type": "sans-serif",
+          "googleFonts": "https://fonts.googleapis.com/css2?family=Lato:wght@400&display=swap",
+          "tailwindClass": "font-caption",
+          "usage": "Small text, labels, captions, metadata",
+          "weights": [400],
+          "characteristics": "Subtle, unobtrusive for secondary information"
+        },
+        "monospace": {
+          "name": "JetBrains Mono",
+          "type": "monospace",
+          "googleFonts": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap",
+          "tailwindClass": "font-mono",
+          "usage": "Code, technical content, dates in specific formats",
+          "weights": [400],
+          "characteristics": "Technical, precise for code and data"
+        },
+        "special": {
+          "name": "Lora",
+          "type": "serif",
+          "googleFonts": "https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&display=swap",
+          "usage": "Special headings, patriarch names, ceremonial text",
+          "weights": [400, 500, 600, 700],
+          "characteristics": "Elegant serif for special occasions and important names"
+        }
+      },
+      "fontSizes": {
+        "h1": {
+          "tailwindClass": "text-4xl lg:text-5xl",
+          "description": "Main page titles, hero headings",
+          "fontFamily": "font-heading",
+          "weight": "font-semibold"
+        },
+        "h2": {
+          "tailwindClass": "text-3xl",
+          "description": "Section titles, major headings",
+          "fontFamily": "font-heading",
+          "weight": "font-semibold"
+        },
+        "h3": {
+          "tailwindClass": "text-xl lg:text-2xl",
+          "description": "Subsection titles, card headings",
+          "fontFamily": "font-heading",
+          "weight": "font-medium"
+        },
+        "h4": {
+          "tailwindClass": "text-lg",
+          "description": "Minor headings, list titles",
+          "fontFamily": "font-heading",
+          "weight": "font-semibold"
+        },
+        "body": {
+          "tailwindClass": "text-lg",
+          "description": "Body text, paragraphs",
+          "fontFamily": "font-body",
+          "weight": "font-normal"
+        },
+        "caption": {
+          "tailwindClass": "text-sm",
+          "description": "Captions, labels, metadata",
+          "fontFamily": "font-caption",
+          "weight": "font-normal"
+        },
+        "small": {
+          "tailwindClass": "text-xs",
+          "description": "Small text, fine print",
+          "fontFamily": "font-caption",
+          "weight": "font-medium"
+        }
+      },
+      "fontUsageRules": {
+        "headings": "Always use font-heading (Crimson Text) for all headings (h1-h6)",
+        "body": "Always use font-body (Source Sans Pro) for paragraphs and general content",
+        "captions": "Use font-caption (Lato) for small text, labels, and metadata",
+        "code": "Use font-mono (JetBrains Mono) for code and technical content",
+        "special": "Use Lora for special ceremonial text and important names"
+      }
+    },
+    
+    "spacing": {
+      "description": "Thoughtful spacing system using 'sacred spacing' concept for consistent vertical rhythm",
+      "sacredSpacing": {
+        "value": "2rem (32px)",
+        "description": "Standard vertical spacing unit",
+        "tailwindClass": "space-sacred"
+      },
+      "sectionSpacing": {
+        "large": {
+          "tailwindClass": "py-16",
+          "value": "4rem (64px)",
+          "usage": "Major content sections"
+        },
+        "medium": {
+          "tailwindClass": "py-12",
+          "value": "3rem (48px)",
+          "usage": "Secondary sections"
+        },
+        "small": {
+          "tailwindClass": "py-8",
+          "value": "2rem (32px)",
+          "usage": "Compact sections"
+        }
+      },
+      "containerPadding": {
+        "horizontal": {
+          "tailwindClass": "px-4 sm:px-6 lg:px-8",
+          "values": {
+            "mobile": "1rem (16px)",
+            "tablet": "1.5rem (24px)",
+            "desktop": "2rem (32px)"
+          },
+          "usage": "Responsive horizontal padding for content containers"
+        }
+      },
+      "gridGaps": {
+        "cards": {
+          "tailwindClass": "gap-8",
+          "value": "2rem (32px)",
+          "usage": "Card grid layouts"
+        },
+        "features": {
+          "tailwindClass": "gap-8 lg:gap-12",
+          "values": {
+            "mobile": "2rem (32px)",
+            "desktop": "3rem (48px)"
+          },
+          "usage": "Feature grid layouts"
+        },
+        "stats": {
+          "tailwindClass": "gap-4",
+          "value": "1rem (16px)",
+          "usage": "Statistics grid layouts"
+        }
+      },
+      "componentSpacing": {
+        "cardPadding": {
+          "tailwindClass": "p-6",
+          "value": "1.5rem (24px)",
+          "usage": "Standard card padding"
+        },
+        "cardPaddingLarge": {
+          "tailwindClass": "p-8",
+          "value": "2rem (32px)",
+          "usage": "Large card padding"
+        },
+        "iconContainer": {
+          "tailwindClass": "mb-4",
+          "value": "1rem (16px)",
+          "usage": "Spacing below icon containers"
+        },
+        "textSpacing": {
+          "tailwindClass": "mb-3",
+          "value": "0.75rem (12px)",
+          "usage": "Spacing between text elements"
+        }
+      }
+    },
+    
+    "layout": {
+      "description": "Layout patterns and container structures",
+      "maxWidth": {
+        "container": {
+          "tailwindClass": "max-w-7xl mx-auto",
+          "value": "80rem (1280px)",
+          "usage": "Main content containers"
+        }
+      },
+      "gridSystems": {
+        "cards": {
+          "tailwindClasses": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8",
+          "description": "Responsive card grid: 1 column mobile, 2 tablet, 4 desktop",
+          "usage": "Card-based layouts, feature grids"
+        },
+        "features": {
+          "tailwindClasses": "grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12",
+          "description": "Feature grid: 1 column mobile, 3 desktop",
+          "usage": "Feature sections, service grids"
+        },
+        "stats": {
+          "tailwindClasses": "grid grid-cols-2 gap-4",
+          "description": "Statistics grid: 2 columns",
+          "usage": "Statistics, metrics displays"
+        },
+        "gallery": {
+          "tailwindClasses": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6",
+          "description": "Gallery grid: 1 column mobile, 2 tablet, 3 desktop",
+          "usage": "Photo galleries, album grids"
+        }
+      },
+      "breakpoints": {
+        "sm": "640px",
+        "md": "768px",
+        "lg": "1024px",
+        "xl": "1280px"
+      },
+      "responsiveStrategy": "Mobile-first design approach"
+    },
+    
+    "shadows": {
+      "description": "Sacred shadow system with warm earth tone shadows",
+      "sacredShadow": {
+        "tailwindClass": "sacred-shadow",
+        "css": "box-shadow: 0 2px 8px rgba(139, 125, 107, 0.15)",
+        "usage": "Standard card shadows, elevated elements"
+      },
+      "sacredShadowSm": {
+        "tailwindClass": "sacred-shadow-sm",
+        "css": "box-shadow: 0 2px 4px rgba(139, 125, 107, 0.15)",
+        "usage": "Subtle shadows, small elevations"
+      },
+      "sacredShadowLg": {
+        "tailwindClass": "sacred-shadow-lg",
+        "css": "box-shadow: 0 4px 12px rgba(139, 125, 107, 0.15)",
+        "usage": "Large shadows, prominent elevations, header when scrolled"
+      }
+    },
+    
+    "transitions": {
+      "description": "Smooth, reverent transitions for interactive elements",
+      "reverentTransition": {
+        "tailwindClass": "reverent-transition",
+        "css": "transition: all 200ms ease-out",
+        "usage": "Standard transitions for hover states, color changes"
+      },
+      "reverentHover": {
+        "tailwindClass": "reverent-hover",
+        "css": "transform: scale(1.02)",
+        "usage": "Subtle scale transform on hover"
+      },
+      "contemplativeTransition": {
+        "description": "Slower transition for contemplative interactions",
+        "css": "transition: all 300ms ease-in-out",
+        "usage": "Slower animations for special interactions"
+      }
+    },
+    
+    "borderRadius": {
+      "description": "Border radius values for rounded elements",
+      "roundedSacred": {
+        "tailwindClass": "rounded-sacred",
+        "value": "8px",
+        "usage": "Standard rounded corners"
+      },
+      "roundedLg": {
+        "tailwindClass": "rounded-lg",
+        "value": "8px",
+        "usage": "Large rounded corners for cards"
+      },
+      "roundedXl": {
+        "tailwindClass": "rounded-xl",
+        "value": "12px",
+        "usage": "Extra large rounded corners"
+      },
+      "rounded2xl": {
+        "tailwindClass": "rounded-2xl",
+        "value": "16px",
+        "usage": "Very large rounded corners for special elements"
+      },
+      "rounded3xl": {
+        "tailwindClass": "rounded-3xl",
+        "value": "24px",
+        "usage": "Gallery containers, large decorative elements"
+      },
+      "roundedFull": {
+        "tailwindClass": "rounded-full",
+        "value": "50%",
+        "usage": "Circular elements, avatars, icon containers"
+      }
+    },
+    
+    "ornamentalElements": {
+      "description": "Byzantine-inspired decorative elements",
+      "orthodoxCross": {
+        "description": "Decorative Orthodox cross SVG component",
+        "usage": "Header dividers, decorative accents",
+        "styling": "text-primary/60, subtle shimmer animation"
+      },
+      "ornamentalDivider": {
+        "description": "Ornamental divider with cross and geometric patterns",
+        "components": [
+          "Gradient lines (from-transparent via-primary/40 to-primary/60)",
+          "Rotated square diamonds (w-1.5 h-1.5 rotate-45 bg-primary/50)",
+          "Orthodox cross icon",
+          "Horizontal lines (h-px w-16 bg-primary/40)"
+        ],
+        "usage": "Section dividers, header separators"
+      },
+      "decorativeBorders": {
+        "topBorder": {
+          "description": "Thin gold accent line at top of header",
+          "tailwindClasses": "h-1 bg-gradient-to-r from-primary/20 via-accent to-primary/20"
+        },
+        "bottomBorder": {
+          "description": "Subtle bottom border",
+          "tailwindClasses": "h-0.5 bg-gradient-to-r from-transparent via-primary/30 to-transparent"
+        }
+      }
+    },
+    
+    "components": {
+      "header": {
+        "description": "MOSC site header with navigation and quick links",
+        "structure": {
+          "container": "bg-card border-b border-border overflow-hidden sticky top-0 z-50 reverent-transition",
+          "topBorder": "h-1 bg-gradient-to-r from-primary/20 via-accent to-primary/20",
+          "mainHeader": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+          "logoSection": "flex items-center group",
+          "logoContainer": "w-40 h-[90px] sm:w-48 sm:h-[110px] md:w-56 md:h-[130px] lg:w-72 lg:h-[180px] rounded-lg",
+          "navigation": "hidden lg:flex items-center",
+          "navLink": "px-4 py-2.5 text-sm font-body font-medium tracking-wide rounded-lg reverent-transition",
+          "navLinkActive": "bg-primary text-white sacred-shadow-sm",
+          "navLinkInactive": "text-black hover:bg-muted hover:text-accent",
+          "quickLinksBar": "hidden lg:block bg-gradient-to-b from-muted/30 to-muted/60 border-t border-border/50",
+          "mobileMenu": "lg:hidden overflow-y-auto reverent-transition"
+        },
+        "features": [
+          "Sticky positioning with scroll shadow effect",
+          "Ornamental top and bottom borders",
+          "Responsive mobile menu",
+          "Quick links bar for desktop",
+          "Active state indicators",
+          "Ornamental dividers"
+        ]
+      },
+      "footer": {
+        "description": "MOSC site footer with church info and links",
+        "structure": {
+          "container": "bg-card border-t border-border mt-16",
+          "content": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12",
+          "grid": "grid grid-cols-1 md:grid-cols-4 gap-10 items-start",
+          "logo": "w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48",
+          "sectionTitle": "font-heading font-semibold text-lg text-foreground",
+          "links": "text-sm text-muted-foreground hover:text-primary reverent-transition",
+          "bottomBar": "border-t border-border mt-8 pt-8"
+        },
+        "sections": [
+          "Church Info with logo and historical text",
+          "Quick Links navigation",
+          "Site Tools (Sitemap, Apps)",
+          "Contact Information"
+        ]
+      },
+      "heroSection": {
+        "description": "Hero section with patriarch info and circular images",
+        "structure": {
+          "container": "relative bg-gradient-to-br from-background to-muted min-h-[600px] flex items-center py-12",
+          "content": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full",
+          "imageGrid": "grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 mb-16 items-start",
+          "circularImage": "w-48 h-48 lg:w-56 lg:h-56 rounded-full border-2 border-white p-1",
+          "circularImageLarge": "w-48 h-48 lg:w-96 lg:h-96 rounded-full border-2 border-white p-1",
+          "imageGlow": "box-shadow: 0 0 20px rgba(255, 255, 255, 0.6), 0 0 40px rgba(255, 255, 255, 0.4), 0 0 60px rgba(255, 255, 255, 0.2)",
+          "welcomeText": "text-center max-w-4xl mx-auto"
+        },
+        "features": [
+          "Three circular images with glowing borders",
+          "Patriarch name with special Lora font",
+          "Navigation links with pipe separators",
+          "Welcome text section"
+        ]
+      },
+      "card": {
+        "description": "Standard card component",
+        "structure": {
+          "container": "bg-card rounded-lg sacred-shadow p-6",
+          "header": "flex items-center space-x-3 mb-6",
+          "iconContainer": "w-8 h-8 bg-primary rounded-full flex items-center justify-center",
+          "title": "text-lg font-heading font-semibold text-foreground",
+          "content": "Standard card content area"
+        },
+        "variants": {
+          "standard": "bg-card rounded-lg sacred-shadow p-6",
+          "hover": "hover:sacred-shadow-lg reverent-transition",
+          "large": "bg-card rounded-lg sacred-shadow p-8"
+        }
+      },
+      "featureCard": {
+        "description": "Feature card with icon and description",
+        "structure": {
+          "container": "text-center group",
+          "iconContainer": "w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 reverent-transition",
+          "icon": "size={32} className=\"text-primary\"",
+          "title": "font-heading font-medium text-xl text-foreground mb-3",
+          "description": "font-body text-muted-foreground leading-relaxed"
+        },
+        "features": [
+          "Circular icon container with hover effect",
+          "Centered text layout",
+          "Group hover for coordinated animations"
+        ]
+      },
+      "button": {
+        "description": "Button component with variants",
+        "variants": {
+          "primary": {
+            "tailwindClasses": "bg-primary text-primary-foreground rounded-md py-2 px-4 text-sm font-body font-medium hover:bg-primary/90 reverent-transition",
+            "usage": "Primary actions, main CTAs"
+          },
+          "secondary": {
+            "tailwindClasses": "bg-secondary text-secondary-foreground rounded-md py-2 px-4 text-sm font-body font-medium hover:bg-secondary/90 reverent-transition",
+            "usage": "Secondary actions"
+          },
+          "outline": {
+            "tailwindClasses": "border border-border hover:border-primary hover:bg-muted/20 reverent-transition",
+            "usage": "Outlined buttons, less prominent actions"
+          },
+          "ghost": {
+            "tailwindClasses": "hover:bg-muted/50 reverent-transition",
+            "usage": "Subtle actions, text buttons"
+          },
+          "warning": {
+            "tailwindClasses": "bg-warning text-warning-foreground rounded-md py-2 px-4 text-sm font-body font-medium hover:bg-warning/90 reverent-transition",
+            "usage": "Attention-grabbing actions"
+          }
+        },
+        "sizes": {
+          "sm": "text-sm py-2 px-3",
+          "default": "text-sm py-2 px-4",
+          "lg": "text-base py-3 px-6"
+        }
+      },
+      "navigationLink": {
+        "description": "Navigation link component",
+        "structure": {
+          "base": "px-4 py-2.5 text-sm font-body font-medium tracking-wide rounded-lg reverent-transition focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1",
+          "active": "bg-primary text-white sacred-shadow-sm",
+          "inactive": "text-black hover:bg-muted hover:text-accent",
+          "activeIndicator": "absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-white/70 rounded-full"
+        }
+      },
+      "galleryCard": {
+        "description": "Gallery album card",
+        "structure": {
+          "container": "group bg-card rounded-lg sacred-shadow hover:sacred-shadow-lg reverent-transition overflow-hidden block",
+          "imageContainer": "relative w-full h-48 overflow-hidden",
+          "image": "object-cover group-hover:scale-105 reverent-transition",
+          "badge": "absolute top-3 right-3 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-body font-medium shadow-md",
+          "content": "p-6",
+          "category": "inline-block px-3 py-1 bg-primary/10 text-primary text-xs font-body font-medium rounded-full",
+          "title": "font-heading font-semibold text-lg text-foreground mb-2 line-clamp-2 group-hover:text-primary reverent-transition",
+          "date": "font-body text-sm text-muted-foreground mb-4",
+          "link": "flex items-center font-body text-primary text-sm font-medium"
+        }
+      },
+      "announcementCard": {
+        "description": "Announcement card component",
+        "structure": {
+          "container": "bg-card rounded-lg sacred-shadow p-6 hover:sacred-shadow-lg reverent-transition",
+          "header": "flex items-start justify-between mb-4",
+          "categoryIcon": "w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center",
+          "category": "font-caption text-sm text-muted-foreground",
+          "urgentBadge": "bg-error/10 text-error px-2 py-1 rounded-full text-xs font-medium",
+          "title": "font-heading font-medium text-xl text-foreground mb-3",
+          "date": "flex items-center space-x-2 mb-4",
+          "excerpt": "font-body text-muted-foreground leading-relaxed mb-6 whitespace-pre-line",
+          "action": "Button variant=\"ghost\" size=\"sm\""
+        }
+      },
+      "prayerTimeCard": {
+        "description": "Prayer time card with special main prayer styling",
+        "structure": {
+          "container": "text-center p-8 rounded-lg",
+          "main": "bg-primary text-primary-foreground sacred-shadow-lg",
+          "secondary": "bg-muted/50 hover:bg-muted reverent-transition",
+          "iconContainer": "w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4",
+          "iconContainerMain": "bg-primary-foreground/20",
+          "iconContainerSecondary": "bg-primary/10",
+          "title": "font-heading font-medium text-xl mb-2",
+          "time": "text-2xl font-bold mb-3",
+          "description": "font-body leading-relaxed"
+        }
+      },
+      "statsCard": {
+        "description": "Statistics display card",
+        "structure": {
+          "container": "text-center",
+          "value": "font-heading font-bold text-4xl text-primary mb-2",
+          "label": "font-body text-sm text-muted-foreground"
+        }
+      },
+      "sectionHeader": {
+        "description": "Standard section header pattern",
+        "structure": {
+          "container": "text-center mb-12",
+          "iconContainer": "flex items-center justify-center space-x-3 mb-6",
+          "icon": "w-12 h-12 bg-primary rounded-full flex items-center justify-center sacred-shadow",
+          "title": "font-heading font-semibold text-3xl text-foreground mb-4",
+          "description": "font-body text-lg text-muted-foreground max-w-3xl mx-auto"
+        }
+      }
+    },
+    
+    "patterns": {
+      "heroSection": {
+        "description": "Hero section with gradient background and centered content",
+        "tailwindClasses": "relative bg-gradient-to-br from-background to-muted min-h-[600px] flex items-center",
+        "contentContainer": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full"
+      },
+      "contentSection": {
+        "description": "Standard content section",
+        "tailwindClasses": "py-16 bg-card",
+        "contentContainer": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+        "header": "text-center mb-12"
+      },
+      "galleryContainer": {
+        "description": "Gallery grid container with gradient background",
+        "tailwindClasses": "relative overflow-hidden rounded-3xl bg-gradient-to-br from-background via-muted to-background border border-border/30 sacred-shadow-lg",
+        "overlay": "absolute inset-0 pointer-events-none opacity-40",
+        "overlayGradient": "radial-gradient(circle at top left, rgba(139, 125, 107, 0.08), transparent 55%)",
+        "content": "relative px-6 py-10 sm:px-10 lg:px-14"
+      },
+      "circularImageFrame": {
+        "description": "Circular image with glowing border effect",
+        "tailwindClasses": "rounded-full border-2 border-white p-1",
+        "glowEffect": "box-shadow: 0 0 20px rgba(255, 255, 255, 0.6), 0 0 40px rgba(255, 255, 255, 0.4), 0 0 60px rgba(255, 255, 255, 0.2)",
+        "filter": "drop-shadow(0 0 8px rgba(255, 255, 255, 0.5))"
+      }
+    },
+    
+    "accessibility": {
+      "description": "Accessibility standards and requirements",
+      "colorContrast": {
+        "requirement": "WCAG AA minimum",
+        "foregroundOnBackground": "2D2A26 on F5F1E8 - passes AA",
+        "primaryOnWhite": "8B7D6B on FFFFFF - passes AA",
+        "textOnPrimary": "FFFFFF on 8B7D6B - passes AA"
+      },
+      "focusStates": {
+        "tailwindClasses": "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        "description": "Visible focus indicators for all interactive elements"
+      },
+      "ariaLabels": {
+        "requirement": "All interactive elements must have proper ARIA labels",
+        "navigation": "aria-label=\"Primary navigation\"",
+        "buttons": "aria-label for icon-only buttons",
+        "links": "aria-current=\"page\" for active links"
+      },
+      "semanticHTML": {
+        "requirement": "Use semantic HTML elements",
+        "header": "<header> for site header",
+        "nav": "<nav> for navigation",
+        "main": "<main> for main content",
+        "footer": "<footer> for site footer",
+        "section": "<section> for content sections"
+      }
+    },
+    
+    "animations": {
+      "description": "Subtle animations and transitions",
+      "shimmer": {
+        "description": "Subtle shimmer animation for decorative elements",
+        "css": "@keyframes shimmer { 0% { opacity: 0.4; } 50% { opacity: 0.7; } 100% { opacity: 0.4; } }",
+        "duration": "3s ease-in-out infinite",
+        "usage": "Ornamental cross icons, decorative elements"
+      },
+      "slideDown": {
+        "description": "Slide down animation for mobile menu",
+        "css": "@keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }",
+        "duration": "200ms ease-out",
+        "usage": "Mobile navigation menu items"
+      },
+      "subtlePulse": {
+        "description": "Subtle pulse for active navigation items",
+        "css": "@keyframes subtlePulse { 0%, 100% { box-shadow: 0 2px 4px rgba(139, 125, 107, 0.15); } 50% { box-shadow: 0 2px 8px rgba(139, 125, 107, 0.25); } }",
+        "duration": "3s ease-in-out infinite",
+        "usage": "Active navigation links"
+      },
+      "hoverEffects": {
+        "scale": "hover:scale-105 (5% increase)",
+        "scaleSubtle": "hover:scale-[1.02] (2% increase)",
+        "shadow": "hover:sacred-shadow-lg",
+        "color": "hover:text-primary, hover:bg-muted"
+      }
+    },
+    
+    "designPrinciples": {
+      "reverence": {
+        "description": "Design should reflect reverence and respect for Orthodox Christian traditions",
+        "manifestation": "Warm colors, elegant typography, thoughtful spacing, ornamental elements"
+      },
+      "clarity": {
+        "description": "Information should be clear and easily accessible",
+        "manifestation": "Clear typography hierarchy, consistent spacing, logical information architecture"
+      },
+      "accessibility": {
+        "description": "Design must be accessible to all users",
+        "manifestation": "WCAG AA compliance, semantic HTML, proper ARIA labels, visible focus states"
+      },
+      "consistency": {
+        "description": "Design elements should be used consistently throughout",
+        "manifestation": "Standardized components, consistent color usage, uniform spacing"
+      },
+      "tradition": {
+        "description": "Design honors ancient traditions while being modern",
+        "manifestation": "Byzantine-inspired ornaments, traditional color palette, elegant serif typography"
+      },
+      "welcome": {
+        "description": "Design should feel welcoming and inclusive",
+        "manifestation": "Warm color tones, friendly typography, approachable layouts"
+      }
+    },
+    
+    "implementationGuidelines": {
+      "cssClasses": {
+        "description": "Use Tailwind utility classes with custom CSS for complex patterns",
+        "customClasses": [
+          "sacred-shadow, sacred-shadow-sm, sacred-shadow-lg",
+          "sacred-gradient",
+          "reverent-transition",
+          "reverent-hover",
+          "circular-frame",
+          "font-heading, font-body, font-caption, font-mono"
+        ]
+      },
+      "componentStructure": {
+        "description": "Components should follow consistent structure patterns",
+        "pattern": "Container → Header (with icon) → Content → Actions"
+      },
+      "responsiveDesign": {
+        "strategy": "Mobile-first approach",
+        "breakpoints": "Use Tailwind breakpoints: sm (640px), md (768px), lg (1024px), xl (1280px)",
+        "grids": "Always provide mobile fallback with grid-cols-1"
+      },
+      "colorUsage": {
+        "rule": "Always use semantic color classes (bg-primary, text-foreground, etc.)",
+        "avoid": "Never use hardcoded colors (bg-gray-100, text-black, etc.)",
+        "gradients": "Use predefined gradient patterns for backgrounds"
+      },
+      "typographyUsage": {
+        "rule": "Always use appropriate font families for content type",
+        "headings": "font-heading (Crimson Text)",
+        "body": "font-body (Source Sans Pro)",
+        "captions": "font-caption (Lato)",
+        "code": "font-mono (JetBrains Mono)"
+      },
+      "spacingUsage": {
+        "rule": "Use consistent spacing values",
+        "sections": "py-16 for large, py-12 for medium, py-8 for small",
+        "containers": "px-4 sm:px-6 lg:px-8 for responsive padding",
+        "components": "p-6 for standard cards, p-8 for large cards"
+      }
+    },
+    
+    "aiInstructions": {
+      "description": "Instructions for AI to replicate this design system",
+      "colorSystem": "Always use the semantic color classes (bg-primary, text-foreground, bg-card, etc.) defined in the color system. Never use hardcoded colors like bg-gray-100 or text-black.",
+      "typography": "Use font-heading for all headings (h1-h6), font-body for paragraphs, font-caption for small text and labels. Never mix font families inappropriately.",
+      "spacing": "Use py-16 for major sections, py-12 for secondary sections, py-8 for compact sections. Use px-4 sm:px-6 lg:px-8 for responsive container padding.",
+      "components": "Follow the component structure patterns defined in the components section. Always include proper accessibility attributes (aria-label, aria-current, etc.).",
+      "shadows": "Use sacred-shadow for standard cards, sacred-shadow-lg for prominent elements. Never use generic shadow-lg or shadow-md.",
+      "transitions": "Use reverent-transition for all interactive elements. Use reverent-hover for subtle hover scale effects.",
+      "gradients": "Use bg-gradient-to-br from-background to-muted for hero sections. Use the gallery container pattern for media grids.",
+      "ornamentalElements": "Include ornamental dividers in headers and section separators. Use the Orthodox cross and geometric patterns for decorative accents.",
+      "responsiveDesign": "Always design mobile-first. Use grid-cols-1 for mobile, then add responsive breakpoints (md:grid-cols-2, lg:grid-cols-3, etc.).",
+      "accessibility": "Always include proper ARIA labels, semantic HTML, and visible focus states. Ensure color contrast meets WCAG AA standards."
+    }
+  }
+}
