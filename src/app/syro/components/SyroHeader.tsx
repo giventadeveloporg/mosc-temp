@@ -48,16 +48,16 @@ const SyroHeader = () => {
     >
       {/* Main Header */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between py-3 lg:py-4">
+        <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/syro" className="flex items-center space-x-3">
-            <div className="w-16 h-16 md:w-20 md:h-20 flex items-center justify-center">
+            <div className="h-48 aspect-square flex items-center justify-center">
               <Image
                 src="/images/logos/MOSC-logo-Brand-part.png"
                 alt="Syro-Malabar Church Logo"
-                width={80}
-                height={80}
-                className="object-contain"
+                width={160}
+                height={160}
+                className="object-contain w-full h-full"
                 priority
               />
             </div>

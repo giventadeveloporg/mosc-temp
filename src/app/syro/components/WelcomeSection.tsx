@@ -43,19 +43,31 @@ const WelcomeSection = () => {
   ];
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-16 bg-white syro-dotted-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-syro-h3 font-bold text-syro-blue mb-4">
-            Our Mission & Ministry
-          </h2>
-          <p className="text-syro-body text-syro-text-gray max-w-3xl mx-auto">
-            As inheritors of the apostolic tradition established by St. Thomas, we strive to nurture faith,
-            preserve our sacred heritage, and serve our community with Christ's love.
-          </p>
+        <div className="flex flex-col lg:flex-row gap-8 items-start mb-12 py-24">
+          {/* Vertical Title Section - Left Side (from section[7]) */}
+          <div className="lg:w-1/6 relative flex items-end">
+            <div className="syro-section-title">
+              <h6>Mission & Ministry</h6>
+            </div>
+          </div>
+          
+          {/* Content Section - Right Side */}
+          <div className="lg:w-5/6 bg-white">
+            <div className="text-center lg:text-left mb-12">
+              <h2 className="text-syro-h3 font-bold text-syro-blue mb-4">
+                Our Mission & Ministry
+              </h2>
+              <p className="text-syro-body text-syro-text-gray max-w-3xl lg:max-w-none mx-auto lg:mx-0">
+                As inheritors of the apostolic tradition established by St. Thomas, we strive to nurture faith,
+                preserve our sacred heritage, and serve our community with Christ's love.
+              </p>
+            </div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 bg-white">
           {features?.map((feature, index) => (
             <div key={index} className="text-center group">
               <div className="w-16 h-16 bg-syro-red-light rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-syro-red transition-all duration-300 text-syro-red group-hover:text-white">

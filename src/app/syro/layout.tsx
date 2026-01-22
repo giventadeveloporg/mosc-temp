@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import SyroHeader from './components/SyroHeader';
 import SyroFooter from './components/SyroFooter';
 import NavigationBreadcrumb from './components/NavigationBreadcrumb';
+import ImageSlider from './components/ImageSlider';
 import '@/styles/syro-malabar.css';
 
 export const metadata: Metadata = {
@@ -27,6 +28,9 @@ export default function SyroLayout({ children }: SyroLayoutProps) {
   return (
     <div className="syro-layout min-h-screen bg-syro-bg-gray flex flex-col font-syro-primary">
       <SyroHeader />
+      
+      {/* Image Slider after navbar */}
+      <ImageSlider />
 
       <main className="syro-main flex-1">
         <NavigationBreadcrumb />

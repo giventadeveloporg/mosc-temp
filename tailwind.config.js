@@ -54,10 +54,10 @@ export default {
         },
         // Syro-Malabar Design System Colors (namespaced with syro- prefix to avoid conflicts)
         "syro-red": {
-          DEFAULT: "#dc3545",
+          DEFAULT: "#bf451e",
           darker: "#be1929",
           hover: "#990b3f",
-          light: "#dc354533",
+          light: "#bf451e33",
         },
         "syro-blue": {
           DEFAULT: "#0b2848",
