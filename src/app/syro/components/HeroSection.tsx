@@ -42,7 +42,7 @@ const HeroSection = () => {
                 style={{ 
                   lineHeight: '1.2', 
                   fontFamily: "'Playfair Display', serif",
-                  color: '#dc3545'
+                  color: 'rgb(191, 69, 30)'
                 }}
               >
                 <span className="text-syro-h4 font-bold">
@@ -51,27 +51,27 @@ const HeroSection = () => {
               </div>
               
               {/* Navigation Links with Pipe Separators */}
-              <div className="flex items-center justify-center gap-1.5 text-syro-small font-syro-primary" style={{ color: '#506276' }}>
+              <div className="flex items-center justify-center gap-1.5 text-syro-small font-syro-primary" style={{ color: 'rgb(191, 69, 30)' }}>
                 <Link
                   href="/syro/holy-synod/his-holiness-baselios-marthoma-mathews-iii"
                   className="hover:underline transition-all duration-200 hover:text-syro-red"
-                  style={{ color: '#506276' }}
+                  style={{ color: 'rgb(191, 69, 30)' }}
                 >
                   Biography
                 </Link>
-                <span className="mx-1">|</span>
+                <span className="mx-1" style={{ color: 'rgb(191, 69, 30)' }}>|</span>
                 <Link
                   href="/syro/photo-gallery/reception-to-his-holiness-baselios-marthoma-mathews-iii"
                   className="hover:underline transition-all duration-200 hover:text-syro-red"
-                  style={{ color: '#506276' }}
+                  style={{ color: 'rgb(191, 69, 30)' }}
                 >
                   Photos
                 </Link>
-                <span className="mx-1">|</span>
+                <span className="mx-1" style={{ color: 'rgb(191, 69, 30)' }}>|</span>
                 <Link
                   href="/syro/speeches"
                   className="hover:underline transition-all duration-200 hover:text-syro-red"
-                  style={{ color: '#506276' }}
+                  style={{ color: 'rgb(191, 69, 30)' }}
                 >
                   Speeches
                 </Link>
@@ -113,6 +113,18 @@ const HeroSection = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Welcome Text */}
+        <div className="text-center max-w-4xl mx-auto">
+          <h2 className="text-syro-h3 font-bold text-syro-blue mb-6">
+            Welcome to Our Sacred Community
+          </h2>
+          <p className="text-syro-body text-syro-text-gray leading-relaxed">
+            The Syro-Malabar Catholic Church traces its origins to the Apostolic ministry of St. Thomas in India.
+            We are a community rooted in ancient traditions, committed to preserving the faith handed down through generations
+            while serving our members with love, compassion, and spiritual guidance.
+          </p>
         </div>
       </div>
     </section>
