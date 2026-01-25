@@ -1341,6 +1341,35 @@ export interface PaymentTransactionItemDTO {
 }
 
 /**
+ * Donation Transaction DTO - Matches backend donation_transaction table schema
+ */
+export interface DonationTransactionDTO {
+  id?: number;
+  tenantId?: string;
+  eventId?: number;
+  paymentTransactionId?: number;
+  transactionReference: string;
+  givebutterDonationId?: string;
+  amount: number;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  prayerIntention?: string;
+  isRecurring?: boolean;
+  isAnonymous?: boolean;
+  status: string; // 'PENDING', 'COMPLETED', 'FAILED', 'CANCELLED'
+  qrCodeUrl?: string;
+  qrCodeImageUrl?: string;
+  emailSent?: boolean;
+  metadata?: string; // JSON string
+  createdAt: string;
+  updatedAt: string;
+  // Relations
+  event?: EventDetailsDTO;
+}
+
+/**
  * Payment Initialization Request
  */
 export interface PaymentInitializeRequest {
