@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { FaUpload, FaTimes, FaSpinner, FaPlus, FaTrash } from 'react-icons/fa';
+import { FaUpload, FaTimes, FaSpinner, FaTrash } from 'react-icons/fa';
 import type { ExecutiveCommitteeTeamMemberDTO, ExecutiveCommitteeTeamMemberFormData } from '@/types/executiveCommitteeTeamMember';
 import { createExecutiveCommitteeMember, updateExecutiveCommitteeMember, uploadTeamMemberProfileImage } from './ApiServerActions';
 import DragDropImageUpload from '@/components/DragDropImageUpload';
@@ -377,11 +377,16 @@ export default function ExecutiveCommitteeForm({
           <button
             type="button"
             onClick={addExpertiseItem}
-            className="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 bg-teal-50 hover:bg-teal-100 px-3 py-2 rounded-md transition-colors"
-            title="Add expertise item"
+            className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+            title="Add Expertise"
+            aria-label="Add Expertise"
           >
-            <FaPlus className="w-4 h-4" />
-            Add Expertise
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+            </div>
+            <span className="font-semibold text-blue-700">Add Expertise</span>
           </button>
         </div>
         <p className="mt-2 text-xs text-gray-500">

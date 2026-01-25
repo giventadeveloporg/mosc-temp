@@ -12,6 +12,7 @@ import { validateRecurrenceEndDate, generateOccurrenceDates } from '@/lib/recurr
 import { useRouter } from 'next/navigation';
 import FromEmailSelect from '@/components/FromEmailSelect';
 import { fetchTenantEmailAddressesServer } from '@/app/admin/tenant-email-addresses/ApiServerActions';
+import EventFormHelpTooltip from '@/components/EventFormHelpTooltip';
 
 interface EventFormProps {
   event?: EventDetailsDTO;
@@ -47,6 +48,8 @@ export const defaultEvent: EventDetailsDTO = {
   featuredEventPriorityRanking: 0,
   liveEventPriorityRanking: 0,
   fromEmail: '',
+  paymentFlowMode: 'STRIPE_ONLY',
+  manualPaymentEnabled: false,
   createdBy: undefined,
   createdAt: '',
   updatedAt: '',
@@ -118,61 +121,37 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
         const formData = { ...defaultEvent, ...event, fromEmail: validFromEmail };
         setForm(formData);
 
-      // Load donation metadata (NEW - preferred)
-      if (event.donationMetadata) {
-        try {
-          const donationMetadata = JSON.parse(event.donationMetadata);
-          setIsFundraiserEvent(Boolean(donationMetadata.isFundraiserEvent));
-          setIsCharityEvent(Boolean(donationMetadata.isCharityEvent));
-          setZeroFeeProvider(donationMetadata.zeroFeeProvider || '');
-          setGivebutterCampaignId(donationMetadata.givebutterCampaignId || '');
-          setUseZeroFeeProvider(Boolean(donationMetadata.zeroFeeProvider));
-        } catch (e) {
-          console.error('Failed to parse donation metadata', e);
-        }
-      }
-      // Fallback: Load from old metadata field (backward compatibility)
-      else if (event.metadata) {
-        const metadata = parseEventMetadata(event.metadata);
-        setIsFundraiserEvent(Boolean(metadata.isFundraiserEvent));
-        setIsCharityEvent(Boolean(metadata.isCharityEvent));
-
-        const donationConfig = metadata.donationConfig;
-        if (donationConfig) {
-          setUseZeroFeeProvider(Boolean(donationConfig.useZeroFeeProvider));
-          setZeroFeeProvider(donationConfig.zeroFeeProvider || '');
-          setGivebutterCampaignId(donationConfig.givebutterCampaignId || '');
-        }
-      }
-
-      // Load recurrence metadata (NEW - preferred)
-      if (event.eventRecurrenceMetadata) {
-        try {
-          const recurrenceConfig = JSON.parse(event.eventRecurrenceMetadata);
-          setIsRecurring(true);
-          setRecurrencePattern((recurrenceConfig.pattern as RecurrencePattern) || '');
-          setRecurrenceInterval(recurrenceConfig.interval || 1);
-          setRecurrenceEndType((recurrenceConfig.endType as RecurrenceEndType) || 'END_DATE');
-          setRecurrenceEndDate(recurrenceConfig.endDate || '');
-          setRecurrenceOccurrences(recurrenceConfig.occurrences || 1);
-          setRecurrenceWeeklyDays(recurrenceConfig.weeklyDays || []);
-          if (recurrenceConfig.monthlyDay === 'LAST') {
-            setRecurrenceMonthlyDay('LAST');
-            setRecurrenceMonthlyDayType('LAST_DAY');
-          } else if (recurrenceConfig.monthlyDay) {
-            setRecurrenceMonthlyDay(recurrenceConfig.monthlyDay);
-            setRecurrenceMonthlyDayType('DAY_NUMBER');
+        // Load donation metadata (NEW - preferred)
+        if (event.donationMetadata) {
+          try {
+            const donationMetadata = JSON.parse(event.donationMetadata);
+            setIsFundraiserEvent(Boolean(donationMetadata.isFundraiserEvent));
+            setIsCharityEvent(Boolean(donationMetadata.isCharityEvent));
+            setZeroFeeProvider(donationMetadata.zeroFeeProvider || '');
+            setGivebutterCampaignId(donationMetadata.givebutterCampaignId || '');
+            setUseZeroFeeProvider(Boolean(donationMetadata.zeroFeeProvider));
+          } catch (e) {
+            console.error('Failed to parse donation metadata', e);
           }
-        } catch (e) {
-          console.error('Failed to parse recurrence metadata', e);
         }
-      }
-      // Fallback: Load from old metadata field (backward compatibility)
-      else if (event.metadata) {
-        const metadata = parseEventMetadata(event.metadata);
-        if (metadata.isRecurring) {
-          const recurrenceConfig = metadata.recurrenceConfig;
-          if (recurrenceConfig) {
+        // Fallback: Load from old metadata field (backward compatibility)
+        else if (event.metadata) {
+          const metadata = parseEventMetadata(event.metadata);
+          setIsFundraiserEvent(Boolean(metadata.isFundraiserEvent));
+          setIsCharityEvent(Boolean(metadata.isCharityEvent));
+
+          const donationConfig = metadata.donationConfig;
+          if (donationConfig) {
+            setUseZeroFeeProvider(Boolean(donationConfig.useZeroFeeProvider));
+            setZeroFeeProvider(donationConfig.zeroFeeProvider || '');
+            setGivebutterCampaignId(donationConfig.givebutterCampaignId || '');
+          }
+        }
+
+        // Load recurrence metadata (NEW - preferred)
+        if (event.eventRecurrenceMetadata) {
+          try {
+            const recurrenceConfig = JSON.parse(event.eventRecurrenceMetadata);
             setIsRecurring(true);
             setRecurrencePattern((recurrenceConfig.pattern as RecurrencePattern) || '');
             setRecurrenceInterval(recurrenceConfig.interval || 1);
@@ -187,9 +166,33 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
               setRecurrenceMonthlyDay(recurrenceConfig.monthlyDay);
               setRecurrenceMonthlyDayType('DAY_NUMBER');
             }
+          } catch (e) {
+            console.error('Failed to parse recurrence metadata', e);
           }
         }
-      }
+        // Fallback: Load from old metadata field (backward compatibility)
+        else if (event.metadata) {
+          const metadata = parseEventMetadata(event.metadata);
+          if (metadata.isRecurring) {
+            const recurrenceConfig = metadata.recurrenceConfig;
+            if (recurrenceConfig) {
+              setIsRecurring(true);
+              setRecurrencePattern((recurrenceConfig.pattern as RecurrencePattern) || '');
+              setRecurrenceInterval(recurrenceConfig.interval || 1);
+              setRecurrenceEndType((recurrenceConfig.endType as RecurrenceEndType) || 'END_DATE');
+              setRecurrenceEndDate(recurrenceConfig.endDate || '');
+              setRecurrenceOccurrences(recurrenceConfig.occurrences || 1);
+              setRecurrenceWeeklyDays(recurrenceConfig.weeklyDays || []);
+              if (recurrenceConfig.monthlyDay === 'LAST') {
+                setRecurrenceMonthlyDay('LAST');
+                setRecurrenceMonthlyDayType('LAST_DAY');
+              } else if (recurrenceConfig.monthlyDay) {
+                setRecurrenceMonthlyDay(recurrenceConfig.monthlyDay);
+                setRecurrenceMonthlyDayType('DAY_NUMBER');
+              }
+            }
+          }
+        }
       };
 
       // Call the async function to validate and set fromEmail
@@ -326,13 +329,13 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
       // - Enters this else block
       // - if (isFromEmailEmpty) = true → Sets error: 'Please enter from email address'
       // - Validation returns false → Form submission prevented ✅
-    if (isFromEmailEmpty) {
+      if (isFromEmailEmpty) {
         // Field is empty (untouched, cleared, or whitespace-only) - require selection
-      errs.fromEmail = 'Please enter from email address';
+        errs.fromEmail = 'Please enter from email address';
         console.log('[EventForm validate] fromEmail error: Field is empty');
       } else if (normalizedFromEmail.trim() !== '' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedFromEmail.trim())) {
         // Field has value but format is invalid
-      errs.fromEmail = 'Please enter a valid email address';
+        errs.fromEmail = 'Please enter a valid email address';
         console.log('[EventForm validate] fromEmail error: Invalid format');
       } else {
         console.log('[EventForm validate] fromEmail validation passed');
@@ -358,14 +361,21 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
     // For date validation, compare strings directly to avoid timezone issues
     // YYYY-MM-DD format can be compared lexicographically
 
-    if (startDateStr && startDateStr < todayStr) {
-      errs.startDate = 'Start date must be today or in the future';
-    }
-    if (endDateStr && endDateStr < todayStr) {
-      errs.endDate = 'End date must be today or in the future';
-    }
-    if (promotionStartDateStr && promotionStartDateStr < todayStr) {
-      errs.promotionStartDate = 'Promotion start date must be today or in the future';
+    // CRITICAL: Only validate "must be today or in the future" when creating a NEW event
+    // When editing an existing event (event.id exists), skip this validation to allow past dates
+    const isEditing = event?.id !== undefined && event?.id !== null;
+
+    if (!isEditing) {
+      // Only apply "future date" validation for new events
+      if (startDateStr && startDateStr < todayStr) {
+        errs.startDate = 'Start date must be today or in the future';
+      }
+      if (endDateStr && endDateStr < todayStr) {
+        errs.endDate = 'End date must be today or in the future';
+      }
+      if (promotionStartDateStr && promotionStartDateStr < todayStr) {
+        errs.promotionStartDate = 'Promotion start date must be today or in the future';
+      }
     }
     if (startDateStr && endDateStr && endDateStr < startDateStr) {
       errs.endDate = 'End date cannot be before start date';
@@ -375,9 +385,11 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
     }
 
     // Time validations
+    // CRITICAL: Only validate "must be in the future" when creating a NEW event
+    // When editing an existing event, skip this validation to allow past times
     const startTimeStr = form.startTime;
     const endTimeStr = form.endTime;
-    if (startDateStr && startTimeStr) {
+    if (!isEditing && startDateStr && startTimeStr) {
       const now = new Date();
       const startDateTime = new Date(`${startDateStr}T${convertTo24Hour(startTimeStr)}`);
       if (startDateStr === todayStr && startDateTime < now) {
@@ -538,8 +550,8 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
     // Check if date is actually valid (e.g., not Feb 30)
     const date = new Date(yearNum, monthNum - 1, dayNum);
     return date.getFullYear() === yearNum &&
-           date.getMonth() === monthNum - 1 &&
-           date.getDate() === dayNum;
+      date.getMonth() === monthNum - 1 &&
+      date.getDate() === dayNum;
   }
 
   // Helper to check if date format is exactly MM/DD/YYYY (with 2 digits for month and day)
@@ -975,6 +987,8 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
       isFeaturedEvent: !!form.isFeaturedEvent,
       featuredEventPriorityRanking: Number(form.featuredEventPriorityRanking) || 0,
       liveEventPriorityRanking: Number(form.liveEventPriorityRanking) || 0,
+      paymentFlowMode: form.paymentFlowMode || 'STRIPE_ONLY',
+      manualPaymentEnabled: !!form.manualPaymentEnabled,
     };
     onSubmit(sanitizedForm);
   }
@@ -984,6 +998,15 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+      {/* Help Tooltip - Events Page Filtering and Display Rules */}
+      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-gray-700">
+            Need help with creating a new event or editing? Please mouse over here about the operation about this page.
+          </span>
+          <EventFormHelpTooltip fieldName="Event Form" />
+        </div>
+      </div>
       <div>
         <label className="block font-medium">Title * <span className="text-sm text-gray-500">({(form.title || '').length}/250)</span></label>
         <input
@@ -1381,6 +1404,74 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
         ))}
       </div>
 
+      {/* Payment Configuration Section */}
+      <div className="border-t border-gray-200 pt-6 mt-6 bg-gradient-to-br from-green-50 via-teal-50 to-blue-50 rounded-lg p-6">
+        <h3 className="text-lg font-semibold mb-4 text-gray-800 flex items-center gap-2">
+          <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          Payment Configuration
+        </h3>
+        <p className="text-sm text-gray-600 mb-4">
+          Configure how payments are processed for this event. Choose between Stripe-only, Manual-only (Zelle, Venmo, Cash App, etc.), or Hybrid mode.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label className="block font-medium mb-2">Payment Flow Mode *</label>
+            <select
+              ref={(el) => { if (el) fieldRefs.current.paymentFlowMode = el; }}
+              name="paymentFlowMode"
+              value={form.paymentFlowMode || 'STRIPE_ONLY'}
+              onChange={handleChange}
+              className={`w-full border rounded-xl focus:ring-blue-500 px-4 py-3 text-base ${errors.paymentFlowMode ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-400 focus:border-blue-500'}`}
+            >
+              <option value="STRIPE_ONLY">Stripe Only</option>
+              <option value="MANUAL_ONLY">Manual Only (Zelle, Venmo, Cash App, etc.)</option>
+              <option value="HYBRID">Hybrid (Both Stripe and Manual)</option>
+            </select>
+            {errors.paymentFlowMode && <div className="text-red-500 text-sm mt-1">{errors.paymentFlowMode}</div>}
+            <p className="text-xs text-gray-500 mt-1">
+              <strong>Stripe Only:</strong> All payments processed through Stripe checkout<br />
+              <strong>Manual Only:</strong> All payments use fee-free methods (Zelle, Venmo, Cash App, Cash, Check)<br />
+              <strong>Hybrid:</strong> Users can choose between Stripe or manual payment methods
+            </p>
+          </div>
+
+          <div className="flex flex-col justify-start">
+            <label className="block font-medium mb-2">Manual Payment Enabled</label>
+            <div className="custom-grid-cell">
+              <label className="flex flex-col items-center">
+                <span className="relative flex items-center justify-center">
+                  <input
+                    ref={(el) => { if (el) fieldRefs.current.manualPaymentEnabled = el; }}
+                    type="checkbox"
+                    name="manualPaymentEnabled"
+                    checked={form.manualPaymentEnabled ?? false}
+                    onChange={e => setForm(f => ({ ...f, manualPaymentEnabled: e.target.checked }))}
+                    className="custom-checkbox"
+                    disabled={form.paymentFlowMode === 'STRIPE_ONLY'}
+                  />
+                  <span className="custom-checkbox-tick">
+                    {(form.manualPaymentEnabled ?? false) && (
+                      <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l5 5L19 7" />
+                      </svg>
+                    )}
+                  </span>
+                </span>
+                <span className="mt-2 text-xs text-center select-none break-words max-w-[6rem]">Enable Manual Payment</span>
+              </label>
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              {form.paymentFlowMode === 'STRIPE_ONLY'
+                ? 'Enable manual payments by selecting "Manual Only" or "Hybrid" mode above.'
+                : 'When enabled, users can pay via Zelle, Venmo, Cash App, Cash, Check, or other manual methods.'}
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Fundraiser & Charity Configuration Section */}
       <div className="border-t border-gray-200 pt-6 mt-6 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 rounded-lg p-6">
         <h3 className="text-lg font-semibold mb-4 text-gray-800">Fundraiser & Charity Configuration</h3>
@@ -1517,11 +1608,10 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
                       });
                     }
                   }}
-                  className={`w-full border rounded p-2 focus:ring-blue-500 ${
-                    errors.zeroFeeProvider
-                      ? 'border-red-500 focus:border-red-500'
-                      : 'border-gray-300 focus:border-blue-500'
-                  } ${(isFundraiserEvent || isCharityEvent) ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                  className={`w-full border rounded p-2 focus:ring-blue-500 ${errors.zeroFeeProvider
+                    ? 'border-red-500 focus:border-red-500'
+                    : 'border-gray-300 focus:border-blue-500'
+                    } ${(isFundraiserEvent || isCharityEvent) ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                   required={useZeroFeeProvider}
                   title={isFundraiserEvent || isCharityEvent ? "Automatically set to GIVEBUTTER for fundraiser/charity events" : ""}
                 >
@@ -1555,11 +1645,10 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
                       }
                     }}
                     placeholder="Enter Givebutter campaign ID"
-                    className={`w-full border rounded p-2 focus:ring-blue-500 ${
-                      errors.givebutterCampaignId
-                        ? 'border-red-500 focus:border-red-500'
-                        : 'border-gray-300 focus:border-blue-500'
-                    }`}
+                    className={`w-full border rounded p-2 focus:ring-blue-500 ${errors.givebutterCampaignId
+                      ? 'border-red-500 focus:border-red-500'
+                      : 'border-gray-300 focus:border-blue-500'
+                      }`}
                     required={false} // Optional - backend falls back to provider config campaign ID
                   />
                   {errors.givebutterCampaignId && (

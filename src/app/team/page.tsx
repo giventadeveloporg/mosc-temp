@@ -11,6 +11,8 @@ export default function TeamPage() {
   const [teamMembers, setTeamMembers] = useState<ExecutiveCommitteeTeamMemberDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [showImages, setShowImages] = useState(false);
+  const [page, setPage] = useState(0); // 0-based for calculations
+  const pageSize = 9; // Display 9 team members per page
 
   // Cache key for sessionStorage
   const CACHE_KEY = 'team_page_cache';
@@ -111,27 +113,63 @@ export default function TeamPage() {
     return '/images/user_profile_loading.webp';
   };
 
+  // Pagination calculations
+  const totalCount = teamMembers.length;
+  const totalPages = Math.ceil(totalCount / pageSize) || 1;
+  const currentPage = page + 1; // Display as 1-based
+  const startItem = totalCount > 0 ? page * pageSize + 1 : 0;
+  const endItem = totalCount > 0 ? Math.min(page * pageSize + pageSize, totalCount) : 0;
+  const isPrevDisabled = page === 0 || loading;
+  const isNextDisabled = page >= totalPages - 1 || loading;
+
+  // Get paginated team members
+  const paginatedTeamMembers = teamMembers.slice(page * pageSize, page * pageSize + pageSize);
+
+  // Reset page if it becomes invalid after data changes
+  useEffect(() => {
+    if (totalPages > 0 && page >= totalPages) {
+      setPage(0);
+    }
+  }, [totalPages, page]);
+
+  const handlePrevPage = () => {
+    if (!isPrevDisabled) {
+      setPage((prev) => Math.max(0, prev - 1));
+    }
+  };
+
+  const handleNextPage = () => {
+    if (!isNextDisabled) {
+      setPage((prev) => Math.min(totalPages - 1, prev + 1));
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background" style={{ paddingTop: '100px' }}>
       {/* Header Section */}
       <section className="py-16 bg-card sacred-shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
+          {/* Header with back button - left aligned */}
+          <div className="flex items-center mb-8 gap-4 px-16">
             <Link
               href="/"
-              className="inline-flex items-center space-x-2 text-primary hover:text-accent reverent-transition mb-6"
+              className="flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-3 sm:px-6"
+              title="Back to Home"
+              aria-label="Back to Home"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              <span className="font-body">Back to Home</span>
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
+                <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+              </div>
+              <span className="font-semibold text-indigo-700 hidden sm:inline">Back to Home</span>
             </Link>
-            <h1 className="font-heading font-semibold text-4xl text-foreground mb-4">
-              Our Team
-            </h1>
-            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto">
-              Meet the dedicated professionals working together to make a positive impact in our communities
-            </p>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Our Team</h1>
+              <p className="text-gray-600 text-sm sm:text-base">
+                Meet the dedicated professionals working together to make a positive impact in our communities
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -161,7 +199,7 @@ export default function TeamPage() {
             <>
               {/* Dynamic Team Grid */}
               <div className={`${styles.teamGrid} gap-8 lg:gap-10`}>
-                {teamMembers.map((member, index) => (
+                {paginatedTeamMembers.map((member, index) => (
                   <div
                     key={member.id}
                     className={`${styles.teamCard} group relative rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 ease-out hover:-translate-y-3`}
@@ -296,6 +334,69 @@ export default function TeamPage() {
                   </div>
                 ))}
               </div>
+
+              {/* Pagination Controls - Always visible, matching admin page style */}
+              {totalCount > 0 && (
+                <div className="mt-8">
+                  <div className="flex justify-between items-center">
+                    {/* Previous Button */}
+                    <button
+                      onClick={handlePrevPage}
+                      disabled={isPrevDisabled}
+                      className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+                      title="Previous Page"
+                      aria-label="Previous Page"
+                      type="button"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                      </svg>
+                      <span>Previous</span>
+                    </button>
+
+                    {/* Page Info */}
+                    <div className="px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+                      <span className="text-sm font-bold text-blue-700">
+                        Page <span className="text-blue-600">{currentPage}</span> of <span className="text-blue-600">{totalPages}</span>
+                      </span>
+                    </div>
+
+                    {/* Next Button */}
+                    <button
+                      onClick={handleNextPage}
+                      disabled={isNextDisabled}
+                      className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+                      title="Next Page"
+                      aria-label="Next Page"
+                      type="button"
+                    >
+                      <span>Next</span>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Item Count Text */}
+                  <div className="text-center mt-3">
+                    {totalCount > 0 ? (
+                      <div className="inline-flex items-center px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+                        <span className="text-sm text-gray-700">
+                          Showing <span className="font-bold text-blue-600">{startItem}</span> to <span className="font-bold text-blue-600">{endItem}</span> of <span className="font-bold text-blue-600">{totalCount}</span> team members
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 border-2 border-orange-300 rounded-lg shadow-sm">
+                        <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="text-sm font-medium text-orange-700">No team members found</span>
+                        <span className="text-sm text-orange-600">[No team members match your criteria]</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Stats Section */}
               <div className="mt-32 text-center">

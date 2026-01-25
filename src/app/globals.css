@@ -510,6 +510,50 @@ To use a consistent, modern checkbox style with a custom tick mark, use:
   font-weight: 600;
 }
 
+/* Instant tooltip for action buttons */
+.instant-tooltip {
+  position: relative;
+}
+
+.instant-tooltip::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #1f2937;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0s;
+  z-index: 1000;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.instant-tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #1f2937;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0s;
+  z-index: 1000;
+}
+
+.instant-tooltip:hover::before,
+.instant-tooltip:hover::after {
+  opacity: 1;
+  transition: opacity 0s;
+}
+
 /* Wavy animation for loading events */
 @keyframes wavy {
 

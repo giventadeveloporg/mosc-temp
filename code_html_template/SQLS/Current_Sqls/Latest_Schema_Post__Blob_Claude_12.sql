@@ -59,6 +59,7 @@ DROP TYPE IF EXISTS public.transaction_status CASCADE;
 DROP TYPE IF EXISTS public.focus_group_member_role_type CASCADE;
 DROP TYPE IF EXISTS public.focus_group_member_status_type CASCADE;
 DROP TYPE IF EXISTS public.tenant_email_type CASCADE;
+DROP TYPE IF EXISTS public.manual_payment_method_type CASCADE;
 
 
 -- Guest age group classifications
@@ -102,6 +103,9 @@ CREATE TYPE public.transaction_type AS ENUM ('SUBSCRIPTION', 'TICKET_SALE', 'COM
 
 -- Transaction status
 CREATE TYPE public.transaction_status AS ENUM ('PENDING', 'COMPLETED', 'FAILED', 'REFUNDED', 'CANCELLED');
+
+-- Manual payment method types
+CREATE TYPE public.manual_payment_method_type AS ENUM ('ZELLE_MANUAL', 'VENMO_MANUAL', 'CASH_APP_MANUAL', 'CASH', 'CHECK', 'OTHER_MANUAL');
 
 
 
@@ -161,6 +165,8 @@ DROP TABLE IF EXISTS public.user_payment_transaction CASCADE;
 DROP TABLE IF EXISTS public.platform_settlement CASCADE;
 DROP TABLE IF EXISTS public.membership_plan CASCADE;
 DROP TABLE IF EXISTS public.payment_provider_config CASCADE;
+DROP TABLE IF EXISTS public.manual_payment_request CASCADE;
+DROP TABLE IF EXISTS public.manual_payment_summary_report CASCADE;
 DROP TABLE IF EXISTS public.event_ticket_type CASCADE;
 DROP TABLE IF EXISTS public.event_organizer CASCADE;
 -- New event-related tables (in reverse dependency order)
@@ -210,6 +216,9 @@ DROP TABLE IF EXISTS public.BATCH_JOB_EXECUTION CASCADE;
 DROP TABLE IF EXISTS public.BATCH_JOB_INSTANCE CASCADE;
 -- Custom application table (independent, no dependencies)
 DROP TABLE IF EXISTS public.batch_job_execution_log CASCADE;
+
+DROP TABLE IF EXISTS public.donation_transaction CASCADE;
+DROP TABLE IF EXISTS public.donation_statistics CASCADE;
 
 DROP TABLE IF EXISTS public.tenant_email_addresses CASCADE;
 
@@ -781,6 +790,8 @@ CREATE TABLE public.event_details (
                                       recurrence_monthly_day int4 NULL,
                                       parent_event_id int8 NULL,
                                       recurrence_series_id int8 NULL,
+                                      payment_flow_mode varchar(30) DEFAULT 'STRIPE_ONLY'::character varying,
+                                      manual_payment_enabled boolean DEFAULT false,
                                       CONSTRAINT check_age_ranges CHECK (((minimum_age IS NULL) OR (maximum_age IS NULL) OR (maximum_age >= minimum_age))),
                                       CONSTRAINT check_capacity_positive CHECK (((capacity IS NULL) OR (capacity > 0))),
                                       CONSTRAINT check_deadlines CHECK (((registration_deadline IS NULL) OR (cancellation_deadline IS NULL) OR (cancellation_deadline <= registration_deadline))),
@@ -1905,6 +1916,7 @@ discount_code_id bigint,
 discount_amount numeric(21,2) DEFAULT 0,
 service_fee numeric(21,2),
 final_amount numeric(21,2) NOT NULL,
+net_payout_amount numeric(21,2) null,
 status character varying(255) DEFAULT 'PENDING'::character varying NOT NULL,
 payment_method character varying(100),
 payment_reference character varying(255),
@@ -2010,7 +2022,7 @@ COMMENT ON COLUMN public.event_ticket_type.sold_quantity IS 'Number of tickets s
 
 
 CREATE TABLE public.event_ticket_transaction_item (
-                                                      id BIGSERIAL PRIMARY KEY,
+                                                      id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
                                                       tenant_id character varying(255),
                                                       transaction_id BIGINT NOT NULL REFERENCES public.event_ticket_transaction(id) ON DELETE CASCADE,
                                                       ticket_type_id BIGINT NOT NULL REFERENCES public.event_ticket_type(id),
@@ -2020,6 +2032,7 @@ CREATE TABLE public.event_ticket_transaction_item (
     -- Optionally: discount_amount, fee_amount, etc.
                                                       created_at TIMESTAMP DEFAULT now() NOT NULL,
                                                       updated_at TIMESTAMP DEFAULT now() NOT NULL,
+                                                      CONSTRAINT event_ticket_transaction_item_pkey PRIMARY KEY (id),
                                                       CONSTRAINT unique_transaction_ticket_type_tenant UNIQUE (transaction_id, ticket_type_id, tenant_id)
 );
 --
@@ -2285,6 +2298,7 @@ CREATE TABLE public.user_payment_transaction (
                                                  ticket_transaction_id bigint,
                                                  created_at timestamp without time zone DEFAULT now() NOT NULL,
                                                  updated_at timestamp without time zone DEFAULT now() NOT NULL,
+                                                 CONSTRAINT user_payment_transaction_pkey PRIMARY KEY (id),
                                                  CONSTRAINT check_payment_amounts CHECK (((amount >= (0)::numeric) AND (platform_fee_amount >= (0)::numeric) AND (tenant_amount >= (0)::numeric) AND (processing_fee >= (0)::numeric))),
                                                  CONSTRAINT ux_payment_transaction_stripe_intent UNIQUE (stripe_payment_intent_id),
                                                  CONSTRAINT fk_payment_transaction__event_id FOREIGN KEY (event_id) REFERENCES public.event_details(id) ON DELETE SET NULL,
@@ -2349,7 +2363,7 @@ CREATE TABLE public.user_task (
 
 -- Create the executive_committee_team_members table
 CREATE TABLE public.executive_committee_team_members (
-                                                         id BIGSERIAL PRIMARY KEY,
+                                                         id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
                                                          first_name VARCHAR(255) NOT NULL,
                                                          last_name VARCHAR(255) NOT NULL,
                                                          title VARCHAR(255) NOT NULL,
@@ -2368,7 +2382,8 @@ CREATE TABLE public.executive_committee_team_members (
                                                          twitter_url VARCHAR(500),
                                                          website_url VARCHAR(500),
                                                          created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-                                                         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+                                                         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+                                                         CONSTRAINT executive_committee_team_members_pkey PRIMARY KEY (id)
 );
 
 -- Create indexes for better performance
@@ -2423,7 +2438,12 @@ COMMENT ON COLUMN public.executive_committee_team_members.is_active IS 'Whether 
 -- Name: discount_code_id_seq; Type: SEQUENCE SET; Schema: public; Owner: giventa_event_management
 --
 
-SELECT pg_catalog.setval('public.discount_code_id_seq', 1, false);
+-- Ensure discount_code_id_seq sequence is always ahead of existing data
+SELECT pg_catalog.setval(
+               'public.discount_code_id_seq',
+               GREATEST(COALESCE((SELECT MAX(id) FROM public.discount_code), 1), 1),
+               true
+       );
 
 
 --
@@ -2432,7 +2452,12 @@ SELECT pg_catalog.setval('public.discount_code_id_seq', 1, false);
 -- Name: event_live_update_attachment_id_seq; Type: SEQUENCE SET; Schema: public; Owner: giventa_event_management
 --
 
-SELECT pg_catalog.setval('public.event_live_update_attachment_id_seq', 1, false);
+-- Ensure event_live_update_attachment_id_seq sequence is always ahead of existing data
+SELECT pg_catalog.setval(
+               'public.event_live_update_attachment_id_seq',
+               GREATEST(COALESCE((SELECT MAX(id) FROM public.event_live_update_attachment), 1), 1),
+               true
+       );
 
 
 --
@@ -2441,7 +2466,12 @@ SELECT pg_catalog.setval('public.event_live_update_attachment_id_seq', 1, false)
 -- Name: event_live_update_id_seq; Type: SEQUENCE SET; Schema: public; Owner: giventa_event_management
 --
 
-SELECT pg_catalog.setval('public.event_live_update_id_seq', 1, false);
+-- Ensure event_live_update_id_seq sequence is always ahead of existing data
+SELECT pg_catalog.setval(
+               'public.event_live_update_id_seq',
+               GREATEST(COALESCE((SELECT MAX(id) FROM public.event_live_update), 1), 1),
+               true
+       );
 
 
 --
@@ -2450,7 +2480,12 @@ SELECT pg_catalog.setval('public.event_live_update_id_seq', 1, false);
 -- Name: event_score_card_detail_id_seq; Type: SEQUENCE SET; Schema: public; Owner: giventa_event_management
 --
 
-SELECT pg_catalog.setval('public.event_score_card_detail_id_seq', 1, false);
+-- Ensure event_score_card_detail_id_seq sequence is always ahead of existing data
+SELECT pg_catalog.setval(
+               'public.event_score_card_detail_id_seq',
+               GREATEST(COALESCE((SELECT MAX(id) FROM public.event_score_card_detail), 1), 1),
+               true
+       );
 
 
 --
@@ -2459,16 +2494,19 @@ SELECT pg_catalog.setval('public.event_score_card_detail_id_seq', 1, false);
 -- Name: event_score_card_id_seq; Type: SEQUENCE SET; Schema: public; Owner: giventa_event_management
 --
 
-SELECT pg_catalog.setval('public.event_score_card_id_seq', 1, false);
+-- Ensure event_score_card_id_seq sequence is always ahead of existing data
+SELECT pg_catalog.setval(
+               'public.event_score_card_id_seq',
+               GREATEST(COALESCE((SELECT MAX(id) FROM public.event_score_card), 1), 1),
+               true
+       );
 
 
 --
 -- TOC entry 4001 (class 0 OID 0)
 -- Dependencies: 224
 -- Name: sequence_generator; Type: SEQUENCE SET; Schema: public; Owner: giventa_event_management
---
-
-SELECT pg_catalog.setval('public.sequence_generator', 4000, true);
+-- (Sequence initialization moved to consolidated section below - see "SEQUENCE INITIALIZATION" section)
 
 
 
@@ -3954,7 +3992,7 @@ CREATE TABLE public.payment_provider_config (
                                                 CONSTRAINT payment_provider_config_pkey PRIMARY KEY (id),
 
     -- Check constraints
-                                                CONSTRAINT check_provider_name CHECK ((provider_name IN ('STRIPE', 'PAYPAL', 'ZEFFY', 'ZELLE_MANUAL', 'REVOLUT', 'CEFI_CHARITY', 'GIVEBUTTER'))),
+                                                CONSTRAINT check_provider_name CHECK ((provider_name IN ('STRIPE', 'PAYPAL', 'ZEFFY', 'ZELLE_MANUAL', 'VENMO_MANUAL', 'CASH_APP_MANUAL', 'CASH', 'CHECK', 'OTHER_MANUAL', 'REVOLUT', 'CEFI_CHARITY', 'GIVEBUTTER'))),
                                                 CONSTRAINT check_payment_use_case CHECK ((payment_use_case IS NULL OR payment_use_case IN ('TICKET_SALE', 'DONATION', 'DONATION_CEFI', 'DONATION_ZERO_FEE', 'OFFERING', 'MEMBERSHIP_SUBSCRIPTION'))),
 
     -- Unique constraints
@@ -3966,7 +4004,7 @@ CREATE TABLE public.payment_provider_config (
 
 COMMENT ON TABLE public.payment_provider_config IS 'Stores tenant-level payment provider configurations and feature flags';
 COMMENT ON COLUMN public.payment_provider_config.tenant_id IS 'Tenant identifier';
-COMMENT ON COLUMN public.payment_provider_config.provider_name IS 'Payment provider name: STRIPE, PAYPAL, ZEFFY, ZELLE_MANUAL, REVOLUT, CEFI_CHARITY, GIVEBUTTER';
+COMMENT ON COLUMN public.payment_provider_config.provider_name IS 'Payment provider name: STRIPE, PAYPAL, ZEFFY, ZELLE_MANUAL, VENMO_MANUAL, CASH_APP_MANUAL, CASH, CHECK, OTHER_MANUAL, REVOLUT, CEFI_CHARITY, GIVEBUTTER';
 COMMENT ON COLUMN public.payment_provider_config.payment_use_case IS 'Payment use case: TICKET_SALE, DONATION, DONATION_CEFI, DONATION_ZERO_FEE, OFFERING, MEMBERSHIP_SUBSCRIPTION';
 COMMENT ON COLUMN public.payment_provider_config.supports_acp IS 'Whether provider supports Stripe Instant Checkout (ACP)';
 COMMENT ON COLUMN public.payment_provider_config.supports_zeffy IS 'Whether provider supports Zeffy integration';
@@ -3975,6 +4013,66 @@ COMMENT ON COLUMN public.payment_provider_config.supports_revolut IS 'Whether pr
 COMMENT ON COLUMN public.payment_provider_config.provider_api_key_encrypted IS 'Encrypted provider API key (AES-256-GCM)';
 COMMENT ON COLUMN public.payment_provider_config.provider_secret_key_encrypted IS 'Encrypted provider secret key (AES-256-GCM)';
 COMMENT ON COLUMN public.payment_provider_config.fallback_order IS 'Order for fallback when primary provider fails (lower number = higher priority)';
+
+--
+-- TOC entry: manual_payment_request
+-- Name: manual_payment_request; Type: TABLE; Schema: public
+-- Purpose: Stores fee-free manual payment requests and proof-of-payment metadata
+--
+
+CREATE TABLE public.manual_payment_request (
+                                             id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                             tenant_id character varying(255) NOT NULL,
+                                             event_id bigint,
+                                             ticket_transaction_id bigint,
+                                             requester_email character varying(255),
+                                             requester_first_name character varying(255),
+                                             requester_last_name character varying(255),
+                                             requester_phone character varying(100),
+                                             amount_due numeric(21,2) NOT NULL,
+                                             payment_method_type VARCHAR(70) NOT NULL,
+                                             payment_handle character varying(255),
+                                             payment_instructions text,
+                                             status character varying(30) DEFAULT 'REQUESTED' NOT NULL,
+                                             proof_of_payment_file_key character varying(512),
+                                             proof_of_payment_file_url character varying(1024),
+                                             proof_of_payment_uploaded_at timestamp without time zone,
+                                             received_at timestamp without time zone,
+                                             received_by character varying(255),
+                                             void_reason text,
+                                             created_at timestamp without time zone DEFAULT now() NOT NULL,
+                                             updated_at timestamp without time zone DEFAULT now() NOT NULL,
+                                             CONSTRAINT manual_payment_request_pkey PRIMARY KEY (id),
+                                             CONSTRAINT check_manual_payment_status CHECK ((status IN ('REQUESTED', 'RECEIVED', 'VOIDED', 'REFUNDED'))),
+                                             CONSTRAINT fk_manual_payment_request_event FOREIGN KEY (event_id) REFERENCES public.event_details(id) ON DELETE CASCADE,
+                                             CONSTRAINT fk_manual_payment_request_ticket_transaction FOREIGN KEY (ticket_transaction_id) REFERENCES public.event_ticket_transaction(id) ON DELETE SET NULL
+);
+
+COMMENT ON TABLE public.manual_payment_request IS 'Manual payment requests with external payment methods and proof-of-payment tracking';
+
+--
+-- TOC entry: manual_payment_summary_report
+-- Name: manual_payment_summary_report; Type: TABLE; Schema: public
+-- Purpose: Daily aggregation totals for manual payments by event/method/status
+--
+
+CREATE TABLE public.manual_payment_summary_report (
+                                                    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                                    tenant_id character varying(255) NOT NULL,
+                                                    event_id bigint NOT NULL,
+                                                    payment_method_type VARCHAR(70) NOT NULL,
+                                                    status VARCHAR(70) NOT NULL,
+                                                    total_amount numeric(21,2) NOT NULL DEFAULT 0,
+                                                    transaction_count integer NOT NULL DEFAULT 0,
+                                                    snapshot_date date NOT NULL,
+                                                    created_at timestamp without time zone DEFAULT now() NOT NULL,
+                                                    CONSTRAINT manual_payment_summary_report_pkey PRIMARY KEY (id),
+                                                    CONSTRAINT check_manual_payment_summary_status CHECK ((status IN ('REQUESTED', 'RECEIVED', 'VOIDED', 'REFUNDED'))),
+                                                    CONSTRAINT fk_manual_payment_summary_event FOREIGN KEY (event_id) REFERENCES public.event_details(id) ON DELETE CASCADE
+);
+
+COMMENT ON TABLE public.manual_payment_summary_report IS 'Daily summary of manual payments grouped by event, status, and method';
+COMMENT ON COLUMN public.manual_payment_summary_report.snapshot_date IS 'Report snapshot date (retention policy: keep daily rows for 18 months, then archive)';
 
 --
 -- TOC entry: platform_settlement
@@ -4002,7 +4100,7 @@ CREATE TABLE public.platform_settlement (
                                             CONSTRAINT platform_settlement_pkey PRIMARY KEY (id),
                                             CONSTRAINT check_settlement_amounts CHECK (((gross_amount >= (0)::numeric) AND (processing_fee_amount >= (0)::numeric) AND (platform_fee_amount >= (0)::numeric) AND (net_amount >= (0)::numeric) AND (transaction_count >= 0))),
                                             CONSTRAINT check_settlement_status CHECK ((status IN ('PENDING', 'PROCESSING', 'SETTLED', 'FAILED', 'CANCELLED'))),
-                                            CONSTRAINT check_provider_name_settlement CHECK ((provider_name IN ('STRIPE', 'PAYPAL', 'ZEFFY', 'ZELLE_MANUAL', 'REVOLUT', 'CEFI_CHARITY'))),
+                                            CONSTRAINT check_provider_name_settlement CHECK ((provider_name IN ('STRIPE', 'PAYPAL', 'ZEFFY', 'ZELLE_MANUAL', 'VENMO_MANUAL', 'CASH_APP_MANUAL', 'CASH', 'CHECK', 'OTHER_MANUAL', 'REVOLUT', 'CEFI_CHARITY'))),
                                             CONSTRAINT unique_tenant_provider_date UNIQUE (tenant_id, provider_name, settlement_date)
 );
 
@@ -4221,7 +4319,7 @@ CREATE TABLE IF NOT EXISTS public.promotion_email_sent_log (
                                                                id BIGINT PRIMARY KEY DEFAULT nextval('public.sequence_generator'::regclass),
     tenant_id VARCHAR(255) NOT NULL,
     template_id BIGINT, -- FK to promotion_email_template.id (nullable to preserve audit logs when template is deleted)
-    event_id BIGINT NOT NULL,
+    event_id BIGINT,
     recipient_email VARCHAR(255) NOT NULL,
     subject VARCHAR(500) NOT NULL,
     promotion_code VARCHAR(50),
@@ -4273,8 +4371,13 @@ CREATE INDEX IF NOT EXISTS idx_promotion_log_tenant ON public.promotion_email_se
 -- These tables are required for Spring Batch to track job executions
 -- Run this script if automatic schema initialization fails
 
--- Create Spring Batch-specific sequences with the exact names Spring Batch expects
--- These are separate from the main sequence_generator used by other application tables
+-- Spring Batch-specific sequences are created after tables (see below) with OWNED BY integrated into CREATE statements
+-- This allows OWNED BY to be set in CREATE SEQUENCE statements (no ALTER needed)
+-- Note: Sequences must exist before tables for DEFAULT nextval() to work, so they are created initially
+-- and then recreated with OWNED BY after tables exist
+
+-- Create Spring Batch sequences initially (before tables) to support DEFAULT nextval() in table definitions
+-- These will be recreated with OWNED BY after tables exist (see below)
 CREATE SEQUENCE IF NOT EXISTS public.batch_job_seq
     START WITH 1
     INCREMENT BY 1
@@ -4419,11 +4522,39 @@ CREATE INDEX IF NOT EXISTS idx_batch_job_execution_log_status
 CREATE INDEX IF NOT EXISTS idx_batch_job_execution_log_tenant
     ON public.batch_job_execution_log(tenant_id, started_at DESC);
 
--- Set sequence ownership to the columns (must be done after tables are created)
+-- (Batch job sequence initialization moved to consolidated section below)
+
+-- Create Spring Batch-specific sequences with OWNED BY integrated into CREATE statements
+-- These sequences are created after tables to allow OWNED BY clause (no ALTER statements needed)
+-- Note: Sequences are recreated here (after tables exist) to set OWNED BY in CREATE statement
 -- This ensures sequences are dropped if columns/tables are dropped
-ALTER SEQUENCE public.batch_job_seq OWNED BY public.BATCH_JOB_INSTANCE.JOB_INSTANCE_ID;
-ALTER SEQUENCE public.batch_job_execution_seq OWNED BY public.BATCH_JOB_EXECUTION.JOB_EXECUTION_ID;
-ALTER SEQUENCE public.batch_step_execution_seq OWNED BY public.BATCH_STEP_EXECUTION.STEP_EXECUTION_ID;
+-- The initial sequence creation (before tables) is removed since we recreate them here with OWNED BY
+DROP SEQUENCE IF EXISTS public.batch_job_seq CASCADE;
+CREATE SEQUENCE public.batch_job_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+    OWNED BY public.BATCH_JOB_INSTANCE.JOB_INSTANCE_ID;
+
+DROP SEQUENCE IF EXISTS public.batch_job_execution_seq CASCADE;
+CREATE SEQUENCE public.batch_job_execution_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+    OWNED BY public.BATCH_JOB_EXECUTION.JOB_EXECUTION_ID;
+
+DROP SEQUENCE IF EXISTS public.batch_step_execution_seq CASCADE;
+CREATE SEQUENCE public.batch_step_execution_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+    OWNED BY public.BATCH_STEP_EXECUTION.STEP_EXECUTION_ID;
 
 
 -- =====================================================
@@ -4435,6 +4566,11 @@ CREATE INDEX IF NOT EXISTS idx_payment_provider_config_tenant_id ON public.payme
 CREATE INDEX IF NOT EXISTS idx_payment_provider_config_provider_name ON public.payment_provider_config(provider_name);
 CREATE INDEX IF NOT EXISTS idx_payment_provider_config_active ON public.payment_provider_config(is_active) WHERE is_active = true;
 CREATE INDEX IF NOT EXISTS idx_payment_provider_config_use_case ON public.payment_provider_config(payment_use_case);
+
+-- Indexes for manual_payment_summary_report
+CREATE INDEX IF NOT EXISTS idx_manual_payment_summary_report_tenant_id ON public.manual_payment_summary_report(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_manual_payment_summary_report_event_id ON public.manual_payment_summary_report(event_id);
+CREATE INDEX IF NOT EXISTS idx_manual_payment_summary_report_snapshot_date ON public.manual_payment_summary_report(snapshot_date);
 
 -- Indexes for platform_settlement
 CREATE INDEX IF NOT EXISTS idx_platform_settlement_tenant_id ON public.platform_settlement(tenant_id);
@@ -4507,5 +4643,272 @@ CREATE TRIGGER trg_membership_subscription_updated_at
     EXECUTE FUNCTION public.update_updated_at_column();
 
 -- =====================================================
+-- GIVEBUTTER DONATION TRANSACTION TABLES
+-- =====================================================
+
+-- Table: donation_transaction
+-- Purpose: Stores standalone donation transactions (non-ticketed donations) for GiveButter integration
+-- Created: 2025-01-XX
+-- Description: Supports donation-based events, Mass offerings, and fundraiser events with zero-fee processing
+
+CREATE TABLE public.donation_transaction (
+    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    tenant_id character varying(255) NOT NULL,
+    event_id bigint,
+    payment_transaction_id bigint,
+    transaction_reference character varying(255) NOT NULL,
+    givebutter_donation_id character varying(255),
+    amount numeric(10,2) NOT NULL,
+    email character varying(255) NOT NULL,
+    first_name character varying(255),
+    last_name character varying(255),
+    phone character varying(50),
+    prayer_intention text,
+    is_recurring boolean DEFAULT false NOT NULL,
+    is_anonymous boolean DEFAULT false NOT NULL,
+    status character varying(50) NOT NULL,
+    qr_code_url text,
+    qr_code_image_url text,
+    email_sent boolean DEFAULT false NOT NULL,
+    metadata text,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT donation_transaction_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_donation_event FOREIGN KEY (event_id) REFERENCES public.event_details(id) ON DELETE SET NULL,
+    CONSTRAINT fk_donation_payment FOREIGN KEY (payment_transaction_id) REFERENCES public.user_payment_transaction(id) ON DELETE SET NULL,
+    CONSTRAINT ux_donation_transaction_reference UNIQUE (transaction_reference)
+);
+
+-- Performance indexes for donation_transaction
+CREATE INDEX idx_donation_tenant_event ON public.donation_transaction(tenant_id, event_id);
+CREATE INDEX idx_donation_reference ON public.donation_transaction(transaction_reference);
+CREATE INDEX idx_donation_givebutter_id ON public.donation_transaction(givebutter_donation_id);
+CREATE INDEX idx_donation_status ON public.donation_transaction(status);
+CREATE INDEX idx_donation_created ON public.donation_transaction(created_at);
+CREATE INDEX idx_donation_email_sent ON public.donation_transaction(email_sent) WHERE email_sent = false;
+CREATE INDEX idx_donation_qr_code ON public.donation_transaction(qr_code_url) WHERE qr_code_url IS NULL;
+
+-- Comments for donation_transaction table
+COMMENT ON TABLE public.donation_transaction IS 'Stores standalone donation transactions (non-ticketed donations) for GiveButter integration';
+COMMENT ON COLUMN public.donation_transaction.tenant_id IS 'Multi-tenant identifier';
+COMMENT ON COLUMN public.donation_transaction.event_id IS 'Foreign key to event_details (nullable for standalone donations)';
+COMMENT ON COLUMN public.donation_transaction.payment_transaction_id IS 'Foreign key to user_payment_transaction (links to payment orchestration)';
+COMMENT ON COLUMN public.donation_transaction.transaction_reference IS 'Unique transaction reference (e.g., "GB-12345")';
+COMMENT ON COLUMN public.donation_transaction.givebutter_donation_id IS 'GiveButter donation ID from API response';
+COMMENT ON COLUMN public.donation_transaction.amount IS 'Donation amount';
+COMMENT ON COLUMN public.donation_transaction.email IS 'Donor email address';
+COMMENT ON COLUMN public.donation_transaction.first_name IS 'Donor first name';
+COMMENT ON COLUMN public.donation_transaction.last_name IS 'Donor last name';
+COMMENT ON COLUMN public.donation_transaction.phone IS 'Donor phone number (optional)';
+COMMENT ON COLUMN public.donation_transaction.prayer_intention IS 'Prayer intention for Mass offerings (optional)';
+COMMENT ON COLUMN public.donation_transaction.is_recurring IS 'Whether donation is recurring';
+COMMENT ON COLUMN public.donation_transaction.is_anonymous IS 'Whether donation is anonymous';
+COMMENT ON COLUMN public.donation_transaction.status IS 'Donation status: PENDING, COMPLETED, FAILED, CANCELLED (VARCHAR, not enum - matches existing pattern)';
+COMMENT ON COLUMN public.donation_transaction.qr_code_url IS 'QR code URL for donation confirmation';
+COMMENT ON COLUMN public.donation_transaction.qr_code_image_url IS 'QR code image URL';
+COMMENT ON COLUMN public.donation_transaction.email_sent IS 'Whether confirmation email has been sent';
+COMMENT ON COLUMN public.donation_transaction.metadata IS 'JSON string for additional donation data';
+COMMENT ON COLUMN public.donation_transaction.created_at IS 'Record creation timestamp';
+COMMENT ON COLUMN public.donation_transaction.updated_at IS 'Record last update timestamp';
+
+-- Trigger for automatic updated_at timestamp on donation_transaction
+CREATE TRIGGER trg_donation_transaction_updated_at
+    BEFORE UPDATE ON public.donation_transaction
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+-- Optional Table: donation_statistics
+-- Purpose: Pre-aggregated donation statistics for admin dashboard performance optimization
+-- Note: This table is optional. Statistics can also be calculated on-the-fly from donation_transaction table.
+
+CREATE TABLE public.donation_statistics (
+    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    tenant_id character varying(255) NOT NULL,
+    event_id bigint,
+    total_donations integer DEFAULT 0 NOT NULL,
+    total_amount numeric(10,2) DEFAULT 0 NOT NULL,
+    average_amount numeric(10,2) DEFAULT 0 NOT NULL,
+    date_range_start date,
+    date_range_end date,
+    last_updated timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT donation_statistics_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_donation_statistics_event FOREIGN KEY (event_id) REFERENCES public.event_details(id) ON DELETE SET NULL,
+    CONSTRAINT ux_donation_statistics_unique UNIQUE (tenant_id, event_id, date_range_start, date_range_end)
+);
+
+-- Indexes for donation_statistics table
+CREATE INDEX idx_donation_stats_tenant_event ON public.donation_statistics(tenant_id, event_id);
+CREATE INDEX idx_donation_stats_date_range ON public.donation_statistics(date_range_start, date_range_end);
+
+-- Comments for donation_statistics table
+COMMENT ON TABLE public.donation_statistics IS 'Pre-aggregated donation statistics for admin dashboard (optional - for performance optimization)';
+COMMENT ON COLUMN public.donation_statistics.tenant_id IS 'Multi-tenant identifier';
+COMMENT ON COLUMN public.donation_statistics.event_id IS 'Foreign key to event_details';
+COMMENT ON COLUMN public.donation_statistics.total_donations IS 'Total number of donations in date range';
+COMMENT ON COLUMN public.donation_statistics.total_amount IS 'Total donation amount in date range';
+COMMENT ON COLUMN public.donation_statistics.average_amount IS 'Average donation amount in date range';
+COMMENT ON COLUMN public.donation_statistics.date_range_start IS 'Start date of statistics range';
+COMMENT ON COLUMN public.donation_statistics.date_range_end IS 'End date of statistics range';
+COMMENT ON COLUMN public.donation_statistics.last_updated IS 'Last time statistics were updated';
+
+-- Trigger for automatic updated_at timestamp on donation_statistics
+CREATE TRIGGER trg_donation_statistics_updated_at
+    BEFORE UPDATE ON public.donation_statistics
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+-- =====================================================
 -- END OF PAYMENT ORCHESTRATION LAYER MIGRATION
 -- =====================================================
+
+-- =====================================================
+-- SEQUENCE INITIALIZATION - PREVENT DUPLICATE KEY ERRORS
+-- =====================================================
+-- All sequence setval statements are consolidated here for maintainability
+-- Each sequence must be set individually (they are different sequences)
+-- =====================================================
+
+-- Table-specific sequences (for tables using BIGSERIAL or explicit sequences)
+-- =====================================================
+
+-- Ensure discount_code_id_seq sequence is always ahead of existing data
+SELECT pg_catalog.setval(
+               'public.discount_code_id_seq',
+               GREATEST(COALESCE((SELECT MAX(id) FROM public.discount_code), 1), 1),
+               true
+       );
+
+-- Ensure event_live_update_attachment_id_seq sequence is always ahead of existing data
+SELECT pg_catalog.setval(
+               'public.event_live_update_attachment_id_seq',
+               GREATEST(COALESCE((SELECT MAX(id) FROM public.event_live_update_attachment), 1), 1),
+               true
+       );
+
+-- Ensure event_live_update_id_seq sequence is always ahead of existing data
+SELECT pg_catalog.setval(
+               'public.event_live_update_id_seq',
+               GREATEST(COALESCE((SELECT MAX(id) FROM public.event_live_update), 1), 1),
+               true
+       );
+
+-- Ensure event_score_card_detail_id_seq sequence is always ahead of existing data
+SELECT pg_catalog.setval(
+               'public.event_score_card_detail_id_seq',
+               GREATEST(COALESCE((SELECT MAX(id) FROM public.event_score_card_detail), 1), 1),
+               true
+       );
+
+-- Ensure event_score_card_id_seq sequence is always ahead of existing data
+SELECT pg_catalog.setval(
+               'public.event_score_card_id_seq',
+               GREATEST(COALESCE((SELECT MAX(id) FROM public.event_score_card), 1), 1),
+               true
+       );
+
+-- Batch job sequences (Spring Batch framework sequences)
+-- =====================================================
+
+-- Ensure batch_job_execution_log sequence is always ahead of existing data
+-- (safe even if the table is empty)
+SELECT pg_catalog.setval(
+               'public.batch_job_execution_log_id_seq',
+               GREATEST(COALESCE((SELECT MAX(id) FROM public.batch_job_execution_log), 1), 1),
+               true
+       );
+
+-- Ensure batch_job_seq sequence is always ahead of existing data
+-- (safe even if the table is empty)
+SELECT pg_catalog.setval(
+               'public.batch_job_seq',
+               GREATEST(COALESCE((SELECT MAX(JOB_INSTANCE_ID) FROM public.BATCH_JOB_INSTANCE), 1), 1),
+               true
+       );
+
+-- Ensure batch_job_execution_seq sequence is always ahead of existing data
+-- (safe even if the table is empty)
+SELECT pg_catalog.setval(
+               'public.batch_job_execution_seq',
+               GREATEST(COALESCE((SELECT MAX(JOB_EXECUTION_ID) FROM public.BATCH_JOB_EXECUTION), 1), 1),
+               true
+       );
+
+-- Ensure batch_step_execution_seq sequence is always ahead of existing data
+-- (safe even if the table is empty)
+SELECT pg_catalog.setval(
+               'public.batch_step_execution_seq',
+               GREATEST(COALESCE((SELECT MAX(STEP_EXECUTION_ID) FROM public.BATCH_STEP_EXECUTION), 1), 1),
+               true
+       );
+
+-- Main shared sequence_generator (for all tables using BIGINT with sequence_generator)
+-- =====================================================
+-- Ensure sequence_generator sequence is always ahead of existing data from all tables that use it
+-- This prevents duplicate key errors by ensuring the sequence is at least as high as the maximum ID in any table
+SELECT pg_catalog.setval(
+               'public.sequence_generator',
+               GREATEST(
+                   COALESCE((SELECT MAX(id) FROM public.user_profile), 0),
+                   COALESCE((SELECT MAX(id) FROM public.bulk_operation_log), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_type_details), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_details), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_recurrence_series), 0),
+                   COALESCE((SELECT MAX(id) FROM public.focus_group), 0),
+                   COALESCE((SELECT MAX(id) FROM public.focus_group_members), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_focus_groups), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_guest_pricing), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_admin), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_admin_audit_log), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_attendee), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_attendee_guest), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_calendar_entry), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_sponsors), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_sponsors_join), 0),
+                   COALESCE((SELECT MAX(id) FROM public.gallery_album), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_media), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_organizer), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_poll), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_poll_option), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_poll_response), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_ticket_transaction), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_ticket_transaction_item), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_ticket_type), 0),
+                   COALESCE((SELECT MAX(id) FROM public.qr_code_usage), 0),
+                   COALESCE((SELECT MAX(id) FROM public.tenant_organization), 0),
+                   COALESCE((SELECT MAX(id) FROM public.tenant_settings), 0),
+                   COALESCE((SELECT MAX(id) FROM public.tenant_email_addresses), 0),
+                   COALESCE((SELECT MAX(id) FROM public.user_payment_transaction), 0),
+                   COALESCE((SELECT MAX(id) FROM public.user_subscription), 0),
+                   COALESCE((SELECT MAX(id) FROM public.user_task), 0),
+                   COALESCE((SELECT MAX(id) FROM public.executive_committee_team_members), 0),
+                   COALESCE((SELECT MAX(id) FROM public.communication_campaign), 0),
+                   COALESCE((SELECT MAX(id) FROM public.email_log), 0),
+                   COALESCE((SELECT MAX(id) FROM public.whatsapp_log), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_featured_performers), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_contacts), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_emails), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_program_directors), 0),
+                   COALESCE((SELECT MAX(id) FROM public.payment_provider_config), 0),
+                   COALESCE((SELECT MAX(id) FROM public.manual_payment_request), 0),
+                   COALESCE((SELECT MAX(id) FROM public.manual_payment_summary_report), 0),
+                   COALESCE((SELECT MAX(id) FROM public.platform_settlement), 0),
+                   COALESCE((SELECT MAX(id) FROM public.platform_invoice), 0),
+                   COALESCE((SELECT MAX(id) FROM public.membership_plan), 0),
+                   COALESCE((SELECT MAX(id) FROM public.membership_subscription), 0),
+                   COALESCE((SELECT MAX(id) FROM public.membership_subscription_reconciliation_log), 0),
+                   COALESCE((SELECT MAX(id) FROM public.promotion_email_template), 0),
+                   COALESCE((SELECT MAX(id) FROM public.promotion_email_sent_log), 0),
+                   COALESCE((SELECT MAX(id) FROM public.clerk_user_tenant), 0),
+                   COALESCE((SELECT MAX(id) FROM public.clerk_organization_role), 0),
+                   COALESCE((SELECT MAX(id) FROM public.clerk_webhook_event), 0),
+                   COALESCE((SELECT MAX(id) FROM public.clerk_session), 0),
+                   COALESCE((SELECT MAX(id) FROM public.donation_transaction), 0),
+                   COALESCE((SELECT MAX(id) FROM public.donation_statistics), 0),
+                   1
+               ),
+               true
+       );
+
+
+
+

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { EventForm } from '@/components/EventForm';
 import type { EventDetailsDTO, EventTypeDetailsDTO } from '@/types';
 import Link from 'next/link';
-import { FaUsers, FaPhotoVideo, FaCalendarAlt, FaTags, FaTicketAlt, FaHome, FaMicrophone, FaAddressBook, FaHandshake, FaEnvelope, FaUserTie, FaClipboardCheck, FaChartLine } from 'react-icons/fa';
+import { FaUsers, FaPhotoVideo, FaCalendarAlt, FaTags, FaTicketAlt, FaHome, FaMicrophone, FaAddressBook, FaHandshake, FaEnvelope, FaUserTie, FaClipboardCheck, FaChartLine, FaDollarSign } from 'react-icons/fa';
 import SaveStatusDialog, { type SaveStatus } from '@/components/SaveStatusDialog';
 
 export default function EditEventPage() {
@@ -108,45 +108,45 @@ export default function EditEventPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             <Link
               href="/admin"
-              className="flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 text-gray-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+              className="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg shadow-md p-3 text-xs transition-all group"
               title="Admin Home"
               aria-label="Admin Home"
             >
-              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-gray-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-                <FaHome className="w-10 h-10 text-gray-500" />
+              <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-blue-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+                <FaHome className="w-8 h-8 text-blue-500" />
               </div>
               <span className="font-semibold text-center leading-tight">Admin Home</span>
             </Link>
             <Link
               href="/admin/manage-usage"
-              className="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+              className="flex flex-col items-center justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-800 rounded-lg shadow-md p-3 text-xs transition-all group"
               title="Manage Usage"
               aria-label="Manage Usage"
             >
-              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-                <FaUsers className="w-10 h-10 text-blue-500" />
+              <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-indigo-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+                <FaUsers className="w-8 h-8 text-indigo-500" />
               </div>
               <span className="font-semibold text-center leading-tight">Manage Usage</span>
             </Link>
             <Link
               href={`/admin/events/${eventId}/media/list`}
-              className="flex flex-col items-center justify-center bg-yellow-50 hover:bg-yellow-100 text-yellow-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+              className="flex flex-col items-center justify-center bg-yellow-50 hover:bg-yellow-100 text-yellow-800 rounded-lg shadow-md p-3 text-xs transition-all group"
               title="Manage Media Files"
               aria-label="Manage Media Files"
             >
-              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-yellow-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-                <FaPhotoVideo className="w-10 h-10 text-yellow-500" />
+              <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-yellow-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+                <FaPhotoVideo className="w-8 h-8 text-yellow-500" />
               </div>
               <span className="font-semibold text-center leading-tight">Manage Media Files</span>
             </Link>
             <Link
               href="/admin/manage-events"
-              className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+              className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-lg shadow-md p-3 text-xs transition-all group"
               title="Manage Events"
               aria-label="Manage Events"
             >
-              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-                <FaCalendarAlt className="w-10 h-10 text-green-500" />
+              <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+                <FaCalendarAlt className="w-8 h-8 text-green-500" />
               </div>
               <span className="font-semibold text-center leading-tight">Manage Events</span>
             </Link>
@@ -154,23 +154,23 @@ export default function EditEventPage() {
               <>
                 <Link
                   href={`/admin/events/${eventId}/ticket-types/list`}
-                  className="flex flex-col items-center justify-center bg-purple-50 hover:bg-purple-100 text-purple-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+                  className="flex flex-col items-center justify-center bg-purple-50 hover:bg-purple-100 text-purple-800 rounded-lg shadow-md p-3 text-xs transition-all group"
                   title="Manage Ticket Types"
                   aria-label="Manage Ticket Types"
                 >
-                  <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-                    <FaTags className="w-10 h-10 text-purple-500" />
+                  <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-purple-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+                    <FaTags className="w-8 h-8 text-purple-500" />
                   </div>
                   <span className="font-semibold text-center leading-tight">Manage Ticket Types</span>
                 </Link>
                 <Link
                   href={`/admin/events/${eventId}/tickets/list`}
-                  className="flex flex-col items-center justify-center bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+                  className="flex flex-col items-center justify-center bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-lg shadow-md p-3 text-xs transition-all group"
                   title="Manage Tickets"
                   aria-label="Manage Tickets"
                 >
-                  <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-teal-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-                    <FaTicketAlt className="w-10 h-10 text-teal-500" />
+                  <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-teal-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+                    <FaTicketAlt className="w-8 h-8 text-teal-500" />
                   </div>
                   <span className="font-semibold text-center leading-tight">Manage Tickets</span>
                 </Link>
@@ -178,26 +178,43 @@ export default function EditEventPage() {
             )}
             <Link
               href={`/admin/check-in-analytics?eventId=${eventId}`}
-              className="flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 text-slate-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+              className="flex flex-col items-center justify-center bg-cyan-50 hover:bg-cyan-100 text-cyan-800 rounded-lg shadow-md p-3 text-xs transition-all group"
               title="Check-In Analytics"
               aria-label="Check-In Analytics"
             >
-              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-slate-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-                <FaClipboardCheck className="w-10 h-10 text-slate-500" />
+              <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-cyan-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+                <FaClipboardCheck className="w-8 h-8 text-cyan-500" />
               </div>
               <span className="font-semibold text-center leading-tight">Check-In Analytics</span>
             </Link>
             <Link
               href={`/admin/sales-analytics?eventId=${eventId}`}
-              className="flex flex-col items-center justify-center bg-stone-50 hover:bg-stone-100 text-stone-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+              className="flex flex-col items-center justify-center bg-sky-50 hover:bg-sky-100 text-sky-800 rounded-lg shadow-md p-3 text-xs transition-all group"
               title="Sales Analytics"
               aria-label="Sales Analytics"
             >
-              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-stone-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-                <FaChartLine className="w-10 h-10 text-stone-500" />
+              <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-sky-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+                <FaChartLine className="w-8 h-8 text-sky-500" />
               </div>
               <span className="font-semibold text-center leading-tight">Sales Analytics</span>
             </Link>
+            {/* Manual Payment Button - Only show if event is manual payment type */}
+            {event && (
+              (event.paymentFlowMode === 'MANUAL_ONLY' || 
+               (event.paymentFlowMode === 'HYBRID' && event.manualPaymentEnabled === true)) && (
+                <Link
+                  href={`/admin/manual-payments?eventId=${eventId}`}
+                  className="flex flex-col items-center justify-center bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-lg shadow-md p-3 text-xs transition-all group"
+                  title="Manual Payments [Zelle, Venmo…]"
+                  aria-label="Manual Payments [Zelle, Venmo…]"
+                >
+                  <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-emerald-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+                    <FaDollarSign className="w-8 h-8 text-emerald-500" />
+                  </div>
+                  <span className="font-semibold text-center leading-tight">Manual Payments [Zelle, Venmo…]</span>
+                </Link>
+              )
+            )}
           </div>
         </div>
       </div>

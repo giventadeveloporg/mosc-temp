@@ -505,27 +505,56 @@ export async function fetchWithJwtRetry(apiUrl: string, options: any = {}, debug
   const tenantId = getTenantId();
   console.log('[fetchWithJwtRetry] Using JWT:', token);
   console.log('[fetchWithJwtRetry] Using Tenant ID:', tenantId);
-  let response = await fetch(apiUrl, {
-    ...options,
-    headers: {
-      ...options.headers,
-      Authorization: `Bearer ${token}`,
-      'X-Tenant-ID': tenantId, // CRITICAL: Backend TenantContextFilter expects this header
-    },
-  });
-  console.log('[fetchWithJwtRetry] Response status:', response.status);
-  if (response.status === 401) {
-    token = await generateApiJwt();
-    console.log('[fetchWithJwtRetry] Retrying with new JWT:', token);
-    response = await fetch(apiUrl, {
+  
+  // Add timeout to fetch calls (30 seconds default, can be overridden in options)
+  const timeoutMs = options.timeout || 30000;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  
+  try {
+    let response = await fetch(apiUrl, {
       ...options,
+      signal: controller.signal,
       headers: {
         ...options.headers,
         Authorization: `Bearer ${token}`,
         'X-Tenant-ID': tenantId, // CRITICAL: Backend TenantContextFilter expects this header
       },
     });
-    console.log('[fetchWithJwtRetry] Response status (after retry):', response.status);
+    clearTimeout(timeoutId);
+    console.log('[fetchWithJwtRetry] Response status:', response.status);
+    if (response.status === 401) {
+      token = await generateApiJwt();
+      console.log('[fetchWithJwtRetry] Retrying with new JWT:', token);
+      // Create new controller for retry
+      const retryController = new AbortController();
+      const retryTimeoutId = setTimeout(() => retryController.abort(), timeoutMs);
+      try {
+        response = await fetch(apiUrl, {
+          ...options,
+          signal: retryController.signal,
+          headers: {
+            ...options.headers,
+            Authorization: `Bearer ${token}`,
+            'X-Tenant-ID': tenantId, // CRITICAL: Backend TenantContextFilter expects this header
+          },
+        });
+        clearTimeout(retryTimeoutId);
+        console.log('[fetchWithJwtRetry] Response status (after retry):', response.status);
+      } catch (retryError: any) {
+        clearTimeout(retryTimeoutId);
+        if (retryError.name === 'AbortError') {
+          throw new Error(`Request to ${apiUrl} timed out after ${timeoutMs}ms`);
+        }
+        throw retryError;
+      }
+    }
+    return response;
+  } catch (error: any) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      throw new Error(`Request to ${apiUrl} timed out after ${timeoutMs}ms`);
+    }
+    throw error;
   }
-  return response;
 }

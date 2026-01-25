@@ -68,17 +68,60 @@ const publicPageTests = [
       '.grid, [class*="grid"]',
       '[class*="event"], [class*="card"]',
       'input[type="search"], input[type="text"]',
-      'button, a[href*="/events/"]'
+      'button, a[href*="/events/"]',
+      'a[href*="/events/"][title*="Event Details"], a[href*="/events/"][aria-label*="Event Details"]',
+      'a[href*="calendar.google.com"], a[title*="Calendar"], a[aria-label*="Calendar"]',
+      'a[href*="/checkout"], a[href*="/manual-checkout"], img[alt*="Buy Tickets"], img[alt*="buy tickets"]'
     ],
     validation: [
       'Events page loads successfully',
       'Event cards or list items are visible',
       'Search/filter functionality accessible',
+      'At least 2 events have "See Event Details" buttons',
+      'At least 2 events have "Add to Calendar" buttons (for future events)',
+      'Buy Tickets buttons link to correct checkout routes',
       'No JavaScript errors'
     ],
     interactions: [
       { type: 'wait', selector: '[class*="event"], [class*="card"]', timeout: 5000 },
-      { type: 'check', selector: 'h1', visible: true }
+      { type: 'check', selector: 'h1', visible: true },
+      { 
+        type: 'verify-buttons',
+        description: 'Verify event action buttons exist and have correct links',
+        checks: [
+          {
+            name: 'See Event Details buttons',
+            selector: 'a[href*="/events/"][title*="Event Details"], a[href*="/events/"][aria-label*="Event Details"]',
+            minCount: 2,
+            validateLink: (href) => {
+              // Should match pattern /events/{id} where id is a number
+              const match = href.match(/\/events\/(\d+)$/);
+              return match !== null && match[1] !== undefined;
+            }
+          },
+          {
+            name: 'Add to Calendar buttons',
+            selector: 'a[href*="calendar.google.com"], a[title*="Calendar"], a[aria-label*="Calendar"]',
+            minCount: 2,
+            validateLink: (href) => {
+              // Should be a Google Calendar link
+              return href.includes('calendar.google.com') && href.includes('action=TEMPLATE');
+            }
+          },
+          {
+            name: 'Buy Tickets buttons',
+            selector: 'a[href*="/checkout"], a[href*="/manual-checkout"], img[alt*="Buy Tickets"], img[alt*="buy tickets"]',
+            minCount: 0, // Optional - only for TICKETED events
+            validateLink: (href) => {
+              // Should match either /events/{id}/checkout or /events/{id}/manual-checkout
+              const checkoutMatch = href.match(/\/events\/(\d+)\/checkout$/);
+              const manualMatch = href.match(/\/events\/(\d+)\/manual-checkout$/);
+              return checkoutMatch !== null || manualMatch !== null;
+            },
+            checkParentLink: true // Check parent <a> tag if selector matches img
+          }
+        ]
+      }
     ]
   },
   {
@@ -493,6 +536,70 @@ async function executeTestWithPlaywright(test, testUrl, startTime) {
               const count = await page.locator(interaction.selector).count();
               if (interaction.count.min && count < interaction.count.min) {
                 errors.push(`Element ${interaction.selector} count ${count} is less than minimum ${interaction.count.min}`);
+              }
+            }
+          } else if (interaction.type === 'verify-buttons') {
+            // Verify event action buttons exist and have correct links
+            if (interaction.checks) {
+              for (const check of interaction.checks) {
+                try {
+                  const elements = await page.locator(check.selector).all();
+                  const count = elements.length;
+                  
+                  if (check.minCount !== undefined && count < check.minCount) {
+                    if (check.minCount > 0) {
+                      errors.push(`${check.name}: Found ${count}, expected at least ${check.minCount}`);
+                    } else {
+                      // Optional check - only warn if found but invalid
+                      warnings.push(`${check.name}: Found ${count} (optional)`);
+                    }
+                  } else if (count > 0) {
+                    // Verify links if validateLink function is provided
+                    if (check.validateLink) {
+                      let validCount = 0;
+                      let invalidLinks = [];
+                      
+                      for (const element of elements) {
+                        let href = null;
+                        
+                        // If checking parent link for images
+                        if (check.checkParentLink) {
+                          const tagName = await element.evaluate(el => el.tagName.toLowerCase());
+                          if (tagName === 'img') {
+                            const parent = await element.locator('..').first();
+                            const parentTagName = await parent.evaluate(el => el.tagName.toLowerCase());
+                            if (parentTagName === 'a') {
+                              href = await parent.getAttribute('href');
+                            }
+                          } else {
+                            href = await element.getAttribute('href');
+                          }
+                        } else {
+                          href = await element.getAttribute('href');
+                        }
+                        
+                        if (href && check.validateLink(href)) {
+                          validCount++;
+                        } else if (href) {
+                          invalidLinks.push(href);
+                        }
+                      }
+                      
+                      if (validCount < count && invalidLinks.length > 0) {
+                        errors.push(`${check.name}: ${invalidLinks.length} invalid link(s) found: ${invalidLinks.slice(0, 3).join(', ')}${invalidLinks.length > 3 ? '...' : ''}`);
+                      } else if (validCount > 0) {
+                        // Log success for debugging
+                        console.log(`   ✓ ${check.name}: ${validCount} valid link(s) found`);
+                      }
+                    }
+                    
+                    if (count >= check.minCount) {
+                      console.log(`   ✓ ${check.name}: Found ${count} (required: ${check.minCount})`);
+                    }
+                  }
+                } catch (checkError) {
+                  warnings.push(`${check.name} verification failed: ${checkError.message}`);
+                }
               }
             }
           }

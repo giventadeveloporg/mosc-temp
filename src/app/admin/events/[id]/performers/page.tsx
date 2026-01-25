@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { FaSearch, FaEdit, FaTrashAlt, FaUpload, FaImages, FaUnlink, FaTicketAlt, FaPercent } from 'react-icons/fa';
+import { FaSearch, FaEdit, FaTrashAlt, FaUpload, FaImages, FaUnlink, FaTicketAlt, FaPercent, FaMicrophone, FaAddressBook, FaHandshake, FaEnvelope, FaUserTie } from 'react-icons/fa';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
@@ -646,89 +646,104 @@ export default function EventPerformersPage() {
         const currentPosterUrl = performer?.portraitImageUrl || performer?.performanceImageUrl;
 
         return (
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                openEditModal(performer);
-              }}
-              className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
-              title="Edit performer details"
-              aria-label="Edit performer details"
-              type="button"
-            >
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-            </button>
+          <div className="flex flex-wrap gap-3 items-start">
+            <div className="flex flex-col items-center gap-1">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openEditModal(performer);
+                }}
+                className="instant-tooltip flex-shrink-0 w-14 h-14 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                data-tooltip="Edit"
+                aria-label="Edit performer details"
+                type="button"
+              >
+                <svg className="text-blue-600 p-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </button>
+              <span className="text-xs text-gray-600 text-center whitespace-nowrap">Edit</span>
+            </div>
             {performerId && (
               <>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedPerformerForPoster({
-                      eventId: eventIdNum,
-                      performerId,
-                      currentPosterUrl,
-                    });
-                    setPosterUploadOpen(true);
-                  }}
-                  className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
-                  title="Upload banners in this particular event for this performer"
-                  aria-label="Upload banners in this particular event for this performer"
-                  type="button"
-                >
-                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
-                  </svg>
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedPerformerForMedia({
-                      eventId: eventIdNum,
-                      performerId,
-                    });
-                  }}
-                  className="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-100 hover:bg-purple-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
-                  title="View all the media files associated with this performer"
-                  aria-label="View all the media files associated with this performer"
-                  type="button"
-                >
-                  <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                </button>
+                <div className="flex flex-col items-center gap-1">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedPerformerForPoster({
+                        eventId: eventIdNum,
+                        performerId,
+                        currentPosterUrl,
+                      });
+                      setPosterUploadOpen(true);
+                    }}
+                    className="instant-tooltip flex-shrink-0 w-14 h-14 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                    data-tooltip="Upload"
+                    aria-label="Upload banners in this particular event for this performer"
+                    type="button"
+                  >
+                    <svg className="text-blue-600 p-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                    </svg>
+                  </button>
+                  <span className="text-xs text-gray-600 text-center whitespace-nowrap">Upload</span>
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedPerformerForMedia({
+                        eventId: eventIdNum,
+                        performerId,
+                      });
+                    }}
+                    className="instant-tooltip flex-shrink-0 w-14 h-14 rounded-lg bg-purple-100 hover:bg-purple-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                    data-tooltip="View Media"
+                    aria-label="View all the media files associated with this performer"
+                    type="button"
+                  >
+                    <svg className="text-purple-600 p-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </button>
+                  <span className="text-xs text-gray-600 text-center whitespace-nowrap">View Media</span>
+                </div>
               </>
             )}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                openDisassociateModal(performer);
-              }}
-              className="flex-shrink-0 w-10 h-10 rounded-lg bg-yellow-100 hover:bg-yellow-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
-              title="Disassociate this performer with this event"
-              aria-label="Disassociate this performer with this event"
-              type="button"
-            >
-              <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-              </svg>
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                openDeleteModal(performer);
-              }}
-              className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
-              title="Permanently delete this performer"
-              aria-label="Permanently delete this performer"
-              type="button"
-            >
-              <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-            </button>
+            <div className="flex flex-col items-center gap-1">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openDisassociateModal(performer);
+                }}
+                className="instant-tooltip flex-shrink-0 w-14 h-14 rounded-lg bg-yellow-100 hover:bg-yellow-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                data-tooltip="Disassociate"
+                aria-label="Disassociate this performer with this event"
+                type="button"
+              >
+                <svg className="text-yellow-600 p-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                </svg>
+              </button>
+              <span className="text-xs text-gray-600 text-center whitespace-nowrap">Disassociate</span>
+            </div>
+            <div className="flex flex-col items-center gap-1">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openDeleteModal(performer);
+                }}
+                className="instant-tooltip flex-shrink-0 w-14 h-14 rounded-lg bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                data-tooltip="Delete"
+                aria-label="Permanently delete this performer"
+                type="button"
+              >
+                <svg className="text-red-600 p-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+              <span className="text-xs text-gray-600 text-center whitespace-nowrap">Delete</span>
+            </div>
           </div>
         );
       }
@@ -877,6 +892,73 @@ export default function EventPerformersPage() {
             </div>
             <span className="font-semibold text-center leading-tight">Manage Discount Codes</span>
           </Link>
+        </div>
+      </div>
+
+      {/* Special Event Management Features Card */}
+      <div className="flex justify-center mb-8">
+        <div className="bg-gradient-to-br from-purple-50 to-blue-50 border-2 border-purple-200 rounded-xl shadow-lg p-6 w-full max-w-4xl">
+          <div className="text-center mb-4">
+            <h2 className="text-xl font-bold text-purple-800 mb-2">🎭 Event Management Features</h2>
+            <p className="text-sm text-purple-600">Manage performers, contacts, sponsors, emails, and program directors for this event</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <Link
+              href={`/admin/events/${eventId}/performers`}
+              className="flex flex-col items-center justify-center bg-pink-50 hover:bg-pink-100 text-pink-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+              title="Featured Performers"
+              aria-label="Featured Performers"
+            >
+              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-pink-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <FaMicrophone className="w-10 h-10 text-pink-500" />
+              </div>
+              <span className="font-semibold text-center leading-tight">Featured Performers</span>
+            </Link>
+            <Link
+              href={`/admin/events/${eventId}/contacts`}
+              className="flex flex-col items-center justify-center bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+              title="Event Contacts"
+              aria-label="Event Contacts"
+            >
+              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-emerald-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <FaAddressBook className="w-10 h-10 text-emerald-500" />
+              </div>
+              <span className="font-semibold text-center leading-tight">Event Contacts</span>
+            </Link>
+            <Link
+              href={`/admin/events/${eventId}/sponsors`}
+              className="flex flex-col items-center justify-center bg-amber-50 hover:bg-amber-100 text-amber-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+              title="Event Sponsors"
+              aria-label="Event Sponsors"
+            >
+              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-amber-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <FaHandshake className="w-10 h-10 text-amber-500" />
+              </div>
+              <span className="font-semibold text-center leading-tight">Event Sponsors</span>
+            </Link>
+            <Link
+              href={`/admin/events/${eventId}/emails`}
+              className="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+              title="Event Emails"
+              aria-label="Event Emails"
+            >
+              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <FaEnvelope className="w-10 h-10 text-blue-500" />
+              </div>
+              <span className="font-semibold text-center leading-tight">Event Emails</span>
+            </Link>
+            <Link
+              href={`/admin/events/${eventId}/program-directors`}
+              className="flex flex-col items-center justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+              title="Program Directors"
+              aria-label="Program Directors"
+            >
+              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-indigo-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <FaUserTie className="w-10 h-10 text-indigo-500" />
+              </div>
+              <span className="font-semibold text-center leading-tight">Program Directors</span>
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -1113,12 +1195,12 @@ export default function EventPerformersPage() {
                         <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
                           <button
                             onClick={() => handleAddPerformerToEvent(performer)}
-                            className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
-                            title="Add performer to event"
+                            className="instant-tooltip flex-shrink-0 w-14 h-14 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                            data-tooltip="Add"
                             aria-label="Add performer to event"
                             type="button"
                           >
-                            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="text-blue-600 p-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                             </svg>
                           </button>

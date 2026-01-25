@@ -1,0 +1,181 @@
+{
+  "designSystem": {
+    "name": "Syro-Malabar Creator Analytics Design System - Tailwind Compatible",
+    "version": "3.0.0",
+    "description": "Tailwind CSS and Next.js compatible version of the Syro-Malabar design system. All styling converted to Tailwind utility classes with custom CSS modules for complex patterns.",
+    "basedOn": "Syro-Malabar Church Design System v2.0.0",
+    "technologyStack": ["Next.js", "React", "Tailwind CSS", "TypeScript"],
+    
+    "tailwindConfig": {
+      "colors": {
+        "syro-red": {
+          "DEFAULT": "#dc3545",
+          "darker": "#be1929",
+          "hover": "#990b3f",
+          "light": "#dc354533"
+        },
+        "syro-blue": {
+          "DEFAULT": "#0b2848",
+          "secondary": "#011e94",
+          "light": "#798daf",
+          "dark": "#16253c"
+        },
+        "syro-orange": "#ff7903",
+        "syro-purple": "#6e1b48",
+        "syro-maroon": "#77121b",
+        "syro-light-gray": "#eaebef",
+        "syro-bg-gray": "#f5f6f7",
+        "syro-text-gray": "#818181",
+        "syro-medium-gray": "#7b869a",
+        "syro-dark-gray": "#506276",
+        "syro-table-border": "#eaebef",
+        "syro-success": {
+          "DEFAULT": "#25d366",
+          "bg": "#25d36633"
+        },
+        "syro-warning": {
+          "DEFAULT": "#ff7903",
+          "bg": "#ffc81533"
+        }
+      },
+      "fontFamily": {
+        "syro-primary": ["Poppins", "Arial", "Helvetica", "sans-serif"],
+        "syro-display": ["Playfair Display", "serif"]
+      },
+      "fontSize": {
+        "syro-logo": "1.5rem",
+        "syro-h1": "2.8rem",
+        "syro-h2": "2.2rem",
+        "syro-h3": "1.8rem",
+        "syro-h4": "1.5rem",
+        "syro-h6": "18px",
+        "syro-body": "20px",
+        "syro-label": "16px",
+        "syro-small": "14px",
+        "syro-section-title": "24px"
+      },
+      "spacing": {
+        "syro-xs": "5px",
+        "syro-sm": "10px",
+        "syro-md": "15px",
+        "syro-lg": "20px",
+        "syro-xl": "30px",
+        "syro-xxl": "40px",
+        "syro-xxxl": "60px"
+      },
+      "boxShadow": {
+        "syro-header": "#0b28487d 0px 10px 25px -10px",
+        "syro-card": "rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px",
+        "syro-card-hover": "rgba(0, 0, 0, 0.35) 0px 5px 15px"
+      },
+      "screens": {
+        "syro-tablet": "991px",
+        "syro-mobile": "576px"
+      }
+    },
+    
+    "components": {
+      "statCard": {
+        "description": "Stat card component using Tailwind utilities",
+        "tailwindClasses": "bg-white p-10 rounded-[5px] shadow-syro-card hover:shadow-syro-card-hover transition-all duration-500 relative",
+        "structure": {
+          "container": "bg-white p-10 rounded-[5px] shadow-syro-card hover:shadow-syro-card-hover transition-all duration-500 relative",
+          "header": "flex justify-between items-center mb-5",
+          "icon": "w-[65px] h-[65px] rounded-[5px] flex items-center justify-center text-white text-[26px] syro-stat-icon",
+          "value": "text-syro-h2 font-bold text-syro-blue mb-1",
+          "label": "text-syro-label text-syro-medium-gray font-light",
+          "change": {
+            "base": "text-syro-small font-medium mt-2.5",
+            "positive": "text-syro-success",
+            "negative": "text-syro-red"
+          }
+        },
+        "example": {
+          "tsx": "<div className=\"bg-white p-10 rounded-[5px] shadow-syro-card hover:shadow-syro-card-hover transition-all duration-500 relative\">\n  <div className=\"flex justify-between items-center mb-5\">\n    <div className=\"w-[65px] h-[65px] rounded-[5px] flex items-center justify-center text-white text-[26px] syro-stat-icon\">\n      <svg className=\"w-6 h-6\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\">\n        <path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M15 12a3 3 0 11-6 0 3 3 0 016 0z\" />\n        <path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z\" />\n      </svg>\n    </div>\n  </div>\n  <div className=\"text-syro-h2 font-bold text-syro-blue mb-1\">124.5K</div>\n  <div className=\"text-syro-label text-syro-medium-gray font-light\">Total Views</div>\n  <div className=\"text-syro-small font-medium mt-2.5 text-syro-success\">+12.5%</div>\n</div>"
+        }
+      },
+      
+      "sectionTitle": {
+        "description": "Section title with vertical text and accent bar - requires CSS module",
+        "tailwindClasses": "relative mb-10 syro-section-title",
+        "cssModule": "syro-section-title",
+        "structure": {
+          "container": "relative mb-10 syro-section-title",
+          "h6": "syro-section-title h6 (uses CSS module for vertical text and positioning)",
+          "accentBar": "syro-section-title::after (pseudo-element in CSS module)"
+        },
+        "note": "This component requires custom CSS for pseudo-elements and vertical text. See syro-malabar.css"
+      },
+      
+      "primaryButton": {
+        "description": "Primary button with right border accent",
+        "tailwindClasses": "no-underline text-white bg-syro-red py-2.5 px-5 border-r-[7px] border-syro-red-darker font-light inline-block transition-all duration-1000 hover:bg-syro-red-darker hover:border-r-[6px] hover:border-syro-red",
+        "structure": {
+          "base": "no-underline text-white bg-syro-red py-2.5 px-5 border-r-[7px] border-syro-red-darker font-light inline-block transition-all duration-1000",
+          "hover": "hover:bg-syro-red-darker hover:border-r-[6px] hover:border-syro-red hover:text-white"
+        },
+        "example": {
+          "tsx": "<a href=\"#\" className=\"no-underline text-white bg-syro-red py-2.5 px-5 border-r-[7px] border-syro-red-darker font-light inline-block transition-all duration-1000 hover:bg-syro-red-darker hover:border-r-[6px] hover:border-syro-red hover:text-white\">\n  <span>View All</span>\n  <svg className=\"w-4 h-4 ml-3 inline\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\">\n    <path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M17 8l4 4m0 0l-4 4m4-4H3\" />\n  </svg>\n</a>"
+        }
+      },
+      
+      "badge": {
+        "description": "Status badge component",
+        "tailwindClasses": {
+          "base": "py-1 px-3 rounded text-syro-small font-medium",
+          "success": "bg-syro-success-bg text-syro-success",
+          "warning": "bg-syro-warning-bg text-syro-warning"
+        },
+        "example": {
+          "tsx": "<span className=\"py-1 px-3 rounded text-syro-small font-medium bg-syro-success-bg text-syro-success\">Active</span>"
+        }
+      },
+      
+      "dataTable": {
+        "description": "Data table component",
+        "tailwindClasses": {
+          "container": "bg-white p-10 rounded-[5px] shadow-syro-card",
+          "table": "w-full border-collapse",
+          "th": "text-left p-4 font-semibold text-syro-blue border-b-2 border-syro-table-border",
+          "td": "p-4 border-b border-syro-table-border text-syro-dark-gray",
+          "trHover": "hover:bg-syro-red-light"
+        },
+        "example": {
+          "tsx": "<div className=\"bg-white p-10 rounded-[5px] shadow-syro-card\">\n  <table className=\"w-full border-collapse\">\n    <thead>\n      <tr>\n        <th className=\"text-left p-4 font-semibold text-syro-blue border-b-2 border-syro-table-border\">Name</th>\n        <th className=\"text-left p-4 font-semibold text-syro-blue border-b-2 border-syro-table-border\">Status</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr className=\"hover:bg-syro-red-light\">\n        <td className=\"p-4 border-b border-syro-table-border text-syro-dark-gray\">John Doe</td>\n        <td className=\"p-4 border-b border-syro-table-border text-syro-dark-gray\">Active</td>\n      </tr>\n    </tbody>\n  </table>\n</div>"
+        }
+      }
+    },
+    
+    "customCSSRequired": {
+      "description": "Components that require custom CSS modules due to pseudo-elements or complex patterns",
+      "files": [
+        {
+          "path": "src/styles/syro-malabar.css",
+          "components": [
+            "sectionTitle (vertical text + ::after pseudo-element)",
+            "statCard icon gradient (complex multi-stop gradient)",
+            "primaryButton (optional - can use Tailwind)"
+          ]
+        }
+      ]
+    },
+    
+    "iconStrategy": {
+      "description": "Icon implementation strategy matching project pattern",
+      "approach": "Use inline SVG icons with Heroicons pattern",
+      "pattern": "Always use inline SVG icons, never react-icons or Font Awesome",
+      "example": {
+        "tsx": "<svg className=\"w-6 h-6 text-syro-blue\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\">\n  <path strokeLinecap=\"round\" strokeLinejoin=\"round\" strokeWidth={2} d=\"M15 12a3 3 0 11-6 0 3 3 0 016 0z\" />\n</svg>"
+      }
+    },
+    
+    "migrationGuide": {
+      "step1": "Add all design tokens to tailwind.config.js (colors, fonts, spacing, shadows)",
+      "step2": "Create src/styles/syro-malabar.css for complex patterns (pseudo-elements)",
+      "step3": "Convert components to use Tailwind utility classes",
+      "step4": "Replace Font Awesome with inline SVG icons",
+      "step5": "Create React components that encapsulate the styling",
+      "step6": "Test responsive breakpoints and accessibility"
+    }
+  }
+}

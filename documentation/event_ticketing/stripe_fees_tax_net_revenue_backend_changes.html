@@ -236,9 +236,123 @@ public class EventTicketTransactionDTO {
 }
         </div>
 
-        <h2>4. API Endpoint Changes</h2>
+        <h2>4. Add Net Revenue Before Tax Calculation</h2>
 
-        <h3>4.1 Update PATCH Endpoint</h3>
+        <h3>4.1 Overview</h3>
+        <div class="recommendation">
+            <h4>Net Revenue Before Tax Calculation (Option A: Calculate On-the-Fly)</h4>
+            <p><strong>Formula:</strong> <code>net_revenue_before_tax = final_amount - stripe_fee_amount</code></p>
+            <p><strong>Alternative Formula:</strong> <code>net_revenue_before_tax = net_payout_amount + stripe_amount_tax</code></p>
+            <p><strong>Approach:</strong> Calculate in analytics service layer (no database changes needed)</p>
+            <p><strong>Rationale:</strong> Simple calculation using existing fields, no need to store in database unless performance becomes an issue.</p>
+        </div>
+
+        <h3>4.2 Update Sales Analytics Service</h3>
+        <p><strong>File:</strong> <code>src/main/java/com/.../service/SalesAnalyticsService.java</code> (or equivalent service)</p>
+        <p><strong>Purpose:</strong> Add calculation for "Net Revenue Before Tax" in sales metrics</p>
+
+        <div class="code-block">
+// ✅ ADD to SalesAnalyticsService (or equivalent service)
+public SalesMetrics calculateSalesMetrics(
+    List&lt;EventTicketTransaction&gt; transactions,
+    String eventId,
+    ZonedDateTime startDate,
+    ZonedDateTime endDate
+) {
+    // Filter only completed transactions
+    List&lt;EventTicketTransaction&gt; completedTransactions = transactions.stream()
+        .filter(t -&gt; "COMPLETED".equals(t.getStatus()))
+        .collect(Collectors.toList());
+
+    // ... existing calculations ...
+
+    // NEW: Calculate Net Revenue Before Tax
+    // Formula: net_revenue_before_tax = final_amount - stripe_fee_amount
+    BigDecimal netRevenueBeforeTax = completedTransactions.stream()
+        .map(t -&gt; {
+            BigDecimal finalAmount = t.getFinalAmount() != null
+                ? t.getFinalAmount()
+                : BigDecimal.ZERO;
+            BigDecimal stripeFee = t.getStripeFeeAmount() != null
+                ? t.getStripeFeeAmount()
+                : BigDecimal.ZERO;
+            // Net revenue before tax = final_amount - stripe_fee_amount
+            return finalAmount.subtract(stripeFee);
+        })
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    // ALTERNATIVE: If net_payout_amount is available, use:
+    // net_revenue_before_tax = net_payout_amount + stripe_amount_tax
+    BigDecimal netRevenueBeforeTaxAlt = completedTransactions.stream()
+        .map(t -&gt; {
+            BigDecimal netPayout = t.getNetPayoutAmount() != null
+                ? t.getNetPayoutAmount()
+                : BigDecimal.ZERO;
+            BigDecimal stripeTax = t.getStripeAmountTax() != null
+                ? t.getStripeAmountTax()
+                : BigDecimal.ZERO;
+            // Net revenue before tax = net_payout_amount + stripe_amount_tax
+            return netPayout.add(stripeTax);
+        })
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    // Use the first calculation (final_amount - stripe_fee_amount)
+    // as it's more reliable if net_payout_amount is not yet populated
+
+    // Create and return metrics
+    SalesMetrics metrics = new SalesMetrics();
+    // ... set existing metrics ...
+    metrics.setNetRevenueBeforeTax(netRevenueBeforeTax);
+
+    return metrics;
+}
+        </div>
+
+        <h3>4.3 Update SalesMetrics DTO</h3>
+        <p><strong>File:</strong> <code>src/main/java/com/.../dto/SalesMetrics.java</code></p>
+
+        <div class="code-block">
+// ✅ ADD to SalesMetrics DTO class
+public class SalesMetrics {
+    // ... existing fields ...
+
+    private BigDecimal totalRevenue;
+    private BigDecimal grossRevenue;
+    private BigDecimal netRevenue;
+    private BigDecimal totalNetPayout;
+    private BigDecimal totalStripeFees;
+    private BigDecimal totalStripeTax;
+    private BigDecimal organizerNetRevenue;
+
+    // NEW: Add netRevenueBeforeTax field
+    private BigDecimal netRevenueBeforeTax;
+
+    // ... existing getters and setters ...
+
+    // NEW: Add getter and setter
+    public BigDecimal getNetRevenueBeforeTax() {
+        return netRevenueBeforeTax;
+    }
+
+    public void setNetRevenueBeforeTax(BigDecimal netRevenueBeforeTax) {
+        this.netRevenueBeforeTax = netRevenueBeforeTax;
+    }
+}
+        </div>
+
+        <div class="info-box">
+            <h4>Important Notes:</h4>
+            <ul>
+                <li><strong>No Database Changes:</strong> This metric is calculated on-the-fly, no need to add a database field</li>
+                <li><strong>No Batch Job Changes:</strong> Calculation happens in analytics service, batch job doesn't need to populate this</li>
+                <li><strong>Performance:</strong> For most datasets, calculating on-the-fly is fast enough. Only consider storing in database if performance becomes an issue</li>
+                <li><strong>Formula Choice:</strong> Use <code>final_amount - stripe_fee_amount</code> as it's more reliable if <code>net_payout_amount</code> is not yet populated by batch job</li>
+            </ul>
+        </div>
+
+        <h2>5. API Endpoint Changes</h2>
+
+        <h3>5.1 Update PATCH Endpoint</h3>
         <p><strong>File:</strong> <code>src/main/java/com/.../web/rest/EventTicketTransactionResource.java</code></p>
         <p><strong>Endpoint:</strong> <code>PATCH /api/event-ticket-transactions/{id}</code></p>
 
@@ -462,6 +576,16 @@ public interface EventTicketTransactionMapper {
             <li>✅ Verify finalAmount matches Stripe PaymentIntent amount</li>
         </ul>
 
+        <h3>8.5 Net Revenue Before Tax Testing</h3>
+        <ul>
+            <li>✅ Verify netRevenueBeforeTax is calculated correctly in analytics service</li>
+            <li>✅ Verify formula: netRevenueBeforeTax = finalAmount - stripeFeeAmount</li>
+            <li>✅ Verify calculation handles NULL values correctly (treats as 0)</li>
+            <li>✅ Verify SalesMetrics DTO includes netRevenueBeforeTax field</li>
+            <li>✅ Verify API response includes netRevenueBeforeTax in metrics</li>
+            <li>✅ Verify calculation works for transactions with and without tax</li>
+        </ul>
+
         <h2>9. File Modification Summary</h2>
 
         <table>
@@ -491,6 +615,16 @@ public interface EventTicketTransactionMapper {
                 <tr>
                     <td><span class="file-path">.../service/EventTicketTransactionService.java</span></td>
                     <td>Fix calculation logic for totalAmount and finalAmount</td>
+                    <td>HIGH</td>
+                </tr>
+                <tr>
+                    <td><span class="file-path">.../service/SalesAnalyticsService.java</span></td>
+                    <td>Add netRevenueBeforeTax calculation in calculateSalesMetrics()</td>
+                    <td>HIGH</td>
+                </tr>
+                <tr>
+                    <td><span class="file-path">.../dto/SalesMetrics.java</span></td>
+                    <td>Add netRevenueBeforeTax field with getter/setter</td>
                     <td>HIGH</td>
                 </tr>
                 <tr>

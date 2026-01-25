@@ -7,17 +7,18 @@ import type { EventWithMedia, EventDetailsDTO } from "@/types";
 import { formatInTimeZone } from 'date-fns-tz';
 import LocationDisplay from '@/components/LocationDisplay';
 import { isRecurringEvent, getNextOccurrenceDate } from '@/lib/eventUtils';
+import { isDonationBasedEvent, isTicketedFundraiserEvent } from '@/lib/donation/utils';
 // import { formatInTimeZone } from 'date-fns-tz';
 
 const EVENTS_PAGE_SIZE = 20; // Minimum events to display per page
 const BACKEND_FETCH_SIZE = 50; // Fetch more from backend to account for recurring event filtering
 
 // Component for handling long descriptions with expand/collapse
-function DescriptionDisplay({ 
+function DescriptionDisplay({
   description,
   isExpanded,
   onToggle
-}: { 
+}: {
   description: string;
   isExpanded: boolean;
   onToggle: () => void;
@@ -26,7 +27,7 @@ function DescriptionDisplay({
 
   if (description.length <= maxLength) {
     return (
-      <div className="text-lg font-semibold text-gray-700 leading-relaxed whitespace-pre-wrap">
+      <div className="text-base sm:text-lg font-semibold text-gray-700 leading-relaxed whitespace-pre-wrap break-words max-w-full">
         {description}
       </div>
     );
@@ -35,8 +36,8 @@ function DescriptionDisplay({
   const truncatedText = description.substring(0, maxLength).trim();
 
   return (
-    <div className="text-lg font-semibold text-gray-700 leading-relaxed">
-      <div className="whitespace-pre-wrap">
+    <div className="text-base sm:text-lg font-semibold text-gray-700 leading-relaxed">
+      <div className="whitespace-pre-wrap break-words max-w-full">
         {isExpanded ? description : `${truncatedText}...`}
       </div>
     </div>
@@ -51,6 +52,7 @@ export default function EventsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [displayedCount, setDisplayedCount] = useState(0); // Actual count after filtering recurring events
+  const [hasMoreEvents, setHasMoreEvents] = useState(false); // Track if there are more events available
   const [heroImageUrl, setHeroImageUrl] = useState<string>("/images/default_placeholder_hero_image.jpeg");
   const [fetchError, setFetchError] = useState(false);
   const [showPastEvents, setShowPastEvents] = useState(false);
@@ -187,6 +189,9 @@ export default function EventsPage() {
 
         const events: EventDetailsDTO[] = await eventsRes.json();
         let eventList = Array.isArray(events) ? events : [events];
+
+        // Check if we got a full page of events (indicates there might be more)
+        setHasMoreEvents(eventList.length === BACKEND_FETCH_SIZE);
 
         // Process recurring events to show only next occurrence (same logic as HeroSection)
         const todayDate = new Date();
@@ -1022,19 +1027,17 @@ export default function EventsPage() {
                           }}
                         />
                       ) : (
-                        <div
-                          className="w-full h-80 flex items-center justify-center"
+                        <Image
+                          src="/images/default event image.png"
+                          alt={event.title || "Default Event Image"}
+                          width={800}
+                          height={600}
+                          className="w-full h-auto object-contain group-hover:scale-105 transition-transform duration-300"
                           style={{
                             backgroundColor: 'transparent',
                             borderRadius: '1rem 1rem 0 0'
                           }}
-                        >
-                          <div className="w-16 h-16 rounded-xl bg-gray-100 flex items-center justify-center">
-                            <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                          </div>
-                        </div>
+                        />
                       )}
                       {/* Past Event Badge */}
                       {showPastEvents && (
@@ -1065,15 +1068,21 @@ export default function EventsPage() {
 
                         // Determine which buttons to show
                         const showRegisterButton = event.isRegistrationRequired === true && isUpcomingLocal;
+                        // Check if event is ticketed fundraiser/charity (shows special fundraiser image)
+                        const isTicketedFundraiser = isTicketedFundraiserEvent(event) && isUpcomingLocal;
                         // Only show Buy Tickets button for TICKETED events (case-insensitive check)
                         // Handles both 'TICKETED' and 'ticketed' from database/backend
-                        const showBuyTicketsButton = event.admissionType?.toUpperCase() === 'TICKETED' && isUpcomingLocal;
+                        // BUT NOT if it's a ticketed fundraiser (use fundraiser image instead)
+                        const showBuyTicketsButton = event.admissionType?.toUpperCase() === 'TICKETED' && isUpcomingLocal && !isTicketedFundraiser;
+                        // Show Make a Donation button for donation-based events
+                        // BUT NOT if it's a ticketed fundraiser (use fundraiser image instead)
+                        const showDonationButton = isDonationBasedEvent(event) && isUpcomingLocal && !isTicketedFundraiser;
 
                         // Don't render if no buttons should be shown
-                        if (!showRegisterButton && !showBuyTicketsButton) return null;
+                        if (!showRegisterButton && !showBuyTicketsButton && !showDonationButton && !isTicketedFundraiser) return null;
 
                         return (
-                          <div className={`absolute top-4 right-4 lg:top-6 lg:right-6 z-10 ${showRegisterButton && showBuyTicketsButton ? 'flex flex-col gap-2' : ''}`}>
+                          <div className={`absolute top-4 right-4 lg:top-6 lg:right-6 z-10 ${showRegisterButton && (showBuyTicketsButton || showDonationButton || isTicketedFundraiser) ? 'flex flex-col gap-2' : ''}`}>
                             {/* Register Here Button - Show if registration is required */}
                             {showRegisterButton && (
                             <Link
@@ -1089,12 +1098,33 @@ export default function EventsPage() {
                             </Link>
                             )}
 
-                            {/* Buy Tickets Button - Show only for non-FREE events */}
+                            {/* Fundraiser Image - Show for ticketed fundraiser/charity events (replaces both Buy Tickets and Make a Donation buttons) */}
+                            {isTicketedFundraiser && (
+                            <Link
+                                href={`/events/${event.id}/donation-checkout`}
+                              className={`transition-transform hover:scale-105 ${isPast ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
+                                title="Buy Tickets"
+                            >
+                              <img
+                                src="/images/buy_tickets_click_here_fundraiser.png"
+                                alt="Buy Tickets"
+                                className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
+                              />
+                            </Link>
+                            )}
+
+                            {/* Buy Tickets Button - Show only for TICKETED events (not fundraiser) */}
                             {showBuyTicketsButton && (
                             <Link
-                                href={`/events/${event.id}/checkout`}
+                                href={
+                                  // Route to manual checkout if manual payment is enabled, otherwise Stripe checkout (latest)
+                                  event.manualPaymentEnabled === true &&
+                                  (event.paymentFlowMode === 'MANUAL_ONLY' || event.paymentFlowMode === 'HYBRID')
+                                    ? `/events/${event.id}/manual-checkout`
+                                    : `/events/${event.id}/checkout`
+                                }
                               className={`transition-transform hover:scale-105 ${isPast ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
-                                title="Buy Tickets (New Payment Flow)"
+                                title="Buy Tickets"
                             >
                               <img
                                 src="/images/buy_tickets_click_here_red.webp"
@@ -1102,6 +1132,23 @@ export default function EventsPage() {
                                 className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
                               />
                             </Link>
+                            )}
+
+                            {/* Make a Donation Button - Show for donation-based events (not ticketed fundraiser) */}
+                            {showDonationButton && (
+                              <Link
+                                href={`/events/${event.id}/donation`}
+                                className="flex-shrink-0 h-14 rounded-xl bg-teal-100 hover:bg-teal-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                                title="Make a Donation"
+                                aria-label="Make a Donation"
+                              >
+                                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
+                                  <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                  </svg>
+                                </div>
+                                <span className="font-semibold text-teal-700">Make a Donation</span>
+                              </Link>
                             )}
                           </div>
                         );
@@ -1153,45 +1200,45 @@ export default function EventsPage() {
 
                           {/* Location */}
                           {event.location && (
-                            <div className="flex items-center gap-3 text-gray-700 w-full sm:w-auto sm:min-w-[280px]">
-                              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                <svg className="w-10 h-10 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <span className="text-lg font-semibold truncate">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 text-gray-700 w-full sm:w-auto sm:min-w-[280px]">
+                              <div className="flex items-center gap-3 min-w-0 flex-1 sm:flex-initial">
+                                <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                  <svg className="w-10 h-10 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                  </svg>
+                                </div>
+                                <span className="text-base sm:text-lg font-semibold break-words min-w-0">
                                   {event.location}
                                 </span>
-                                {/* Copy and Navigate Icons */}
-                                <div className="flex gap-1">
-                                  <button
-                                    onClick={() => {
-                                      navigator.clipboard.writeText(event.location || '');
-                                      alert('Address copied to clipboard!');
-                                    }}
-                                    className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-colors"
-                                    title="Copy Address"
-                                    aria-label="Copy address to clipboard"
-                                  >
-                                    <svg className="w-6 h-6 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                    </svg>
-                                  </button>
-                                  <a
-                                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location || '')}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 hover:bg-green-200 flex items-center justify-center transition-colors"
-                                    title="Open in Google Maps"
-                                    aria-label="Open location in Google Maps"
-                                  >
-                                    <svg className="w-6 h-6 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                                    </svg>
-                                  </a>
-                                </div>
+                              </div>
+                              {/* Copy and Navigate Icons */}
+                              <div className="flex gap-1 flex-shrink-0 ml-[68px] sm:ml-0">
+                                <button
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(event.location || '');
+                                    alert('Address copied to clipboard!');
+                                  }}
+                                  className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-colors"
+                                  title="Copy Address"
+                                  aria-label="Copy address to clipboard"
+                                >
+                                  <svg className="w-6 h-6 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                  </svg>
+                                </button>
+                                <a
+                                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location || '')}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 hover:bg-green-200 flex items-center justify-center transition-colors"
+                                  title="Open in Google Maps"
+                                  aria-label="Open location in Google Maps"
+                                >
+                                  <svg className="w-6 h-6 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                                  </svg>
+                                </a>
                               </div>
                             </div>
                           )}
@@ -1200,9 +1247,9 @@ export default function EventsPage() {
 
                       {/* Description */}
                       {event.description && (
-                        <div className="mb-4 px-4 lg:max-w-4xl lg:mx-auto">
-                          <DescriptionDisplay 
-                            description={event.description} 
+                        <div className="mb-4 px-4 lg:max-w-4xl lg:mx-auto w-full max-w-full overflow-hidden">
+                          <DescriptionDisplay
+                            description={event.description}
                             isExpanded={expandedDescriptions[event.id!] || false}
                             onToggle={() => {
                               setExpandedDescriptions(prev => ({
@@ -1311,14 +1358,16 @@ export default function EventsPage() {
                               href={calendarLink}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-xl border-2 border-blue-400 transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-3"
+                              className="flex-shrink-0 h-14 rounded-xl bg-orange-100 hover:bg-orange-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                              title="Add to Calendar"
+                              aria-label="Add to Calendar"
                             >
-                              <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-orange-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                <svg className="w-10 h-10 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-200 flex items-center justify-center">
+                                <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
                               </div>
-                              <span className="text-lg">Add to Calendar</span>
+                              <span className="font-semibold text-orange-700">Add to Calendar</span>
                             </a>
                           );
                         })()}
@@ -1338,6 +1387,92 @@ export default function EventsPage() {
                           </div>
                           <span className="font-semibold text-green-700">See Event Details</span>
                         </Link>
+
+                        {/* Buy Tickets Image - Show only for TICKETED events */}
+                        {(() => {
+                          if (!event.startDate) return null;
+
+                          // Get today's date in YYYY-MM-DD format using local timezone
+                          const today = new Date();
+                          const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+                          // Compare dates as strings to avoid timezone parsing issues
+                          const eventDateStr = event.startDate ? event.startDate.split('T')[0] : null;
+
+                          if (!eventDateStr) return null;
+
+                          // Check if event date is today or in the future
+                          const isToday = eventDateStr === todayStr;
+                          const isFuture = eventDateStr > todayStr;
+                          const isUpcomingLocal = isToday || isFuture;
+
+                          // Check if event is ticketed fundraiser/charity (shows special fundraiser image)
+                          const isTicketedFundraiser = isTicketedFundraiserEvent(event) && isUpcomingLocal;
+                          // Only show Buy Tickets image for TICKETED events (case-insensitive check)
+                          // BUT NOT if it's a ticketed fundraiser (use fundraiser image instead)
+                          const showBuyTicketsButton = event.admissionType?.toUpperCase() === 'TICKETED' && isUpcomingLocal && !isTicketedFundraiser;
+                          // Show Make a Donation button for donation-based events
+                          // BUT NOT if it's a ticketed fundraiser (use fundraiser image instead)
+                          const showDonationButton = isDonationBasedEvent(event) && isUpcomingLocal && !isTicketedFundraiser;
+
+                          if (!showBuyTicketsButton && !showDonationButton && !isTicketedFundraiser) return null;
+
+                          // Route to manual checkout if manual payment is enabled, otherwise Stripe checkout (latest)
+                          const checkoutRoute =
+                            event.manualPaymentEnabled === true &&
+                            (event.paymentFlowMode === 'MANUAL_ONLY' || event.paymentFlowMode === 'HYBRID')
+                              ? `/events/${event.id}/manual-checkout`
+                              : `/events/${event.id}/checkout`;
+
+                          return (
+                            <div className="flex flex-col gap-2">
+                              {/* Fundraiser Image - Show for ticketed fundraiser/charity events (replaces both Buy Tickets and Make a Donation buttons) */}
+                              {isTicketedFundraiser && (
+                                <Link
+                                  href={`/events/${event.id}/donation-checkout`}
+                                  className="transition-transform hover:scale-105"
+                                  title="Buy Tickets"
+                                  aria-label="Buy Tickets"
+                                >
+                                  <img
+                                    alt="Buy Tickets"
+                                    className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
+                                    src="/images/buy_tickets_click_here_fundraiser.png"
+                                  />
+                                </Link>
+                              )}
+                              {showBuyTicketsButton && (
+                                <Link
+                                  href={checkoutRoute}
+                                  className="transition-transform hover:scale-105"
+                                  title="Buy Tickets"
+                                  aria-label="Buy Tickets"
+                                >
+                                  <img
+                                    alt="Buy Tickets"
+                                    className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
+                                    src="/images/buy_tickets_click_here_red.webp"
+                                  />
+                                </Link>
+                              )}
+                              {showDonationButton && (
+                                <Link
+                                  href={`/events/${event.id}/donation`}
+                                  className="flex-shrink-0 h-14 rounded-xl bg-teal-100 hover:bg-teal-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                                  title="Make a Donation"
+                                  aria-label="Make a Donation"
+                                >
+                                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
+                                    <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                  </div>
+                                  <span className="font-semibold text-teal-700">Make a Donation</span>
+                                </Link>
+                              )}
+                            </div>
+                          );
+                        })()}
                       </div>
                     </div>
                   </div>
@@ -1373,8 +1508,8 @@ export default function EventsPage() {
 
                   {/* Next Button */}
                   <button
-                    onClick={() => setPage((p) => (p + 1 < totalPages ? p + 1 : p))}
-                    disabled={page >= totalPages - 1 || loading}
+                    onClick={() => setPage((p) => p + 1)}
+                    disabled={!hasMoreEvents || loading}
                     className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
                     title="Next Page"
                     aria-label="Next Page"

@@ -34,40 +34,86 @@ export function WeekView({ events, anchorDate }: { events: CalendarEvent[]; anch
     setHoveredEvent(null);
     setTooltipAnchor(null);
   };
+  const today = new Date();
+  const isToday = (d: Date) => {
+    return (
+      d.getDate() === today.getDate() &&
+      d.getMonth() === today.getMonth() &&
+      d.getFullYear() === today.getFullYear()
+    );
+  };
+
   return (
-    <div className="grid grid-cols-7 gap-2">
-      {days.map((d, idx) => {
-        const day = d.getDate();
-        const evs = eventsByDay.get(day) || [];
-        // Build date string for day view link (YYYY-MM-DD format)
-        const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        return (
-          <div key={idx} className="min-h-[140px] border rounded-lg p-2 bg-white">
-            <div className="text-xs font-semibold text-gray-700">{d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}</div>
-            <div className="mt-1 flex flex-col gap-1">
-              {evs.slice(0, 5).map(event => (
-                <Link
-                  key={event.id}
-                  href={`/events/${event.id}`}
-                  className="text-xs truncate px-2 py-1 rounded bg-green-50 text-green-700 hover:bg-green-100 transition-colors cursor-pointer"
-                  onMouseEnter={(e) => handleEventMouseEnter(event, e)}
-                  onMouseLeave={handleEventMouseLeave}
-                >
-                  {event.title}
-                </Link>
-              ))}
-              {evs.length > 5 && (
-                <Link
-                  href={`/calendar?view=day&date=${dateStr}`}
-                  className="text-[10px] text-blue-600 hover:text-blue-800 hover:underline transition-colors cursor-pointer"
-                >
-                  + {evs.length - 5} more
-                </Link>
-              )}
+    <div className="bg-white rounded-lg overflow-hidden">
+      {/* Week Grid */}
+      <div className="grid grid-cols-7 gap-px bg-gray-200">
+        {days.map((d, idx) => {
+          const day = d.getDate();
+          const evs = eventsByDay.get(day) || [];
+          const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+          const isTodayCell = isToday(d);
+
+          return (
+            <div
+              key={idx}
+              className={`min-h-[140px] sm:min-h-[160px] p-2 sm:p-3 bg-white ${
+                isTodayCell ? 'bg-gradient-to-br from-green-50 to-green-100' : ''
+              } hover:bg-gray-50 transition-colors`}
+            >
+              {/* Day Header */}
+              <div className="mb-2">
+                <div className={`text-xs sm:text-sm font-bold ${
+                  isTodayCell ? 'text-green-700' : 'text-gray-700'
+                }`}>
+                  {d.toLocaleDateString(undefined, { weekday: 'short' })}
+                </div>
+                <div className={`text-lg sm:text-xl font-bold ${
+                  isTodayCell
+                    ? 'inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-600 text-white'
+                    : 'text-gray-900'
+                }`}>
+                  {day}
+                </div>
+                <div className="text-xs text-gray-500">
+                  {d.toLocaleDateString(undefined, { month: 'short' })}
+                </div>
+              </div>
+
+              {/* Events */}
+              <div className="flex flex-col gap-1">
+                {evs.slice(0, 5).map(event => (
+                  <Link
+                    key={event.id}
+                    href={`/events/${event.id}`}
+                    className="group text-xs truncate px-2 py-1.5 rounded-lg bg-gradient-to-br from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 text-green-800 transition-all duration-300 hover:scale-105 cursor-pointer shadow-sm"
+                    onMouseEnter={(e) => handleEventMouseEnter(event, e)}
+                    onMouseLeave={handleEventMouseLeave}
+                  >
+                    <div className="flex items-center gap-1">
+                      <svg className="w-3 h-3 flex-shrink-0 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span className="truncate font-medium">{event.title}</span>
+                    </div>
+                  </Link>
+                ))}
+                {evs.length > 5 && (
+                  <Link
+                    href={`/calendar?view=day&date=${dateStr}`}
+                    className="text-xs px-2 py-1 text-indigo-600 hover:text-indigo-800 font-semibold hover:underline transition-colors cursor-pointer flex items-center gap-1"
+                  >
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    {evs.length - 5} more
+                  </Link>
+                )}
+              </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
+
       {hoveredEvent && (
         <EventTooltip
           event={hoveredEvent}

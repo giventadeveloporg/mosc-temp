@@ -334,19 +334,17 @@ const DynamicHeroImage: React.FC = () => {
             <div className="absolute left-4 z-10" style={{ bottom: '-36px' }}>
               <Link
                 href="/events"
-                className="block cursor-pointer hover:scale-105 transition-transform duration-300"
+                className="flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                title="See All Events"
+                aria-label="See All Events"
                 onClick={(e) => e.stopPropagation()}
               >
-                <Image
-                  src="/images/hero_bottom_see_all_events-Photoroom.png"
-                  alt="See All Events"
-                  width={240}
-                  height={120}
-                  className="cursor-pointer hover:scale-105 transition-transform duration-300"
-                  onError={(e) => {
-                    console.warn('See All Events overlay image not found');
-                  }}
-                />
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-indigo-700">See All Events</span>
               </Link>
             </div>
           ) : null;

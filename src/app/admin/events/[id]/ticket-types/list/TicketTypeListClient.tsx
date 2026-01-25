@@ -146,6 +146,18 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
   const [editingTicketType, setEditingTicketType] = useState<EventTicketTypeDTO | null>(null);
   const [deletingTicketType, setDeletingTicketType] = useState<EventTicketTypeDTO | null>(null);
 
+  // Pagination state
+  const [page, setPage] = useState(0);
+  const pageSize = 10;
+
+  // Reset page if current page is out of bounds (e.g., after deletion)
+  useEffect(() => {
+    const totalPages = Math.max(1, Math.ceil(ticketTypes.length / pageSize));
+    if (page >= totalPages && totalPages > 0) {
+      setPage(totalPages - 1);
+    }
+  }, [ticketTypes.length, page, pageSize]);
+
   const [formData, setFormData] = useState<Partial<EventTicketTypeFormDTO>>({});
   const [displayPrice, setDisplayPrice] = useState<string>('');
 
@@ -595,8 +607,89 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
     setHoveredTicketType(null);
   };
 
+  // Pagination calculations
+  const totalCount = ticketTypes.length;
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+  const currentPage = page + 1; // 1-based for display
+  const startItem = totalCount > 0 ? page * pageSize + 1 : 0;
+  const endItem = totalCount > 0 ? page * pageSize + Math.min(pageSize, totalCount - page * pageSize) : 0;
+  const isPrevDisabled = page === 0;
+  const isNextDisabled = page >= totalPages - 1 || totalCount === 0;
+  const prevPage = Math.max(0, page - 1);
+  const nextPage = page + 1 < totalPages ? page + 1 : page;
+  const paginatedTicketTypes = ticketTypes.slice(page * pageSize, (page + 1) * pageSize);
+
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
+      {/* Rainbow Gradient Scrollbar CSS */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .table-scroll-container {
+            overflow-x: scroll !important;
+            overflow-y: visible !important;
+            scrollbar-width: thin !important;
+            scrollbar-color: #EC4899 #FCE7F3 !important; /* Pink thumb, pink track (Firefox) */
+            -ms-overflow-style: -ms-autohiding-scrollbar !important;
+          }
+
+          /* WebKit browsers (Chrome, Safari, Edge) */
+          .table-scroll-container::-webkit-scrollbar {
+            height: 20px !important; /* Larger for visibility */
+            display: block !important;
+            -webkit-appearance: none !important;
+            appearance: none !important;
+          }
+
+          .table-scroll-container::-webkit-scrollbar-track {
+            background: linear-gradient(90deg, #DBEAFE, #E9D5FF, #FCE7F3, #FED7AA) !important;
+            border-radius: 10px !important;
+            -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.15) !important;
+            box-shadow: inset 0 0 6px rgba(0,0,0,0.15) !important;
+          }
+
+          .table-scroll-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899, #F97316) !important;
+            border-radius: 10px !important;
+            border: 4px solid #F3F4F6 !important;
+            -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.4) !important;
+            box-shadow: inset 0 0 6px rgba(0,0,0,0.4) !important;
+            min-width: 50px !important; /* CRITICAL: Ensures thumb is always visible */
+            background-clip: padding-box !important;
+          }
+
+          .table-scroll-container::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(90deg, #2563EB, #7C3AED, #DB2777, #EA580C) !important;
+            border-color: #E5E7EB !important;
+          }
+
+          .table-scroll-container::-webkit-scrollbar-thumb:active {
+            background: linear-gradient(90deg, #1D4ED8, #6D28D9, #BE185D, #C2410C) !important;
+            border-color: #D1D5DB !important;
+          }
+
+          .table-scroll-container::-webkit-scrollbar-button {
+            display: none !important;
+          }
+
+          .table-scroll-container::-webkit-scrollbar-corner {
+            background: #E0E7FF !important;
+          }
+
+          /* Flexbox spacer for right-side centering */
+          .table-scroll-container::after {
+            content: '';
+            display: block;
+            width: 100vw; /* Full viewport width of scrollable space */
+            height: 1px;
+            flex-shrink: 0;
+          }
+
+          .table-scroll-container {
+            display: flex !important;
+          }
+        `
+      }} />
+
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
         <h2 className="text-xl font-bold text-gray-800 break-words flex-1 min-w-0">Ticket Types for {eventDetails?.title}</h2>
         <button
@@ -629,8 +722,41 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
+      {/* Outer wrapper with gradient border */}
+      <div className="rounded-lg shadow w-full overflow-hidden" style={{
+        background: 'linear-gradient(to right, #3B82F6, #8B5CF6, #EC4899, #F97316)',
+        padding: '4px'
+      }}>
+        {/* Inner scroll container with gradient background */}
+        <div
+          className="w-full table-scroll-container"
+          style={{
+            overflowX: 'scroll',
+            overflowY: 'visible',
+            WebkitOverflowScrolling: 'touch',
+            maxWidth: '100%',
+            display: 'flex',
+            position: 'relative',
+            width: '100%',
+            minHeight: '1px',
+            scrollbarGutter: 'stable',
+            background: 'linear-gradient(to right, #3B82F6, #8B5CF6, #EC4899, #F97316)',
+            borderRadius: '8px',
+            padding: '20px'
+          }}
+        >
+          {/* Table with semi-transparent white background */}
+          <table
+            className="divide-y divide-gray-200"
+            style={{
+              width: 'max-content',
+              minWidth: 'fit-content', /* Responsive: fits content naturally */
+              flexShrink: 0,
+              background: 'rgba(255, 255, 255, 0.95)', /* Semi-transparent white */
+              borderRadius: '8px',
+              overflow: 'hidden'
+            }}
+          >
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
@@ -642,7 +768,7 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {ticketTypes && ticketTypes.length > 0 ? ticketTypes.map((ticketType) => (
+            {paginatedTicketTypes && paginatedTicketTypes.length > 0 ? paginatedTicketTypes.map((ticketType) => (
               <tr key={ticketType.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap cursor-pointer" onMouseEnter={(e) => handleMouseEnter(ticketType, e)} onMouseLeave={handleMouseLeave}>
                   {ticketType.name}
@@ -657,7 +783,7 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
                   {ticketType.availableQuantity}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${ticketType.isActive
+                  <span className={`inline-flex px-3 py-1.5 text-sm font-semibold rounded-full ${ticketType.isActive
                     ? 'bg-green-100 text-green-800'
                     : 'bg-red-100 text-red-800'
                     }`}>
@@ -706,6 +832,68 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
             )}
           </tbody>
         </table>
+        </div>
+      </div>
+
+      {/* Pagination Controls - Always visible, matching admin page style */}
+      <div className="mt-8">
+        <div className="flex justify-between items-center">
+          {/* Previous Button */}
+          <button
+            onClick={() => setPage(prevPage)}
+            disabled={isPrevDisabled}
+            className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+            title="Previous Page"
+            aria-label="Previous Page"
+            type="button"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+            </svg>
+            <span>Previous</span>
+          </button>
+
+          {/* Page Info */}
+          <div className="px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+            <span className="text-sm font-bold text-blue-700">
+              Page <span className="text-blue-600">{currentPage}</span> of <span className="text-blue-600">{totalPages}</span>
+            </span>
+          </div>
+
+          {/* Next Button */}
+          <button
+            onClick={() => setPage(nextPage)}
+            disabled={isNextDisabled}
+            className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+            title="Next Page"
+            aria-label="Next Page"
+            type="button"
+          >
+            <span>Next</span>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Item Count Text */}
+        <div className="text-center mt-3">
+          {totalCount > 0 ? (
+            <div className="inline-flex items-center px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+              <span className="text-sm text-gray-700">
+                Showing <span className="font-bold text-blue-600">{startItem}</span> to <span className="font-bold text-blue-600">{endItem}</span> of <span className="font-bold text-blue-600">{totalCount}</span> ticket types
+              </span>
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 border-2 border-orange-300 rounded-lg shadow-sm">
+              <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="text-sm font-medium text-orange-700">No ticket types found</span>
+              <span className="text-sm text-orange-600">[Click "Add New Ticket Type" to create one]</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Tooltip component */}
@@ -793,7 +981,9 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
           {error && <div className="text-red-500 bg-red-100 p-3 rounded-md">{error}</div>}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Name</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Name <span className="text-red-500">*</span>
+            </label>
             <div className="relative">
               <input
                 type="text"
@@ -817,7 +1007,9 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
             {validationErrors.name && <p className="text-red-500 text-xs mt-1">{validationErrors.name}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Code</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Code <span className="text-red-500">*</span>
+            </label>
             <div className="relative">
               <input
                 type="text"
@@ -841,7 +1033,9 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
             {validationErrors.code && <p className="text-red-500 text-xs mt-1">{validationErrors.code}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Description</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Description <span className="text-red-500">*</span>
+            </label>
             <textarea
               name="description"
               value={formData.description || ''}
@@ -858,7 +1052,9 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Price</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Price <span className="text-red-500">*</span>
+              </label>
               <input
                 type="text"
                 name="price"
@@ -973,7 +1169,9 @@ export default function TicketTypeListClient({ eventId, eventDetails, ticketType
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Minimum Quantity Per Order</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Minimum Quantity Per Order <span className="text-red-500">*</span>
+              </label>
               <input
                 type="number"
                 name="minQuantityPerOrder"

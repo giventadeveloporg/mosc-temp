@@ -11,6 +11,7 @@ import { Camera, Video, Eye } from 'lucide-react';
 import styles from './GalleryThumbnails.module.css';
 import cardGridStyles from './CenteredCardGrid.module.css';
 import { SponsorCard } from '@/components/sponsors/SponsorCard';
+import { isDonationBasedEvent, isTicketedFundraiserEvent } from '@/lib/donation/utils';
 
 // Helper function to get initials from a name
 function getInitials(name: string): string {
@@ -360,6 +361,8 @@ export default function EventDetailsPage() {
   const heroImage = media.find((m) => m.isHomePageHeroImage && m.fileUrl) ||
                     media.find((m) => m.eventFlyer && m.fileUrl) ||
                     media.find((m) => m.fileUrl);
+  // Use default hero image if no hero image found (same as events page)
+  const heroImageUrl = heroImage?.fileUrl || "/images/default_placeholder_hero_image.jpeg";
   const gallery = media.filter((m) => m.fileUrl && (!heroImage || m.id !== heroImage.id));
 
   // Get preview images (first 12 media items for grid display)
@@ -454,50 +457,46 @@ export default function EventDetailsPage() {
       <section className="relative w-full bg-transparent" style={{ marginTop: '100px', paddingTop: '20px', paddingBottom: '20px' }}>
         <div className="w-full relative">
           {/* Main hero image container - Full image display with max height constraint */}
-          {heroImage && heroImage.fileUrl ? (
-            <div className="relative w-full flex items-center justify-center" style={{ maxWidth: '100%', minHeight: '200px' }}>
-              {/* Blurred background image for width fill - positioned behind main image */}
-              <div className="absolute inset-0 w-full h-full" style={{ zIndex: 0 }}>
-                <Image
-                  src={heroImage.fileUrl}
-                  alt="Hero blurred background"
-                  fill
-                  className="object-cover w-full h-full blur-lg scale-105"
-                  style={{
-                    filter: 'blur(24px) brightness(1.1)',
-                    objectPosition: 'center',
-                  }}
-                  aria-hidden="true"
-                  priority
-                />
-              </div>
-
-              {/* Main hero image - Full image display with max height constraint */}
-              <div className="relative w-full flex items-center justify-center" style={{ zIndex: 1, maxWidth: '100%' }}>
-                <Image
-                  src={heroImage.fileUrl}
-                  alt="Event Hero"
-                  width={1920}
-                  height={1900}
-                  className="w-full h-auto"
-                  style={{
-                    maxHeight: '1900px',
-                    maxWidth: '100%',
-                    objectFit: 'contain',
-                    objectPosition: 'center',
-                    display: 'block',
-                  }}
-                  priority
-                />
-              </div>
-
-              {/* Fade overlays for top and bottom borders */}
-              <div className="pointer-events-none absolute left-0 top-0 w-full h-16" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%)', zIndex: 20 }} />
-              <div className="pointer-events-none absolute left-0 bottom-0 w-full h-16" style={{ background: 'linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%)', zIndex: 20 }} />
+          <div className="relative w-full flex items-center justify-center" style={{ maxWidth: '100%', minHeight: '200px' }}>
+            {/* Blurred background image for width fill - positioned behind main image */}
+            <div className="absolute inset-0 w-full h-full" style={{ zIndex: 0 }}>
+              <Image
+                src={heroImageUrl}
+                alt="Hero blurred background"
+                fill
+                className="object-cover w-full h-full blur-lg scale-105"
+                style={{
+                  filter: 'blur(24px) brightness(1.1)',
+                  objectPosition: 'center',
+                }}
+                aria-hidden="true"
+                priority
+              />
             </div>
-          ) : (
-            <div className="w-full h-64 bg-gradient-to-br from-gray-100 to-gray-200" />
-          )}
+
+            {/* Main hero image - Full image display with max height constraint */}
+            <div className="relative w-full flex items-center justify-center" style={{ zIndex: 1, maxWidth: '100%' }}>
+              <Image
+                src={heroImageUrl}
+                alt="Event Hero"
+                width={1920}
+                height={1900}
+                className="w-full h-auto"
+                style={{
+                  maxHeight: '1900px',
+                  maxWidth: '100%',
+                  objectFit: 'contain',
+                  objectPosition: 'center',
+                  display: 'block',
+                }}
+                priority
+              />
+            </div>
+
+            {/* Fade overlays for top and bottom borders */}
+            <div className="pointer-events-none absolute left-0 top-0 w-full h-16" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%)', zIndex: 20 }} />
+            <div className="pointer-events-none absolute left-0 bottom-0 w-full h-16" style={{ background: 'linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%)', zIndex: 20 }} />
+          </div>
         </div>
       </section>
 
@@ -533,12 +532,18 @@ export default function EventDetailsPage() {
 
                 // Determine which buttons to show
                 const showRegisterButton = event.isRegistrationRequired === true && isUpcomingLocal;
+                // Check if event is ticketed fundraiser/charity (shows special fundraiser image)
+                const isTicketedFundraiser = isTicketedFundraiserEvent(event) && isUpcomingLocal;
                 // Only show Buy Tickets button for TICKETED events (case-insensitive check)
                 // Handles both 'TICKETED' and 'ticketed' from database/backend
-                const showBuyTicketsButton = event.admissionType?.toUpperCase() === 'TICKETED' && isUpcomingLocal;
+                // BUT NOT if it's a ticketed fundraiser (use fundraiser image instead)
+                const showBuyTicketsButton = event.admissionType?.toUpperCase() === 'TICKETED' && isUpcomingLocal && !isTicketedFundraiser;
+                // Show Make a Donation button for donation-based events
+                // BUT NOT if it's a ticketed fundraiser (use fundraiser image instead)
+                const showDonationButton = isDonationBasedEvent(event) && isUpcomingLocal && !isTicketedFundraiser;
 
                 // Don't render if no buttons should be shown
-                if (!showRegisterButton && !showBuyTicketsButton) return null;
+                if (!showRegisterButton && !showBuyTicketsButton && !showDonationButton && !isTicketedFundraiser) return null;
 
                 return (
                   <div className="absolute top-4 right-4 lg:top-6 lg:right-6 z-10 flex flex-col gap-2">
@@ -546,30 +551,66 @@ export default function EventDetailsPage() {
                     {showRegisterButton && (
                       <Link
                         href={`/events/${event.id}/register`}
-                        className="transition-transform hover:scale-105"
+                        className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
                         title="Register Here"
+                        aria-label="Register Here"
                       >
-                        <img
-                          src="/images/register_here_button.jpg"
-                          alt="Register Here"
-                          className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
-                        />
+                        <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                          <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                        </div>
+                        <span className="font-semibold text-blue-700">Register Here</span>
                       </Link>
                     )}
 
-                    {/* Buy Tickets Button - Show only for non-FREE events */}
-                    {showBuyTicketsButton && (
+                    {/* Fundraiser Image - Show for ticketed fundraiser/charity events (replaces both Buy Tickets and Make a Donation buttons) */}
+                    {isTicketedFundraiser && (
                     <Link
-                      href={`/events/${event.id}/checkout`}
-                      className={`transition-transform hover:scale-105 ${isPast ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
-                      title="Buy Tickets (New Payment Flow)"
+                      href={`/events/${event.id}/donation-checkout`}
+                      className={`transition-transform hover:scale-105 ${isPast ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      title="Buy Tickets"
+                      aria-label="Buy Tickets"
                     >
                       <img
-                        src="/images/buy_tickets_click_here_red.webp"
                         alt="Buy Tickets"
                         className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
+                        src="/images/buy_tickets_click_here_fundraiser.png"
                       />
                     </Link>
+                    )}
+
+                    {/* Buy Tickets Image - Show only for TICKETED events (not fundraiser) */}
+                    {showBuyTicketsButton && (
+                    <Link
+                      href={`/events/${event.id}/tickets`}
+                      className={`transition-transform hover:scale-105 ${isPast ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      title="Buy Tickets"
+                      aria-label="Buy Tickets"
+                    >
+                      <img
+                        alt="Buy Tickets"
+                        className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
+                        src="/images/buy_tickets_click_here_red.webp"
+                      />
+                    </Link>
+                    )}
+
+                    {/* Make a Donation Button - Show for donation-based events (not ticketed fundraiser) */}
+                    {showDonationButton && (
+                      <Link
+                        href={`/events/${event.id}/donation`}
+                        className="flex-shrink-0 h-14 rounded-xl bg-teal-100 hover:bg-teal-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                        title="Make a Donation"
+                        aria-label="Make a Donation"
+                      >
+                        <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
+                          <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </div>
+                        <span className="font-semibold text-teal-700">Make a Donation</span>
+                      </Link>
                     )}
                   </div>
                 );
@@ -1039,16 +1080,78 @@ export default function EventDetailsPage() {
                     href={calendarLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-xl border-2 border-blue-400 transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-3"
+                    className="flex-shrink-0 h-14 rounded-xl bg-orange-100 hover:bg-orange-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                    title="Add to Calendar"
+                    aria-label="Add to Calendar"
                   >
-                    <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-orange-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                      <svg className="w-10 h-10 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-200 flex items-center justify-center">
+                      <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                     </div>
-                    <span className="text-lg">Add to Calendar</span>
+                    <span className="font-semibold text-orange-700">Add to Calendar</span>
                   </a>
                 )}
+
+                {/* Buy Tickets Image - Show only for TICKETED events */}
+                {(() => {
+                  if (!event.startDate) return null;
+
+                  // Get today's date in YYYY-MM-DD format using local timezone
+                  const today = new Date();
+                  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+                  // Compare dates as strings to avoid timezone parsing issues
+                  const eventDateStr = event.startDate ? event.startDate.split('T')[0] : null;
+
+                  if (!eventDateStr) return null;
+
+                  // Check if event date is today or in the future
+                  const isToday = eventDateStr === todayStr;
+                  const isFuture = eventDateStr > todayStr;
+                  const isUpcomingLocal = isToday || isFuture;
+
+                  // Only show Buy Tickets image for TICKETED events (case-insensitive check)
+                  const showBuyTicketsButton = event.admissionType?.toUpperCase() === 'TICKETED' && isUpcomingLocal;
+                  // Show Make a Donation button for donation-based events
+                  const showDonationButton = isDonationBasedEvent(event) && isUpcomingLocal;
+
+                  if (!showBuyTicketsButton && !showDonationButton) return null;
+
+                  return (
+                    <div className="flex flex-col gap-2">
+                      {showBuyTicketsButton && (
+                        <Link
+                          href={`/events/${event.id}/tickets`}
+                          className="transition-transform hover:scale-105"
+                          title="Buy Tickets"
+                          aria-label="Buy Tickets"
+                        >
+                          <img
+                            alt="Buy Tickets"
+                            className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
+                            src="/images/buy_tickets_click_here_red.webp"
+                          />
+                        </Link>
+                      )}
+                      {showDonationButton && (
+                        <Link
+                          href={`/events/${event.id}/donation`}
+                          className="flex-shrink-0 h-14 rounded-xl bg-teal-100 hover:bg-teal-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                          title="Make a Donation"
+                          aria-label="Make a Donation"
+                        >
+                          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
+                            <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                          <span className="font-semibold text-teal-700">Make a Donation</span>
+                        </Link>
+                      )}
+                    </div>
+                  );
+                })()}
               </div>
             </div>
           </div>
@@ -1214,8 +1317,18 @@ export default function EventDetailsPage() {
           />
         )}
         <div className="mt-8 text-center">
-          <Link href="/events" className="inline-block bg-yellow-400 text-gray-900 px-8 py-3 rounded-lg font-semibold text-lg shadow hover:bg-yellow-300 transition">
-            View All Events
+          <Link
+            href="/events"
+            className="inline-flex flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+            title="View All Events"
+            aria-label="View All Events"
+          >
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
+              <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+            <span className="font-semibold text-indigo-700">View All Events</span>
           </Link>
         </div>
       </div>

@@ -4,17 +4,17 @@ import { getTenantId } from '@/lib/env';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-export async function bootstrapUserProfile({ 
-  userId, 
-  userData 
-}: { 
-  userId: string, 
-  userData?: { 
+export async function bootstrapUserProfile({
+  userId,
+  userData
+}: {
+  userId: string,
+  userData?: {
     email?: string;
     firstName?: string;
     lastName?: string;
     imageUrl?: string;
-  } 
+  }
 }) {
   if (!userId) return;
   try {
@@ -25,7 +25,9 @@ export async function bootstrapUserProfile({
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000); // 15 second timeout
 
-    // 1. Try to fetch by userId
+    // 1. Try to fetch by userId + tenantId
+    // CRITICAL: If profile exists with correct userId, do NOT update anything
+    // This prevents overwriting existing firstName, lastName, email fields
     let res = await fetch(`${API_BASE_URL}/api/user-profiles/by-user/${userId}?tenantId.equals=${tenantId}`, {
       headers: { Authorization: `Bearer ${token}` },
       cache: 'no-store',
@@ -47,7 +49,19 @@ export async function bootstrapUserProfile({
       clearTimeout(timeout);
     }
 
-    if (res.ok) return; // Profile exists
+    // CRITICAL: If profile exists with correct userId + tenantId, return immediately
+    // Do NOT update anything - preserve all existing fields
+    if (res.ok) {
+      const existingProfile = await res.json();
+      console.log('[bootstrapUserProfile] ✅ Profile exists with correct userId, preserving all existing fields:', {
+        id: existingProfile?.id,
+        userId: existingProfile?.userId,
+        firstName: existingProfile?.firstName || '(empty)',
+        lastName: existingProfile?.lastName || '(empty)',
+        email: existingProfile?.email || '(empty)',
+      });
+      return; // Profile exists - do NOT update
+    }
 
     // 2. Fallback: lookup by email
     if (res.status === 404) {
@@ -69,30 +83,116 @@ export async function bootstrapUserProfile({
           const profiles = await emailRes.json();
           if (Array.isArray(profiles) && profiles.length > 0) {
             const userProfile = profiles[0];
-            // Update the found profile with the current userId and Clerk data
+
+            // CRITICAL: Only update if userId is different
+            // If userId already matches, skip update to preserve existing data
+            if (userProfile.userId === userId) {
+              console.log('[bootstrapUserProfile] Profile already has correct userId, skipping update to preserve existing data');
+              return;
+            }
+
+            // Update the found profile with the current userId
+            // CRITICAL: Use PATCH (not PUT) and only update userId/clerkUserId
+            // DO NOT overwrite firstName, lastName, email if they already exist
             const now = new Date().toISOString();
-            const updatedProfile = {
-              ...userProfile,
-              userId,
-              firstName: userData?.firstName || userProfile.firstName || "",
-              lastName: userData?.lastName || userProfile.lastName || "",
-              email,
-              profileImageUrl: userData?.imageUrl || userProfile.profileImageUrl || "",
+            const updatePayload: any = {
+              id: userProfile.id, // MUST include id for PATCH
+              userId: userId, // Update to current Clerk userId
+              clerkUserId: userId, // Also update clerkUserId
+              tenantId: tenantId, // Include tenantId
               updatedAt: now,
-              tenantId,
             };
+
+            // CRITICAL: ONLY update firstName/lastName/email if they are missing/empty in existing profile
+            // NEVER include these fields in the payload if they would overwrite existing non-empty values
+            // This prevents overwriting existing data with empty values from Clerk
+            if (!userProfile.firstName || userProfile.firstName.trim() === '') {
+              // Only update if Clerk provides a non-empty value
+              if (userData?.firstName && userData.firstName.trim() !== '') {
+                updatePayload.firstName = userData.firstName;
+                console.log('[bootstrapUserProfile] Will update firstName (was empty):', userData.firstName);
+              } else {
+                console.log('[bootstrapUserProfile] Skipping firstName update (Clerk data missing/empty)');
+              }
+            } else {
+              console.log('[bootstrapUserProfile] Preserving existing firstName:', userProfile.firstName);
+            }
+            // Preserve existing firstName - do NOT update
+
+            if (!userProfile.lastName || userProfile.lastName.trim() === '') {
+              // Only update if Clerk provides a non-empty value
+              if (userData?.lastName && userData.lastName.trim() !== '') {
+                updatePayload.lastName = userData.lastName;
+                console.log('[bootstrapUserProfile] Will update lastName (was empty):', userData.lastName);
+              } else {
+                console.log('[bootstrapUserProfile] Skipping lastName update (Clerk data missing/empty)');
+              }
+            } else {
+              console.log('[bootstrapUserProfile] Preserving existing lastName:', userProfile.lastName);
+            }
+            // Preserve existing lastName - do NOT update
+
+            if (!userProfile.email || userProfile.email.trim() === '') {
+              // Only update if Clerk provides a non-empty value
+              if (email && email.trim() !== '') {
+                updatePayload.email = email;
+                console.log('[bootstrapUserProfile] Will update email (was empty):', email);
+              } else {
+                console.log('[bootstrapUserProfile] Skipping email update (Clerk data missing/empty)');
+              }
+            } else {
+              console.log('[bootstrapUserProfile] Preserving existing email:', userProfile.email);
+            }
+            // Preserve existing email - do NOT update
+
+            if (!userProfile.profileImageUrl || userProfile.profileImageUrl.trim() === '') {
+              if (userData?.imageUrl && userData.imageUrl.trim() !== '') {
+                updatePayload.profileImageUrl = userData.imageUrl;
+              }
+            }
+            // Preserve existing profileImageUrl - do NOT update
+
+            // CRITICAL: Log the payload to verify we're not sending empty strings
+            console.log('[bootstrapUserProfile] 🔍 PATCH payload before sending:', {
+              profileId: userProfile.id,
+              oldUserId: userProfile.userId,
+              newUserId: userId,
+              existingFirstName: userProfile.firstName || '(empty)',
+              existingLastName: userProfile.lastName || '(empty)',
+              existingEmail: userProfile.email || '(empty)',
+              updatePayloadKeys: Object.keys(updatePayload),
+              updatePayload: JSON.stringify(updatePayload, null, 2),
+              willUpdateFirstName: updatePayload.hasOwnProperty('firstName'),
+              willUpdateLastName: updatePayload.hasOwnProperty('lastName'),
+              willUpdateEmail: updatePayload.hasOwnProperty('email'),
+            });
+
+            // CRITICAL: Double-check - remove any fields that are empty strings to prevent overwriting
+            if (updatePayload.firstName === '' || updatePayload.firstName === null || updatePayload.firstName === undefined) {
+              delete updatePayload.firstName;
+              console.log('[bootstrapUserProfile] ⚠️ Removed empty firstName from payload');
+            }
+            if (updatePayload.lastName === '' || updatePayload.lastName === null || updatePayload.lastName === undefined) {
+              delete updatePayload.lastName;
+              console.log('[bootstrapUserProfile] ⚠️ Removed empty lastName from payload');
+            }
+            if (updatePayload.email === '' || updatePayload.email === null || updatePayload.email === undefined) {
+              delete updatePayload.email;
+              console.log('[bootstrapUserProfile] ⚠️ Removed empty email from payload');
+            }
+
             let updateToken = token;
             let updateRes = await fetch(`${API_BASE_URL}/api/user-profiles/${userProfile.id}`, {
-              method: 'PUT',
-              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${updateToken}` },
-              body: JSON.stringify(updatedProfile),
+              method: 'PATCH', // Use PATCH instead of PUT to avoid overwriting fields
+              headers: { 'Content-Type': 'application/merge-patch+json', Authorization: `Bearer ${updateToken}` },
+              body: JSON.stringify(updatePayload),
             });
             if (updateRes.status === 401) {
               updateToken = await generateApiJwt();
               updateRes = await fetch(`${API_BASE_URL}/api/user-profiles/${userProfile.id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${updateToken}` },
-                body: JSON.stringify(updatedProfile),
+                method: 'PATCH', // Use PATCH instead of PUT
+                headers: { 'Content-Type': 'application/merge-patch+json', Authorization: `Bearer ${updateToken}` },
+                body: JSON.stringify(updatePayload),
               });
             }
             return;

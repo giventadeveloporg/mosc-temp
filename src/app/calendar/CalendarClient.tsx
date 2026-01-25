@@ -68,9 +68,9 @@ export default function CalendarClient({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlView, searchParams]);
 
-  // Update year/month when date changes (for day view)
+  // Update year/month when date changes (for day and week views)
   useEffect(() => {
-    if (urlView === 'day') {
+    if (urlView === 'day' || urlView === 'week') {
       if (currentYear !== nav.year || currentMonth !== nav.month) {
         nav.setYear(currentYear);
         nav.setMonth(currentMonth);
@@ -96,7 +96,7 @@ export default function CalendarClient({
   const handleViewChange = (newView: 'month' | 'week' | 'day') => {
     const params = new URLSearchParams(searchParams.toString());
     params.set('view', newView);
-    if (newView === 'day' && !params.has('date')) {
+    if ((newView === 'day' || newView === 'week') && !params.has('date')) {
       const today = new Date();
       params.set('date', `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`);
     }
@@ -110,6 +110,12 @@ export default function CalendarClient({
       prevDate.setDate(prevDate.getDate() - 1);
       const dateStr = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, '0')}-${String(prevDate.getDate()).padStart(2, '0')}`;
       router.push(`/calendar?view=day&date=${dateStr}`);
+    } else if (nav.view === 'week') {
+      // Move back 7 days for previous week
+      const prevDate = new Date(currentDate);
+      prevDate.setDate(prevDate.getDate() - 7);
+      const dateStr = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, '0')}-${String(prevDate.getDate()).padStart(2, '0')}`;
+      router.push(`/calendar?view=week&date=${dateStr}`);
     } else {
       nav.prev();
     }
@@ -121,6 +127,12 @@ export default function CalendarClient({
       nextDate.setDate(nextDate.getDate() + 1);
       const dateStr = `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, '0')}-${String(nextDate.getDate()).padStart(2, '0')}`;
       router.push(`/calendar?view=day&date=${dateStr}`);
+    } else if (nav.view === 'week') {
+      // Move forward 7 days for next week
+      const nextDate = new Date(currentDate);
+      nextDate.setDate(nextDate.getDate() + 7);
+      const dateStr = `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, '0')}-${String(nextDate.getDate()).padStart(2, '0')}`;
+      router.push(`/calendar?view=week&date=${dateStr}`);
     } else {
       nav.next();
     }
@@ -131,6 +143,9 @@ export default function CalendarClient({
     if (nav.view === 'day') {
       const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
       router.push(`/calendar?view=day&date=${dateStr}`);
+    } else if (nav.view === 'week') {
+      const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      router.push(`/calendar?view=week&date=${dateStr}`);
     } else {
       nav.today();
     }
@@ -141,33 +156,110 @@ export default function CalendarClient({
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
-        <div className="text-xl font-semibold text-gray-900">
+      {/* Header with Month/Date Display and Navigation Buttons */}
+      <div className="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4">
+        <div className="text-lg sm:text-xl font-bold text-gray-900">
           {displayView === 'day'
             ? currentDate.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+            : displayView === 'week'
+            ? (() => {
+                // Calculate week start (Sunday)
+                const weekStart = new Date(currentDate);
+                const day = weekStart.getDay();
+                const diff = weekStart.getDate() - day;
+                weekStart.setDate(diff);
+
+                // Calculate week end (Saturday)
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekStart.getDate() + 6);
+
+                return `${weekStart.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} - ${weekEnd.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}`;
+              })()
             : new Date(nav.year, nav.month - 1, 1).toLocaleString(undefined, { month: 'long', year: 'numeric' })
           }
         </div>
-        <div className="flex gap-2">
-          <button onClick={handlePrev} className="px-3 py-2 rounded bg-blue-50 text-blue-700 hover:bg-blue-100">Previous</button>
-          <button onClick={handleToday} className="px-3 py-2 rounded bg-blue-50 text-blue-700 hover:bg-blue-100">Today</button>
-          <button onClick={handleNext} className="px-3 py-2 rounded bg-blue-50 text-blue-700 hover:bg-blue-100">Next</button>
+
+        {/* Navigation Button Group - Each button has unique color */}
+        <div className="flex gap-2 sm:gap-3">
+          {/* Previous Button - Purple */}
+          <button
+            onClick={handlePrev}
+            className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-purple-50 hover:bg-purple-100 text-purple-800 rounded-lg shadow-md transition-all duration-300 hover:scale-105"
+            title="Previous"
+            aria-label="Previous"
+            type="button"
+          >
+            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
+              <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+            </div>
+            <span className="hidden sm:inline font-semibold">Previous</span>
+          </button>
+
+          {/* Today Button - Teal */}
+          <button
+            onClick={handleToday}
+            className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-lg shadow-md transition-all duration-300 hover:scale-105"
+            title={displayView === 'week' ? 'This Week' : displayView === 'day' ? 'Today' : 'This Month'}
+            aria-label={displayView === 'week' ? 'This Week' : displayView === 'day' ? 'Today' : 'This Month'}
+            type="button"
+          >
+            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center">
+              <svg className="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <span className="hidden sm:inline font-semibold">
+              {displayView === 'week' ? 'This Week' : displayView === 'day' ? 'Today' : 'Today'}
+            </span>
+          </button>
+
+          {/* Next Button - Orange */}
+          <button
+            onClick={handleNext}
+            className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-orange-50 hover:bg-orange-100 text-orange-800 rounded-lg shadow-md transition-all duration-300 hover:scale-105"
+            title="Next"
+            aria-label="Next"
+            type="button"
+          >
+            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center">
+              <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+            <span className="hidden sm:inline font-semibold">Next</span>
+          </button>
         </div>
       </div>
+
+      {/* View Switcher */}
       <ViewSwitcher view={displayView} onChange={handleViewChange} />
+
+      {/* Calendar Views */}
       {loading ? (
-        <div className="text-sm text-gray-500">Loading...</div>
+        <div className="flex items-center justify-center py-12">
+          <div className="flex items-center gap-3">
+            <svg className="animate-spin w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span className="text-sm text-gray-600 font-medium">Loading events...</span>
+          </div>
+        </div>
       ) : (
         <>
           {displayView === 'month' && <MonthView events={events} year={nav.year} month={nav.month} />}
           {displayView === 'week' && (
-            <WeekView events={events} anchorDate={new Date(nav.year, nav.month - 1, 1)} />
+            <WeekView events={events} anchorDate={currentDate} />
           )}
           {displayView === 'day' && (
             <DayView events={events} date={currentDate} />
           )}
         </>
       )}
+
+      {/* Pagination */}
       <CalendarPagination
         totalCount={events.length}
         onPrevMonth={handlePrev}

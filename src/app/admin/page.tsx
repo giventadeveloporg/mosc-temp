@@ -183,57 +183,59 @@ export default function AdminPage() {
       href: '/admin/check-in-analytics',
       icon: 'clipboardCheck',
       label: 'Check-In Analytics',
-      color: 'slate',
+      color: 'cyan',
       key: 'check-in-analytics'
     },
     {
       href: '/admin/sales-analytics',
       icon: 'chartLine',
       label: 'Sales Analytics',
-      color: 'stone',
+      color: 'sky',
       key: 'sales-analytics'
+    },
+    {
+      href: '/admin/manual-payments',
+      icon: 'moneyBill',
+      label: 'Manual Payments [Zelle, Venmo…]',
+      color: 'mintGreen',
+      key: 'manual-payments'
     }
   ];
 
   const getColorClasses = (color: string) => {
     const colorMap: Record<string, string> = {
-      gray: 'bg-gray-50 hover:bg-gray-100 text-gray-700 border-gray-200',
-      blue: 'bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200',
-      green: 'bg-green-50 hover:bg-green-100 text-green-700 border-green-200',
-      yellow: 'bg-yellow-50 hover:bg-yellow-100 text-yellow-700 border-yellow-200',
-      purple: 'bg-purple-50 hover:bg-purple-100 text-purple-700 border-purple-200',
-      orange: 'bg-orange-50 hover:bg-orange-100 text-orange-700 border-orange-200',
-      teal: 'bg-teal-50 hover:bg-teal-100 text-teal-700 border-teal-200',
-      indigo: 'bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border-indigo-200',
-      cyan: 'bg-cyan-50 hover:bg-cyan-100 text-cyan-700 border-cyan-200',
-      slate: 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200',
-      red: 'bg-red-50 hover:bg-red-100 text-red-700 border-red-200',
-      pink: 'bg-pink-50 hover:bg-pink-100 text-pink-700 border-pink-200',
-      emerald: 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200',
-      amber: 'bg-amber-50 hover:bg-amber-100 text-amber-700 border-amber-200',
-      rose: 'bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-200',
-      lime: 'bg-lime-50 hover:bg-lime-100 text-lime-700 border-lime-200',
-      violet: 'bg-violet-50 hover:bg-violet-100 text-violet-700 border-violet-200',
-      fuchsia: 'bg-fuchsia-50 hover:bg-fuchsia-100 text-fuchsia-700 border-fuchsia-200',
-      sky: 'bg-sky-50 hover:bg-sky-100 text-sky-700 border-sky-200',
-      stone: 'bg-stone-50 hover:bg-stone-100 text-stone-700 border-stone-200',
-      zinc: 'bg-zinc-50 hover:bg-zinc-100 text-zinc-700 border-zinc-200',
-      neutral: 'bg-neutral-50 hover:bg-neutral-100 text-neutral-700 border-neutral-200',
+      blue: 'bg-blue-50 hover:bg-blue-100 text-blue-800',
+      green: 'bg-green-50 hover:bg-green-100 text-green-800',
+      yellow: 'bg-yellow-50 hover:bg-yellow-100 text-yellow-800',
+      purple: 'bg-purple-50 hover:bg-purple-100 text-purple-800',
+      orange: 'bg-orange-50 hover:bg-orange-100 text-orange-800',
+      teal: 'bg-teal-50 hover:bg-teal-100 text-teal-800',
+      indigo: 'bg-indigo-50 hover:bg-indigo-100 text-indigo-800',
+      cyan: 'bg-cyan-50 hover:bg-cyan-100 text-cyan-800',
+      red: 'bg-red-50 hover:bg-red-100 text-red-800',
+      pink: 'bg-pink-50 hover:bg-pink-100 text-pink-800',
+      emerald: 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800',
+      amber: 'bg-amber-50 hover:bg-amber-100 text-amber-800',
+      rose: 'bg-rose-50 hover:bg-rose-100 text-rose-800',
+      lime: 'bg-lime-50 hover:bg-lime-100 text-lime-800',
+      violet: 'bg-violet-50 hover:bg-violet-100 text-violet-800',
+      fuchsia: 'bg-fuchsia-50 hover:bg-fuchsia-100 text-fuchsia-800',
+      sky: 'bg-sky-50 hover:bg-sky-100 text-sky-800',
       // Custom colors for additional unique buttons (using Tailwind color shades)
-      warmOrange: 'bg-orange-100 hover:bg-orange-200 text-orange-800 border-orange-300',
-      coolBlue: 'bg-blue-100 hover:bg-blue-200 text-blue-800 border-blue-300',
-      vibrantPurple: 'bg-purple-100 hover:bg-purple-200 text-purple-800 border-purple-300',
-      softPink: 'bg-pink-100 hover:bg-pink-200 text-pink-800 border-pink-300',
-      brightYellow: 'bg-yellow-100 hover:bg-yellow-200 text-yellow-800 border-yellow-300',
-      deepTeal: 'bg-teal-100 hover:bg-teal-200 text-teal-800 border-teal-300',
-      lightCyan: 'bg-cyan-100 hover:bg-cyan-200 text-cyan-800 border-cyan-300'
+      warmOrange: 'bg-orange-50 hover:bg-orange-100 text-orange-800',
+      coolBlue: 'bg-blue-50 hover:bg-blue-100 text-blue-800',
+      vibrantPurple: 'bg-purple-50 hover:bg-purple-100 text-purple-800',
+      softPink: 'bg-pink-50 hover:bg-pink-100 text-pink-800',
+      brightYellow: 'bg-yellow-50 hover:bg-yellow-100 text-yellow-800',
+      deepTeal: 'bg-teal-50 hover:bg-teal-100 text-teal-800',
+      lightCyan: 'bg-cyan-50 hover:bg-cyan-100 text-cyan-800',
+      mintGreen: 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800'
     };
-    return colorMap[color] || colorMap.gray;
+    return colorMap[color] || colorMap.blue;
   };
 
   const getIconBgColor = (color: string) => {
     const colorMap: Record<string, string> = {
-      gray: 'bg-gray-100',
       blue: 'bg-blue-100',
       green: 'bg-green-100',
       yellow: 'bg-yellow-100',
@@ -242,7 +244,6 @@ export default function AdminPage() {
       teal: 'bg-teal-100',
       indigo: 'bg-indigo-100',
       cyan: 'bg-cyan-100',
-      slate: 'bg-slate-100',
       red: 'bg-red-100',
       pink: 'bg-pink-100',
       emerald: 'bg-emerald-100',
@@ -252,24 +253,21 @@ export default function AdminPage() {
       violet: 'bg-violet-100',
       fuchsia: 'bg-fuchsia-100',
       sky: 'bg-sky-100',
-      stone: 'bg-stone-100',
-      zinc: 'bg-zinc-100',
-      neutral: 'bg-neutral-100',
       // Custom colors for additional unique buttons
-      warmOrange: 'bg-orange-200',
-      coolBlue: 'bg-blue-200',
-      vibrantPurple: 'bg-purple-200',
-      softPink: 'bg-pink-200',
-      brightYellow: 'bg-yellow-200',
-      deepTeal: 'bg-teal-200',
-      lightCyan: 'bg-cyan-200'
+      warmOrange: 'bg-orange-100',
+      coolBlue: 'bg-blue-100',
+      vibrantPurple: 'bg-purple-100',
+      softPink: 'bg-pink-100',
+      brightYellow: 'bg-yellow-100',
+      deepTeal: 'bg-teal-100',
+      lightCyan: 'bg-cyan-100',
+      mintGreen: 'bg-emerald-100'
     };
-    return colorMap[color] || colorMap.gray;
+    return colorMap[color] || colorMap.blue;
   };
 
   const getIconTextColor = (color: string) => {
     const colorMap: Record<string, string> = {
-      gray: 'text-gray-500',
       blue: 'text-blue-500',
       green: 'text-green-500',
       yellow: 'text-yellow-500',
@@ -278,7 +276,6 @@ export default function AdminPage() {
       teal: 'text-teal-500',
       indigo: 'text-indigo-500',
       cyan: 'text-cyan-500',
-      slate: 'text-slate-500',
       red: 'text-red-500',
       pink: 'text-pink-500',
       emerald: 'text-emerald-500',
@@ -288,19 +285,17 @@ export default function AdminPage() {
       violet: 'text-violet-500',
       fuchsia: 'text-fuchsia-500',
       sky: 'text-sky-500',
-      stone: 'text-stone-500',
-      zinc: 'text-zinc-500',
-      neutral: 'text-neutral-500',
       // Custom colors for additional unique buttons
-      warmOrange: 'text-orange-600',
-      coolBlue: 'text-blue-600',
-      vibrantPurple: 'text-purple-600',
-      softPink: 'text-pink-600',
-      brightYellow: 'text-yellow-600',
-      deepTeal: 'text-teal-600',
-      lightCyan: 'text-cyan-600'
+      warmOrange: 'text-orange-500',
+      coolBlue: 'text-blue-500',
+      vibrantPurple: 'text-purple-500',
+      softPink: 'text-pink-500',
+      brightYellow: 'text-yellow-500',
+      deepTeal: 'text-teal-500',
+      lightCyan: 'text-cyan-500',
+      mintGreen: 'text-emerald-500'
     };
-    return colorMap[color] || colorMap.gray;
+    return colorMap[color] || colorMap.blue;
   };
 
   const renderIcon = (iconName: string, className: string) => {
@@ -351,6 +346,8 @@ export default function AdminPage() {
         return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>;
       case 'chartLine':
         return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" /></svg>;
+      case 'moneyBill':
+        return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>;
       default:
         return null;
     }
@@ -393,8 +390,9 @@ export default function AdminPage() {
         ] Event Management
       </h1>
 
-      <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 lg:p-8">
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+      {/* Responsive Button Group */}
+      <div className="w-full mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {adminButtons.map((button) => {
             const colorClasses = getColorClasses(button.color);
             const iconBgColor = getIconBgColor(button.color);
@@ -404,14 +402,14 @@ export default function AdminPage() {
               <Link
                 key={button.key}
                 href={button.href}
-                className={`flex flex-col items-center justify-center rounded-lg border-2 p-2.5 sm:p-3 lg:p-4 transition-all duration-300 hover:scale-105 hover:shadow-md group ${colorClasses}`}
+                className={`flex flex-col items-center justify-center ${colorClasses} rounded-lg shadow-md p-4 text-xs transition-all group`}
+                title={button.label}
+                aria-label={button.label}
               >
-                <div className={`flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-xl ${iconBgColor} flex items-center justify-center mb-1.5 sm:mb-2 group-hover:scale-110 transition-transform duration-300`}>
-                  {renderIcon(button.icon, `w-6 h-6 sm:w-8 sm:h-8 ${iconTextColor}`)}
+                <div className={`flex-shrink-0 w-14 h-14 rounded-xl ${iconBgColor} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300`}>
+                  {renderIcon(button.icon, `w-10 h-10 ${iconTextColor}`)}
                 </div>
-                <span className="font-semibold text-center text-xs sm:text-sm lg:text-base leading-tight px-1">
-                  {button.label}
-                </span>
+                <span className="font-semibold text-center leading-tight">{button.label}</span>
               </Link>
             );
           })}

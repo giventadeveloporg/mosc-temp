@@ -190,44 +190,44 @@ export function GalleryEventCard({ eventWithMedia }: GalleryEventCardProps) {
           <div className="flex-grow"></div>
         </div>
 
-        {/* Action buttons - Per icons_buttons_styles.mdc */}
+        {/* Action buttons - Per admin_action_buttons_styling.mdc */}
         <div className="flex space-x-3 p-6 pt-0 mt-auto">
-            {/* View Gallery Button - Full-width with icon + text pattern */}
+            {/* View Gallery Button - Standard admin action button pattern */}
             <button
               onClick={() => {
                 console.log('View Gallery clicked for event:', event.title, 'Media count:', media.length);
                 setShowSlideshow(true);
               }}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 h-12 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed transition-all duration-300 hover:scale-105 hover:shadow-md"
+              className="flex-1 flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:bg-blue-100 disabled:text-blue-500 disabled:cursor-not-allowed disabled:hover:scale-100"
               title="View Gallery"
               aria-label="View Gallery"
               disabled={media.length === 0}
               type="button"
             >
-              <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-blue-200 flex items-center justify-center">
-                {/* Eye/View Icon - Inline SVG per icons_buttons_styles.mdc */}
-                <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                {/* Eye/View Icon - Inline SVG per admin_action_buttons_styling.mdc */}
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>
               </div>
-              <span className="text-sm">View Gallery</span>
+              <span className="font-semibold text-blue-700">View Gallery</span>
             </button>
 
-            {/* Event Details Button - Full-width with icon + text pattern */}
+            {/* Event Details Button - Standard admin action button pattern */}
             <Link
               href={`/events/${event.id}`}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 h-12 rounded-lg bg-green-100 hover:bg-green-200 text-green-700 font-semibold shadow-sm border-2 border-green-400 hover:border-green-500 transition-all duration-300 hover:scale-105 hover:shadow-md"
+              className="flex-1 flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105"
               title="Event Details"
               aria-label="Event Details"
             >
-              <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-green-200 flex items-center justify-center">
-                {/* External Link Icon - Inline SVG per icons_buttons_styles.mdc */}
-                <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+                {/* External Link Icon - Inline SVG per admin_action_buttons_styling.mdc */}
+                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
               </div>
-              <span className="text-sm">Event Details</span>
+              <span className="font-semibold text-green-700">Event Details</span>
             </Link>
           </div>
       </div>

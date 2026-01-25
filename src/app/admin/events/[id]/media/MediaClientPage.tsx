@@ -5,6 +5,7 @@ import { FaEdit, FaTrashAlt, FaUpload, FaFolderOpen, FaSpinner, FaBan, FaTimes, 
 import { deleteMediaServer, editMediaServer } from './ApiServerActions';
 import { createPortal } from "react-dom";
 import Link from 'next/link';
+import { ConfirmModal } from '@/components/ui/Modal';
 
 interface MediaClientPageProps {
   eventId: string;
@@ -109,6 +110,8 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
   const [popoverUploadedMediaAnchor, setPopoverUploadedMediaAnchor] = useState<DOMRect | null>(null);
   const [popoverUploadedMediaMedia, setPopoverUploadedMediaMedia] = useState<EventMediaDTO | null>(null);
   const [isHeroImage, setIsHeroImage] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedMedia, setSelectedMedia] = useState<EventMediaDTO | null>(null);
   const [isActiveHeroImage, setIsActiveHeroImage] = useState(false);
   const [isFeaturedEventImage, setIsFeaturedEventImage] = useState(false);
   const [isLiveEventImage, setIsLiveEventImage] = useState(false);
@@ -330,15 +333,27 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
     }
   };
 
-  const handleDelete = async (mediaId: number | string) => {
+  const handleDelete = (mediaId: number | string) => {
     if (!mediaId) return;
-    if (!confirm('Are you sure you want to delete this media?')) return;
+    const media = mediaList.find((m) => m.id === mediaId);
+    if (media) {
+      setSelectedMedia(media);
+      setIsDeleteModalOpen(true);
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedMedia || !selectedMedia.id) return;
     try {
-      await deleteMediaServer(mediaId);
-      setMediaList((prev) => prev.filter((m) => m.id !== mediaId));
+      await deleteMediaServer(selectedMedia.id);
+      setMediaList((prev) => prev.filter((m) => m.id !== selectedMedia.id));
       setMessage('Media deleted successfully.');
+      setIsDeleteModalOpen(false);
+      setSelectedMedia(null);
     } catch (err: any) {
       setMessage(`Delete error: ${err.message}`);
+      setIsDeleteModalOpen(false);
+      setSelectedMedia(null);
     }
   };
 
@@ -661,12 +676,12 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           <Link
             href="/admin"
-            className="flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 text-gray-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+            className="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg shadow-md p-3 text-xs transition-all group"
             title="Admin Home"
             aria-label="Admin Home"
           >
-            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-gray-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-              <svg className="w-10 h-10 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-blue-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
               </svg>
             </div>
@@ -674,12 +689,12 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
           </Link>
           <Link
             href="/admin/manage-usage"
-            className="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+            className="flex flex-col items-center justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-800 rounded-lg shadow-md p-3 text-xs transition-all group"
             title="Manage Usage"
             aria-label="Manage Usage"
           >
-            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-              <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-indigo-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-8 h-8 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
             </div>
@@ -687,12 +702,12 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
           </Link>
           <Link
             href={`/admin/events/${eventId}/media/list`}
-            className="flex flex-col items-center justify-center bg-yellow-50 hover:bg-yellow-100 text-yellow-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+            className="flex flex-col items-center justify-center bg-yellow-50 hover:bg-yellow-100 text-yellow-800 rounded-lg shadow-md p-3 text-xs transition-all group"
             title="Manage Media Files"
             aria-label="Manage Media Files"
           >
-            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-yellow-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-              <svg className="w-10 h-10 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-yellow-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-8 h-8 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
               </svg>
             </div>
@@ -700,12 +715,12 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
           </Link>
           <Link
             href="/admin/manage-events"
-            className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+            className="flex flex-col items-center justify-center bg-green-50 hover:bg-green-100 text-green-800 rounded-lg shadow-md p-3 text-xs transition-all group"
             title="Manage Events"
             aria-label="Manage Events"
           >
-            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-              <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
@@ -713,12 +728,12 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
           </Link>
           <Link
             href={`/admin/events/${eventId}/ticket-types/list`}
-            className="flex flex-col items-center justify-center bg-purple-50 hover:bg-purple-100 text-purple-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+            className="flex flex-col items-center justify-center bg-purple-50 hover:bg-purple-100 text-purple-800 rounded-lg shadow-md p-3 text-xs transition-all group"
             title="Manage Ticket Types"
             aria-label="Manage Ticket Types"
           >
-            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-              <svg className="w-10 h-10 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-purple-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-8 h-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
               </svg>
             </div>
@@ -726,12 +741,12 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
           </Link>
           <Link
             href={`/admin/events/${eventId}/tickets/list`}
-            className="flex flex-col items-center justify-center bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+            className="flex flex-col items-center justify-center bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-lg shadow-md p-3 text-xs transition-all group"
             title="Manage Tickets"
             aria-label="Manage Tickets"
           >
-            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-teal-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-              <svg className="w-10 h-10 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-teal-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-8 h-8 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4v-3a2 2 0 00-2-2H5z" />
               </svg>
             </div>
@@ -739,12 +754,12 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
           </Link>
           <Link
             href={`/admin/events/${eventId}/discount-codes/list`}
-            className="flex flex-col items-center justify-center bg-pink-50 hover:bg-pink-100 text-pink-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+            className="flex flex-col items-center justify-center bg-pink-50 hover:bg-pink-100 text-pink-800 rounded-lg shadow-md p-3 text-xs transition-all group"
             title="Manage Discount Codes"
             aria-label="Manage Discount Codes"
           >
-            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-pink-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-              <svg className="w-10 h-10 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-pink-100 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-8 h-8 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
               </svg>
             </div>
@@ -1011,9 +1026,13 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
             {/* Choose Files Buttons */}
             <div className="flex justify-center gap-3 flex-wrap">
               <label className="relative cursor-pointer">
-                <span className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded shadow-sm border border-blue-700 transition-colors inline-block text-center min-w-[160px] flex items-center justify-center gap-2">
-                  <FaFolderOpen className="w-5 h-5" />
-                  Browse Files
+                <span className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                    <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                    </svg>
+                  </div>
+                  <span className="font-semibold text-blue-700">Browse Files</span>
                 </span>
                 <input
                   type="file"
@@ -1025,9 +1044,13 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
               </label>
 
               <label className="relative cursor-pointer">
-                <span className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded shadow-sm border border-green-700 transition-colors inline-block text-center min-w-[160px] flex items-center justify-center gap-2">
-                  <FaFolderOpen className="w-5 h-5" />
-                  Upload Folder
+                <span className="flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                    </svg>
+                  </div>
+                  <span className="font-semibold text-green-700">Upload Folder</span>
                 </span>
                 <input
                   type="file"
@@ -1235,173 +1258,6 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
         </form>
       </div>
 
-      {/* Official Documents Table */}
-      <div className="mt-8">
-        <div className="mb-2 text-sm text-blue-700 bg-blue-50 border border-blue-200 rounded px-4 py-2">
-          Mouse over the first 2 columns (Title, Type) to see full details about the item. Use the × button to close the tooltip.
-        </div>
-        <h2 className="text-lg font-semibold mb-2">Official Documents</h2>
-        {officialDocsList.length === 0 ? (
-          <div className="text-gray-500">No official documents uploaded yet.</div>
-        ) : (
-          <div className="mb-8">
-            <table className="w-full border text-sm relative bg-white rounded shadow-md">
-              <thead>
-                <tr className="bg-blue-100 font-bold border-b-2 border-blue-300">
-                  <th className="p-2 border">Title</th>
-                  <th className="p-2 border">Type</th>
-                  <th className="p-2 border">Preview</th>
-                  <th className="p-2 border">Uploaded At</th>
-                  <th className="p-2 border">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {pagedOfficialDocs.map((media) => {
-                  let officialDocPosition0 = 'right', officialDocPosition1 = 'right', officialDocPosition2 = 'right';
-                  // Calculate position for each cell
-                  // We'll use a ref and effect, but for simplicity, use mouse event
-                  return (
-                    <tr key={media.id} className="border-b border-gray-300 relative">
-                      <td
-                        className="p-2 border align-middle relative hover:bg-blue-50 cursor-pointer"
-                        onMouseEnter={e => handleCellMouseEnter(media, e, 'officialDocs')}
-                        onMouseLeave={handleCellMouseLeave}
-                      >
-                        {media.title}
-                      </td>
-                      <td
-                        className="p-2 border align-middle relative hover:bg-blue-50 cursor-pointer"
-                        onMouseEnter={e => handleCellMouseEnter(media, e, 'officialDocs')}
-                        onMouseLeave={handleCellMouseLeave}
-                      >
-                        {media.eventMediaType}
-                      </td>
-                      <td
-                        className="p-2 border align-middle text-center relative"
-                      >
-                        {media.fileUrl && media.contentType?.startsWith('image') && (
-                          <a href={media.fileUrl} target="_blank" rel="noopener noreferrer">
-                            <img src={media.fileUrl.startsWith('http') ? media.fileUrl : `https://placehold.co/600x400?text=${media.title}`} alt={media.title || ''} className="w-16 h-16 object-cover rounded mx-auto" />
-                          </a>
-                        )}
-                        {media.fileUrl && media.contentType?.startsWith('video') && (
-                          <a href={media.fileUrl} target="_blank" rel="noopener noreferrer">
-                            <video src={media.fileUrl.startsWith('http') ? media.fileUrl : `https://placehold.co/600x400?text=${media.title}`} controls className="w-24 h-16 rounded mx-auto" />
-                          </a>
-                        )}
-                        {media.fileUrl && !media.contentType?.startsWith('image') && !media.contentType?.startsWith('video') && (
-                          <a href={media.fileUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
-                            {media.title || media.fileUrl}
-                          </a>
-                        )}
-                      </td>
-                      <td className="p-2 border align-middle">{media.createdAt ? new Date(media.createdAt).toLocaleString() : ''}</td>
-                      <td className="p-2 border align-middle flex gap-2 items-center justify-center">
-                        <button
-                          className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
-                          title="Edit"
-                          aria-label="Edit"
-                          onClick={() => {
-                            console.log('Edit icon clicked', media);
-                            setEditMedia(media);
-                          }}
-                        >
-                          <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                          </svg>
-                        </button>
-                        <button
-                          className="flex-shrink-0 w-14 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
-                          onClick={() => handleDelete(media.id!)}
-                          title="Delete"
-                          aria-label="Delete"
-                        >
-                          <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-            {/* Pagination for official docs */}
-            {(() => {
-              const totalCount = officialDocsList.length;
-              const totalPages = Math.ceil(totalCount / officialDocsPageSize) || 1;
-              const displayPage = officialDocsPage + 1;
-              const startItem = totalCount > 0 ? officialDocsPage * officialDocsPageSize + 1 : 0;
-              const endItem = totalCount > 0 ? Math.min((officialDocsPage + 1) * officialDocsPageSize, totalCount) : 0;
-              const isPrevDisabled = officialDocsPage === 0;
-              const isNextDisabled = !hasNextOfficialDocsPage;
-
-              return (
-                <div className="mt-8">
-                  <div className="flex justify-between items-center">
-                    {/* Previous Button */}
-                    <button
-                      onClick={() => setOfficialDocsPage(p => Math.max(0, p - 1))}
-                      disabled={isPrevDisabled}
-                      className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
-                      title="Previous Page"
-                      aria-label="Previous Page"
-                      type="button"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
-                      </svg>
-                      <span>Previous</span>
-                    </button>
-
-                    {/* Page Info */}
-                    <div className="px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
-                      <span className="text-sm font-bold text-blue-700">
-                        Page <span className="text-blue-600">{displayPage}</span> of <span className="text-blue-600">{totalPages}</span>
-                      </span>
-                    </div>
-
-                    {/* Next Button */}
-                    <button
-                      onClick={() => setOfficialDocsPage(p => p + 1)}
-                      disabled={isNextDisabled}
-                      className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
-                      title="Next Page"
-                      aria-label="Next Page"
-                      type="button"
-                    >
-                      <span>Next</span>
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </button>
-                  </div>
-
-                  {/* Item Count Text */}
-                  <div className="text-center mt-3">
-                    {totalCount > 0 ? (
-                      <div className="inline-flex items-center px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
-                        <span className="text-sm text-gray-700">
-                          Showing <span className="font-bold text-blue-600">{startItem}</span> to <span className="font-bold text-blue-600">{endItem}</span> of <span className="font-bold text-blue-600">{totalCount}</span> documents
-                        </span>
-                      </div>
-                    ) : (
-                      <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 border-2 border-orange-300 rounded-lg shadow-sm">
-                        <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span className="text-sm font-medium text-orange-700">No documents found</span>
-                        <span className="text-sm text-orange-600">[No documents match your criteria]</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })()}
-          </div>
-        )}
-      </div>
-
       {/* Uploaded Media Table */}
       <div ref={uploadedMediaSectionRef} className="mt-8">
         <div className="mb-2 text-sm text-blue-700 bg-blue-50 border border-blue-200 rounded px-4 py-2">
@@ -1511,26 +1367,79 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
               })}
             </div>
 
-            {/* Pagination */}
-            <div className="flex justify-between items-center mt-8">
+            {/* Pagination Controls - Always visible, matching admin page style */}
+            {(() => {
+              const totalCount = filteredMediaList.length;
+              const totalPages = Math.ceil(totalCount / mediaPageSize) || 1;
+              const displayPage = mediaPage + 1; // Convert 0-based to 1-based for display
+              const currentPageZeroBased = mediaPage;
+              const startItem = totalCount > 0 ? currentPageZeroBased * mediaPageSize + 1 : 0;
+              const endItem = totalCount > 0 ? currentPageZeroBased * mediaPageSize + Math.min(mediaPageSize, totalCount - currentPageZeroBased * mediaPageSize) : 0;
+              const isPrevDisabled = currentPageZeroBased === 0;
+              const isNextDisabled = currentPageZeroBased >= totalPages - 1;
+
+              return (
+                <div className="mt-8">
+                  <div className="flex justify-between items-center">
+                    {/* Previous Button */}
               <button
                 onClick={() => setMediaPage(p => Math.max(0, p - 1))}
-                disabled={mediaPage === 0}
-                className="px-4 py-2 bg-blue-600 text-white font-semibold rounded shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                      disabled={isPrevDisabled}
+                      className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+                      title="Previous Page"
+                      aria-label="Previous Page"
+                      type="button"
               >
-                ← Previous
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                      </svg>
+                      <span>Previous</span>
               </button>
-              <span className="text-sm font-semibold text-gray-700">
-                Page {mediaPage + 1} of {Math.ceil(filteredMediaList.length / mediaPageSize)}
+
+                    {/* Page Info */}
+                    <div className="px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+                      <span className="text-sm font-bold text-blue-700">
+                        Page <span className="text-blue-600">{displayPage}</span> of <span className="text-blue-600">{totalPages}</span>
               </span>
+                    </div>
+
+                    {/* Next Button */}
               <button
                 onClick={() => setMediaPage(p => p + 1)}
-                disabled={!hasNextMediaPage}
-                className="px-4 py-2 bg-blue-600 text-white font-semibold rounded shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                      disabled={isNextDisabled}
+                      className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+                      title="Next Page"
+                      aria-label="Next Page"
+                      type="button"
               >
-                Next →
+                      <span>Next</span>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                      </svg>
               </button>
             </div>
+
+                  {/* Item Count Text */}
+                  <div className="text-center mt-3">
+                    {totalCount > 0 ? (
+                      <div className="inline-flex items-center px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+                        <span className="text-sm text-gray-700">
+                          Showing <span className="font-bold text-blue-600">{startItem}</span> to <span className="font-bold text-blue-600">{endItem}</span> of <span className="font-bold text-blue-600">{totalCount}</span> media items
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 border-2 border-orange-300 rounded-lg shadow-sm">
+                        <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="text-sm font-medium text-orange-700">No media found</span>
+                        <span className="text-sm text-orange-600">[No media items match your criteria]</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         )}
       </div>
@@ -1603,6 +1512,20 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
         </div>,
         document.body
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setSelectedMedia(null);
+        }}
+        onConfirm={confirmDelete}
+        title="Delete Media"
+        message={`Are you sure you want to delete "${selectedMedia?.title || 'this media item'}"? This action cannot be undone.`}
+        confirmText="Delete"
+        variant="danger"
+      />
     </div>
   );
 }

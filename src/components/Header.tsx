@@ -64,6 +64,7 @@ const adminSubmenuItems = [
   { name: 'QR Scanner', href: '/admin/qr-scanner' },
   { name: 'Check-In Analytics', href: '/admin/check-in-analytics' },
   { name: 'Sales Analytics', href: '/admin/sales-analytics' },
+  { name: 'Manual Payments', href: '/admin/manual-payments' },
   { name: 'Poll Management', href: '/admin/polls' },
   { name: 'Focus Groups', href: '/admin/focus-groups' },
   {
@@ -87,6 +88,13 @@ type HeaderProps = {
   hideMenuItems?: boolean;
   variant?: 'charity' | 'default';
   isTenantAdmin?: boolean;
+};
+
+const getNavAriaLabel = (itemName: string) => {
+  if (itemName === 'Calendar') {
+    return 'Navigate to Schedule';
+  }
+  return `Navigate to ${itemName}`;
 };
 
 const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -511,8 +519,25 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
         if (resp.ok) {
           const data = await resp.json();
           const profile = Array.isArray(data) ? data[0] : data;
+          console.log('[Header] 🔍 Profile data from API:', {
+            id: profile?.id,
+            userId: profile?.userId,
+            email: profile?.email,
+            userRole: profile?.userRole,
+            userStatus: profile?.userStatus,
+            tenantId: profile?.tenantId,
+            rawProfile: JSON.stringify(profile, null, 2)
+          });
           const isAdminUser = profile?.userRole === 'ADMIN';
-          console.log('[Header] Admin status check:', { userId, isAdminUser, userRole: profile?.userRole });
+          console.log('[Header] ✅ Admin status check result:', {
+            userId,
+            isAdminUser,
+            userRole: profile?.userRole,
+            roleMatch: profile?.userRole === 'ADMIN',
+            roleType: typeof profile?.userRole,
+            roleValue: JSON.stringify(profile?.userRole),
+            isTenantAdminProp: isTenantAdmin
+          });
           setIsAdmin(isAdminUser);
         } else {
           console.warn('[Header] Failed to check admin status:', resp.status);
@@ -842,7 +867,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                               }
                             `}
                             onClick={(e) => handleSmoothScroll(e, item.href)}
-                            aria-label={`Navigate to ${item.name}`}
+                            aria-label={getNavAriaLabel(item.name)}
                             aria-current={item.active ? 'page' : undefined}
                           >
                             <span className="tracking-[0.025em]">{item.name}</span>
@@ -1228,7 +1253,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                         closeMobileMenu();
                         handleSmoothScroll(e, item.href);
                       }}
-                      aria-label={`Navigate to ${item.name}`}
+                      aria-label={getNavAriaLabel(item.name)}
                       aria-current={item.active ? 'page' : undefined}
                     >
                       {item.name}

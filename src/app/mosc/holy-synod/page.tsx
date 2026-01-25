@@ -1,13 +1,31 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-
-export const metadata = {
-  title: 'Holy Synod',
-  description: 'Meet the spiritual leaders and bishops of the Malankara Orthodox Syrian Church Holy Synod.',
-};
+import { useSearchParams } from 'next/navigation';
 
 const HolySynodPage = () => {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    // Check if we should scroll to the Catholicos section
+    const hash = window.location.hash;
+    const shouldScroll = hash === '#catholicos-section' || searchParams?.get('scroll') === 'catholicos';
+    
+    if (shouldScroll) {
+      // Small delay to ensure the page is fully rendered
+      setTimeout(() => {
+        const section = document.getElementById('catholicos-section');
+        if (section) {
+          section.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+          });
+        }
+      }, 100);
+    }
+  }, [searchParams]);
   const synodMembers = [
     {
       name: 'H.H. Baselios Marthoma Mathews III',
@@ -243,7 +261,7 @@ const HolySynodPage = () => {
       </section>
 
       {/* Current Catholicos */}
-      <section className="py-16 bg-card">
+      <section id="catholicos-section" className="py-16 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="font-heading font-semibold text-3xl text-foreground mb-4">

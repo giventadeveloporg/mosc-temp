@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import type { ExecutiveCommitteeTeamMemberDTO } from '@/types';
 import { getAppUrl } from '@/lib/env';
 import styles from './TeamSection.module.css';
@@ -147,8 +148,9 @@ const TeamSection: React.FC = () => {
 
         {/* Dynamic Team Grid with Perfect Equal Distribution */}
         {teamMembers.length > 0 ? (
-          <div className={`${styles.teamGrid} gap-8 lg:gap-10`}>
-            {teamMembers.map((member, index) => (
+          <>
+            <div className={`${styles.teamGrid} gap-8 lg:gap-10`}>
+              {teamMembers.slice(0, 6).map((member, index) => (
               <div
                 key={member.id}
                 className={`${styles.teamCard} group relative rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 ease-out hover:-translate-y-3 ${getLastRowClasses(index, teamMembers.length)}`}
@@ -284,7 +286,27 @@ const TeamSection: React.FC = () => {
                 </div>
               </div>
             ))}
-          </div>
+            </div>
+
+            {/* Show More Button - Only show if there are more than 6 team members */}
+            {teamMembers.length > 6 && (
+              <div className="mt-12 flex justify-center">
+                <Link
+                  href="/team"
+                  className="w-full max-w-xs flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105"
+                  title="View All Team Members"
+                  aria-label="View All Team Members"
+                >
+                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
+                    <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </div>
+                  <span className="font-semibold text-indigo-700">Show More</span>
+                </Link>
+              </div>
+            )}
+          </>
         ) : (
           <div className="text-center text-gray-500 py-8">
             <div className="bg-white rounded-lg shadow-sm p-8 max-w-md mx-auto">

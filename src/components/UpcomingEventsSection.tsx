@@ -6,6 +6,7 @@ import Image from 'next/image';
 import type { EventWithMedia, EventDetailsDTO } from "@/types";
 import { formatInTimeZone } from 'date-fns-tz';
 import { isRecurringEvent, getNextOccurrenceDate } from '@/lib/eventUtils';
+import { isDonationBasedEvent, isTicketedFundraiserEvent } from '@/lib/donation/utils';
 
 // Component to handle event image loading errors and hide container when image fails
 function EventImageWithErrorHandling({
@@ -587,12 +588,17 @@ const UpcomingEventsSection: React.FC = () => {
                         <Link
                           href={`/events/${event.id}`}
                           onClick={(e) => e.stopPropagation()}
-                          className="bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 px-6 rounded-xl border border-gray-200 transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2"
+                          className="flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                          title="See Event Details"
+                          aria-label="See Event Details"
                         >
-                          <span>See Event Details</span>
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
+                          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+                            <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                          </div>
+                          <span className="font-semibold text-green-700">See Event Details</span>
                         </Link>
 
                         {/* Register Here Button - Show if registration is required and event is upcoming */}
@@ -614,12 +620,36 @@ const UpcomingEventsSection: React.FC = () => {
                           </Link>
                         )}
 
+                        {/* Fundraiser Image - Show for ticketed fundraiser/charity events (replaces Buy Tickets button) */}
+                        {isUpcomingEvents && isTicketedFundraiserEvent(event) && (
+                          <Link
+                            href={`/events/${event.id}/donation-checkout`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="transition-transform hover:scale-105 inline-block"
+                            title="Buy Tickets"
+                            aria-label="Buy Tickets"
+                          >
+                            <img
+                              src="/images/buy_tickets_click_here_fundraiser.png"
+                              alt="Buy Tickets"
+                              className="object-contain"
+                              style={{
+                                width: '200px',
+                                height: '70px'
+                              }}
+                            />
+                          </Link>
+                        )}
+
                         {/* Buy Tickets Button - Only for TICKETED events and upcoming events (case-insensitive) */}
-                        {isUpcomingEvents && event.admissionType?.toUpperCase() === 'TICKETED' && (
+                        {/* BUT NOT if it's a ticketed fundraiser (use fundraiser image instead) */}
+                        {isUpcomingEvents && event.admissionType?.toUpperCase() === 'TICKETED' && !isTicketedFundraiserEvent(event) && (
                           <Link
                             href={`/events/${event.id}/checkout`}
                             onClick={(e) => e.stopPropagation()}
                             className="transition-transform hover:scale-105 inline-block"
+                            title="Buy Tickets"
+                            aria-label="Buy Tickets"
                           >
                             <img
                               src="/images/buy_tickets_click_here_red.webp"
@@ -630,6 +660,24 @@ const UpcomingEventsSection: React.FC = () => {
                                 height: '70px'
                               }}
                             />
+                          </Link>
+                        )}
+
+                        {/* Make a Donation Button - Show for donation-based events (not ticketed fundraiser) */}
+                        {isUpcomingEvents && isDonationBasedEvent(event) && !isTicketedFundraiserEvent(event) && (
+                          <Link
+                            href={`/events/${event.id}/donation`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="flex-shrink-0 h-14 rounded-xl bg-teal-100 hover:bg-teal-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                            title="Make a Donation"
+                            aria-label="Make a Donation"
+                          >
+                            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
+                              <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                            </div>
+                            <span className="font-semibold text-teal-700">Make a Donation</span>
                           </Link>
                         )}
                       </div>
@@ -643,12 +691,16 @@ const UpcomingEventsSection: React.FC = () => {
         <div className="text-center">
           <Link
             href="/events"
-            className="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3 px-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200"
+            className="inline-flex flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+            title="View All Events"
+            aria-label="View All Events"
           >
-            <span>View All Events</span>
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
+              <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+            <span className="font-semibold text-indigo-700">View All Events</span>
           </Link>
         </div>
       </div>
