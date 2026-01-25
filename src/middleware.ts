@@ -96,6 +96,7 @@ const clerkMiddleware = authMiddleware({
     '/api/proxy(.*)',
     '/api/event/success(.*)',
     '/api/membership/success(.*)',
+    '/api/events/donation/success(.*)',
     '/membership/success(.*)',
     '/membership/qr(.*)',
     '/api/diagnostic(.*)',
@@ -132,6 +133,7 @@ const clerkMiddleware = authMiddleware({
     '/api/proxy/(.*)',
     '/api/event/success/(.*)',  // CRITICAL: Ignore payment success processing (mobile browser compatibility)
     '/api/membership/success/(.*)',  // CRITICAL: Ignore membership success processing (mobile browser compatibility)
+    '/api/events/donation/success/(.*)',  // CRITICAL: Ignore donation success processing (mobile browser compatibility)
     '/api/stripe/payment-intent(.*)',  // Ignore payment intent route (mobile wallet)
     '/api/stripe/event-checkout(.*)',  // Ignore event checkout route
     '/api/stripe/membership-payment-intent(.*)',  // Ignore membership payment intent route (mobile wallet)

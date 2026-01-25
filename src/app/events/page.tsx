@@ -7,6 +7,7 @@ import type { EventWithMedia, EventDetailsDTO } from "@/types";
 import { formatInTimeZone } from 'date-fns-tz';
 import LocationDisplay from '@/components/LocationDisplay';
 import { isRecurringEvent, getNextOccurrenceDate } from '@/lib/eventUtils';
+import { isDonationBasedEvent, isTicketedFundraiserEvent } from '@/lib/donation/utils';
 // import { formatInTimeZone } from 'date-fns-tz';
 
 const EVENTS_PAGE_SIZE = 20; // Minimum events to display per page
@@ -1067,15 +1068,21 @@ export default function EventsPage() {
 
                         // Determine which buttons to show
                         const showRegisterButton = event.isRegistrationRequired === true && isUpcomingLocal;
+                        // Check if event is ticketed fundraiser/charity (shows special fundraiser image)
+                        const isTicketedFundraiser = isTicketedFundraiserEvent(event) && isUpcomingLocal;
                         // Only show Buy Tickets button for TICKETED events (case-insensitive check)
                         // Handles both 'TICKETED' and 'ticketed' from database/backend
-                        const showBuyTicketsButton = event.admissionType?.toUpperCase() === 'TICKETED' && isUpcomingLocal;
+                        // BUT NOT if it's a ticketed fundraiser (use fundraiser image instead)
+                        const showBuyTicketsButton = event.admissionType?.toUpperCase() === 'TICKETED' && isUpcomingLocal && !isTicketedFundraiser;
+                        // Show Make a Donation button for donation-based events
+                        // BUT NOT if it's a ticketed fundraiser (use fundraiser image instead)
+                        const showDonationButton = isDonationBasedEvent(event) && isUpcomingLocal && !isTicketedFundraiser;
 
                         // Don't render if no buttons should be shown
-                        if (!showRegisterButton && !showBuyTicketsButton) return null;
+                        if (!showRegisterButton && !showBuyTicketsButton && !showDonationButton && !isTicketedFundraiser) return null;
 
                         return (
-                          <div className={`absolute top-4 right-4 lg:top-6 lg:right-6 z-10 ${showRegisterButton && showBuyTicketsButton ? 'flex flex-col gap-2' : ''}`}>
+                          <div className={`absolute top-4 right-4 lg:top-6 lg:right-6 z-10 ${showRegisterButton && (showBuyTicketsButton || showDonationButton || isTicketedFundraiser) ? 'flex flex-col gap-2' : ''}`}>
                             {/* Register Here Button - Show if registration is required */}
                             {showRegisterButton && (
                             <Link
@@ -1091,7 +1098,22 @@ export default function EventsPage() {
                             </Link>
                             )}
 
-                            {/* Buy Tickets Button - Show only for TICKETED events */}
+                            {/* Fundraiser Image - Show for ticketed fundraiser/charity events (replaces both Buy Tickets and Make a Donation buttons) */}
+                            {isTicketedFundraiser && (
+                            <Link
+                                href={`/events/${event.id}/donation-checkout`}
+                              className={`transition-transform hover:scale-105 ${isPast ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
+                                title="Buy Tickets"
+                            >
+                              <img
+                                src="/images/buy_tickets_click_here_fundraiser.png"
+                                alt="Buy Tickets"
+                                className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
+                              />
+                            </Link>
+                            )}
+
+                            {/* Buy Tickets Button - Show only for TICKETED events (not fundraiser) */}
                             {showBuyTicketsButton && (
                             <Link
                                 href={
@@ -1110,6 +1132,23 @@ export default function EventsPage() {
                                 className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
                               />
                             </Link>
+                            )}
+
+                            {/* Make a Donation Button - Show for donation-based events (not ticketed fundraiser) */}
+                            {showDonationButton && (
+                              <Link
+                                href={`/events/${event.id}/donation`}
+                                className="flex-shrink-0 h-14 rounded-xl bg-teal-100 hover:bg-teal-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                                title="Make a Donation"
+                                aria-label="Make a Donation"
+                              >
+                                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
+                                  <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                  </svg>
+                                </div>
+                                <span className="font-semibold text-teal-700">Make a Donation</span>
+                              </Link>
                             )}
                           </div>
                         );
@@ -1367,10 +1406,16 @@ export default function EventsPage() {
                           const isFuture = eventDateStr > todayStr;
                           const isUpcomingLocal = isToday || isFuture;
 
+                          // Check if event is ticketed fundraiser/charity (shows special fundraiser image)
+                          const isTicketedFundraiser = isTicketedFundraiserEvent(event) && isUpcomingLocal;
                           // Only show Buy Tickets image for TICKETED events (case-insensitive check)
-                          const showBuyTicketsButton = event.admissionType?.toUpperCase() === 'TICKETED' && isUpcomingLocal;
+                          // BUT NOT if it's a ticketed fundraiser (use fundraiser image instead)
+                          const showBuyTicketsButton = event.admissionType?.toUpperCase() === 'TICKETED' && isUpcomingLocal && !isTicketedFundraiser;
+                          // Show Make a Donation button for donation-based events
+                          // BUT NOT if it's a ticketed fundraiser (use fundraiser image instead)
+                          const showDonationButton = isDonationBasedEvent(event) && isUpcomingLocal && !isTicketedFundraiser;
 
-                          if (!showBuyTicketsButton) return null;
+                          if (!showBuyTicketsButton && !showDonationButton && !isTicketedFundraiser) return null;
 
                           // Route to manual checkout if manual payment is enabled, otherwise Stripe checkout (latest)
                           const checkoutRoute =
@@ -1380,18 +1425,52 @@ export default function EventsPage() {
                               : `/events/${event.id}/checkout`;
 
                           return (
-                            <Link
-                              href={checkoutRoute}
-                              className="transition-transform hover:scale-105"
-                              title="Buy Tickets"
-                              aria-label="Buy Tickets"
-                            >
-                              <img
-                                alt="Buy Tickets"
-                                className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
-                                src="/images/buy_tickets_click_here_red.webp"
-                              />
-                            </Link>
+                            <div className="flex flex-col gap-2">
+                              {/* Fundraiser Image - Show for ticketed fundraiser/charity events (replaces both Buy Tickets and Make a Donation buttons) */}
+                              {isTicketedFundraiser && (
+                                <Link
+                                  href={`/events/${event.id}/donation-checkout`}
+                                  className="transition-transform hover:scale-105"
+                                  title="Buy Tickets"
+                                  aria-label="Buy Tickets"
+                                >
+                                  <img
+                                    alt="Buy Tickets"
+                                    className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
+                                    src="/images/buy_tickets_click_here_fundraiser.png"
+                                  />
+                                </Link>
+                              )}
+                              {showBuyTicketsButton && (
+                                <Link
+                                  href={checkoutRoute}
+                                  className="transition-transform hover:scale-105"
+                                  title="Buy Tickets"
+                                  aria-label="Buy Tickets"
+                                >
+                                  <img
+                                    alt="Buy Tickets"
+                                    className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
+                                    src="/images/buy_tickets_click_here_red.webp"
+                                  />
+                                </Link>
+                              )}
+                              {showDonationButton && (
+                                <Link
+                                  href={`/events/${event.id}/donation`}
+                                  className="flex-shrink-0 h-14 rounded-xl bg-teal-100 hover:bg-teal-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                                  title="Make a Donation"
+                                  aria-label="Make a Donation"
+                                >
+                                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
+                                    <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                  </div>
+                                  <span className="font-semibold text-teal-700">Make a Donation</span>
+                                </Link>
+                              )}
+                            </div>
                           );
                         })()}
                       </div>

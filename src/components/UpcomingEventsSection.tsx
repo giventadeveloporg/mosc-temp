@@ -6,6 +6,7 @@ import Image from 'next/image';
 import type { EventWithMedia, EventDetailsDTO } from "@/types";
 import { formatInTimeZone } from 'date-fns-tz';
 import { isRecurringEvent, getNextOccurrenceDate } from '@/lib/eventUtils';
+import { isDonationBasedEvent, isTicketedFundraiserEvent } from '@/lib/donation/utils';
 
 // Component to handle event image loading errors and hide container when image fails
 function EventImageWithErrorHandling({
@@ -619,12 +620,36 @@ const UpcomingEventsSection: React.FC = () => {
                           </Link>
                         )}
 
+                        {/* Fundraiser Image - Show for ticketed fundraiser/charity events (replaces Buy Tickets button) */}
+                        {isUpcomingEvents && isTicketedFundraiserEvent(event) && (
+                          <Link
+                            href={`/events/${event.id}/donation-checkout`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="transition-transform hover:scale-105 inline-block"
+                            title="Buy Tickets"
+                            aria-label="Buy Tickets"
+                          >
+                            <img
+                              src="/images/buy_tickets_click_here_fundraiser.png"
+                              alt="Buy Tickets"
+                              className="object-contain"
+                              style={{
+                                width: '200px',
+                                height: '70px'
+                              }}
+                            />
+                          </Link>
+                        )}
+
                         {/* Buy Tickets Button - Only for TICKETED events and upcoming events (case-insensitive) */}
-                        {isUpcomingEvents && event.admissionType?.toUpperCase() === 'TICKETED' && (
+                        {/* BUT NOT if it's a ticketed fundraiser (use fundraiser image instead) */}
+                        {isUpcomingEvents && event.admissionType?.toUpperCase() === 'TICKETED' && !isTicketedFundraiserEvent(event) && (
                           <Link
                             href={`/events/${event.id}/checkout`}
                             onClick={(e) => e.stopPropagation()}
                             className="transition-transform hover:scale-105 inline-block"
+                            title="Buy Tickets"
+                            aria-label="Buy Tickets"
                           >
                             <img
                               src="/images/buy_tickets_click_here_red.webp"
@@ -635,6 +660,24 @@ const UpcomingEventsSection: React.FC = () => {
                                 height: '70px'
                               }}
                             />
+                          </Link>
+                        )}
+
+                        {/* Make a Donation Button - Show for donation-based events (not ticketed fundraiser) */}
+                        {isUpcomingEvents && isDonationBasedEvent(event) && !isTicketedFundraiserEvent(event) && (
+                          <Link
+                            href={`/events/${event.id}/donation`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="flex-shrink-0 h-14 rounded-xl bg-teal-100 hover:bg-teal-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                            title="Make a Donation"
+                            aria-label="Make a Donation"
+                          >
+                            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
+                              <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                            </div>
+                            <span className="font-semibold text-teal-700">Make a Donation</span>
                           </Link>
                         )}
                       </div>
