@@ -57,11 +57,22 @@ const DynamicHeroImage: React.FC<{
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [dynamicImages, setDynamicImages] = useState<string[]>([]);
   const [upcomingEvents, setUpcomingEvents] = useState<EventWithMediaExtended[]>([]);
+  const [imageDurations, setImageDurations] = useState<number[]>([]); // Duration in milliseconds for each image
   const [isInitialized, setIsInitialized] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isTouched, setIsTouched] = useState(false);
   const touchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  const rotationTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  // Ref to store latest durations array to avoid stale closures
+  const imageDurationsRef = React.useRef<number[]>([]);
+  // Refs to store latest arrays to avoid stale closures in recursive function
+  const dynamicImagesRef = React.useRef<string[]>([]);
+  const upcomingEventsRef = React.useRef<EventWithMediaExtended[]>([]);
+  // Ref to store latest isPaused state to avoid stale closures
+  const isPausedRef = React.useRef<boolean>(false);
+  // Ref to track the last scheduled image index to prevent duplicate scheduling
+  const lastScheduledIndexRef = React.useRef<number | null>(null);
 
   const { filteredEvents, isLoading: eventsLoading, error } = useFilteredEvents('hero');
 
@@ -79,6 +90,7 @@ const DynamicHeroImage: React.FC<{
       try {
         const imageUrls: string[] = [];
         const processedEvents: EventWithMediaExtended[] = [];
+        const durations: number[] = []; // Duration in milliseconds for each image
 
         if (filteredEvents && filteredEvents.length > 0) {
           const today = new Date();
@@ -89,11 +101,19 @@ const DynamicHeroImage: React.FC<{
           const recurringSeriesMap = new Map<number, EventWithMediaExtended>();
 
           filteredEvents.forEach(({ event, media }) => {
+            // Extract duration from media (convert seconds to milliseconds, default to 8000ms if null)
+            const durationSeconds = media.homePageHeroDisplayDurationSeconds;
+            const durationMs = durationSeconds != null && durationSeconds > 0 
+              ? Math.max(1000, Math.min(600000, durationSeconds * 1000)) // Clamp 1s-10min in ms
+              : 8000; // Default 8 seconds in milliseconds
+
             const eventWithMedia: EventWithMediaExtended = {
               ...event,
               thumbnailUrl: media.fileUrl,
-              media: [media]
-            };
+              media: [media],
+              // Store duration for later use when building imageUrls array
+              heroDisplayDurationMs: durationMs
+            } as EventWithMediaExtended & { heroDisplayDurationMs: number };
 
             if (isRecurringEvent(event)) {
               const seriesId = event.recurrenceSeriesId || event.parentEventId || event.id;
@@ -125,25 +145,41 @@ const DynamicHeroImage: React.FC<{
             return new Date(a.startDate).getTime() - new Date(b.startDate).getTime();
           });
 
-          // Add event images
-          processedEvents.forEach(e => {
+          // Add event images and their durations
+          processedEvents.forEach((e, index) => {
             if (e.thumbnailUrl) {
               imageUrls.push(e.thumbnailUrl);
+              // Get duration from event (stored in heroDisplayDurationMs property)
+              const eventDuration = (e as any).heroDisplayDurationMs || 8000; // Default 8 seconds
+              durations.push(eventDuration);
+              console.log(`[HeroSection] Event ${index + 1} duration: ${eventDuration}ms (${eventDuration / 1000}s)`, {
+                eventId: e.id,
+                eventTitle: e.title,
+                durationSeconds: (e as any).heroDisplayDurationMs ? (e as any).heroDisplayDurationMs / 1000 : null,
+                mediaDurationSeconds: e.media?.[0]?.homePageHeroDisplayDurationSeconds
+              });
             }
           });
         }
 
-        // ALWAYS add default image at the end of the rotation
+        // ALWAYS add default image at the end of the rotation (use default 8 seconds)
         imageUrls.push(defaultImage);
+        durations.push(8000); // Default image uses default 8 seconds
 
         console.log('[HeroSection] Image rotation initialized:', {
           totalImages: imageUrls.length,
           eventImages: imageUrls.length - 1,
-          hasDefaultImage: true
+          hasDefaultImage: true,
+          durations: durations.map(d => `${d}ms (${d / 1000}s)`)
         });
 
         setUpcomingEvents(processedEvents);
         setDynamicImages(imageUrls);
+        setImageDurations(durations); // Set the durations array
+        // Store in refs for latest access in recursive rotation function
+        imageDurationsRef.current = durations;
+        dynamicImagesRef.current = imageUrls;
+        upcomingEventsRef.current = processedEvents;
         setIsInitialized(true);
 
         // Set initial event (first event or null if only default image)
@@ -164,64 +200,210 @@ const DynamicHeroImage: React.FC<{
     }
   }, [filteredEvents, eventsLoading, error]);
 
-  // Image rotation effect - continuous loop (pauses when isPaused is true)
+  // Update refs whenever state changes to avoid stale closures
   useEffect(() => {
-    // Don't start rotation until initialized and we have at least 2 images
-    if (!isInitialized || dynamicImages.length < 2 || isPaused) {
-      console.log('[HeroSection] Rotation not started:', { isInitialized, imageCount: dynamicImages.length, isPaused });
+    imageDurationsRef.current = imageDurations;
+  }, [imageDurations]);
+  
+  useEffect(() => {
+    dynamicImagesRef.current = dynamicImages;
+  }, [dynamicImages]);
+  
+  useEffect(() => {
+    upcomingEventsRef.current = upcomingEvents;
+  }, [upcomingEvents]);
+  
+  useEffect(() => {
+    isPausedRef.current = isPaused;
+  }, [isPaused]);
+
+  // Store scheduleNextRotation in a ref to avoid dependency issues
+  const scheduleNextRotationRef = React.useRef<((imageIndex: number) => void) | null>(null);
+
+  // Shared recursive function to rotate to next image with dynamic duration
+  // Use refs to access the latest arrays to avoid stale closures
+  // This function is used both by the rotation effect and manual navigation
+  const scheduleNextRotation = React.useCallback((imageIndex: number) => {
+    // CRITICAL: Prevent duplicate scheduling for the same image index
+    if (lastScheduledIndexRef.current === imageIndex && rotationTimeoutRef.current !== null) {
+      console.log('[HeroSection] Duplicate schedule prevented for index', imageIndex);
       return;
     }
 
-    console.log('[HeroSection] Starting image rotation with', dynamicImages.length, 'images');
+    // CRITICAL: Clear any existing timeout before scheduling a new one to prevent duplicates
+    if (rotationTimeoutRef.current) {
+      clearTimeout(rotationTimeoutRef.current);
+      rotationTimeoutRef.current = null;
+    }
 
-    const rotationInterval = 8000; // 8 seconds per image
-    const transitionDuration = 400; // 400ms fade transition
+    // Don't schedule if paused or not initialized - use refs to get latest values
+    if (isPausedRef.current || !isInitialized) {
+      lastScheduledIndexRef.current = null;
+      return;
+    }
 
-    const interval = setInterval(() => {
+    // Mark this index as scheduled
+    lastScheduledIndexRef.current = imageIndex;
+
+    // CRITICAL: Access all arrays from refs to get the latest values, not from closure
+    const currentDurations = imageDurationsRef.current;
+    const currentImages = dynamicImagesRef.current;
+    const currentEvents = upcomingEventsRef.current;
+    
+    // Safety check
+    if (!currentImages || currentImages.length < 2) {
+      return;
+    }
+    
+    // Get duration for the specified image (default to 8 seconds if not available)
+    const imageDuration = (currentDurations && currentDurations[imageIndex]) ? currentDurations[imageIndex] : 8000;
+    
+    console.log('[HeroSection] Scheduling next rotation:', {
+      currentIndex: imageIndex,
+      currentDurationMs: imageDuration,
+      currentDurationSec: imageDuration / 1000,
+      totalImages: currentImages.length,
+      imageUrl: currentImages[imageIndex] || 'default',
+      durationsArray: currentDurations,
+      durationsArrayLength: currentDurations?.length
+    });
+
+    rotationTimeoutRef.current = setTimeout(() => {
+      // Clear the scheduled index ref when timeout executes
+      lastScheduledIndexRef.current = null;
+      
       setIsTransitioning(true);
 
       setTimeout(() => {
         setCurrentImageIndex((prevIndex) => {
-          const nextIndex = (prevIndex + 1) % dynamicImages.length;
+          // CRITICAL: Get latest arrays from refs, not closure
+          const latestDurations = imageDurationsRef.current;
+          const latestImages = dynamicImagesRef.current;
+          const latestEvents = upcomingEventsRef.current;
+          
+          const nextIndex = (prevIndex + 1) % latestImages.length;
+          const nextDuration = (latestDurations && latestDurations[nextIndex]) ? latestDurations[nextIndex] : 8000;
 
-          console.log('[HeroSection] Rotating to image', nextIndex + 1, 'of', dynamicImages.length);
+          console.log('[HeroSection] Rotating to image', nextIndex + 1, 'of', latestImages.length, {
+            previousIndex: prevIndex,
+            nextIndex,
+            nextDurationMs: nextDuration,
+            nextDurationSec: nextDuration / 1000,
+            nextImageUrl: latestImages[nextIndex] || 'default',
+            durationsArray: latestDurations,
+            durationsArrayLength: latestDurations?.length
+          });
 
           // Update current event based on new index
           // The last image is always the default image (no event)
-          if (nextIndex < upcomingEvents.length && onEventChangeRef.current) {
-            onEventChangeRef.current(upcomingEvents[nextIndex]);
+          if (nextIndex < latestEvents.length && onEventChangeRef.current) {
+            onEventChangeRef.current(latestEvents[nextIndex]);
           } else if (onEventChangeRef.current) {
             // Default image - no event associated
             onEventChangeRef.current(null);
           }
+
+          // Schedule next rotation with the new image's duration (use nextIndex)
+          // Access latest arrays from refs in the next schedule call
+          // Use ref to check pause state to avoid stale closure
+          // Use the ref to call the function to avoid closure issues
+          // Schedule after a small delay to ensure state update completes
+          setTimeout(() => {
+            if (!isPausedRef.current && scheduleNextRotationRef.current) {
+              scheduleNextRotationRef.current(nextIndex);
+            }
+          }, 10);
 
           return nextIndex;
         });
 
         // Remove transition class after image changes
         setTimeout(() => setIsTransitioning(false), 50);
-      }, transitionDuration);
-    }, rotationInterval);
+      }, 400);
+    }, imageDuration);
+  }, [isInitialized]);
+
+  // Update the ref whenever the function changes
+  useEffect(() => {
+    scheduleNextRotationRef.current = scheduleNextRotation;
+  }, [scheduleNextRotation]);
+
+  // Image rotation effect - continuous loop with per-image durations (pauses when isPaused is true)
+  useEffect(() => {
+    // Don't start rotation until initialized and we have at least 2 images
+    if (!isInitialized || dynamicImages.length < 2 || isPaused) {
+      console.log('[HeroSection] Rotation not started:', { isInitialized, imageCount: dynamicImages.length, isPaused });
+      // Clear any existing timeout when paused
+      if (rotationTimeoutRef.current) {
+        clearTimeout(rotationTimeoutRef.current);
+        rotationTimeoutRef.current = null;
+      }
+      return;
+    }
+
+    console.log('[HeroSection] Starting image rotation with', dynamicImages.length, 'images');
+    console.log('[HeroSection] Image durations:', imageDurations.map((d, i) => `Image ${i + 1}: ${d}ms (${d / 1000}s)`));
+
+    // CRITICAL: Clear any existing timeout before starting new rotation to prevent duplicates
+    if (rotationTimeoutRef.current) {
+      clearTimeout(rotationTimeoutRef.current);
+      rotationTimeoutRef.current = null;
+    }
+
+    // Reset the scheduled index guard when starting fresh rotation
+    lastScheduledIndexRef.current = null;
+
+    // Start the rotation cycle with the current image index (0 for first image)
+    // Use the ref to call the function to avoid dependency issues
+    // Use setTimeout to ensure this runs after any pending state updates
+    setTimeout(() => {
+      if (scheduleNextRotationRef.current && !isPausedRef.current) {
+        scheduleNextRotationRef.current(currentImageIndex);
+      }
+    }, 0);
 
     return () => {
-      console.log('[HeroSection] Cleaning up rotation interval');
-      clearInterval(interval);
+      console.log('[HeroSection] Cleaning up rotation timeout');
+      if (rotationTimeoutRef.current) {
+        clearTimeout(rotationTimeoutRef.current);
+        rotationTimeoutRef.current = null;
+      }
+      lastScheduledIndexRef.current = null;
     };
   }, [isInitialized, dynamicImages.length, upcomingEvents.length, isPaused]);
 
   // Navigation functions
   const goToPrevious = () => {
+    // Clear existing rotation timeout when manually navigating
+    if (rotationTimeoutRef.current) {
+      clearTimeout(rotationTimeoutRef.current);
+      rotationTimeoutRef.current = null;
+    }
+    lastScheduledIndexRef.current = null;
+
     setIsTransitioning(true);
     setTimeout(() => {
       setCurrentImageIndex((prevIndex) => {
-        const newIndex = (prevIndex - 1 + dynamicImages.length) % dynamicImages.length;
+        // Use refs to get latest arrays
+        const latestImages = dynamicImagesRef.current;
+        const latestEvents = upcomingEventsRef.current;
+        
+        const newIndex = (prevIndex - 1 + latestImages.length) % latestImages.length;
         
         // Update current event
-        if (newIndex < upcomingEvents.length && onEventChangeRef.current) {
-          onEventChangeRef.current(upcomingEvents[newIndex]);
+        if (newIndex < latestEvents.length && onEventChangeRef.current) {
+          onEventChangeRef.current(latestEvents[newIndex]);
         } else if (onEventChangeRef.current) {
           onEventChangeRef.current(null);
         }
+        
+        // Restart rotation from new index after navigation completes
+        // Use ref to call the function to avoid closure issues
+        setTimeout(() => {
+          if (scheduleNextRotationRef.current) {
+            scheduleNextRotationRef.current(newIndex);
+          }
+        }, 100);
         
         return newIndex;
       });
@@ -230,17 +412,36 @@ const DynamicHeroImage: React.FC<{
   };
 
   const goToNext = () => {
+    // Clear existing rotation timeout when manually navigating
+    if (rotationTimeoutRef.current) {
+      clearTimeout(rotationTimeoutRef.current);
+      rotationTimeoutRef.current = null;
+    }
+    lastScheduledIndexRef.current = null;
+
     setIsTransitioning(true);
     setTimeout(() => {
       setCurrentImageIndex((prevIndex) => {
-        const nextIndex = (prevIndex + 1) % dynamicImages.length;
+        // Use refs to get latest arrays
+        const latestImages = dynamicImagesRef.current;
+        const latestEvents = upcomingEventsRef.current;
+        
+        const nextIndex = (prevIndex + 1) % latestImages.length;
         
         // Update current event
-        if (nextIndex < upcomingEvents.length && onEventChangeRef.current) {
-          onEventChangeRef.current(upcomingEvents[nextIndex]);
+        if (nextIndex < latestEvents.length && onEventChangeRef.current) {
+          onEventChangeRef.current(latestEvents[nextIndex]);
         } else if (onEventChangeRef.current) {
           onEventChangeRef.current(null);
         }
+        
+        // Restart rotation from new index after navigation completes
+        // Use ref to call the function to avoid closure issues
+        setTimeout(() => {
+          if (scheduleNextRotationRef.current) {
+            scheduleNextRotationRef.current(nextIndex);
+          }
+        }, 100);
         
         return nextIndex;
       });

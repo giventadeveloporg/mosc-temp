@@ -284,10 +284,16 @@ setDynamicImages(imageUrls);
 
 ### **Rotation Timing**
 - **Default Image Duration**: 2000ms (2 seconds) - shown before rotation starts
-- **Rotation Interval**: 8000ms (8 seconds) - time between image changes (updated from 15 seconds)
+- **Default Rotation Interval**: 8000ms (8 seconds) - default time between image changes (used when `home_page_hero_display_duration_seconds` is NULL)
 - **Rotation Start Delay**: 2000ms (2 seconds) - delay before first rotation after default image
-- **Pause State**: When `isPaused === true`, rotation interval is not created (auto-rotation stops)
-- **Resume State**: When `isPaused === false`, rotation interval resumes automatically
+- **Pause State**: When `isPaused === true`, rotation timeout is not created (auto-rotation stops)
+- **Resume State**: When `isPaused === false`, rotation timeout resumes automatically
+- **Per-Image Duration (CRITICAL)**: `event_media.home_page_hero_display_duration_seconds` (int4, nullable). 
+  - **When set (1–600 seconds)**: Use the specified duration for that specific hero image
+  - **When `NULL`**: Use default 8 seconds (8000ms)
+  - **Implementation**: Each image in the rotation array has a corresponding duration in `imageDurations` array
+  - **Access Pattern**: Always access durations from `imageDurationsRef.current[imageIndex]` to avoid stale closures
+  - **See**: [`documentation/INTEGRATION_PROMPT_HOME_PAGE_HERO_DISPLAY_DURATION.md`](mdc:documentation/INTEGRATION_PROMPT_HOME_PAGE_HERO_DISPLAY_DURATION.md)
 
 ### **State Management**
 - **`currentImageIndex`**: Tracks which image in the array is currently displayed (0-based)
@@ -323,6 +329,363 @@ setCurrentImageIndex((prev) => {
 - **Event Images**: When `currentImageIndex < eventImageCount`, set `currentEvent` to `upcomingEvents[newIndex]`
 - **Fallback Image**: When showing fallback (last image in array), set `currentEvent` to `null`
 - **Overlay Display**: Overlay buttons are shown/hidden based on `currentEvent` state
+
+## **Preventing Duplicate Rotations and Stale Closures**
+
+### **Problem Solved**
+- **Duplicate Rotations**: Prevents multiple timeouts from being created simultaneously, causing images to flash or skip
+- **Stale Closures**: Ensures rotation function always accesses the latest state values, not outdated closure values
+- **Missing Images**: Prevents images from being skipped due to premature effect restarts
+- **Flickering**: Eliminates visual flickering caused by duplicate state updates
+
+### **Critical Implementation Pattern**
+
+#### **1. Use Refs for Latest State Values**
+```typescript
+// ✅ DO: Store latest state values in refs to avoid stale closures
+const imageDurationsRef = React.useRef<number[]>([]);
+const dynamicImagesRef = React.useRef<string[]>([]);
+const upcomingEventsRef = React.useRef<EventWithMediaExtended[]>([]);
+const isPausedRef = React.useRef<boolean>(false);
+const rotationTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+const lastScheduledIndexRef = React.useRef<number | null>(null);
+
+// Update refs whenever state changes
+useEffect(() => {
+  imageDurationsRef.current = imageDurations;
+}, [imageDurations]);
+
+useEffect(() => {
+  dynamicImagesRef.current = dynamicImages;
+}, [dynamicImages]);
+
+useEffect(() => {
+  upcomingEventsRef.current = upcomingEvents;
+}, [upcomingEvents]);
+
+useEffect(() => {
+  isPausedRef.current = isPaused;
+}, [isPaused]);
+```
+
+#### **2. Store Rotation Function in Ref**
+```typescript
+// ✅ DO: Store scheduleNextRotation in a ref to avoid dependency issues
+const scheduleNextRotationRef = React.useRef<((imageIndex: number) => void) | null>(null);
+
+const scheduleNextRotation = React.useCallback((imageIndex: number) => {
+  // Function implementation...
+}, [isInitialized]);
+
+// Update ref whenever function changes
+useEffect(() => {
+  scheduleNextRotationRef.current = scheduleNextRotation;
+}, [scheduleNextRotation]);
+```
+
+#### **3. Prevent Duplicate Scheduling**
+```typescript
+// ✅ DO: Prevent duplicate scheduling for the same image index
+const scheduleNextRotation = React.useCallback((imageIndex: number) => {
+  // CRITICAL: Prevent duplicate scheduling for the same image index
+  if (lastScheduledIndexRef.current === imageIndex && rotationTimeoutRef.current !== null) {
+    console.log('[HeroSection] Duplicate schedule prevented for index', imageIndex);
+    return;
+  }
+
+  // CRITICAL: Clear any existing timeout before scheduling a new one
+  if (rotationTimeoutRef.current) {
+    clearTimeout(rotationTimeoutRef.current);
+    rotationTimeoutRef.current = null;
+  }
+
+  // Mark this index as scheduled
+  lastScheduledIndexRef.current = imageIndex;
+
+  // Don't schedule if paused or not initialized - use refs to get latest values
+  if (isPausedRef.current || !isInitialized) {
+    lastScheduledIndexRef.current = null;
+    return;
+  }
+
+  // Access latest arrays from refs (not from closure)
+  const currentDurations = imageDurationsRef.current;
+  const currentImages = dynamicImagesRef.current;
+  const currentEvents = upcomingEventsRef.current;
+
+  // Get duration for the specified image (default to 8 seconds if not available)
+  const imageDuration = (currentDurations && currentDurations[imageIndex]) 
+    ? currentDurations[imageIndex] 
+    : 8000;
+
+  // Schedule timeout with per-image duration
+  rotationTimeoutRef.current = setTimeout(() => {
+    // Clear the scheduled index ref when timeout executes
+    lastScheduledIndexRef.current = null;
+    
+    setIsTransitioning(true);
+
+    setTimeout(() => {
+      setCurrentImageIndex((prevIndex) => {
+        // Access latest arrays from refs (not from closure)
+        const latestDurations = imageDurationsRef.current;
+        const latestImages = dynamicImagesRef.current;
+        const latestEvents = upcomingEventsRef.current;
+        
+        const nextIndex = (prevIndex + 1) % latestImages.length;
+        const nextDuration = (latestDurations && latestDurations[nextIndex]) 
+          ? latestDurations[nextIndex] 
+          : 8000;
+
+        // Update current event based on new index
+        if (nextIndex < latestEvents.length && onEventChangeRef.current) {
+          onEventChangeRef.current(latestEvents[nextIndex]);
+        } else if (onEventChangeRef.current) {
+          onEventChangeRef.current(null);
+        }
+
+        // Schedule next rotation with the new image's duration
+        // Use setTimeout to ensure state update completes before scheduling
+        setTimeout(() => {
+          if (!isPausedRef.current && scheduleNextRotationRef.current) {
+            scheduleNextRotationRef.current(nextIndex);
+          }
+        }, 10);
+
+        return nextIndex;
+      });
+
+      setTimeout(() => setIsTransitioning(false), 50);
+    }, 400);
+  }, imageDuration);
+}, [isInitialized]);
+```
+
+#### **4. Rotation Effect Without scheduleNextRotation in Dependencies**
+```typescript
+// ✅ DO: Remove scheduleNextRotation from effect dependencies
+useEffect(() => {
+  // Don't start rotation until initialized and we have at least 2 images
+  if (!isInitialized || dynamicImages.length < 2 || isPaused) {
+    // Clear any existing timeout when paused
+    if (rotationTimeoutRef.current) {
+      clearTimeout(rotationTimeoutRef.current);
+      rotationTimeoutRef.current = null;
+    }
+    lastScheduledIndexRef.current = null;
+    return;
+  }
+
+  // CRITICAL: Clear any existing timeout before starting new rotation
+  if (rotationTimeoutRef.current) {
+    clearTimeout(rotationTimeoutRef.current);
+    rotationTimeoutRef.current = null;
+  }
+
+  // Reset the scheduled index guard when starting fresh rotation
+  lastScheduledIndexRef.current = null;
+
+  // Start the rotation cycle with the current image index
+  // Use the ref to call the function to avoid dependency issues
+  setTimeout(() => {
+    if (scheduleNextRotationRef.current && !isPausedRef.current) {
+      scheduleNextRotationRef.current(currentImageIndex);
+    }
+  }, 0);
+
+  return () => {
+    if (rotationTimeoutRef.current) {
+      clearTimeout(rotationTimeoutRef.current);
+      rotationTimeoutRef.current = null;
+    }
+    lastScheduledIndexRef.current = null;
+  };
+}, [isInitialized, dynamicImages.length, upcomingEvents.length, isPaused]);
+// ❌ DON'T: Include scheduleNextRotation in dependencies - causes duplicate rotations
+```
+
+#### **5. Manual Navigation Functions**
+```typescript
+// ✅ DO: Clear timeout and reset guard when manually navigating
+const goToPrevious = () => {
+  // Clear existing rotation timeout when manually navigating
+  if (rotationTimeoutRef.current) {
+    clearTimeout(rotationTimeoutRef.current);
+    rotationTimeoutRef.current = null;
+  }
+  lastScheduledIndexRef.current = null;
+
+  setIsTransitioning(true);
+  setTimeout(() => {
+    setCurrentImageIndex((prevIndex) => {
+      const latestImages = dynamicImagesRef.current;
+      const latestEvents = upcomingEventsRef.current;
+      const newIndex = (prevIndex - 1 + latestImages.length) % latestImages.length;
+
+      if (newIndex < latestEvents.length && onEventChangeRef.current) {
+        onEventChangeRef.current(latestEvents[newIndex]);
+      } else if (onEventChangeRef.current) {
+        onEventChangeRef.current(null);
+      }
+
+      // Restart rotation from new index after navigation completes
+      setTimeout(() => {
+        if (scheduleNextRotationRef.current) {
+          scheduleNextRotationRef.current(newIndex);
+        }
+      }, 100);
+
+      return newIndex;
+    });
+    setTimeout(() => setIsTransitioning(false), 50);
+  }, 400);
+};
+
+const goToNext = () => {
+  // Clear existing rotation timeout when manually navigating
+  if (rotationTimeoutRef.current) {
+    clearTimeout(rotationTimeoutRef.current);
+    rotationTimeoutRef.current = null;
+  }
+  lastScheduledIndexRef.current = null;
+
+  setIsTransitioning(true);
+  setTimeout(() => {
+    setCurrentImageIndex((prevIndex) => {
+      const latestImages = dynamicImagesRef.current;
+      const latestEvents = upcomingEventsRef.current;
+      const nextIndex = (prevIndex + 1) % latestImages.length;
+
+      if (nextIndex < latestEvents.length && onEventChangeRef.current) {
+        onEventChangeRef.current(latestEvents[nextIndex]);
+      } else if (onEventChangeRef.current) {
+        onEventChangeRef.current(null);
+      }
+
+      // Restart rotation from new index after navigation completes
+      setTimeout(() => {
+        if (scheduleNextRotationRef.current) {
+          scheduleNextRotationRef.current(nextIndex);
+        }
+      }, 100);
+
+      return nextIndex;
+    });
+    setTimeout(() => setIsTransitioning(false), 50);
+  }, 400);
+};
+```
+
+### **Key Requirements**
+
+#### **Required Refs**
+- **`imageDurationsRef`**: Stores latest `imageDurations` array to avoid stale closures
+- **`dynamicImagesRef`**: Stores latest `dynamicImages` array to avoid stale closures
+- **`upcomingEventsRef`**: Stores latest `upcomingEvents` array to avoid stale closures
+- **`isPausedRef`**: Stores latest `isPaused` state to avoid stale closures
+- **`rotationTimeoutRef`**: Stores current timeout ID for cleanup
+- **`lastScheduledIndexRef`**: Tracks last scheduled image index to prevent duplicates
+- **`scheduleNextRotationRef`**: Stores rotation function to avoid dependency issues
+
+#### **Required useEffect Hooks for Ref Synchronization**
+```typescript
+// ✅ DO: Keep refs synchronized with state
+useEffect(() => {
+  imageDurationsRef.current = imageDurations;
+}, [imageDurations]);
+
+useEffect(() => {
+  dynamicImagesRef.current = dynamicImages;
+}, [dynamicImages]);
+
+useEffect(() => {
+  upcomingEventsRef.current = upcomingEvents;
+}, [upcomingEvents]);
+
+useEffect(() => {
+  isPausedRef.current = isPaused;
+}, [isPaused]);
+
+useEffect(() => {
+  scheduleNextRotationRef.current = scheduleNextRotation;
+}, [scheduleNextRotation]);
+```
+
+#### **Critical Rules**
+1. **Always access arrays/states from refs inside `scheduleNextRotation`**: Use `imageDurationsRef.current`, `dynamicImagesRef.current`, `upcomingEventsRef.current`, `isPausedRef.current` instead of direct state values
+2. **Always clear timeout before scheduling new one**: Check `rotationTimeoutRef.current` and clear it before creating a new timeout
+3. **Prevent duplicate scheduling**: Check `lastScheduledIndexRef.current === imageIndex` before scheduling
+4. **Don't include `scheduleNextRotation` in effect dependencies**: Store it in a ref and call via `scheduleNextRotationRef.current`
+5. **Reset guards on cleanup**: Set `lastScheduledIndexRef.current = null` in cleanup functions
+6. **Defer next rotation scheduling**: Use `setTimeout(..., 10)` after state update to ensure it completes
+
+### **Common Anti-Patterns**
+
+```typescript
+// ❌ DON'T: Access state directly in recursive function (causes stale closures)
+const scheduleNextRotation = React.useCallback((imageIndex: number) => {
+  const duration = imageDurations[imageIndex]; // WRONG: Stale closure
+  // ...
+}, [imageDurations]); // This causes function to be recreated on every change
+
+// ❌ DON'T: Include scheduleNextRotation in effect dependencies
+useEffect(() => {
+  scheduleNextRotation(currentImageIndex);
+}, [scheduleNextRotation, currentImageIndex]); // WRONG: Causes duplicate rotations
+
+// ❌ DON'T: Schedule without clearing existing timeout
+rotationTimeoutRef.current = setTimeout(() => {
+  // WRONG: May create duplicate timeouts
+}, duration);
+
+// ❌ DON'T: Schedule immediately from state updater
+setCurrentImageIndex((prev) => {
+  scheduleNextRotation(nextIndex); // WRONG: May cause duplicate scheduling
+  return nextIndex;
+});
+```
+
+### **Best Practices**
+
+#### **DO:**
+- ✅ Always use refs (`imageDurationsRef.current`, `dynamicImagesRef.current`, etc.) inside `scheduleNextRotation`
+- ✅ Always clear existing timeout before scheduling new one
+- ✅ Check `lastScheduledIndexRef.current` to prevent duplicate scheduling
+- ✅ Store `scheduleNextRotation` in a ref and call via `scheduleNextRotationRef.current`
+- ✅ Use `setTimeout` with small delay (10ms) after state update before scheduling next rotation
+- ✅ Reset `lastScheduledIndexRef.current = null` in cleanup functions
+- ✅ Keep refs synchronized with state using dedicated `useEffect` hooks
+- ✅ Clear timeout and reset guard in manual navigation functions
+
+#### **DON'T:**
+- ❌ Access state directly in `scheduleNextRotation` (use refs instead)
+- ❌ Include `scheduleNextRotation` in effect dependency array
+- ❌ Schedule new timeout without clearing existing one
+- ❌ Skip duplicate prevention guard (`lastScheduledIndexRef`)
+- ❌ Call `scheduleNextRotation` directly from state updater (use `setTimeout` with delay)
+- ❌ Forget to reset guards in cleanup functions
+- ❌ Skip ref synchronization `useEffect` hooks
+
+### **Troubleshooting**
+
+#### **Duplicate Rotations (Images Flashing/Skipping)**
+- **Check**: Is `scheduleNextRotation` in the effect dependency array? (Should NOT be)
+- **Check**: Is `lastScheduledIndexRef` being checked before scheduling? (Should be)
+- **Check**: Is timeout being cleared before scheduling new one? (Should be)
+- **Check**: Is `scheduleNextRotationRef.current` being used instead of direct function call? (Should be)
+
+#### **Missing Images in Rotation**
+- **Check**: Are refs being updated when state changes? (Should have `useEffect` hooks)
+- **Check**: Is `scheduleNextRotation` accessing arrays from refs? (Should use `.current`)
+- **Check**: Is guard being reset on cleanup? (Should set `lastScheduledIndexRef.current = null`)
+
+#### **Stale Duration Values (All Images Using 8 Seconds)**
+- **Check**: Is `imageDurationsRef.current` being used instead of `imageDurations`? (Should use ref)
+- **Check**: Is ref being updated when `imageDurations` changes? (Should have `useEffect`)
+
+#### **Rotation Not Continuing After Manual Navigation**
+- **Check**: Is `scheduleNextRotationRef.current` being called after navigation? (Should be)
+- **Check**: Is guard being reset before calling? (Should set `lastScheduledIndexRef.current = null`)
 
 ## **Overlay Logic (Buy Tickets Click Here Image Pattern)**
 
@@ -853,7 +1216,12 @@ const DynamicHeroImage: React.FC = () => {
 ### **DO:**
 - ✅ Use `useFilteredEvents('hero')` hook for consistent event filtering
 - ✅ Always show default image for first 2 seconds
-- ✅ Use 8-second rotation interval (8000ms) - updated from 15 seconds
+- ✅ Use per-image durations from `home_page_hero_display_duration_seconds` field (default 8 seconds if NULL)
+- ✅ **Always use refs** (`imageDurationsRef.current`, `dynamicImagesRef.current`, etc.) inside `scheduleNextRotation` to avoid stale closures
+- ✅ **Always clear timeout** before scheduling new one to prevent duplicates
+- ✅ **Prevent duplicate scheduling** using `lastScheduledIndexRef` guard
+- ✅ **Store rotation function in ref** (`scheduleNextRotationRef`) and call via ref to avoid dependency issues
+- ✅ **Defer next rotation scheduling** with `setTimeout(..., 10)` after state update
 - ✅ Update `currentEvent` state when image index changes
 - ✅ Sort events by `startDate` (earliest first)
 - ✅ Handle recurring events (show only next occurrence)
@@ -863,16 +1231,23 @@ const DynamicHeroImage: React.FC = () => {
 - ✅ Check if event is upcoming (today or future) before showing overlay
 - ✅ Use image overlays (`<img>`) instead of Next.js `Image` component for overlay buttons
 - ✅ Use responsive sizing: `w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]` (matches events page)
-- ✅ Clean up intervals and timeouts in useEffect cleanup
+- ✅ Clean up timeouts in useEffect cleanup
 - ✅ Use `onClick={(e) => e.stopPropagation()}` on overlay links to prevent event bubbling
+- ✅ Keep refs synchronized with state using dedicated `useEffect` hooks
+- ✅ Reset guards (`lastScheduledIndexRef.current = null`) in cleanup functions
 
 ### **DON'T:**
 - ❌ Skip default image display (always show for 2 seconds)
-- ❌ Use different rotation intervals (always 8 seconds)
+- ❌ Use hardcoded rotation intervals (always use per-image durations from `home_page_hero_display_duration_seconds`)
+- ❌ **Access state directly in `scheduleNextRotation`** (always use refs: `imageDurationsRef.current`, `dynamicImagesRef.current`, etc.)
+- ❌ **Include `scheduleNextRotation` in effect dependency array** (store in ref instead)
+- ❌ **Schedule timeout without clearing existing one** (always clear `rotationTimeoutRef.current` first)
+- ❌ **Skip duplicate prevention guard** (always check `lastScheduledIndexRef.current`)
+- ❌ **Call `scheduleNextRotation` directly from state updater** (use `setTimeout` with delay)
 - ❌ Show multiple occurrences of same recurring event series
 - ❌ Show overlays on default or fallback images
 - ❌ Show overlays for past events (only upcoming events)
-- ❌ Forget to clean up intervals/timeouts
+- ❌ Forget to clean up timeouts
 - ❌ Use hardcoded event selection (always use `useFilteredEvents` hook)
 - ❌ Skip event sorting (always sort by startDate)
 - ❌ Use different overlay logic than events page (must match for consistency)
@@ -884,6 +1259,7 @@ const DynamicHeroImage: React.FC = () => {
 - ❌ Skip pause state in rotation effect dependencies (rotation must respect pause)
 - ❌ Forget to clean up touch timeout on unmount (prevent memory leaks)
 - ❌ Show controls permanently (only show on hover/touch)
+- ❌ Forget to reset guards in cleanup functions
 
 ## **Error Handling**
 
@@ -935,24 +1311,50 @@ if (!filteredEvents || filteredEvents.length === 0) {
 
 ## **Reference Implementations**
 
-- **HeroSection Component**: [`src/components/HeroSection.tsx`](mdc:src/components/HeroSection.tsx) - Lines 221-323 (HeroSection component with overlay logic)
-- **DynamicHeroImage Component**: [`src/components/HeroSection.tsx`](mdc:src/components/HeroSection.tsx) - Lines 52-219 (Image rotation logic)
+- **DynamicHeroImage Component (Rotation Logic)**: [`src/components/HeroSection.tsx`](mdc:src/components/HeroSection.tsx) - Lines 53-575 (Complete rotation implementation with per-image durations, refs, and duplicate prevention)
+  - **Refs Declaration**: Lines 56-70 (All refs for avoiding stale closures)
+  - **Ref Synchronization**: Lines 201-216 (useEffect hooks to keep refs updated)
+  - **scheduleNextRotation Function**: Lines 221-296 (Recursive rotation with per-image durations and duplicate prevention)
+  - **Rotation Effect**: Lines 299-324 (Main rotation effect without scheduleNextRotation in dependencies)
+  - **Manual Navigation**: Lines 327-409 (goToPrevious and goToNext with proper cleanup)
+- **HeroSection Component (Overlay Logic)**: [`src/components/HeroSection.tsx`](mdc:src/components/HeroSection.tsx) - Lines 221-323 (HeroSection component with overlay logic)
 - **Events Page Overlay Pattern**: [`src/app/events/page.tsx`](mdc:src/app/events/page.tsx) - Lines 1409-1474 (Overlay image logic - matches hero section)
 - **Event Type Detection**: [`src/lib/donation/utils.ts`](mdc:src/lib/donation/utils.ts) - `isTicketedFundraiserEvent()` function
 - **useFilteredEvents Hook**: [`src/hooks/useFilteredEvents.ts`](mdc:src/hooks/useFilteredEvents.ts) - Hero filter implementation
 - **Event Utils**: [`src/lib/eventUtils.ts`](mdc:src/lib/eventUtils.ts) - Recurring event handling (`isRecurringEvent`, `getNextOccurrenceDate`)
 - **Home Page**: [`src/app/page.tsx`](mdc:src/app/page.tsx) - Uses `<HeroSection />` component
+- **Per-Image Duration Documentation**: [`documentation/INTEGRATION_PROMPT_HOME_PAGE_HERO_DISPLAY_DURATION.md`](mdc:documentation/INTEGRATION_PROMPT_HOME_PAGE_HERO_DISPLAY_DURATION.md) - Complete specification for per-image duration feature
 - **Documentation**: [`documentation/hero-image-selection-overlay-logic.md`](mdc:documentation/hero-image-selection-overlay-logic.md) - Complete specification
 
 ## **Troubleshooting**
 
 ### **Images Not Rotating?**
 - Check that `dynamicImages.length > 0`
-- Verify `setInterval` is set to 8000ms (8 seconds) - updated from 15 seconds
-- Check that `useEffect` dependencies include `dynamicImages.length`, `upcomingEvents.length`, and `isPaused`
+- Verify `scheduleNextRotation` is being called correctly
+- Check that `useEffect` dependencies include `isInitialized`, `dynamicImages.length`, `upcomingEvents.length`, and `isPaused` (but NOT `scheduleNextRotation`)
 - Verify `isPaused` is `false` (rotation stops when paused)
-- Check that cleanup functions are properly returning cleanup callbacks
-- Verify rotation effect checks `isPaused` before creating interval
+- Check that cleanup functions are properly clearing timeouts
+- Verify rotation effect checks `isPaused` before scheduling timeout
+- Check that refs are being updated when state changes (verify `useEffect` hooks for ref synchronization)
+
+### **Duplicate Rotations (Images Flashing/Skipping)?**
+- **Check**: Is `scheduleNextRotation` in the effect dependency array? (Should NOT be - causes duplicate rotations)
+- **Check**: Is `lastScheduledIndexRef` being checked before scheduling? (Should prevent duplicates)
+- **Check**: Is timeout being cleared before scheduling new one? (Should always clear `rotationTimeoutRef.current` first)
+- **Check**: Is `scheduleNextRotationRef.current` being used instead of direct function call? (Should use ref)
+- **Check**: Are multiple timeouts being created? (Should only have one active timeout at a time)
+
+### **Missing Images in Rotation?**
+- **Check**: Are refs being updated when state changes? (Should have `useEffect` hooks for each ref)
+- **Check**: Is `scheduleNextRotation` accessing arrays from refs? (Should use `.current` not direct state)
+- **Check**: Is guard being reset on cleanup? (Should set `lastScheduledIndexRef.current = null`)
+- **Check**: Is effect restarting prematurely? (Should NOT include `currentImageIndex` in dependencies)
+
+### **All Images Using 8 Seconds (Per-Image Duration Not Working)?**
+- **Check**: Is `imageDurationsRef.current` being used instead of `imageDurations`? (Should use ref to avoid stale closure)
+- **Check**: Is ref being updated when `imageDurations` changes? (Should have `useEffect` hook)
+- **Check**: Is `imageDurations` array being populated correctly during initialization? (Should match `dynamicImages` array length)
+- **Check**: Are durations being calculated correctly from `home_page_hero_display_duration_seconds`? (Should convert seconds to milliseconds: `duration * 1000`)
 
 ### **Overlay Not Showing?**
 - Check that `currentEvent` is set correctly when image changes
@@ -976,11 +1378,13 @@ if (!filteredEvents || filteredEvents.length === 0) {
 
 ### **Rotation Timing Issues?**
 - Verify default image timer is 2000ms (2 seconds)
-- Check rotation interval is 8000ms (8 seconds) - updated from 15 seconds
+- Check per-image durations are being used (from `home_page_hero_display_duration_seconds`, default 8000ms if NULL)
 - Verify rotation start delay is 2000ms (2 seconds)
-- Check that cleanup functions are clearing timers properly
+- Check that cleanup functions are clearing timeouts properly
 - Verify `isPaused` state is included in rotation effect dependencies
 - Check that pause button correctly toggles `isPaused` state
+- Verify durations are being accessed from `imageDurationsRef.current` (not from closure)
+- Check that `imageDurations` array matches `dynamicImages` array length
 
 ## **Related Patterns**
 
@@ -993,14 +1397,17 @@ if (!filteredEvents || filteredEvents.length === 0) {
 
 **Key Pattern**: Hero section image rotation should:
 - Show default image for 2 seconds
-- Rotate through event images every 8 seconds (8000ms)
+- Rotate through event images with **per-image durations** from `home_page_hero_display_duration_seconds` (default 8 seconds if NULL)
+- **Use refs** (`imageDurationsRef.current`, `dynamicImagesRef.current`, etc.) to avoid stale closures
+- **Prevent duplicate rotations** using `lastScheduledIndexRef` guard and clearing timeouts before scheduling
+- **Store rotation function in ref** (`scheduleNextRotationRef`) to avoid dependency issues
 - Update `currentEvent` state when image changes
 - Display "Buy Tickets Click Here" image overlays based on current event type (matching events page)
 - Handle recurring events (show only next occurrence)
 - Sort events by startDate (earliest first)
 - Include fallback image at end of rotation array
 - Use `useFilteredEvents('hero')` hook for event selection
-- Clean up intervals and timeouts properly
+- Clean up timeouts properly
 - Only show overlays for upcoming events (today or future)
 - Provide interactive controls (Previous/Next/Play/Pause) for manual navigation
 - Show controls only on hover (desktop) or touch (mobile)
@@ -1009,8 +1416,10 @@ if (!filteredEvents || filteredEvents.length === 0) {
 
 **Critical Timing Values**:
 - Default image: 2000ms (2 seconds)
-- Rotation interval: 8000ms (8 seconds) - updated from 15 seconds
+- Default rotation interval: 8000ms (8 seconds) - used when `home_page_hero_display_duration_seconds` is NULL
+- Per-image duration: From `event_media.home_page_hero_display_duration_seconds` (1-600 seconds, converted to milliseconds)
 - Transition duration: 400ms (fade transition)
+- Next rotation scheduling delay: 10ms (deferred after state update)
 
 **Event Selection**:
 - Primary: `isHomePageHeroImage = true` AND `startDate >= today`

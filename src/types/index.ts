@@ -191,6 +191,11 @@ export interface EventMediaDTO {
   isHeroImage?: boolean;
   isActiveHeroImage?: boolean;
   isHomePageHeroImage: boolean;
+  /**
+   * Duration in seconds to display this image in the homepage hero slider when isHomePageHeroImage is true.
+   * Stored as total seconds (e.g. 50, 80 for 1m20s). Null = use app default (8 seconds). Valid range: 1–600.
+   */
+  homePageHeroDisplayDurationSeconds?: number | null;
   isFeaturedEventImage: boolean;
   isLiveEventImage: boolean;
   eventId?: number;
