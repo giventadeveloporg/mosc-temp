@@ -1,15 +1,16 @@
 # Hero Section Image Rotation Pattern
 
 ## **Overview**
-This rule defines the standard pattern for hero section image rotation on the home page. The pattern provides automatic rotation through event flyer images with synchronized overlay buttons, default image display, and proper event selection criteria.
+This rule defines the standard pattern for hero section image rotation on the home page. The pattern provides automatic rotation through event flyer images with synchronized overlay buttons, interactive navigation controls (Previous/Next/Play/Pause), default image display, and proper event selection criteria.
 
 ## **Problem Solved**
-- **Automatic Image Rotation**: Rotates through event hero images automatically every 15 seconds
-- **Overlay Synchronization**: Keeps overlay buttons (Buy Tickets, Register, etc.) synchronized with current event image
+- **Automatic Image Rotation**: Rotates through event hero images automatically every 8 seconds
+- **Interactive Controls**: Provides Previous/Next/Play/Pause buttons for manual navigation (shown on hover/touch)
+- **Overlay Synchronization**: Keeps overlay buttons (Buy Tickets Click Here images) synchronized with current event image
 - **Event Selection**: Only shows events that meet specific criteria (future dates, isHomePageHeroImage flag)
 - **Recurring Event Handling**: Shows only the next occurrence for recurring events
 - **Default Image Display**: Shows default image for first 2 seconds before rotation begins
-- **User Experience**: Smooth transitions between event images with proper navigation links
+- **User Experience**: Smooth transitions between event images with proper navigation links and manual control
 
 ## **Core Pattern**
 
@@ -68,6 +69,186 @@ const DynamicHeroImage: React.FC = () => {
 };
 ```
 
+## **Interactive Slider Controls (Play/Pause/Previous/Next)**
+
+### **Feature Overview**
+The hero section slider includes interactive controls that allow users to manually navigate through images and control auto-rotation. These controls appear on hover (desktop) or touch (mobile) and provide:
+- **Previous/Next Navigation**: Manual browsing through event images
+- **Play/Pause Control**: Toggle auto-rotation on/off
+- **Event Synchronization**: Current event state updates when navigating manually
+
+### **Control Visibility**
+- **Show on Hover**: Controls appear when mouse hovers over hero image
+- **Show on Touch**: Controls appear when user touches the hero image on mobile devices
+- **Auto-Hide on Touch**: Controls automatically hide after 3 seconds of no interaction on touch devices
+- **Only for Multiple Images**: Controls only appear when there are 2+ images in the rotation
+
+### **Control Buttons**
+
+**1. Previous Button (Left)**
+- **Position**: Left side of hero image
+- **Action**: Navigate to previous image in rotation
+- **Icon**: `ChevronLeft` from lucide-react
+- **Styling**: Circular white button with backdrop blur
+
+**2. Play/Pause Button (Center)** ⭐ **KEY FEATURE**
+- **Position**: Center of hero image
+- **Action**: Toggle auto-rotation on/off
+- **Icon**: `Play` when paused, `Pause` when playing
+- **Styling**: Circular white button with backdrop blur
+- **State Management**: Uses `isPaused` state to control rotation interval
+- **Behavior**: 
+  - When **paused**: Shows `Play` icon, auto-rotation stops completely
+  - When **playing**: Shows `Pause` icon, auto-rotation continues every 8 seconds
+  - Clicking toggles between states and immediately affects rotation behavior
+- **Implementation**: 
+  - `isPaused` state is included in rotation effect dependencies
+  - Rotation interval is only created when `isPaused === false`
+  - When paused, the interval is cleared and rotation stops immediately
+  - When resumed, the interval is recreated and rotation continues from current image
+
+**3. Next Button (Right)**
+- **Position**: Right side of hero image
+- **Action**: Navigate to next image in rotation
+- **Icon**: `ChevronRight` from lucide-react
+- **Styling**: Circular white button with backdrop blur
+
+### **Control Implementation**
+```tsx
+const [isPaused, setIsPaused] = useState(false);
+const [isHovered, setIsHovered] = useState(false);
+const [isTouched, setIsTouched] = useState(false);
+const touchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
+// Show controls on hover or touch
+const showControls = isHovered || isTouched;
+const hasMultipleImages = dynamicImages.length > 1;
+
+// Pause rotation when isPaused is true
+useEffect(() => {
+  if (!isInitialized || dynamicImages.length < 2 || isPaused) {
+    return; // Don't rotate if paused
+  }
+  // ... rotation interval logic
+}, [isInitialized, dynamicImages.length, upcomingEvents.length, isPaused]);
+
+// Navigation functions
+const goToPrevious = () => {
+  setIsTransitioning(true);
+  setTimeout(() => {
+    setCurrentImageIndex((prevIndex) => {
+      const newIndex = (prevIndex - 1 + dynamicImages.length) % dynamicImages.length;
+      // Update current event
+      if (newIndex < upcomingEvents.length && onEventChangeRef.current) {
+        onEventChangeRef.current(upcomingEvents[newIndex]);
+      }
+      return newIndex;
+    });
+    setTimeout(() => setIsTransitioning(false), 50);
+  }, 400);
+};
+
+const goToNext = () => {
+  setIsTransitioning(true);
+  setTimeout(() => {
+    setCurrentImageIndex((prevIndex) => {
+      const nextIndex = (prevIndex + 1) % dynamicImages.length;
+      // Update current event
+      if (nextIndex < upcomingEvents.length && onEventChangeRef.current) {
+        onEventChangeRef.current(upcomingEvents[nextIndex]);
+      }
+      return nextIndex;
+    });
+    setTimeout(() => setIsTransitioning(false), 50);
+  }, 400);
+};
+
+const togglePlayPause = () => {
+  setIsPaused((prev) => !prev);
+  // Rotation effect automatically respects isPaused state
+  // When isPaused is true, the rotation interval is not created/cleared
+};
+
+// Touch handling
+const handleTouchStart = () => {
+  setIsTouched(true);
+  if (touchTimeoutRef.current) {
+    clearTimeout(touchTimeoutRef.current);
+  }
+  touchTimeoutRef.current = setTimeout(() => {
+    setIsTouched(false);
+    touchTimeoutRef.current = null;
+  }, 3000);
+};
+
+// Render controls
+{hasMultipleImages && showControls && (
+  <div 
+    className="absolute inset-0 flex items-center justify-between px-4 z-20 pointer-events-none"
+    onTouchStart={handleTouchInteraction}
+  >
+    <button onClick={goToPrevious} className="...">
+      <ChevronLeft className="w-6 h-6" />
+    </button>
+    <button onClick={togglePlayPause} className="...">
+      {isPaused ? <Play /> : <Pause />}
+    </button>
+    <button onClick={goToNext} className="...">
+      <ChevronRight className="w-6 h-6" />
+    </button>
+  </div>
+)}
+```
+
+### **Control Styling**
+
+**Button Container:**
+- **Position**: `absolute inset-0` (covers entire hero image)
+- **Layout**: `flex items-center justify-between` (buttons on left, center, right)
+- **Padding**: `px-4` (16px horizontal padding)
+- **Z-Index**: `z-20` (above image, below modals)
+- **Pointer Events**: `pointer-events-none` on container, `pointer-events-auto` on buttons
+
+**Individual Buttons:**
+- **Size**: `w-12 h-12` (48px × 48px circular buttons)
+- **Background**: `bg-white/90` (90% opacity white with backdrop blur)
+- **Hover**: `hover:bg-white` (full white on hover)
+- **Border**: `border-2 border-gray-300 hover:border-blue-500` (2px border, blue on hover)
+- **Shadow**: `shadow-lg` (large shadow for depth)
+- **Backdrop**: `backdrop-blur-sm` (subtle blur effect)
+- **Hover Effect**: `hover:scale-110` (10% scale increase)
+- **Active Effect**: `active:scale-95` (5% scale decrease on press)
+- **Transition**: `transition-all duration-300` (smooth animations)
+
+**Icon Styling:**
+- **Size**: `w-6 h-6` (24px × 24px)
+- **Color**: `text-gray-700` (dark gray)
+- **Play Icon**: `ml-0.5` (slight left margin for visual centering)
+
+### **Touch Device Behavior**
+
+**Touch Detection:**
+- **Trigger**: `onTouchStart` on hero image container
+- **Visibility**: Controls show immediately on touch
+- **Auto-Hide**: Controls hide after 3 seconds of no interaction
+- **Reset**: Any touch interaction resets the 3-second timer
+
+**Touch Interaction:**
+- **Button Press**: Each button press resets the 3-second auto-hide timer
+- **Swipe Support**: Can be extended with swipe gestures (optional)
+- **Active State**: Buttons show `active:scale-95` for tactile feedback
+
+### **Hover Behavior (Desktop)**
+
+**Mouse Enter:**
+- **Trigger**: `onMouseEnter` on hero image container
+- **Visibility**: Controls show immediately on hover
+- **Persistence**: Controls remain visible while mouse is over image
+
+**Mouse Leave:**
+- **Trigger**: `onMouseLeave` on hero image container
+- **Visibility**: Controls hide immediately when mouse leaves
+
 ## **Key Implementation Details**
 
 ### **Event Selection Criteria**
@@ -103,8 +284,10 @@ setDynamicImages(imageUrls);
 
 ### **Rotation Timing**
 - **Default Image Duration**: 2000ms (2 seconds) - shown before rotation starts
-- **Rotation Interval**: 15000ms (15 seconds) - time between image changes
+- **Rotation Interval**: 8000ms (8 seconds) - time between image changes (updated from 15 seconds)
 - **Rotation Start Delay**: 2000ms (2 seconds) - delay before first rotation after default image
+- **Pause State**: When `isPaused === true`, rotation interval is not created (auto-rotation stops)
+- **Resume State**: When `isPaused === false`, rotation interval resumes automatically
 
 ### **State Management**
 - **`currentImageIndex`**: Tracks which image in the array is currently displayed (0-based)
@@ -141,79 +324,169 @@ setCurrentImageIndex((prev) => {
 - **Fallback Image**: When showing fallback (last image in array), set `currentEvent` to `null`
 - **Overlay Display**: Overlay buttons are shown/hidden based on `currentEvent` state
 
-## **Overlay Logic (Priority-Based System)**
+## **Overlay Logic (Buy Tickets Click Here Image Pattern)**
 
-### **Overlay Priority Order**
-1. **Buy Tickets** (Highest Priority)
-   - Condition: `admissionType?.toLowerCase().includes('ticket') || admissionType?.toLowerCase().includes('paid') || admissionType?.toLowerCase().includes('fee')`
-   - Image: `/images/buy_tickets_click_here_red.webp`
-   - Action: `/events/${event.id}/checkout` (or manual checkout if applicable)
+### **Event Type Detection (Matching Events Page Logic)**
 
-2. **Registration Required**
-   - Condition: `isRegistrationRequired === true`
-   - Image: `/images/register_here_button.png`
-   - Action: `/events/${event.id}`
+The hero section overlay uses the same event type detection logic as the events page (`/events`), ensuring consistency across the application.
 
-3. **Live Event**
-   - Condition: `isLive === true`
-   - Image: `/images/watch_live_button.png`
-   - Action: `/events/${event.id}`
+### **Overlay Display Rules**
 
-4. **Sports Event**
-   - Condition: `isSportsEvent === true`
-   - Image: `/images/sports_event_button.png`
-   - Action: `/events/${event.id}`
+**1. Ticketed Fundraiser/Charity Events** (Highest Priority)
+   - **Condition**: `isTicketedFundraiserEvent(event) === true`
+   - **Image**: `/images/buy_tickets_click_here_fundraiser.png`
+   - **Action**: `/events/${event.id}/donation-checkout`
+   - **Detection**: Event must be `admissionType === 'TICKETED'` AND `isDonationBasedEvent(event) === true`
+
+**2. Regular Ticketed Events**
+   - **Condition**: `event.admissionType?.toUpperCase() === 'TICKETED'` AND NOT a ticketed fundraiser
+   - **Image**: `/images/buy_tickets_click_here_red.webp`
+   - **Action**: 
+     - `/events/${event.id}/manual-checkout` (if `manualPaymentEnabled === true` AND `paymentFlowMode === 'MANUAL_ONLY'` or `'HYBRID'`)
+     - `/events/${event.id}/checkout` (default Stripe checkout)
+
+**3. No Overlay**
+   - **Condition**: Event is not ticketed OR event is in the past
+   - **Action**: No overlay displayed
+
+### **Upcoming Events Only**
+
+**Critical**: Overlay is only shown for **upcoming events** (today or future):
+```typescript
+// Check if event is upcoming (today or future)
+const today = new Date();
+const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+const eventDateStr = event.startDate ? event.startDate.split('T')[0] : null;
+
+if (!eventDateStr) return null; // No date = no overlay
+
+const isToday = eventDateStr === todayStr;
+const isFuture = eventDateStr > todayStr;
+const isUpcomingLocal = isToday || isFuture;
+
+if (!isUpcomingLocal) return null; // Don't show overlay for past events
+```
 
 ### **Overlay Implementation**
 ```tsx
-const getOverlayForEvent = (event: EventWithMediaExtended | null) => {
-  if (!event) return null;
+import { isTicketedFundraiserEvent } from '@/lib/donation/utils';
 
-  // Priority 1: Buy Tickets (highest priority)
-  if (event.admissionType?.toLowerCase().includes('ticket') ||
-      event.admissionType?.toLowerCase().includes('paid') ||
-      event.admissionType?.toLowerCase().includes('fee')) {
-    return { type: 'tickets', image: '/images/buy_tickets_click_here_red.webp', action: `/events/${event.id}/checkout` };
+const getOverlayInfo = (event: EventWithMediaExtended | null) => {
+  if (!event || !event.id) return null;
+
+  // Check if event is upcoming (today or future)
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  const eventDateStr = event.startDate ? event.startDate.split('T')[0] : null;
+  
+  if (!eventDateStr) return null;
+  
+  const isToday = eventDateStr === todayStr;
+  const isFuture = eventDateStr > todayStr;
+  const isUpcomingLocal = isToday || isFuture;
+
+  if (!isUpcomingLocal) return null; // Don't show overlay for past events
+
+  // Priority 1: Ticketed fundraiser/charity (shows special fundraiser image)
+  const isTicketedFundraiser = isTicketedFundraiserEvent(event);
+  
+  if (isTicketedFundraiser) {
+    return {
+      image: '/images/buy_tickets_click_here_fundraiser.png',
+      href: `/events/${event.id}/donation-checkout`,
+      alt: 'Buy Tickets'
+    };
   }
 
-  // Priority 2: Registration Required
-  if (event.isRegistrationRequired) {
-    return { type: 'registration', image: '/images/register_here_button.png', action: `/events/${event.id}` };
+  // Priority 2: Regular ticketed event
+  if (event.admissionType?.toUpperCase() === 'TICKETED') {
+    // Route to manual checkout if manual payment is enabled, otherwise Stripe checkout
+    const checkoutRoute =
+      event.manualPaymentEnabled === true &&
+      (event.paymentFlowMode === 'MANUAL_ONLY' || event.paymentFlowMode === 'HYBRID')
+        ? `/events/${event.id}/manual-checkout`
+        : `/events/${event.id}/checkout`;
+
+    return {
+      image: '/images/buy_tickets_click_here_red.webp',
+      href: checkoutRoute,
+      alt: 'Buy Tickets'
+    };
   }
 
-  // Priority 3: Live Event
-  if (event.isLive) {
-    return { type: 'live', image: '/images/watch_live_button.png', action: `/events/${event.id}` };
-  }
-
-  // Priority 4: Sports Event
-  if (event.isSportsEvent) {
-    return { type: 'sports', image: '/images/sports_event_button.png', action: `/events/${event.id}` };
-  }
-
-  return null; // No overlay
+  return null; // No overlay for non-ticketed events
 };
 
-// Render overlay
-{(() => {
-  const overlay = getOverlayForEvent(currentEvent);
-  const isShowingEventFlyer = currentImageIndex < dynamicImages.length - 1;
-  
-  return overlay && isShowingEventFlyer ? (
-    <div className="absolute bottom-4 right-4 z-10">
-      <Link href={overlay.action} className="block cursor-pointer hover:scale-105 transition-transform duration-300">
-        <Image
-          src={overlay.image}
-          alt={`${overlay.type} overlay`}
-          width={180}
-          height={90}
-          className="cursor-pointer hover:scale-105 transition-transform duration-300"
-        />
-      </Link>
-    </div>
-  ) : null;
-})()}
+// Render overlay in hero section
+const overlayInfo = getOverlayInfo(currentEvent);
+
+{overlayInfo && (
+  <div className="absolute bottom-4 right-4 z-10">
+    <Link
+      href={overlayInfo.href}
+      className="block cursor-pointer hover:scale-105 transition-transform duration-300"
+      onClick={(e) => e.stopPropagation()}
+      title={overlayInfo.alt}
+      aria-label={overlayInfo.alt}
+    >
+      <img
+        src={overlayInfo.image}
+        alt={overlayInfo.alt}
+        className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px] cursor-pointer hover:scale-105 transition-transform duration-300"
+      />
+    </Link>
+  </div>
+)}
 ```
+
+### **Image Specifications**
+
+**Regular Ticketed Events:**
+- **Image Path**: `/images/buy_tickets_click_here_red.webp`
+- **Responsive Sizing**: 
+  - Mobile: `w-[150px] h-[52px]` (150px × 52px)
+  - Desktop: `sm:w-[200px] sm:h-[70px]` (200px × 70px)
+- **Styling**: `object-contain` (maintains aspect ratio, no cropping)
+
+**Fundraiser/Charity Events:**
+- **Image Path**: `/images/buy_tickets_click_here_fundraiser.png`
+- **Responsive Sizing**: 
+  - Mobile: `w-[150px] h-[52px]` (150px × 52px)
+  - Desktop: `sm:w-[200px] sm:h-[70px]` (200px × 70px)
+- **Styling**: `object-contain` (maintains aspect ratio, no cropping)
+
+### **Positioning and Styling**
+
+**Overlay Container:**
+- **Position**: `absolute bottom-4 right-4 z-10` (bottom-right corner, 16px from edges)
+- **Z-Index**: `z-10` (above hero image, below modals)
+
+**Link Styling:**
+- **Display**: `block` (full clickable area)
+- **Hover Effect**: `hover:scale-105 transition-transform duration-300` (5% scale increase)
+- **Click Handling**: `onClick={(e) => e.stopPropagation()}` (prevents event bubbling)
+
+**Image Styling:**
+- **Object Fit**: `object-contain` (maintains aspect ratio, no cropping)
+- **Hover Effect**: `hover:scale-105 transition-transform duration-300` (matches link hover)
+- **Cursor**: `cursor-pointer` (shows pointer on hover)
+
+### **Routing Logic**
+
+**Manual Payment Checkout Route:**
+- **Condition**: `event.manualPaymentEnabled === true` AND (`event.paymentFlowMode === 'MANUAL_ONLY'` OR `event.paymentFlowMode === 'HYBRID'`)
+- **Route**: `/events/${event.id}/manual-checkout`
+- **Use Case**: Events configured for fee-free manual payments (Zelle, Venmo, etc.)
+
+**Stripe Checkout Route (Default):**
+- **Condition**: All other ticketed events
+- **Route**: `/events/${event.id}/checkout`
+- **Use Case**: Standard Stripe payment flow
+
+**Fundraiser Donation Checkout Route:**
+- **Condition**: `isTicketedFundraiserEvent(event) === true`
+- **Route**: `/events/${event.id}/donation-checkout`
+- **Use Case**: Ticketed fundraiser/charity events with Givebutter integration
 
 ## **Image Display Requirements**
 
@@ -280,6 +553,23 @@ if (dynamicImages.length > 0) {
 - **`absolute bottom-4 right-4 z-10`**: Positioned at bottom-right corner
 - **`hover:scale-105`**: 5% scale increase on hover
 - **`transition-transform duration-300`**: Smooth hover animation
+
+### **Slider Controls Container**
+- **`absolute inset-0`**: Covers entire hero image area
+- **`flex items-center justify-between`**: Horizontal layout with buttons on left, center, right
+- **`px-4`**: Horizontal padding (16px) for button spacing
+- **`z-20`**: Above image and Buy Tickets overlay (controls are interactive)
+- **`pointer-events-none`**: Container doesn't block clicks (buttons have `pointer-events-auto`)
+
+### **Control Button Styling**
+- **Size**: `w-12 h-12` (48px × 48px circular buttons)
+- **Background**: `bg-white/90` (90% opacity white)
+- **Backdrop**: `backdrop-blur-sm` (subtle blur effect)
+- **Border**: `border-2 border-gray-300 hover:border-blue-500` (2px border, blue on hover)
+- **Shadow**: `shadow-lg` (large shadow for depth)
+- **Hover**: `hover:bg-white hover:scale-110` (full white, 10% scale increase)
+- **Active**: `active:bg-white active:scale-95 active:border-blue-600` (tactile feedback on press)
+- **Transition**: `transition-all duration-300` (smooth animations)
 
 ### **See All Events Button** (Bottom Left)
 - **Position**: `absolute left-4` with `bottom: '-36px'` (outside image container)
@@ -457,16 +747,20 @@ const DynamicHeroImage: React.FC = () => {
           />
         </Link>
 
-        {/* Overlay */}
-        {overlay && isShowingEventFlyer && (
+        {/* Buy Tickets Overlay Image - Bottom Right Corner (matching events page style) */}
+        {overlayInfo && (
           <div className="absolute bottom-4 right-4 z-10">
-            <Link href={overlay.action} className="block cursor-pointer hover:scale-105 transition-transform duration-300">
-              <Image
-                src={overlay.image}
-                alt={`${overlay.type} overlay`}
-                width={180}
-                height={90}
-                className="cursor-pointer hover:scale-105 transition-transform duration-300"
+            <Link
+              href={overlayInfo.href}
+              className="block cursor-pointer hover:scale-105 transition-transform duration-300"
+              onClick={(e) => e.stopPropagation()}
+              title={overlayInfo.alt}
+              aria-label={overlayInfo.alt}
+            >
+              <img
+                src={overlayInfo.image}
+                alt={overlayInfo.alt}
+                className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px] cursor-pointer hover:scale-105 transition-transform duration-300"
               />
             </Link>
           </div>
@@ -495,17 +789,20 @@ const DynamicHeroImage: React.FC = () => {
 
 ### **Critical Timing Values**
 - **Default Image Duration**: `2000` (2 seconds) - `setTimeout(() => setIsShowingDefault(false), 2000)`
-- **Rotation Interval**: `15000` (15 seconds) - `setInterval(() => { ... }, 15000)`
+- **Rotation Interval**: `8000` (8 seconds) - `setInterval(() => { ... }, 8000)` (updated from 15 seconds)
 - **Rotation Start Delay**: `2000` (2 seconds) - `setTimeout(() => { setInterval(...) }, 2000)`
+- **Pause Control**: `isPaused` state controls whether rotation interval is active
 
 ### **Timing Flow**
 1. **0-2 seconds**: Show default image (`isShowingDefault = true`)
-2. **2 seconds**: Hide default image, start rotation timer
-3. **2-17 seconds**: Show first event image
-4. **17 seconds**: Rotate to second event image
-5. **32 seconds**: Rotate to third event image
-6. **...continues every 15 seconds...**
+2. **2 seconds**: Hide default image, start rotation timer (if `isPaused === false`)
+3. **2-10 seconds**: Show first event image (if not paused)
+4. **10 seconds**: Rotate to second event image (if not paused)
+5. **18 seconds**: Rotate to third event image (if not paused)
+6. **...continues every 8 seconds...** (if not paused)
 7. **Last image**: Fallback image (no overlay)
+8. **Pause State**: When user clicks pause, rotation stops immediately and interval is cleared
+9. **Resume State**: When user clicks play, rotation resumes and interval is recreated
 
 ## **Event Selection Rules**
 
@@ -528,38 +825,65 @@ const DynamicHeroImage: React.FC = () => {
 ## **Overlay Display Rules**
 
 ### **Overlay Priority System**
-1. **Buy Tickets** (Highest) - If `admissionType` contains "ticket", "paid", or "fee"
-2. **Registration** - If `isRegistrationRequired === true`
-3. **Live Event** - If `isLive === true`
-4. **Sports Event** - If `isSportsEvent === true`
-5. **No Overlay** - If none of the above conditions are met
+1. **Ticketed Fundraiser/Charity** (Highest Priority)
+   - Condition: `isTicketedFundraiserEvent(event) === true`
+   - Image: `/images/buy_tickets_click_here_fundraiser.png`
+   - Route: `/events/${event.id}/donation-checkout`
+
+2. **Regular Ticketed Events**
+   - Condition: `event.admissionType?.toUpperCase() === 'TICKETED'` AND NOT a ticketed fundraiser
+   - Image: `/images/buy_tickets_click_here_red.webp`
+   - Route: `/events/${event.id}/checkout` or `/events/${event.id}/manual-checkout` (if manual payment enabled)
+
+3. **No Overlay**
+   - Condition: Event is not ticketed OR event is in the past OR no event is associated with current image
 
 ### **Overlay Display Conditions**
-- **Show Overlay**: Only when `isShowingEventFlyer === true` (not showing fallback image)
-- **Hide Overlay**: When showing default image or fallback image (`currentEvent === null`)
+- **Show Overlay**: 
+  - Event is upcoming (today or future)
+  - Event is ticketed (regular or fundraiser)
+  - Current image is an event flyer (not default/fallback image)
+- **Hide Overlay**: 
+  - When showing default image or fallback image (`currentEvent === null`)
+  - When event is in the past
+  - When event is not ticketed
 
 ## **Best Practices**
 
 ### **DO:**
 - ✅ Use `useFilteredEvents('hero')` hook for consistent event filtering
 - ✅ Always show default image for first 2 seconds
-- ✅ Use 15-second rotation interval (15000ms)
+- ✅ Use 8-second rotation interval (8000ms) - updated from 15 seconds
 - ✅ Update `currentEvent` state when image index changes
 - ✅ Sort events by `startDate` (earliest first)
 - ✅ Handle recurring events (show only next occurrence)
 - ✅ Add fallback image at end of `dynamicImages` array
-- ✅ Use `getOverlayForEvent()` function for overlay logic
+- ✅ Use `getOverlayInfo()` function for overlay logic (matching events page)
+- ✅ Import `isTicketedFundraiserEvent` from `@/lib/donation/utils` for event type detection
+- ✅ Check if event is upcoming (today or future) before showing overlay
+- ✅ Use image overlays (`<img>`) instead of Next.js `Image` component for overlay buttons
+- ✅ Use responsive sizing: `w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]` (matches events page)
 - ✅ Clean up intervals and timeouts in useEffect cleanup
-- ✅ Use `isShowingEventFlyer` to determine if showing event or fallback
+- ✅ Use `onClick={(e) => e.stopPropagation()}` on overlay links to prevent event bubbling
 
 ### **DON'T:**
 - ❌ Skip default image display (always show for 2 seconds)
-- ❌ Use different rotation intervals (always 15 seconds)
+- ❌ Use different rotation intervals (always 8 seconds)
 - ❌ Show multiple occurrences of same recurring event series
 - ❌ Show overlays on default or fallback images
+- ❌ Show overlays for past events (only upcoming events)
 - ❌ Forget to clean up intervals/timeouts
 - ❌ Use hardcoded event selection (always use `useFilteredEvents` hook)
 - ❌ Skip event sorting (always sort by startDate)
+- ❌ Use different overlay logic than events page (must match for consistency)
+- ❌ Use Next.js `Image` component for overlay buttons (use `<img>` tag instead)
+- ❌ Skip upcoming event check (always verify event date is today or future)
+- ❌ Use different image paths than events page (must match exactly)
+- ❌ Show controls when there's only one image (only show for multiple images)
+- ❌ Forget to update `currentEvent` when manually navigating (Previous/Next)
+- ❌ Skip pause state in rotation effect dependencies (rotation must respect pause)
+- ❌ Forget to clean up touch timeout on unmount (prevent memory leaks)
+- ❌ Show controls permanently (only show on hover/touch)
 
 ## **Error Handling**
 
@@ -611,7 +935,10 @@ if (!filteredEvents || filteredEvents.length === 0) {
 
 ## **Reference Implementations**
 
-- **HeroSection Component**: [`src/components/HeroSection.tsx`](mdc:src/components/HeroSection.tsx) - Lines 17-376 (DynamicHeroImage component)
+- **HeroSection Component**: [`src/components/HeroSection.tsx`](mdc:src/components/HeroSection.tsx) - Lines 221-323 (HeroSection component with overlay logic)
+- **DynamicHeroImage Component**: [`src/components/HeroSection.tsx`](mdc:src/components/HeroSection.tsx) - Lines 52-219 (Image rotation logic)
+- **Events Page Overlay Pattern**: [`src/app/events/page.tsx`](mdc:src/app/events/page.tsx) - Lines 1409-1474 (Overlay image logic - matches hero section)
+- **Event Type Detection**: [`src/lib/donation/utils.ts`](mdc:src/lib/donation/utils.ts) - `isTicketedFundraiserEvent()` function
 - **useFilteredEvents Hook**: [`src/hooks/useFilteredEvents.ts`](mdc:src/hooks/useFilteredEvents.ts) - Hero filter implementation
 - **Event Utils**: [`src/lib/eventUtils.ts`](mdc:src/lib/eventUtils.ts) - Recurring event handling (`isRecurringEvent`, `getNextOccurrenceDate`)
 - **Home Page**: [`src/app/page.tsx`](mdc:src/app/page.tsx) - Uses `<HeroSection />` component
@@ -621,15 +948,20 @@ if (!filteredEvents || filteredEvents.length === 0) {
 
 ### **Images Not Rotating?**
 - Check that `dynamicImages.length > 0`
-- Verify `setInterval` is set to 15000ms (15 seconds)
-- Check that `useEffect` dependencies include `dynamicImages.length` and `upcomingEvents`
-- Verify cleanup functions are properly returning cleanup callbacks
+- Verify `setInterval` is set to 8000ms (8 seconds) - updated from 15 seconds
+- Check that `useEffect` dependencies include `dynamicImages.length`, `upcomingEvents.length`, and `isPaused`
+- Verify `isPaused` is `false` (rotation stops when paused)
+- Check that cleanup functions are properly returning cleanup callbacks
+- Verify rotation effect checks `isPaused` before creating interval
 
 ### **Overlay Not Showing?**
 - Check that `currentEvent` is set correctly when image changes
-- Verify `isShowingEventFlyer` is `true` (not showing fallback image)
-- Check that `getOverlayForEvent()` returns correct overlay for event type
-- Verify overlay priority logic (tickets > registration > live > sports)
+- Verify event is upcoming (today or future) - past events don't show overlay
+- Check that `getOverlayInfo()` returns correct overlay for event type
+- Verify event is ticketed (`admissionType === 'TICKETED'`)
+- Check that `isTicketedFundraiserEvent()` is imported and working correctly
+- Verify image paths are correct (`/images/buy_tickets_click_here_red.webp` or `/images/buy_tickets_click_here_fundraiser.png`)
+- Check browser console for image loading errors
 
 ### **Wrong Events Showing?**
 - Verify `useFilteredEvents('hero')` is filtering correctly
@@ -644,9 +976,11 @@ if (!filteredEvents || filteredEvents.length === 0) {
 
 ### **Rotation Timing Issues?**
 - Verify default image timer is 2000ms (2 seconds)
-- Check rotation interval is 15000ms (15 seconds)
+- Check rotation interval is 8000ms (8 seconds) - updated from 15 seconds
 - Verify rotation start delay is 2000ms (2 seconds)
 - Check that cleanup functions are clearing timers properly
+- Verify `isPaused` state is included in rotation effect dependencies
+- Check that pause button correctly toggles `isPaused` state
 
 ## **Related Patterns**
 
@@ -659,23 +993,380 @@ if (!filteredEvents || filteredEvents.length === 0) {
 
 **Key Pattern**: Hero section image rotation should:
 - Show default image for 2 seconds
-- Rotate through event images every 15 seconds
+- Rotate through event images every 8 seconds (8000ms)
 - Update `currentEvent` state when image changes
-- Display overlay buttons based on current event (priority: tickets > registration > live > sports)
+- Display "Buy Tickets Click Here" image overlays based on current event type (matching events page)
 - Handle recurring events (show only next occurrence)
 - Sort events by startDate (earliest first)
 - Include fallback image at end of rotation array
 - Use `useFilteredEvents('hero')` hook for event selection
 - Clean up intervals and timeouts properly
+- Only show overlays for upcoming events (today or future)
+- Provide interactive controls (Previous/Next/Play/Pause) for manual navigation
+- Show controls only on hover (desktop) or touch (mobile)
+- Pause auto-rotation when user clicks pause button
+- Update `currentEvent` when navigating manually (Previous/Next buttons)
 
 **Critical Timing Values**:
 - Default image: 2000ms (2 seconds)
-- Rotation interval: 15000ms (15 seconds)
-- Rotation start delay: 2000ms (2 seconds)
+- Rotation interval: 8000ms (8 seconds) - updated from 15 seconds
+- Transition duration: 400ms (fade transition)
 
 **Event Selection**:
 - Primary: `isHomePageHeroImage = true` AND `startDate >= today`
 - Additional: `isActive = true` AND `startDate <= oneYearFromNow`
 - Recurring: Show only next occurrence, one per series
 
+**Overlay Image Pattern**:
+- **Ticketed Fundraiser/Charity**: `/images/buy_tickets_click_here_fundraiser.png` → `/events/${event.id}/donation-checkout`
+- **Regular Ticketed**: `/images/buy_tickets_click_here_red.webp` → `/events/${event.id}/checkout` or `/events/${event.id}/manual-checkout`
+- **Position**: Bottom-right corner (`absolute bottom-4 right-4 z-10`)
+- **Sizing**: Responsive (`w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]`)
+- **Styling**: `object-contain` with hover scale effect
+- **Only for Upcoming Events**: Past events don't show overlay
+
 This ensures consistent, automatic hero image rotation with synchronized overlay buttons across all event types.
+
+## **Video-Like Animated Images (Movie Trailer Effect)**
+
+### **Overview**
+The hero section currently supports static image uploads only. To achieve video-like cinematic effects (movie trailer animations), several options are available, each with different trade-offs.
+
+### **Current System Limitations**
+- **Image Uploads Only**: System currently supports image file uploads
+- **Filtering**: Images filtered by `isHomePageHeroImage = true` flag
+- **Display**: Uses Next.js `Image` component for all hero images
+- **Media Type**: `thumbnailUrl` from event media is used for display
+
+### **Recommended Options (In Order of Preference)**
+
+#### **1. Animated WebP (Best for Current System)** ⭐ **RECOMMENDED**
+
+**Advantages:**
+- ✅ Works with existing image upload system (no code changes needed)
+- ✅ Better compression than GIF (smaller file sizes)
+- ✅ Good browser support (Chrome, Firefox, Edge, Safari 14+)
+- ✅ Maintains image quality while adding animation
+- ✅ Can be uploaded immediately using current media upload interface
+
+**Implementation:**
+1. Convert video/movie trailer to animated WebP format using tools like:
+   - FFmpeg: `ffmpeg -i input.mp4 -vf "fps=10,scale=800:-1:flags=lanczos" -loop 0 output.webp`
+   - Online converters (CloudConvert, EZGIF)
+   - Photoshop/GIMP with WebP export plugin
+2. Upload animated WebP file through existing media upload interface
+3. Mark as `isHomePageHeroImage = true` in media settings
+4. System treats it as regular image - works immediately
+
+**File Specifications:**
+- **Format**: Animated WebP (`.webp`)
+- **Frame Rate**: 10-15 fps (balance between smoothness and file size)
+- **Duration**: 3-10 seconds (loops automatically)
+- **Dimensions**: Match hero image specs (800×1200px desktop, 600×900px mobile)
+- **File Size**: Target under 500KB (animated WebP compresses well)
+
+**Browser Support:**
+- Chrome/Edge: Full support
+- Firefox: Full support
+- Safari: 14+ (full support), older versions fallback to static image
+
+---
+
+#### **2. Animated GIF (Universal Fallback)**
+
+**Advantages:**
+- ✅ Universal browser support (works everywhere)
+- ✅ No code changes needed
+- ✅ Simple upload process (same as WebP)
+
+**Disadvantages:**
+- ❌ Larger file sizes than WebP (typically 2-3x larger)
+- ❌ Limited color palette (256 colors max)
+- ❌ No transparency support (or limited)
+
+**Implementation:**
+1. Convert video to animated GIF using:
+   - FFmpeg: `ffmpeg -i input.mp4 -vf "fps=10,scale=800:-1:flags=lanczos" -loop 0 output.gif`
+   - Online converters (EZGIF, CloudConvert)
+   - Photoshop/GIMP
+2. Upload GIF file through existing media upload interface
+3. Mark as `isHomePageHeroImage = true`
+4. Works immediately (no code changes)
+
+**File Specifications:**
+- **Format**: Animated GIF (`.gif`)
+- **Frame Rate**: 8-12 fps (to keep file size manageable)
+- **Duration**: 3-8 seconds (loops automatically)
+- **Dimensions**: Match hero image specs
+- **File Size**: Target under 1MB (GIFs are larger than WebP)
+
+---
+
+#### **3. CSS Animations on Static Images (Lightweight)**
+
+**Advantages:**
+- ✅ No file size increase (uses existing static images)
+- ✅ Smooth, performant animations (GPU-accelerated)
+- ✅ Flexible animation effects (Ken Burns, fade, scale, pan)
+- ✅ Works with all browsers
+
+**Disadvantages:**
+- ❌ Requires code changes to detect and apply animations
+- ❌ Limited to CSS-based effects (no complex video-like motion)
+- ❌ Requires adding animation flag to media metadata
+
+**Implementation Steps:**
+
+**Step 1: Add Animation Flag to Media**
+```typescript
+// In media upload interface, add checkbox:
+// "Enable CSS Animation" → sets hasAnimation: true in media metadata
+```
+
+**Step 2: Update Hero Component**
+```tsx
+// Detect animated images
+const hasAnimation = currentEvent?.media?.[0]?.hasAnimation || false;
+
+// Apply CSS animation class
+<Image
+  src={currentImage}
+  alt="Featured Event"
+  fill
+  className={`object-contain hero-image-transition ${
+    isTransitioning ? 'transitioning' : ''
+  } ${hasAnimation ? 'hero-image-animated' : ''}`}
+  sizes="100vw"
+  priority
+/>
+```
+
+**Step 3: Add CSS Animations**
+```css
+/* Ken Burns Effect (zoom + pan) */
+.hero-image-animated {
+  animation: kenBurns 15s ease-in-out infinite;
+}
+
+@keyframes kenBurns {
+  0% {
+    transform: scale(1) translate(0, 0);
+  }
+  50% {
+    transform: scale(1.1) translate(-2%, -2%);
+  }
+  100% {
+    transform: scale(1) translate(0, 0);
+  }
+}
+
+/* Alternative: Fade pulse effect */
+.hero-image-animated-pulse {
+  animation: fadePulse 3s ease-in-out infinite;
+}
+
+@keyframes fadePulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+```
+
+**Animation Options:**
+- **Ken Burns Effect**: Slow zoom + pan (cinematic)
+- **Fade Pulse**: Subtle brightness/opacity changes
+- **Scale Breathe**: Gentle scale in/out
+- **Pan Left/Right**: Horizontal movement
+
+---
+
+#### **4. Future: Video Upload Support (Most Flexible)**
+
+**Advantages:**
+- ✅ Full video quality and control
+- ✅ Supports audio (if needed)
+- ✅ Native video playback controls
+- ✅ Best for true movie trailer experience
+
+**Disadvantages:**
+- ❌ Requires significant backend and frontend changes
+- ❌ Larger file sizes (requires video hosting/CDN)
+- ❌ More complex implementation
+
+**Implementation Requirements:**
+
+**Backend Changes:**
+1. Extend media upload API to accept video files (MP4, WebM)
+2. Add `eventMediaType` field to distinguish video from image
+3. Store video files in media storage (S3/CDN)
+4. Add video metadata (duration, format, resolution)
+
+**Frontend Changes:**
+1. Update media upload component to accept video files
+2. Add video preview in upload interface
+3. Update hero component to detect video vs image:
+```tsx
+const isVideo = currentEvent?.media?.[0]?.eventMediaType?.startsWith('video/');
+const mediaUrl = currentEvent?.thumbnailUrl || currentEvent?.media?.[0]?.fileUrl;
+
+{isVideo ? (
+  <video
+    src={mediaUrl}
+    autoPlay
+    loop
+    muted
+    playsInline
+    className="object-contain hero-image-transition"
+    style={{ width: '100%', height: '100%' }}
+  />
+) : (
+  <Image
+    src={mediaUrl}
+    alt="Featured Event"
+    fill
+    className="object-contain hero-image-transition"
+    sizes="100vw"
+    priority
+  />
+)}
+```
+
+**Video Specifications:**
+- **Format**: MP4 (H.264) or WebM (VP9)
+- **Resolution**: 1920×1080 (Full HD) or 1280×720 (HD)
+- **Frame Rate**: 24-30 fps
+- **Duration**: 10-30 seconds (loops automatically)
+- **File Size**: Target under 5MB (compressed)
+- **Audio**: Muted (autoplay requires muted for browser compatibility)
+
+---
+
+### **Quick Implementation Path**
+
+#### **Option A: Animated WebP (No Code Changes)** ⭐ **START HERE**
+
+**Steps:**
+1. Convert video/movie trailer to animated WebP:
+   ```bash
+   # Using FFmpeg
+   ffmpeg -i trailer.mp4 -vf "fps=12,scale=800:-1:flags=lanczos" \
+     -loop 0 -quality 85 hero-trailer.webp
+   ```
+2. Upload through existing media upload interface
+3. Mark as `isHomePageHeroImage = true`
+4. **Works immediately** - no code changes needed
+
+**Tools for Conversion:**
+- **FFmpeg** (command-line, most control)
+- **CloudConvert** (online, easy to use)
+- **EZGIF** (online, GIF/WebP converter)
+- **Photoshop** (with WebP export plugin)
+
+---
+
+#### **Option B: CSS Animations (Code Changes Required)**
+
+**Steps:**
+1. Add `hasAnimation` boolean field to media metadata
+2. Update hero component to detect animation flag
+3. Add CSS animation classes to `globals.css`
+4. Apply animation class conditionally in hero component
+5. Upload static images with animation flag enabled
+
+**Code Changes:**
+- Update `HeroSection.tsx` to check `hasAnimation` flag
+- Add CSS animation keyframes to `globals.css`
+- Update media upload interface to include animation checkbox
+
+---
+
+#### **Option C: Video Support (Larger Implementation)**
+
+**Steps:**
+1. **Backend**: Extend media upload API to accept video files
+2. **Backend**: Add video storage and metadata handling
+3. **Frontend**: Update media upload component for video files
+4. **Frontend**: Update hero component to render `<video>` for videos
+5. **Frontend**: Add video autoplay, loop, and muted attributes
+6. **Testing**: Test video playback across browsers and devices
+
+**Estimated Effort:**
+- Backend changes: 2-4 hours
+- Frontend changes: 2-3 hours
+- Testing and refinement: 1-2 hours
+- **Total: 5-9 hours**
+
+---
+
+### **Recommendation Summary**
+
+**For Immediate Results:**
+- ✅ **Start with Animated WebP (Option A)**
+  - No code changes needed
+  - Works with existing system
+  - Good quality and file size
+  - Can be implemented today
+
+**For Enhanced Flexibility:**
+- ✅ **Add Video Support (Option C) Later**
+  - Full video quality and control
+  - Best for true movie trailer experience
+  - Requires development time but provides most flexibility
+
+**For Lightweight Alternative:**
+- ✅ **CSS Animations (Option B)**
+  - No file size increase
+  - Smooth, performant effects
+  - Good for subtle cinematic effects
+
+### **File Format Comparison**
+
+| Format | File Size | Quality | Browser Support | Code Changes | Best For |
+|--------|-----------|---------|-----------------|--------------|----------|
+| **Animated WebP** | Small (200-500KB) | High | Good (Safari 14+) | None | ⭐ **Recommended** |
+| **Animated GIF** | Medium (500KB-2MB) | Medium | Universal | None | Universal fallback |
+| **CSS Animations** | None (uses existing) | High | Universal | Required | Lightweight effects |
+| **Video (MP4/WebM)** | Large (2-10MB) | Highest | Universal | Required | Full video experience |
+
+### **Best Practices**
+
+**For Animated WebP/GIF:**
+- ✅ Keep duration short (3-10 seconds) for smooth looping
+- ✅ Optimize frame rate (10-15 fps for WebP, 8-12 fps for GIF)
+- ✅ Compress files to target sizes (WebP: <500KB, GIF: <1MB)
+- ✅ Test on multiple browsers before deploying
+- ✅ Provide fallback static image for older browsers
+
+**For CSS Animations:**
+- ✅ Use GPU-accelerated properties (`transform`, `opacity`)
+- ✅ Keep animations subtle and smooth
+- ✅ Test performance on mobile devices
+- ✅ Provide option to disable animations for accessibility
+
+**For Video Support:**
+- ✅ Always include `muted` attribute (required for autoplay)
+- ✅ Use `playsInline` for mobile compatibility
+- ✅ Compress videos to reasonable file sizes (<5MB)
+- ✅ Provide fallback image if video fails to load
+- ✅ Consider video CDN for large files
+
+### **Accessibility Considerations**
+
+- **Motion Sensitivity**: Provide option to disable animations for users with motion sensitivity
+- **Performance**: Monitor performance impact, especially on mobile devices
+- **Bandwidth**: Consider users on slow connections - provide loading states
+- **Fallbacks**: Always provide static image fallback for animated content
+
+### **Testing Checklist**
+
+- [ ] Animated WebP/GIF loops smoothly without stuttering
+- [ ] File sizes are within acceptable limits (<500KB WebP, <1MB GIF)
+- [ ] Animations work on mobile devices (iOS Safari, Android Chrome)
+- [ ] Fallback static image displays on older browsers
+- [ ] Performance is acceptable (no frame drops, smooth transitions)
+- [ ] Animations don't interfere with overlay buttons or controls
+- [ ] Video autoplay works (muted, loop, playsInline attributes)
+- [ ] CSS animations are GPU-accelerated and performant

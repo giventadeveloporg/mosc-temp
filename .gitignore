@@ -16,6 +16,7 @@ out/
 # Environment variables
 # Ignore all .env files
 .env*
+.env.*
 
 # Except .env.example (keep as template)
 .env.example
