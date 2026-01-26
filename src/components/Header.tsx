@@ -849,7 +849,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                       href="/sign-up"
                       className="header-cta"
                     >
-                      <span>Get Started</span>
+                      <span>Sign up</span>
                     </Link>
                   </>
                 ) : (
@@ -1153,7 +1153,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                     "
                     onClick={closeMobileMenu}
                   >
-                    Get Started
+                    Sign up
                   </Link>
                 </div>
               ) : (
