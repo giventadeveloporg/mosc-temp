@@ -7,10 +7,11 @@ alwaysApply: true
 # Clerk Authentication and Admin Role Lookup Pattern
 
 ## **Overview**
-This rule defines the correct pattern for configuring Clerk middleware to enable `auth()` calls in server components, particularly for admin role lookup in the root layout. It explains when routes should be in `ignoredRoutes` vs `publicRoutes` and how to properly check admin status after user login.
+This rule defines the correct pattern for configuring Clerk middleware to enable `auth()` calls in server components, particularly for admin role lookup in the root layout. It explains when routes should be in `ignoredRoutes` vs `publicRoutes`, how to properly check admin status after user login, and **why the admin check must run on all routes (including public pages)** so the Admin menu appears in the Header on every page—not only on `/admin` and sub-pages.
 
 ## **Problem Solved**
 - **Admin Menu Not Appearing**: Ensures admin role lookup works correctly after user login
+- **Admin Menu on Public Pages**: Ensures the Admin menu appears when a logged-in admin visits **any** page (homepage, events, gallery, pricing, etc.), not only `/admin` and sub-pages
 - **Clerk auth() Errors**: Prevents "Clerk can't detect usage of authMiddleware()" errors
 - **Next.js 15+ Compatibility**: Properly handles async `headers()` calls
 - **Route Configuration**: Clarifies when routes need Clerk middleware vs when they can be ignored
@@ -131,13 +132,53 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 }
 ```
 
+### **Admin Check on ALL Routes (Including Public Pages)**
+
+**CRITICAL**: Run the admin check on **every route** where the root layout renders (i.e., whenever `pathname` is present). Do **not** limit the admin lookup to `/admin` or protected routes only.
+
+**Why**: The Header is rendered by the root layout for all non-MOSC/non-Syro routes. If the admin check is skipped on public routes (e.g. homepage, `/events`, `/gallery`, `/pricing`), then when a logged-in admin visits a public page, `isTenantAdmin` will be `false` or stale, and the Admin menu will not appear until they navigate to `/admin`.
+
+**Correct pattern in root layout**:
+```typescript
+// ✅ DO: Run admin check whenever pathname is present (all pages that use main layout)
+if (pathname) {
+  try {
+    const authResult = await auth();
+    const userId = authResult?.userId || null;
+    if (userId) {
+      // ... fetch profile, set isTenantAdmin
+    }
+  } catch (error) {
+    isTenantAdmin = false;
+  }
+}
+return (
+  <ClerkProvider>
+    <Header isTenantAdmin={isTenantAdmin} />
+    {children}
+  </ClerkProvider>
+);
+```
+
+**Anti-pattern**:
+```typescript
+// ❌ DON'T: Only run admin check on /admin routes
+if (pathname?.startsWith('/admin')) {
+  // ... admin lookup
+}
+// Result: Admin menu missing on homepage, /events, /gallery, etc.
+```
+
+**Reference**: [`src/app/layout.tsx`](mdc:src/app/layout.tsx) - Lines 102-107 ("Run admin check on ALL routes (including public) so the Header shows the Admin menu when a logged-in admin visits any page (e.g. homepage).")
+
 ### **Key Requirements**:
 1. ✅ **Await `headers()` first** - Required for Next.js 15+
 2. ✅ **Call `auth()` after headers()** - Ensures proper async context
-3. ✅ **Check `userId` exists** - Only fetch profile if user is authenticated
-4. ✅ **Query by `userId + tenantId`** - Multi-tenant scoping
-5. ✅ **Check `userRole === 'ADMIN'`** - Admin status check
-6. ✅ **Pass `isTenantAdmin` to Header** - Client component receives server-verified flag
+3. ✅ **Run admin check on ALL routes** - Use `if (pathname)` (or equivalent); do not gate by `pathname?.startsWith('/admin')` so the Admin menu shows on public pages too
+4. ✅ **Check `userId` exists** - Only fetch profile if user is authenticated
+5. ✅ **Query by `userId + tenantId`** - Multi-tenant scoping
+6. ✅ **Check `userRole === 'ADMIN'`** - Admin status check
+7. ✅ **Pass `isTenantAdmin` to Header** - Client component receives server-verified flag
 
 ### **CRITICAL: Admin Role Must Be Set in Database**
 
@@ -197,6 +238,10 @@ WHERE user_id = 'user_2vVLxhPnsIPGYf6qpfozk383Slr'
 ---
 
 ## **Header Component Admin Menu Pattern**
+
+### **Admin Menu Visibility: All Pages (Not Just /admin)**
+
+The Admin menu in the Header must be shown whenever the user is an admin (**`isAdmin` true**), on **every page** that uses the main layout—including public pages (homepage, `/events`, `/gallery`, `/pricing`, etc.). The Header does **not** hide the Admin menu based on the current path; it only checks `isAdmin`. Ensuring the root layout runs the admin check on all routes (see above) guarantees `isTenantAdmin` is set correctly for every page, so the Admin menu appears consistently.
 
 ### **Client-Side Admin Check in `src/components/Header.tsx`**
 
@@ -560,6 +605,21 @@ isTenantAdmin = profile?.userStatus === 'APPROVED';
 
 ---
 
+### **❌ DON'T: Run Admin Check Only on /admin Routes**
+```typescript
+// ❌ WRONG: Admin menu won't show on public pages
+if (pathname?.startsWith('/admin')) {
+  const authResult = await auth();
+  // ... set isTenantAdmin
+}
+```
+
+**Problem**: On public pages (homepage, `/events`, `/gallery`, etc.), `isTenantAdmin` stays false, so the Admin menu does not appear in the Header until the user navigates to `/admin`.
+
+**Fix**: Run the admin check whenever `pathname` is present (all routes that use the main layout). See "Admin Check on ALL Routes" above.
+
+---
+
 ## **Complete Example: Homepage with Admin Lookup**
 
 ### **1. Middleware Configuration** (`src/middleware.ts`)
@@ -670,6 +730,7 @@ Does the route call auth() or currentUser() in server components?
 ### **DO:**
 - ✅ Always await `headers()` before calling `auth()` or `currentUser()`
 - ✅ Keep routes that call `auth()` in `publicRoutes`, not `ignoredRoutes`
+- ✅ **Run admin check on ALL routes** (whenever `pathname` is present) so the Admin menu shows on public pages (homepage, events, gallery, etc.), not only on `/admin`
 - ✅ Use server-verified `isTenantAdmin` flag in Header component
 - ✅ Query user profiles with both `userId` and `tenantId` for multi-tenant scoping
 - ✅ Check `userRole === 'ADMIN'` for admin status (not `userStatus`)
@@ -678,6 +739,7 @@ Does the route call auth() or currentUser() in server components?
 ### **DON'T:**
 - ❌ Put routes that call `auth()` in `ignoredRoutes`
 - ❌ Call `auth()` before awaiting `headers()` in Next.js 15+
+- ❌ **Gate the admin check by pathname** (e.g. `pathname?.startsWith('/admin')`)—this hides the Admin menu on public pages
 - ❌ Skip tenant ID in admin lookup queries
 - ❌ Check `userStatus` instead of `userRole` for admin
 - ❌ Rely solely on Clerk metadata for admin status (not tenant-aware)
@@ -737,9 +799,10 @@ Does the route call auth() or currentUser() in server components?
 **Admin Lookup Pattern**:
 1. Await `headers()` first
 2. Call `auth()` to get `userId`
-3. Query user profile with `userId + tenantId`
-4. Check `userRole === 'ADMIN'` (must be set in database)
-5. Pass `isTenantAdmin` to Header component
+3. **Run admin check on ALL routes** (whenever `pathname` is present)—do not limit to `/admin` so the Admin menu shows on public pages (homepage, events, gallery, etc.)
+4. Query user profile with `userId + tenantId`
+5. Check `userRole === 'ADMIN'` (must be set in database)
+6. Pass `isTenantAdmin` to Header component
 
 **User Profile Avatar Pattern**:
 1. Use Clerk's `useUser()` hook to get `user.imageUrl`, `user.firstName`, `user.emailAddresses`
@@ -755,5 +818,6 @@ Does the route call auth() or currentUser() in server components?
 
 This ensures:
 - Admin menu appears correctly after user login while maintaining proper authentication flow
+- **Admin menu appears on public pages** (homepage, events, gallery, pricing, etc.) when a logged-in user is an admin—not only on `/admin` and sub-pages
 - User profile avatar displays social login profile picture with dropdown menu for Profile and Sign Out
 - Consistent user experience across desktop and mobile with proper accessibility support

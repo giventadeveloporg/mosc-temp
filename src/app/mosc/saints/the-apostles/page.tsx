@@ -1,13 +1,16 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { SAINTS_SIDEBAR_LINKS } from '../saintsSidebarLinks';
 
 export const metadata = {
   title: 'The Apostles',
   description: 'The twelve apostles of Jesus Christ and their missionary work',
 };
 
-const theapostlesPage = () => {
+const currentSlug = '/mosc/saints/the-apostles';
+
+export default function TheApostlesPage() {
   return (
     <div className="bg-background">
       {/* Hero Section */}
@@ -66,37 +69,19 @@ const theapostlesPage = () => {
                   Saints Categories
                 </h3>
                 <nav className="space-y-2">
-                  <Link 
-                    href="/mosc/saints" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Saints Overview
-                  </Link>
-                  <div className="border-t border-border my-2"></div>
-                  <Link 
-                      href="/mosc/saints/the-apostles" 
-                      className="block px-3 py-2 bg-primary text-primary-foreground rounded-md font-body text-sm reverent-transition"
+                  {SAINTS_SIDEBAR_LINKS.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={`block px-3 py-2 rounded-md font-body text-sm reverent-transition ${
+                        link.href === currentSlug
+                          ? 'bg-primary text-primary-foreground'
+                          : 'text-muted-foreground hover:text-primary hover:bg-muted'
+                      }`}
                     >
-                      The Apostles
+                      {link.label}
                     </Link>
-                  <Link 
-                      href="/mosc/saints/st-mary-mother-of-god" 
-                      className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                    >
-                      St. Mary Mother of God
-                    </Link>
-                  <Link 
-                      href="/mosc/saints/church-fathers" 
-                      className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                    >
-                      Church Fathers
-                    </Link>
-                  <Link 
-                      href="/mosc/saints/indian-saints" 
-                      className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                    >
-                      Indian Saints
-                    </Link>
+                  ))}
                 </nav>
               </div>
 
@@ -192,6 +177,4 @@ const theapostlesPage = () => {
       </section>
     </div>
   );
-};
-
-export default theapostlesPage;
+}

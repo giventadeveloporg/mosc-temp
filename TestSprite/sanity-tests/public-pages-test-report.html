@@ -204,7 +204,7 @@
         <div class="header">
             <h1>🧪 Public Pages Test Report</h1>
             <p>Malayalees US Site Event Registration Platform</p>
-            <p style="margin-top: 10px; font-size: 0.9em;">Test Engine: Playwright (Local) | 14 Tests | 92.9% Success Rate</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">Test Engine: Playwright (Local) | 14 Tests | 85.7% Success Rate</p>
         </div>
 
         <div class="summary">
@@ -216,11 +216,11 @@
                 </div>
                 <div class="summary-card">
                     <h3>Passed</h3>
-                    <div class="number passed">13</div>
+                    <div class="number passed">12</div>
                 </div>
                 <div class="summary-card">
                     <h3>Failed</h3>
-                    <div class="number failed">1</div>
+                    <div class="number failed">2</div>
                 </div>
                 <div class="summary-card">
                     <h3>Skipped</h3>
@@ -228,7 +228,7 @@
                 </div>
                 <div class="summary-card">
                     <h3>Success Rate</h3>
-                    <div class="number success-rate">92.9%</div>
+                    <div class="number success-rate">85.7%</div>
                 </div>
             </div>
         </div>
@@ -259,20 +259,20 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/</div>
-                        <div class="duration">11887ms</div>
+                        <div class="duration">5847ms</div>
                         
                     </div>
                 </div>
             
-                <div class="test-item passed">
-                    <div class="test-status">✅</div>
+                <div class="test-item failed">
+                    <div class="test-status">❌</div>
                     <div class="test-info">
                         <h4>
                             <span class="test-id">public-002</span>
                             Events Listing Page Test
                             <span class="test-priority priority-critical">critical</span>
                         </h4>
-                        <p>Test completed successfully</p>
+                        <p>Error: Buy Tickets buttons: 2 invalid link(s) found: /events/4202/donation-checkout, /events/4202/donation-checkout</p>
                         
                         <div class="warning-details">
                             <strong>⚠️ Warnings:</strong> Network idle timeout - page may still be loading
@@ -280,19 +280,26 @@
                         
                         
                         
+                        <div class="error-details">
+                            <strong>Errors:</strong>
+                            <ul>
+                                <li>Buy Tickets buttons: 2 invalid link(s) found: /events/4202/donation-checkout, /events/4202/donation-checkout</li>
+                            </ul>
+                        </div>
+                        
                         
                         <div class="error-details">
                             <h5>Expected Elements:</h5>
                             <ul>
-                                <li><code>h1</code></li><li><code>.grid, [class*="grid"]</code></li><li><code>[class*="event"], [class*="card"]</code></li><li><code>input[type="search"], input[type="text"]</code></li><li><code>button, a[href*="/events/"]</code></li>
+                                <li><code>h1</code></li><li><code>.grid, [class*="grid"]</code></li><li><code>[class*="event"], [class*="card"]</code></li><li><code>input[type="search"], input[type="text"]</code></li><li><code>button, a[href*="/events/"]</code></li><li><code>a[href*="/events/"][title*="Event Details"], a[href*="/events/"][aria-label*="Event Details"]</code></li><li><code>a[href*="calendar.google.com"], a[title*="Calendar"], a[aria-label*="Calendar"]</code></li><li><code>a[href*="/checkout"], a[href*="/manual-checkout"], img[alt*="Buy Tickets"], img[alt*="buy tickets"]</code></li>
                             </ul>
                         </div>
                         
                     </div>
                     <div class="test-details">
                         <div class="url">/events</div>
-                        <div class="duration">10599ms</div>
-                        
+                        <div class="duration">11790ms</div>
+                        <a href="screenshots/public-002-1769528206860.png" target="_blank" class="screenshot-link">📷 Screenshot</a>
                     </div>
                 </div>
             
@@ -327,7 +334,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/events/1</div>
-                        <div class="duration">22106ms</div>
+                        <div class="duration">9076ms</div>
                         
                     </div>
                 </div>
@@ -355,7 +362,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/sponsors</div>
-                        <div class="duration">5255ms</div>
+                        <div class="duration">2520ms</div>
                         
                     </div>
                 </div>
@@ -383,7 +390,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/sponsors/1</div>
-                        <div class="duration">6225ms</div>
+                        <div class="duration">3316ms</div>
                         
                     </div>
                 </div>
@@ -418,8 +425,8 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/gallery</div>
-                        <div class="duration">14614ms</div>
-                        <a href="screenshots/public-006-1767880937516.png" target="_blank" class="screenshot-link">📷 Screenshot</a>
+                        <div class="duration">3673ms</div>
+                        <a href="screenshots/public-006-1769528228161.png" target="_blank" class="screenshot-link">📷 Screenshot</a>
                     </div>
                 </div>
             
@@ -454,7 +461,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/polls</div>
-                        <div class="duration">31820ms</div>
+                        <div class="duration">3624ms</div>
                         
                     </div>
                 </div>
@@ -490,7 +497,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/calendar</div>
-                        <div class="duration">16728ms</div>
+                        <div class="duration">3330ms</div>
                         
                     </div>
                 </div>
@@ -518,7 +525,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc</div>
-                        <div class="duration">11229ms</div>
+                        <div class="duration">5350ms</div>
                         
                     </div>
                 </div>
@@ -554,7 +561,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/holy-synod</div>
-                        <div class="duration">7254ms</div>
+                        <div class="duration">3264ms</div>
                         
                     </div>
                 </div>
@@ -590,7 +597,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/gallery</div>
-                        <div class="duration">3807ms</div>
+                        <div class="duration">3620ms</div>
                         
                     </div>
                 </div>
@@ -626,7 +633,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/directory</div>
-                        <div class="duration">6737ms</div>
+                        <div class="duration">3349ms</div>
                         
                     </div>
                 </div>
@@ -642,7 +649,7 @@
                         <p>Test completed successfully</p>
                         
                         <div class="warning-details">
-                            <strong>⚠️ Warnings:</strong> Network idle timeout - page may still be loading; Some expected elements not found: h1
+                            <strong>⚠️ Warnings:</strong> Some expected elements not found: h1
                         </div>
                         
                         
@@ -662,7 +669,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/charity-theme</div>
-                        <div class="duration">21604ms</div>
+                        <div class="duration">12543ms</div>
                         
                     </div>
                 </div>
@@ -698,7 +705,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/pricing</div>
-                        <div class="duration">14536ms</div>
+                        <div class="duration">5643ms</div>
                         
                     </div>
                 </div>
@@ -707,7 +714,7 @@
 
         <div class="footer">
             <p>Generated by Public Pages Test Suite</p>
-            <p class="timestamp">Report generated on: 1/8/2026, 2:04:15 PM</p>
+            <p class="timestamp">Report generated on: 1/27/2026, 3:37:53 PM</p>
             <p class="timestamp">Base URL: http://localhost:3000</p>
             <p class="timestamp">Test Engine: Playwright (Local Browser Execution)</p>
         </div>
