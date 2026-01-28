@@ -1,0 +1,550 @@
+---
+description: Standard pattern for integrating Givebutter donation widgets with popup modal functionality in Next.js applications
+globs: src/components/Givebutter*.tsx, src/app/**/donate/**/*.tsx, src/app/**/page.tsx
+alwaysApply: false
+---
+
+# Givebutter Widget Integration Pattern
+
+## **Overview**
+This rule defines the standard pattern for integrating Givebutter donation widgets into Next.js applications, specifically for creating donate buttons that open popup modals with donation forms. This pattern addresses X-Frame-Options restrictions and provides reliable popup functionality across desktop and mobile devices.
+
+## **Problem Solved**
+- **X-Frame-Options Restriction**: Givebutter sets `X-Frame-Options: sameorigin`, preventing iframe embedding from other domains
+- **Popup Modal Functionality**: Provides reliable popup window functionality that works around iframe restrictions
+- **Cross-Platform Compatibility**: Works consistently on both desktop and mobile browsers
+- **Script Loading**: Handles asynchronous Givebutter script loading and initialization
+- **Fallback Mechanisms**: Provides multiple fallback strategies for maximum reliability
+
+## **Core Pattern**
+
+### **1. Script Installation in Layout**
+
+```tsx
+// ✅ DO: Add Givebutter script to root layout using Next.js Script component
+// src/app/layout.tsx
+import Script from "next/script";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html>
+      <body>
+        {/* Other content */}
+        
+        {/* Givebutter Widget Script */}
+        <Script
+          id="givebutter-widget"
+          src="https://widgets.givebutter.com/latest.umd.cjs?acct={YOUR_ACCOUNT_ID}&p=other"
+          strategy="afterInteractive"
+          async
+        />
+      </body>
+    </html>
+  );
+}
+```
+
+**Key Requirements:**
+- **`strategy="afterInteractive"`**: Loads script after page becomes interactive
+- **`async`**: Allows script to load asynchronously
+- **Account ID**: Replace `{YOUR_ACCOUNT_ID}` with your Givebutter account ID (e.g., `mKoUpYQebNsn6RqA`)
+
+### **2. Donate Button Component**
+
+```tsx
+// ✅ DO: Use popup window approach (not iframe)
+'use client';
+
+import React, { useEffect, useState } from 'react';
+
+interface GivebutterDonateButtonProps {
+  campaignId?: string;
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export default function GivebutterDonateButton({ 
+  campaignId = 'mhoZp0',
+  className = '',
+  children
+}: GivebutterDonateButtonProps) {
+  const [isScriptLoaded, setIsScriptLoaded] = useState(false);
+  const [useCustomElement, setUseCustomElement] = useState(false);
+
+  useEffect(() => {
+    // Wait for Givebutter script and custom element to be defined
+    const checkGivebutter = () => {
+      if (typeof window === 'undefined') return false;
+      
+      const script = document.querySelector('script[src*="widgets.givebutter.com"]');
+      if (!script) return false;
+
+      // Check if custom element is defined
+      const isCustomElementDefined = 
+        customElements.get('givebutter-button') !== undefined ||
+        (window as any).Givebutter ||
+        (window as any).givebutter;
+
+      if (isCustomElementDefined) {
+        setIsScriptLoaded(true);
+        setUseCustomElement(true);
+        return true;
+      }
+      return false;
+    };
+
+    // Check immediately
+    if (checkGivebutter()) return;
+
+    // Poll for script and custom element
+    const interval = setInterval(() => {
+      if (checkGivebutter()) {
+        clearInterval(interval);
+      }
+    }, 100);
+
+    const timeout = setTimeout(() => {
+      clearInterval(interval);
+      console.warn('[GivebutterDonateButton] Givebutter custom element not available, using popup window fallback');
+      setIsScriptLoaded(true);
+    }, 5000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
+  }, []);
+
+  // Use Givebutter's native button element if available (opens modal automatically)
+  if (useCustomElement && isScriptLoaded) {
+    return (
+      <givebutter-button 
+        campaign={campaignId}
+        className={className}
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '8px',
+        }}
+      >
+        {children}
+      </givebutter-button>
+    );
+  }
+
+  // Fallback: Regular button that opens popup window
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Open Givebutter campaign in a popup window
+    // This works because popup windows are not subject to X-Frame-Options
+    const width = 800;
+    const height = 900;
+    const left = (window.screen.width - width) / 2;
+    const top = (window.screen.height - height) / 2;
+    
+    const popup = window.open(
+      `https://givebutter.com/${campaignId}`,
+      'GivebutterDonation',
+      `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=no`
+    );
+    
+    if (popup) {
+      popup.focus();
+      // Monitor popup for closure (optional - for analytics or callbacks)
+      const checkClosed = setInterval(() => {
+        if (popup.closed) {
+          clearInterval(checkClosed);
+          console.log('[GivebutterDonateButton] Donation popup closed');
+        }
+      }, 500);
+      
+      // Cleanup interval after 10 minutes
+      setTimeout(() => clearInterval(checkClosed), 600000);
+    } else {
+      // Popup blocked - fallback to new tab
+      console.warn('[GivebutterDonateButton] Popup blocked, opening in new tab');
+      window.open(`https://givebutter.com/${campaignId}`, '_blank');
+    }
+  };
+
+  return (
+    <button
+      onClick={handleClick}
+      className={className}
+      title="Donate Now"
+      aria-label="Donate Now"
+      type="button"
+    >
+      {children}
+    </button>
+  );
+}
+```
+
+## **Key Implementation Details**
+
+### **Why Popup Window Instead of Iframe?**
+
+**Problem**: Givebutter sets `X-Frame-Options: sameorigin` header, which prevents embedding their pages in iframes from other domains. This is a security measure to prevent clickjacking attacks.
+
+**Error Message**: `Refused to display 'https://givebutter.com/' in a frame because it set 'X-Frame-Options' to 'sameorigin'.`
+
+**Solution**: Use `window.open()` to create a popup window instead of an iframe. Popup windows are not subject to X-Frame-Options restrictions.
+
+### **Popup Window Configuration**
+
+**Desktop Configuration:**
+- **Width**: `800px` - Comfortable width for donation forms
+- **Height**: `900px` - Sufficient height for form and content
+- **Position**: Centered on screen using `(screen.width - width) / 2` and `(screen.height - height) / 2`
+
+**Window Features:**
+- **`resizable=yes`**: Allows users to resize if needed
+- **`scrollbars=yes`**: Enables scrolling for long forms
+- **`toolbar=no`**: Removes browser toolbar for cleaner appearance
+- **`menubar=no`**: Removes menu bar
+- **`location=no`**: Removes address bar (optional, improves UX)
+
+**Mobile Configuration:**
+- **Strategy**: Open in new tab instead of popup window
+- **Rationale**: Mobile browsers don't support popup windows well and often block them
+- **PRB Support**: Opening in new tab ensures Apple Pay/Google Pay PRB buttons work correctly
+- **Detection**: Use user agent and screen width to detect mobile devices
+
+### **Fallback Strategy**
+
+1. **Primary**: Try to use Givebutter's native `<givebutter-button>` custom element (if script loads and element is defined)
+2. **Secondary**: Use popup window with `window.open()` (works around X-Frame-Options)
+3. **Tertiary**: If popup is blocked, open in new tab with `window.open(url, '_blank')`
+
+### **Script Loading Detection**
+
+**Polling Strategy:**
+- Check every 100ms for script and custom element availability
+- Timeout after 5 seconds if not detected
+- Still allow button to work with popup fallback even if script doesn't load
+
+**Detection Methods:**
+- Check for script tag: `document.querySelector('script[src*="widgets.givebutter.com"]')`
+- Check for custom element: `customElements.get('givebutter-button')`
+- Check for global object: `(window as any).Givebutter` or `(window as any).givebutter`
+
+## **TypeScript Declarations**
+
+### **Custom Element Types**
+
+```typescript
+// src/types/givebutter.d.ts
+declare namespace JSX {
+  interface IntrinsicElements {
+    'givebutter-widget': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & {
+      id?: string;
+    }, HTMLElement>;
+    'givebutter-form': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & {
+      campaign?: string;
+    }, HTMLElement>;
+    'givebutter-button': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & {
+      campaign?: string;
+      label?: string;
+      'label-color'?: string;
+      'background-color'?: string;
+      'drop-shadow'?: string | boolean;
+      'border-radius'?: string | number;
+      'border-color'?: string;
+      'border-width'?: string | number;
+      'givebutter-theme'?: string;
+    }, HTMLElement>;
+  }
+}
+
+declare global {
+  interface Window {
+    Givebutter?: {
+      init?: (config: {
+        account: string;
+        campaign?: string;
+        container?: HTMLElement;
+      }) => void;
+    };
+  }
+}
+
+export {};
+```
+
+## **Usage Examples**
+
+### **Homepage Donate Button**
+
+```tsx
+// src/app/page.tsx
+import GivebutterDonateButton from '@/components/GivebutterDonateButton';
+
+export default function HomePage() {
+  return (
+    <div>
+      <div className="w-full bg-green-700 text-white py-6 md:py-8 mt-[10px]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <span className="text-2xl md:text-4xl font-bold tracking-wider">MOSC-TEMP</span>
+          
+          {/* Donate Button - Opens Givebutter Popup Modal */}
+          <div className="mt-4">
+            <GivebutterDonateButton
+              campaignId="mhoZp0"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+              <span>Donate Now</span>
+            </GivebutterDonateButton>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+### **Embedded Widget (Full Page)**
+
+```tsx
+// src/app/donate/page.tsx
+import GivebutterWidget from '@/components/GivebutterWidget';
+
+export default function DonatePage() {
+  return (
+    <div className="min-h-screen bg-gray-50 py-12">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-white rounded-lg shadow-lg p-6 md:p-8">
+          <GivebutterWidget campaignId="mhoZp0" />
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+## **Common Anti-Patterns**
+
+```tsx
+// ❌ DON'T: Use iframe for Givebutter campaigns
+<iframe src={`https://givebutter.com/${campaignId}`} />
+// Error: X-Frame-Options: sameorigin blocks this
+
+// ❌ DON'T: Navigate to donation page instead of popup
+<Link href="/donate">Donate</Link>
+// This breaks the popup modal UX pattern
+
+// ❌ DON'T: Use givebutter-theme on regular buttons without script check
+<button givebutter-theme="click-only">Donate</button>
+// Won't work if script hasn't loaded
+
+// ❌ DON'T: Load script in component instead of layout
+useEffect(() => {
+  const script = document.createElement('script');
+  script.src = 'https://widgets.givebutter.com/...';
+  // This can cause duplicate script loads
+}, []);
+```
+
+## **Best Practices**
+
+### **DO:**
+- ✅ Load Givebutter script in root layout using Next.js `Script` component
+- ✅ Use `strategy="afterInteractive"` for script loading
+- ✅ Always provide popup window fallback
+- ✅ Wait for script to load before using custom elements
+- ✅ Handle popup blocking gracefully (fallback to new tab)
+- ✅ Monitor popup closure for analytics/callbacks
+- ✅ Use TypeScript declarations for custom elements
+- ✅ Center popup windows on screen
+- ✅ Set appropriate popup dimensions (800x900px recommended)
+- ✅ Include cleanup for interval timers
+
+### **DON'T:**
+- ❌ Don't use iframe for Givebutter campaigns (X-Frame-Options blocks it)
+- ❌ Don't navigate to donation page (breaks popup UX)
+- ❌ Don't assume script is loaded immediately
+- ❌ Don't skip fallback mechanisms
+- ❌ Don't forget to handle popup blocking
+- ❌ Don't use arbitrary popup dimensions
+- ❌ Don't forget cleanup for timers/intervals
+
+## **Mobile Device Support & PRB Compatibility**
+
+### **Apple Pay & Google Pay PRB Support**
+
+**✅ YES - Givebutter supports Apple Pay and Google Pay automatically**
+
+Givebutter's donation forms automatically display Apple Pay and Google Pay buttons when:
+- **Apple Pay**: User is on iOS Safari or macOS Safari with Apple Pay configured
+- **Google Pay**: User is on Chrome/Android with Google Pay configured
+- Payment methods are enabled in Givebutter campaign settings
+
+### **Mobile Browser Behavior**
+
+**Mobile Strategy:**
+- **Desktop**: Opens popup window (800x900px, centered)
+- **Mobile**: Opens in new tab (better UX, ensures PRB works)
+
+**Why New Tab on Mobile?**
+1. Mobile browsers often block or mishandle popup windows
+2. New tab provides better user experience on small screens
+3. Ensures Apple Pay/Google Pay PRB buttons work correctly
+4. Avoids popup blocking issues common on mobile
+
+**PRB Compatibility:**
+- ✅ **Apple Pay**: Works when Givebutter page opens in new tab on iOS Safari
+- ✅ **Google Pay**: Works when Givebutter page opens in new tab on Chrome/Android
+- ✅ **Automatic Detection**: Givebutter automatically detects device capabilities and shows appropriate PRB buttons
+- ✅ **No Configuration Needed**: Givebutter handles PRB display automatically
+
+### **Testing Mobile PRB**
+
+1. **Test on iOS Safari**:
+   - Open donation page on iPhone/iPad
+   - Verify Apple Pay button appears (if Apple Pay is set up)
+   - Complete donation using Apple Pay
+
+2. **Test on Android Chrome**:
+   - Open donation page on Android device
+   - Verify Google Pay button appears (if Google Pay is set up)
+   - Complete donation using Google Pay
+
+3. **Verify in Givebutter Dashboard**:
+   - Check that donations are recorded correctly
+   - Verify payment method shows as Apple Pay/Google Pay
+
+## **Optional: Cover Image & Description (Future Integration)**
+
+**Current behavior (default):** We use the **widget modal** (`<givebutter-button>`) when available. The modal shows only the **checkout flow** (Choose amount → payment). **No cover image or campaign description** appear in the modal. This is by Givebutter design and not configurable.
+
+**Optional behavior for later:** If we want to **always show the campaign cover image and description** before donation, we can switch to **always opening the full campaign page** (popup on desktop, new tab on mobile) and **never** use the `<givebutter-button>` modal.
+
+### **Modal vs Full Campaign Page**
+
+| Approach | What opens | Cover image & description? |
+|----------|------------|----------------------------|
+| **Widget modal** (current) | Overlay on our site → "Choose amount" → checkout | **No** – checkout only |
+| **Full campaign page** (optional) | `https://givebutter.com/{campaignId}` in popup/tab | **Yes** – uses Givebutter dashboard config |
+
+### **Dashboard Configuration**
+
+- Cover image and description are configured in **Givebutter Dashboard** → Campaign → **Details** → Cover Photo / Description.
+- That config applies **only** to the **full campaign page** (when opening `https://givebutter.com/{campaignId}`).
+- The **widget modal** does not use cover/description; there is **no** Givebutter setting to show them there.
+
+### **Implementation Option (When We Want Cover + Description)**
+
+1. **Skip `<givebutter-button>`:** Do not use the Givebutter custom element that opens the modal.
+2. **Always use popup/tab:** On click, always `window.open(\`https://givebutter.com/${campaignId}\`, ...)` (popup on desktop, `_blank` on mobile), same as current fallback.
+3. **Component change:** In `GivebutterDonateButton`, remove the branch that renders `<givebutter-button>` and the script polling for it; keep only the button that opens the full campaign URL in popup/tab.
+
+**Trade-offs:**
+
+- **Pro:** Users always see cover image and description before donating.
+- **Con:** They leave our page (popup/tab) instead of staying in the overlay.
+
+**References:** Givebutter Help – [How to use Givebutter Widgets on your website](https://help.givebutter.com/en/articles/6464859-how-to-use-givebutter-widgets-on-your-website) (“An embedded Widget will not embed the entire campaign page… it will embed the checkout flow”; “If you're embedding a Form campaign, the campaign description will not appear”).
+
+## **Troubleshooting**
+
+### **Popup Not Opening?**
+1. Check browser popup blocker settings
+2. Verify popup is triggered by user interaction (not programmatic)
+3. Check console for errors
+4. Verify campaign ID is correct
+5. Test popup in different browsers
+6. **On Mobile**: Popup will open in new tab instead (this is expected behavior)
+
+### **PRB Buttons Not Showing on Mobile?**
+1. Verify you're testing on actual device (not just browser dev tools)
+2. Check that Apple Pay/Google Pay is set up on the device
+3. Verify payment methods are enabled in Givebutter campaign settings
+4. Ensure Givebutter page opens in new tab (not iframe)
+5. Check browser console for any errors
+6. Verify HTTPS is being used (required for Apple Pay)
+
+### **Custom Element Not Working?**
+1. Verify script is loaded: `document.querySelector('script[src*="widgets.givebutter.com"]')`
+2. Check if custom element is defined: `customElements.get('givebutter-button')`
+3. Verify account ID in script URL matches your Givebutter account
+4. Check browser console for Givebutter initialization errors
+5. Fallback to popup window should still work
+
+### **X-Frame-Options Error?**
+- **This is expected** - Givebutter blocks iframe embedding
+- **Solution**: Use popup window instead of iframe
+- **Error Message**: `Refused to display 'https://givebutter.com/' in a frame because it set 'X-Frame-Options' to 'sameorigin'.`
+
+### **Script Not Loading?**
+1. Check network tab for script request
+2. Verify script URL is correct
+3. Check for CORS or CSP errors
+4. Verify `strategy="afterInteractive"` is set
+5. Check if script is being blocked by ad blockers
+
+## **Environment Variables**
+
+### **Required**
+- No environment variables required for basic widget functionality
+- Account ID is embedded in script URL
+- Campaign ID is passed as prop to component
+
+### **Optional (for Webhooks)**
+- `DEV_GBTTR_API_KEY`: Givebutter API key for webhook verification
+- `DEV_GBTTR_WEBHOOK_SECRET`: Givebutter webhook secret for signature verification
+
+## **Reference Implementations**
+
+- **Donate Button Component**: [`src/components/GivebutterDonateButton.tsx`](mdc:src/components/GivebutterDonateButton.tsx)
+- **Widget Component**: [`src/components/GivebutterWidget.tsx`](mdc:src/components/GivebutterWidget.tsx)
+- **Donation Page**: [`src/app/donate/page.tsx`](mdc:src/app/donate/page.tsx)
+- **Homepage Integration**: [`src/app/page.tsx`](mdc:src/app/page.tsx) - Lines 268-279
+- **Layout Script**: [`src/app/layout.tsx`](mdc:src/app/layout.tsx) - Lines 374-380
+- **TypeScript Declarations**: [`src/types/givebutter.d.ts`](mdc:src/types/givebutter.d.ts)
+
+## **Related Patterns**
+
+- See [Next.js API Routes](mdc:.cursor/rules/nextjs_api_routes.mdc) for webhook handling patterns
+- See [Icon Standards](mdc:.cursor/rules/icons_buttons_styles.mdc) for button styling
+- See [MOSC Styling Standards](mdc:.cursor/rules/mosc_styling_standards.mdc) for design system
+
+## **Summary**
+
+**Key Rules:**
+1. **Never use iframe** - Givebutter blocks iframe embedding with X-Frame-Options
+2. **Use popup window on desktop** - `window.open()` works around X-Frame-Options restrictions
+3. **Use new tab on mobile** - Mobile browsers handle popups poorly; new tab ensures PRB works
+4. **Wait for script** - Always check if Givebutter script is loaded before using custom elements
+5. **Provide fallbacks** - Multiple fallback strategies ensure reliability
+6. **Handle popup blocking** - Gracefully fallback to new tab if popup is blocked
+7. **Monitor popup closure** - Use intervals to detect when popup closes (for analytics)
+8. **Detect mobile devices** - Use user agent and screen width to determine mobile vs desktop
+
+**Implementation Checklist:**
+- [ ] Givebutter script added to root layout with `strategy="afterInteractive"`
+- [ ] TypeScript declarations file created for custom elements
+- [ ] Donate button component uses popup window (desktop) or new tab (mobile)
+- [ ] Mobile device detection implemented (user agent + screen width)
+- [ ] Script loading detection implemented with polling
+- [ ] Fallback to new tab if popup is blocked
+- [ ] Popup dimensions set to 800x900px and centered (desktop only)
+- [ ] Cleanup for timers/intervals implemented
+- [ ] Error handling and logging included
+
+**Mobile PRB Support:**
+- ✅ **Apple Pay**: Automatically supported when Givebutter page opens in new tab on iOS Safari
+- ✅ **Google Pay**: Automatically supported when Givebutter page opens in new tab on Chrome/Android
+- ✅ **No Additional Configuration**: Givebutter handles PRB display automatically based on device capabilities
+- ✅ **HTTPS Required**: Ensure your site uses HTTPS (required for Apple Pay)
+
+**Cover image & description (optional, not implemented):**
+- **Modal (current):** Checkout only; no cover/description. Keep popup/modal as default.
+- **Full campaign page (optional):** Cover + description shown. See **Optional: Cover Image & Description (Future Integration)** above if we want to switch to always opening the full campaign page (popup/tab) later.
+
+This ensures reliable Givebutter donation widget integration that works across all browsers and devices while respecting security restrictions and enabling mobile payment methods (Apple Pay/Google Pay PRB).

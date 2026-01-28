@@ -1617,12 +1617,14 @@ CREATE TABLE public.event_media (
                                     director_id bigint NULL,
                                     priority_ranking INT4 NOT NULL DEFAULT 0,
                                     is_home_page_hero_image bool DEFAULT false NOT NULL,
+                                    home_page_hero_display_duration_seconds int4 NULL,
                                     is_featured_event_image bool DEFAULT false NOT NULL,
                                     is_live_event_image bool DEFAULT false NOT NULL,
                                     album_id int8 NULL,
                                     CONSTRAINT check_download_count_non_negative CHECK ((download_count >= 0)),
                                     CONSTRAINT check_file_size_positive CHECK (((file_size IS NULL) OR (file_size >= 0))),
                                     CONSTRAINT check_priority_ranking_non_negative CHECK (priority_ranking >= 0),
+                                    CONSTRAINT check_home_page_hero_display_duration CHECK (home_page_hero_display_duration_seconds IS NULL OR (home_page_hero_display_duration_seconds >= 1 AND home_page_hero_display_duration_seconds <= 600)),
                                     CONSTRAINT check_event_album_mutually_exclusive CHECK (((event_id IS NULL AND album_id IS NULL) OR (event_id IS NOT NULL AND album_id IS NULL) OR (event_id IS NULL AND album_id IS NOT NULL))),
                                     CONSTRAINT fk_event_media__event_id FOREIGN KEY (event_id) REFERENCES public.event_details(id) ON DELETE CASCADE,
                                     CONSTRAINT fk_event_media__uploaded_by_id FOREIGN KEY (uploaded_by_id) REFERENCES public.user_profile(id) ON DELETE SET NULL,
@@ -1647,6 +1649,8 @@ COMMENT ON COLUMN public.event_media.event_sponsors_join_id IS 'Reference to eve
 COMMENT ON COLUMN public.event_media.priority_ranking IS 'Priority ranking for media files (sponsor or event-sponsor). Lower values indicate higher priority (0 = highest priority). Used to determine which image to display when multiple files are available.';
 
 COMMENT ON COLUMN public.event_media.album_id IS 'Reference to gallery album. Mutually exclusive with event_id (media belongs to either an event OR an album, not both).';
+
+COMMENT ON COLUMN public.event_media.home_page_hero_display_duration_seconds IS 'Duration in seconds to display this image in the homepage hero slider when is_home_page_hero_image is true. Stored as total seconds (e.g. 50, 80 for 1m20s). NULL = use app default (8 seconds). Valid range: 1–600.';
 
 
 

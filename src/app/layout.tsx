@@ -345,7 +345,10 @@ export default async function RootLayout({
     >
       <html lang="en" suppressHydrationWarning>
         <head>
-          <link href="https://fonts.googleapis.com/css?family=Epilogue:300,400,500,600,700|Sora:400,500,600,700&display=swap" rel="stylesheet" />
+          {/* Header Design System Fonts - DM Serif Display + Plus Jakarta Sans */}
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+          <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Epilogue:wght@300;400;500;600;700&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet" />
           <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
         </head>
         <body className={inter.className + " flex flex-col min-h-screen"} suppressHydrationWarning>
@@ -370,6 +373,13 @@ export default async function RootLayout({
                 };
               `,
             }}
+          />
+          {/* Givebutter Widget Script */}
+          <Script
+            id="givebutter-widget"
+            src="https://widgets.givebutter.com/latest.umd.cjs?acct=mKoUpYQebNsn6RqA&p=other"
+            strategy="afterInteractive"
+            async
           />
           {/* Mobile Debug Console - Always available for log copying, even on error pages */}
           <MobileDebugConsole />

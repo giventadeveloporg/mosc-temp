@@ -172,6 +172,19 @@ type MediaCheckboxName = 'isPublic' | 'eventFlyer' | 'isEventManagementOfficialD
 
 function EditMediaModal({ media, onClose, onSave, loading }: EditMediaModalProps) {
   console.log('EditMediaModal - media object:', media);
+  
+  // Helper to convert total seconds to minutes and seconds
+  const secondsToMinutesAndSeconds = (totalSeconds: number | null | undefined): { minutes: number | ''; seconds: number | '' } => {
+    if (!totalSeconds || totalSeconds <= 0) return { minutes: '', seconds: '' };
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return { minutes, seconds };
+  };
+
+  const initialDuration = secondsToMinutesAndSeconds(media.homePageHeroDisplayDurationSeconds);
+  const [heroDisplayDurationMinutes, setHeroDisplayDurationMinutes] = useState<number | ''>(initialDuration.minutes);
+  const [heroDisplayDurationSeconds, setHeroDisplayDurationSeconds] = useState<number | ''>(initialDuration.seconds);
+
   const [form, setForm] = useState<Partial<EventMediaDTO>>(() => ({
     id: media.id,
     tenantId: media.tenantId,
@@ -205,7 +218,15 @@ function EditMediaModal({ media, onClose, onSave, loading }: EditMediaModalProps
       (typeof media.startDisplayingFromDate === 'string' ?
         media.startDisplayingFromDate :
         new Date(media.startDisplayingFromDate).toISOString().split('T')[0]) : '',
+    homePageHeroDisplayDurationSeconds: media.homePageHeroDisplayDurationSeconds || undefined,
   }));
+
+  // Sync duration fields when media changes
+  useEffect(() => {
+    const duration = secondsToMinutesAndSeconds(media.homePageHeroDisplayDurationSeconds);
+    setHeroDisplayDurationMinutes(duration.minutes);
+    setHeroDisplayDurationSeconds(duration.seconds);
+  }, [media]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -214,9 +235,15 @@ function EditMediaModal({ media, onClose, onSave, loading }: EditMediaModalProps
     if (loading) return;
 
     try {
+      // Convert minutes + seconds to total seconds for homePageHeroDisplayDurationSeconds
+      const minutes = typeof heroDisplayDurationMinutes === 'number' ? heroDisplayDurationMinutes : 0;
+      const seconds = typeof heroDisplayDurationSeconds === 'number' ? heroDisplayDurationSeconds : 0;
+      const totalSeconds = minutes * 60 + seconds;
+      
       const payload = {
         ...form,
         updatedAt: new Date().toISOString(),
+        homePageHeroDisplayDurationSeconds: totalSeconds > 0 && totalSeconds <= 600 ? totalSeconds : (form.isHomePageHeroImage ? null : undefined),
         ...Object.fromEntries(
           Object.entries(form)
             .filter(([_, v]) => v !== undefined && v !== null && v !== '')
@@ -332,6 +359,75 @@ function EditMediaModal({ media, onClose, onSave, loading }: EditMediaModalProps
                 className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
                 placeholder="https://www.youtube.com/watch?v=..."
               />
+            </div>
+          )}
+
+          {/* Home Page Hero Display Duration (shown only when isHomePageHeroImage is checked) */}
+          {form.isHomePageHeroImage && (
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Home Page Hero Display Duration
+              </label>
+              <p className="text-xs text-gray-600 mb-3">
+                How long should this image be displayed in the homepage hero slider? Leave empty to use default (8 seconds).
+              </p>
+              <div className="flex items-center gap-4">
+                <div className="flex-1">
+                  <label htmlFor="editHeroDisplayDurationMinutes" className="block text-xs font-medium text-gray-600 mb-1">
+                    Minutes
+                  </label>
+                  <input
+                    type="number"
+                    id="editHeroDisplayDurationMinutes"
+                    name="editHeroDisplayDurationMinutes"
+                    min="0"
+                    max="10"
+                    value={heroDisplayDurationMinutes}
+                    onChange={e => {
+                      const val = e.target.value === '' ? '' : Math.max(0, Math.min(10, parseInt(e.target.value, 10) || 0));
+                      setHeroDisplayDurationMinutes(val);
+                    }}
+                    className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
+                    placeholder="0"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label htmlFor="editHeroDisplayDurationSeconds" className="block text-xs font-medium text-gray-600 mb-1">
+                    Seconds
+                  </label>
+                  <input
+                    type="number"
+                    id="editHeroDisplayDurationSeconds"
+                    name="editHeroDisplayDurationSeconds"
+                    min="0"
+                    max="59"
+                    value={heroDisplayDurationSeconds}
+                    onChange={e => {
+                      const val = e.target.value === '' ? '' : Math.max(0, Math.min(59, parseInt(e.target.value, 10) || 0));
+                      setHeroDisplayDurationSeconds(val);
+                    }}
+                    className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
+                    placeholder="0"
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                Valid range: 1 second to 10 minutes (600 seconds). Example: 1 min 20 secs = 80 seconds total.
+              </p>
+              {(typeof heroDisplayDurationMinutes === 'number' && heroDisplayDurationMinutes > 0) || (typeof heroDisplayDurationSeconds === 'number' && heroDisplayDurationSeconds > 0) ? (
+                <div className="mt-2 text-sm text-blue-700 font-medium">
+                  Total: {(() => {
+                    const min = typeof heroDisplayDurationMinutes === 'number' ? heroDisplayDurationMinutes : 0;
+                    const sec = typeof heroDisplayDurationSeconds === 'number' ? heroDisplayDurationSeconds : 0;
+                    const total = min * 60 + sec;
+                    if (total === 0) return '0 seconds (will use default)';
+                    if (total < 60) return `${total} secs`;
+                    const m = Math.floor(total / 60);
+                    const s = total % 60;
+                    return s === 0 ? `${m} min` : `${m} min ${s} secs`;
+                  })()}
+                </div>
+              ) : null}
             </div>
           )}
 

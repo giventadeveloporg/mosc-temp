@@ -1,205 +1,197 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import type { EventDetailsDTO, EventWithMedia } from '@/types';
-import { getAppUrl } from '@/lib/env';
+import type { EventWithMedia } from '@/types';
 import { useFilteredEvents } from '@/hooks/useFilteredEvents';
 import { isRecurringEvent, getNextOccurrenceDate } from '@/lib/eventUtils';
+import { isTicketedFundraiserEvent } from '@/lib/donation/utils';
+import { Ticket, ArrowRight, Sparkles, Users, Heart, Play, Pause, ChevronLeft, ChevronRight } from 'lucide-react';
+import GivebutterDonateButton from '@/components/GivebutterDonateButton';
 
-// Add local extension for placeholder text
+// Extended event type
 interface EventWithMediaExtended extends EventWithMedia {
   placeholderText?: string;
 }
 
-// Image rotation logic component with full event flyer implementation
-const DynamicHeroImage: React.FC = () => {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isShowingDefault, setIsShowingDefault] = useState(true);
-  const [dynamicImages, setDynamicImages] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [currentEvent, setCurrentEvent] = useState<EventWithMediaExtended | null>(null);
-  const [hasTicketedEvents, setHasTicketedEvents] = useState(false);
-  const [upcomingEvents, setUpcomingEvents] = useState<EventWithMediaExtended[]>([]);
+// Hands/Heart Icon SVG for About Card
+const HandsHeartIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg className={className} viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M40 20C40 20 32 12 24 12C16 12 10 18 10 26C10 40 40 56 40 56C40 56 70 40 70 26C70 18 64 12 56 12C48 12 40 20 40 20Z"
+      stroke="white"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
+    <path
+      d="M20 44V64C20 66 22 68 24 68H32C34 68 36 66 36 64V52"
+      stroke="white"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M60 44V64C60 66 58 68 56 68H48C46 68 44 66 44 64V52"
+      stroke="white"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M28 52H52"
+      stroke="white"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+    />
+  </svg>
+);
 
-  // Use shared data hook for consistent date parsing
+// Dynamic Hero Image Component
+const DynamicHeroImage: React.FC<{
+  onEventChange?: (event: EventWithMediaExtended | null) => void;
+}> = ({ onEventChange }) => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [dynamicImages, setDynamicImages] = useState<string[]>([]);
+  const [upcomingEvents, setUpcomingEvents] = useState<EventWithMediaExtended[]>([]);
+  const [imageDurations, setImageDurations] = useState<number[]>([]); // Duration in milliseconds for each image
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isTouched, setIsTouched] = useState(false);
+  const touchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  const rotationTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  // Ref to store latest durations array to avoid stale closures
+  const imageDurationsRef = React.useRef<number[]>([]);
+  // Refs to store latest arrays to avoid stale closures in recursive function
+  const dynamicImagesRef = React.useRef<string[]>([]);
+  const upcomingEventsRef = React.useRef<EventWithMediaExtended[]>([]);
+  // Ref to store latest isPaused state to avoid stale closures
+  const isPausedRef = React.useRef<boolean>(false);
+  // Ref to track the last scheduled image index to prevent duplicate scheduling
+  const lastScheduledIndexRef = React.useRef<number | null>(null);
+
   const { filteredEvents, isLoading: eventsLoading, error } = useFilteredEvents('hero');
 
-  // Default image path
   const defaultImage = "/images/hero_section/default_hero_section_second_column_poster.webp";
 
-  // Overlay logic based on current event - Implements priority system from documentation
-  const getOverlayForEvent = (event: EventWithMediaExtended | null) => {
-    if (!event) return null;
+  // Store onEventChange in a ref to avoid dependency issues in the rotation effect
+  const onEventChangeRef = React.useRef(onEventChange);
+  React.useEffect(() => {
+    onEventChangeRef.current = onEventChange;
+  }, [onEventChange]);
 
-    // Priority 1: Buy Tickets (highest priority)
-    if (event.admissionType?.toLowerCase().includes('ticket') ||
-      event.admissionType?.toLowerCase().includes('paid') ||
-      event.admissionType?.toLowerCase().includes('fee')) {
-      return { type: 'tickets', image: '/images/buy_tickets_click_here_red.webp', action: `/events/${event.id}/checkout` };
-    }
-
-    // Priority 2: Registration Required
-    if (event.isRegistrationRequired) {
-      return { type: 'registration', image: '/images/register_here_button.png', action: `/events/${event.id}` };
-    }
-
-    // Priority 3: Live Event
-    if (event.isLive) {
-      return { type: 'live', image: '/images/watch_live_button.png', action: `/events/${event.id}` };
-    }
-
-    // Priority 4: Sports Event
-    if (event.isSportsEvent) {
-      return { type: 'sports', image: '/images/sports_event_button.png', action: `/events/${event.id}` };
-    }
-
-    return null; // No overlay
-  };
-
-
-
+  // Initialize hero images
   useEffect(() => {
     const initializeHeroImages = async () => {
       try {
-        setIsLoading(true);
+        const imageUrls: string[] = [];
+        const processedEvents: EventWithMediaExtended[] = [];
+        const durations: number[] = []; // Duration in milliseconds for each image
 
-        // Use shared data hook for consistent date parsing
         if (filteredEvents && filteredEvents.length > 0) {
-          console.log('=== HERO IMAGE SELECTION ===');
-          console.log(`Found ${filteredEvents.length} hero events from shared hook`);
-
-          let heroImageUrl = defaultImage;
-          let nextEvent: EventWithMediaExtended | null = null;
-
           const today = new Date();
           today.setHours(0, 0, 0, 0);
           const oneYearFromNow = new Date();
           oneYearFromNow.setFullYear(today.getFullYear() + 1);
-          oneYearFromNow.setHours(23, 59, 59, 999);
 
-          // Process events and filter recurring events to show only next occurrence
-          const processedEvents: EventWithMediaExtended[] = [];
-          const recurringSeriesMap = new Map<number, EventWithMediaExtended>(); // Map recurrenceSeriesId -> event with earliest next occurrence
+          const recurringSeriesMap = new Map<number, EventWithMediaExtended>();
 
           filteredEvents.forEach(({ event, media }) => {
+            // Extract duration from media (convert seconds to milliseconds, default to 8000ms if null)
+            const durationSeconds = media.homePageHeroDisplayDurationSeconds;
+            const durationMs = durationSeconds != null && durationSeconds > 0 
+              ? Math.max(1000, Math.min(600000, durationSeconds * 1000)) // Clamp 1s-10min in ms
+              : 8000; // Default 8 seconds in milliseconds
+
             const eventWithMedia: EventWithMediaExtended = {
               ...event,
               thumbnailUrl: media.fileUrl,
-              media: [media]
-            };
+              media: [media],
+              // Store duration for later use when building imageUrls array
+              heroDisplayDurationMs: durationMs
+            } as EventWithMediaExtended & { heroDisplayDurationMs: number };
 
-            // Handle recurring events
             if (isRecurringEvent(event)) {
               const seriesId = event.recurrenceSeriesId || event.parentEventId || event.id;
-
-              // Calculate next occurrence date
               const nextOccurrence = getNextOccurrenceDate(event, today);
 
-              if (!nextOccurrence) {
-                console.log(`Skipping recurring event ${event.id}: No next occurrence found`);
-                return; // Skip if no next occurrence
-              }
+              if (!nextOccurrence || nextOccurrence > oneYearFromNow) return;
 
-              // Check if next occurrence is within 1 year
-              if (nextOccurrence > oneYearFromNow) {
-                console.log(`Skipping recurring event ${event.id}: Next occurrence ${nextOccurrence.toISOString()} is beyond 1 year`);
-                return; // Skip if beyond 1 year
-              }
-
-              // Update event startDate to next occurrence for display
               const nextOccurrenceStr = nextOccurrence.toISOString().split('T')[0];
               eventWithMedia.startDate = nextOccurrenceStr;
 
-              // Check if we already have an event from this series
               const existingSeriesEvent = recurringSeriesMap.get(seriesId);
               if (!existingSeriesEvent) {
-                // First event from this series - add it
                 recurringSeriesMap.set(seriesId, eventWithMedia);
-                console.log(`Added recurring event series ${seriesId}: ${event.title} (Next occurrence: ${nextOccurrenceStr})`);
               } else {
-                // Compare dates - keep the one with earlier next occurrence
                 const existingDate = new Date(existingSeriesEvent.startDate!);
                 if (nextOccurrence < existingDate) {
                   recurringSeriesMap.set(seriesId, eventWithMedia);
-                  console.log(`Updated recurring event series ${seriesId}: ${event.title} (Earlier occurrence: ${nextOccurrenceStr})`);
                 }
               }
             } else {
-              // Non-recurring event - add directly
               processedEvents.push(eventWithMedia);
             }
           });
 
-          // Add recurring events (only one per series - the next occurrence)
-          recurringSeriesMap.forEach((event) => {
-            processedEvents.push(event);
-          });
+          recurringSeriesMap.forEach((event) => processedEvents.push(event));
 
-          // Sort by startDate to show earliest events first
           processedEvents.sort((a, b) => {
             if (!a.startDate || !b.startDate) return 0;
             return new Date(a.startDate).getTime() - new Date(b.startDate).getTime();
           });
 
-          // Store upcoming events for image rotation logic
-          setUpcomingEvents(processedEvents);
-
-          console.log(`Found ${processedEvents.length} upcoming events with isHomePageHeroImage = true (${recurringSeriesMap.size} recurring series, ${processedEvents.length - recurringSeriesMap.size} non-recurring)`);
-
-          // Build dynamic images array with filtered events
-          const imageUrls: string[] = [];
-          const eventData: EventWithMediaExtended[] = [];
-
-          // Add filtered upcoming events (only next occurrence for recurring events)
-          processedEvents.forEach((event, index) => {
-            if (event.thumbnailUrl) {
-              imageUrls.push(event.thumbnailUrl);
-              eventData.push(event);
-              const isRecurring = isRecurringEvent(event);
-              console.log(`  [${index + 1}/${processedEvents.length}] Added event to rotation: ${event.title} (ID: ${event.id}, Date: ${event.startDate}${isRecurring ? ', Recurring - Next occurrence' : ''})`);
-            } else {
-              console.warn(`  [${index + 1}/${processedEvents.length}] Skipped event (no thumbnail): ${event.title} (ID: ${event.id})`);
+          // Add event images and their durations
+          processedEvents.forEach((e, index) => {
+            if (e.thumbnailUrl) {
+              imageUrls.push(e.thumbnailUrl);
+              // Get duration from event (stored in heroDisplayDurationMs property)
+              const eventDuration = (e as any).heroDisplayDurationMs || 8000; // Default 8 seconds
+              durations.push(eventDuration);
+              console.log(`[HeroSection] Event ${index + 1} duration: ${eventDuration}ms (${eventDuration / 1000}s)`, {
+                eventId: e.id,
+                eventTitle: e.title,
+                durationSeconds: (e as any).heroDisplayDurationMs ? (e as any).heroDisplayDurationMs / 1000 : null,
+                mediaDurationSeconds: e.media?.[0]?.homePageHeroDisplayDurationSeconds
+              });
             }
           });
+        }
 
-          // Set first event for initial display
-          if (upcomingEvents.length > 0) {
-            const event = upcomingEvents[0];
-            heroImageUrl = event.thumbnailUrl!;
-            nextEvent = event;
-            console.log(`Using hero image from event: ${event.title} (ID: ${event.id})`);
-            console.log(`✅ Total events in rotation: ${imageUrls.length} (all events in next 1 year with isHomePageHeroImage = true, recurring events show only next occurrence)`);
-          }
+        // ALWAYS add default image at the end of the rotation (use default 8 seconds)
+        imageUrls.push(defaultImage);
+        durations.push(8000); // Default image uses default 8 seconds
 
-          // Add fallback to original image
-          imageUrls.push("https://cdn.builder.io/api/v1/image/assets%2Fa70a28525f6f491aaa751610252a199c%2F67c8b636de774dd2bb5d7097f5fcc176?format=webp&width=800");
+        console.log('[HeroSection] Image rotation initialized:', {
+          totalImages: imageUrls.length,
+          eventImages: imageUrls.length - 1,
+          hasDefaultImage: true,
+          durations: durations.map(d => `${d}ms (${d / 1000}s)`)
+        });
 
-          setDynamicImages(imageUrls);
+        setUpcomingEvents(processedEvents);
+        setDynamicImages(imageUrls);
+        setImageDurations(durations); // Set the durations array
+        // Store in refs for latest access in recursive rotation function
+        imageDurationsRef.current = durations;
+        dynamicImagesRef.current = imageUrls;
+        upcomingEventsRef.current = processedEvents;
+        setIsInitialized(true);
 
-          // Check if any events have tickets (infer from admissionType or other fields)
-          const hasTickets = upcomingEvents.some(event =>
-            event.admissionType &&
-            (event.admissionType.toLowerCase().includes('ticket') ||
-              event.admissionType.toLowerCase().includes('paid') ||
-              event.admissionType.toLowerCase().includes('fee'))
-          );
-          setHasTicketedEvents(hasTickets);
-
-          // Set current event for display - this will be updated during rotation
-          if (eventData.length > 0) {
-            setCurrentEvent(eventData[0]);
-          } else {
-            setCurrentEvent(null); // No current event for default/fallback images
-          }
+        // Set initial event (first event or null if only default image)
+        if (processedEvents.length > 0 && onEventChangeRef.current) {
+          onEventChangeRef.current(processedEvents[0]);
+        } else if (onEventChangeRef.current) {
+          onEventChangeRef.current(null);
         }
       } catch (error) {
         console.error('Failed to initialize hero images:', error);
-        // Fallback to original image
-        setDynamicImages(["https://cdn.builder.io/api/v1/image/assets%2Fa70a28525f6f491aaa751610252a199c%2F67c8b636de774dd2bb5d7097f5fcc176?format=webp&width=800"]);
-      } finally {
-        setIsLoading(false);
+        setDynamicImages([defaultImage]);
+        setIsInitialized(true);
       }
     };
 
@@ -208,281 +200,519 @@ const DynamicHeroImage: React.FC = () => {
     }
   }, [filteredEvents, eventsLoading, error]);
 
+  // Update refs whenever state changes to avoid stale closures
   useEffect(() => {
-    // Start with default image for 2 seconds (reduced from 4)
-    const defaultTimer = setTimeout(() => {
-      setIsShowingDefault(false);
-    }, 2000);
+    imageDurationsRef.current = imageDurations;
+  }, [imageDurations]);
+  
+  useEffect(() => {
+    dynamicImagesRef.current = dynamicImages;
+  }, [dynamicImages]);
+  
+  useEffect(() => {
+    upcomingEventsRef.current = upcomingEvents;
+  }, [upcomingEvents]);
+  
+  useEffect(() => {
+    isPausedRef.current = isPaused;
+  }, [isPaused]);
 
-    // If we have dynamic images, start rotating them
-    if (dynamicImages.length > 0) {
-      const dynamicTimer = setTimeout(() => {
-        const interval = setInterval(() => {
-          setCurrentImageIndex((prev) => {
-            const newIndex = (prev + 1) % dynamicImages.length;
+  // Store scheduleNextRotation in a ref to avoid dependency issues
+  const scheduleNextRotationRef = React.useRef<((imageIndex: number) => void) | null>(null);
 
-            // Calculate number of event images (excluding fallback image at the end)
-            const eventImageCount = dynamicImages.length - 1; // Subtract 1 for fallback image
-
-            // Update current event when image changes - key implementation for overlay sync
-            if (newIndex < eventImageCount && newIndex < upcomingEvents.length) {
-              // Show event-specific overlay for event images
-              setCurrentEvent(upcomingEvents[newIndex]);
-              console.log(`Hero rotation: Showing event ${newIndex + 1}/${eventImageCount}: ${upcomingEvents[newIndex]?.title}`);
-            } else {
-              // No overlay for fallback/default images
-              setCurrentEvent(null);
-              console.log(`Hero rotation: Showing fallback image (index ${newIndex})`);
-            }
-
-            return newIndex;
-          });
-        }, 15000); // Change every 15 seconds
-
-        return () => clearInterval(interval);
-      }, 2000); // Start after 2 seconds
-
-      return () => {
-        clearTimeout(defaultTimer);
-        clearTimeout(dynamicTimer);
-      };
+  // Shared recursive function to rotate to next image with dynamic duration
+  // Use refs to access the latest arrays to avoid stale closures
+  // This function is used both by the rotation effect and manual navigation
+  const scheduleNextRotation = React.useCallback((imageIndex: number) => {
+    // CRITICAL: Prevent duplicate scheduling for the same image index
+    if (lastScheduledIndexRef.current === imageIndex && rotationTimeoutRef.current !== null) {
+      console.log('[HeroSection] Duplicate schedule prevented for index', imageIndex);
+      return;
     }
 
-    return () => clearTimeout(defaultTimer);
-  }, [dynamicImages.length, upcomingEvents]);
+    // CRITICAL: Clear any existing timeout before scheduling a new one to prevent duplicates
+    if (rotationTimeoutRef.current) {
+      clearTimeout(rotationTimeoutRef.current);
+      rotationTimeoutRef.current = null;
+    }
 
-  // Show default image for first 2 seconds
-  if (isShowingDefault) {
-    return (
-      <div className="relative w-full h-full">
-        <Link href="/events" className="block w-full h-full">
-          <Image
-            src={defaultImage}
-            alt="Default Hero Image"
-            fill
-            className="object-fill w-full h-full cursor-pointer"
-            style={{
-              filter: 'contrast(1.1) saturate(0.9)'
-            }}
-            sizes="(max-width: 1024px) 100vw, 50vw"
-          />
-        </Link>
-        {/* No Buy Tickets overlay for default image */}
-      </div>
-    );
-  }
+    // Don't schedule if paused or not initialized - use refs to get latest values
+    if (isPausedRef.current || !isInitialized) {
+      lastScheduledIndexRef.current = null;
+      return;
+    }
 
-  // Show dynamic images after 2 seconds
-  if (dynamicImages.length > 0) {
-    const isShowingEventFlyer = currentImageIndex < dynamicImages.length - 1; // Skip the fallback image
+    // Mark this index as scheduled
+    lastScheduledIndexRef.current = imageIndex;
 
-    return (
-      <div className="relative w-full h-full">
-        <Link
-          href={isShowingEventFlyer && currentEvent && currentEvent.id ? `/events/${currentEvent.id}` : '/events'}
-          className="block w-full h-full"
-        >
-          <Image
-            src={dynamicImages[currentImageIndex]}
-            alt="Dynamic Hero Image"
-            fill
-            className="object-fill w-full h-full cursor-pointer"
-            style={{
-              filter: 'contrast(1.1) saturate(0.9)'
-            }}
-            sizes="(max-width: 1024px) 100vw, 50vw"
-          />
-        </Link>
+    // CRITICAL: Access all arrays from refs to get the latest values, not from closure
+    const currentDurations = imageDurationsRef.current;
+    const currentImages = dynamicImagesRef.current;
+    const currentEvents = upcomingEventsRef.current;
+    
+    // Safety check
+    if (!currentImages || currentImages.length < 2) {
+      return;
+    }
+    
+    // Get duration for the specified image (default to 8 seconds if not available)
+    const imageDuration = (currentDurations && currentDurations[imageIndex]) ? currentDurations[imageIndex] : 8000;
+    
+    console.log('[HeroSection] Scheduling next rotation:', {
+      currentIndex: imageIndex,
+      currentDurationMs: imageDuration,
+      currentDurationSec: imageDuration / 1000,
+      totalImages: currentImages.length,
+      imageUrl: currentImages[imageIndex] || 'default',
+      durationsArray: currentDurations,
+      durationsArrayLength: currentDurations?.length
+    });
 
-        {/* Enhanced Overlay Logic - Priority-based system as per documentation */}
-        {(() => {
-          const overlay = getOverlayForEvent(currentEvent);
-          return overlay && isShowingEventFlyer ? (
-            <div className="absolute bottom-4 right-4 z-10">
-              <Link
-                href={overlay.action}
-                className="block cursor-pointer hover:scale-105 transition-transform duration-300"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <Image
-                  src={overlay.image}
-                  alt={`${overlay.type} overlay`}
-                  width={180}
-                  height={90}
-                  className="cursor-pointer hover:scale-105 transition-transform duration-300"
-                  onError={(e) => {
-                    // Fallback to buy tickets image if overlay image is missing
-                    const img = e.target as HTMLImageElement;
-                    img.src = '/images/buy_tickets_click_here_red.webp';
-                  }}
-                />
-              </Link>
-            </div>
-          ) : null;
-        })()}
+    rotationTimeoutRef.current = setTimeout(() => {
+      // Clear the scheduled index ref when timeout executes
+      lastScheduledIndexRef.current = null;
+      
+      setIsTransitioning(true);
 
-        {/* See All Events Overlay - Bottom Left */}
-        {(() => {
-          const shouldShowSeeAllEvents = currentEvent && (
-            (currentEvent.admissionType?.toLowerCase().includes('ticket') ||
-              currentEvent.admissionType?.toLowerCase().includes('paid') ||
-              currentEvent.admissionType?.toLowerCase().includes('fee')) ||
-            currentEvent.isRegistrationRequired
-          );
+      setTimeout(() => {
+        setCurrentImageIndex((prevIndex) => {
+          // CRITICAL: Get latest arrays from refs, not closure
+          const latestDurations = imageDurationsRef.current;
+          const latestImages = dynamicImagesRef.current;
+          const latestEvents = upcomingEventsRef.current;
+          
+          const nextIndex = (prevIndex + 1) % latestImages.length;
+          const nextDuration = (latestDurations && latestDurations[nextIndex]) ? latestDurations[nextIndex] : 8000;
 
-          return shouldShowSeeAllEvents && isShowingEventFlyer ? (
-            <div className="absolute left-4 z-10" style={{ bottom: '-36px' }}>
-              <Link
-                href="/events"
-                className="flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
-                title="See All Events"
-                aria-label="See All Events"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </div>
-                <span className="font-semibold text-indigo-700">See All Events</span>
-              </Link>
-            </div>
-          ) : null;
-        })()}
-      </div>
-    );
-  }
+          console.log('[HeroSection] Rotating to image', nextIndex + 1, 'of', latestImages.length, {
+            previousIndex: prevIndex,
+            nextIndex,
+            nextDurationMs: nextDuration,
+            nextDurationSec: nextDuration / 1000,
+            nextImageUrl: latestImages[nextIndex] || 'default',
+            durationsArray: latestDurations,
+            durationsArrayLength: latestDurations?.length
+          });
 
-  // Fallback to default image
+          // Update current event based on new index
+          // The last image is always the default image (no event)
+          if (nextIndex < latestEvents.length && onEventChangeRef.current) {
+            onEventChangeRef.current(latestEvents[nextIndex]);
+          } else if (onEventChangeRef.current) {
+            // Default image - no event associated
+            onEventChangeRef.current(null);
+          }
+
+          // Schedule next rotation with the new image's duration (use nextIndex)
+          // Access latest arrays from refs in the next schedule call
+          // Use ref to check pause state to avoid stale closure
+          // Use the ref to call the function to avoid closure issues
+          // Schedule after a small delay to ensure state update completes
+          setTimeout(() => {
+            if (!isPausedRef.current && scheduleNextRotationRef.current) {
+              scheduleNextRotationRef.current(nextIndex);
+            }
+          }, 10);
+
+          return nextIndex;
+        });
+
+        // Remove transition class after image changes
+        setTimeout(() => setIsTransitioning(false), 50);
+      }, 400);
+    }, imageDuration);
+  }, [isInitialized]);
+
+  // Update the ref whenever the function changes
+  useEffect(() => {
+    scheduleNextRotationRef.current = scheduleNextRotation;
+  }, [scheduleNextRotation]);
+
+  // Image rotation effect - continuous loop with per-image durations (pauses when isPaused is true)
+  useEffect(() => {
+    // Don't start rotation until initialized and we have at least 2 images
+    if (!isInitialized || dynamicImages.length < 2 || isPaused) {
+      console.log('[HeroSection] Rotation not started:', { isInitialized, imageCount: dynamicImages.length, isPaused });
+      // Clear any existing timeout when paused
+      if (rotationTimeoutRef.current) {
+        clearTimeout(rotationTimeoutRef.current);
+        rotationTimeoutRef.current = null;
+      }
+      return;
+    }
+
+    console.log('[HeroSection] Starting image rotation with', dynamicImages.length, 'images');
+    console.log('[HeroSection] Image durations:', imageDurations.map((d, i) => `Image ${i + 1}: ${d}ms (${d / 1000}s)`));
+
+    // CRITICAL: Clear any existing timeout before starting new rotation to prevent duplicates
+    if (rotationTimeoutRef.current) {
+      clearTimeout(rotationTimeoutRef.current);
+      rotationTimeoutRef.current = null;
+    }
+
+    // Reset the scheduled index guard when starting fresh rotation
+    lastScheduledIndexRef.current = null;
+
+    // Start the rotation cycle with the current image index (0 for first image)
+    // Use the ref to call the function to avoid dependency issues
+    // Use setTimeout to ensure this runs after any pending state updates
+    setTimeout(() => {
+      if (scheduleNextRotationRef.current && !isPausedRef.current) {
+        scheduleNextRotationRef.current(currentImageIndex);
+      }
+    }, 0);
+
+    return () => {
+      console.log('[HeroSection] Cleaning up rotation timeout');
+      if (rotationTimeoutRef.current) {
+        clearTimeout(rotationTimeoutRef.current);
+        rotationTimeoutRef.current = null;
+      }
+      lastScheduledIndexRef.current = null;
+    };
+  }, [isInitialized, dynamicImages.length, upcomingEvents.length, isPaused]);
+
+  // Navigation functions
+  const goToPrevious = () => {
+    // Clear existing rotation timeout when manually navigating
+    if (rotationTimeoutRef.current) {
+      clearTimeout(rotationTimeoutRef.current);
+      rotationTimeoutRef.current = null;
+    }
+    lastScheduledIndexRef.current = null;
+
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentImageIndex((prevIndex) => {
+        // Use refs to get latest arrays
+        const latestImages = dynamicImagesRef.current;
+        const latestEvents = upcomingEventsRef.current;
+        
+        const newIndex = (prevIndex - 1 + latestImages.length) % latestImages.length;
+        
+        // Update current event
+        if (newIndex < latestEvents.length && onEventChangeRef.current) {
+          onEventChangeRef.current(latestEvents[newIndex]);
+        } else if (onEventChangeRef.current) {
+          onEventChangeRef.current(null);
+        }
+        
+        // Restart rotation from new index after navigation completes
+        // Use ref to call the function to avoid closure issues
+        setTimeout(() => {
+          if (scheduleNextRotationRef.current) {
+            scheduleNextRotationRef.current(newIndex);
+          }
+        }, 100);
+        
+        return newIndex;
+      });
+      setTimeout(() => setIsTransitioning(false), 50);
+    }, 400);
+  };
+
+  const goToNext = () => {
+    // Clear existing rotation timeout when manually navigating
+    if (rotationTimeoutRef.current) {
+      clearTimeout(rotationTimeoutRef.current);
+      rotationTimeoutRef.current = null;
+    }
+    lastScheduledIndexRef.current = null;
+
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentImageIndex((prevIndex) => {
+        // Use refs to get latest arrays
+        const latestImages = dynamicImagesRef.current;
+        const latestEvents = upcomingEventsRef.current;
+        
+        const nextIndex = (prevIndex + 1) % latestImages.length;
+        
+        // Update current event
+        if (nextIndex < latestEvents.length && onEventChangeRef.current) {
+          onEventChangeRef.current(latestEvents[nextIndex]);
+        } else if (onEventChangeRef.current) {
+          onEventChangeRef.current(null);
+        }
+        
+        // Restart rotation from new index after navigation completes
+        // Use ref to call the function to avoid closure issues
+        setTimeout(() => {
+          if (scheduleNextRotationRef.current) {
+            scheduleNextRotationRef.current(nextIndex);
+          }
+        }, 100);
+        
+        return nextIndex;
+      });
+      setTimeout(() => setIsTransitioning(false), 50);
+    }, 400);
+  };
+
+  const togglePlayPause = () => {
+    setIsPaused((prev) => !prev);
+  };
+
+  // Touch event handlers for mobile
+  const handleTouchStart = () => {
+    setIsTouched(true);
+    // Clear existing timeout
+    if (touchTimeoutRef.current) {
+      clearTimeout(touchTimeoutRef.current);
+    }
+    // Hide controls after 3 seconds if no interaction
+    touchTimeoutRef.current = setTimeout(() => {
+      setIsTouched(false);
+      touchTimeoutRef.current = null;
+    }, 3000);
+  };
+
+  // Keep controls visible on touch interaction
+  const handleTouchInteraction = () => {
+    setIsTouched(true);
+    // Clear existing timeout
+    if (touchTimeoutRef.current) {
+      clearTimeout(touchTimeoutRef.current);
+    }
+    // Reset timeout on any touch interaction
+    touchTimeoutRef.current = setTimeout(() => {
+      setIsTouched(false);
+      touchTimeoutRef.current = null;
+    }, 3000);
+  };
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (touchTimeoutRef.current) {
+        clearTimeout(touchTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const currentImage = dynamicImages[currentImageIndex] || defaultImage;
+  const showControls = isHovered || isTouched;
+  const hasMultipleImages = dynamicImages.length > 1;
+
   return (
-    <div className="relative w-full h-full">
+    <div
+      className="relative w-full h-full"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onTouchStart={handleTouchStart}
+    >
       <Image
-        src={defaultImage}
-        alt="Default Hero Image"
+        src={currentImage}
+        alt="Featured Event"
         fill
-        className="object-fill w-full h-full cursor-pointer"
-        style={{
-          filter: 'contrast(1.1) saturate(0.9)'
-        }}
-        sizes="(max-width: 1024px) 100vw, 50vw"
-        onClick={() => {
-          // Route to events page for default image
-          window.location.href = '/events';
-        }}
+        className={`object-contain hero-image-transition ${isTransitioning ? 'transitioning' : ''}`}
+        sizes="100vw"
+        priority
       />
-      {/* No Buy Tickets overlay for fallback image */}
+
+      {/* Slider Controls - Show on hover or touch */}
+      {/* Controls positioned above image and Buy Tickets overlay (z-20) */}
+      {hasMultipleImages && showControls && (
+        <div 
+          className="absolute inset-0 flex items-center justify-between px-4 z-20 pointer-events-none"
+          onTouchStart={handleTouchInteraction}
+        >
+          {/* Previous Button - Left */}
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              goToPrevious();
+            }}
+            onTouchStart={handleTouchInteraction}
+            className="pointer-events-auto flex-shrink-0 w-12 h-12 rounded-full bg-white/90 hover:bg-white active:bg-white backdrop-blur-sm shadow-lg border-2 border-gray-300 hover:border-blue-500 active:border-blue-600 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
+            title="Previous Image"
+            aria-label="Previous Image"
+            type="button"
+          >
+            <ChevronLeft className="w-6 h-6 text-gray-700" />
+          </button>
+
+          {/* Play/Pause Button - Center */}
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              togglePlayPause();
+            }}
+            onTouchStart={handleTouchInteraction}
+            className="pointer-events-auto flex-shrink-0 w-12 h-12 rounded-full bg-white/90 hover:bg-white active:bg-white backdrop-blur-sm shadow-lg border-2 border-gray-300 hover:border-blue-500 active:border-blue-600 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
+            title={isPaused ? 'Play' : 'Pause'}
+            aria-label={isPaused ? 'Play' : 'Pause'}
+            type="button"
+          >
+            {isPaused ? (
+              <Play className="w-6 h-6 text-gray-700 ml-0.5" />
+            ) : (
+              <Pause className="w-6 h-6 text-gray-700" />
+            )}
+          </button>
+
+          {/* Next Button - Right */}
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              goToNext();
+            }}
+            onTouchStart={handleTouchInteraction}
+            className="pointer-events-auto flex-shrink-0 w-12 h-12 rounded-full bg-white/90 hover:bg-white active:bg-white backdrop-blur-sm shadow-lg border-2 border-gray-300 hover:border-blue-500 active:border-blue-600 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
+            title="Next Image"
+            aria-label="Next Image"
+            type="button"
+          >
+            <ChevronRight className="w-6 h-6 text-gray-700" />
+          </button>
+        </div>
+      )}
     </div>
   );
 };
 
 const HeroSection: React.FC = () => {
+  const [currentEvent, setCurrentEvent] = useState<EventWithMediaExtended | null>(null);
+
+  // Determine overlay image and route based on event type (matching events page logic)
+  const getOverlayInfo = (event: EventWithMediaExtended | null) => {
+    if (!event || !event.id) return null;
+
+    // Check if event is upcoming (today or future)
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    const eventDateStr = event.startDate ? event.startDate.split('T')[0] : null;
+    
+    if (!eventDateStr) return null;
+    
+    const isToday = eventDateStr === todayStr;
+    const isFuture = eventDateStr > todayStr;
+    const isUpcomingLocal = isToday || isFuture;
+
+    if (!isUpcomingLocal) return null; // Don't show overlay for past events
+
+    // Check if event is ticketed fundraiser/charity (shows special fundraiser image)
+    const isTicketedFundraiser = isTicketedFundraiserEvent(event);
+    
+    if (isTicketedFundraiser) {
+      return {
+        image: '/images/buy_tickets_click_here_fundraiser.png',
+        href: `/events/${event.id}/donation-checkout`,
+        alt: 'Buy Tickets'
+      };
+    }
+
+    // Check if event is regular ticketed event
+    if (event.admissionType?.toUpperCase() === 'TICKETED') {
+      // Route to manual checkout if manual payment is enabled, otherwise Stripe checkout
+      const checkoutRoute =
+        event.manualPaymentEnabled === true &&
+        (event.paymentFlowMode === 'MANUAL_ONLY' || event.paymentFlowMode === 'HYBRID')
+          ? `/events/${event.id}/manual-checkout`
+          : `/events/${event.id}/checkout`;
+
+      return {
+        image: '/images/buy_tickets_click_here_red.webp',
+        href: checkoutRoute,
+        alt: 'Buy Tickets'
+      };
+    }
+
+    return null;
+  };
+
+  const overlayInfo = getOverlayInfo(currentEvent);
+
   return (
-    <>
-      <div className="min-h-[37.5vh] bg-white pt-20 pb-0 relative">
-        {/* Donate Image - Top Right Corner - Positioned below header to avoid hamburger overlap */}
-        <div className="absolute top-28 right-6 z-50 lg:top-28 lg:right-8">
-          <div className="bg-transparent p-2 rounded-lg">
-            <Image
-              src="https://cdn.builder.io/api/v1/image/assets%2Fa70a28525f6f491aaa751610252a199c%2Fee43fae6623544d193ab0c26deca1d95?format=webp&width=800"
-              alt="Donate"
-              width={120}
-              height={60}
-              className="cursor-pointer hover:scale-105 transition-transform duration-300 drop-shadow-lg"
-              onClick={() => {
-                // Add donate functionality here
-                console.log('Donate button clicked');
-                // You can add a link to a donation page or open a modal
-              }}
-            />
+    <section className="hero-container">
+      {/* Main Hero Image */}
+      <div className="hero-image-wrapper">
+        <DynamicHeroImage onEventChange={setCurrentEvent} />
+
+        {/* Buy Tickets Overlay Image - Bottom Right Corner (matching events page style) */}
+        {overlayInfo && (
+          <div className="absolute bottom-4 right-4 z-10">
+            <Link
+              href={overlayInfo.href}
+              className="block cursor-pointer hover:scale-105 transition-transform duration-300"
+              onClick={(e) => e.stopPropagation()}
+              title={overlayInfo.alt}
+              aria-label={overlayInfo.alt}
+            >
+              <img
+                src={overlayInfo.image}
+                alt={overlayInfo.alt}
+                className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px] cursor-pointer hover:scale-105 transition-transform duration-300"
+              />
+            </Link>
           </div>
-        </div>
+        )}
+      </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Grid Layout - Mobile: First column cells side by side, second column below; Desktop: custom columns */}
-          <div className="grid gap-8 h-full min-h-[300px]">
+      {/* Two Cards Section */}
+      <div className="hero-cards-section">
+        {/* Unite India Card - Left */}
+        <Link href="/#about-us" className="hero-card hero-card-about group">
+          {/* Unite India Background Image */}
+          <div
+            className="absolute inset-0 bg-contain bg-center bg-no-repeat transition-transform duration-500 group-hover:scale-105"
+            style={{
+              backgroundImage: `url('https://cdn.builder.io/api/v1/image/assets%2Fa70a28525f6f491aaa751610252a199c%2F7e04d4cf965b47f9b58322797a9f4ba2?format=webp&width=800')`,
+              filter: 'brightness(0.95) contrast(1.05)'
+            }}
+          />
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+          {/* Text Content */}
+          <div className="absolute bottom-4 left-4 right-4">
+            <p className="hero-card-label">About</p>
+            <p className="hero-card-title">Our Mission</p>
+          </div>
+        </Link>
 
-            {/* Mobile layout: First column cells in same row */}
-            <div className="grid grid-cols-2 gap-4 lg:hidden">
-              {/* Cell 1: Logo - Simple image and text */}
-              <div className="relative overflow-hidden group min-h-[187px] flex flex-col items-center justify-center p-4">
-                <Image
-                  src="https://cdn.builder.io/api/v1/image/assets%2Fa70a28525f6f491aaa751610252a199c%2Fd7543f582d4f477599d341da96d48e2b?format=webp&width=800"
-                  alt="Malayalees Friends Logo"
-                  width={180}
-                  height={180}
-                  className="mx-auto mb-3"
-                  priority
-                />
-                <h2 className="text-lg font-bold text-gray-800 text-center">
-                  Malayalees Friends
-                </h2>
-                <p className="text-sm text-gray-600 mt-1 text-center">
-                  Cultural Events Federation
-                </p>
-              </div>
-
-              {/* Cell 3: Unite India Image - No text overlay */}
-              <div className="relative overflow-hidden group min-h-[187px] rounded-[2rem] bg-white">
-                <div
-                  className="absolute inset-0 rounded-[2rem] p-2"
-                  style={{
-                    background: `url('https://cdn.builder.io/api/v1/image/assets%2Fa70a28525f6f491aaa751610252a199c%2F7e04d4cf965b47f9b58322797a9f4ba2?format=webp&width=800') center/contain`,
-                    backgroundRepeat: 'no-repeat',
-                    filter: 'brightness(0.9) contrast(1.1)'
-                  }}
-                ></div>
-              </div>
-
-            </div>
-
-            {/* Cell 2: Large Modern Image - Mobile - Bleed to edges */}
-            <div className="relative overflow-hidden group min-h-[300px] lg:hidden -mx-4 sm:-mx-6">
-              <DynamicHeroImage />
-            </div>
-
-            {/* Desktop layout: Original grid with modifications */}
-            <div className="hidden lg:grid lg:grid-cols-[3fr_7fr] gap-8 items-end">
-
-              {/* Cell 1: Logo - Simple image and text */}
-              <div className="relative overflow-hidden group h-[262px] flex flex-col items-center justify-center">
-                <Image
-                  src="https://cdn.builder.io/api/v1/image/assets%2Fa70a28525f6f491aaa751610252a199c%2Fd7543f582d4f477599d341da96d48e2b?format=webp&width=800"
-                  alt="Malayalees Friends Logo"
-                  width={240}
-                  height={240}
-                  className="mx-auto mb-4"
-                  priority
-                />
-                <h2 className="text-xl font-bold text-gray-800 text-center">
-                  Malayalees Friends
-                </h2>
-                <p className="text-base text-gray-600 mt-2 text-center">
-                  Cultural Events Federation
-                </p>
-              </div>
-
-              {/* Cell 2: Large Modern Image - Dynamic image rotation */}
-              <div className="relative lg:row-span-2 group h-[531px]">
-                <DynamicHeroImage />
-              </div>
-
-              {/* Cell 3: Unite India Image - No text overlay */}
-              <div className="relative overflow-hidden group h-[262px] rounded-[2rem] bg-white">
-                <div
-                  className="absolute inset-0 rounded-[2rem] p-4"
-                  style={{
-                    background: `url('https://cdn.builder.io/api/v1/image/assets%2Fa70a28525f6f491aaa751610252a199c%2F7e04d4cf965b47f9b58322797a9f4ba2?format=webp&width=800') center/contain`,
-                    backgroundRepeat: 'no-repeat',
-                    filter: 'brightness(0.9) contrast(1.1)'
-                  }}
-                ></div>
-              </div>
-            </div>
+        {/* Malayalees Friends Card - Right (with Donate) */}
+        <div className="hero-card hero-card-donate group">
+          {/* Gradient Background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[#2d1b4e] via-[#3d2b5e] to-[#1a0a2e]" />
+          {/* Decorative Pattern */}
+          <div className="absolute inset-0 opacity-10" style={{
+            backgroundImage: `radial-gradient(circle at 20% 80%, rgba(255,255,255,0.3) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 20%, rgba(245,158,11,0.3) 0%, transparent 50%)`
+          }} />
+          {/* Content */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-4">
+            {/* Malayalees Friends Logo */}
+            <Image
+              src="https://cdn.builder.io/api/v1/image/assets%2Fa70a28525f6f491aaa751610252a199c%2Fd7543f582d4f477599d341da96d48e2b?format=webp&width=800"
+              alt="Malayalees Friends"
+              width={60}
+              height={60}
+              className="mb-2"
+            />
+            <p className="hero-card-donate-title">Support Us</p>
+            {/* Givebutter Donate Button - Opens Popup Modal */}
+            <GivebutterDonateButton
+              campaignId="mhoZp0"
+              className="mt-2 flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 rounded-full text-white text-sm font-semibold shadow-lg hover:shadow-amber-500/30 transition-all duration-300 hover:scale-105 cursor-pointer"
+            >
+              <Heart size={14} className="fill-white" />
+              <span>Donate Now</span>
+            </GivebutterDonateButton>
           </div>
         </div>
       </div>
 
-    </>
+      {/* Browse All Events Link */}
+      <div className="max-w-1400px mx-auto">
+        <Link href="/events" className="hero-browse-link">
+          <span>Browse all upcoming events</span>
+          <ArrowRight size={16} />
+        </Link>
+      </div>
+    </section>
   );
 };
 
