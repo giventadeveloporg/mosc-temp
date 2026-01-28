@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Search, ChevronDown, X, LogOut, User, Sparkles } from 'lucide-react';
+import { Search, ChevronDown, X, LogOut, User } from 'lucide-react';
 import { useAuth, useClerk, useUser } from '@clerk/nextjs';
 import { useTenantSettings } from '@/components/TenantSettingsProvider';
 import Image from 'next/image';
@@ -721,9 +721,15 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
             {/* Left side - Unite India Text Logo with Editorial Typography */}
             <div className="flex items-center">
               <Link href="/" className="group flex items-center gap-3">
-                {/* Optional: Decorative element */}
-                <div className="hidden sm:flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-amber-500 shadow-lg shadow-violet-500/20 group-hover:shadow-violet-500/30 transition-all duration-300 group-hover:scale-105">
-                  <Sparkles size={20} className="text-white" />
+                {/* Unite India logo icon - visible on mobile and desktop */}
+                <div className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex-shrink-0 overflow-hidden shadow-lg shadow-violet-500/20 group-hover:shadow-violet-500/30 transition-all duration-300 group-hover:scale-105">
+                  <Image
+                    src="/images/logos/unite_india_header_icon.jpeg"
+                    alt="Unite India"
+                    width={40}
+                    height={40}
+                    className="w-full h-full object-contain"
+                  />
                 </div>
                 <div className="text-left">
                   <div className="header-logo-primary text-[1.375rem] leading-tight group-hover:text-[var(--header-accent-primary)] transition-colors duration-300">
@@ -1000,8 +1006,14 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
           {/* Mobile Menu Header */}
           <div className="flex items-center justify-between p-5 border-b border-[var(--header-border)]">
             <Link href="/" className="flex items-center gap-2.5" onClick={closeMobileMenu}>
-              <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-violet-600 to-amber-500">
-                <Sparkles size={16} className="text-white" />
+              <div className="flex items-center justify-center w-9 h-9 rounded-lg flex-shrink-0 overflow-hidden">
+                <Image
+                  src="/images/logos/unite_india_header_icon.jpeg"
+                  alt="Unite India"
+                  width={36}
+                  height={36}
+                  className="w-full h-full object-contain"
+                />
               </div>
               <div className="text-left">
                 <div className="header-logo-primary text-lg leading-tight">

@@ -100,14 +100,12 @@ export default async function RootLayout({
     };
 
   // Determine tenant-scoped admin flag on the server
-  // CRITICAL: For public routes, skip auth checks entirely to avoid Next.js 15+ headers() async errors
-  // This allows public pages to render without authentication, which is correct behavior
-  // Also skip auth checks if pathname is empty (header not available) to prevent errors
+  // Run admin check on ALL routes (including public) so the Header shows the Admin menu when a logged-in admin visits any page (e.g. homepage).
+  // Skip only when pathname is empty to avoid edge cases. headers() is already awaited above, so auth() is safe.
   let isTenantAdmin = false;
 
-  // Only perform auth checks for non-public routes
-  // If pathname is empty, treat as public route to avoid headers() errors
-  if (!isPublicRoute && pathname) {
+  // Perform auth + profile lookup whenever we have a pathname so Header gets correct isTenantAdmin on every page
+  if (pathname) {
     try {
       // CRITICAL: Call auth() immediately after awaiting headers() to ensure proper async context
       // Do not call any other async functions before auth() completes
@@ -331,8 +329,8 @@ export default async function RootLayout({
       isTenantAdmin = false;
     }
   } else {
-    // Public route - skip auth checks to avoid Next.js 15+ headers() async errors
-    console.log('[Layout] 🔍 Public route detected, skipping auth checks:', pathname);
+    // pathname empty - skip auth to avoid edge cases
+    console.log('[Layout] 🔍 No pathname, skipping auth checks');
     isTenantAdmin = false;
   }
 

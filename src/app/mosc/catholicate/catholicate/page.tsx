@@ -86,13 +86,13 @@ const CatholicateOverviewPage = () => {
             {/* Main Content */}
             <div className="lg:col-span-2">
               <div className="bg-background rounded-lg sacred-shadow p-8">
-                <div className="mb-8">
+                <div className="mb-8 flex justify-center">
                   <Image
-                    src="/images/catholicate/Untitled-1.jpg"
+                    src="/images/logos/Current_Edits/Mosc_logo_jan2026.png"
                     alt="The Catholicate of the Malankara Orthodox Syrian Church"
                     width={500}
                     height={300}
-                    className="rounded-lg sacred-shadow mb-6"
+                    className="mb-6 w-full max-w-md h-auto object-contain"
                     priority
                   />
                 </div>

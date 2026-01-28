@@ -654,15 +654,17 @@ const HeroSection: React.FC = () => {
 
       {/* Two Cards Section */}
       <div className="hero-cards-section">
-        {/* Unite India Card - Left */}
-        <Link href="/#about-us" className="hero-card hero-card-about group">
-          {/* Unite India Background Image */}
+        {/* United India Card - Left (image: unite_india_logo.avif) */}
+        <Link href="/#about-us" className="hero-card hero-card-about group" aria-label="United India - About our mission">
+          {/* United India image - unite_india_logo.avif */}
           <div
             className="absolute inset-0 bg-contain bg-center bg-no-repeat transition-transform duration-500 group-hover:scale-105"
             style={{
-              backgroundImage: `url('https://cdn.builder.io/api/v1/image/assets%2Fa70a28525f6f491aaa751610252a199c%2F7e04d4cf965b47f9b58322797a9f4ba2?format=webp&width=800')`,
+              backgroundImage: `url('/images/unite_india_logo.avif')`,
               filter: 'brightness(0.95) contrast(1.05)'
             }}
+            role="img"
+            aria-label="United India"
           />
           {/* Gradient Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
