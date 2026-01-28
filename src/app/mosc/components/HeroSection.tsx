@@ -203,20 +203,17 @@ const HeroSection = () => {
           </div>
         </div>
 
-        {/* Welcome Text - Refined Typography */}
+        {/* Welcome Text - text only, no box */}
         <div className="text-center max-w-3xl mx-auto">
           <h2
-            className="font-heading font-semibold text-2xl lg:text-3xl mb-5"
-            style={{
-              color: '#2D2A26',
-              textShadow: '0 1px 2px rgba(45, 42, 38, 0.05)',
-            }}
+            className="font-heading font-semibold text-3xl sm:text-4xl lg:text-[2.25rem] mb-6"
+            style={{ color: '#58534F' }}
           >
             Welcome to Our Sacred Community
           </h2>
           <p
-            className="font-body text-base lg:text-lg leading-relaxed"
-            style={{ color: '#5A5550' }}
+            className="font-heading text-lg lg:text-xl font-normal leading-loose"
+            style={{ color: '#58534F' }}
           >
             The Malankara Orthodox Syrian Church traces its origins to the Apostolic ministry of St. Thomas in India.
             We are a community rooted in ancient traditions, committed to preserving the faith handed down through generations
