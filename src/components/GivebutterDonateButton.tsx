@@ -8,9 +8,12 @@ interface GivebutterDonateButtonProps {
   children?: React.ReactNode;
 }
 
+const DEFAULT_CAMPAIGN_ID = 'mhoZp0';
+
 /**
  * Givebutter Donate Button Component
  * Opens the full Givebutter campaign page in a popup (desktop) or new tab (mobile).
+ * Campaign ID is read from NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_ID (optional prop overrides).
  *
  * We do not use the <givebutter-button> widget modal because it does not show
  * campaign-level options from the dashboard, including:
@@ -20,15 +23,20 @@ interface GivebutterDonateButtonProps {
  * minimum donation settings are all visible.
  *
  * Usage:
- * <GivebutterDonateButton campaignId="mhoZp0">
- *   <span>Donate Now</span>
- * </GivebutterDonateButton>
+ * <GivebutterDonateButton />
+ * Or override: <GivebutterDonateButton campaignId="otherCampaignId" />
  */
 export default function GivebutterDonateButton({
-  campaignId = 'mhoZp0',
+  campaignId: campaignIdProp,
   className = '',
   children,
 }: GivebutterDonateButtonProps) {
+  const campaignId =
+    campaignIdProp ??
+    (typeof process.env.NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_ID === 'string' && process.env.NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_ID.trim()
+      ? process.env.NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_ID.trim()
+      : DEFAULT_CAMPAIGN_ID);
+
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();

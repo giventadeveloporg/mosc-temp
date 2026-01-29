@@ -103,7 +103,7 @@ const DynamicHeroImage: React.FC<{
           filteredEvents.forEach(({ event, media }) => {
             // Extract duration from media (convert seconds to milliseconds, default to 8000ms if null)
             const durationSeconds = media.homePageHeroDisplayDurationSeconds;
-            const durationMs = durationSeconds != null && durationSeconds > 0 
+            const durationMs = durationSeconds != null && durationSeconds > 0
               ? Math.max(1000, Math.min(600000, durationSeconds * 1000)) // Clamp 1s-10min in ms
               : 8000; // Default 8 seconds in milliseconds
 
@@ -204,15 +204,15 @@ const DynamicHeroImage: React.FC<{
   useEffect(() => {
     imageDurationsRef.current = imageDurations;
   }, [imageDurations]);
-  
+
   useEffect(() => {
     dynamicImagesRef.current = dynamicImages;
   }, [dynamicImages]);
-  
+
   useEffect(() => {
     upcomingEventsRef.current = upcomingEvents;
   }, [upcomingEvents]);
-  
+
   useEffect(() => {
     isPausedRef.current = isPaused;
   }, [isPaused]);
@@ -249,15 +249,15 @@ const DynamicHeroImage: React.FC<{
     const currentDurations = imageDurationsRef.current;
     const currentImages = dynamicImagesRef.current;
     const currentEvents = upcomingEventsRef.current;
-    
+
     // Safety check
     if (!currentImages || currentImages.length < 2) {
       return;
     }
-    
+
     // Get duration for the specified image (default to 8 seconds if not available)
     const imageDuration = (currentDurations && currentDurations[imageIndex]) ? currentDurations[imageIndex] : 8000;
-    
+
     console.log('[HeroSection] Scheduling next rotation:', {
       currentIndex: imageIndex,
       currentDurationMs: imageDuration,
@@ -271,7 +271,7 @@ const DynamicHeroImage: React.FC<{
     rotationTimeoutRef.current = setTimeout(() => {
       // Clear the scheduled index ref when timeout executes
       lastScheduledIndexRef.current = null;
-      
+
       setIsTransitioning(true);
 
       setTimeout(() => {
@@ -280,7 +280,7 @@ const DynamicHeroImage: React.FC<{
           const latestDurations = imageDurationsRef.current;
           const latestImages = dynamicImagesRef.current;
           const latestEvents = upcomingEventsRef.current;
-          
+
           const nextIndex = (prevIndex + 1) % latestImages.length;
           const nextDuration = (latestDurations && latestDurations[nextIndex]) ? latestDurations[nextIndex] : 8000;
 
@@ -387,16 +387,16 @@ const DynamicHeroImage: React.FC<{
         // Use refs to get latest arrays
         const latestImages = dynamicImagesRef.current;
         const latestEvents = upcomingEventsRef.current;
-        
+
         const newIndex = (prevIndex - 1 + latestImages.length) % latestImages.length;
-        
+
         // Update current event
         if (newIndex < latestEvents.length && onEventChangeRef.current) {
           onEventChangeRef.current(latestEvents[newIndex]);
         } else if (onEventChangeRef.current) {
           onEventChangeRef.current(null);
         }
-        
+
         // Restart rotation from new index after navigation completes
         // Use ref to call the function to avoid closure issues
         setTimeout(() => {
@@ -404,7 +404,7 @@ const DynamicHeroImage: React.FC<{
             scheduleNextRotationRef.current(newIndex);
           }
         }, 100);
-        
+
         return newIndex;
       });
       setTimeout(() => setIsTransitioning(false), 50);
@@ -425,16 +425,16 @@ const DynamicHeroImage: React.FC<{
         // Use refs to get latest arrays
         const latestImages = dynamicImagesRef.current;
         const latestEvents = upcomingEventsRef.current;
-        
+
         const nextIndex = (prevIndex + 1) % latestImages.length;
-        
+
         // Update current event
         if (nextIndex < latestEvents.length && onEventChangeRef.current) {
           onEventChangeRef.current(latestEvents[nextIndex]);
         } else if (onEventChangeRef.current) {
           onEventChangeRef.current(null);
         }
-        
+
         // Restart rotation from new index after navigation completes
         // Use ref to call the function to avoid closure issues
         setTimeout(() => {
@@ -442,7 +442,7 @@ const DynamicHeroImage: React.FC<{
             scheduleNextRotationRef.current(nextIndex);
           }
         }, 100);
-        
+
         return nextIndex;
       });
       setTimeout(() => setIsTransitioning(false), 50);
@@ -513,7 +513,7 @@ const DynamicHeroImage: React.FC<{
       {/* Slider Controls - Show on hover or touch */}
       {/* Controls positioned above image and Buy Tickets overlay (z-20) */}
       {hasMultipleImages && showControls && (
-        <div 
+        <div
           className="absolute inset-0 flex items-center justify-between px-4 z-20 pointer-events-none"
           onTouchStart={handleTouchInteraction}
         >
@@ -585,9 +585,9 @@ const HeroSection: React.FC = () => {
     const today = new Date();
     const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     const eventDateStr = event.startDate ? event.startDate.split('T')[0] : null;
-    
+
     if (!eventDateStr) return null;
-    
+
     const isToday = eventDateStr === todayStr;
     const isFuture = eventDateStr > todayStr;
     const isUpcomingLocal = isToday || isFuture;
@@ -596,7 +596,7 @@ const HeroSection: React.FC = () => {
 
     // Check if event is ticketed fundraiser/charity (shows special fundraiser image)
     const isTicketedFundraiser = isTicketedFundraiserEvent(event);
-    
+
     if (isTicketedFundraiser) {
       return {
         image: '/images/buy_tickets_click_here_fundraiser.png',
@@ -610,7 +610,7 @@ const HeroSection: React.FC = () => {
       // Route to manual checkout if manual payment is enabled, otherwise Stripe checkout
       const checkoutRoute =
         event.manualPaymentEnabled === true &&
-        (event.paymentFlowMode === 'MANUAL_ONLY' || event.paymentFlowMode === 'HYBRID')
+          (event.paymentFlowMode === 'MANUAL_ONLY' || event.paymentFlowMode === 'HYBRID')
           ? `/events/${event.id}/manual-checkout`
           : `/events/${event.id}/checkout`;
 
@@ -695,9 +695,8 @@ const HeroSection: React.FC = () => {
               className="mb-2"
             />
             <p className="hero-card-donate-title">Support Us</p>
-            {/* Givebutter Donate Button - Opens Popup Modal */}
+            {/* Givebutter Donate Button - Opens full campaign page (popup/tab). Campaign ID from NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_ID. */}
             <GivebutterDonateButton
-              campaignId="mhoZp0"
               className="mt-2 flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 rounded-full text-white text-sm font-semibold shadow-lg hover:shadow-amber-500/30 transition-all duration-300 hover:scale-105 cursor-pointer"
             >
               <Heart size={14} className="fill-white" />

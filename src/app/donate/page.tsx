@@ -17,20 +17,20 @@ export default function DonatePage() {
             Support Our Mission
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Your generous donation helps us continue our mission to preserve and promote Malayali culture 
+            Your generous donation helps us continue our mission to preserve and promote Malayali culture
             across the United States. Every contribution makes a difference.
           </p>
         </div>
 
         {/* Givebutter Widget */}
         <div className="bg-white rounded-lg shadow-lg p-6 md:p-8">
-          <GivebutterWidget campaignId="mhoZp0" />
+          <GivebutterWidget />
         </div>
 
         {/* Additional Information */}
         <div className="mt-8 text-center">
           <p className="text-sm text-gray-500">
-            All donations are processed securely through Givebutter. 
+            All donations are processed securely through Givebutter.
             Your information is protected and your contribution is tax-deductible.
           </p>
         </div>

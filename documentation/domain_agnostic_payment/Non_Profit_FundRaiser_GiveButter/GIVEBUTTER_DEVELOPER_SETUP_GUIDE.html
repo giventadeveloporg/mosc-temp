@@ -277,7 +277,7 @@
                     <tr>
                         <td><strong>Campaign ID</strong></td>
                         <td>Campaign URL: <code>https://givebutter.com/<em>{CampaignID}</em></code> (e.g. <code>mhoZp0</code>). Or: Campaign → Sharing → Widgets → copy from campaign link or embed code.</td>
-                        <td><code>GivebutterDonateButton</code> <code>campaignId</code> prop or <code>NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_ID</code>. Builds URL: <code>https://givebutter.com/{campaignId}</code>.</td>
+                        <td>Set in <strong>.env.local</strong> (and production env) as <code>NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_ID</code>. Declared in <code>next.config.mjs</code> <code>env</code>. Read by <code>GivebutterDonateButton</code> and <code>GivebutterWidget</code>; optional <code>campaignId</code> prop overrides. No hardcoded campaign ID. Builds URL: <code>https://givebutter.com/{campaignId}</code>.</td>
                         <td><strong>Yes</strong></td>
                     </tr>
                     <tr>
@@ -303,7 +303,7 @@
             <div class="success-box">
                 <h4>Summary for the home-page donate button</h4>
                 <ul>
-                    <li><strong>Campaign ID</strong> — Required. Get from campaign URL or Sharing → Widgets. Set via <code>GivebutterDonateButton</code> <code>campaignId</code> prop or <code>NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_ID</code>.</li>
+                    <li><strong>Campaign ID</strong> — Required. Set <code>NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_ID</code> in <strong>.env.local</strong> (and in production env). Get the value from campaign URL or Sharing → Widgets. The app reads from env; no hardcoded campaign ID. Optional <code>campaignId</code> prop overrides env. Add to <code>next.config.mjs</code> <code>env</code> for production.</li>
                     <li><strong>Account ID</strong> — Optional. Only if you use the widget script (e.g. for other Givebutter embeds). Set in layout script URL: <code>acct=YOUR_ACCOUNT_ID</code>.</li>
                 </ul>
             </div>
@@ -315,6 +315,12 @@
                     <li>No webhook secret in the Next.js app — the backend holds and verifies it.</li>
                 </ul>
             </div>
+            <p><strong>Example .env.local (donate button):</strong></p>
+            <div class="code-block">
+<code># Givebutter campaign ID (from campaign URL, e.g. https://givebutter.com/mhoZp0)
+NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_ID=mhoZp0</code>
+            </div>
+            <p>Use the exact variable name <code>NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_ID</code> (with <strong>ID</strong> at the end). The variable is declared in <code>next.config.mjs</code> <code>env</code> so it is available in production.</p>
         </section>
 
         <section id="account-setup" class="section">
