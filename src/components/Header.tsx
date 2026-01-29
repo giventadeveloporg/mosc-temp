@@ -719,24 +719,21 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-[4.5rem]">
             {/* Left side - Unite India Text Logo with Editorial Typography */}
-            <div className="flex items-center">
-              <Link href="/" className="group flex items-center gap-3">
-                {/* Unite India logo icon - visible on mobile and desktop */}
-                <div className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex-shrink-0 overflow-hidden shadow-lg shadow-violet-500/20 group-hover:shadow-violet-500/30 transition-all duration-300 group-hover:scale-105">
+            <div className="flex items-center h-full">
+              <Link href="/" className="group flex items-center gap-3 h-full">
+                {/* Unite India logo icon - full header height, 102px wide */}
+                <div className="flex items-center justify-center h-full w-[102px] min-w-[102px] rounded-xl flex-shrink-0 overflow-hidden transition-all duration-300 group-hover:scale-105">
                   <Image
-                    src="/images/logos/unite_india_header_icon.jpeg"
+                    src="/images/logos/Malayalees_US/Malayalees_US_Header_Branding.png"
                     alt="Unite India"
-                    width={40}
-                    height={40}
+                    width={102}
+                    height={72}
                     className="w-full h-full object-contain"
                   />
                 </div>
                 <div className="text-left">
                   <div className="header-logo-primary text-[1.375rem] leading-tight group-hover:text-[var(--header-accent-primary)] transition-colors duration-300">
-                    Unite India
-                  </div>
-                  <div className="header-logo-secondary uppercase group-hover:text-[var(--header-accent-secondary)]">
-                    A Nonprofit Corporation
+                    MALAYALEES.US
                   </div>
                 </div>
               </Link>
@@ -1006,21 +1003,18 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
           {/* Mobile Menu Header */}
           <div className="flex items-center justify-between p-5 border-b border-[var(--header-border)]">
             <Link href="/" className="flex items-center gap-2.5" onClick={closeMobileMenu}>
-              <div className="flex items-center justify-center w-9 h-9 rounded-lg flex-shrink-0 overflow-hidden">
+              <div className="flex items-center justify-center w-[86px] min-w-[86px] h-14 rounded-lg flex-shrink-0 overflow-hidden">
                 <Image
-                  src="/images/logos/unite_india_header_icon.jpeg"
+                  src="/images/logos/Malayalees_US/Malayalees_US_Header_Branding.png"
                   alt="Unite India"
-                  width={36}
-                  height={36}
+                  width={86}
+                  height={56}
                   className="w-full h-full object-contain"
                 />
               </div>
               <div className="text-left">
                 <div className="header-logo-primary text-lg leading-tight">
-                  Unite India
-                </div>
-                <div className="header-logo-secondary">
-                  A Nonprofit Corporation
+                  MALAYALEES.US
                 </div>
               </div>
             </Link>

@@ -46,8 +46,8 @@
   <div class="container">
     <h1>Regular User Comprehensive Test Report</h1>
     <p style="color: #666; margin-bottom: 20px;">
-      Generated: 12/31/2025, 10:30:54 AM<br>
-      Duration: 10m 11s<br>
+      Generated: 1/22/2026, 3:50:12 PM<br>
+      Duration: 6m 31s<br>
       Base URL: http://localhost:3000
     </p>
 
@@ -57,11 +57,11 @@
         <p>Total Tests</p>
       </div>
       <div class="summary-card passed">
-        <h2>8</h2>
+        <h2>13</h2>
         <p>Passed</p>
       </div>
       <div class="summary-card failed">
-        <h2>12</h2>
+        <h2>7</h2>
         <p>Failed</p>
       </div>
     </div>
@@ -86,10 +86,10 @@
             <td>sanity</td>
             <td><span class="priority Critical">Critical</span></td>
             <td><span class="status failed">FAILED</span></td>
-            <td>70520ms</td>
+            <td>51422ms</td>
             <td>
               <div class="error">Authentication failed</div>
-              <div class="screenshot"><a href="screenshots\failure-USER-001-1767194569227.png" target="_blank">View Screenshot</a></div>
+              <div class="screenshot"><a href="screenshots\failure-USER-001-1769096730564.png" target="_blank">View Screenshot</a></div>
             </td>
           </tr>
         
@@ -99,7 +99,7 @@
             <td>functional</td>
             <td><span class="priority High">High</span></td>
             <td><span class="status passed">PASSED</span></td>
-            <td>4587ms</td>
+            <td>1917ms</td>
             <td>
               <div class="error">Homepage loaded with authenticated state</div>
               
@@ -111,14 +111,11 @@
             <td>Profile Page Access</td>
             <td>functional</td>
             <td><span class="priority Critical">Critical</span></td>
-            <td><span class="status failed">FAILED</span></td>
-            <td>30022ms</td>
+            <td><span class="status passed">PASSED</span></td>
+            <td>10902ms</td>
             <td>
-              <div class="error">page.goto: Timeout 30000ms exceeded.
-Call log:
-[2m  - navigating to "http://localhost:3000/profile", waiting until "networkidle"[22m
-</div>
-              <div class="screenshot"><a href="screenshots\failure-USER-003-1767194611026.png" target="_blank">View Screenshot</a></div>
+              <div class="error">Profile page loaded with form fields</div>
+              
             </td>
           </tr>
         
@@ -128,7 +125,7 @@ Call log:
             <td>functional</td>
             <td><span class="priority High">High</span></td>
             <td><span class="status passed">PASSED</span></td>
-            <td>13889ms</td>
+            <td>3434ms</td>
             <td>
               <div class="error">Personal information fields edited successfully</div>
               
@@ -141,7 +138,7 @@ Call log:
             <td>functional</td>
             <td><span class="priority Medium">Medium</span></td>
             <td><span class="status passed">PASSED</span></td>
-            <td>7848ms</td>
+            <td>2726ms</td>
             <td>
               <div class="error">Address fields edited successfully</div>
               
@@ -154,7 +151,7 @@ Call log:
             <td>functional</td>
             <td><span class="priority Critical">Critical</span></td>
             <td><span class="status passed">PASSED</span></td>
-            <td>16018ms</td>
+            <td>7695ms</td>
             <td>
               <div class="error">Save operation completed (value may not have changed)</div>
               
@@ -166,11 +163,14 @@ Call log:
             <td>Events Listing Page Access</td>
             <td>functional</td>
             <td><span class="priority High">High</span></td>
-            <td><span class="status passed">PASSED</span></td>
-            <td>14142ms</td>
+            <td><span class="status failed">FAILED</span></td>
+            <td>30004ms</td>
             <td>
-              <div class="error">Events page loaded successfully</div>
-              
+              <div class="error">page.goto: Timeout 30000ms exceeded.
+Call log:
+[2m  - navigating to "http://localhost:3000/events", waiting until "networkidle"[22m
+</div>
+              <div class="screenshot"><a href="screenshots\failure-USER-007-1769096788693.png" target="_blank">View Screenshot</a></div>
             </td>
           </tr>
         
@@ -180,10 +180,13 @@ Call log:
             <td>functional</td>
             <td><span class="priority High">High</span></td>
             <td><span class="status failed">FAILED</span></td>
-            <td>2760ms</td>
+            <td>30012ms</td>
             <td>
-              <div class="error">No events found to click</div>
-              <div class="screenshot"><a href="screenshots\failure-USER-008-1767194666069.png" target="_blank">View Screenshot</a></div>
+              <div class="error">page.goto: Timeout 30000ms exceeded.
+Call log:
+[2m  - navigating to "http://localhost:3000/events", waiting until "networkidle"[22m
+</div>
+              <div class="screenshot"><a href="screenshots\failure-USER-008-1769096819521.png" target="_blank">View Screenshot</a></div>
             </td>
           </tr>
         
@@ -193,7 +196,7 @@ Call log:
             <td>functional</td>
             <td><span class="priority Medium">Medium</span></td>
             <td><span class="status passed">PASSED</span></td>
-            <td>13509ms</td>
+            <td>8188ms</td>
             <td>
               <div class="error">Gallery page loaded successfully</div>
               
@@ -206,7 +209,7 @@ Call log:
             <td>functional</td>
             <td><span class="priority Medium">Medium</span></td>
             <td><span class="status passed">PASSED</span></td>
-            <td>11430ms</td>
+            <td>5205ms</td>
             <td>
               <div class="error">Gallery search and filter worked correctly</div>
               
@@ -219,7 +222,7 @@ Call log:
             <td>functional</td>
             <td><span class="priority Medium">Medium</span></td>
             <td><span class="status failed">FAILED</span></td>
-            <td>34076ms</td>
+            <td>31693ms</td>
             <td>
               <div class="error">locator.click: Timeout 30000ms exceeded.
 Call log:
@@ -234,12 +237,12 @@ Call log:
 [2m      - element is not visible[22m
 [2m    - retrying click action[22m
 [2m      - waiting 100ms[22m
-[2m    55 × waiting for element to be visible, enabled and stable[22m
+[2m    58 × waiting for element to be visible, enabled and stable[22m
 [2m       - element is not visible[22m
 [2m     - retrying click action[22m
 [2m       - waiting 500ms[22m
 </div>
-              <div class="screenshot"><a href="screenshots\failure-USER-011-1767194725723.png" target="_blank">View Screenshot</a></div>
+              <div class="screenshot"><a href="screenshots\failure-USER-011-1769096865426.png" target="_blank">View Screenshot</a></div>
             </td>
           </tr>
         
@@ -249,7 +252,7 @@ Call log:
             <td>functional</td>
             <td><span class="priority Medium">Medium</span></td>
             <td><span class="status passed">PASSED</span></td>
-            <td>9769ms</td>
+            <td>3805ms</td>
             <td>
               <div class="error">Contact page accessed successfully</div>
               
@@ -261,14 +264,11 @@ Call log:
             <td>Polls Page Access</td>
             <td>functional</td>
             <td><span class="priority Medium">Medium</span></td>
-            <td><span class="status failed">FAILED</span></td>
-            <td>30008ms</td>
+            <td><span class="status passed">PASSED</span></td>
+            <td>6650ms</td>
             <td>
-              <div class="error">page.goto: Timeout 30000ms exceeded.
-Call log:
-[2m  - navigating to "http://localhost:3000/polls", waiting until "networkidle"[22m
-</div>
-              <div class="screenshot"><a href="screenshots\failure-USER-013-1767194773093.png" target="_blank">View Screenshot</a></div>
+              <div class="error">Polls page loaded successfully</div>
+              
             </td>
           </tr>
         
@@ -277,14 +277,11 @@ Call log:
             <td>Calendar Page Access</td>
             <td>functional</td>
             <td><span class="priority Medium">Medium</span></td>
-            <td><span class="status failed">FAILED</span></td>
-            <td>30036ms</td>
+            <td><span class="status passed">PASSED</span></td>
+            <td>4605ms</td>
             <td>
-              <div class="error">page.goto: Timeout 30000ms exceeded.
-Call log:
-[2m  - navigating to "http://localhost:3000/calendar", waiting until "networkidle"[22m
-</div>
-              <div class="screenshot"><a href="screenshots\failure-USER-014-1767194803914.png" target="_blank">View Screenshot</a></div>
+              <div class="error">Calendar page loaded successfully</div>
+              
             </td>
           </tr>
         
@@ -293,14 +290,11 @@ Call log:
             <td>Pricing Page Access</td>
             <td>functional</td>
             <td><span class="priority Medium">Medium</span></td>
-            <td><span class="status failed">FAILED</span></td>
-            <td>30035ms</td>
+            <td><span class="status passed">PASSED</span></td>
+            <td>4501ms</td>
             <td>
-              <div class="error">page.goto: Timeout 30000ms exceeded.
-Call log:
-[2m  - navigating to "http://localhost:3000/pricing", waiting until "networkidle"[22m
-</div>
-              <div class="screenshot"><a href="screenshots\failure-USER-015-1767194853615.png" target="_blank">View Screenshot</a></div>
+              <div class="error">Pricing page loaded successfully</div>
+              
             </td>
           </tr>
         
@@ -310,7 +304,7 @@ Call log:
             <td>functional</td>
             <td><span class="priority High">High</span></td>
             <td><span class="status failed">FAILED</span></td>
-            <td>35037ms</td>
+            <td>32095ms</td>
             <td>
               <div class="error">locator.click: Timeout 30000ms exceeded.
 Call log:
@@ -325,12 +319,12 @@ Call log:
 [2m      - element is not visible[22m
 [2m    - retrying click action[22m
 [2m      - waiting 100ms[22m
-[2m    53 × waiting for element to be visible, enabled and stable[22m
+[2m    58 × waiting for element to be visible, enabled and stable[22m
 [2m       - element is not visible[22m
 [2m     - retrying click action[22m
 [2m       - waiting 500ms[22m
 </div>
-              <div class="screenshot"><a href="screenshots\failure-USER-016-1767194889726.png" target="_blank">View Screenshot</a></div>
+              <div class="screenshot"><a href="screenshots\failure-USER-016-1769096918848.png" target="_blank">View Screenshot</a></div>
             </td>
           </tr>
         
@@ -339,14 +333,11 @@ Call log:
             <td>User Sign Out</td>
             <td>functional</td>
             <td><span class="priority Critical">Critical</span></td>
-            <td><span class="status failed">FAILED</span></td>
-            <td>30010ms</td>
+            <td><span class="status passed">PASSED</span></td>
+            <td>11286ms</td>
             <td>
-              <div class="error">page.goto: Timeout 30000ms exceeded.
-Call log:
-[2m  - navigating to "http://localhost:3000/profile", waiting until "networkidle"[22m
-</div>
-              <div class="screenshot"><a href="screenshots\failure-USER-017-1767194927524.png" target="_blank">View Screenshot</a></div>
+              <div class="error">User signed out successfully</div>
+              
             </td>
           </tr>
         
@@ -356,10 +347,13 @@ Call log:
             <td>functional</td>
             <td><span class="priority Medium">Medium</span></td>
             <td><span class="status failed">FAILED</span></td>
-            <td>14918ms</td>
+            <td>33211ms</td>
             <td>
-              <div class="error">Sign In button not visible on public pages</div>
-              <div class="screenshot"><a href="screenshots\failure-USER-018-1767194957819.png" target="_blank">View Screenshot</a></div>
+              <div class="error">page.goto: Timeout 30000ms exceeded.
+Call log:
+[2m  - navigating to "http://localhost:3000/events", waiting until "networkidle"[22m
+</div>
+              <div class="screenshot"><a href="screenshots\failure-USER-018-1769096965259.png" target="_blank">View Screenshot</a></div>
             </td>
           </tr>
         
@@ -368,11 +362,11 @@ Call log:
             <td>Re-Login After Logout</td>
             <td>functional</td>
             <td><span class="priority High">High</span></td>
-            <td><span class="status failed">FAILED</span></td>
-            <td>69191ms</td>
+            <td><span class="status passed">PASSED</span></td>
+            <td>13091ms</td>
             <td>
-              <div class="error">Re-authentication failed</div>
-              <div class="screenshot"><a href="screenshots\failure-USER-019-1767195028842.png" target="_blank">View Screenshot</a></div>
+              <div class="error">Re-login successful</div>
+              
             </td>
           </tr>
         
@@ -382,13 +376,64 @@ Call log:
             <td>functional</td>
             <td><span class="priority Low">Low</span></td>
             <td><span class="status failed">FAILED</span></td>
-            <td>19373ms</td>
+            <td>33190ms</td>
             <td>
-              <div class="error">page.waitForSelector: Timeout 10000ms exceeded.
+              <div class="error">locator.click: Timeout 30000ms exceeded.
 Call log:
-[2m  - waiting for locator('form, input[name*="firstName" i]') to be visible[22m
+[2m  - waiting for locator('button:has-text("Save"), button[type="submit"]').first()[22m
+[2m    - locator resolved to <button type="submit" title="Save Profile" aria-label="Save Profile" class="w-full flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 px-6">…</button>[22m
+[2m  - attempting click action[22m
+[2m    2 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is visible, enabled and stable[22m
+[2m      - scrolling into view if needed[22m
+[2m      - done scrolling[22m
+[2m      - <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">…</div> intercepts pointer events[22m
+[2m    - retrying click action[22m
+[2m    - waiting 20ms[22m
+[2m    - waiting for element to be visible, enabled and stable[22m
+[2m    - element is visible, enabled and stable[22m
+[2m    - scrolling into view if needed[22m
+[2m    - done scrolling[22m
+[2m    - <div class="text-center">…</div> from <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">…</div> subtree intercepts pointer events[22m
+[2m  2 × retrying click action[22m
+[2m      - waiting 100ms[22m
+[2m      - waiting for element to be visible, enabled and stable[22m
+[2m      - element is visible, enabled and stable[22m
+[2m      - scrolling into view if needed[22m
+[2m      - done scrolling[22m
+[2m      - <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">…</div> intercepts pointer events[22m
+[2m  14 × retrying click action[22m
+[2m       - waiting 500ms[22m
+[2m       - waiting for element to be visible, enabled and stable[22m
+[2m       - element is visible, enabled and stable[22m
+[2m       - scrolling into view if needed[22m
+[2m       - done scrolling[22m
+[2m       - <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">…</div> intercepts pointer events[22m
+[2m     - retrying click action[22m
+[2m       - waiting 500ms[22m
+[2m       - waiting for element to be visible, enabled and stable[22m
+[2m       - element is visible, enabled and stable[22m
+[2m       - scrolling into view if needed[22m
+[2m       - done scrolling[22m
+[2m       - <div class="text-center">…</div> from <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">…</div> subtree intercepts pointer events[22m
+[2m     - retrying click action[22m
+[2m       - waiting 500ms[22m
+[2m       - waiting for element to be visible, enabled and stable[22m
+[2m       - element is visible, enabled and stable[22m
+[2m       - scrolling into view if needed[22m
+[2m       - done scrolling[22m
+[2m       - <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">…</div> intercepts pointer events[22m
+[2m     - retrying click action[22m
+[2m       - waiting 500ms[22m
+[2m       - waiting for element to be visible, enabled and stable[22m
+[2m       - element is visible, enabled and stable[22m
+[2m       - scrolling into view if needed[22m
+[2m       - done scrolling[22m
+[2m       - <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">…</div> intercepts pointer events[22m
+[2m  - retrying click action[22m
+[2m    - waiting 500ms[22m
 </div>
-              <div class="screenshot"><a href="screenshots\failure-USER-020-1767195053904.png" target="_blank">View Screenshot</a></div>
+              <div class="screenshot"><a href="screenshots\failure-USER-020-1769097012389.png" target="_blank">View Screenshot</a></div>
             </td>
           </tr>
         
@@ -396,7 +441,7 @@ Call log:
     </table>
 
     <div class="footer">
-      <p>Test execution completed at 12/31/2025, 10:30:56 AM</p>
+      <p>Test execution completed at 1/22/2026, 3:50:12 PM</p>
     </div>
   </div>
 </body>

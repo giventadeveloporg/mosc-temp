@@ -247,7 +247,7 @@ const OrthodoxFaithPage = () => {
                     Liturgy & Worship
                   </Link>
                   <Link 
-                    href="/mosc/the-church/sacraments" 
+                    href="/mosc/the-church/the-holy-myron" 
                     className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
                   >
                     Sacraments
