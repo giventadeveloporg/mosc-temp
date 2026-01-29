@@ -8,19 +8,28 @@ interface GivebutterWidgetProps {
   className?: string;
 }
 
+const DEFAULT_CAMPAIGN_ID = 'mhoZp0';
+
 /**
  * Givebutter Widget Component
- * Embeds a Givebutter donation widget into the page
- * 
+ * Embeds a Givebutter donation widget into the page.
+ * Campaign ID is read from NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_ID (optional prop overrides).
+ *
  * Usage:
- * <GivebutterWidget campaignId="mhoZp0" /> - For campaign form
+ * <GivebutterWidget /> - For campaign form (uses env or fallback)
+ * <GivebutterWidget campaignId="otherId" /> - Override campaign
  * <GivebutterWidget widgetId="your-widget-id" /> - For specific widget
  */
-export default function GivebutterWidget({ 
-  campaignId = 'mhoZp0', 
+export default function GivebutterWidget({
+  campaignId: campaignIdProp,
   widgetId,
-  className = '' 
+  className = '',
 }: GivebutterWidgetProps) {
+  const campaignId =
+    campaignIdProp ??
+    (typeof process.env.NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_ID === 'string' && process.env.NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_ID.trim()
+      ? process.env.NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_ID.trim()
+      : DEFAULT_CAMPAIGN_ID);
   const [isScriptLoaded, setIsScriptLoaded] = useState(false);
 
   useEffect(() => {
