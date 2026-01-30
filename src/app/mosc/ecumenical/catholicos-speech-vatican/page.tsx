@@ -44,7 +44,7 @@ const CatholicosSpeechVaticanPage = () => {
               <div className="bg-background rounded-lg sacred-shadow p-8">
                 <div className="mb-8 flex justify-center">
                   <Image
-                    src="https://mosc.in/wp-content/uploads/2015/11/rm.jpg"
+                    src="/images/mosc/ecumenical/rm.jpg"
                     alt="Meeting with Pope Francis at Vatican"
                     width={600}
                     height={360}

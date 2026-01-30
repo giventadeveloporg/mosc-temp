@@ -43,7 +43,7 @@ const TheFraternityAtViennaPage = () => {
               <div className="bg-background rounded-lg sacred-shadow p-8">
                 <div className="mb-8 flex justify-center">
                   <Image
-                    src="https://mosc.in/wp-content/uploads/2015/11/vienna.jpg"
+                    src="/images/mosc/ecumenical/vienna.jpg"
                     alt="Ecumenical meeting in Vienna"
                     width={600}
                     height={360}

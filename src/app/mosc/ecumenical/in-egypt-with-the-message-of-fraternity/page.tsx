@@ -45,7 +45,7 @@ const InEgyptWithTheMessageOfFraternityPage = () => {
                 {/* Featured Image */}
                 <div className="mb-8 flex justify-center">
                   <Image
-                    src="https://mosc.in/wp-content/uploads/2015/11/eg.jpg"
+                    src="/images/mosc/ecumenical/eg.jpg"
                     alt="Ecumenical gathering in Egypt"
                     width={600}
                     height={360}

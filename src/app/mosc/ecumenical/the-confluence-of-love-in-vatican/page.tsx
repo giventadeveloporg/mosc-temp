@@ -43,7 +43,7 @@ const TheConfluenceOfLoveInVaticanPage = () => {
               <div className="bg-background rounded-lg sacred-shadow p-8">
                 <div className="mb-8 flex justify-center">
                   <Image
-                    src="https://mosc.in/wp-content/uploads/2015/11/rome.jpg"
+                    src="/images/mosc/ecumenical/rome.jpg"
                     alt="Ecumenical meeting in Vatican"
                     width={600}
                     height={360}

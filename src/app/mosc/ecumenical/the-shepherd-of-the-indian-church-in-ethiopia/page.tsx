@@ -45,7 +45,7 @@ const TheShepherdOfTheIndianChurchInEthiopiaPage = () => {
                 {/* Featured Image */}
                 <div className="mb-8 flex justify-center">
                   <Image
-                    src="https://mosc.in/wp-content/uploads/2015/11/et.jpg"
+                    src="/images/mosc/ecumenical/et.jpg"
                     alt="Ecumenical gathering in Ethiopia"
                     width={600}
                     height={360}
