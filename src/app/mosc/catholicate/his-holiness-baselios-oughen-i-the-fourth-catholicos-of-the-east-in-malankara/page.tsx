@@ -27,10 +27,15 @@ const BaseliosAugenIPage = () => {
                     His Holiness Baselios Augen I, The Fourth Catholicos of the East in Malankara (1964–1975)
                   </h3>
                 </div>
-                <div className="space-y-4 font-body text-muted-foreground leading-relaxed text-justify">
-                  <p>
-                    His Holiness was born on 26 June 1884 at Perumbavoor , Vengola, to Abraham Kathanar of Chettakulathukara family. He was ordained as deacon by Kadavil Paulose Mar Athanasios and in 1908 at Jerusalem he was elevated to the monastic order of Ramban. He was consecrated as Metropolitan Oughen Mar Timotheos on 15 May 1927 at Jerusalem. He was appointed as the fourth Metropolitan of Kandanad. He has left his imprint in several offices that he held during his life. He was principal of the Orthodox Theological Seminary, and the Metropolitan of Kandanad and Thumpamon dioseses. On 17 May 1962, when the Malankara Association met at Niranam, he was chosen as the Catholicate of the East. It was on 22 May 1964 at M.D. Seminary, Kottayam that he was installed formally as the fourth Catholicos. As he was very old, he relinquished his position as Malankara Metropolitan to his successor on 24 September 1975. Having achieved expectional scholarship in Malayalam and Syriac languages, he translated into Malayalam the 'Pemkisa Namaskaram' 'Prumiyonukal', ' Valiya    Nombilae Namaskaram', 'Pattamkoda Shushrusha Kramangal' and 'Pallikoodasha Kramangal'. He also composed the 'Hood- omakal' for 'Holy Synods' and the 'State after death'. He passed away on 8 December 1975 at Develokam Aramana and was laid to rest near the Aramana Chapel. His Annverary: 8 December.
-                  </p>
+                <div className="space-y-6 font-body text-muted-foreground leading-relaxed text-justify">
+                  <div>
+                    <h2 className="font-heading font-semibold text-2xl text-primary mb-4">
+                      Biography
+                    </h2>
+                    <p>
+                      His Holiness was born on 26 June 1884 at Perumbavoor , Vengola, to Abraham Kathanar of Chettakulathukara family. He was ordained as deacon by Kadavil Paulose Mar Athanasios and in 1908 at Jerusalem he was elevated to the monastic order of Ramban. He was consecrated as Metropolitan Oughen Mar Timotheos on 15 May 1927 at Jerusalem. He was appointed as the fourth Metropolitan of Kandanad. He has left his imprint in several offices that he held during his life. He was principal of the Orthodox Theological Seminary, and the Metropolitan of Kandanad and Thumpamon dioseses. On 17 May 1962, when the Malankara Association met at Niranam, he was chosen as the Catholicate of the East. It was on 22 May 1964 at M.D. Seminary, Kottayam that he was installed formally as the fourth Catholicos. As he was very old, he relinquished his position as Malankara Metropolitan to his successor on 24 September 1975. Having achieved expectional scholarship in Malayalam and Syriac languages, he translated into Malayalam the 'Pemkisa Namaskaram' 'Prumiyonukal', ' Valiya    Nombilae Namaskaram', 'Pattamkoda Shushrusha Kramangal' and 'Pallikoodasha Kramangal'. He also composed the 'Hood- omakal' for 'Holy Synods' and the 'State after death'. He passed away on 8 December 1975 at Develokam Aramana and was laid to rest near the Aramana Chapel. His Anniversary: 8 December.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>

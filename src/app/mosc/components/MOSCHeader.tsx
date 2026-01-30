@@ -27,7 +27,7 @@ const OrthodoxCross = ({ className = '' }: { className?: string }) => (
  * Inspired by Byzantine manuscript illumination
  */
 const OrnamentalDivider = () => (
-  <div className="flex items-center justify-center gap-3 py-1">
+  <div className="flex items-center justify-center gap-3 py-0.5">
     <div className="h-px w-8 bg-gradient-to-r from-transparent via-primary/40 to-primary/60" />
     <div className="w-1.5 h-1.5 rotate-45 bg-primary/50" />
     <div className="h-px w-16 bg-primary/40" />
@@ -97,7 +97,7 @@ const MOSCHeader = () => {
 
       {/* Main Header */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between py-3 lg:py-4">
+        <div className="flex items-center justify-between">
 
           {/* Logo Section */}
           <Link
@@ -148,10 +148,6 @@ const MOSCHeader = () => {
                     aria-current={isActive(item.href) ? 'page' : undefined}
                   >
                     <span className="relative z-10">{item.name}</span>
-                    {/* Active indicator dot */}
-                    {isActive(item.href) && (
-                      <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-white/70 rounded-full" />
-                    )}
                   </Link>
                 </li>
               ))}
@@ -247,11 +243,13 @@ const MOSCHeader = () => {
       {/* Quick Links Bar - Desktop Only */}
       <div className="hidden lg:block bg-gradient-to-b from-muted/30 to-muted/60 border-t border-border/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Decorative divider */}
-          <OrnamentalDivider />
+          {/* Decorative divider - hidden */}
+          <div className="hidden" aria-hidden="true">
+            <OrnamentalDivider />
+          </div>
 
           {/* Quick Links */}
-          <div className="py-3">
+          <div className="py-2">
             <nav aria-label="Quick links">
               <ul className="flex flex-wrap items-center justify-center gap-x-1 gap-y-2">
                 <li className="flex items-center">

@@ -27,11 +27,16 @@ const BaseliosGeevargheseIPage = () => {
                     His Holiness Baselios Geevarghese I, The Second Catholicos of the East in Malankara (1925–1928)
                   </h3>
                 </div>
-                <div className="space-y-4 font-body text-muted-foreground leading-relaxed text-justify">
-                  <p>
-                    His Holiness was born in 1870 as the second son of Karuchira Paulose. He was ordained as 'Koruya'
-                    on 13 June 1885, as deacon in 1892, on 16 August 1896 as priest and on 23 August as Ramban(Monk) by Metropolitan Kadavil Paulose Mar Athanasios. He served as Manager in Thrikunnath Seminary, Aluva from 1908 to 1910. On February 1913, he was consecrated as Metropolitan Geevarghese Mar Philexinos. He was the Metropolitan of Kottayam and Angamaly diocese. He made Vallikattu Dayara his administrative headquarters. On 30 April 1925 at Niranam, the Holy Synod installed him as the Catholicos of the East. Through prayer and fasting he achieved spiritual strength, which helped him to guide the Malankara Church into green pastures. He passed away on 17 December 1928 at Neyyoor Hospital. He was laid to rest on the northern side of Vallikattu Dayara. His death anniversary is on 17th December.
-                  </p>
+                <div className="space-y-6 font-body text-muted-foreground leading-relaxed text-justify">
+                  <div>
+                    <h2 className="font-heading font-semibold text-2xl text-primary mb-4">
+                      Biography
+                    </h2>
+                    <p>
+                      His Holiness was born in 1870 as the second son of Karuchira Paulose. He was ordained as 'Koruya'
+                      on 13 June 1885, as deacon in 1892, on 16 August 1896 as priest and on 23 August as Ramban(Monk) by Metropolitan Kadavil Paulose Mar Athanasios. He served as Manager in Thrikunnath Seminary, Aluva from 1908 to 1910. On February 1913, he was consecrated as Metropolitan Geevarghese Mar Philexinos. He was the Metropolitan of Kottayam and Angamaly diocese. He made Vallikattu Dayara his administrative headquarters. On 30 April 1925 at Niranam, the Holy Synod installed him as the Catholicos of the East. Through prayer and fasting he achieved spiritual strength, which helped him to guide the Malankara Church into green pastures. He passed away on 17 December 1928 at Neyyoor Hospital. He was laid to rest on the northern side of Vallikattu Dayara. His death anniversary is on 17th December.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>

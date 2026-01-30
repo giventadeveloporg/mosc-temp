@@ -15,6 +15,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'eventapp-media-bucket.s3.us-east-2.amazonaws.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'mosc.in',
+      },
     ],
     formats: ['image/avif', 'image/webp'],
     unoptimized: true,

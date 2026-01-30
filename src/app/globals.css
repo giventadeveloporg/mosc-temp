@@ -430,6 +430,52 @@
   margin: 0 auto;
 }
 
+/* Single unified card: image left half, donate right half */
+.hero-cards-section-single {
+  grid-template-columns: 1fr;
+}
+
+.hero-card-unified {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  min-height: 160px;
+  padding: 0;
+  gap: 0;
+}
+
+.hero-card-left-half {
+  position: relative;
+  flex: 1 1 50%;
+  min-height: 140px;
+  overflow: hidden;
+  border-radius: 1rem 0 0 1rem;
+  cursor: pointer;
+}
+
+.hero-card-right-half {
+  position: relative;
+  flex: 1 1 50%;
+  min-height: 140px;
+  overflow: hidden;
+  border-radius: 0 1rem 1rem 0;
+}
+
+@media (min-width: 768px) {
+  .hero-card-left-half,
+  .hero-card-right-half {
+    min-height: 160px;
+  }
+
+  .hero-card-left-half {
+    border-radius: 1.25rem 0 0 1.25rem;
+  }
+
+  .hero-card-right-half {
+    border-radius: 0 1.25rem 1.25rem 0;
+  }
+}
+
 @media (min-width: 768px) {
   .hero-cards-section {
     gap: 1.25rem;

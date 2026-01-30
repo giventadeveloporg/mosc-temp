@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import QuickLinks from '@/components/holy-synod/QuickLinks';
 import { SAINTS_SIDEBAR_LINKS } from '../saintsSidebarLinks';
 
 export const metadata = {
@@ -104,6 +105,11 @@ export default function OtherSaintsAndMartyrsPage() {
                   </p>
                 </div>
               </div>
+
+              {/* Quick Links - Horizontal Below Main Content (aligned with holy-synod page) */}
+              <div className="mt-8">
+                <QuickLinks />
+              </div>
             </div>
             <div className="lg:col-span-1">
               <div className="bg-background rounded-lg sacred-shadow p-6 mb-6">
@@ -122,18 +128,6 @@ export default function OtherSaintsAndMartyrsPage() {
                       {link.label}
                     </Link>
                   ))}
-                </nav>
-              </div>
-              <div className="bg-background rounded-lg sacred-shadow p-6">
-                <h3 className="font-heading font-semibold text-lg text-foreground mb-4">Quick Links</h3>
-                <nav className="space-y-2">
-                  <Link href="/mosc/the-church" className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition">The Church</Link>
-                  <Link href="/mosc/holy-synod" className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition">Holy Synod</Link>
-                  <Link href="/mosc/dioceses" className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition">Dioceses</Link>
-                  <Link href="/mosc/ecumenical" className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition">Ecumenical Relations</Link>
-                  <Link href="/mosc/institutions" className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition">Institutions</Link>
-                  <Link href="/mosc/gallery" className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition">Gallery</Link>
-                  <Link href="/mosc/contact-info" className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition">Contact Info</Link>
                 </nav>
               </div>
             </div>
