@@ -652,56 +652,48 @@ const HeroSection: React.FC = () => {
         )}
       </div>
 
-      {/* Two Cards Section */}
-      <div className="hero-cards-section">
-        {/* United India Card - Left (image: unite_india_logo.avif) */}
-        <Link href="/#about-us" className="hero-card hero-card-about group" aria-label="United India - About our mission">
-          {/* United India image - unite_india_logo.avif */}
-          <div
-            className="absolute inset-0 bg-contain bg-center bg-no-repeat transition-transform duration-500 group-hover:scale-105"
-            style={{
-              backgroundImage: `url('/images/unite_india_logo.avif')`,
-              filter: 'brightness(0.95) contrast(1.05)'
-            }}
-            role="img"
-            aria-label="United India"
-          />
-          {/* Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-          {/* Text Content */}
-          <div className="absolute bottom-4 left-4 right-4">
-            <p className="hero-card-label">About</p>
-            <p className="hero-card-title">Our Mission</p>
-          </div>
-        </Link>
-
-        {/* Malayalees Friends Card - Right (with Donate) */}
-        <div className="hero-card hero-card-donate group">
-          {/* Gradient Background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-[#2d1b4e] via-[#3d2b5e] to-[#1a0a2e]" />
-          {/* Decorative Pattern */}
-          <div className="absolute inset-0 opacity-10" style={{
-            backgroundImage: `radial-gradient(circle at 20% 80%, rgba(255,255,255,0.3) 0%, transparent 50%),
-                              radial-gradient(circle at 80% 20%, rgba(245,158,11,0.3) 0%, transparent 50%)`
-          }} />
-          {/* Content */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center p-4">
-            {/* Malayalees Friends Logo */}
-            <Image
-              src="https://cdn.builder.io/api/v1/image/assets%2Fa70a28525f6f491aaa751610252a199c%2Fd7543f582d4f477599d341da96d48e2b?format=webp&width=800"
-              alt="Malayalees Friends"
-              width={60}
-              height={60}
-              className="mb-2"
+      {/* Single Hero Card: Unite India image (left half) + Donate button (right half) */}
+      <div className="hero-cards-section hero-cards-section-single">
+        <div className="hero-card hero-card-unified group">
+          {/* Left half: Unite India Header Branding - fills half width, enlarged */}
+          <Link href="/#about-us" className="hero-card-left-half" aria-label="United India - About our mission">
+            <div
+              className="absolute inset-0 z-[1] bg-no-repeat bg-[#f5f5f5] transition-transform duration-500 group-hover:scale-[1.02]"
+              style={{
+                backgroundImage: "url('/images/logos/Malayalees_US/Unite_India_Header_Branding.jpeg')",
+                backgroundSize: 'cover',
+                backgroundPosition: 'left center',
+              }}
+              role="img"
+              aria-label="Unite India - A Nonprofit Corporation"
             />
-            <p className="hero-card-donate-title">Support Us</p>
-            {/* Givebutter Donate Button - Opens full campaign page (popup/tab). Campaign ID from NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_ID. */}
-            <GivebutterDonateButton
-              className="mt-2 flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 rounded-full text-white text-sm font-semibold shadow-lg hover:shadow-amber-500/30 transition-all duration-300 hover:scale-105 cursor-pointer"
-            >
-              <Heart size={14} className="fill-white" />
-              <span>Donate Now</span>
-            </GivebutterDonateButton>
+            {/* Gradient overlay on left half for text */}
+            <div
+              className="absolute inset-0 z-[2] pointer-events-none"
+              style={{ backgroundImage: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.15) 50%, transparent 100%)' }}
+            />
+            <div className="absolute bottom-4 left-4 right-4 z-[3]">
+              <p className="hero-card-label">About</p>
+              <p className="hero-card-title">Our Mission</p>
+            </div>
+          </Link>
+
+          {/* Right half: Donate button */}
+          <div className="hero-card-right-half">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#2d1b4e] via-[#3d2b5e] to-[#1a0a2e]" />
+            <div className="absolute inset-0 opacity-10" style={{
+              backgroundImage: `radial-gradient(circle at 20% 80%, rgba(255,255,255,0.3) 0%, transparent 50%),
+                                radial-gradient(circle at 80% 20%, rgba(245,158,11,0.3) 0%, transparent 50%)`
+            }} />
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-4 z-[1]">
+              <p className="hero-card-donate-title text-white mb-3">Support Us</p>
+              <GivebutterDonateButton
+                className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 rounded-full text-white text-sm font-semibold shadow-lg hover:shadow-amber-500/30 transition-all duration-300 hover:scale-105 cursor-pointer"
+              >
+                <Heart size={16} className="fill-white" />
+                <span>Donate Now</span>
+              </GivebutterDonateButton>
+            </div>
           </div>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import QuickLinks from '@/components/holy-synod/QuickLinks';
 
 export const metadata = {
   title: 'Oriental Orthodox',
@@ -60,6 +61,11 @@ const orientalorthodoxPage = () => {
                     </p>
                 </div>
               </div>
+
+              {/* Quick Links - Horizontal Below Main Content */}
+              <div className="mt-8">
+                <QuickLinks />
+              </div>
             </div>
 
             {/* Sidebar */}
@@ -110,81 +116,6 @@ const orientalorthodoxPage = () => {
                     className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
                   >
                     Interfaith Dialogue
-                  </Link>
-                </nav>
-              </div>
-
-              {/* Quick Links */}
-              <div className="bg-background rounded-lg sacred-shadow p-6">
-                <h3 className="font-heading font-semibold text-lg text-foreground mb-4">
-                  Quick Links
-                </h3>
-                <nav className="space-y-2">
-                  <Link 
-                    href="/mosc/downloads/kalpana" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Kalpana
-                  </Link>
-                  <Link 
-                    href="/mosc/downloads" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Downloads
-                  </Link>
-                  <Link 
-                    href="/mosc/institutions" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Institutions
-                  </Link>
-                  <Link 
-                    href="/mosc/training" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Training
-                  </Link>
-                  <Link 
-                    href="/mosc/publications" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Publications
-                  </Link>
-                  <Link 
-                    href="/mosc/spiritual" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Spiritual Organisations
-                  </Link>
-                  <Link 
-                    href="/mosc/theological" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Theological Seminaries
-                  </Link>
-                  <Link 
-                    href="/mosc/lectionary" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Lectionary
-                  </Link>
-                  <Link 
-                    href="/mosc/gallery" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Gallery
-                  </Link>
-                  <Link 
-                    href="/mosc/contact-info" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Contact Info
-                  </Link>
-                  <Link 
-                    href="/mosc/faqs" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    FAQs
                   </Link>
                 </nav>
               </div>
