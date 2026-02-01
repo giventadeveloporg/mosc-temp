@@ -68,6 +68,7 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
   const [useZeroFeeProvider, setUseZeroFeeProvider] = useState(false);
   const [zeroFeeProvider, setZeroFeeProvider] = useState<string>('');
   const [givebutterCampaignId, setGivebutterCampaignId] = useState<string>('');
+  const [givebutterWidgetId, setGivebutterWidgetId] = useState<string>('');
 
   // Recurrence configuration state
   const [isRecurring, setIsRecurring] = useState(false);
@@ -129,6 +130,7 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
             setIsCharityEvent(Boolean(donationMetadata.isCharityEvent));
             setZeroFeeProvider(donationMetadata.zeroFeeProvider || '');
             setGivebutterCampaignId(donationMetadata.givebutterCampaignId || '');
+            setGivebutterWidgetId(donationMetadata.givebutterWidgetId || '');
             setUseZeroFeeProvider(Boolean(donationMetadata.zeroFeeProvider));
           } catch (e) {
             console.error('Failed to parse donation metadata', e);
@@ -145,6 +147,7 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
             setUseZeroFeeProvider(Boolean(donationConfig.useZeroFeeProvider));
             setZeroFeeProvider(donationConfig.zeroFeeProvider || '');
             setGivebutterCampaignId(donationConfig.givebutterCampaignId || '');
+            setGivebutterWidgetId((donationConfig as { givebutterWidgetId?: string }).givebutterWidgetId || '');
           }
         }
 
@@ -875,6 +878,7 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
       isCharityEvent,
       zeroFeeProvider: isFundraiserOrCharity ? 'GIVEBUTTER' : (useZeroFeeProvider ? zeroFeeProvider : undefined),
       givebutterCampaignId: (isFundraiserOrCharity || zeroFeeProvider === 'GIVEBUTTER') ? (givebutterCampaignId || undefined) : undefined,
+      givebutterWidgetId: (isFundraiserOrCharity || zeroFeeProvider === 'GIVEBUTTER') ? (givebutterWidgetId?.trim() || undefined) : undefined,
     });
 
     // Calculate end date if "OCCURRENCES" is selected
@@ -1654,11 +1658,27 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
                   {errors.givebutterCampaignId && (
                     <div className="text-red-500 text-sm mt-1">{errors.givebutterCampaignId}</div>
                   )}
+                  <div className="mt-4">
+                    <label htmlFor="givebutterWidgetId" className="block text-sm font-medium text-gray-700 mb-1">
+                      GiveButter Event Widget ID <span className="text-gray-500 text-xs">(Optional – for embed)</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="givebutterWidgetId"
+                      value={givebutterWidgetId}
+                      onChange={(e) => setGivebutterWidgetId(e.target.value)}
+                      placeholder="e.g. j1ek6j"
+                      className="w-full border border-gray-300 rounded p-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Used on the event GiveButter checkout page to embed <code className="bg-gray-100 px-1 rounded">{'<givebutter-widget id="...">'}</code>. Leave empty to use campaign form instead.
+                    </p>
+                  </div>
                   <div className="text-xs text-gray-600 mt-2 p-3 bg-blue-50 border border-blue-200 rounded">
-                    <p className="font-semibold text-blue-900 mb-2">GiveButter Campaign ID (Optional):</p>
+                    <p className="font-semibold text-blue-900 mb-2">GiveButter: Campaign ID &amp; Widget ID</p>
                     <div className="space-y-2 text-blue-800">
-                      <p><strong>For DEV/PROD:</strong> This field is <strong>optional</strong>. If left empty, the backend will use the default campaign ID from your GiveButter provider configuration.</p>
-                      <p><strong>Recommended:</strong> Set a specific campaign ID per event for better tracking and reporting.</p>
+                      <p><strong>Campaign ID (optional):</strong> Stored in <code className="bg-white px-1 rounded">donation_metadata</code> as <code className="bg-white px-1 rounded">givebutterCampaignId</code>, e.g. <code className="bg-white px-1 rounded">FwSx70</code> from the event ticketing URL (<code className="bg-white px-1 rounded">https://givebutter.com/FwSx70</code>). If left empty, the backend uses the default from your GiveButter provider configuration.</p>
+                      <p><strong>Widget ID (optional):</strong> Add to the same JSON as <code className="bg-white px-1 rounded">givebutterWidgetId</code>, e.g. <code className="bg-white px-1 rounded">j1ek6j</code>. Frontend and backend keep parsing <code className="bg-white px-1 rounded">donation_metadata</code>; when rendering the embed page, if <code className="bg-white px-1 rounded">givebutterWidgetId</code> is set we render <code className="bg-white px-1 rounded">{'<givebutter-widget id="..." />'}</code>, else we use <code className="bg-white px-1 rounded">givebutterCampaignId</code> and render <code className="bg-white px-1 rounded">{'<givebutter-form campaign="..." />'}</code>.</p>
                       <div className="mt-3 p-2 bg-blue-100 rounded">
                         <p className="font-semibold mb-1">How to get your GiveButter Campaign ID:</p>
                         <ol className="list-decimal list-inside space-y-1">
@@ -1671,7 +1691,7 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
                         </ol>
                       </div>
                       <p className="mt-2 text-blue-700 text-xs">
-                        <strong>Fallback Behavior:</strong> If this field is empty, the system will use the campaign ID configured in your GiveButter payment provider settings (stored in <code className="bg-blue-100 px-1 rounded">payment_provider_config.metadata.campaignId</code>).
+                        <strong>Fallback:</strong> If Campaign ID is empty, the system uses the campaign ID from <code className="bg-blue-100 px-1 rounded">payment_provider_config.metadata.campaignId</code>.
                       </p>
                     </div>
                   </div>

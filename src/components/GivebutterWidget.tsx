@@ -2,10 +2,15 @@
 
 import React, { useEffect, useState } from 'react';
 
+/** Optional data-* attributes to pass to <givebutter-widget> (e.g. when GiveButter documents data-hide-donations) */
+export type GivebutterWidgetDataAttrs = Record<string, string | undefined>;
+
 interface GivebutterWidgetProps {
   campaignId?: string;
   widgetId?: string;
   className?: string;
+  /** Optional data-* attributes for <givebutter-widget> (e.g. data-hide-donations="true" when supported by GiveButter) */
+  dataAttrs?: GivebutterWidgetDataAttrs;
 }
 
 const DEFAULT_CAMPAIGN_ID = 'mhoZp0';
@@ -24,6 +29,7 @@ export default function GivebutterWidget({
   campaignId: campaignIdProp,
   widgetId,
   className = '',
+  dataAttrs = {},
 }: GivebutterWidgetProps) {
   const campaignId =
     campaignIdProp ??
@@ -59,9 +65,14 @@ export default function GivebutterWidget({
 
   // Use custom element approach - Givebutter will automatically initialize these
   if (widgetId) {
+    const widgetDataAttrs = Object.fromEntries(
+      Object.entries(dataAttrs).filter(
+        ([k, v]) => (k.startsWith('data-') || k.startsWith('aria-')) && v != null && v !== ''
+      )
+    ) as Record<string, string>;
     return (
       <div className={`givebutter-widget-container ${className}`}>
-        <givebutter-widget id={widgetId} />
+        <givebutter-widget id={widgetId} {...widgetDataAttrs} />
       </div>
     );
   }

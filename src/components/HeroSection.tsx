@@ -600,7 +600,7 @@ const HeroSection: React.FC = () => {
     if (isTicketedFundraiser) {
       return {
         image: '/images/buy_tickets_click_here_fundraiser.png',
-        href: `/events/${event.id}/donation-checkout`,
+        href: `/events/${event.id}/givebutter-checkout`,
         alt: 'Buy Tickets'
       };
     }
