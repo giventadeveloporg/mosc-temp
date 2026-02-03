@@ -37,7 +37,7 @@ const dioceseofsouthwestamericaPage = () => {
                 {/* Featured Image */}
                 <div className="mb-8">
                   <Image
-                    src="/images/dioceses/diocese-of-south-west-america.jpg"
+                    src="/images/dioceses/southwest_america_diocese.jpg"
                     alt="Diocese of South West America"
                     width={500}
                     height={300}

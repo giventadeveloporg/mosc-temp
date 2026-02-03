@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 export const metadata = {
   title: 'Orthodox Syrian Sunday School Association of the East (SUNDAY SCHOOL) | MOSC',
-  description: 'Orthodox Syrian Sunday School Association of the East is a spiritual organization functioning in all the parishes of the Malankara Orthodox Church throughout th...',
+  description: 'Orthodox Syrian Sunday School Association of the East is a spiritual organization functioning in all the parishes of the Malankara Orthodox Church throughout the world. It takes care of the spiritual nurturing of the children, by bringing them up in the knowledge and fellowship of Jesus Christ and His Church.',
 };
 
 const OrthodoxSyrianSundaySchoolAssociationOfTheEastPage = () => {
@@ -21,7 +21,7 @@ const OrthodoxSyrianSundaySchoolAssociationOfTheEastPage = () => {
               Orthodox Syrian Sunday School Association of the East (SUNDAY SCHOOL)
             </h1>
             <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Orthodox Syrian Sunday School Association of the East is a spiritual organization functioning in all the parishes of the Malankara Orthodox Church throughout the world. It takes care of the...
+              Orthodox Syrian Sunday School Association of the East is a spiritual organization functioning in all the parishes of the Malankara Orthodox Church throughout the world. It takes care of the spiritual nurturing of the children, by bringing them up in the knowledge and fellowship of Jesus Christ and His Church.
             </p>
           </div>
         </div>
@@ -30,14 +30,91 @@ const OrthodoxSyrianSundaySchoolAssociationOfTheEastPage = () => {
       {/* Content Section */}
       <section className="py-16 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            <div className="lg:col-span-2">
-              <div className="bg-background rounded-lg sacred-shadow p-8">
-                <h2 className="font-heading font-semibold text-2xl text-foreground mb-6">
-                  About Orthodox Syrian Sunday School Association of the East (SUNDAY SCHOOL)
-                </h2>
-                <div className="space-y-4 font-body text-muted-foreground leading-relaxed">
-                  <p>Orthodox Syrian Sunday School Association of the East is a spiritual organization functioning in all the parishes of the Malankara Orthodox Church throughout the world. It takes care of the...</p>
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <div className="lg:col-span-3">
+              <div className="bg-background rounded-lg sacred-shadow p-0 overflow-hidden">
+                {/* Featured Image */}
+                <div className="relative w-full h-48 bg-muted overflow-hidden flex items-center justify-center">
+                  <Image
+                    src="/images/spiritual/OSSSAE.png"
+                    alt="Orthodox Syrian Sunday School Association of the East"
+                    fill
+                    className="object-contain object-center"
+                    style={{ objectPosition: 'center center', backgroundColor: 'transparent' }}
+                    sizes="(min-width: 1024px) 75vw, 100vw"
+                  />
+                </div>
+                <div className="p-8">
+                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-6">
+                    About O.S.S.A.E.
+                  </h2>
+                  <div className="space-y-4 font-body text-muted-foreground leading-relaxed">
+                    <p>
+                      Orthodox Syrian Sunday School Association of the East is a spiritual organization functioning in all the parishes of the Malankara Orthodox Church throughout the world. It takes care of the spiritual nurturing of the children, by bringing them up in the knowledge and fellowship of Jesus Christ and His Church. The classes are conducted for the children. It has a separate wing for the Outside Kerala Region (OKR).
+                    </p>
+                    <p>
+                      The classes range from Pre-primary to the twelfth (Vedapraveen Diploma). We follow a curriculum, jointly prepared and published by the Oriental Orthodox Churches which is revised from time to time. The Vacation Bible School conducted (OVBS) is a very vibrant wing of the O.S.S.A.E. The movement publish textbooks, devotional materials, song books, songs and animations for the OVBS every year. The headquarters of O.S.S.A.E is located in the complex of the Devalokom Catholicate Aramana, Kottayam.
+                    </p>
+                  </div>
+
+                  {/* Office Bearers */}
+                  <div className="mt-10 space-y-6">
+                    <h3 className="font-heading font-semibold text-xl text-foreground border-b border-border pb-2">
+                      President
+                    </h3>
+                    <ul className="space-y-2 font-body text-muted-foreground">
+                      <li>H.G. Dr. Joseph Mar Dionysius Metropolitan</li>
+                      <li>H.G. Dr. Youhanon Mar Demetrios Metropolitan (President, Outside Kerala Region)</li>
+                    </ul>
+
+                    <h3 className="font-heading font-semibold text-xl text-foreground border-b border-border pb-2 mt-8">
+                      Director General
+                    </h3>
+                    <p className="font-body text-muted-foreground">
+                      Rev. Fr. Dr. Varghese Varghese, Mob: +91 9947362708
+                    </p>
+
+                    <h3 className="font-heading font-semibold text-xl text-foreground border-b border-border pb-2 mt-8">
+                      Office Administrator
+                    </h3>
+                    <p className="font-body text-muted-foreground">
+                      Rev. Fr. Jobsam Mathew, Mob: +91 9846670920
+                    </p>
+
+                    <h3 className="font-heading font-semibold text-xl text-foreground border-b border-border pb-2 mt-8">
+                      Outside Kerala Region
+                    </h3>
+                    <p className="font-body text-muted-foreground">
+                      Director: Rev. Fr. Dr. Jossi Jacob, Mob: +91 9400352724
+                    </p>
+
+                    <h3 className="font-heading font-semibold text-xl text-foreground border-b border-border pb-2 mt-8">
+                      Address
+                    </h3>
+                    <address className="font-body text-muted-foreground not-italic leading-relaxed">
+                      O.S.S.A.E Central Office,<br />
+                      Catholicate Aramana,<br />
+                      Devalokam P.O, Kottayam,<br />
+                      Kerala<br />
+                      Phone: 0481 2572890
+                    </address>
+
+                    <h3 className="font-heading font-semibold text-xl text-foreground border-b border-border pb-2 mt-8">
+                      Websites
+                    </h3>
+                    <ul className="space-y-2 font-body text-muted-foreground">
+                      <li>
+                        <a href="http://www.ossae.org/" target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80 underline reverent-transition">
+                          www.ossae.org
+                        </a>
+                      </li>
+                      <li>
+                        <a href="https://ossaebodhanam.org/" target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80 underline reverent-transition">
+                          ossaebodhanam.org
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
             </div>
@@ -72,8 +149,8 @@ const OrthodoxSyrianSundaySchoolAssociationOfTheEastPage = () => {
                   Related Organizations
                 </h3>
                 <div className="space-y-3">
-                  <Link 
-                    href="/mosc/spiritual-organizations" 
+                  <Link
+                    href="/mosc/spiritual-organizations"
                     className="block text-primary hover:text-primary/80 font-medium reverent-transition"
                   >
                     ← All Spiritual Organizations
@@ -85,31 +162,6 @@ const OrthodoxSyrianSundaySchoolAssociationOfTheEastPage = () => {
         </div>
       </section>
 
-      {/* Call to Action */}
-      <section className="py-16 bg-muted/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="font-heading font-semibold text-3xl text-foreground mb-4">
-            Get Involved
-          </h2>
-          <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto mb-8">
-            Learn more about how you can participate in the activities and programs of Orthodox Syrian Sunday School Association of the East (SUNDAY SCHOOL).
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/mosc/spiritual-organizations"
-              className="inline-flex items-center justify-center px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 reverent-transition"
-            >
-              Explore All Organizations
-            </Link>
-            <Link
-              href="/mosc"
-              className="inline-flex items-center justify-center px-6 py-3 bg-background text-foreground border border-border rounded-lg hover:bg-muted reverent-transition"
-            >
-              Learn About MOSC
-            </Link>
-          </div>
-        </div>
-      </section>
     </div>
   );
 };

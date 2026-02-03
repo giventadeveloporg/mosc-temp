@@ -37,7 +37,7 @@ const dioceseofchengannurPage = () => {
                 {/* Featured Image */}
                 <div className="mb-8">
                   <Image
-                    src="/images/dioceses/diocese-of-chengannur.jpg"
+                    src="/images/dioceses/chengannur_diocese.jpg"
                     alt="Diocese of Chengannur"
                     width={500}
                     height={300}

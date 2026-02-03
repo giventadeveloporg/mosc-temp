@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import QuickLinks from '@/components/holy-synod/QuickLinks';
 
 export const metadata = {
   title: 'H.H. Baselios Paulos I - The First Catholicos of the East in Malankara (1912–1913)',
@@ -12,6 +13,12 @@ const BaseliosPaulosIPage = () => {
     {
       name: 'The Catholicate Overview',
       href: '/mosc/catholicate/catholicate'
+    },
+    {
+      name: 'H.H. Baselios Paulos I',
+      period: '1912–1913',
+      description: 'The First Catholicos of the East in Malankara',
+      href: '/mosc/catholicate/his-holiness-baselios-paulos-i-1st-catholicos-of-the-east-in-malankara'
     },
     {
       name: 'H.H. Baselios Geevarghese I',
@@ -150,6 +157,11 @@ const BaseliosPaulosIPage = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Quick Links - Horizontal Below Main Content (same as holy-synod) */}
+              <div className="mt-8">
+                <QuickLinks />
+              </div>
             </div>
 
             {/* Sidebar */}
@@ -164,8 +176,7 @@ const BaseliosPaulosIPage = () => {
                     <Link
                       key={catholicos.name}
                       href={catholicos.href}
-                      className={`block p-3 rounded-lg hover:bg-muted/50 reverent-transition group ${index === 0 ? 'bg-primary/5 border border-primary/20' : ''
-                        }`}
+                      className={`block p-3 rounded-lg hover:bg-muted/50 reverent-transition group ${index === 1 ? 'bg-primary/5 border border-primary/20' : ''}`}
                     >
                       <div className="flex items-start space-x-3">
                         <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 reverent-transition">
@@ -218,27 +229,6 @@ const BaseliosPaulosIPage = () => {
                     <span className="font-medium text-foreground">Resting Place:</span>
                     <p className="text-sm text-muted-foreground">Pampakuda Cheriya Palli</p>
                   </div>
-                </div>
-              </div>
-
-              {/* Quick Links */}
-              <div className="bg-background rounded-lg sacred-shadow p-6">
-                <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
-                  Quick Links
-                </h3>
-                <div className="space-y-2">
-                  <Link href="/mosc/catholicate" className="block text-sm text-muted-foreground hover:text-primary reverent-transition">
-                    The Catholicate
-                  </Link>
-                  <Link href="/mosc/holy-synod" className="block text-sm text-muted-foreground hover:text-primary reverent-transition">
-                    Holy Synod
-                  </Link>
-                  <Link href="/mosc/dioceses" className="block text-sm text-muted-foreground hover:text-primary reverent-transition">
-                    Dioceses
-                  </Link>
-                  <Link href="/mosc/gallery" className="block text-sm text-muted-foreground hover:text-primary reverent-transition">
-                    Photo Gallery
-                  </Link>
                 </div>
               </div>
             </div>

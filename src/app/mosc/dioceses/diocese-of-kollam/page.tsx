@@ -37,7 +37,7 @@ const dioceseofkollamPage = () => {
                 {/* Featured Image */}
                 <div className="mb-8">
                   <Image
-                    src="/images/dioceses/diocese-of-kollam.jpg"
+                    src="/images/dioceses/kollam diocese.jpg"
                     alt="Diocese of Kollam"
                     width={500}
                     height={300}

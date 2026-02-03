@@ -37,7 +37,7 @@ const dioceseofthrissurPage = () => {
                 {/* Featured Image */}
                 <div className="mb-8">
                   <Image
-                    src="/images/dioceses/diocese-of-thrissur.jpg"
+                    src="/images/dioceses/thrissur_diocese.jpg"
                     alt="Diocese of Thrissur"
                     width={500}
                     height={300}

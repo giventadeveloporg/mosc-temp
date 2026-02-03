@@ -1101,7 +1101,7 @@ export default function EventsPage() {
                             {/* Fundraiser Image - Show for ticketed fundraiser/charity events (replaces both Buy Tickets and Make a Donation buttons) */}
                             {isTicketedFundraiser && (
                             <Link
-                                href={`/events/${event.id}/donation-checkout`}
+                                href={`/events/${event.id}/givebutter-checkout`}
                               className={`transition-transform hover:scale-105 ${isPast ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
                                 title="Buy Tickets"
                             >
@@ -1429,7 +1429,7 @@ export default function EventsPage() {
                               {/* Fundraiser Image - Show for ticketed fundraiser/charity events (replaces both Buy Tickets and Make a Donation buttons) */}
                               {isTicketedFundraiser && (
                                 <Link
-                                  href={`/events/${event.id}/donation-checkout`}
+                                  href={`/events/${event.id}/givebutter-checkout`}
                                   className="transition-transform hover:scale-105"
                                   title="Buy Tickets"
                                   aria-label="Buy Tickets"

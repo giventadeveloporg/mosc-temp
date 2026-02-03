@@ -32,15 +32,21 @@ export function isDonationBasedEvent(event: EventDetailsDTO): boolean {
 }
 
 /**
- * Extracts donation metadata from event
+ * Donation metadata shape returned by getDonationMetadata
  */
-export function getDonationMetadata(event: EventDetailsDTO): {
+export type DonationMetadata = {
   isFundraiserEvent: boolean;
   isCharityEvent: boolean;
   zeroFeeProvider?: string;
   givebutterCampaignId?: string;
-} {
-  const defaultMetadata = {
+  givebutterWidgetId?: string;
+};
+
+/**
+ * Extracts donation metadata from event
+ */
+export function getDonationMetadata(event: EventDetailsDTO): DonationMetadata {
+  const defaultMetadata: DonationMetadata = {
     isFundraiserEvent: false,
     isCharityEvent: false,
   };
@@ -56,6 +62,7 @@ export function getDonationMetadata(event: EventDetailsDTO): {
       isCharityEvent: Boolean(parsed.isCharityEvent),
       zeroFeeProvider: parsed.zeroFeeProvider,
       givebutterCampaignId: parsed.givebutterCampaignId,
+      givebutterWidgetId: parsed.givebutterWidgetId,
     };
   } catch (error) {
     console.error('[getDonationMetadata] Error parsing donationMetadata:', error);

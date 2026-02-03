@@ -334,6 +334,7 @@ export function createDonationMetadata(options: {
   isCharityEvent?: boolean;
   zeroFeeProvider?: string;
   givebutterCampaignId?: string;
+  givebutterWidgetId?: string;
 }): Record<string, any> {
   const metadata: Record<string, any> = {};
 
@@ -348,6 +349,9 @@ export function createDonationMetadata(options: {
   }
   if (options.givebutterCampaignId) {
     metadata.givebutterCampaignId = options.givebutterCampaignId;
+  }
+  if (options.givebutterWidgetId) {
+    metadata.givebutterWidgetId = options.givebutterWidgetId;
   }
 
   return metadata;

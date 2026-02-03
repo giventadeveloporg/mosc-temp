@@ -6,6 +6,10 @@ declare namespace JSX {
   interface IntrinsicElements {
     'givebutter-widget': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & {
       id?: string;
+      /** Optional: future GiveButter attributes (e.g. data-hide-donations) – pass when documented */
+      'data-hide-donations'?: string;
+      'data-tickets-only'?: string;
+      [key: `data-${string}`]: string | undefined;
     }, HTMLElement>;
     'givebutter-form': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & {
       campaign?: string;

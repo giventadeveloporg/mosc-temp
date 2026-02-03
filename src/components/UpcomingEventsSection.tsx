@@ -623,7 +623,7 @@ const UpcomingEventsSection: React.FC = () => {
                         {/* Fundraiser Image - Show for ticketed fundraiser/charity events (replaces Buy Tickets button) */}
                         {isUpcomingEvents && isTicketedFundraiserEvent(event) && (
                           <Link
-                            href={`/events/${event.id}/donation-checkout`}
+                            href={`/events/${event.id}/givebutter-checkout`}
                             onClick={(e) => e.stopPropagation()}
                             className="transition-transform hover:scale-105 inline-block"
                             title="Buy Tickets"

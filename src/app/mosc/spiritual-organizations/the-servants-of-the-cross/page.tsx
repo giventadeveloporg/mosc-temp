@@ -85,31 +85,6 @@ const TheServantsOfTheCrossPage = () => {
         </div>
       </section>
 
-      {/* Call to Action */}
-      <section className="py-16 bg-muted/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="font-heading font-semibold text-3xl text-foreground mb-4">
-            Get Involved
-          </h2>
-          <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto mb-8">
-            Learn more about how you can participate in the activities and programs of The Servants of the Cross.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/mosc/spiritual-organizations"
-              className="inline-flex items-center justify-center px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 reverent-transition"
-            >
-              Explore All Organizations
-            </Link>
-            <Link
-              href="/mosc"
-              className="inline-flex items-center justify-center px-6 py-3 bg-background text-foreground border border-border rounded-lg hover:bg-muted reverent-transition"
-            >
-              Learn About MOSC
-            </Link>
-          </div>
-        </div>
-      </section>
     </div>
   );
 };

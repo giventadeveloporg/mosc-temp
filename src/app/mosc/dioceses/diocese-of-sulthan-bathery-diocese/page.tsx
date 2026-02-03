@@ -37,7 +37,7 @@ const dioceseofsulthanbatherydiocesePage = () => {
                 {/* Featured Image */}
                 <div className="mb-8">
                   <Image
-                    src="/images/dioceses/diocese-of-sulthan-bathery-diocese.jpg"
+                    src="/images/dioceses/sulthan_bathery_diocese.jpg"
                     alt="Diocese of Sulthan Bathery"
                     width={500}
                     height={300}
