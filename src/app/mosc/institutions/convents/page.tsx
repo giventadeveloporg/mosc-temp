@@ -45,8 +45,16 @@ export default function ConventsPage() {
       <section className="relative bg-gradient-to-br from-background to-muted py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            <div className="relative w-full h-80 lg:h-96 rounded-lg overflow-hidden sacred-shadow-lg">
-              <Image src="/images/institutions/conv.jpg" alt="Convents" fill className="object-cover" priority />
+            <div className="relative w-full h-auto rounded-lg overflow-hidden flex items-center justify-center bg-muted/20">
+              <Image
+                src="/images/institutions/conv.jpg"
+                alt="Convents"
+                width={800}
+                height={600}
+                className="w-full h-auto object-contain group-hover:scale-105 transition-transform duration-300"
+                style={{ backgroundColor: 'transparent', borderRadius: '0.5rem' }}
+                priority
+              />
             </div>
             <div>
               <h1 className="font-heading font-semibold text-4xl lg:text-5xl text-foreground mb-4">Convents</h1>
@@ -92,7 +100,7 @@ export default function ConventsPage() {
       <section className="py-12 bg-muted">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-center">
-            <Link href="/mosc/institutions" className="inline-flex items-center px-6 py-3 bg-primary text-primary-foreground font-body font-medium rounded-lg hover:bg-primary/90 reverent-transition sacred-shadow">
+            <Link href="/mosc/institutions" className="inline-flex items-center px-6 py-3 bg-primary text-white font-body font-medium rounded-lg hover:bg-primary/90 reverent-transition sacred-shadow">
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>

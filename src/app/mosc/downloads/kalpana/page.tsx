@@ -41,12 +41,17 @@ export default function KalpanaPage() {
       <section className="relative bg-gradient-to-br from-background to-muted py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            <div className="relative w-full h-80 lg:h-96 rounded-lg overflow-hidden sacred-shadow-lg">
+            <div className="relative w-full h-auto rounded-lg overflow-hidden flex items-center justify-center bg-muted/20">
               <Image
-                src="/images/downloads/kalpana.jpg"
+                src="/images/downloads/kalpana.png"
                 alt="Kalpana"
-                fill
-                className="object-cover"
+                width={800}
+                height={600}
+                className="w-full h-auto object-contain"
+                style={{
+                  backgroundColor: 'transparent',
+                  borderRadius: '0.5rem',
+                }}
                 priority
               />
             </div>
@@ -89,10 +94,14 @@ export default function KalpanaPage() {
                   }
                 }}
               >
-                <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 reverent-transition">
-                  <svg className="w-10 h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
+                <div className="relative w-28 h-28 mx-auto mb-4 rounded-lg overflow-hidden flex items-center justify-center bg-primary/10 group-hover:bg-primary/20 reverent-transition p-0">
+                  <Image
+                    src="/images/downloads/kalapana_card_logo.png"
+                    alt={`Kalpana ${edition.year}`}
+                    fill
+                    className="object-cover p-0"
+                    sizes="112px"
+                  />
                 </div>
                 <h3 className="font-heading font-semibold text-2xl text-foreground mb-2 group-hover:text-primary reverent-transition">
                   {edition.year}

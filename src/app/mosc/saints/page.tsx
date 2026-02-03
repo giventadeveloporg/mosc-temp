@@ -92,14 +92,21 @@ const SaintsPage = () => {
                 href={card.href}
                 className="bg-background rounded-lg sacred-shadow p-0 overflow-hidden hover:sacred-shadow-lg reverent-transition group flex flex-col"
               >
-                <div className="relative w-full h-48 bg-muted overflow-hidden">
-                  <Image
-                    src={card.image}
-                    alt={card.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                  />
+                {/* Image area - padded container, object-contain per image_containment_prevention rule */}
+                <div className="relative w-full h-48 bg-muted overflow-hidden flex items-center justify-center p-4">
+                  <div className="relative w-full h-full min-h-0">
+                    <Image
+                      src={card.image}
+                      alt={card.title}
+                      fill
+                      className="object-contain object-center group-hover:scale-105 transition-transform duration-300"
+                      style={{
+                        objectPosition: 'center center',
+                        backgroundColor: 'transparent',
+                      }}
+                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    />
+                  </div>
                 </div>
                 <div className="p-6 flex flex-col flex-1">
                   <h3 className="font-heading font-semibold text-xl text-foreground mb-3 group-hover:text-primary reverent-transition">
