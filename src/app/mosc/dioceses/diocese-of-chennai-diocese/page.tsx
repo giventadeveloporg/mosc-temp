@@ -37,7 +37,7 @@ const dioceseofchennaidiocesePage = () => {
                 {/* Featured Image */}
                 <div className="mb-8">
                   <Image
-                    src="/images/dioceses/diocese-of-chennai-diocese.jpg"
+                    src="/images/dioceses/madras_diocese.jpg"
                     alt="Diocese of Madras"
                     width={500}
                     height={300}

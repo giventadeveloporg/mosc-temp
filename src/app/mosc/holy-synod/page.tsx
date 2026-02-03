@@ -375,9 +375,26 @@ const HolySynodPage = () => {
                     <p className="font-body text-sm text-primary font-medium mb-2">
                       {member.title}
                     </p>
-                    <p className="font-body text-xs text-muted-foreground leading-relaxed line-clamp-3">
+                    <p className="font-body text-xs text-muted-foreground leading-relaxed line-clamp-3 mb-3">
                       {member.description}
                     </p>
+                    <span className="inline-flex items-center gap-1.5 font-body text-sm font-medium text-primary mt-auto">
+                      Read More
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </span>
                   </div>
                 </div>
               </Link>

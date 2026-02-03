@@ -37,7 +37,7 @@ const dioceseofthumpamonPage = () => {
                 {/* Featured Image */}
                 <div className="mb-8">
                   <Image
-                    src="/images/dioceses/diocese-of-thumpamon.jpg"
+                    src="/images/dioceses/thumpamon_diocese.jpg"
                     alt="Diocese of Thumpamon"
                     width={500}
                     height={300}

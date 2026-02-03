@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import CatholicateEmblem from './CatholicateEmblem';
+import QuickLinks from '@/components/holy-synod/QuickLinks';
 
 export const metadata = {
   title: 'The Catholicate',
@@ -126,12 +127,12 @@ const CatholicatePage = () => {
                 href={catholicos.href}
                 className="bg-card rounded-lg sacred-shadow p-0 overflow-hidden hover:sacred-shadow-lg reverent-transition group flex flex-col"
               >
-                <div className="relative w-full h-48 bg-muted overflow-hidden">
+                <div className="relative w-full h-48 bg-muted overflow-hidden flex items-center justify-center">
                   <Image
                     src={catholicos.image}
                     alt={catholicos.name}
                     fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="object-center group-hover:scale-105 transition-transform duration-300"
                     sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                   />
                 </div>
@@ -142,13 +143,33 @@ const CatholicatePage = () => {
                   <p className="font-body text-muted-foreground text-sm leading-relaxed flex-1 line-clamp-4">
                     {catholicos.excerpt}
                   </p>
-                  <span className="inline-flex items-center mt-4 text-primary font-body font-medium text-sm group-hover:underline reverent-transition">
-                    Read More
-                    <span className="ml-1" aria-hidden>→</span>
+                  <div className="mt-auto pt-4">
+                    <span className="inline-flex items-center gap-1.5 font-body text-sm font-medium text-primary">
+                      Read More
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
                   </span>
+                  </div>
                 </div>
               </Link>
             ))}
+          </div>
+
+          {/* Quick Links - Horizontal Below Main Content (same as holy-synod) */}
+          <div className="mt-8">
+            <QuickLinks />
           </div>
         </div>
       </section>

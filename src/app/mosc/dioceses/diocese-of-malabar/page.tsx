@@ -37,7 +37,7 @@ const dioceseofmalabarPage = () => {
                 {/* Featured Image */}
                 <div className="mb-8">
                   <Image
-                    src="/images/dioceses/diocese-of-malabar.jpg"
+                    src="/images/dioceses/malabar_diocese.png"
                     alt="Diocese of Malabar"
                     width={500}
                     height={300}

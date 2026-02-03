@@ -37,7 +37,7 @@ const dioceseofahmedabadPage = () => {
                 {/* Featured Image */}
                 <div className="mb-8">
                   <Image
-                    src="/images/dioceses/diocese-of-ahmedabad.jpg"
+                    src="/images/dioceses/ahmedabad_diocese.jpg"
                     alt="Diocese of Ahmedabad"
                     width={500}
                     height={300}

@@ -56,38 +56,42 @@ const SpiritualOrganizationsPage = () => {
       title: 'Ardra Charitable Society',
       description: 'Ardra aims to work for the educational, social, cultural, spiritual and economic advancement of the marginalised people of India, irrespective of caste, creed or community. Etymologically derived from the Sanskrit...',
       href: '/mosc/spiritual-organizations/ardra-charitable-trust',
-      image: '/images/spiritual/ardra.jpg',
+      image: '/images/spiritual/ARDRA.png',
       icon: '🤝'
     },
     {
       title: 'Akhila Malankara Prayer Group Association',
       description: 'The Akhila Malankara Prayer Group Association has been constituted to monitor and streamline the prayer and reading habits of congregations in different prayer groups functioning in the various parishes under...',
       href: '/mosc/spiritual-organizations/akhila-malankara-prayer-group-association',
+      image: '/images/logos/Current_Edits/MOSC-Logo-only.png',
       icon: '🙏'
     },
     {
       title: 'Akhila Malankara Orthodox Shusrushaka Sangham (AMOSS)',
       description: 'AMOSS is a movement working on the following objectives: To give instructions to the altar boys of all parishes in the Malankara Church to make uniformity in the worship of the...',
       href: '/mosc/spiritual-organizations/akhila-malankara-orthodox-shusrushaka-sangham-amoss',
+      image: '/images/logos/Current_Edits/MOSC-Logo-only.png',
       icon: '⛪'
     },
     {
       title: 'Mission Board and Mission Society',
       description: 'Orthodox Church which has been existing in India for the last two thousand years has started the mission society and mission board to fulfil its mission in India and hence...',
       href: '/mosc/spiritual-organizations/mission-board',
+      image: '/images/logos/Current_Edits/MOSC-Logo-only.png',
       icon: '🌍'
     },
     {
       title: 'Ministry of Human Empowerment',
       description: 'MOHE is a Department of Malankara Orthodox Syrian Church. It aims to explore ,enlighten and empower the human potential of the society  through various awareness campaigns. The main thrust of...',
       href: '/mosc/spiritual-organizations/ministry-of-human-empowerment',
+      image: '/images/logos/Current_Edits/MOSC-Logo-only.png',
       icon: '💪'
     },
     {
       title: 'Akhila Malankara Balasamajam',
       description: 'AKHILA MALANKARA BALASAMAJAM is the student portion of the Malankara Orthodox Syrian Church. Balasamajam aims at the integrated personal development of the youth in the Church. The main objectives are worship, study and virtuous...',
       href: '/mosc/spiritual-organizations/akhila-malankara-bala-samajam',
-      image: '/images/spiritual/balasamajam.jpg',
+      image: '/images/spiritual/BALASAMAJAM.png',
       icon: '👶'
     },
     {
@@ -101,7 +105,7 @@ const SpiritualOrganizationsPage = () => {
       title: "Marth Mariam Vanitha Samajam (Women's Wing of Orthodox Church of India)",
       description: "A Brief History Marth Mariam Vanitha Samajam is the Women's wing of the Malankara Orthodox Church of India. It is one of the major spiritual organization of the church combining...",
       href: '/mosc/spiritual-organizations/marth-mariam-vanitha-samajam-womens-wing-of-orthodox-church-of-india',
-      image: '/images/spiritual/moms.jpg',
+      image: '/images/spiritual/MMVS.png',
       icon: '👩'
     },
     {
@@ -115,7 +119,7 @@ const SpiritualOrganizationsPage = () => {
       title: 'The Orthodox Christian Youth Movement',
       description: 'The Orthodox Christian Youth Movement (OCYM), the Youth-wing of the Malankara Orthodox Syrian Church is in its 77th year of active leadership and Christian witness in the Church and society....',
       href: '/mosc/spiritual-organizations/the-orthodox-christian-youth-movement',
-      image: '/images/spiritual/OCYM-ahmedabad.jpg',
+      image: '/images/spiritual/OCYM-ahmedabad.png',
       icon: '🌟'
     },
     {
@@ -159,29 +163,87 @@ const SpiritualOrganizationsPage = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {organizations.map((org, index) => (
               <Link
                 key={index}
                 href={org.href}
-                className="bg-background rounded-lg sacred-shadow p-6 hover:sacred-shadow-lg reverent-transition group"
+                className="bg-background rounded-lg sacred-shadow p-0 overflow-hidden hover:sacred-shadow-lg reverent-transition group flex flex-col"
               >
-                <div className="text-center mb-4">
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 reverent-transition">
-                    <span className="text-3xl" role="img" aria-label={org.title}>{org.icon}</span>
-                  </div>
-                  <h3 className="font-heading font-semibold text-lg text-foreground mb-3 group-hover:text-primary reverent-transition leading-tight">
+                {/* Image/icon area - same as administration: full width h-48 */}
+                <div className="relative w-full h-48 bg-muted overflow-hidden flex items-center justify-center">
+                  {index === 0 ? (
+                    <Image
+                      src="/images/spiritual/OSSSAE.png"
+                      alt={org.title}
+                      fill
+                      className="object-contain object-center group-hover:scale-105 transition-transform duration-300"
+                      style={{
+                        objectPosition: 'center center',
+                        backgroundColor: 'transparent',
+                      }}
+                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    />
+                  ) : index >= 8 && index <= 11 ? (
+                    /* Cards a[9]-a[12]: smaller centered logo */
+                    <div className="relative w-28 h-28 flex-shrink-0">
+                      <Image
+                        src={org.image!}
+                        alt={org.title}
+                        fill
+                        className="object-contain object-center group-hover:scale-105 transition-transform duration-300"
+                        style={{
+                          objectPosition: 'center center',
+                          backgroundColor: 'transparent',
+                        }}
+                        sizes="112px"
+                      />
+                    </div>
+                  ) : org.image ? (
+                    <Image
+                      src={org.image}
+                      alt={org.title}
+                      fill
+                      className="object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                      style={{
+                        objectPosition: 'center center',
+                        backgroundColor: 'transparent',
+                      }}
+                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center group-hover:bg-primary/20 reverent-transition">
+                      <span className="text-3xl" role="img" aria-label={org.title}>{org.icon}</span>
+                    </div>
+                  )}
+                </div>
+                {/* Content area - same as administration */}
+                <div className="p-6 flex flex-col flex-1">
+                  <h3 className="font-heading font-semibold text-xl text-foreground mb-3 group-hover:text-primary reverent-transition">
                     {org.title}
                   </h3>
-                  <p className="font-body text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                  <p className="font-body text-muted-foreground text-sm leading-relaxed flex-1 line-clamp-4">
                     {org.description}
                   </p>
-                </div>
-                <div className="mt-4 text-center">
-                  <span className="inline-flex items-center text-primary hover:text-primary/80 font-medium text-sm reverent-transition">
-                    Learn More
-                    <span className="ml-1" role="img" aria-label="Arrow">→</span>
-                  </span>
+                  <div className="mt-auto pt-4">
+                    <span className="inline-flex items-center gap-1.5 font-body text-sm font-medium text-primary">
+                      Read More
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </span>
+                  </div>
                 </div>
               </Link>
             ))}

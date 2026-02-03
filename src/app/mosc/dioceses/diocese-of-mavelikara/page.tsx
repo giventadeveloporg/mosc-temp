@@ -37,7 +37,7 @@ const dioceseofmavelikaraPage = () => {
                 {/* Featured Image */}
                 <div className="mb-8">
                   <Image
-                    src="/images/dioceses/diocese-of-mavelikara.jpg"
+                    src="/images/dioceses/mavelikara_diocese.jpg"
                     alt="Diocese of Mavelikara"
                     width={500}
                     height={300}

@@ -123,35 +123,37 @@ const AdministrationPage = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {administrationSections.map((item) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {administrationSections.map((item, index) => (
               <Link
                 key={item.title}
                 href={item.href}
-                className="bg-background rounded-lg sacred-shadow p-4 hover:sacred-shadow-lg reverent-transition group flex flex-col h-full"
+                className="bg-card rounded-lg sacred-shadow p-0 overflow-hidden hover:sacred-shadow-lg reverent-transition group flex flex-col"
               >
-                <div className="text-center flex flex-col h-full">
-                  {/* Image container - centered, contained, no shadow */}
-                  <div className="relative w-full h-48 min-h-[192px] mb-3 rounded-lg overflow-hidden reverent-transition bg-muted/30 flex items-center justify-center p-3">
-                    <div className="relative w-full h-full">
-                      <Image
-                        src={item.image}
-                        alt={item.title}
-                        fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        className="object-contain object-center group-hover:scale-105 reverent-transition"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col flex-1 text-left">
-                    <h3 className="font-heading font-semibold text-base text-foreground mb-1.5 group-hover:text-primary reverent-transition">
-                      {item.title}
-                    </h3>
-                    <p className="font-body text-sm text-muted-foreground leading-relaxed line-clamp-3 mb-3">
-                      {item.description}
-                    </p>
-                    <span className="inline-flex items-center gap-1.5 font-body text-sm font-medium text-primary mt-auto">
+                {/* Image area - same as catholicate: full width h-48, centered and fully visible */}
+                <div className="relative w-full h-48 bg-muted overflow-hidden flex items-center justify-center">
+                  <Image
+                    src={item.image}
+                    alt={item.title}
+                    fill
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    className={index === 0 ? 'object-contain object-center group-hover:scale-105 transition-transform duration-300' : 'object-center group-hover:scale-105 transition-transform duration-300'}
+                    style={{
+                      objectPosition: 'center center',
+                      backgroundColor: 'transparent',
+                    }}
+                  />
+                </div>
+                {/* Content area - same padding and spacing as catholicate */}
+                <div className="p-6 flex flex-col flex-1">
+                  <h3 className="font-heading font-semibold text-xl text-foreground mb-3 group-hover:text-primary reverent-transition">
+                    {item.title}
+                  </h3>
+                  <p className="font-body text-muted-foreground text-sm leading-relaxed flex-1 line-clamp-4">
+                    {item.description}
+                  </p>
+                  <div className="mt-auto pt-4">
+                    <span className="inline-flex items-center gap-1.5 font-body text-sm font-medium text-primary">
                       Read More
                       <svg
                         className="w-4 h-4"

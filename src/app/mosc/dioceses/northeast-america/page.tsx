@@ -37,7 +37,7 @@ const northeastamericaPage = () => {
                 {/* Featured Image */}
                 <div className="mb-8">
                   <Image
-                    src="/images/dioceses/northeast-america.jpg"
+                    src="/images/dioceses/northeast_america_diocese.jpg"
                     alt="Diocese of Northeast America"
                     width={500}
                     height={300}

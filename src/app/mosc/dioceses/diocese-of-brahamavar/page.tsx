@@ -37,7 +37,7 @@ const dioceseofbrahamavarPage = () => {
                 {/* Featured Image */}
                 <div className="mb-8">
                   <Image
-                    src="/images/dioceses/diocese-of-brahamavar.jpg"
+                    src="/images/dioceses/bhramavar_diocese.jpg"
                     alt="Diocese of Brahamavar"
                     width={500}
                     height={300}

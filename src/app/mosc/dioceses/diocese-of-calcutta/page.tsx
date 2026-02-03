@@ -37,7 +37,7 @@ const dioceseofcalcuttaPage = () => {
                 {/* Featured Image */}
                 <div className="mb-8">
                   <Image
-                    src="/images/dioceses/diocese-of-calcutta.jpg"
+                    src="/images/dioceses/culcutta_diocese.jpg"
                     alt="Diocese of Calcutta"
                     width={500}
                     height={300}

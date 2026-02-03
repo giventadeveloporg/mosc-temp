@@ -108,10 +108,25 @@ const SaintsPage = () => {
                   <p className="font-body text-muted-foreground text-sm leading-relaxed flex-1 line-clamp-4">
                     {card.excerpt}
                   </p>
-                  <span className="inline-flex items-center mt-4 text-primary font-body font-medium text-sm group-hover:underline reverent-transition">
-                    Read More
-                    <span className="ml-1" aria-hidden>→</span>
+                  <div className="mt-auto pt-4">
+                    <span className="inline-flex items-center gap-1.5 font-body text-sm font-medium text-primary">
+                      Read More
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
                   </span>
+                  </div>
                 </div>
               </Link>
             ))}

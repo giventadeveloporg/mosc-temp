@@ -37,7 +37,7 @@ const dioceseofadoorkadampanaduPage = () => {
                 {/* Featured Image */}
                 <div className="mb-8">
                   <Image
-                    src="/images/dioceses/diocese-of-adoor-kadampanadu.jpg"
+                    src="/images/dioceses/kadampanadu diocese.jpg"
                     alt="Diocese of Adoor – Kadampanadu"
                     width={500}
                     height={300}
