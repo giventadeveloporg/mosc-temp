@@ -236,30 +236,87 @@
         <div class="tests-section">
             <h2 style="margin-bottom: 20px; color: #333;">Test Results</h2>
             
-                <div class="test-item passed">
-                    <div class="test-status">✅</div>
+                <div class="test-item failed">
+                    <div class="test-status">❌</div>
                     <div class="test-info">
                         <h4>
                             <span class="test-id">mosc-001</span>
                             MOSC Homepage Test
                             <span class="test-priority priority-critical">critical</span>
                         </h4>
-                        <p>Test completed successfully</p>
+                        <p>Error: page.goto: Timeout 30000ms exceeded.
+Call log:
+[2m  - navigating to "http://localhost:3000/mosc", waiting until "domcontentloaded"[22m
+</p>
                         
                         
+                        
+                        <div class="error-details">
+                            <strong>Errors:</strong>
+                            <ul>
+                                <li>page.goto: Timeout 30000ms exceeded.
+Call log:
+[2m  - navigating to "http://localhost:3000/mosc", waiting until "domcontentloaded"[22m
+</li>
+                            </ul>
+                        </div>
                         
                         
                         <div class="error-details">
                             <h5>Expected Elements:</h5>
                             <ul>
-                                <li><code>h1, h2</code></li><li><code>nav</code></li><li><code>main</code></li><li><code>a[href*="/mosc/"]</code></li>
+                                <li><code>h1, h2</code></li><li><code>nav</code></li><li><code>main</code></li><li><code>a[href*="/mosc/"]</code></li><li><code>button:has-text("Gallery"), a[href="/mosc/gallery"]</code></li>
                             </ul>
                         </div>
                         
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc</div>
-                        <div class="duration">15605ms</div>
+                        <div class="duration">30270ms</div>
+                        
+                    </div>
+                </div>
+            
+                <div class="test-item passed">
+                    <div class="test-status">✅</div>
+                    <div class="test-info">
+                        <h4>
+                            <span class="test-id">mosc-001a</span>
+                            MOSC Homepage Quick Links - Gallery Navigation Test
+                            <span class="test-priority priority-high">high</span>
+                        </h4>
+                        <p>Test completed successfully</p>
+                        
+                        <div class="warning-details">
+                            <strong>⚠️ Warnings:</strong> Some expected elements not found: [class*="gallery"], [class*="album"], [class*="grid"]; Interaction failed: page.waitForURL: Timeout 15000ms exceeded.
+=========================== logs ===========================
+waiting for navigation to "/mosc/gallery" until "load"
+  navigated to "http://localhost:3000/mosc/gallery"
+============================================================; Interaction failed: page.waitForSelector: Timeout 5000ms exceeded.
+Call log:
+[2m  - waiting for locator('[class*="gallery"], [class*="album"], [class*="grid"]') to be visible[22m
+[2m    15 × locator resolved to 4 elements. Proceeding with the first one: <div class="grid grid-cols-2 gap-2 px-2">…</div>[22m
+
+                        </div>
+                        
+                        
+                        <div class="error-details">
+                            <strong class="missing-elements">Missing Elements:</strong> <code>[class*="gallery"], [class*="album"], [class*="grid"]</code>
+                        </div>
+                        
+                        
+                        
+                        <div class="error-details">
+                            <h5>Expected Elements:</h5>
+                            <ul>
+                                <li><code>button:has-text("Gallery"), a[href="/mosc/gallery"]</code></li><li><code>h1, h2</code></li><li><code>[class*="gallery"], [class*="album"], [class*="grid"]</code></li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                    <div class="test-details">
+                        <div class="url">/mosc</div>
+                        <div class="duration">40329ms</div>
                         
                     </div>
                 </div>
@@ -295,7 +352,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/holy-synod</div>
-                        <div class="duration">7052ms</div>
+                        <div class="duration">11574ms</div>
                         
                     </div>
                 </div>
@@ -310,6 +367,14 @@
                         </h4>
                         <p>Test completed successfully</p>
                         
+                        <div class="warning-details">
+                            <strong>⚠️ Warnings:</strong> Some expected elements not found: [class*="gallery"], [class*="album"], [class*="grid"]
+                        </div>
+                        
+                        
+                        <div class="error-details">
+                            <strong class="missing-elements">Missing Elements:</strong> <code>[class*="gallery"], [class*="album"], [class*="grid"]</code>
+                        </div>
                         
                         
                         
@@ -323,42 +388,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/gallery</div>
-                        <div class="duration">1748ms</div>
-                        
-                    </div>
-                </div>
-            
-                <div class="test-item failed">
-                    <div class="test-status">❌</div>
-                    <div class="test-info">
-                        <h4>
-                            <span class="test-id">mosc-004</span>
-                            MOSC Photo Gallery Page Test
-                            <span class="test-priority priority-medium">medium</span>
-                        </h4>
-                        <p>Error: Page returned status 404 Not Found. URL: http://localhost:3000/mosc/photo-gallery</p>
-                        
-                        
-                        
-                        <div class="error-details">
-                            <strong>Errors:</strong>
-                            <ul>
-                                <li>Page returned status 404 Not Found. URL: http://localhost:3000/mosc/photo-gallery</li>
-                            </ul>
-                        </div>
-                        
-                        
-                        <div class="error-details">
-                            <h5>Expected Elements:</h5>
-                            <ul>
-                                <li><code>h1</code></li><li><code>[class*="gallery"], [class*="grid"], [class*="photo"]</code></li><li><code>img, [class*="image"]</code></li>
-                            </ul>
-                        </div>
-                        
-                    </div>
-                    <div class="test-details">
-                        <div class="url">/mosc/photo-gallery</div>
-                        <div class="duration">7468ms</div>
+                        <div class="duration">3450ms</div>
                         
                     </div>
                 </div>
@@ -394,7 +424,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/directory</div>
-                        <div class="duration">5630ms</div>
+                        <div class="duration">8995ms</div>
                         
                     </div>
                 </div>
@@ -422,7 +452,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/calendar</div>
-                        <div class="duration">3404ms</div>
+                        <div class="duration">7311ms</div>
                         
                     </div>
                 </div>
@@ -458,7 +488,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/contact-info</div>
-                        <div class="duration">4177ms</div>
+                        <div class="duration">11458ms</div>
                         
                     </div>
                 </div>
@@ -486,7 +516,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/dioceses</div>
-                        <div class="duration">3388ms</div>
+                        <div class="duration">11590ms</div>
                         
                     </div>
                 </div>
@@ -514,7 +544,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/the-church</div>
-                        <div class="duration">3265ms</div>
+                        <div class="duration">18216ms</div>
                         
                     </div>
                 </div>
@@ -542,7 +572,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/spiritual-organizations</div>
-                        <div class="duration">3639ms</div>
+                        <div class="duration">13601ms</div>
                         
                     </div>
                 </div>
@@ -570,7 +600,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/training</div>
-                        <div class="duration">4506ms</div>
+                        <div class="duration">13787ms</div>
                         
                     </div>
                 </div>
@@ -598,7 +628,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/theological-seminaries</div>
-                        <div class="duration">3439ms</div>
+                        <div class="duration">14630ms</div>
                         
                     </div>
                 </div>
@@ -626,7 +656,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/pilgrim-centres</div>
-                        <div class="duration">6627ms</div>
+                        <div class="duration">8800ms</div>
                         
                     </div>
                 </div>
@@ -654,7 +684,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/institutions</div>
-                        <div class="duration">3279ms</div>
+                        <div class="duration">7181ms</div>
                         
                     </div>
                 </div>
@@ -682,7 +712,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/saints</div>
-                        <div class="duration">3270ms</div>
+                        <div class="duration">13862ms</div>
                         
                     </div>
                 </div>
@@ -710,7 +740,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/sitemap</div>
-                        <div class="duration">4573ms</div>
+                        <div class="duration">21535ms</div>
                         
                     </div>
                 </div>
@@ -738,7 +768,7 @@
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/catholicate</div>
-                        <div class="duration">1703ms</div>
+                        <div class="duration">18652ms</div>
                         
                     </div>
                 </div>
@@ -753,13 +783,6 @@
                         </h4>
                         <p>Test completed successfully</p>
                         
-                        <div class="warning-details">
-                            <strong>⚠️ Warnings:</strong> Interaction failed: page.waitForSelector: Timeout 5000ms exceeded.
-Call log:
-[2m  - waiting for locator('h1') to be visible[22m
-
-                        </div>
-                        
                         
                         
                         
@@ -773,7 +796,7 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/catholicate/h-h-baselios-marthoma-paulose-ii</div>
-                        <div class="duration">8453ms</div>
+                        <div class="duration">14088ms</div>
                         
                     </div>
                 </div>
@@ -801,7 +824,7 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/speeches</div>
-                        <div class="duration">3209ms</div>
+                        <div class="duration">8544ms</div>
                         
                     </div>
                 </div>
@@ -810,7 +833,7 @@ Call log:
 
         <div class="footer">
             <p>Generated by MOSC Pages Test Suite</p>
-            <p class="timestamp">Report generated on: 1/16/2026, 4:26:47 AM</p>
+            <p class="timestamp">Report generated on: 2/3/2026, 4:28:12 PM</p>
             <p class="timestamp">Base URL: http://localhost:3000</p>
             <p class="timestamp">Test Engine: Playwright (Local Browser Execution)</p>
         </div>
