@@ -16,7 +16,7 @@ type DirectorySection = {
 };
 
 export default function DirectoryPage() {
-  // Content from https://directory.mosc.in/
+  // Content of from https://directory.mosc.in/
   const sections: DirectorySection[] = [
     {
       title: 'The Holy Synod of Bishops',
