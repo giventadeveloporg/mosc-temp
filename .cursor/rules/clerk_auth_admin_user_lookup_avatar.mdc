@@ -1,6 +1,6 @@
 ---
-description: Clerk authentication middleware configuration and admin role lookup patterns for Next.js App Router
-globs: src/middleware.ts, src/app/layout.tsx, src/app/**/layout.tsx
+description: Clerk authentication middleware configuration, admin role lookup, and satellite/primary sign-in and sign-out patterns for Next.js App Router
+globs: src/middleware.ts, src/app/layout.tsx, src/app/**/layout.tsx, src/app/(auth)/sign-in/[[...sign-in]]/page.tsx, src/app/auth/signout-redirect/page.tsx, src/components/Header.tsx
 alwaysApply: true
 ---
 
@@ -550,6 +550,86 @@ import Image from 'next/image';
 
 ---
 
+## **Satellite vs Primary: Sign-In and Sign-Out (Multi-Domain)**
+
+When using Clerk with a **primary domain** (e.g. `event-site-manager.com`) and **satellite domain(s)** (e.g. `mosc-temp.com`), sign-in and sign-out must detect primary vs satellite correctly. If the primary app is misidentified as a satellite (e.g. due to `NEXT_PUBLIC_CLERK_DOMAIN` set to the primary host), the sign-in page can render blank and sign-out can fail or redirect incorrectly.
+
+### **Core Rule: Primary-First Detection**
+
+- **Always detect primary domain first** using `NEXT_PUBLIC_PRIMARY_DOMAIN` and `window.location.hostname`.
+- **Never use `NEXT_PUBLIC_CLERK_DOMAIN`** to decide "am I satellite?" on the primary app—that env can be mis-set and cause the primary to redirect to itself or hide the Clerk UI.
+- **Only treat as satellite** when the hostname is a known satellite (e.g. `hostname.includes('mosc-temp.com')`).
+
+### **Sign-In Page** (`src/app/(auth)/sign-in/[[...sign-in]]/page.tsx`)
+
+**Pattern**:
+1. Localhost → show Clerk `<SignIn />` (development).
+2. **If hostname is the primary domain** (using `NEXT_PUBLIC_PRIMARY_DOMAIN`, normalized with/without `www.`) → **do not redirect**; always render Clerk `<SignIn />` and honor `redirect_url` for return to satellite after sign-in.
+3. **Only if hostname is satellite** (e.g. `mosc-temp.com`) → set redirect state and send user to primary’s `/sign-in?redirect_url=<satellite-origin>`.
+
+**Primary detection (use this shape)**:
+```typescript
+const primaryDomain = process.env.NEXT_PUBLIC_PRIMARY_DOMAIN || 'www.event-site-manager.com';
+const primaryHost = primaryDomain.replace(/^https?:\/\//, '').replace(/\/$/, '');
+const isPrimary =
+  hostname === primaryHost ||
+  hostname === primaryDomain ||
+  hostname.includes(primaryHost.replace('www.', '')) ||
+  hostname.includes(primaryDomain.replace('www.', ''));
+if (isPrimary) return; // Do not set shouldRedirect; render <SignIn />
+```
+
+**Satellite redirect (only for known satellite)**:
+```typescript
+const isSatellite = hostname.includes('mosc-temp.com');
+if (isSatellite) {
+  setShouldRedirect(true);
+  window.location.href = `https://${primaryHost}/sign-in?redirect_url=${encodeURIComponent(window.location.origin)}`;
+}
+```
+
+**Reference**: [`src/app/(auth)/sign-in/[[...sign-in]]/page.tsx`](mdc:src/app/(auth)/sign-in/[[...sign-in]]/page.tsx)
+
+### **Sign-Out in Header** (`src/components/Header.tsx` — `handleSignOut`)
+
+**Pattern**:
+1. **If hostname is the primary domain** (same primary detection as above) → call Clerk `signOut()` and redirect to `/`. Do **not** redirect to `/auth/signout-redirect`.
+2. **Only if hostname is satellite** (e.g. `mosc-temp.com`) → redirect to primary’s `/auth/signout-redirect?redirect_url=<satellite-origin>`.
+3. Fallback (e.g. localhost): call `signOut()` and redirect to `/`.
+
+**Reference**: [`src/components/Header.tsx`](mdc:src/components/Header.tsx) — `handleSignOut`
+
+### **Sign-Out Redirect Page** (`src/app/auth/signout-redirect/page.tsx`)
+
+**Purpose**: On the **primary** domain, this page is the target when users sign out from a **satellite**. The satellite redirects here; this page calls Clerk `signOut()` then redirects the user back to the satellite with `?clerk_signout=true` so the satellite can clear local state.
+
+**Requirements**:
+- **Primary app must serve this route** (required for satellite sign-out to work). The file can exist in both repos and be deployed to both; it is only used when the primary serves the request.
+- Read `redirect_url` from query; allow only known satellites (e.g. `mosc-temp.com`) or `localhost`.
+- Call `signOut()` from `useClerk()`, then `window.location.href = redirect_url + '?clerk_signout=true'` (or `&` if URL already has query).
+- If `redirect_url` is invalid or missing, redirect to `/`.
+
+**Reference**: [`src/app/auth/signout-redirect/page.tsx`](mdc:src/app/auth/signout-redirect/page.tsx)
+
+### **Deployment (Same Repo vs Two Repos)**
+
+- **Same repo for both domains**: Add/update the sign-in page, Header, and signout-redirect page once; deploy to both Amplify apps. Both get the same code; behavior is determined by hostname and env (primary vs satellite).
+- **Two repos**: Apply the same sign-in and Header logic in both. Add the signout-redirect page at least to the **primary** repo; having it in both repos is fine and keeps codebases in sync.
+
+### **Anti-Pattern: Using NEXT_PUBLIC_CLERK_DOMAIN for "Am I Satellite?"**
+
+```typescript
+// ❌ DON'T: Primary can be misidentified as satellite if env is wrong
+const satelliteDomain = process.env.NEXT_PUBLIC_CLERK_DOMAIN || 'mosc-temp.com';
+if (hostname.includes(satelliteDomain.replace('www.', ''))) {
+  setShouldRedirect(true);  // On primary, if CLERK_DOMAIN=event-site-manager.com, this runs!
+}
+```
+
+**Fix**: Detect primary first via `NEXT_PUBLIC_PRIMARY_DOMAIN`; only then treat as satellite when `hostname.includes('mosc-temp.com')` (or another explicit satellite host).
+
+---
+
 ## **Common Anti-Patterns**
 
 ### **❌ DON'T: Put Routes That Call auth() in ignoredRoutes**
@@ -778,11 +858,27 @@ Does the route call auth() or currentUser() in server components?
 
 ---
 
+### **Sign-In Page Blank on Primary (event-site-manager.com)**
+**Cause**: Primary domain was treated as satellite (e.g. `NEXT_PUBLIC_CLERK_DOMAIN` set to primary host), so the page redirected to itself or showed "Redirecting..." instead of Clerk `<SignIn />`.
+
+**Fix**: Use primary-first detection in sign-in page; only redirect when `hostname.includes('mosc-temp.com')`. See "Satellite vs Primary: Sign-In and Sign-Out" above.
+
+---
+
+### **Sign-Out Error on Satellite (mosc-temp.com)**
+**Cause**: Primary app does not serve `/auth/signout-redirect`, or Header on primary was redirecting to signout-redirect instead of calling `signOut()` (primary misidentified as satellite).
+
+**Fix**: (1) Add `src/app/auth/signout-redirect/page.tsx` to the primary app (or both). (2) In Header `handleSignOut`, use primary-first detection; only redirect to primary’s signout-redirect when `hostname.includes('mosc-temp.com')`. See "Satellite vs Primary: Sign-In and Sign-Out" above.
+
+---
+
 ## **References**
 
 - **Middleware Config**: [`src/middleware.ts`](mdc:src/middleware.ts) - Lines 29-99
 - **Root Layout**: [`src/app/layout.tsx`](mdc:src/app/layout.tsx) - Lines 57-212
-- **Header Component**: [`src/components/Header.tsx`](mdc:src/components/Header.tsx) - Lines 256-420 (UserAvatarDropdown), Lines 872-995 (desktop integration), Lines 1223-1280 (mobile integration)
+- **Header Component**: [`src/components/Header.tsx`](mdc:src/components/Header.tsx) - Lines 256-420 (UserAvatarDropdown), Lines 872-995 (desktop integration), Lines 1223-1280 (mobile integration), `handleSignOut` (satellite/primary sign-out)
+- **Sign-In Page**: [`src/app/(auth)/sign-in/[[...sign-in]]/page.tsx`](mdc:src/app/(auth)/sign-in/[[...sign-in]]/page.tsx) - Satellite/primary sign-in (primary-first detection)
+- **Sign-Out Redirect Page**: [`src/app/auth/signout-redirect/page.tsx`](mdc:src/app/auth/signout-redirect/page.tsx) - Primary sign-out redirect for satellite users
 - **Admin Layout**: [`src/app/admin/layout.tsx`](mdc:src/app/admin/layout.tsx) - Admin route protection pattern
 - **Next.js 15+ Headers API**: https://nextjs.org/docs/messages/sync-dynamic-apis
 - **Clerk Middleware Docs**: https://clerk.com/docs/references/nextjs/auth-middleware
@@ -816,8 +912,14 @@ Does the route call auth() or currentUser() in server components?
 - Via Admin Dashboard: `/admin/manage-usage` → Edit user → Change Role to `ADMIN`
 - Via Direct Database: `UPDATE user_profile SET user_role = 'ADMIN' WHERE ...`
 
+**Satellite vs primary (sign-in and sign-out)**:
+- **Primary-first detection**: Always detect primary domain via `NEXT_PUBLIC_PRIMARY_DOMAIN` and hostname before any redirect. Never use `NEXT_PUBLIC_CLERK_DOMAIN` to decide "am I satellite?" on the primary.
+- **Sign-in**: Primary always renders Clerk `<SignIn />`; only satellite (e.g. `mosc-temp.com`) redirects to primary’s `/sign-in?redirect_url=...`.
+- **Sign-out**: Primary always calls `signOut()` and redirects to `/`; only satellite redirects to primary’s `/auth/signout-redirect?redirect_url=...`. Primary must serve `/auth/signout-redirect` (calls `signOut()` then redirects back to satellite with `clerk_signout=true`).
+
 This ensures:
 - Admin menu appears correctly after user login while maintaining proper authentication flow
 - **Admin menu appears on public pages** (homepage, events, gallery, pricing, etc.) when a logged-in user is an admin—not only on `/admin` and sub-pages
 - User profile avatar displays social login profile picture with dropdown menu for Profile and Sign Out
+- **Sign-in and sign-out work on both primary and satellite** without blank pages or redirect errors
 - Consistent user experience across desktop and mobile with proper accessibility support

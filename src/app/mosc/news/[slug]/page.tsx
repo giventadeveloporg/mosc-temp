@@ -2,7 +2,10 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { getArticleBySlug } from '../getNewsHomePageData';
+import { getArticleBySlug, getFlashNewsForNewsPages } from '../getNewsHomePageData';
+import { NewsPageHeader } from '../components/NewsPageHeader';
+import { FlashNewsCarousel } from '../components/FlashNewsCarousel';
+import { FlashBar } from '../components/FlashBar';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -20,11 +23,24 @@ export async function generateMetadata({ params }: PageProps) {
 
 export default async function NewsArticlePage({ params }: PageProps) {
   const { slug } = await params;
-  const article = await getArticleBySlug(slug);
+  const [article, flashData] = await Promise.all([
+    getArticleBySlug(slug),
+    getFlashNewsForNewsPages(),
+  ]);
   if (!article) notFound();
 
   return (
     <div className="bg-background">
+      {/* Same header as news index: title, description, section + external links */}
+      <NewsPageHeader />
+
+      {/* Flash news: carousel or legacy bar (same as news index) */}
+      {flashData.flashNewsItems?.length > 0 ? (
+        <FlashNewsCarousel items={flashData.flashNewsItems} />
+      ) : flashData.flash?.active && flashData.flash.message ? (
+        <FlashBar message={flashData.flash.message} />
+      ) : null}
+
       <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <Link
           href="/mosc/news"

@@ -6,7 +6,7 @@
  */
 
 import { fetchStrapi, getStrapiUrl, getStrapiTenantId } from '@/lib/strapi';
-import type { NewsHomePageData, NewsArticle, FlashNews, SidebarPromoBlock, AdSlot } from './types';
+import type { NewsHomePageData, NewsArticle, FlashNews, FlashNewsItemUI, SidebarPromoBlock, AdSlot } from './types';
 
 /** Strapi 5: Array-style populate; comma-separated populate triggers 400. */
 const POPULATE = 'populate[0]=cover&populate[1]=category&populate[2]=author';
@@ -153,12 +153,61 @@ function normalizeAdSlot(raw: { id?: number; documentId?: string; attributes?: R
   };
 }
 
+/** Raw flash-news-item from Strapi (with optional populated article). */
+interface RawFlashNewsItem {
+  id?: number;
+  documentId?: string;
+  attributes?: Record<string, unknown>;
+  content?: string;
+  title?: string;
+  externalUrl?: string | null;
+  order?: number;
+  startDate?: string | null;
+  endDate?: string | null;
+  publishedAt?: string | null;
+  article?: { slug?: string; id?: number; documentId?: string } | { data?: { attributes?: { slug?: string }; slug?: string } } | null;
+}
+
+function normalizeFlashNewsItem(raw: RawFlashNewsItem): FlashNewsItemUI {
+  const attrs = (raw?.attributes ?? raw) as Record<string, unknown>;
+  const content = (attrs?.content ?? raw?.content ?? '') as string;
+  const externalUrl = (attrs?.externalUrl ?? raw?.externalUrl ?? null) as string | null | undefined;
+  const article = (attrs?.article ?? raw?.article) as RawFlashNewsItem['article'];
+  const slug =
+    article && typeof article === 'object'
+      ? (article as { slug?: string }).slug ?? (article as { data?: { attributes?: { slug?: string }; slug?: string } })?.data?.attributes?.slug ?? (article as { data?: { slug?: string } })?.data?.slug
+      : undefined;
+  const link =
+    externalUrl && externalUrl.trim()
+      ? externalUrl
+      : slug
+        ? `/mosc/news/${encodeURIComponent(slug)}`
+        : undefined;
+  return {
+    id: (raw?.id ?? attrs?.id ?? 0) as number,
+    content: content.trim() || (raw?.title ?? attrs?.title ?? '') as string,
+    link: link ?? null,
+    startDate: (attrs?.startDate ?? raw?.startDate ?? null) as string | null | undefined,
+    endDate: (attrs?.endDate ?? raw?.endDate ?? null) as string | null | undefined,
+  };
+}
+
+function filterFlashNewsByDate(items: FlashNewsItemUI[]): FlashNewsItemUI[] {
+  const today = new Date().toISOString().split('T')[0];
+  return items.filter((item) => {
+    if (item.startDate && item.startDate > today) return false;
+    if (item.endDate && item.endDate < today) return false;
+    return true;
+  });
+}
+
 /**
  * Fetches all data needed for the news homepage. Returns empty sections if Strapi is unavailable or on error.
  */
 export async function getNewsHomePageData(): Promise<NewsHomePageData> {
   const empty: NewsHomePageData = {
     flash: null,
+    flashNewsItems: [],
     featured: [],
     mainNews: [],
     pressRelease: [],
@@ -184,8 +233,11 @@ export async function getNewsHomePageData(): Promise<NewsHomePageData> {
 
   console.info(`[STRAPI-NEWS] Fetching news homepage data (tenant: ${tenantId}, Strapi: ${strapiUrl})`);
   try {
+  const flashNewsPath = `/flash-news-items?filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}&filters[publishedAt][$notNull]=true&sort=order:asc,publishedAt:desc&populate[0]=article&pagination[limit]=20`;
+
   const [
     homepageRes,
+    flashRes,
     featuredRes,
     mainRes,
     pressRes,
@@ -194,6 +246,7 @@ export async function getNewsHomePageData(): Promise<NewsHomePageData> {
     adsRes,
   ] = await Promise.all([
     fetchStrapi<{ id?: number; attributes?: Record<string, unknown> }>('/homepage?populate=*'),
+    fetchStrapi<unknown[]>(flashNewsPath),
     fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=featured-news', 'publishedAt:desc', 6)),
     fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=main-news', 'publishedAt:desc', 10)),
     fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=press-release', 'publishedAt:desc', 10)),
@@ -202,11 +255,17 @@ export async function getNewsHomePageData(): Promise<NewsHomePageData> {
     fetchStrapi<unknown[]>(`/advertisement-slots?filters[$or][0][position][$eq]=sidebar&filters[$or][1][position][$eq]=top&filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}&populate=media`),
   ]);
 
+  const flashList = Array.isArray(flashRes?.data) ? flashRes.data : [];
   const featuredList = Array.isArray(featuredRes?.data) ? featuredRes.data : [];
   const mainList = Array.isArray(mainRes?.data) ? mainRes.data : [];
   const pressList = Array.isArray(pressRes?.data) ? pressRes.data : [];
   const mostReadList = Array.isArray(mostReadRes?.data) ? mostReadRes.data : [];
   const adsList = Array.isArray(adsRes?.data) ? adsRes.data : [];
+
+  const allFlashItems = (flashList ?? [])
+    .map((f) => normalizeFlashNewsItem(f as RawFlashNewsItem))
+    .filter((f) => f.content && f.content.length > 0);
+  const flashNewsItems = filterFlashNewsByDate(allFlashItems);
 
   const allAds = (adsList ?? []).map((a) => normalizeAdSlot(a as { id?: number; attributes?: Record<string, unknown> }));
   const sidebarSlots = allAds.filter((a) => (a.position ?? '').toLowerCase() === 'sidebar');
@@ -214,6 +273,7 @@ export async function getNewsHomePageData(): Promise<NewsHomePageData> {
 
   const result = {
     flash: normalizeHomepage(homepageRes?.data ?? null),
+    flashNewsItems,
     featured: (featuredList ?? []).map((a) => normalizeArticle(a as { id?: number; documentId?: string; attributes?: Record<string, unknown> })),
     mainNews: (mainList ?? []).map((a) => normalizeArticle(a as { id?: number; documentId?: string; attributes?: Record<string, unknown> })),
     pressRelease: (pressList ?? []).map((a) => normalizeArticle(a as { id?: number; documentId?: string; attributes?: Record<string, unknown> })),
@@ -223,10 +283,50 @@ export async function getNewsHomePageData(): Promise<NewsHomePageData> {
     topAdSlots: topSlots,
   };
   const totalArticles = result.featured.length + result.mainNews.length + result.pressRelease.length + result.mostRead.length;
-  console.info(`[STRAPI-NEWS] Homepage data loaded: ${totalArticles} articles, flash=${!!result.flash?.active}, sidebar=${!!result.sidebarPromo}, sidebarAds=${result.adSlots.length}, topAds=${result.topAdSlots.length}`);
+  console.info(`[STRAPI-NEWS] Homepage data loaded: ${totalArticles} articles, flash=${!!result.flash?.active}, flashItems=${result.flashNewsItems.length}, sidebar=${!!result.sidebarPromo}, sidebarAds=${result.adSlots.length}, topAds=${result.topAdSlots.length}`);
   return result;
   } catch (e) {
     console.warn('[STRAPI-NEWS] getNewsHomePageData failed:', e);
+    return empty;
+  }
+}
+
+/** Result for shared news layout (header + flash) on index and article detail pages. */
+export interface FlashNewsForPage {
+  flashNewsItems: FlashNewsItemUI[];
+  flash: FlashNews | null;
+}
+
+/**
+ * Fetches only flash news (carousel items + legacy homepage flash) for use on news index and article detail pages.
+ * Lighter than getNewsHomePageData when only header + flash bar are needed.
+ */
+export async function getFlashNewsForNewsPages(): Promise<FlashNewsForPage> {
+  const empty: FlashNewsForPage = { flashNewsItems: [], flash: null };
+  let tenantId: string;
+  try {
+    tenantId = getStrapiTenantId();
+  } catch {
+    return empty;
+  }
+  if (!getStrapiUrl()) return empty;
+  try {
+    const flashNewsPath = `/flash-news-items?filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}&filters[publishedAt][$notNull]=true&sort=order:asc,publishedAt:desc&populate[0]=article&pagination[limit]=20`;
+    const [homepageRes, flashRes] = await Promise.all([
+      fetchStrapi<{ id?: number; attributes?: Record<string, unknown> }>('/homepage?populate=*'),
+      fetchStrapi<unknown[]>(flashNewsPath),
+    ]);
+    const flashList = Array.isArray(flashRes?.data) ? flashRes.data : [];
+    const allFlashItems = (flashList ?? [])
+      .map((f) => normalizeFlashNewsItem(f as RawFlashNewsItem))
+      .filter((f) => f.content && f.content.length > 0);
+    const flashNewsItems = filterFlashNewsByDate(allFlashItems);
+    return {
+      flashNewsItems,
+      flash: normalizeHomepage(homepageRes?.data ?? null),
+    };
+  } catch (e) {
+    console.warn('[STRAPI-NEWS] getFlashNewsForNewsPages failed:', e);
     return empty;
   }
 }
