@@ -1,10 +1,10 @@
 import React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
+import QuickLinks from '@/components/holy-synod/QuickLinks';
+import SpiritualOrganizationsSidebar from '../SpiritualOrganizationsSidebar';
 
 export const metadata = {
   title: 'Ecological Commission | MOSC',
-  description: 'President H. G. Dr. Joseph Mar Dionysius Metropolitan Secretary Rev. Fr. Dr. Michael Zachariah (Mount Tabore Dayara, Pathanapuram)...',
+  description: 'Ecological Commission of the Malankara Orthodox Syrian Church. President H. G. Dr. Joseph Mar Dionysius Metropolitan. Vice President Fr. Kurian Daniel. General Secretary Fr. Thomas George.',
 };
 
 const EcologicalCommissionPage = () => {
@@ -21,7 +21,7 @@ const EcologicalCommissionPage = () => {
               Ecological Commission
             </h1>
             <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              President H. G. Dr. Joseph Mar Dionysius Metropolitan Secretary Rev. Fr. Dr. Michael Zachariah (Mount Tabore Dayara, Pathanapuram)
+              Office bearers of the Ecological Commission of the Malankara Orthodox Syrian Church.
             </p>
           </div>
         </div>
@@ -33,58 +33,38 @@ const EcologicalCommissionPage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             <div className="lg:col-span-2">
               <div className="bg-background rounded-lg sacred-shadow p-8">
-                <h2 className="font-heading font-semibold text-2xl text-foreground mb-6">
-                  About Ecological Commission
-                </h2>
-                <div className="space-y-4 font-body text-muted-foreground leading-relaxed">
-                  <p>President H. G. Dr. Joseph Mar Dionysius Metropolitan Secretary Rev. Fr. Dr. Michael Zachariah (Mount Tabore Dayara, Pathanapuram)</p>
+                {/* Office Bearers */}
+                <div className="space-y-6">
+                  <h3 className="font-heading font-semibold text-xl text-foreground border-b border-border pb-2">
+                    President
+                  </h3>
+                  <p className="font-body text-muted-foreground">
+                    H. G. Dr. Joseph Mar Dionysius Metropolitan
+                  </p>
+
+                  <h3 className="font-heading font-semibold text-xl text-foreground border-b border-border pb-2 mt-8">
+                    Vice President
+                  </h3>
+                  <p className="font-body text-muted-foreground">
+                    Fr. Kurian Daniel
+                  </p>
+
+                  <h3 className="font-heading font-semibold text-xl text-foreground border-b border-border pb-2 mt-8">
+                    General Secretary
+                  </h3>
+                  <p className="font-body text-muted-foreground">
+                    Fr. Thomas George
+                  </p>
                 </div>
               </div>
             </div>
 
-            <div className="space-y-6">
-              {/* Quick Info */}
-              <div className="bg-background rounded-lg sacred-shadow p-6">
-                <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
-                  Quick Information
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-3">
-                    <span className="text-primary text-xl" role="img" aria-label="Organization">🌱</span>
-                    <div>
-                      <h4 className="font-heading font-medium text-foreground">Organization Type</h4>
-                      <p className="font-body text-muted-foreground text-sm">Spiritual Organization</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <span className="text-primary text-xl" role="img" aria-label="Church">⛪</span>
-                    <div>
-                      <h4 className="font-heading font-medium text-foreground">Church Affiliation</h4>
-                      <p className="font-body text-muted-foreground text-sm">Malankara Orthodox Syrian Church</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Related Organizations */}
-              <div className="bg-background rounded-lg sacred-shadow p-6">
-                <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
-                  Related Organizations
-                </h3>
-                <div className="space-y-3">
-                  <Link 
-                    href="/mosc/spiritual-organizations" 
-                    className="block text-primary hover:text-primary/80 font-medium reverent-transition"
-                  >
-                    ← All Spiritual Organizations
-                  </Link>
-                </div>
-              </div>
-            </div>
+            <SpiritualOrganizationsSidebar currentHref="/mosc/spiritual-organizations/ecological-commission" />
           </div>
         </div>
       </section>
 
+      <QuickLinks />
     </div>
   );
 };

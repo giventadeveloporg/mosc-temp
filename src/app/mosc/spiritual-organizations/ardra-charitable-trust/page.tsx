@@ -1,10 +1,10 @@
 import React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
+import QuickLinks from '@/components/holy-synod/QuickLinks';
+import SpiritualOrganizationsSidebar from '../SpiritualOrganizationsSidebar';
 
 export const metadata = {
   title: 'Ardra Charitable Society | MOSC',
-  description: 'Ardra aims to work for the educational, social, cultural, spiritual and economic advancement of the marginalised people of India, irrespective of caste, creed o...',
+  description: 'Ardra aims to work for the educational, social, cultural, spiritual and economic advancement of the marginalised people of India. President H.G. Dr. Abraham Mar Seraphim Metropolitan.',
 };
 
 const ArdraCharitableTrustPage = () => {
@@ -21,7 +21,7 @@ const ArdraCharitableTrustPage = () => {
               Ardra Charitable Society
             </h1>
             <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Ardra aims to work for the educational, social, cultural, spiritual and economic advancement of the marginalised people of India, irrespective of caste, creed or community. Etymologically derived from the Sanskrit...
+              Ardra aims to work for the educational, social, cultural, spiritual and economic advancement of the marginalised people of India, irrespective of caste, creed or community.
             </p>
           </div>
         </div>
@@ -33,58 +33,78 @@ const ArdraCharitableTrustPage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             <div className="lg:col-span-2">
               <div className="bg-background rounded-lg sacred-shadow p-8">
-                <h2 className="font-heading font-semibold text-2xl text-foreground mb-6">
-                  About Ardra Charitable Society
-                </h2>
-                <div className="space-y-4 font-body text-muted-foreground leading-relaxed">
-                  <p>Ardra aims to work for the educational, social, cultural, spiritual and economic advancement of the marginalised people of India, irrespective of caste, creed or community. Etymologically derived from the Sanskrit...</p>
+                <div className="space-y-6 font-body text-muted-foreground leading-relaxed">
+                  <p>
+                    Etymologically derived from the Sanskrit word Ardra – Ardram in Malayalam – the name means compassion, fellow-feeling or sorrow for the sufferings of another. Ardra strives to help the poor and needy by providing primary necessities, education, medical care, job-training, marriage assistance, employment etc. This charitable society derives its inspiration from our Lord whose compassion towards suffering humanity was boundless. The one who loved us with an everlasting love has often called upon us to translate our love and pity into deeds, into meaningful gestures.
+                  </p>
+                  <p>
+                    Formed in August 2001, Ardra is under the direct patronage of H.H. Baselios Marthoma Paulose II, Catholicos of the East and Malankara Metropolitan. Registered (No. K. 451) under the provision of Travancore-Cochin Literary, Scientific and Charitable Societies Registration Act 12 of 1955 with its head office at Kottayam, Ardra is a non-profit charitable organisation operating throughout India.
+                  </p>
+                  <p>
+                    All contributions made to Ardra will be eligible for exemption under Section 80G of the Income Tax Act. Ardra is a registered entity with the Office of the Registrar of Companies, Ministry of Corporate Affairs under the Government of India, for undertaking CSR activities.
+                  </p>
+                </div>
+
+                <div className="mt-10 space-y-6">
+                  <h3 className="font-heading font-semibold text-xl text-foreground border-b border-border pb-2">
+                    President
+                  </h3>
+                  <p className="font-body text-muted-foreground">
+                    H.G. Dr. Abraham Mar Seraphim Metropolitan
+                  </p>
+
+                  <h3 className="font-heading font-semibold text-xl text-foreground border-b border-border pb-2 mt-8">
+                    General Secretary
+                  </h3>
+                  <p className="font-body text-muted-foreground">
+                    Joseph Alexander
+                  </p>
+                  <p className="font-body text-muted-foreground">
+                    Ph: +91 9446360949
+                  </p>
+
+                  <h3 className="font-heading font-semibold text-xl text-foreground border-b border-border pb-2 mt-8">
+                    Contact Address
+                  </h3>
+                  <p className="font-body text-muted-foreground">
+                    Catholicate Office , Devalokam P O<br />
+                    Kottayam -686004<br />
+                    Kerala, India
+                  </p>
+                  <p className="font-body text-muted-foreground">
+                    Tel: 0481-2574457, 2578500
+                  </p>
+                  <p className="font-body text-muted-foreground">
+                    Website:{' '}
+                    <a href="https://www.ardramosc.in" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                      www.ardramosc.in
+                    </a>
+                  </p>
+                  <p className="font-body text-muted-foreground">
+                    Email:{' '}
+                    <a href="mailto:ardra@mosc.in" className="text-primary hover:underline">
+                      ardra@mosc.in
+                    </a>
+                  </p>
+                  <p className="font-body text-muted-foreground">
+                    <a href="https://www.facebook.com/ardramosc" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                      www.facebook.com/ardramosc
+                    </a>
+                    <br />
+                    <a href="https://www.instagram.com/ardramosc" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                      www.instagram.com/ardramosc
+                    </a>
+                  </p>
                 </div>
               </div>
             </div>
 
-            <div className="space-y-6">
-              {/* Quick Info */}
-              <div className="bg-background rounded-lg sacred-shadow p-6">
-                <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
-                  Quick Information
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-3">
-                    <span className="text-primary text-xl" role="img" aria-label="Organization">🤝</span>
-                    <div>
-                      <h4 className="font-heading font-medium text-foreground">Organization Type</h4>
-                      <p className="font-body text-muted-foreground text-sm">Spiritual Organization</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <span className="text-primary text-xl" role="img" aria-label="Church">⛪</span>
-                    <div>
-                      <h4 className="font-heading font-medium text-foreground">Church Affiliation</h4>
-                      <p className="font-body text-muted-foreground text-sm">Malankara Orthodox Syrian Church</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Related Organizations */}
-              <div className="bg-background rounded-lg sacred-shadow p-6">
-                <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
-                  Related Organizations
-                </h3>
-                <div className="space-y-3">
-                  <Link 
-                    href="/mosc/spiritual-organizations" 
-                    className="block text-primary hover:text-primary/80 font-medium reverent-transition"
-                  >
-                    ← All Spiritual Organizations
-                  </Link>
-                </div>
-              </div>
-            </div>
+            <SpiritualOrganizationsSidebar currentHref="/mosc/spiritual-organizations/ardra-charitable-trust" />
           </div>
         </div>
       </section>
 
+      <QuickLinks />
     </div>
   );
 };

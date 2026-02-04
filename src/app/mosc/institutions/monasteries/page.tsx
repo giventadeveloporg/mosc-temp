@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Metadata } from 'next';
+import QuickLinks from '@/components/holy-synod/QuickLinks';
 
 export const metadata: Metadata = {
   title: 'Monasteries | Institutions | MOSC',
@@ -116,6 +117,8 @@ export default function MonasteriesPage() {
           </div>
         </div>
       </section>
+
+      <QuickLinks />
 
       {/* Navigation */}
       <section className="py-12 bg-muted">

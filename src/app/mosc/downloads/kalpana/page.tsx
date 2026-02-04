@@ -3,19 +3,23 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import QuickLinks from '@/components/holy-synod/QuickLinks';
 
 export default function KalpanaPage() {
+  // Editions from mosc.in/downloads/kalpana/ (2026 down to 2015); label format matches mosc.in for 2021 and 2019
   const kalpanaEditions = [
-    { year: '2025', link: '#', available: true },
-    { year: '2024', link: '#', available: true },
-    { year: '2023', link: '#', available: true },
-    { year: '2022', link: '#', available: true },
-    { year: '2021', link: '#', available: true },
-    { year: '2020', link: '#', available: true },
-    { year: '2019', link: '#', available: true },
-    { year: '2018', link: '#', available: true },
-    { year: '2017', link: '#', available: true },
-    { year: '2016', link: '#', available: true },
+    { year: '2026', title: 'Kalpana 2026', link: '#', available: true },
+    { year: '2025', title: 'Kalpana 2025', link: '#', available: true },
+    { year: '2024', title: 'Kalpana 2024', link: '#', available: true },
+    { year: '2023', title: 'Kalpana 2023', link: '#', available: true },
+    { year: '2022', title: 'Kalpana 2022', link: '#', available: true },
+    { year: '2021', title: 'Kalpana- 2021', link: '#', available: true },
+    { year: '2020', title: 'Kalpana 2020', link: '#', available: true },
+    { year: '2019', title: 'Kalpana- 2019', link: '#', available: true },
+    { year: '2018', title: 'Kalpana 2018', link: '#', available: true },
+    { year: '2017', title: 'Kalpana 2017', link: '#', available: true },
+    { year: '2016', title: 'Kalpana 2016', link: '#', available: true },
+    { year: '2015', title: 'Kalpana 2015', link: '#', available: true },
   ];
 
   return (
@@ -103,21 +107,16 @@ export default function KalpanaPage() {
                     sizes="112px"
                   />
                 </div>
-                <h3 className="font-heading font-semibold text-2xl text-foreground mb-2 group-hover:text-primary reverent-transition">
-                  {edition.year}
+                <h3 className="font-heading font-semibold text-xl text-foreground mb-2 group-hover:text-primary reverent-transition">
+                  {edition.title}
                 </h3>
-                <p className="font-body text-sm text-muted-foreground">
-                  Kalpana {edition.year}
-                </p>
                 {edition.available && (
-                  <div className="mt-3">
-                    <span className="inline-flex items-center px-3 py-1 bg-success/10 text-success rounded-full text-xs font-medium">
-                      <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      Available
-                    </span>
-                  </div>
+                  <span className="inline-flex items-center font-body text-sm font-medium text-primary">
+                    View
+                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </span>
                 )}
               </Link>
             ))}
@@ -168,7 +167,7 @@ export default function KalpanaPage() {
           <div className="flex justify-center">
             <Link
               href="/mosc/downloads"
-              className="inline-flex items-center px-6 py-3 bg-primary text-primary-foreground font-body font-medium rounded-lg hover:bg-primary/90 reverent-transition sacred-shadow"
+              className="inline-flex items-center px-6 py-3 bg-primary text-white font-body font-medium rounded-lg hover:bg-primary/90 reverent-transition sacred-shadow"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -178,6 +177,8 @@ export default function KalpanaPage() {
           </div>
         </div>
       </section>
+
+      <QuickLinks />
     </div>
   );
 }

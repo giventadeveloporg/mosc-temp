@@ -315,6 +315,8 @@ export default function SchoolsPage() {
         </div>
       </section>
 
+      <QuickLinks />
+
       {/* Navigation */}
       <section className="py-12 bg-muted">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
