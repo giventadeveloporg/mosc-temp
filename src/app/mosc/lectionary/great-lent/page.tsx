@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Metadata } from 'next';
+import QuickLinks from '@/components/holy-synod/QuickLinks';
 
 export const metadata: Metadata = {
   title: 'Great Lent | Lectionary | MOSC',
@@ -387,6 +388,8 @@ export default function GreatLentPage() {
           </div>
         </div>
       </section>
+
+      <QuickLinks />
 
       {/* Navigation */}
       <section className="py-12 bg-muted">

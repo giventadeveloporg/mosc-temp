@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Metadata } from 'next';
+import QuickLinks from '@/components/holy-synod/QuickLinks';
 
 export const metadata: Metadata = {
   title: 'Malankara Sabha Magazine (Masika) | Publications | MOSC',
@@ -163,7 +164,7 @@ export default function MalankaraSabhaMagazinePage() {
           <div className="flex justify-center">
             <Link
               href="/mosc/publications"
-              className="inline-flex items-center px-6 py-3 bg-primary text-primary-foreground font-body font-medium rounded-lg hover:bg-primary/90 reverent-transition sacred-shadow"
+              className="inline-flex items-center px-6 py-3 bg-primary text-white font-body font-medium rounded-lg hover:bg-primary/90 reverent-transition sacred-shadow"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -173,6 +174,8 @@ export default function MalankaraSabhaMagazinePage() {
           </div>
         </div>
       </section>
+
+      <QuickLinks />
     </div>
   );
 }

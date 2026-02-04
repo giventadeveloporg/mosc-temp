@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import QuickLinks from '@/components/holy-synod/QuickLinks';
 
 export const metadata = {
   title: 'St. Thomas Orthodox Theological Seminary, Nagpur (STOTS) | MOSC',
@@ -127,6 +128,8 @@ const StThomasOrthodoxTheologicalSeminaryNagpurPage = () => {
           </div>
         </div>
       </section>
+
+      <QuickLinks />
 
       {/* Call to Action */}
       <section className="py-16 bg-muted/30">

@@ -1,6 +1,7 @@
 import React from 'react';
 import { getNewsHomePageData } from './getNewsHomePageData';
 import { FlashBar } from './components/FlashBar';
+import { FlashNewsCarousel } from './components/FlashNewsCarousel';
 import { ArticleList } from './components/ArticleList';
 import { SidebarPromo } from './components/SidebarPromo';
 import { FollowUsFacebook } from './components/FollowUsFacebook';
@@ -21,7 +22,6 @@ const SECTION_LINKS = [
 
 /** External nav links from legacy index.html - no Strapi, URL forwarding */
 const EXTERNAL_LINKS = [
-  { label: 'MOSC Official Website', href: 'https://mosc.in/' },
   { label: 'LIVE', href: 'https://www.youtube.com/@DevalokamAramana/streams' },
 ] as const;
 
@@ -65,10 +65,12 @@ export default async function NewsPage() {
         </div>
       </section>
 
-      {/* Flash news bar (only when active) */}
-      {data.flash?.active && data.flash.message && (
+      {/* Flash news: carousel from Strapi flash-news-items, or legacy single-message bar */}
+      {data.flashNewsItems?.length > 0 ? (
+        <FlashNewsCarousel items={data.flashNewsItems} />
+      ) : data.flash?.active && data.flash.message ? (
         <FlashBar message={data.flash.message} />
-      )}
+      ) : null}
 
       {/* Top banner ads (position=top) */}
       {data.topAdSlots.length > 0 && (

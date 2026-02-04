@@ -23,6 +23,16 @@ export interface FlashNews {
   active: boolean;
 }
 
+/** Single item for the flash news carousel/ticker (from Strapi flash-news-item). */
+export interface FlashNewsItemUI {
+  id: number;
+  content: string;
+  /** Internal path (/mosc/news/slug) or external URL; omit for text-only. */
+  link?: string | null;
+  startDate?: string | null;
+  endDate?: string | null;
+}
+
 export interface SidebarPromoBlock {
   blockType?: string;
   embedCode?: string | null;
@@ -41,6 +51,8 @@ export interface AdSlot {
 
 export interface NewsHomePageData {
   flash: FlashNews | null;
+  /** Scrolling flash news items (carousel); from Strapi flash-news-items. */
+  flashNewsItems: FlashNewsItemUI[];
   featured: NewsArticle[];
   mainNews: NewsArticle[];
   pressRelease: NewsArticle[];

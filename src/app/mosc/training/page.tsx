@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Metadata } from 'next';
+import QuickLinks from '@/components/holy-synod/QuickLinks';
 
 export const metadata: Metadata = {
   title: 'Training | Malankara Orthodox Syrian Church',
@@ -65,9 +66,9 @@ export default function TrainingPage() {
               <Link
                 key={program.id}
                 href={program.link}
-                className="group bg-card rounded-lg sacred-shadow hover:sacred-shadow-lg reverent-transition overflow-hidden"
+                className="group bg-card rounded-lg sacred-shadow hover:sacred-shadow-lg reverent-transition overflow-hidden flex flex-col h-full min-h-0"
               >
-                <div className="relative w-full h-64">
+                <div className="relative w-full h-64 flex-shrink-0">
                   <Image
                     src={program.image}
                     alt={program.title}
@@ -75,19 +76,20 @@ export default function TrainingPage() {
                     className="object-cover group-hover:scale-105 reverent-transition"
                   />
                 </div>
-                <div className="p-6">
-                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-3 group-hover:text-primary reverent-transition">
+                <div className="flex flex-col flex-1 min-h-0 px-6 pt-6 pb-4">
+                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-3 group-hover:text-primary reverent-transition flex-shrink-0">
                     {program.title}
                   </h2>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-4 line-clamp-3">
+                  <p className="font-body text-muted-foreground leading-relaxed line-clamp-3 flex-shrink-0 mb-4">
                     {program.description}
                   </p>
-                  <span className="inline-flex items-center font-body text-primary font-medium group-hover:gap-2 reverent-transition">
+                  <div className="flex-1 min-h-[24px]" aria-hidden="true" />
+                  <span className="inline-flex items-center font-body text-primary font-medium group-hover:gap-2 reverent-transition flex-shrink-0 mt-auto">
                     Learn More
-                    <svg 
-                      className="w-5 h-5 ml-1 group-hover:ml-2 reverent-transition" 
-                      fill="none" 
-                      stroke="currentColor" 
+                    <svg
+                      className="w-5 h-5 ml-1 group-hover:ml-2 reverent-transition"
+                      fill="none"
+                      stroke="currentColor"
                       viewBox="0 0 24 24"
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -168,6 +170,8 @@ export default function TrainingPage() {
           </div>
         </div>
       </section>
+
+      <QuickLinks />
     </div>
   );
 }

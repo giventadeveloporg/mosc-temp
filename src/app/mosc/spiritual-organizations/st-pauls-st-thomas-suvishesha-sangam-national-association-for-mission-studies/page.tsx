@@ -1,10 +1,10 @@
 import React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
+import QuickLinks from '@/components/holy-synod/QuickLinks';
+import SpiritualOrganizationsSidebar from '../SpiritualOrganizationsSidebar';
 
 export const metadata = {
   title: "St. Paul's & St.Thomas Suvishesha Sangam National Association for Mission Studies | MOSC",
-  description: "President H.G. Dr. Yuhanon Mar Thevodoros Metropolitan Office Address St.Paul's M.T.C , Mavelikara Ph- 0479 2302473, 2342709 Email- stpaulsmtc@yahoo.com...",
+  description: "St. Paul's & St.Thomas Suvishesha Sangam National Association for Mission Studies. President H.G. Dr. Yuhanon Mar Thevodoros Metropolitan. Office: St.Paul's M.T.C, Mavelikara. Ph: 0479 2302473, 2342709.",
 };
 
 const StPaulsStThomasSuvisheshaSangamNationalAssociationForMissionStudiesPage = () => {
@@ -18,10 +18,10 @@ const StPaulsStThomasSuvisheshaSangamNationalAssociationForMissionStudiesPage = 
               <span className="text-primary-foreground text-4xl font-bold" role="img" aria-label="St. Paul's & St.Thomas Suvishesha Sangam National Association for Mission Studies">✟</span>
             </div>
             <h1 className="font-heading font-semibold text-4xl text-foreground mb-4">
-              St. Paul's & St.Thomas Suvishesha Sangam National Association for Mission Studies
+              St. Paul&apos;s & St.Thomas Suvishesha Sangam National Association for Mission Studies
             </h1>
             <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              President H.G. Dr. Yuhanon Mar Thevodoros Metropolitan Office Address St.Paul's M.T.C , Mavelikara Ph- 0479 2302473, 2342709 Email- stpaulsmtc@yahoo.com
+              President and office contact for the St. Paul&apos;s & St.Thomas Suvishesha Sangam National Association for Mission Studies.
             </p>
           </div>
         </div>
@@ -33,58 +33,40 @@ const StPaulsStThomasSuvisheshaSangamNationalAssociationForMissionStudiesPage = 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             <div className="lg:col-span-2">
               <div className="bg-background rounded-lg sacred-shadow p-8">
-                <h2 className="font-heading font-semibold text-2xl text-foreground mb-6">
-                  About St. Paul's & St.Thomas Suvishesha Sangam National Association for Mission Studies
-                </h2>
-                <div className="space-y-4 font-body text-muted-foreground leading-relaxed">
-                  <p>President H.G. Dr. Yuhanon Mar Thevodoros Metropolitan Office Address St.Paul's M.T.C , Mavelikara Ph- 0479 2302473, 2342709 Email- stpaulsmtc@yahoo.com</p>
+                {/* Office Bearers / Contact */}
+                <div className="space-y-6">
+                  <h3 className="font-heading font-semibold text-xl text-foreground border-b border-border pb-2">
+                    President
+                  </h3>
+                  <p className="font-body text-muted-foreground">
+                    H.G. Dr. Yuhanon Mar Thevodoros Metropolitan
+                  </p>
+
+                  <h3 className="font-heading font-semibold text-xl text-foreground border-b border-border pb-2 mt-8">
+                    Office Address
+                  </h3>
+                  <p className="font-body text-muted-foreground">
+                    St.Paul&apos;s M.T.C , Mavelikara
+                  </p>
+                  <p className="font-body text-muted-foreground">
+                    Ph: 0479 2302473, 2342709
+                  </p>
+                  <p className="font-body text-muted-foreground">
+                    Email:{' '}
+                    <a href="mailto:stpaulsmtc@yahoo.com" className="text-primary hover:underline">
+                      stpaulsmtc@yahoo.com
+                    </a>
+                  </p>
                 </div>
               </div>
             </div>
 
-            <div className="space-y-6">
-              {/* Quick Info */}
-              <div className="bg-background rounded-lg sacred-shadow p-6">
-                <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
-                  Quick Information
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-3">
-                    <span className="text-primary text-xl" role="img" aria-label="Organization">✟</span>
-                    <div>
-                      <h4 className="font-heading font-medium text-foreground">Organization Type</h4>
-                      <p className="font-body text-muted-foreground text-sm">Spiritual Organization</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <span className="text-primary text-xl" role="img" aria-label="Church">⛪</span>
-                    <div>
-                      <h4 className="font-heading font-medium text-foreground">Church Affiliation</h4>
-                      <p className="font-body text-muted-foreground text-sm">Malankara Orthodox Syrian Church</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Related Organizations */}
-              <div className="bg-background rounded-lg sacred-shadow p-6">
-                <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
-                  Related Organizations
-                </h3>
-                <div className="space-y-3">
-                  <Link 
-                    href="/mosc/spiritual-organizations" 
-                    className="block text-primary hover:text-primary/80 font-medium reverent-transition"
-                  >
-                    ← All Spiritual Organizations
-                  </Link>
-                </div>
-              </div>
-            </div>
+            <SpiritualOrganizationsSidebar currentHref="/mosc/spiritual-organizations/st-pauls-st-thomas-suvishesha-sangam-national-association-for-mission-studies" />
           </div>
         </div>
       </section>
 
+      <QuickLinks />
     </div>
   );
 };

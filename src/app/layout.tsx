@@ -28,18 +28,14 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Satellite domain configuration for multi-domain support
-  // Primary domain: Read from NEXT_PUBLIC_PRIMARY_DOMAIN env variable
-  // Satellite domains: Read from NEXT_PUBLIC_CLERK_DOMAIN and NEXT_PUBLIC_APP_URL env variables
-  // IMPORTANT: Only apply satellite config in production, not in development (localhost)
-
-  // CRITICAL: Next.js 15+ requires headers() to be fully resolved before any iteration or access
-  // For public routes, we still need headers() to determine route type, but Next.js 15 will log a warning
-  // This warning is expected for public routes and can be ignored in TestSprite/Playwright tests
-  // The page will still render correctly despite the console warning
+  // CRITICAL: Next.js 15+ - await headers() first before any other async or header-dependent code (e.g. auth()).
+  // This must be the first awaited call so the request context is established for Clerk and other consumers.
   const headersList = await headers();
   const hostname = headersList.get('host') || '';
   const pathname = headersList.get('x-pathname') || '';
+
+  // Satellite domain configuration for multi-domain support
+  // Primary domain: NEXT_PUBLIC_PRIMARY_DOMAIN; Satellite: NEXT_PUBLIC_CLERK_DOMAIN / NEXT_PUBLIC_APP_URL
 
   // Define public routes that don't require authentication checks
   // These routes can skip auth() calls to avoid Next.js 15+ headers() async errors
@@ -155,173 +151,173 @@ export default async function RootLayout({
         console.log('[Layout] 🔍 Profile fetch response:', { status: resp.status, ok: resp.ok });
 
         if (resp.ok) {
-        const arr = await resp.json();
-        const p = Array.isArray(arr) ? arr[0] : arr;
+          const arr = await resp.json();
+          const p = Array.isArray(arr) ? arr[0] : arr;
 
-        if (!p) {
-          // Step 2: Profile not found by userId + tenantId
-          // Check if email + tenantId combination exists (different userId case)
-          // CRITICAL: Use currentUserData from above instead of calling currentUser() again
-          // This prevents multiple headers() calls in Next.js 15+
-          try {
-            const u = currentUserData; // Use already-fetched currentUser data
-            const userEmail = u?.emailAddresses?.[0]?.emailAddress || '';
+          if (!p) {
+            // Step 2: Profile not found by userId + tenantId
+            // Check if email + tenantId combination exists (different userId case)
+            // CRITICAL: Use currentUserData from above instead of calling currentUser() again
+            // This prevents multiple headers() calls in Next.js 15+
+            try {
+              const u = currentUserData; // Use already-fetched currentUser data
+              const userEmail = u?.emailAddresses?.[0]?.emailAddress || '';
 
-            if (userEmail) {
-              // Check for existing profile with same email + tenantId but different userId
-              const emailCheckUrl = `${baseUrl}/api/proxy/user-profiles?email.equals=${encodeURIComponent(userEmail)}&tenantId.equals=${encodeURIComponent(tenantId)}&size=1`;
-              const emailResp = await fetch(emailCheckUrl, { cache: 'no-store', headers: { 'Content-Type': 'application/json' } });
+              if (userEmail) {
+                // Check for existing profile with same email + tenantId but different userId
+                const emailCheckUrl = `${baseUrl}/api/proxy/user-profiles?email.equals=${encodeURIComponent(userEmail)}&tenantId.equals=${encodeURIComponent(tenantId)}&size=1`;
+                const emailResp = await fetch(emailCheckUrl, { cache: 'no-store', headers: { 'Content-Type': 'application/json' } });
 
-              if (emailResp.ok) {
-                const emailArr = await emailResp.json();
-                const existingProfile = Array.isArray(emailArr) ? emailArr[0] : emailArr;
+                if (emailResp.ok) {
+                  const emailArr = await emailResp.json();
+                  const existingProfile = Array.isArray(emailArr) ? emailArr[0] : emailArr;
 
-                if (existingProfile && existingProfile.userId !== userId) {
-                  // Step 3: Email + tenantId exists but with different userId
-                  // UPDATE the existing record's userId to match current Clerk userId
-                  // CRITICAL: Preserve all existing fields - only update userId and clerkUserId
-                  // DO NOT overwrite firstName, lastName, email if they already have values
-                  console.log('[Layout] Found existing profile with same email but different userId. Updating userId...');
-                  console.log('[Layout] Old userId:', existingProfile.userId, '→ New userId:', userId);
-                  console.log('[Layout] Preserving existing profile data:', {
-                    firstName: existingProfile.firstName,
-                    lastName: existingProfile.lastName,
-                    email: existingProfile.email
-                  });
-
-                  // Use direct backend call with JWT (not proxy) for PATCH operations
-                  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
-                  // CRITICAL: Build update payload that ONLY updates userId/clerkUserId
-                  // Preserve ALL existing fields - do NOT include fields that might overwrite existing data
-                  const updatePayload: any = {
-                    id: existingProfile.id, // MUST include id in PATCH payload per backend requirements
-                    userId: userId, // Update to current Clerk userId
-                    clerkUserId: userId, // Also update clerkUserId
-                    tenantId: tenantId, // Include tenantId
-                    updatedAt: new Date().toISOString(),
-                  };
-
-                  // ONLY update firstName/lastName/email if they are missing/empty in existing profile
-                  // This prevents overwriting existing data with empty values from Clerk
-                  if (!existingProfile.firstName || existingProfile.firstName.trim() === '') {
-                    if (u?.firstName && u.firstName.trim() !== '') {
-                      updatePayload.firstName = u.firstName;
-                    }
-                  }
-                  // Preserve existing firstName - do NOT update
-
-                  if (!existingProfile.lastName || existingProfile.lastName.trim() === '') {
-                    if (u?.lastName && u.lastName.trim() !== '') {
-                      updatePayload.lastName = u.lastName;
-                    }
-                  }
-                  // Preserve existing lastName - do NOT update
-
-                  if (!existingProfile.email || existingProfile.email.trim() === '') {
-                    if (userEmail && userEmail.trim() !== '') {
-                      updatePayload.email = userEmail;
-                    }
-                  }
-                  // Preserve existing email - do NOT update
-
-                  if (!existingProfile.profileImageUrl || existingProfile.profileImageUrl.trim() === '') {
-                    if (u?.imageUrl && u.imageUrl.trim() !== '') {
-                      updatePayload.profileImageUrl = u.imageUrl;
-                    }
-                  }
-                  // Preserve existing profileImageUrl - do NOT update
-
-                  console.log('[Layout] Sending PATCH request with payload:', JSON.stringify(updatePayload, null, 2));
-
-                  const updateRes = await fetchWithJwtRetry(`${API_BASE_URL}/api/user-profiles/${existingProfile.id}`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/merge-patch+json' },
-                    body: JSON.stringify(updatePayload),
-                  });
-
-                  if (updateRes.ok) {
-                    const updated = await updateRes.json();
-                    console.log('[Layout] 🔍 Updated profile data:', {
-                      id: updated?.id,
-                      userId: updated?.userId,
-                      email: updated?.email,
-                      userRole: updated?.userRole,
-                      userStatus: updated?.userStatus,
-                      tenantId: updated?.tenantId,
-                      rawProfile: JSON.stringify(updated, null, 2)
+                  if (existingProfile && existingProfile.userId !== userId) {
+                    // Step 3: Email + tenantId exists but with different userId
+                    // UPDATE the existing record's userId to match current Clerk userId
+                    // CRITICAL: Preserve all existing fields - only update userId and clerkUserId
+                    // DO NOT overwrite firstName, lastName, email if they already have values
+                    console.log('[Layout] Found existing profile with same email but different userId. Updating userId...');
+                    console.log('[Layout] Old userId:', existingProfile.userId, '→ New userId:', userId);
+                    console.log('[Layout] Preserving existing profile data:', {
+                      firstName: existingProfile.firstName,
+                      lastName: existingProfile.lastName,
+                      email: existingProfile.email
                     });
-                    isTenantAdmin = updated?.userRole === 'ADMIN';
-                    console.log('[Layout] ✅ Successfully updated userId. Admin status:', {
-                      isTenantAdmin,
-                      userRole: updated?.userRole,
-                      roleMatch: updated?.userRole === 'ADMIN',
-                      roleType: typeof updated?.userRole,
-                      roleValue: JSON.stringify(updated?.userRole)
+
+                    // Use direct backend call with JWT (not proxy) for PATCH operations
+                    const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+                    // CRITICAL: Build update payload that ONLY updates userId/clerkUserId
+                    // Preserve ALL existing fields - do NOT include fields that might overwrite existing data
+                    const updatePayload: any = {
+                      id: existingProfile.id, // MUST include id in PATCH payload per backend requirements
+                      userId: userId, // Update to current Clerk userId
+                      clerkUserId: userId, // Also update clerkUserId
+                      tenantId: tenantId, // Include tenantId
+                      updatedAt: new Date().toISOString(),
+                    };
+
+                    // ONLY update firstName/lastName/email if they are missing/empty in existing profile
+                    // This prevents overwriting existing data with empty values from Clerk
+                    if (!existingProfile.firstName || existingProfile.firstName.trim() === '') {
+                      if (u?.firstName && u.firstName.trim() !== '') {
+                        updatePayload.firstName = u.firstName;
+                      }
+                    }
+                    // Preserve existing firstName - do NOT update
+
+                    if (!existingProfile.lastName || existingProfile.lastName.trim() === '') {
+                      if (u?.lastName && u.lastName.trim() !== '') {
+                        updatePayload.lastName = u.lastName;
+                      }
+                    }
+                    // Preserve existing lastName - do NOT update
+
+                    if (!existingProfile.email || existingProfile.email.trim() === '') {
+                      if (userEmail && userEmail.trim() !== '') {
+                        updatePayload.email = userEmail;
+                      }
+                    }
+                    // Preserve existing email - do NOT update
+
+                    if (!existingProfile.profileImageUrl || existingProfile.profileImageUrl.trim() === '') {
+                      if (u?.imageUrl && u.imageUrl.trim() !== '') {
+                        updatePayload.profileImageUrl = u.imageUrl;
+                      }
+                    }
+                    // Preserve existing profileImageUrl - do NOT update
+
+                    console.log('[Layout] Sending PATCH request with payload:', JSON.stringify(updatePayload, null, 2));
+
+                    const updateRes = await fetchWithJwtRetry(`${API_BASE_URL}/api/user-profiles/${existingProfile.id}`, {
+                      method: 'PATCH',
+                      headers: { 'Content-Type': 'application/merge-patch+json' },
+                      body: JSON.stringify(updatePayload),
                     });
-                  } else {
-                    const errorText = await updateRes.text();
-                    console.error('[Layout] Failed to update userId:', updateRes.status);
-                    console.error('[Layout] Error response:', errorText);
-                  }
-                } else {
-                  // Step 4: No existing profile found - Create new profile
-                  console.log('[Layout] Creating new user profile for userId:', userId);
-                  const now = new Date().toISOString();
-                  const payload = {
-                    userId,
-                    clerkUserId: userId,
-                    email: userEmail,
-                    firstName: u?.firstName || '',
-                    lastName: u?.lastName || '',
-                    profileImageUrl: u?.imageUrl || '',
-                    userRole: 'MEMBER',
-                    userStatus: 'PENDING_APPROVAL',
-                    createdAt: now,
-                    updatedAt: now,
-                  };
 
-                  const createRes = await fetch(`${baseUrl}/api/proxy/user-profiles`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                  });
-
-                  if (!createRes.ok) {
-                    console.error('[Layout] Failed to create user profile:', createRes.status);
+                    if (updateRes.ok) {
+                      const updated = await updateRes.json();
+                      console.log('[Layout] 🔍 Updated profile data:', {
+                        id: updated?.id,
+                        userId: updated?.userId,
+                        email: updated?.email,
+                        userRole: updated?.userRole,
+                        userStatus: updated?.userStatus,
+                        tenantId: updated?.tenantId,
+                        rawProfile: JSON.stringify(updated, null, 2)
+                      });
+                      isTenantAdmin = updated?.userRole === 'ADMIN';
+                      console.log('[Layout] ✅ Successfully updated userId. Admin status:', {
+                        isTenantAdmin,
+                        userRole: updated?.userRole,
+                        roleMatch: updated?.userRole === 'ADMIN',
+                        roleType: typeof updated?.userRole,
+                        roleValue: JSON.stringify(updated?.userRole)
+                      });
+                    } else {
+                      const errorText = await updateRes.text();
+                      console.error('[Layout] Failed to update userId:', updateRes.status);
+                      console.error('[Layout] Error response:', errorText);
+                    }
                   } else {
-                    console.log('[Layout] Successfully created new user profile');
+                    // Step 4: No existing profile found - Create new profile
+                    console.log('[Layout] Creating new user profile for userId:', userId);
+                    const now = new Date().toISOString();
+                    const payload = {
+                      userId,
+                      clerkUserId: userId,
+                      email: userEmail,
+                      firstName: u?.firstName || '',
+                      lastName: u?.lastName || '',
+                      profileImageUrl: u?.imageUrl || '',
+                      userRole: 'MEMBER',
+                      userStatus: 'PENDING_APPROVAL',
+                      createdAt: now,
+                      updatedAt: now,
+                    };
+
+                    const createRes = await fetch(`${baseUrl}/api/proxy/user-profiles`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(payload),
+                    });
+
+                    if (!createRes.ok) {
+                      console.error('[Layout] Failed to create user profile:', createRes.status);
+                    } else {
+                      console.log('[Layout] Successfully created new user profile');
+                    }
                   }
                 }
+              } else {
+                // No email available, cannot check or create profile
+                console.warn('[Layout] User has no email address, skipping profile creation');
               }
-            } else {
-              // No email available, cannot check or create profile
-              console.warn('[Layout] User has no email address, skipping profile creation');
+            } catch (err) {
+              console.error('[Layout] Error in user profile creation/update logic:', err);
             }
-          } catch (err) {
-            console.error('[Layout] Error in user profile creation/update logic:', err);
+          } else {
+            // Step 5: Profile found by userId + tenantId - check admin status
+            console.log('[Layout] 🔍 Profile data:', {
+              id: p?.id,
+              userId: p?.userId,
+              email: p?.email,
+              userRole: p?.userRole,
+              userStatus: p?.userStatus,
+              tenantId: p?.tenantId,
+              rawProfile: JSON.stringify(p, null, 2)
+            });
+            isTenantAdmin = p?.userRole === 'ADMIN';
+            console.log('[Layout] ✅ Found existing profile. Admin status:', {
+              isTenantAdmin,
+              userRole: p?.userRole,
+              roleMatch: p?.userRole === 'ADMIN',
+              roleType: typeof p?.userRole,
+              roleValue: JSON.stringify(p?.userRole)
+            });
           }
-        } else {
-          // Step 5: Profile found by userId + tenantId - check admin status
-          console.log('[Layout] 🔍 Profile data:', {
-            id: p?.id,
-            userId: p?.userId,
-            email: p?.email,
-            userRole: p?.userRole,
-            userStatus: p?.userStatus,
-            tenantId: p?.tenantId,
-            rawProfile: JSON.stringify(p, null, 2)
-          });
-          isTenantAdmin = p?.userRole === 'ADMIN';
-          console.log('[Layout] ✅ Found existing profile. Admin status:', {
-            isTenantAdmin,
-            userRole: p?.userRole,
-            roleMatch: p?.userRole === 'ADMIN',
-            roleType: typeof p?.userRole,
-            roleValue: JSON.stringify(p?.userRole)
-          });
         }
-      }
       }
     } catch (e) {
       // Fail closed (no admin) on error
