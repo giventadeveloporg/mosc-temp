@@ -48,14 +48,13 @@ export function getStrapiApiToken(): string | undefined {
 
 /**
  * Returns headers for Strapi API requests. Includes Authorization if token is set.
- * Uses Strapi-Response-Format: v4 for compatibility with media/relation extraction
- * (Strapi 5 flattened format can differ; v4 ensures media.data.attributes.url structure).
+ * Uses native Strapi 5 response format (no v4 compatibility header).
+ * Media extraction in getNewsHomePageData handles Strapi 5 flattened structure.
  */
 export function getStrapiHeaders(): Record<string, string> {
   const token = getStrapiApiToken();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    'Strapi-Response-Format': 'v4',
   };
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;

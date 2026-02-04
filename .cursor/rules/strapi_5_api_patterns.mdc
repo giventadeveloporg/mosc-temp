@@ -59,6 +59,14 @@ const POPULATE = 'populate=cover,category,author';
 GET /api/articles?filters[isFeatured][$eq]=true&filters[tenant][tenantId][$eq]=tenant_demo_002&filters[publishedAt][$notNull]=true&populate[0]=cover&populate[1]=category&populate[2]=author&sort=publishedAt:desc&pagination[limit]=6
 ```
 
+### **Featured News** (use category slug like Main News, not isFeatured)
+
+```
+GET /api/articles?filters[category][slug][$eqi]=featured-news&filters[tenant][tenantId][$eq]=tenant_demo_002&filters[publishedAt][$notNull]=true&populate[0]=cover&populate[1]=category&populate[2]=author&sort=publishedAt:desc&pagination[limit]=6
+```
+
+If you have a "Featured News" category in Strapi (slug `Featured-News`), filter by category slug. The `isFeatured` boolean is an alternative; use category when articles are assigned to the Featured News category.
+
 ### **Main News** (use `$eqi` for case-insensitive slug)
 
 ```
@@ -88,6 +96,16 @@ Strapi may store category slugs with different casing (e.g. `Main-News`, `Press-
 'filters[category][slug][$eq]=main-news'
 ```
 
+## **Article Detail Page (slug or id)**
+
+The detail route `/mosc/news/[slug]` accepts slug, numeric id, or documentId:
+
+1. **Slug** (text): `filters[slug][$eqi]=<slug>` — preferred for SEO
+2. **Numeric id** (e.g. `7`): `filters[id][$eq]=7` — when slug is empty
+3. **documentId** (Strapi 5): `filters[documentId][$eq]=<documentId>` — alphanumeric
+
+Article links use: `article.slug || article.documentId || article.id`. No Strapi model changes needed; ensure articles have slug populated for SEO-friendly URLs.
+
 ## **Advertisement Slots (Position: sidebar + top)**
 
 Fetch both sidebar and top ads with `$or`:
@@ -98,19 +116,9 @@ filters[$or][0][position][$eq]=sidebar&filters[$or][1][position][$eq]=top
 
 Split results client-side by `position` for sidebar vs top banner display.
 
-## **Strapi-Response-Format: v4 Header**
+## **Use Native Strapi 5 Response Format**
 
-Strapi 5 supports a compatibility header to return the v4 response format (with `attributes` wrapper). Use this for reliable media/relation extraction:
-
-```typescript
-headers: {
-  'Content-Type': 'application/json',
-  'Strapi-Response-Format': 'v4',
-  'Authorization': 'Bearer <token>',  // if needed
-}
-```
-
-Implementation: [`src/lib/strapi.ts`](mdc:src/lib/strapi.ts) - `getStrapiHeaders()` includes this header.
+Do **not** send `Strapi-Response-Format: v4`. Use native Strapi 5 responses (flattened structure). The extraction helpers in `getNewsHomePageData.ts` (`getMediaUrl`, `getMediaAlt`, `attrs = raw?.attributes ?? raw`) support both Strapi 4 and Strapi 5, but the server runs Strapi 5 and we consume its native format. Implementation: [`src/lib/strapi.ts`](mdc:src/lib/strapi.ts) - `getStrapiHeaders()` does not include a v4 compatibility header.
 
 ## **Media/Relation URL Extraction (Strapi 4 vs 5)**
 
@@ -152,6 +160,37 @@ const url = media?.data?.attributes?.url;
 ## **Exception: Simple populate**
 
 For single-field populate (e.g. `populate=media`), the simple format may work. Advertisement slots use `populate=media` successfully. If you encounter 400s with simple populate, switch to array-style: `populate[0]=media`.
+
+## **Strapi Image Upload Recommendations (News Article Covers)**
+
+Full specs: [`documentation/news_portal/strapi/image_upload_spec.md`](documentation/news_portal/strapi/image_upload_spec.md).
+
+### **Suggested dimensions**
+
+| Use | Size | Aspect |
+|-----|------|--------|
+| **Primary** | **1200 × 800 px** | 3:2 |
+| Alternative (list) | 1200 × 900 px | 4:3 |
+| Alternative (hero) | 1200 × 675 px | 16:9 |
+
+### **Format and quality**
+
+- **Format:** JPEG (or WebP if available)
+- **Quality:** 80–85%
+- **Target file size:** Under 200 KB per image
+
+### **Rationale**
+
+- **1200px** on the long side: enough for retina at max display (896px)
+- **3:2 (1200×800):** works for both list cards and hero without heavy cropping
+- **JPEG 80–85%:** balances quality and load time
+- **Under 200 KB:** keeps page load fast on mobile
+
+### **Composition**
+
+- Put faces and important elements in the upper half (headers are now visible)
+- Avoid important content at the very edges
+- Use simple, neutral backgrounds where possible
 
 ## **References**
 

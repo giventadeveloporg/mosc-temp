@@ -194,7 +194,7 @@ export async function getNewsHomePageData(): Promise<NewsHomePageData> {
     adsRes,
   ] = await Promise.all([
     fetchStrapi<{ id?: number; attributes?: Record<string, unknown> }>('/homepage?populate=*'),
-    fetchStrapi<unknown[]>(buildArticleQuery('filters[isFeatured][$eq]=true', 'publishedAt:desc', 6)),
+    fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=featured-news', 'publishedAt:desc', 6)),
     fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=main-news', 'publishedAt:desc', 10)),
     fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=press-release', 'publishedAt:desc', 10)),
     fetchStrapi<unknown[]>(buildArticleQuery('', 'views:desc', 5)),
@@ -232,21 +232,43 @@ export async function getNewsHomePageData(): Promise<NewsHomePageData> {
 }
 
 /**
- * Fetches a single article by slug for the detail page. Returns null if not found or Strapi unavailable.
+ * Fetches a single article by slug or id for the detail page. Returns null if not found or Strapi unavailable.
+ * Supports: text slug, numeric id (legacy), or documentId (Strapi 5).
+ * Replicates legacy index.html: article links use slug or id in the URL.
  */
-export async function getArticleBySlug(slug: string): Promise<NewsArticle | null> {
-  if (!getStrapiUrl() || !slug?.trim()) return null;
+export async function getArticleBySlug(slugOrId: string): Promise<NewsArticle | null> {
+  if (!getStrapiUrl() || !slugOrId?.trim()) return null;
   let tenantId: string;
   try {
     tenantId = getStrapiTenantId();
   } catch {
     return null;
   }
+  const base = `filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}&filters[publishedAt][$notNull]=true&${POPULATE}`;
   try {
-    const path = `/articles?filters[slug][$eq]=${encodeURIComponent(slug.trim())}&filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}&filters[publishedAt][$notNull]=true&${POPULATE}`;
-    const res = await fetchStrapi<unknown[]>(path);
-    const list = Array.isArray(res?.data) ? res.data : [];
-    const first = list[0] as { id?: number; documentId?: string; attributes?: Record<string, unknown> } | undefined;
+    // 1. Try slug (text) — use $eqi for case-insensitive match
+    let path = `/articles?filters[slug][$eqi]=${encodeURIComponent(slugOrId.trim())}&${base}`;
+    let res = await fetchStrapi<unknown[]>(path);
+    let list = Array.isArray(res?.data) ? res.data : [];
+    let first = list[0] as { id?: number; documentId?: string; attributes?: Record<string, unknown> } | undefined;
+
+    // 2. If not found and param looks numeric, try by id (Strapi v4 or when id is used)
+    if (!first && /^\d+$/.test(slugOrId.trim())) {
+      const id = parseInt(slugOrId.trim(), 10);
+      path = `/articles?filters[id][$eq]=${id}&${base}`;
+      res = await fetchStrapi<unknown[]>(path);
+      list = Array.isArray(res?.data) ? res.data : [];
+      first = list[0] as { id?: number; documentId?: string; attributes?: Record<string, unknown> } | undefined;
+    }
+
+    // 3. If not found, try documentId (Strapi 5 identifier, typically alphanumeric)
+    if (!first && slugOrId.trim().length > 10) {
+      path = `/articles?filters[documentId][$eq]=${encodeURIComponent(slugOrId.trim())}&${base}`;
+      res = await fetchStrapi<unknown[]>(path);
+      list = Array.isArray(res?.data) ? res.data : [];
+      first = list[0] as { id?: number; documentId?: string; attributes?: Record<string, unknown> } | undefined;
+    }
+
     if (!first) return null;
     return normalizeArticle(first);
   } catch {
