@@ -60,7 +60,7 @@ export default function DirectoryPage() {
     },
     {
       title: 'Pilgrim Centres',
-      description: 'The major Pilgrim centres of Malankara Orthodox Church includes historical Churches such as Niranam St. Mary\'s Valiya Pally, Thiruvathamcode Arapally, which are instituted by the Apostle St. Thomas.',
+      description: `The major Pilgrim centres of Malankara Orthodox Church include historical churches such as Niranam St. Mary's Valiya Pally, Thiruvathamcode Arapally, which are instituted by the Apostle St. Thomas.`,
       href: '/mosc/pilgrim-centres',
     },
     {
