@@ -564,26 +564,41 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
     // Broadcast sign-out to other tabs
     localStorage.setItem('clerk_signout_broadcast', Date.now().toString());
 
-    // For satellite domains, redirect to primary domain's sign-out URL
     const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
-    const satelliteDomain = process.env.NEXT_PUBLIC_CLERK_DOMAIN || 'mosc-temp.com';
-    const isSatellite = hostname.includes('mosc-temp.com') || hostname.includes(satelliteDomain.replace('www.', ''));
+    const primaryDomain = process.env.NEXT_PUBLIC_PRIMARY_DOMAIN || 'www.event-site-manager.com';
+    const primaryHost = primaryDomain.replace(/^https?:\/\//, '').replace(/\/$/, '');
 
+    // CRITICAL: If we're on the primary domain, always do normal sign out (never redirect).
+    // This prevents sign-out errors when NEXT_PUBLIC_CLERK_DOMAIN is mis-set on primary app.
+    const isPrimary =
+      hostname === primaryHost ||
+      hostname === primaryDomain ||
+      hostname.includes(primaryHost.replace('www.', '')) ||
+      hostname.includes(primaryDomain.replace('www.', ''));
+
+    if (isPrimary) {
+      try {
+        await signOut();
+        window.location.href = '/';
+      } catch (error) {
+        console.error('[Header] Error signing out:', error);
+        setIsSigningOut(false);
+      }
+      return;
+    }
+
+    // Only redirect to primary sign-out when we're on a known satellite domain (mosc-temp.com).
+    // Do not use NEXT_PUBLIC_CLERK_DOMAIN for this check - it can be set to primary by mistake.
+    const isSatellite = hostname.includes('mosc-temp.com');
     if (isSatellite) {
       console.log('[Header] Satellite domain detected, redirecting to primary domain sign-out...');
-
-      // Get primary domain from environment variable
-      const primaryDomain = process.env.NEXT_PUBLIC_PRIMARY_DOMAIN || 'www.event-site-manager.com';
-
-      // Redirect to primary domain's dedicated sign-out page
-      const primarySignOutUrl = `https://${primaryDomain}/auth/signout-redirect`;
+      const primarySignOutUrl = `https://${primaryHost}/auth/signout-redirect`;
       const returnUrl = encodeURIComponent(window.location.origin);
-
       window.location.href = `${primarySignOutUrl}?redirect_url=${returnUrl}`;
       return;
     }
 
-    // Primary domain: normal sign out
+    // Fallback: not primary and not satellite (e.g. localhost) - normal sign out
     try {
       await signOut();
       window.location.href = '/';
@@ -621,8 +636,8 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
           if (targetId === 'team-section') {
             // Check if element has actual content (team members loaded)
             const hasContent = targetElement.querySelector('.max-w-7xl') &&
-                               (targetElement.querySelector('.grid') || targetElement.querySelector('.flex') ||
-                                targetElement.querySelector('[class*="team"]'));
+              (targetElement.querySelector('.grid') || targetElement.querySelector('.flex') ||
+                targetElement.querySelector('[class*="team"]'));
             if (!hasContent) {
               // Element exists but content not loaded yet, keep waiting
               const elapsed = Date.now() - startTime;
@@ -764,11 +779,10 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                         {hasDropdown ? (
                           <>
                             <div
-                              className={`header-nav-link flex items-center gap-1.5 cursor-pointer ${
-                                (item.name === 'About' && isAboutActive) || (item.name === 'Features' && isFeaturesActive)
+                              className={`header-nav-link flex items-center gap-1.5 cursor-pointer ${(item.name === 'About' && isAboutActive) || (item.name === 'Features' && isFeaturesActive)
                                   ? 'active'
                                   : ''
-                              }`}
+                                }`}
                               aria-haspopup="true"
                               aria-expanded="false"
                               role="button"
@@ -994,9 +1008,8 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
       {/* Mobile Menu Sidebar */}
       <div
         id="mobile-menu"
-        className={`header-mobile-menu fixed top-0 right-0 h-full w-80 max-w-[85vw] z-50 transform transition-transform duration-300 ease-out lg:hidden ${
-          isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
+        className={`header-mobile-menu fixed top-0 right-0 h-full w-80 max-w-[85vw] z-50 transform transition-transform duration-300 ease-out lg:hidden ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
         aria-hidden={!isMobileMenuOpen}
       >
         <div className="flex flex-col h-full">
