@@ -35,12 +35,14 @@ export default async function NewsArticlePage({ params }: PageProps) {
 
         <header className="mb-8">
           {article.coverUrl && (
-            <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden bg-muted mb-6">
+            <div className="relative w-full h-auto rounded-xl overflow-hidden bg-muted mb-6 p-4">
               <Image
                 src={article.coverUrl}
                 alt={article.coverAlt || article.title}
-                fill
-                className="object-cover"
+                width={896}
+                height={504}
+                className="w-full h-auto object-contain"
+                style={{ borderRadius: '0.75rem', backgroundColor: 'transparent' }}
                 sizes="(max-width: 896px) 100vw, 896px"
                 unoptimized
               />

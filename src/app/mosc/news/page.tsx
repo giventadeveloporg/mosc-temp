@@ -3,6 +3,7 @@ import { getNewsHomePageData } from './getNewsHomePageData';
 import { FlashBar } from './components/FlashBar';
 import { ArticleList } from './components/ArticleList';
 import { SidebarPromo } from './components/SidebarPromo';
+import { FollowUsFacebook } from './components/FollowUsFacebook';
 import { AdSlots } from './components/AdSlots';
 
 export const metadata = {
@@ -10,11 +11,18 @@ export const metadata = {
   description: 'News and updates from the Malankara Orthodox Syrian Church.',
 };
 
+/** Section anchors (same page) */
 const SECTION_LINKS = [
   { label: 'Main News', href: '#main-news' },
   { label: 'Featured News', href: '#featured-news' },
   { label: 'Press Release', href: '#press-release' },
   { label: 'Most Read', href: '#most-read' },
+] as const;
+
+/** External nav links from legacy index.html - no Strapi, URL forwarding */
+const EXTERNAL_LINKS = [
+  { label: 'MOSC Official Website', href: 'https://mosc.in/' },
+  { label: 'LIVE', href: 'https://www.youtube.com/@DevalokamAramana/streams' },
 ] as const;
 
 export default async function NewsPage() {
@@ -42,6 +50,17 @@ export default async function NewsPage() {
                 {label}
               </a>
             ))}
+            {EXTERNAL_LINKS.map(({ label, href, external }) => (
+              <a
+                key={href}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-body text-sm font-medium text-primary hover:text-accent hover:underline reverent-transition px-3 py-1.5 rounded-lg bg-muted/50 hover:bg-muted"
+              >
+                {label}
+              </a>
+            ))}
           </nav>
         </div>
       </section>
@@ -61,7 +80,7 @@ export default async function NewsPage() {
       {/* Main content: one column + sidebar - all sections always visible with empty placeholders */}
       <section className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-10">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_380px] gap-10">
             {/* Main column - order per PRD: Main News, Featured News, Press Release, Most Read */}
             <div className="space-y-12">
               <ArticleList
@@ -91,17 +110,12 @@ export default async function NewsPage() {
               />
             </div>
 
-            {/* Sidebar - always visible with placeholders per layout */}
+            {/* Sidebar - always visible: Strapi promo or default Facebook Follow Us (from legacy index.html) */}
             <aside className="space-y-8">
               {data.sidebarPromo ? (
                 <SidebarPromo block={data.sidebarPromo} />
               ) : (
-                <div className="rounded-xl bg-card border border-border sacred-shadow-sm overflow-hidden p-4">
-                  <h3 className="font-heading font-semibold text-lg text-foreground mb-2">Follow Us</h3>
-                  <p className="font-body text-sm text-muted-foreground">
-                    Social promotional block will appear here when configured in Strapi.
-                  </p>
-                </div>
+                <FollowUsFacebook />
               )}
               <AdSlots slots={data.adSlots} />
             </aside>
