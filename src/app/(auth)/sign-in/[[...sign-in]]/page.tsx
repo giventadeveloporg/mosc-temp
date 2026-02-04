@@ -38,7 +38,7 @@ export default function SignInPage() {
       }).catch(() => { });
     }
 
-    // Check if we're on a satellite domain
+    // Check if we're on a satellite domain (primary domain must always show Clerk SignIn)
     if (typeof window !== 'undefined') {
       const hostname = window.location.hostname;
 
@@ -48,20 +48,27 @@ export default function SignInPage() {
         return;
       }
 
-      // If on satellite domain, redirect to primary domain with return URL
-      const satelliteDomain = process.env.NEXT_PUBLIC_CLERK_DOMAIN || 'mosc-temp.com';
-      if (hostname.includes('mosc-temp.com') || hostname.includes(satelliteDomain.replace('www.', ''))) {
+      // CRITICAL: If we're on the primary domain, never redirect - always show SignIn.
+      // This prevents blank sign-in page when NEXT_PUBLIC_CLERK_DOMAIN is mis-set on primary app.
+      const primaryDomain = process.env.NEXT_PUBLIC_PRIMARY_DOMAIN || 'www.event-site-manager.com';
+      const primaryHost = primaryDomain.replace(/^https?:\/\//, '').replace(/\/$/, '');
+      const isPrimary =
+        hostname === primaryHost ||
+        hostname === primaryDomain ||
+        hostname.includes(primaryHost.replace('www.', '')) ||
+        hostname.includes(primaryDomain.replace('www.', ''));
+      if (isPrimary) {
+        return; // Primary domain: do not set shouldRedirect; fall through to render <SignIn />
+      }
+
+      // Only redirect when we're on a known satellite domain (mosc-temp.com).
+      // Do not use NEXT_PUBLIC_CLERK_DOMAIN for this check on primary - it can be set to primary by mistake.
+      const isSatellite = hostname.includes('mosc-temp.com');
+      if (isSatellite) {
         setShouldRedirect(true);
-        // Get the current URL to return to after authentication
         const currentUrl = window.location.origin;
-
-        // Get primary domain from environment variable
-        const primaryDomain = process.env.NEXT_PUBLIC_PRIMARY_DOMAIN || 'www.event-site-manager.com';
-
-        // Redirect to primary domain with redirect_url parameter
-        // Clerk will redirect back to this URL after successful authentication
-        const redirectUrl = `https://${primaryDomain}/sign-in?redirect_url=${encodeURIComponent(currentUrl)}`;
-        window.location.href = redirectUrl;
+        const signInUrl = `https://${primaryHost}/sign-in?redirect_url=${encodeURIComponent(currentUrl)}`;
+        window.location.href = signInUrl;
       }
     }
   }, []);
