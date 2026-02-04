@@ -109,12 +109,13 @@ export default function InstitutionsPage() {
                 href={institution.link}
                 className="group bg-card rounded-lg sacred-shadow hover:sacred-shadow-lg reverent-transition overflow-hidden"
               >
-                <div className="relative w-full h-64">
+                <div className="relative w-full h-64 flex items-center justify-center overflow-hidden bg-muted/20">
                   <Image
                     src={institution.image}
                     alt={institution.title}
                     fill
-                    className="object-cover group-hover:scale-105 reverent-transition"
+                    className="object-contain group-hover:scale-105 reverent-transition"
+                    style={{ objectPosition: 'center center' }}
                   />
                 </div>
                 <div className="p-6">
@@ -125,7 +126,7 @@ export default function InstitutionsPage() {
                     {institution.description}
                   </p>
                   <span className="inline-flex items-center font-body text-primary font-medium group-hover:gap-2 reverent-transition">
-                    Learn More
+                    Read more
                     <svg 
                       className="w-5 h-5 ml-1 group-hover:ml-2 reverent-transition" 
                       fill="none" 

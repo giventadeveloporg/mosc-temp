@@ -1,0 +1,160 @@
+---
+description: Strapi 5 REST API patterns for published state and populate parameters
+globs: src/lib/strapi.ts, src/app/mosc/news/**/*.ts
+alwaysApply: false
+---
+
+# Strapi 5 REST API Patterns
+
+## **Overview**
+
+This rule defines correct patterns for Strapi 5 Content API calls, particularly for published-state filtering and populate parameters. Incorrect syntax causes 400 Bad Request errors.
+
+## **Problem Solved**
+
+- **status=published** – Can cause validation errors in Strapi 5 setups; use `filters[publishedAt][$notNull]=true` instead
+- **Comma-separated populate** – `populate=cover,category,author` triggers 400s; Strapi 5 expects array-style populate
+- **Category slug case mismatch** – Strapi may store slugs as `Main-News` while the filter uses `main-news`; use `$eqi` for case-insensitive match
+
+## **Published State Filter**
+
+### **DO: Use filters[publishedAt][$notNull]=true**
+
+```typescript
+// ✅ DO: Filter for published documents
+const query = `filters[publishedAt][$notNull]=true`;
+```
+
+### **DON'T: Use status=published**
+
+```typescript
+// ❌ DON'T: Can cause validation errors in Strapi 5
+const query = `status=published`;
+```
+
+## **Populate Parameter (Array-Style)**
+
+### **DO: Use array-style populate**
+
+```typescript
+// ✅ DO: Array-style populate for Strapi 5
+const POPULATE = 'populate[0]=cover&populate[1]=category&populate[2]=author';
+
+// Full example
+const path = `/articles?filters[tenant][tenantId][$eq]=${tenantId}&filters[publishedAt][$notNull]=true&populate[0]=cover&populate[1]=category&populate[2]=author&sort=publishedAt:desc&pagination[limit]=10`;
+```
+
+### **DON'T: Use comma-separated populate**
+
+```typescript
+// ❌ DON'T: Triggers 400 Bad Request in Strapi 5
+const POPULATE = 'populate=cover,category,author';
+```
+
+## **Example Article Query URLs**
+
+### **Featured News**
+
+```
+GET /api/articles?filters[isFeatured][$eq]=true&filters[tenant][tenantId][$eq]=tenant_demo_002&filters[publishedAt][$notNull]=true&populate[0]=cover&populate[1]=category&populate[2]=author&sort=publishedAt:desc&pagination[limit]=6
+```
+
+### **Main News** (use `$eqi` for case-insensitive slug)
+
+```
+GET /api/articles?filters[category][slug][$eqi]=main-news&filters[tenant][tenantId][$eq]=tenant_demo_002&filters[publishedAt][$notNull]=true&populate[0]=cover&populate[1]=category&populate[2]=author&sort=publishedAt:desc&pagination[limit]=10
+```
+
+### **Press Release / Most Read**
+
+Same pattern: use `filters[publishedAt][$notNull]=true` and `populate[0]=...&populate[1]=...&populate[2]=...`
+
+## **Category Slug Filter (Case-Insensitive)**
+
+### **DO: Use $eqi for case-insensitive slug match**
+
+Strapi may store category slugs with different casing (e.g. `Main-News`, `Press-Release`) from the UI. Slug filters are case-sensitive; use `$eqi` to match regardless of case:
+
+```typescript
+// ✅ DO: Case-insensitive category slug filter
+'filters[category][slug][$eqi]=main-news'
+'filters[category][slug][$eqi]=press-release'
+```
+
+### **DON'T: Use $eq for slugs (case-sensitive)**
+
+```typescript
+// ❌ DON'T: May not match "Main-News" when stored with different casing
+'filters[category][slug][$eq]=main-news'
+```
+
+## **Advertisement Slots (Position: sidebar + top)**
+
+Fetch both sidebar and top ads with `$or`:
+
+```
+filters[$or][0][position][$eq]=sidebar&filters[$or][1][position][$eq]=top
+```
+
+Split results client-side by `position` for sidebar vs top banner display.
+
+## **Strapi-Response-Format: v4 Header**
+
+Strapi 5 supports a compatibility header to return the v4 response format (with `attributes` wrapper). Use this for reliable media/relation extraction:
+
+```typescript
+headers: {
+  'Content-Type': 'application/json',
+  'Strapi-Response-Format': 'v4',
+  'Authorization': 'Bearer <token>',  // if needed
+}
+```
+
+Implementation: [`src/lib/strapi.ts`](mdc:src/lib/strapi.ts) - `getStrapiHeaders()` includes this header.
+
+## **Media/Relation URL Extraction (Strapi 4 vs 5)**
+
+Strapi 5 uses a flattened response format; media URLs are no longer at `relation.data.attributes.url`.
+
+### **DO: Use a helper that supports both formats**
+
+```typescript
+function getMediaUrl(media: unknown, baseUrl: string): string | null {
+  if (!media || !baseUrl) return null;
+  const m = media as Record<string, unknown>;
+  let url: string | undefined;
+  // Strapi 5: media.url or media.data.url
+  url = m?.url as string | undefined;
+  if (!url) url = (m?.data as Record<string, unknown>)?.url as string | undefined;
+  if (!url) {
+    // Strapi 4: media.data.attributes.url
+    const attrs = (m?.data as Record<string, unknown>)?.attributes as Record<string, unknown> | undefined;
+    url = attrs?.url as string | undefined;
+  }
+  if (!url) return null;
+  return url.startsWith('http') ? url : `${baseUrl}${url}`;
+}
+```
+
+### **DON'T: Assume only Strapi 4 structure**
+
+```typescript
+// ❌ DON'T: Only handles Strapi 4 - fails with Strapi 5 flattened format
+const url = media?.data?.attributes?.url;
+```
+
+### **Apply to**
+
+- Article `cover` → `coverUrl`
+- Advertisement Slot `media` → `mediaUrl`
+- Sidebar Promotional Block `thumbnail` → `thumbnailUrl`
+
+## **Exception: Simple populate**
+
+For single-field populate (e.g. `populate=media`), the simple format may work. Advertisement slots use `populate=media` successfully. If you encounter 400s with simple populate, switch to array-style: `populate[0]=media`.
+
+## **References**
+
+- Implementation: [`src/app/mosc/news/getNewsHomePageData.ts`](mdc:src/app/mosc/news/getNewsHomePageData.ts)
+- Strapi client: [`src/lib/strapi.ts`](mdc:src/lib/strapi.ts)
+- API reference: [`documentation/news_portal/strapi/api_reference.md`](mdc:documentation/news_portal/strapi/api_reference.md)

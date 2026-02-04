@@ -1,6 +1,6 @@
 import { authMiddleware } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import type { NextRequest, NextFetchEvent } from "next/server";
 import { createLogger } from "@/lib/logger";
 
 const logger = createLogger('MIDDLEWARE');
@@ -255,16 +255,14 @@ const clerkMiddleware = authMiddleware({
 // CRITICAL: Custom middleware wrapper that intercepts Clerk's 401 responses for public routes
 // This prevents Clerk from returning 401 for public routes when there's no session cookie
 //
-// IMPORTANT: This wrapper does NOT break Clerk's authMiddleware() detection because:
-// 1. We still call authMiddleware() (as clerkMiddleware) - Clerk detects it by checking file contents
-// 2. Clerk middleware runs for all routes (including public routes) so auth() works in layout.tsx
-// 3. The wrapper only intercepts 401/redirect responses, it doesn't prevent Clerk from running
+// IMPORTANT: Next.js 15+ - Pass x-pathname in REQUEST headers so layout's headers() can read it.
+// Layout uses pathname for admin check; without it auth() triggers "headers() should be awaited" errors.
 //
 // This ensures:
 // - ✅ Playwright tests work (public routes don't get 401)
 // - ✅ auth() calls work in layout.tsx (Clerk middleware runs)
 // - ✅ Admin menu appears correctly (admin lookup in layout.tsx works)
-export default async function middleware(req: NextRequest) {
+export default async function middleware(req: NextRequest, event: NextFetchEvent) {
   const pathname = req.nextUrl.pathname;
   const isPublic = isPublicRoute(pathname);
 
@@ -272,47 +270,56 @@ export default async function middleware(req: NextRequest) {
     console.log('[MIDDLEWARE] Public route detected:', pathname);
   }
 
-  // Always call Clerk middleware (even for public routes) so auth() works in layout.tsx
-  // Clerk middleware may return a Promise, so we await it
-  let response = clerkMiddleware(req);
+  // CRITICAL: Add x-pathname to REQUEST headers so layout can read it via headers()
+  // Next.js 15+ requires this for layout to avoid "headers() should be awaited" when calling auth()
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set('x-pathname', pathname);
 
-  // Handle both sync and async responses
+  // Always call Clerk middleware (even for public routes) so auth() works in layout.tsx
+  let response = clerkMiddleware(req, event);
   if (response instanceof Promise) {
     response = await response;
   }
 
-  // CRITICAL: If Clerk returned 401 or redirected to sign-in for a public route, override it to allow access
-  // This fixes Playwright/curl tests that don't have session cookies
-  if (isPublic) {
-    if (response instanceof NextResponse) {
-      const location = response.headers.get('location');
-      const isRedirectToSignIn = location && (location.includes('/sign-in') || location.includes('sign-in'));
-      const isUnauthorized = response.status === 401 || response.status === 307 || response.status === 308;
+  // Build response that forwards request with x-pathname
+  const nextRes = NextResponse.next({ request: { headers: requestHeaders } });
 
-      console.log('[MIDDLEWARE] Response for public route', pathname, ':', {
-        status: response.status,
-        location,
-        isRedirectToSignIn,
-        isUnauthorized
+  if (isPublic && response instanceof NextResponse) {
+    const location = response.headers.get('location');
+    const isRedirectToSignIn = location && (location.includes('/sign-in') || location.includes('sign-in'));
+    const isUnauthorized = response.status === 401 || response.status === 307 || response.status === 308;
+
+    console.log('[MIDDLEWARE] Response for public route', pathname, ':', {
+      status: response.status,
+      location,
+      isRedirectToSignIn,
+      isUnauthorized
+    });
+
+    if (isUnauthorized || isRedirectToSignIn) {
+      console.log('[MIDDLEWARE] ⚠️ Clerk returned', response.status, 'for public route', pathname, '- overriding to 200');
+      nextRes.headers.set('x-pathname', pathname);
+      response.headers.forEach((value, key) => {
+        if ((key.startsWith('x-') || key === 'set-cookie') && key !== 'location') {
+          nextRes.headers.set(key, value);
+        }
       });
-
-      if (isUnauthorized || isRedirectToSignIn) {
-        console.log('[MIDDLEWARE] ⚠️ Clerk returned', response.status, 'for public route', pathname, isRedirectToSignIn ? '(redirect to sign-in)' : '', '- overriding to 200');
-        const publicResponse = NextResponse.next();
-        publicResponse.headers.set('x-pathname', pathname);
-        // Copy any headers from Clerk's response that we need (except location header)
-        response.headers.forEach((value, key) => {
-          if ((key.startsWith('x-') || key === 'set-cookie') && key !== 'location') {
-            publicResponse.headers.set(key, value);
-          }
-        });
-        return publicResponse;
-      } else {
-        console.log('[MIDDLEWARE] ✅ Public route', pathname, 'allowed through with status', response.status);
-      }
-    } else {
-      console.log('[MIDDLEWARE] ⚠️ Unexpected response type for public route', pathname, ':', typeof response);
+      return nextRes;
     }
+    console.log('[MIDDLEWARE] ✅ Public route', pathname, 'allowed through with status', response.status);
+  }
+
+  // Copy Clerk's response headers/status to our response (preserves set-cookie, etc.)
+  if (response instanceof NextResponse) {
+    const headers = new Headers(nextRes.headers);
+    response.headers.forEach((value, key) => {
+      headers.set(key, value);
+    });
+    return new NextResponse(nextRes.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers,
+    });
   }
 
   return response;

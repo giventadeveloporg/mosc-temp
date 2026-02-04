@@ -4,11 +4,72 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Directory | Malankara Orthodox Syrian Church',
-  description: 'Access the comprehensive directory of the Malankara Orthodox Syrian Church including parishes, priests, dioceses, and church officials.',
-  keywords: ['MOSC Directory', 'Parish Directory', 'Priest Directory', 'Church Directory', 'Orthodox Church Contact'],
+  description: 'Malankara Orthodox Directory — Holy Synod, Dioceses, Parishes, Priests, Institutions, Church Dignitaries, Working Committee, Managing Committee, Spiritual Organisations, Pilgrim Centres, Seminaries.',
+  keywords: ['MOSC Directory', 'Malankara Orthodox Directory', 'Parishes', 'Priests', 'Dioceses', 'Church Directory'],
+};
+
+type DirectorySection = {
+  title: string;
+  description: string;
+  href?: string;
+  external?: boolean;
 };
 
 export default function DirectoryPage() {
+  // Content from https://directory.mosc.in/
+  const sections: DirectorySection[] = [
+    {
+      title: 'The Holy Synod of Bishops',
+      description: 'The Episcopal Synod with the Catholicos as its president is the apex body of all bishops. The authority of the synod is final and binding. It has exclusive rights and privileges in the matter of upholding the faith of the church, its discipline and order of Apostolic Succession. As regards temporal matters the church is guided by the Malankara Syrian Christian Association.',
+      href: '/mosc/holy-synod',
+    },
+    {
+      title: 'Dioceses',
+      description: 'The Diocese is the basic church body which comprises all the parishes of a determined geographical area. It is governed by the Diocesan Bishop with the assistance of Diocesan Council.',
+      href: '/mosc/dioceses',
+    },
+    {
+      title: 'Parishes',
+      description: 'The parish is a local community of the Church having at its head a duly appointed priest and consisting of Orthodox Christians who live in accordance with the teachings of the Orthodox Church, comply with the discipline and rules of the Church, and regularly support their parish. Being subordinate to the Diocesan Authority, it is a component part of the Diocese.',
+    },
+    {
+      title: 'Priests',
+      description: 'At the head of the parish is its Vicar. According to the teachings of the Church, he is the spiritual father and teacher of his flock and the celebrant of the liturgical worship established by the Church. He teaches and edifies the People of God entrusted to his spiritual care.',
+    },
+    {
+      title: 'Institutions',
+      description: 'The institutions of the Malankara Orthodox Church consists of different organizations such as hospitals, schools, monasteries, orphanages, convents, medical colleges etc. Some of these Institutions are directly administered by the church and some others have its own leadership team.',
+      href: '/mosc/institutions',
+    },
+    {
+      title: 'Church Dignitaries',
+      description: 'The Church dignitaries consists of the Priest trustee, Lay trustee and the Association Secretary. The Priest trustee and Lay trustee are elected in the Malankara Association. The Association Secretary is elected in the Managing Committee. The tenure of the office is five years.',
+    },
+    {
+      title: 'Working Committee',
+      description: 'It is a small body of members nominated by the Malankara Metropolitan. This body prepares the agenda for the Managing Committee and helps the Malankara Metropolitan in his administrative functions. The same body is also known as the Advisory Council.',
+    },
+    {
+      title: 'The Managing Committee',
+      description: 'The members of the Managing Committee are elected by the association, two priests and four lay people representing each Diocese are elected for a period of five years. Other than the elected members, a proportionate number of members are nominated to the Managing Committee by the Malankara Metropolitan.',
+    },
+    {
+      title: 'Spiritual Organisations',
+      description: 'Spiritual organisations include all types of organizations of the Church that offer spiritual guidance to the faithful. They also include religious or spiritual study groups and other organizations that teach or offer spiritual direction and advice to the members of the Church.',
+      href: '/mosc/spiritual-organizations',
+    },
+    {
+      title: 'Pilgrim Centres',
+      description: 'The major Pilgrim centres of Malankara Orthodox Church includes historical Churches such as Niranam St. Mary\'s Valiya Pally, Thiruvathamcode Arapally, which are instituted by the Apostle St. Thomas.',
+      href: '/mosc/pilgrim-centres',
+    },
+    {
+      title: 'Seminaries',
+      description: 'There are mainly two seminaries under Malankara Orthodox Church.',
+      href: '/mosc/theological-seminaries',
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
@@ -19,24 +80,25 @@ export default function DirectoryPage() {
               <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center sacred-shadow">
                 <svg className="w-6 h-6 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </div>
             </div>
             <h1 className="font-heading font-semibold text-4xl lg:text-5xl text-foreground mb-4">
-              Church Directory
+              Malankara Orthodox Directory
             </h1>
             <p className="font-body text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-              Access the comprehensive directory of the Malankara Orthodox Syrian Church including parishes, priests, dioceses, and church officials.
+              The comprehensive directory of the Malankara Orthodox Syrian Church — bishops, dioceses, parishes, priests, institutions, and church administration.
             </p>
             <a
-              href="/mosc/directory"
-              className="inline-flex items-center px-8 py-4 bg-primary text-primary-foreground font-body font-semibold text-lg rounded-lg hover:bg-primary/90 reverent-transition sacred-shadow hover:sacred-shadow-lg"
+              href="https://directory.mosc.in/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center px-8 py-4 bg-primary text-white font-body font-semibold text-lg rounded-lg hover:bg-primary/90 reverent-transition sacred-shadow hover:sacred-shadow-lg"
             >
               <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
-              Access Church Directory
+              Access Directory at directory.mosc.in
               <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
@@ -45,257 +107,128 @@ export default function DirectoryPage() {
         </div>
       </section>
 
-      {/* What's in the Directory Section */}
+      {/* Directory Sections - content from directory.mosc.in */}
       <section className="py-16 bg-card">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="font-heading font-semibold text-3xl text-foreground mb-4">
-              What's in the Directory
-            </h2>
-            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto">
-              The comprehensive church directory provides contact information for all levels of church administration
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="text-center group">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 reverent-transition">
-                <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="space-y-12">
+            {sections.map((section, index) => (
+              <div key={index} className="bg-muted/20 rounded-lg p-6 sacred-shadow-sm border-l-4 border-primary hover:sacred-shadow reverent-transition">
+                {section.href ? (
+                  <Link href={section.href} className="block group">
+                    <h2 className="font-heading font-semibold text-2xl text-foreground mb-3 group-hover:text-primary reverent-transition">
+                      {section.title}
+                    </h2>
+                    <p className="font-body text-muted-foreground leading-relaxed">
+                      {section.description}
+                    </p>
+                    <span className="inline-flex items-center font-body text-primary font-medium mt-3 group-hover:gap-2 reverent-transition">
+                      View more
+                      <svg className="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </span>
+                  </Link>
+                ) : (
+                  <>
+                    <h2 className="font-heading font-semibold text-2xl text-foreground mb-3">
+                      {section.title}
+                    </h2>
+                    <p className="font-body text-muted-foreground leading-relaxed">
+                      {section.description}
+                    </p>
+                  </>
+                )}
               </div>
-              <h3 className="font-heading font-medium text-xl text-foreground mb-3">
-                Parishes
-              </h3>
-              <p className="font-body text-muted-foreground leading-relaxed">
-                Complete list of all parishes with contact information, addresses, and church officials
-              </p>
-            </div>
-            <div className="text-center group">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 reverent-transition">
-                <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </div>
-              <h3 className="font-heading font-medium text-xl text-foreground mb-3">
-                Priests
-              </h3>
-              <p className="font-body text-muted-foreground leading-relaxed">
-                Directory of priests serving in various parishes and special assignments across all dioceses
-              </p>
-            </div>
-            <div className="text-center group">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 reverent-transition">
-                <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                </svg>
-              </div>
-              <h3 className="font-heading font-medium text-xl text-foreground mb-3">
-                Dioceses
-              </h3>
-              <p className="font-body text-muted-foreground leading-relaxed">
-                Contact information for all diocesan offices, bishops, and administrative personnel
-              </p>
-            </div>
-            <div className="text-center group">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 reverent-transition">
-                <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-              </div>
-              <h3 className="font-heading font-medium text-xl text-foreground mb-3">
-                Institutions
-              </h3>
-              <p className="font-body text-muted-foreground leading-relaxed">
-                Directory of church-run institutions including schools, hospitals, and seminaries
-              </p>
-            </div>
-            <div className="text-center group">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 reverent-transition">
-                <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              </div>
-              <h3 className="font-heading font-medium text-xl text-foreground mb-3">
-                Organizations
-              </h3>
-              <p className="font-body text-muted-foreground leading-relaxed">
-                Contact details for spiritual organizations, associations, and church committees
-              </p>
-            </div>
-            <div className="text-center group">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 reverent-transition">
-                <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                </svg>
-              </div>
-              <h3 className="font-heading font-medium text-xl text-foreground mb-3">
-                Emergency Contacts
-              </h3>
-              <p className="font-body text-muted-foreground leading-relaxed">
-                Important contact numbers for immediate assistance and pastoral care
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* How to Use Section */}
+      {/* Update directory info / Login */}
+      <section className="py-12 bg-muted">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="font-body text-muted-foreground mb-4">
+            Need to update your Directory information?
+          </p>
+          <a
+            href="mailto:webmanager@mosc.in"
+            className="font-body text-primary font-medium hover:underline"
+          >
+            Email webmanager@mosc.in
+          </a>
+          <p className="font-body text-sm text-muted-foreground mt-6">
+            Login only for admin
+          </p>
+        </div>
+      </section>
+
+      {/* Official links - mosc.in & catholicatenews.in */}
+      <section className="py-12 bg-card">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <a
+              href="https://mosc.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-muted/20 rounded-lg p-6 sacred-shadow-sm border-l-4 border-primary hover:sacred-shadow reverent-transition text-center group"
+            >
+              <span className="font-heading font-semibold text-lg text-foreground group-hover:text-primary reverent-transition block">
+                mosc.in
+              </span>
+              <span className="font-body text-sm text-muted-foreground block mt-1">
+                The Malankara Orthodox Syrian Church
+              </span>
+            </a>
+            <a
+              href="https://catholicatenews.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-muted/20 rounded-lg p-6 sacred-shadow-sm border-l-4 border-primary hover:sacred-shadow reverent-transition text-center group"
+            >
+              <span className="font-heading font-semibold text-lg text-foreground group-hover:text-primary reverent-transition block">
+                catholicatenews.in
+              </span>
+              <span className="font-body text-sm text-muted-foreground block mt-1">
+                The official news portal of the Indian Orthodox Church
+              </span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Address Info - from directory.mosc.in */}
       <section className="py-16 bg-muted">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-card rounded-lg sacred-shadow p-8">
-            <h2 className="font-heading font-semibold text-2xl text-foreground mb-6 text-center">
-              How to Use the Directory
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <span className="font-heading font-bold text-xl text-primary">1</span>
-                </div>
-                <h3 className="font-heading font-medium text-lg text-foreground mb-2">
-                  Search
-                </h3>
-                <p className="font-body text-sm text-muted-foreground">
-                  Find parishes, priests, or institutions by name, location, or diocese
-                </p>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <span className="font-heading font-bold text-xl text-primary">2</span>
-                </div>
-                <h3 className="font-heading font-medium text-lg text-foreground mb-2">
-                  Browse
-                </h3>
-                <p className="font-body text-sm text-muted-foreground">
-                  Navigate through dioceses and regions to find specific churches or contacts
-                </p>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <span className="font-heading font-bold text-xl text-primary">3</span>
-                </div>
-                <h3 className="font-heading font-medium text-lg text-foreground mb-2">
-                  Connect
-                </h3>
-                <p className="font-body text-sm text-muted-foreground">
-                  Use the contact information to reach out to parishes, priests, or church offices
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* External Directory CTA Section */}
-      <section className="py-16 bg-primary/5">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="bg-card rounded-lg sacred-shadow p-12">
-            <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg className="w-10 h-10 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-            </div>
-            <h2 className="font-heading font-semibold text-3xl text-foreground mb-4">
-              Official Church Directory
-            </h2>
-            <p className="font-body text-lg text-muted-foreground leading-relaxed mb-8">
-              The official directory is maintained on a dedicated platform for easy searching and regular updates. Click below to access the complete, searchable directory of the Malankara Orthodox Syrian Church.
+          <h2 className="font-heading font-semibold text-2xl text-foreground mb-6 text-center">
+            Address Info
+          </h2>
+          <div className="bg-card rounded-lg sacred-shadow p-8 border-l-4 border-primary">
+            <p className="font-body text-foreground font-medium mb-2">
+              Malankara Orthodox Church
             </p>
-            <a
-              href="/mosc/directory"
-              className="inline-flex items-center px-8 py-4 bg-primary text-primary-foreground font-body font-semibold text-lg rounded-lg hover:bg-primary/90 reverent-transition sacred-shadow hover:sacred-shadow-lg"
-            >
-              <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-              Visit Church Directory
-              <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </a>
-            <p className="font-body text-sm text-muted-foreground mt-4">
-              (Opens in new window)
+            <p className="font-body text-muted-foreground">
+              Catholicate Palace,<br />
+              Devalokam,<br />
+              Kottayam - 686 004
+            </p>
+            <p className="font-body text-muted-foreground mt-4">
+              <span className="font-medium text-foreground">Phone:</span> 0481 2578500, 0481 2578499
             </p>
           </div>
         </div>
       </section>
 
-      {/* Quick Contact Section */}
+      {/* Related internal links */}
       <section className="py-16 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="font-heading font-semibold text-3xl text-foreground mb-4">
-              Quick Contacts
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <div className="bg-muted/30 rounded-lg p-8 sacred-shadow-sm border-l-4 border-primary">
-              <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
-                Catholicate Palace, Devalokam
-              </h3>
-              <div className="space-y-3 font-body text-muted-foreground">
-                <p className="flex items-start">
-                  <svg className="w-5 h-5 text-primary mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  <span>Kottayam – 686 038, Kerala, India</span>
-                </p>
-                <p className="flex items-start">
-                  <svg className="w-5 h-5 text-primary mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                  </svg>
-                  <span>0481 2570569, 2578500, 2574323</span>
-                </p>
-                <p className="flex items-start">
-                  <svg className="w-5 h-5 text-primary mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                  <a href="mailto:catholicos@mosc.in" className="text-primary hover:underline">
-                    catholicos@mosc.in
-                  </a>
-                </p>
-              </div>
-            </div>
-            <div className="bg-muted/30 rounded-lg p-8 sacred-shadow-sm border-l-4 border-primary">
-              <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
-                Public Relations Office
-              </h3>
-              <div className="space-y-3 font-body text-muted-foreground">
-                <p className="flex items-start">
-                  <svg className="w-5 h-5 text-primary mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                  <a href="mailto:pro@mosc.in" className="text-primary hover:underline">
-                    pro@mosc.in
-                  </a>
-                </p>
-                <p className="mt-6 text-sm">
-                  For media inquiries, press releases, and general information
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Related Resources */}
-      <section className="py-16 bg-muted">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="font-heading font-semibold text-3xl text-foreground mb-4">
-              Related Resources
-            </h2>
-          </div>
+          <h2 className="font-heading font-semibold text-3xl text-foreground mb-8 text-center">
+            Related Resources
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Link
               href="/mosc/dioceses"
-              className="bg-card rounded-lg p-6 sacred-shadow hover:sacred-shadow-lg reverent-transition text-center group"
+              className="bg-muted/20 rounded-lg p-6 sacred-shadow-sm hover:sacred-shadow reverent-transition text-center group border-l-4 border-primary"
             >
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 reverent-transition">
-                <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                </svg>
-              </div>
               <h3 className="font-heading font-medium text-lg text-foreground mb-2 group-hover:text-primary reverent-transition">
                 Dioceses
               </h3>
@@ -305,41 +238,38 @@ export default function DirectoryPage() {
             </Link>
             <Link
               href="/mosc/institutions"
-              className="bg-card rounded-lg p-6 sacred-shadow hover:sacred-shadow-lg reverent-transition text-center group"
+              className="bg-muted/20 rounded-lg p-6 sacred-shadow-sm hover:sacred-shadow reverent-transition text-center group border-l-4 border-primary"
             >
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 reverent-transition">
-                <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-              </div>
               <h3 className="font-heading font-medium text-lg text-foreground mb-2 group-hover:text-primary reverent-transition">
                 Institutions
               </h3>
               <p className="font-body text-sm text-muted-foreground">
-                Browse schools, hospitals, and other institutions
+                Schools, hospitals, monasteries, and more
               </p>
             </Link>
             <Link
-              href="/mosc/downloads"
-              className="bg-card rounded-lg p-6 sacred-shadow hover:sacred-shadow-lg reverent-transition text-center group"
+              href="/mosc/spiritual-organizations"
+              className="bg-muted/20 rounded-lg p-6 sacred-shadow-sm hover:sacred-shadow reverent-transition text-center group border-l-4 border-primary"
             >
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 reverent-transition">
-                <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
-                </svg>
-              </div>
               <h3 className="font-heading font-medium text-lg text-foreground mb-2 group-hover:text-primary reverent-transition">
-                Downloads
+                Spiritual Organisations
               </h3>
               <p className="font-body text-sm text-muted-foreground">
-                Access Kalpana and other church resources
+                Organisations offering spiritual guidance
               </p>
             </Link>
           </div>
         </div>
       </section>
+
+      {/* Footer note */}
+      <section className="py-8 bg-muted">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="font-body text-sm text-muted-foreground">
+            © {new Date().getFullYear()} Malankara Orthodox Directory. All Rights Reserved. Created by: ipsr solutions ltd.
+          </p>
+        </div>
+      </section>
     </div>
   );
 }
-
-

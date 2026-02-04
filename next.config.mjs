@@ -19,6 +19,13 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'mosc.in',
       },
+      // Strapi CMS (News Portal - article covers, ad slots)
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '1337',
+        pathname: '/uploads/**',
+      },
     ],
     formats: ['image/avif', 'image/webp'],
     unoptimized: true,
@@ -188,6 +195,12 @@ const nextConfig = {
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
     STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY,
+
+    // Strapi CMS (News Portal - MOSC)
+    NEXT_PUBLIC_STRAPI_URL: process.env.AMPLIFY_NEXT_PUBLIC_STRAPI_URL || process.env.NEXT_PUBLIC_STRAPI_URL,
+    AMPLIFY_NEXT_PUBLIC_STRAPI_URL: process.env.AMPLIFY_NEXT_PUBLIC_STRAPI_URL,
+    STRAPI_API_TOKEN: process.env.AMPLIFY_STRAPI_API_TOKEN || process.env.STRAPI_API_TOKEN,
+    AMPLIFY_STRAPI_API_TOKEN: process.env.AMPLIFY_STRAPI_API_TOKEN,
   },
 };
 

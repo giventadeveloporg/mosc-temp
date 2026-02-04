@@ -61,12 +61,12 @@ export default function MOCCollegesPage() {
         </div>
       </section>
 
-      {/* Colleges List Section */}
+      {/* Colleges List Section - 2 cards per row at all times */}
       <section className="py-16 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {colleges.map((college, index) => (
-              <div key={index} className="bg-muted/20 rounded-lg p-6 sacred-shadow-sm border-l-4 border-primary hover:sacred-shadow reverent-transition">
+              <div key={index} className="bg-muted/20 rounded-lg p-6 sacred-shadow-sm border-l-4 border-primary hover:sacred-shadow reverent-transition min-w-0">
                 <h3 className="font-heading font-semibold text-xl text-foreground mb-3">{college.name}</h3>
                 <div className="space-y-2 font-body text-muted-foreground">
                   <p className="flex items-start">
@@ -87,19 +87,27 @@ export default function MOCCollegesPage() {
                 </div>
               </div>
             ))}
-          </div>
-
-          {/* Corporate Office */}
-          <div className="mt-12 bg-primary/5 rounded-lg p-8 sacred-shadow border-l-4 border-primary">
-            <h3 className="font-heading font-semibold text-2xl text-foreground mb-4">
-              MOC Colleges Corporate Management Office
-            </h3>
-            <p className="font-body text-lg text-muted-foreground">
-              Devalokam, Kottayam – 38
-            </p>
-            <p className="font-body text-lg text-muted-foreground">
-              <span className="font-medium text-foreground">Phone:</span> 0481-2573533
-            </p>
+            {/* Corporate Office - same grid, keeps 2-per-row so last row has two cards */}
+            <div className="bg-primary/5 rounded-lg p-6 sacred-shadow-sm border-l-4 border-primary hover:sacred-shadow reverent-transition min-w-0">
+              <h3 className="font-heading font-semibold text-xl text-foreground mb-3">
+                MOC Colleges Corporate Management Office
+              </h3>
+              <div className="space-y-2 font-body text-muted-foreground">
+                <p className="flex items-start">
+                  <svg className="w-5 h-5 text-primary mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <span>Devalokam, Kottayam – 38</span>
+                </p>
+                <p className="flex items-start">
+                  <svg className="w-5 h-5 text-primary mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                  <span>0481-2573533</span>
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -108,7 +116,7 @@ export default function MOCCollegesPage() {
       <section className="py-12 bg-muted">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-center">
-            <Link href="/mosc/institutions" className="inline-flex items-center px-6 py-3 bg-primary text-primary-foreground font-body font-medium rounded-lg hover:bg-primary/90 reverent-transition sacred-shadow">
+            <Link href="/mosc/institutions" className="inline-flex items-center px-6 py-3 bg-primary text-white font-body font-medium rounded-lg hover:bg-primary/90 reverent-transition sacred-shadow">
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>

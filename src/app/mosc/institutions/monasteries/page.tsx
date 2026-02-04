@@ -9,32 +9,34 @@ export const metadata: Metadata = {
 };
 
 export default function MonasteriesPage() {
+  // Content from https://mosc.in/institutions/monasteries/ (order and wording preserved)
   const monasteries = [
-    { name: 'Mount Tabore Dayara', location: 'Pathanapuram – 689 695', phone: '0475 2352231, 2352475' },
+    { name: 'Mount Tabore Dayara', location: 'Pathanapuram – 689 695', phone: '0475 2352231 2352475' },
     { name: 'Bethlehem Asram', location: 'Chengamanad, Kottarakara', phone: '0474 2402543' },
     { name: 'St. George Dayara', location: 'Othera, Tiruvalla', phone: '0469 2656808' },
-    { name: 'St. Paul\'s Asram', location: 'Puthuppady, Kozhikode – 673 586', phone: '0495 2235805' },
+    { name: "St. Paul's Asram", location: "Puthuppady, Kozhikode – 673 586", phone: '0495 2235805' },
     { name: 'St. Basil Dayara', location: 'Pathanamthitta – 689 645', phone: '0468 2222243' },
     { name: 'Holy Trinity Asram', location: 'Angady, Ranni – 689 674', phone: '04735 200335' },
-    { name: 'Mar Kuriakose Asram', location: 'Kumbazha North, Pathanamthitta', phone: '0468 2322295, 2221295, 2321414' },
+    { name: 'Mar Kuriakose Asram', location: 'Kumbazha North, Pathanamthitta', phone: '0468 2322295 2221295, 2321414' },
     { name: 'Mar Baselius Dayara', location: 'Njaliakuzhy, Vakathanam', phone: '0481 2462629, 2462099' },
-    { name: 'Mount Carmel Asram', location: 'Mathilakom, East Kallada, Kollam – 691 502', phone: '0474 2585262, 2585062' },
-    { name: 'Mount Horeb Asram', location: 'Muthupilakad P.O., Sasthamkotta – 690 520', phone: '0476 2830778, 2831712' },
+    { name: 'Mount Carmel Asram', location: 'Mathilakom, East Kallada, Kollam – 691 502', phone: '0474 2585262 2585062' },
+    { name: 'Mount Horeb Asram', location: 'Muthupilakad P.O., Sasthamkotta – 690 520', phone: '0476 2830778 2831712' },
     { name: 'MGD Asram and Balabhavan', location: 'Karunagiri, Karukachal', phone: '0481 2486384' },
     { name: 'Christa Sishya Asram', location: 'Thadagom P.O., Coimbatore (T.N.)', phone: '0422 2568228' },
     { name: 'Mar Gregorios Bethel Asram', location: 'Kuttikonam, Kunnicode', phone: '0475 2322450' },
-    { name: 'St. George Mount Asram', location: 'Chayalode, Adoor – 691 556', phone: '04734 240949, 240933, 244646' },
+    { name: 'St. George Mount Asram', location: 'Chayalode, Adoor – 691 556', phone: '04734 240949 240933, 244646' },
     { name: 'St. Thomas Asram', location: 'Nellipathy, Agali P.O., Palakkad', phone: '04924 254430' },
     { name: 'St. Thomas Karunya Vishranthi Bhavan', location: 'Trivandrum', phone: '0471 2445543, 2445547' },
     { name: 'St. Thomas Karunya Ashram', location: 'Trivandrum', phone: '0471 2596418' },
     { name: 'St. Thomas Karunya MAS, SAF, SHF', location: 'Trivandrum', phone: '0471 2445543, 2445547' },
     { name: 'Bethany Asram', location: 'Ranni – Perunad – 689 711', phone: '04735 240223' },
-    { name: 'Mount Calvary Asram', location: 'Pattazhy, Kottarakara' },
-    { name: 'St. George Asram', location: 'Kulamudi, Mylom, Kottarakara' },
-    { name: 'Mount Tabore Asram', location: 'Mathuramala, Pattazhi' },
-    { name: 'Mar Augen Asram', location: 'Piramadom (S), Pampakkuda' },
-    { name: 'St. Gregorios Mount Asram', location: 'Kottarakara' },
-    { name: 'St. Thomas Asram', location: 'Sooranad P.O., Kollam – 690522' },
+    { name: 'Mount Calvary Asram', location: 'Pattazhy, Kottarakara', phone: '' },
+    { name: 'St. George Asram', location: 'Kulamudi, Mylom, Kottarakara', phone: '' },
+    { name: 'Mount Tabore Asram', location: 'Mathuramala, Pattazhi', phone: '' },
+    { name: 'Mar Augen Asram', location: 'Piramadom (S), Pampakkuda', phone: '' },
+    { name: 'St. Gregorios Mount Asram', location: 'Kottarakara', phone: '' },
+    { name: 'St. Thomas Asram', location: 'Sooranad P.O., Kollam – 690522', phone: '' },
+    { name: 'St. Basil Dayara', location: 'Pathanamthitta – 689 645', phone: '0468 2222243' },
   ];
 
   return (
@@ -60,12 +62,14 @@ export default function MonasteriesPage() {
       <section className="relative bg-gradient-to-br from-background to-muted py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            <div className="relative w-full h-80 lg:h-96 rounded-lg overflow-hidden sacred-shadow-lg">
+            <div className="relative w-full h-auto rounded-lg overflow-hidden flex items-center justify-center bg-muted/20">
               <Image
                 src="/images/institutions/mon.jpg"
                 alt="Monasteries"
-                fill
-                className="object-cover"
+                width={800}
+                height={600}
+                className="w-full h-auto object-contain group-hover:scale-105 transition-transform duration-300"
+                style={{ backgroundColor: 'transparent', borderRadius: '0.5rem' }}
                 priority
               />
             </div>
@@ -103,7 +107,7 @@ export default function MonasteriesPage() {
                       <svg className="w-5 h-5 text-primary mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                       </svg>
-                      <span>{monastery.phone}</span>
+                      <span>Ph: {monastery.phone}</span>
                     </p>
                   )}
                 </div>
@@ -119,7 +123,7 @@ export default function MonasteriesPage() {
           <div className="flex justify-center">
             <Link
               href="/mosc/institutions"
-              className="inline-flex items-center px-6 py-3 bg-primary text-primary-foreground font-body font-medium rounded-lg hover:bg-primary/90 reverent-transition sacred-shadow"
+              className="inline-flex items-center px-6 py-3 bg-primary text-white font-body font-medium rounded-lg hover:bg-primary/90 reverent-transition sacred-shadow"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />

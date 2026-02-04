@@ -170,20 +170,22 @@ const SpiritualOrganizationsPage = () => {
                 href={org.href}
                 className="bg-background rounded-lg sacred-shadow p-0 overflow-hidden hover:sacred-shadow-lg reverent-transition group flex flex-col"
               >
-                {/* Image/icon area - same as administration: full width h-48 */}
-                <div className="relative w-full h-48 bg-muted overflow-hidden flex items-center justify-center">
+                {/* Image/icon area - padded container, object-contain per image_containment_prevention rule */}
+                <div className="relative w-full h-48 bg-muted overflow-hidden flex items-center justify-center p-4">
                   {index === 0 ? (
-                    <Image
-                      src="/images/spiritual/OSSSAE.png"
-                      alt={org.title}
-                      fill
-                      className="object-contain object-center group-hover:scale-105 transition-transform duration-300"
-                      style={{
-                        objectPosition: 'center center',
-                        backgroundColor: 'transparent',
-                      }}
-                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                    />
+                    <div className="relative w-full h-full min-h-0">
+                      <Image
+                        src="/images/spiritual/OSSSAE.png"
+                        alt={org.title}
+                        fill
+                        className="object-contain object-center group-hover:scale-105 transition-transform duration-300"
+                        style={{
+                          objectPosition: 'center center',
+                          backgroundColor: 'transparent',
+                        }}
+                        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                      />
+                    </div>
                   ) : index >= 8 && index <= 11 ? (
                     /* Cards a[9]-a[12]: smaller centered logo */
                     <div className="relative w-28 h-28 flex-shrink-0">
@@ -200,17 +202,19 @@ const SpiritualOrganizationsPage = () => {
                       />
                     </div>
                   ) : org.image ? (
-                    <Image
-                      src={org.image}
-                      alt={org.title}
-                      fill
-                      className="object-cover object-center group-hover:scale-105 transition-transform duration-300"
-                      style={{
-                        objectPosition: 'center center',
-                        backgroundColor: 'transparent',
-                      }}
-                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                    />
+                    <div className="relative w-full h-full min-h-0">
+                      <Image
+                        src={org.image}
+                        alt={org.title}
+                        fill
+                        className="object-contain object-center group-hover:scale-105 transition-transform duration-300"
+                        style={{
+                          objectPosition: 'center center',
+                          backgroundColor: 'transparent',
+                        }}
+                        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                      />
+                    </div>
                   ) : (
                     <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center group-hover:bg-primary/20 reverent-transition">
                       <span className="text-3xl" role="img" aria-label={org.title}>{org.icon}</span>

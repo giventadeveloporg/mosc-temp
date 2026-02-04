@@ -45,13 +45,19 @@ export function PollCreationForm({
     eventId: initialData?.eventId || undefined,
   });
 
+  const optionsArray = Array.isArray(initialOptions)
+    ? initialOptions
+    : (initialOptions && typeof initialOptions === 'object' && 'content' in initialOptions && Array.isArray((initialOptions as { content: EventPollOptionDTO[] }).content))
+      ? (initialOptions as { content: EventPollOptionDTO[] }).content
+      : [];
+
   const [options, setOptions] = useState<PollOption[]>(
-    initialOptions.length > 0 
-      ? initialOptions.map(opt => ({
+    optionsArray.length > 0
+      ? optionsArray.map((opt, index) => ({
           id: opt.id,
-          optionText: opt.optionText,
-          displayOrder: opt.displayOrder || 0,
-          isActive: opt.isActive ?? true,
+          optionText: opt.optionText ?? '',
+          displayOrder: (opt as EventPollOptionDTO & { displayOrder?: number }).displayOrder ?? index,
+          isActive: (opt as EventPollOptionDTO & { isActive?: boolean }).isActive ?? true,
         }))
       : [
           { optionText: '', displayOrder: 0, isActive: true },
