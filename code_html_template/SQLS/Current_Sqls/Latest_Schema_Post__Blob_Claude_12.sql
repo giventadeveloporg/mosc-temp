@@ -222,6 +222,15 @@ DROP TABLE IF EXISTS public.donation_statistics CASCADE;
 
 DROP TABLE IF EXISTS public.tenant_email_addresses CASCADE;
 
+-- News portal tables (drop children first, then parents)
+DROP TABLE IF EXISTS public.news_article_category CASCADE;
+DROP TABLE IF EXISTS public.news_article CASCADE;
+DROP TABLE IF EXISTS public.news_flash CASCADE;
+DROP TABLE IF EXISTS public.news_live_stream_config CASCADE;
+DROP TABLE IF EXISTS public.news_section_display_config CASCADE;
+DROP TABLE IF EXISTS public.news_sidebar_promotion CASCADE;
+DROP TABLE IF EXISTS public.news_category CASCADE;
+
 
 
 
@@ -4762,6 +4771,193 @@ CREATE TRIGGER trg_donation_statistics_updated_at
     EXECUTE FUNCTION public.update_updated_at_column();
 
 -- =====================================================
+-- NEWS PORTAL TABLES
+-- =====================================================
+-- Tables follow schema standards: id bigint with sequence_generator, tenant_id, created_at/updated_at.
+-- See .cursor/rules/database_schema_guidelines.mdc and documentation/news_portal/backend_prd.html.
+
+-- news_category: Categories for articles (e.g. Main News, Featured News, Press Release).
+CREATE TABLE public.news_category (
+    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    tenant_id character varying(255) NOT NULL,
+    name character varying(255) NOT NULL,
+    slug character varying(255) NOT NULL,
+    description text,
+    display_order integer DEFAULT 0 NOT NULL,
+    is_active boolean DEFAULT true NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    CONSTRAINT news_category_pkey PRIMARY KEY (id),
+    CONSTRAINT ux_news_category_tenant_slug UNIQUE (tenant_id, slug)
+);
+
+CREATE INDEX idx_news_category_tenant_id ON public.news_category(tenant_id);
+CREATE INDEX idx_news_category_slug ON public.news_category(tenant_id, slug);
+CREATE INDEX idx_news_category_is_active ON public.news_category(tenant_id, is_active) WHERE is_active = true;
+
+COMMENT ON TABLE public.news_category IS 'News categories (e.g. Main News, Featured News, Press Release).';
+
+-- news_article: Single news item.
+CREATE TABLE public.news_article (
+    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    tenant_id character varying(255) NOT NULL,
+    title character varying(500) NOT NULL,
+    slug character varying(500) NOT NULL,
+    excerpt text,
+    body text,
+    featured_image_url character varying(1024),
+    published_at timestamp without time zone,
+    status character varying(50) NOT NULL,
+    author_id bigint,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    CONSTRAINT news_article_pkey PRIMARY KEY (id),
+    CONSTRAINT ux_news_article_tenant_slug UNIQUE (tenant_id, slug),
+    CONSTRAINT fk_news_article_author FOREIGN KEY (author_id) REFERENCES public.user_profile(id) ON DELETE SET NULL
+);
+
+CREATE INDEX idx_news_article_tenant_id ON public.news_article(tenant_id);
+CREATE INDEX idx_news_article_slug ON public.news_article(tenant_id, slug);
+CREATE INDEX idx_news_article_status ON public.news_article(tenant_id, status);
+CREATE INDEX idx_news_article_published_at ON public.news_article(published_at) WHERE published_at IS NOT NULL;
+
+COMMENT ON TABLE public.news_article IS 'News articles with title, slug, body, status (DRAFT/PUBLISHED/ARCHIVED).';
+
+-- news_section_display_config: Per-section display settings (one row per section per tenant).
+CREATE TABLE public.news_section_display_config (
+    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    tenant_id character varying(255) NOT NULL,
+    section_key character varying(100) NOT NULL,
+    section_title_override character varying(255),
+    banner_image_url character varying(1024),
+    display_order integer DEFAULT 0 NOT NULL,
+    is_active boolean DEFAULT true NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    CONSTRAINT news_section_display_config_pkey PRIMARY KEY (id),
+    CONSTRAINT ux_news_section_display_config_tenant_key UNIQUE (tenant_id, section_key)
+);
+
+CREATE INDEX idx_news_section_display_config_tenant_id ON public.news_section_display_config(tenant_id);
+CREATE INDEX idx_news_section_display_config_section_key ON public.news_section_display_config(tenant_id, section_key);
+
+COMMENT ON TABLE public.news_section_display_config IS 'Per-section display config (flash_news, main_news, featured_news, most_read, press_release, sidebar_promotional_block).';
+
+-- news_sidebar_promotion: Rotating banner ads / promotional items for the right sidebar (slideshow with timer).
+CREATE TABLE public.news_sidebar_promotion (
+    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    tenant_id character varying(255) NOT NULL,
+    title character varying(255),
+    image_url character varying(1024) NOT NULL,
+    link_url character varying(1024),
+    display_order integer DEFAULT 0 NOT NULL,
+    display_duration_seconds integer DEFAULT 5 NOT NULL,
+    valid_from timestamp without time zone,
+    valid_to timestamp without time zone,
+    is_active boolean DEFAULT true NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    CONSTRAINT news_sidebar_promotion_pkey PRIMARY KEY (id)
+);
+
+CREATE INDEX idx_news_sidebar_promotion_tenant_id ON public.news_sidebar_promotion(tenant_id);
+CREATE INDEX idx_news_sidebar_promotion_is_active ON public.news_sidebar_promotion(tenant_id, is_active) WHERE is_active = true;
+CREATE INDEX idx_news_sidebar_promotion_valid_dates ON public.news_sidebar_promotion(valid_from, valid_to);
+CREATE INDEX idx_news_sidebar_promotion_display_order ON public.news_sidebar_promotion(tenant_id, display_order);
+
+COMMENT ON TABLE public.news_sidebar_promotion IS 'Rotating banner ads / promotional items for the right sidebar; displayed as slideshow with configurable display_duration_seconds per slide.';
+COMMENT ON COLUMN public.news_sidebar_promotion.display_duration_seconds IS 'Seconds to show this slide in the rotating slideshow before advancing to next.';
+
+-- news_flash: Short flash items for carousel/ticker.
+CREATE TABLE public.news_flash (
+    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    tenant_id character varying(255) NOT NULL,
+    headline character varying(500) NOT NULL,
+    link_url character varying(1024),
+    news_article_id bigint,
+    display_order integer DEFAULT 0 NOT NULL,
+    valid_from timestamp without time zone,
+    valid_to timestamp without time zone,
+    is_active boolean DEFAULT true NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    CONSTRAINT news_flash_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_news_flash_article FOREIGN KEY (news_article_id) REFERENCES public.news_article(id) ON DELETE SET NULL
+);
+
+CREATE INDEX idx_news_flash_tenant_id ON public.news_flash(tenant_id);
+CREATE INDEX idx_news_flash_is_active ON public.news_flash(tenant_id, is_active) WHERE is_active = true;
+CREATE INDEX idx_news_flash_valid_dates ON public.news_flash(valid_from, valid_to);
+
+COMMENT ON TABLE public.news_flash IS 'Flash news items for carousel/ticker.';
+
+-- news_live_stream_config: Current live stream for the LIVE page (one active config per tenant).
+CREATE TABLE public.news_live_stream_config (
+    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    tenant_id character varying(255) NOT NULL,
+    embed_url character varying(1024),
+    title character varying(500),
+    is_active boolean DEFAULT true NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    CONSTRAINT news_live_stream_config_pkey PRIMARY KEY (id)
+);
+
+CREATE INDEX idx_news_live_stream_config_tenant_id ON public.news_live_stream_config(tenant_id);
+CREATE INDEX idx_news_live_stream_config_is_active ON public.news_live_stream_config(tenant_id, is_active) WHERE is_active = true;
+
+COMMENT ON TABLE public.news_live_stream_config IS 'Live stream embed config for the LIVE page (e.g. YouTube Live).';
+
+-- news_article_category: Many-to-many between news_article and news_category.
+CREATE TABLE public.news_article_category (
+    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    news_article_id bigint NOT NULL,
+    news_category_id bigint NOT NULL,
+    is_primary boolean DEFAULT false NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    CONSTRAINT news_article_category_pkey PRIMARY KEY (id),
+    CONSTRAINT ux_news_article_category_article_category UNIQUE (news_article_id, news_category_id),
+    CONSTRAINT fk_news_article_category_article FOREIGN KEY (news_article_id) REFERENCES public.news_article(id) ON DELETE CASCADE,
+    CONSTRAINT fk_news_article_category_category FOREIGN KEY (news_category_id) REFERENCES public.news_category(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_news_article_category_article ON public.news_article_category(news_article_id);
+CREATE INDEX idx_news_article_category_category ON public.news_article_category(news_category_id);
+
+COMMENT ON TABLE public.news_article_category IS 'Many-to-many link between news_article and news_category.';
+
+-- Triggers for updated_at on tables that have updated_at
+CREATE TRIGGER trg_news_category_updated_at
+    BEFORE UPDATE ON public.news_category
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER trg_news_article_updated_at
+    BEFORE UPDATE ON public.news_article
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER trg_news_section_display_config_updated_at
+    BEFORE UPDATE ON public.news_section_display_config
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER trg_news_sidebar_promotion_updated_at
+    BEFORE UPDATE ON public.news_sidebar_promotion
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER trg_news_flash_updated_at
+    BEFORE UPDATE ON public.news_flash
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER trg_news_live_stream_config_updated_at
+    BEFORE UPDATE ON public.news_live_stream_config
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+-- =====================================================
 -- END OF PAYMENT ORCHESTRATION LAYER MIGRATION
 -- =====================================================
 
@@ -4908,6 +5104,13 @@ SELECT pg_catalog.setval(
                    COALESCE((SELECT MAX(id) FROM public.clerk_session), 0),
                    COALESCE((SELECT MAX(id) FROM public.donation_transaction), 0),
                    COALESCE((SELECT MAX(id) FROM public.donation_statistics), 0),
+                   COALESCE((SELECT MAX(id) FROM public.news_category), 0),
+                   COALESCE((SELECT MAX(id) FROM public.news_article), 0),
+                   COALESCE((SELECT MAX(id) FROM public.news_section_display_config), 0),
+                   COALESCE((SELECT MAX(id) FROM public.news_sidebar_promotion), 0),
+                   COALESCE((SELECT MAX(id) FROM public.news_flash), 0),
+                   COALESCE((SELECT MAX(id) FROM public.news_live_stream_config), 0),
+                   COALESCE((SELECT MAX(id) FROM public.news_article_category), 0),
                    1
                ),
                true
