@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import QuickLinks from '@/components/holy-synod/QuickLinks';
+import TheChurchSidebar from '../TheChurchSidebar';
 
 export const metadata = {
   title: 'The Creed',
@@ -269,87 +270,19 @@ const TheCreedPage = () => {
                 </div>
               </div>
 
-              <div className="mt-8">
+              <div className="mt-8 hidden lg:block">
                 <QuickLinks />
               </div>
             </div>
 
-            {/* Sidebar - The Church navigation */}
+            {/* Sidebar - The Church (all subpages, like mosc.in) */}
             <div className="lg:col-span-1">
-              <div className="bg-background rounded-lg sacred-shadow p-6 mb-6">
-                <h3 className="font-heading font-semibold text-lg text-foreground mb-4">
-                  The Church
-                </h3>
-                <nav className="space-y-2">
-                  <Link
-                    href="/mosc/the-church/the-malankara-orthodox-syrian-church"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    The Malankara Orthodox Syrian Church
-                  </Link>
-                  <Link
-                    href="/mosc/the-church/the-throne-of-st-thomas"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    The Throne of St. Thomas
-                  </Link>
-                  <Link
-                    href="/mosc/the-church/what-do-we-believe"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    What do we believe?
-                  </Link>
-                  <Link
-                    href="/mosc/the-church/the-creed"
-                    className="block px-3 py-2 bg-primary text-primary-foreground rounded-md font-body text-sm reverent-transition"
-                  >
-                    The Creed
-                  </Link>
-                  <Link
-                    href="/mosc/the-church/theology"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Theology
-                  </Link>
-                  <Link
-                    href="/mosc/the-church/spirituality"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Spirituality
-                  </Link>
-                  <Link
-                    href="/mosc/the-church/syrian-heritage"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Syrian Heritage
-                  </Link>
-                  <Link
-                    href="/mosc/the-church/oriental-and-eastern-orthodox-churches"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Oriental and Eastern Orthodox churches
-                  </Link>
-                  <Link
-                    href="/mosc/the-church/church-history"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    History
-                  </Link>
-                  <Link
-                    href="/mosc/the-church/the-holy-myron"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    The Holy Myron
-                  </Link>
-                  <Link
-                    href="/mosc/the-church/liturgy-worship"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Liturgy
-                  </Link>
-                </nav>
-              </div>
+              <TheChurchSidebar />
             </div>
+          </div>
+          {/* Quick Links - mobile only: just above footer */}
+          <div className="mt-8 lg:hidden">
+            <QuickLinks />
           </div>
         </div>
       </section>

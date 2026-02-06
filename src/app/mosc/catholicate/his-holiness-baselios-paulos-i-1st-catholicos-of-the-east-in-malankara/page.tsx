@@ -4,8 +4,8 @@ import Image from 'next/image';
 import QuickLinks from '@/components/holy-synod/QuickLinks';
 
 export const metadata = {
-  title: 'H.H. Baselios Paulos I - The First Catholicos of the East in Malankara (1912–1913)',
-  description: 'Learn about His Holiness Baselios Paulos I, the first Catholicos of the East in Malankara, his life, ministry, and historical significance.',
+  title: 'His Holiness Baselios Paulos I, The First Catholicos of the East in Malankara (1912–1913)',
+  description: 'His Holiness Baselios Paulos I: born 1836 in Kolencherry, consecrated Catholicos 1912, laid to rest in Pampakuda Cheriya Palli. Death anniversary 3rd May.',
 };
 
 const BaseliosPaulosIPage = () => {
@@ -104,62 +104,16 @@ const BaseliosPaulosIPage = () => {
                   />
                 </div>
 
+                {/* Content from mosc.in/catholicate/his-holiness-baselios-paulos-i-1st-catholicos-of-the-east-in-malankara/ */}
                 <div className="space-y-6 font-body text-muted-foreground leading-relaxed">
-                  <div>
-                    <h2 className="font-heading font-semibold text-2xl text-primary mb-4">
-                      Biography
-                    </h2>
-                    <p>
-                      His Holiness was born on 19 January 1836 to Murimattom Kurian and Mariamma in Kolencherry.
-                      He received deaconship from Cheppad Mar Dionysius in 1843 and in 1852 he was ordained as Priest
-                      by Metropolitan Yuyakim Mar Kurilos. He served for a long period as Vicar of Kolencherry Church.
-                    </p>
-                    <p>
-                      On 17th May 1877, His Holiness Patriarch Pathrose consecrated him as Paulose Mar Ivanios at
-                      Cherallayam Palli, Kunnam kulam and appointed him as Metropolitan of Kandanad diocese.
-                    </p>
-                    <p>
-                      On 15th September 1912, His Holiness Patriarch Abdhedh Messiah with the co-operation of
-                      Vattasseril Geevarghese Mar Dionysios Metropolitan and Geevarghese Mar Gregorios Metropolitan
-                      elevated him to the Apostolic throne of St. Thomas as Catholicos of Malankara church.
-                    </p>
-                    <p>
-                      He passed away on 2 May 1913. He was laid to rest in Pampakuda Cheriya Palli.
-                      His death Anniversary is on 3rd May.
-                    </p>
-                  </div>
-
-                  <div>
-                    <h2 className="font-heading font-semibold text-2xl text-primary mb-4">
-                      Historical Significance
-                    </h2>
-                    <p>
-                      His Holiness Baselios Paulos I holds a unique place in the history of the Malankara Orthodox Syrian Church
-                      as the first Catholicos of the East in Malankara. His consecration marked a pivotal moment in the church's
-                      journey toward ecclesiastical independence and self-governance.
-                    </p>
-                    <p>
-                      The establishment of the Catholicate in 1912 was a response to the challenges faced by the Malankara Church
-                      and represented the culmination of centuries of spiritual and administrative development within the Indian Orthodox tradition.
-                    </p>
-                  </div>
-
-                  <div>
-                    <h2 className="font-heading font-semibold text-2xl text-primary mb-4">
-                      Legacy
-                    </h2>
-                    <p>
-                      Though his tenure as Catholicos was brief, His Holiness Baselios Paulos I laid the foundation for the
-                      Catholicate tradition that continues to guide the Malankara Orthodox Syrian Church today. His consecration
-                      established the apostolic succession and ecclesiastical authority that has been carried forward by
-                      subsequent Catholicos throughout the church's history.
-                    </p>
-                  </div>
+                  <p>
+                    His Holiness was born on 19 January 1836 to Murimattom Kurian and Mariamma in Kolencherry. He received deaconship from Cheppad Mar Dionysius in 1843 and in 1852 he was ordained as Priest by Metropolitan Yuyakim Mar Kurilos. He served for a long period as Vicar of Kolencherry Church. On 17th May 1877, His Holiness Patriarch Pathrose consecrated him as Paulose Mar Ivanios at Cherallayam Palli, Kunnam kulam and appointed him as Metropolitan of Kandanad diocese. On 15th September 1912, His Holiness Patriarch Abdhedh Messiah with the co-operation of Vattasseril Geevarghese Mar Dionysios Metropolitan and Geevarghese Mar Gregorios Metropolitan elevated him to the Apostolic throne of St. Thomas as Catholicos of Malankara church. He passed away on 2 May 1913. He was laid to rest in Pampakuda Cheriya Palli. His death Anniversary is on 3rd May.
+                  </p>
                 </div>
               </div>
 
-              {/* Quick Links - Horizontal Below Main Content (same as holy-synod) */}
-              <div className="mt-8">
+              {/* Quick Links - Horizontal Below Main Content (same as holy-synod) - desktop only in column */}
+              <div className="mt-8 hidden lg:block">
                 <QuickLinks />
               </div>
             </div>
@@ -214,7 +168,7 @@ const BaseliosPaulosIPage = () => {
                     <p className="text-sm text-muted-foreground">19 January 1836</p>
                   </div>
                   <div>
-                    <span className="font-medium text-foreground">Consecrated:</span>
+                    <span className="font-medium text-foreground">Consecrated as Bishop:</span>
                     <p className="text-sm text-muted-foreground">15 September 1912</p>
                   </div>
                   <div>
@@ -232,6 +186,10 @@ const BaseliosPaulosIPage = () => {
                 </div>
               </div>
             </div>
+          </div>
+          {/* Quick Links - mobile only: just above footer */}
+          <div className="mt-8 lg:hidden">
+            <QuickLinks />
           </div>
         </div>
       </section>

@@ -62,8 +62,8 @@ const orthodoxchurchesPage = () => {
                 </div>
               </div>
 
-              {/* Quick Links - Horizontal Below Main Content */}
-              <div className="mt-8">
+              {/* Quick Links - Horizontal Below Main Content (desktop only in column) */}
+              <div className="mt-8 hidden lg:block">
                 <QuickLinks />
               </div>
             </div>
@@ -120,6 +120,10 @@ const orthodoxchurchesPage = () => {
                 </nav>
               </div>
             </div>
+          </div>
+          {/* Quick Links - mobile only: just above footer */}
+          <div className="mt-8 lg:hidden">
+            <QuickLinks />
           </div>
         </div>
       </section>

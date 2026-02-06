@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import QuickLinks from '@/components/holy-synod/QuickLinks';
+import TheChurchSidebar from '../TheChurchSidebar';
 
 export const metadata = {
   title: 'Liturgy',
@@ -76,7 +77,7 @@ const LiturgyWorshipPage = () => {
                   </div>
 
                   <h2 className="font-heading font-semibold text-2xl text-foreground mb-4">
-                    The Meaning of the Liturgy
+                    THE MEANING OF THE LITURGY
                   </h2>
 
                   <p className="font-body text-muted-foreground leading-relaxed mb-6">
@@ -94,33 +95,19 @@ const LiturgyWorshipPage = () => {
                     Holy Eucharist.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
-                    Early Christian Worship
-                  </h3>
-
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    Christian life at that time is described in the Book of Acts as continuing
+                  <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                    1. Christian life at that time is described in the Book of Acts as continuing
                     &quot;steadfastly in the apostle&apos;s doctrine and fellowship, in the breaking
-                    of bread, and in the prayers.&quot; Christians would &quot;break bread&quot; on
-                    the first day of the week, the day the Lord had risen from the dead.
+                    of bread, and in the prayers&quot;
                   </p>
-                  <p className="font-body text-sm text-muted-foreground mb-6">
-                    <sup>1</sup> Acts 2:46; 3:1. &nbsp;
-                    <sup>2</sup> It is unclear whether &quot;the prayers&quot; referred to here are
-                    the prayers said when celebrating the Eucharist or the Jewish prayer said when
-                    the Christians &quot;went up together into the Temple at the hour of
-                    prayer&quot; (Acts 3:1). &nbsp;
-                    <sup>3</sup> Acts 20:7.
+                  <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                    2. Christians would &quot;break bread&quot; on the first day of the week, the
+                    day the Lord had risen from the dead.
                   </p>
-
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
-                    A More Excellent Liturgy
-                  </h3>
-
                   <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    Christians came to see their worship as the legitimate maturation of the worship
-                    given to Moses, supplanting the cult of the Temple in Jerusalem. Inasmuch as
-                    Christ had established a better covenant between God and the fallen world, He
+                    3. Christians came to see their worship as the legitimate maturation of the
+                    worship given to Moses, supplanting the cult of the Temple in Jerusalem. Inasmuch
+                    as Christ had established a better covenant between God and the fallen world, He
                     obtained for us &quot;a more excellent liturgy&quot;: &quot;For if [Jesus] were
                     on earth, He would not be a priest, since there are priests who offer gifts
                     according to the law (i.e., the Jewish priests in Jerusalem); who serve the
@@ -132,32 +119,28 @@ const LiturgyWorshipPage = () => {
                     established on better promises.&quot;
                   </p>
                   <p className="font-body text-sm text-muted-foreground mb-6">
-                    <sup>4</sup> Hebrews 8:4–6 (cf. Exodus 25:40). &nbsp;
-                    <sup>5</sup> Hebrews 8:6.
+                    1. Acts 2:46; 3:1.<br />
+                    2. It is unclear whether &quot;the prayers&quot; referred to here are the
+                    prayers said when celebrating the Eucharist or the Jewish prayer said when the
+                    Christians &quot;went up together into the Temple at the hour of prayer&quot;
+                    (Acts 3:1).<br />
+                    3. Acts 20:7.
                   </p>
-
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
-                    Heavenly Worship
-                  </h3>
 
                   <p className="font-body text-muted-foreground leading-relaxed mb-6">
                     Like the worship given to Moses, which as we read above was &quot;a copy and
                     shadow of the heavenly things,&quot; Christians also saw their liturgical
                     worship as mirroring the worship of the heavenly hosts. As Saint Germanus, the
-                    eighth-century Patriarch of Constantinople, would later put it, &quot;The church
+                    eighth century Patriarch of Constantinople, would later put it, &quot;The church
                     is an earthly heaven in which the super-celestial God dwells and walks
                     about.&quot;
                   </p>
                   <p className="font-body text-sm text-muted-foreground mb-6">
-                    <sup>6</sup> Saint Germanus of Constantinople, <em>On the Divine Liturgy</em>.
+                    6. Saint Germanus of Constantinople, <em>On the Divine Liturgy</em>.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
-                    The Etymology of Liturgy
-                  </h3>
-
                   <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    The word &quot;liturgy&quot; is a contraction of two Greek words: the word
+                    The word &quot;liturgy&quot; is a contraction of two Greek words, the word{' '}
                     <em>laos</em> meaning &quot;common,&quot; as in &quot;belonging to the
                     people,&quot; and the word <em>ergon</em>, meaning &quot;work.&quot; Thus
                     &quot;liturgy&quot; refers to the work of the common people in praising God. In
@@ -167,175 +150,29 @@ const LiturgyWorshipPage = () => {
                     bishop appears let the congregation also be present; just as wherever Jesus
                     Christ is, there is the catholic (Greek: the &quot;whole&quot;) Church.&quot;
                   </p>
-                  <p className="font-body text-sm text-muted-foreground mb-6">
-                    <sup>7</sup> Saint Ignatius of Antioch, <em>Letter to the Smyrnaeans</em>.
+                  <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                    7. The word &quot;liturgy&quot; is routinely used in the New Testament,
                   </p>
-
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
-                    Biblical Foundation
-                  </h3>
-
                   <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    The word &quot;liturgy&quot; is routinely used in the New Testament, and is used
-                    as well in the Greek translation of the Old Testament known as the Septuagint
-                    (made in Alexandria).
+                    8. and is used as well in the Greek translation of the Old Testament known as the
+                    Septuagint (made in Alexandria).
                   </p>
-                  <p className="font-body text-sm text-muted-foreground mb-8">
-                    <sup>8</sup> See for example Luke 1:23; Hebrews 8:2, 6; 9:21; 10:11; etc.
-                  </p>
-
-                  <div className="bg-muted/30 rounded-lg p-6 mb-8 border border-border/50">
-                    <h4 className="font-heading font-semibold text-lg text-foreground mb-4">
-                      Key Elements of Orthodox Liturgy
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="bg-card rounded-lg p-4 sacred-shadow-sm">
-                        <h5 className="font-heading font-medium text-foreground mb-2">
-                          Holy Qurbana
-                        </h5>
-                        <p className="font-body text-muted-foreground text-sm">
-                          The Divine Liturgy—the central act of worship
-                        </p>
-                      </div>
-                      <div className="bg-card rounded-lg p-4 sacred-shadow-sm">
-                        <h5 className="font-heading font-medium text-foreground mb-2">
-                          Liturgical Music
-                        </h5>
-                        <p className="font-body text-muted-foreground text-sm">
-                          Traditional Syriac chant and hymns
-                        </p>
-                      </div>
-                      <div className="bg-card rounded-lg p-4 sacred-shadow-sm">
-                        <h5 className="font-heading font-medium text-foreground mb-2">
-                          Feast and Festivals
-                        </h5>
-                        <p className="font-body text-muted-foreground text-sm">
-                          Celebration of saints and holy days
-                        </p>
-                      </div>
-                      <div className="bg-card rounded-lg p-4 sacred-shadow-sm">
-                        <h5 className="font-heading font-medium text-foreground mb-2">
-                          Liturgical Seasons
-                        </h5>
-                        <p className="font-body text-muted-foreground text-sm">
-                          The Church calendar and liturgical year
-                        </p>
-                      </div>
-                      <div className="bg-card rounded-lg p-4 sacred-shadow-sm">
-                        <h5 className="font-heading font-medium text-foreground mb-2">
-                          Sacraments
-                        </h5>
-                        <p className="font-body text-muted-foreground text-sm">
-                          The seven holy mysteries of the Church
-                        </p>
-                      </div>
-                      <div className="bg-card rounded-lg p-4 sacred-shadow-sm">
-                        <h5 className="font-heading font-medium text-foreground mb-2">
-                          West Syrian Worship
-                        </h5>
-                        <p className="font-body text-muted-foreground text-sm">
-                          Traditional Antiochian liturgical practices
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-primary/5 rounded-lg p-6 border border-border/50">
-                    <h4 className="font-heading font-semibold text-lg text-foreground mb-4">
-                      The Purpose of Liturgy
-                    </h4>
-                    <p className="font-body text-muted-foreground leading-relaxed">
-                      The Orthodox liturgy is not merely a ceremony or ritual, but a participation
-                      in the eternal worship of heaven. Through the liturgy, we join with the
-                      angels and saints in praising God, and we receive the grace and blessings of
-                      the Holy Spirit. The liturgy transforms us and brings us closer to God, making
-                      us partakers of the divine nature.
-                    </p>
-                  </div>
                 </div>
 
-                <div className="mt-10">
+                <div className="mt-10 hidden lg:block">
                   <QuickLinks />
                 </div>
               </div>
             </div>
 
-            {/* Sidebar - The Church nav */}
+            {/* Sidebar - The Church (all subpages, like mosc.in) */}
             <div className="lg:col-span-1">
-              <div className="bg-background rounded-lg sacred-shadow p-6 sticky top-8">
-                <h3 className="font-heading font-semibold text-lg text-foreground mb-4">
-                  The Church
-                </h3>
-                <nav className="space-y-2">
-                  <Link
-                    href="/mosc/the-church/the-malankara-orthodox-syrian-church"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    The Malankara Orthodox Syrian Church
-                  </Link>
-                  <Link
-                    href="/mosc/the-church/the-throne-of-st-thomas"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    The Throne of St. Thomas
-                  </Link>
-                  <Link
-                    href="/mosc/the-church/what-do-we-believe"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    What do we believe?
-                  </Link>
-                  <Link
-                    href="/mosc/the-church/the-creed"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    The Creed
-                  </Link>
-                  <Link
-                    href="/mosc/the-church/theology"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Theology
-                  </Link>
-                  <Link
-                    href="/mosc/the-church/spirituality"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Spirituality
-                  </Link>
-                  <Link
-                    href="/mosc/the-church/syrian-heritage"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Syrian Heritage
-                  </Link>
-                  <Link
-                    href="/mosc/the-church/oriental-and-eastern-orthodox-churches"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Oriental and Eastern Orthodox churches
-                  </Link>
-                  <Link
-                    href="/mosc/the-church/church-history"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    History
-                  </Link>
-                  <Link
-                    href="/mosc/the-church/the-holy-myron"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    The Holy Myron
-                  </Link>
-                  <Link
-                    href="/mosc/the-church/liturgy-worship"
-                    className="block px-3 py-2 bg-primary text-primary-foreground rounded-md font-body text-sm reverent-transition"
-                  >
-                    Liturgy
-                  </Link>
-                </nav>
-              </div>
+              <TheChurchSidebar />
             </div>
+          </div>
+          {/* Quick Links - mobile only: just above footer */}
+          <div className="mt-8 lg:hidden">
+            <QuickLinks />
           </div>
         </div>
       </section>

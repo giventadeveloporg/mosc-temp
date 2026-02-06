@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import QuickLinks from '@/components/holy-synod/QuickLinks';
 
 export const metadata = {
   title: 'Spiritual Organizations | MOSC',
@@ -326,6 +327,13 @@ const SpiritualOrganizationsPage = () => {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Quick Links - same as other MOSC subpages */}
+      <section className="py-16 bg-card">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <QuickLinks />
         </div>
       </section>
     </div>

@@ -5,9 +5,8 @@ import QuickLinks from '@/components/holy-synod/QuickLinks';
 
 export const metadata = {
   title: 'The Parish General Body',
-  description: 'The general assembly of all parish members for decision-making.',
+  description: 'Every parish is within the framework of the church constitution. The Parish General Body comprises eligible members who discuss and decide parish matters and elect the managing committee, secretary, and lay trustee.',
 };
-// test
 const ParishGeneralBodyPage = () => {
   return (
     <div className="bg-background">
@@ -49,90 +48,19 @@ const ParishGeneralBodyPage = () => {
                   />
                 </div>
 
-                {/* Content */}
+                {/* Content - from mosc.in/administration/the-parish-general-body/ */}
                 <div className="prose prose-lg max-w-none">
                   <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    The Parish General Body is the supreme decision-making body at the parish level, consisting 
-                    of all baptized members of the parish who are eligible to participate in parish governance. 
-                    It serves as the democratic foundation of parish administration.
+                    Every parish is within the framework of the church constitution. It is neither outside the umbrella of the constitution nor an independent entity.
                   </p>
-
-                  <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
-                    Membership
-                  </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    All baptized members of the parish who meet the following criteria are eligible to be members 
-                    of the Parish General Body:
+                  <p className="font-body text-muted-foreground leading-relaxed">
+                    Each Parish has a general body. The membership is confined to all male and female members above the age of 21 and who have made their annual confession and communion, and who are not defaulters in the parish dues for more than six months. All matters related to the parish are discussed and decided by this body. This general body elects the &apos;church managing committee&apos;, &apos;the secretary&apos;, and the &apos;lay trustee&apos;. The parish managing committee, the trustee and the secretary are elected every year.
                   </p>
-                  <ul className="list-disc list-inside space-y-2 mb-6">
-                    <li className="font-body text-muted-foreground">Must be baptized in the Malankara Orthodox Church</li>
-                    <li className="font-body text-muted-foreground">Must be regular attendees of parish services</li>
-                    <li className="font-body text-muted-foreground">Must be at least 18 years of age</li>
-                    <li className="font-body text-muted-foreground">Must be in good standing with the parish</li>
-                    <li className="font-body text-muted-foreground">Must have contributed to parish activities</li>
-                  </ul>
-
-                  <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
-                    Functions and Powers
-                  </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    The Parish General Body has the authority to:
-                  </p>
-                  <ul className="list-disc list-inside space-y-2 mb-6">
-                    <li className="font-body text-muted-foreground">Elect members of the Parish Managing Committee</li>
-                    <li className="font-body text-muted-foreground">Approve annual budgets and financial reports</li>
-                    <li className="font-body text-muted-foreground">Make decisions on major parish projects and initiatives</li>
-                    <li className="font-body text-muted-foreground">Approve changes to parish constitution and by-laws</li>
-                    <li className="font-body text-muted-foreground">Decide on matters affecting the entire parish community</li>
-                    <li className="font-body text-muted-foreground">Review and approve parish policies and programs</li>
-                    <li className="font-body text-muted-foreground">Elect representatives to diocesan bodies</li>
-                  </ul>
-
-                  <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
-                    Meetings
-                  </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    The Parish General Body meets regularly throughout the year:
-                  </p>
-                  <ul className="list-disc list-inside space-y-2 mb-6">
-                    <li className="font-body text-muted-foreground">Annual General Meeting - for elections and major decisions</li>
-                    <li className="font-body text-muted-foreground">Special General Meetings - for urgent matters</li>
-                    <li className="font-body text-muted-foreground">Regular meetings - for ongoing parish business</li>
-                  </ul>
-
-                  <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
-                    Decision Making Process
-                  </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    Decisions in the Parish General Body are made through democratic processes:
-                  </p>
-                  <ul className="list-disc list-inside space-y-2 mb-6">
-                    <li className="font-body text-muted-foreground">Majority vote for most decisions</li>
-                    <li className="font-body text-muted-foreground">Two-thirds majority for constitutional changes</li>
-                    <li className="font-body text-muted-foreground">Consensus building for important matters</li>
-                    <li className="font-body text-muted-foreground">Open discussion and debate on all issues</li>
-                  </ul>
-
-                  <div className="bg-muted/30 rounded-lg p-6">
-                    <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
-                      Democratic Foundation
-                    </h3>
-                    <p className="font-body text-muted-foreground leading-relaxed mb-4">
-                      The Parish General Body represents the democratic foundation of the Malankara Orthodox Church 
-                      at the local level. It ensures that all parish members have a voice in parish governance and 
-                      that decisions are made collectively by the community.
-                    </p>
-                    <p className="font-body text-muted-foreground leading-relaxed">
-                      This body maintains the connection between individual parish members and the broader church 
-                      structure, ensuring that local needs and concerns are addressed while maintaining unity with 
-                      the universal church.
-                    </p>
-                  </div>
                 </div>
               </div>
 
-              {/* Quick Links - Horizontal Below Main Content (same as holy-synod) */}
-              <div className="mt-8">
+              {/* Quick Links - Horizontal Below Main Content (same as holy-synod) - desktop only in column */}
+              <div className="mt-8 hidden lg:block">
                 <QuickLinks />
               </div>
             </div>
@@ -201,6 +129,10 @@ const ParishGeneralBodyPage = () => {
                 </nav>
               </div>
             </div>
+          </div>
+          {/* Quick Links - mobile only: just above footer */}
+          <div className="mt-8 lg:hidden">
+            <QuickLinks />
           </div>
         </div>
       </section>

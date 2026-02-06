@@ -65,8 +65,8 @@ const HGJoshuaMarNicodemusMetropolitanPage = () => {
                 </div>
               </div>
 
-              {/* Quick Links - Horizontal Below Main Content */}
-              <div className="mt-8">
+              {/* Quick Links - Horizontal Below Main Content (desktop only in column) */}
+              <div className="mt-8 hidden lg:block">
                 <QuickLinks />
               </div>
             </div>
@@ -75,6 +75,10 @@ const HGJoshuaMarNicodemusMetropolitanPage = () => {
             <div className="lg:col-span-1">
               <SynodMembersSidebar />
             </div>
+          </div>
+          {/* Quick Links - mobile only: just above footer */}
+          <div className="mt-8 lg:hidden">
+            <QuickLinks />
           </div>
         </div>
       </section>
