@@ -8,7 +8,7 @@ export const metadata = {
   description:
     'Every diocese has a Diocesan Assembly. The Diocesan bishop presides; budget, accounts and diocesan matters are decided in the General body. Term of members is five years.',
 };
-
+// test
 const DiocesanGeneralBodyPage = () => {
   return (
     <div className="bg-background">

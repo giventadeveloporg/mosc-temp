@@ -9,7 +9,7 @@ export const metadata = {
   description:
     'The managing committee of the Malankara Orthodox Syrian Church — elected and nominated members 2022-2027.',
 };
-
+// test
 /** Renders member text and turns email addresses into mailto links */
 function MemberText({ text }: { text: string }) {
   const emailRegex = /[\w.-]+@[\w.-]+\.\w+/g;

@@ -7,7 +7,7 @@ export const metadata = {
   title: 'The Canon Law of the Malankara Orthodox Church',
   description: 'The ecclesiastical laws and regulations that guide our church governance.',
 };
-
+// test
 const CanonLawPage = () => {
   return (
     <div className="bg-background">

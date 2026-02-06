@@ -7,7 +7,7 @@ export const metadata = {
   title: 'The Parish General Body',
   description: 'The general assembly of all parish members for decision-making.',
 };
-
+// test
 const ParishGeneralBodyPage = () => {
   return (
     <div className="bg-background">

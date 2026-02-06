@@ -7,7 +7,7 @@ export const metadata = {
   title: 'The Holy Episcopal Synod',
   description: 'The highest governing body consisting of all bishops of the church.',
 };
-
+// test
 const HolyEpiscopalSynodPage = () => {
   return (
     <div className="bg-background">
