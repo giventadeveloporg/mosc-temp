@@ -88,7 +88,7 @@ const CanonLawPage = () => {
                 </div>
               </div>
 
-              <div className="mt-8">
+              <div className="mt-8 hidden lg:block">
                 <QuickLinks />
               </div>
             </div>
@@ -158,6 +158,10 @@ const CanonLawPage = () => {
               </div>
 
             </div>
+          </div>
+          {/* Quick Links - mobile only: just above footer */}
+          <div className="mt-8 lg:hidden">
+            <QuickLinks />
           </div>
         </div>
       </section>

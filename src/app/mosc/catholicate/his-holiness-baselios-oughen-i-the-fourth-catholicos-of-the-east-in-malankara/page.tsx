@@ -71,8 +71,8 @@ const BaseliosAugenIPage = () => {
                 </div>
               </div>
 
-              {/* Quick Links - Horizontal Below Main Content (same as holy-synod) */}
-              <div className="mt-8">
+              {/* Quick Links - Horizontal Below Main Content (same as holy-synod) - desktop only in column */}
+              <div className="mt-8 hidden lg:block">
                 <QuickLinks />
               </div>
             </div>
@@ -122,24 +122,12 @@ const BaseliosAugenIPage = () => {
                     <p className="text-sm text-muted-foreground">26 June 1884</p>
                   </div>
                   <div>
-                    <span className="font-medium text-foreground">Consecrated as Metropolitan:</span>
+                    <span className="font-medium text-foreground">Consecrated as Bishop:</span>
                     <p className="text-sm text-muted-foreground">15 May 1927 (Jerusalem)</p>
-                  </div>
-                  <div>
-                    <span className="font-medium text-foreground">Chosen as Catholicos:</span>
-                    <p className="text-sm text-muted-foreground">17 May 1962</p>
-                  </div>
-                  <div>
-                    <span className="font-medium text-foreground">Installed as Catholicos:</span>
-                    <p className="text-sm text-muted-foreground">22 May 1964</p>
                   </div>
                   <div>
                     <span className="font-medium text-foreground">Reign:</span>
                     <p className="text-sm text-muted-foreground">1964–1975</p>
-                  </div>
-                  <div>
-                    <span className="font-medium text-foreground">Relinquished:</span>
-                    <p className="text-sm text-muted-foreground">24 September 1975</p>
                   </div>
                   <div>
                     <span className="font-medium text-foreground">Passed Away:</span>
@@ -149,13 +137,13 @@ const BaseliosAugenIPage = () => {
                     <span className="font-medium text-foreground">Resting Place:</span>
                     <p className="text-sm text-muted-foreground">Near Aramana Chapel, Devalokam</p>
                   </div>
-                  <div>
-                    <span className="font-medium text-foreground">Anniversary:</span>
-                    <p className="text-sm text-muted-foreground">8 December</p>
-                  </div>
                 </div>
               </div>
             </div>
+          </div>
+          {/* Quick Links - mobile only: just above footer */}
+          <div className="mt-8 lg:hidden">
+            <QuickLinks />
           </div>
         </div>
       </section>

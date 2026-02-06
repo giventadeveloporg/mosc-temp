@@ -138,7 +138,7 @@ const HolyEpiscopalSynodPage = () => {
                   <div className="bg-primary/10 rounded-lg p-6">
                     <Link 
                       href="/mosc/holysynod" 
-                      className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md font-body font-medium reverent-transition hover:bg-primary/90"
+                      className="inline-flex items-center px-4 py-2 bg-primary text-white rounded-md font-body font-medium reverent-transition hover:bg-primary/90"
                     >
                       View all Episcopal Synod Members
                     </Link>
@@ -146,7 +146,7 @@ const HolyEpiscopalSynodPage = () => {
                 </div>
               </div>
 
-              <div className="mt-8">
+              <div className="mt-8 hidden lg:block">
                 <QuickLinks />
               </div>
             </div>
@@ -216,6 +216,10 @@ const HolyEpiscopalSynodPage = () => {
               </div>
 
             </div>
+          </div>
+          {/* Quick Links - mobile only: just above footer */}
+          <div className="mt-8 lg:hidden">
+            <QuickLinks />
           </div>
         </div>
       </section>

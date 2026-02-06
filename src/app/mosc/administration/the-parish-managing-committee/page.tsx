@@ -42,88 +42,23 @@ const ParishManagingCommitteePage = () => {
                     alt="The Parish Managing Committee"
                     width={1200}
                     height={720}
-                    className="rounded-lg sacred-shadow w-1/2 h-auto"
+                    className="rounded-lg sacred-shadow w-1/2 h-auto object-contain"
                     sizes="(min-width: 1024px) 37.5vw, 50vw"
                     quality={90}
                     priority
                   />
                 </div>
 
-                {/* Content */}
+                {/* Content - from mosc.in/administration/the-parish-managing-committee/ */}
                 <div className="prose prose-lg max-w-none">
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    The Parish Managing Committee is the local administrative body responsible for the day-to-day 
-                    management and administration of individual parishes. It serves as the executive body at the 
-                    parish level and implements decisions made by the Parish General Body.
+                  <p className="font-body text-muted-foreground leading-relaxed">
+                    The members of the Parish Managing Committee excluding the priests will be elected by the Parish Assembly and their term of office will be one year. Every Parish Managing Committee will have a minimum of 5 and a maximum of 15 members excluding the Priests. The Parish Assembly will decide the required number of members within these limits. In the event of any vacancy arising in the Parish Managing Committee, the remaining members of the committee may fill up such vacancy by co-option from the members of the Parish Assembly. If in any circumstances special to any Parish, it is found necessary to extend the term of the Parish Managing Committee, the Parish Assembly may with the special permission of the Diocesan Metropolitan extend the term of office of that Parish Managing Committee to a period for three years.
                   </p>
-
-                  <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
-                    Composition
-                  </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    The Parish Managing Committee typically consists of:
-                  </p>
-                  <ul className="list-disc list-inside space-y-2 mb-6">
-                    <li className="font-body text-muted-foreground">The Parish Vicar (President)</li>
-                    <li className="font-body text-muted-foreground">Elected lay members from the parish</li>
-                    <li className="font-body text-muted-foreground">Representatives from various parish organizations</li>
-                    <li className="font-body text-muted-foreground">Youth and women representatives</li>
-                    <li className="font-body text-muted-foreground">Treasurer and Secretary</li>
-                  </ul>
-
-                  <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
-                    Responsibilities
-                  </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    The Parish Managing Committee is responsible for:
-                  </p>
-                  <ul className="list-disc list-inside space-y-2 mb-6">
-                    <li className="font-body text-muted-foreground">Managing parish finances and budgets</li>
-                    <li className="font-body text-muted-foreground">Maintaining church properties and facilities</li>
-                    <li className="font-body text-muted-foreground">Organizing parish activities and programs</li>
-                    <li className="font-body text-muted-foreground">Coordinating with diocesan authorities</li>
-                    <li className="font-body text-muted-foreground">Implementing parish policies and decisions</li>
-                    <li className="font-body text-muted-foreground">Supporting spiritual and educational programs</li>
-                    <li className="font-body text-muted-foreground">Managing parish staff and volunteers</li>
-                  </ul>
-
-                  <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
-                    Election Process
-                  </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    Members of the Parish Managing Committee are elected by the Parish General Body through a 
-                    democratic process. The election is conducted according to the constitution and by-laws of 
-                    the parish, ensuring fair representation of all parish members.
-                  </p>
-
-                  <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
-                    Term of Office
-                  </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    The term of office for Parish Managing Committee members is typically three years, with 
-                    provisions for re-election. This ensures continuity while allowing for fresh perspectives 
-                    and leadership.
-                  </p>
-
-                  <div className="bg-muted/30 rounded-lg p-6">
-                    <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
-                      Parish Governance Structure
-                    </h3>
-                    <p className="font-body text-muted-foreground leading-relaxed mb-4">
-                      The Parish Managing Committee operates under the guidance of the Parish Vicar and reports 
-                      to the Parish General Body. It maintains close coordination with diocesan authorities 
-                      and follows the constitution and canons of the Malankara Orthodox Church.
-                    </p>
-                    <p className="font-body text-muted-foreground leading-relaxed">
-                      This committee plays a vital role in ensuring the smooth functioning of parish activities, 
-                      maintaining church properties, and fostering spiritual growth within the parish community.
-                    </p>
-                  </div>
                 </div>
               </div>
 
-              {/* Quick Links - Horizontal Below Main Content (same as holy-synod) */}
-              <div className="mt-8">
+              {/* Quick Links - Horizontal Below Main Content (same as holy-synod) - desktop only in column */}
+              <div className="mt-8 hidden lg:block">
                 <QuickLinks />
               </div>
             </div>
@@ -192,6 +127,10 @@ const ParishManagingCommitteePage = () => {
                 </nav>
               </div>
             </div>
+          </div>
+          {/* Quick Links - mobile only: just above footer */}
+          <div className="mt-8 lg:hidden">
+            <QuickLinks />
           </div>
         </div>
       </section>

@@ -72,8 +72,8 @@ const BaseliosGeevargheseIPage = () => {
                 </div>
               </div>
 
-              {/* Quick Links - Horizontal Below Main Content (same as holy-synod) */}
-              <div className="mt-8">
+              {/* Quick Links - Horizontal Below Main Content (same as holy-synod) - desktop only in column */}
+              <div className="mt-8 hidden lg:block">
                 <QuickLinks />
               </div>
             </div>
@@ -123,7 +123,7 @@ const BaseliosGeevargheseIPage = () => {
                     <p className="text-sm text-muted-foreground">1870</p>
                   </div>
                   <div>
-                    <span className="font-medium text-foreground">Consecrated:</span>
+                    <span className="font-medium text-foreground">Consecrated as Bishop:</span>
                     <p className="text-sm text-muted-foreground">30 April 1925</p>
                   </div>
                   <div>
@@ -141,6 +141,10 @@ const BaseliosGeevargheseIPage = () => {
                 </div>
               </div>
             </div>
+          </div>
+          {/* Quick Links - mobile only: just above footer */}
+          <div className="mt-8 lg:hidden">
+            <QuickLinks />
           </div>
         </div>
       </section>

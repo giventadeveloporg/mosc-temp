@@ -60,11 +60,11 @@ const BaseliosMarthomaMathewsIPage = () => {
                   />
                 </div>
                 <div className="space-y-6 font-body text-muted-foreground leading-relaxed">
-                  <div>
+                  <div className="space-y-6">
                     <h2 className="font-heading font-semibold text-2xl text-primary mb-4">
                       Biography
                     </h2>
-                    <p>
+                    <p className="mb-6">
                       His Holiness was born on 27th, March 1907 as the youngest son of Vattakunnel Kurien Kathanar and Olesha Pulickaparampil Mariamma in Kottayam. He took his B.A, B.D. degrees. Even as a layman he had achieved the unique distinction in studies and also in the Canonical Laws; he was selected as a member of the Managing committee in 1944. He received on 18 August 1945 at the Old Seminary the order of "Musmrono" and on 19 August at Mar Elia Chapel he became a full deacon; on 27 October 1946 he was ordained as priest by His Holess Baselios Geevarghese II, Catholicos of the East. Later, on 21 September 1951, he was elevated to the rank of Ramban (Monk). His Holiness Baselios Geevarghese II consecrated him as Episcopa under the name Mahews Mar Athanasios. He was further elevated to the office of Metropolitan on 12 July 1959. In 1960, he became Head of outside Kerala Diocese of the Malankara church. He was unanimously elected as the Supreme Head
                       of the church and successor to the Catholicate of the East/Malankara Metropolitanate by the Malankara Association, which met on 31 December 1970 at M.D.Seminary, Kottayam. On 24 September 1975, he became Malankara Metropolitan. On 27 October 1975, at the Old Seminary, he was installed as Catholicos of the East with the title His Holiness Baselios Marthoma Mathews I. He executed many administrative innovations and helped to strengthen the sovereignty of the Malankara Orthodox Church and its right to have its own sovereign Head. He was able to project the name and fame of the church on an international level. On 27 April 1991, due to failing health he relinquished his office. On 8 November 1996 he passed away, and was laid to rest in Devalokam Aramana.
                     </p>
@@ -75,8 +75,8 @@ const BaseliosMarthomaMathewsIPage = () => {
                 </div>
               </div>
 
-              {/* Quick Links - Horizontal Below Main Content (same as holy-synod) */}
-              <div className="mt-8">
+              {/* Quick Links - Horizontal Below Main Content (same as holy-synod) - desktop only in column */}
+              <div className="mt-8 hidden lg:block">
                 <QuickLinks />
               </div>
             </div>
@@ -126,28 +126,12 @@ const BaseliosMarthomaMathewsIPage = () => {
                     <p className="text-sm text-muted-foreground">27 March 1907</p>
                   </div>
                   <div>
-                    <span className="font-medium text-foreground">Consecrated Episcopa:</span>
+                    <span className="font-medium text-foreground">Consecrated as Bishop:</span>
                     <p className="text-sm text-muted-foreground">21 September 1951 (Mathews Mar Athanasios)</p>
-                  </div>
-                  <div>
-                    <span className="font-medium text-foreground">Elevated to Metropolitan:</span>
-                    <p className="text-sm text-muted-foreground">12 July 1959</p>
-                  </div>
-                  <div>
-                    <span className="font-medium text-foreground">Elected Successor:</span>
-                    <p className="text-sm text-muted-foreground">31 December 1970</p>
-                  </div>
-                  <div>
-                    <span className="font-medium text-foreground">Installed as Catholicos:</span>
-                    <p className="text-sm text-muted-foreground">27 October 1975</p>
                   </div>
                   <div>
                     <span className="font-medium text-foreground">Reign:</span>
                     <p className="text-sm text-muted-foreground">1975–1991</p>
-                  </div>
-                  <div>
-                    <span className="font-medium text-foreground">Relinquished:</span>
-                    <p className="text-sm text-muted-foreground">27 April 1991</p>
                   </div>
                   <div>
                     <span className="font-medium text-foreground">Passed Away:</span>
@@ -157,13 +141,13 @@ const BaseliosMarthomaMathewsIPage = () => {
                     <span className="font-medium text-foreground">Resting Place:</span>
                     <p className="text-sm text-muted-foreground">Devalokam Aramana</p>
                   </div>
-                  <div>
-                    <span className="font-medium text-foreground">Anniversary:</span>
-                    <p className="text-sm text-muted-foreground">8 November</p>
-                  </div>
                 </div>
               </div>
             </div>
+          </div>
+          {/* Quick Links - mobile only: just above footer */}
+          <div className="mt-8 lg:hidden">
+            <QuickLinks />
           </div>
         </div>
       </section>

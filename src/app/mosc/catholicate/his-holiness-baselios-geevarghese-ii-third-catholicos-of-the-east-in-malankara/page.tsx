@@ -60,7 +60,7 @@ const BaseliosGeevargheseIIPage = () => {
                   />
                 </div>
                 <div className="space-y-6 font-body text-muted-foreground leading-relaxed">
-                  <div>
+                  <div className="space-y-6">
                     <h2 className="font-heading font-semibold text-2xl text-primary mb-4">
                       Biography
                     </h2>
@@ -71,8 +71,8 @@ const BaseliosGeevargheseIIPage = () => {
                 </div>
               </div>
 
-              {/* Quick Links - Horizontal Below Main Content (same as holy-synod) */}
-              <div className="mt-8">
+              {/* Quick Links - Horizontal Below Main Content (same as holy-synod) - desktop only in column */}
+              <div className="mt-8 hidden lg:block">
                 <QuickLinks />
               </div>
             </div>
@@ -122,12 +122,8 @@ const BaseliosGeevargheseIIPage = () => {
                     <p className="text-sm text-muted-foreground">16 June 1874</p>
                   </div>
                   <div>
-                    <span className="font-medium text-foreground">Consecrated as Metropolitan:</span>
+                    <span className="font-medium text-foreground">Consecrated as Bishop:</span>
                     <p className="text-sm text-muted-foreground">8 September 1912</p>
-                  </div>
-                  <div>
-                    <span className="font-medium text-foreground">Installed as Catholicos:</span>
-                    <p className="text-sm text-muted-foreground">15 February 1929</p>
                   </div>
                   <div>
                     <span className="font-medium text-foreground">Reign:</span>
@@ -141,13 +137,13 @@ const BaseliosGeevargheseIIPage = () => {
                     <span className="font-medium text-foreground">Resting Place:</span>
                     <p className="text-sm text-muted-foreground">Beside Devalokam Aramana Chapel</p>
                   </div>
-                  <div>
-                    <span className="font-medium text-foreground">Anniversary:</span>
-                    <p className="text-sm text-muted-foreground">3 January</p>
-                  </div>
                 </div>
               </div>
             </div>
+          </div>
+          {/* Quick Links - mobile only: just above footer */}
+          <div className="mt-8 lg:hidden">
+            <QuickLinks />
           </div>
         </div>
       </section>

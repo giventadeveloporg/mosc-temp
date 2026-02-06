@@ -38,11 +38,11 @@ const MalankaraAssociationPage = () => {
                 {/* Featured Image - half size, centered */}
                 <div className="mb-8 flex justify-center">
                   <Image
-                    src="/images/administration/malankara-association.jpg"
+                    src="/images/downloads/malankara_association.png"
                     alt="Malankara Association"
                     width={1200}
                     height={720}
-                    className="rounded-lg sacred-shadow w-1/2 h-auto"
+                    className="rounded-lg w-1/2 h-auto"
                     sizes="(min-width: 1024px) 37.5vw, 50vw"
                     quality={90}
                     priority
@@ -76,8 +76,8 @@ const MalankaraAssociationPage = () => {
                 </div>
               </div>
 
-              {/* Quick Links - horizontal below main content (same as holy synod member pages) */}
-              <div className="mt-8">
+              {/* Quick Links - horizontal below main content (same as holy synod member pages) - desktop only in column */}
+              <div className="mt-8 hidden lg:block">
                 <QuickLinks />
               </div>
             </div>
@@ -146,6 +146,10 @@ const MalankaraAssociationPage = () => {
                 </nav>
               </div>
             </div>
+          </div>
+          {/* Quick Links - mobile only: just above footer */}
+          <div className="mt-8 lg:hidden">
+            <QuickLinks />
           </div>
         </div>
       </section>
