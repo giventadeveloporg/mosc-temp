@@ -5,7 +5,8 @@ import QuickLinks from '@/components/holy-synod/QuickLinks';
 
 export const metadata = {
   title: 'The Diocesan General Body',
-  description: 'The governing body at the diocesan level representing all parishes in a diocese.',
+  description:
+    'Every diocese has a Diocesan Assembly. The Diocesan bishop presides; budget, accounts and diocesan matters are decided in the General body. Term of members is five years.',
 };
 
 const DiocesanGeneralBodyPage = () => {
@@ -22,7 +23,8 @@ const DiocesanGeneralBodyPage = () => {
               The Diocesan General Body
             </h1>
             <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              The governing body at the diocesan level representing all parishes in a diocese.
+              Every diocese has a Diocesan Assembly; the Diocesan bishop presides over the meetings.
+              Budget, accounts and all diocesan matters are decided in the General body assembly.
             </p>
           </div>
         </div>
@@ -35,76 +37,29 @@ const DiocesanGeneralBodyPage = () => {
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-background rounded-lg sacred-shadow p-8">
-                {/* Featured Image */}
-                <div className="mb-8">
+                {/* Featured Image - half size, centered */}
+                <div className="mb-8 flex justify-center">
                   <Image
                     src="/images/administration/diocesan-general-body.jpg"
                     alt="The Diocesan General Body"
-                    width={500}
-                    height={300}
-                    className="rounded-lg sacred-shadow w-full h-auto"
+                    width={1200}
+                    height={720}
+                    className="rounded-lg sacred-shadow w-1/2 h-auto object-contain"
+                    sizes="(min-width: 1024px) 37.5vw, 50vw"
+                    quality={90}
                     priority
                   />
                 </div>
 
-                {/* Content */}
+                {/* Content - from mosc.in/administration/the-diocesan-general-body/ */}
                 <div className="prose prose-lg max-w-none">
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    The Diocesan General Body is the governing body at the diocesan level representing all parishes 
-                    in a diocese. It consists of representatives from all parishes within the diocese and plays a 
-                    crucial role in diocesan administration and decision-making.
+                  <p className="font-body text-muted-foreground leading-relaxed">
+                    Every diocese will have a Diocesan Assembly. The Diocesan bishop presides over the meetings.
+                    All matters related to the Diocese is discussed and decided in the General body assembly
+                    including the budget and accounts. If necessary the Malankara Metropolitan can also convene
+                    the diocesan General body. The representation of the lay people is based on the number of
+                    parishioners. The term of members will be five years.
                   </p>
-
-                  <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
-                    Composition
-                  </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    The Diocesan General Body includes:
-                  </p>
-                  <ul className="list-disc list-inside space-y-2 mb-6">
-                    <li className="font-body text-muted-foreground">The Diocesan Metropolitan (President)</li>
-                    <li className="font-body text-muted-foreground">Representatives from each parish in the diocese</li>
-                    <li className="font-body text-muted-foreground">Diocesan clergy members</li>
-                    <li className="font-body text-muted-foreground">Lay representatives elected by parish members</li>
-                  </ul>
-
-                  <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
-                    Functions
-                  </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    The Diocesan General Body is responsible for:
-                  </p>
-                  <ul className="list-disc list-inside space-y-2 mb-6">
-                    <li className="font-body text-muted-foreground">Electing diocesan officers and committee members</li>
-                    <li className="font-body text-muted-foreground">Approving diocesan budgets and financial matters</li>
-                    <li className="font-body text-muted-foreground">Making decisions on diocesan policies and programs</li>
-                    <li className="font-body text-muted-foreground">Overseeing diocesan institutions and activities</li>
-                    <li className="font-body text-muted-foreground">Representing the diocese at higher church levels</li>
-                  </ul>
-
-                  <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
-                    Meetings
-                  </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    The Diocesan General Body meets regularly to discuss and decide on matters pertaining to the 
-                    diocese. These meetings provide a forum for parishes to voice their concerns and participate 
-                    in diocesan governance.
-                  </p>
-
-                  <div className="bg-muted/30 rounded-lg p-6">
-                    <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
-                      Diocesan Structure
-                    </h3>
-                    <p className="font-body text-muted-foreground leading-relaxed mb-4">
-                      Each diocese is organized with its own General Body that operates under the guidance of 
-                      the Diocesan Metropolitan and follows the constitution and canons of the Malankara Orthodox Church.
-                    </p>
-                    <p className="font-body text-muted-foreground leading-relaxed">
-                      The Diocesan General Body serves as a bridge between individual parishes and the central 
-                      church administration, ensuring that local needs and concerns are addressed while maintaining 
-                      unity with the broader church structure.
-                    </p>
-                  </div>
                 </div>
               </div>
 
@@ -116,7 +71,7 @@ const DiocesanGeneralBodyPage = () => {
 
             {/* Sidebar */}
             <div className="lg:col-span-1">
-              <div className="bg-background rounded-lg sacred-shadow p-6 mb-6">
+              <div className="bg-background rounded-lg sacred-shadow p-6 mb-6 sticky top-4">
                 <h3 className="font-heading font-semibold text-lg text-foreground mb-4">
                   Administration Structure
                 </h3>
@@ -159,7 +114,8 @@ const DiocesanGeneralBodyPage = () => {
                   </Link>
                   <Link 
                     href="/mosc/administration/the-diocesan-general-body" 
-                    className="block px-3 py-2 bg-primary text-primary-foreground rounded-md font-body text-sm reverent-transition"
+                    className="block px-3 py-2 bg-primary text-white rounded-md font-body text-sm reverent-transition"
+                    aria-current="page"
                   >
                     The Diocesan General Body
                   </Link>

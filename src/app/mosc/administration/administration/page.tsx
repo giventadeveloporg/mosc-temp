@@ -106,7 +106,7 @@ const ConstitutionPage = () => {
                 <nav className="space-y-2">
                   <Link 
                     href="/mosc/administration/administration" 
-                    className="block px-3 py-2 bg-primary text-primary-foreground rounded-md font-body text-sm reverent-transition"
+                    className="block px-3 py-2 bg-primary text-white rounded-md font-body text-sm reverent-transition"
                   >
                     The Constitution of the Malankara Orthodox Church
                   </Link>

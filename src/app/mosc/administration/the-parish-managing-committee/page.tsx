@@ -35,14 +35,16 @@ const ParishManagingCommitteePage = () => {
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-background rounded-lg sacred-shadow p-8">
-                {/* Featured Image */}
-                <div className="mb-8">
+                {/* Featured Image - half size, centered */}
+                <div className="mb-8 flex justify-center">
                   <Image
                     src="/images/administration/parish-managing-committee.jpg"
                     alt="The Parish Managing Committee"
-                    width={500}
-                    height={300}
-                    className="rounded-lg sacred-shadow w-full h-auto"
+                    width={1200}
+                    height={720}
+                    className="rounded-lg sacred-shadow w-1/2 h-auto"
+                    sizes="(min-width: 1024px) 37.5vw, 50vw"
+                    quality={90}
                     priority
                   />
                 </div>
@@ -177,7 +179,7 @@ const ParishManagingCommitteePage = () => {
                   </Link>
                   <Link 
                     href="/mosc/administration/the-parish-managing-committee" 
-                    className="block px-3 py-2 bg-primary text-primary-foreground rounded-md font-body text-sm reverent-transition"
+                    className="block px-3 py-2 bg-primary text-white rounded-md font-body text-sm reverent-transition"
                   >
                     The Parish Managing Committee
                   </Link>

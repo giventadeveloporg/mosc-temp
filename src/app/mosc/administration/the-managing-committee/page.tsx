@@ -71,13 +71,16 @@ const ManagingCommitteePage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             <div className="lg:col-span-3">
               <div className="bg-background rounded-lg sacred-shadow p-8">
-                <div className="mb-8">
+                {/* Featured Image - half size, centered */}
+                <div className="mb-8 flex justify-center">
                   <Image
                     src="/images/administration/managing-committee.jpg"
                     alt="The Managing Committee"
-                    width={500}
-                    height={300}
-                    className="rounded-lg sacred-shadow w-full h-auto object-contain"
+                    width={1200}
+                    height={720}
+                    className="rounded-lg sacred-shadow w-1/2 h-auto object-contain"
+                    sizes="(min-width: 1024px) 37.5vw, 50vw"
+                    quality={90}
                     priority
                   />
                 </div>
