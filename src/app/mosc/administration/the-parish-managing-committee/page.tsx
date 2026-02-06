@@ -7,7 +7,7 @@ export const metadata = {
   title: 'The Parish Managing Committee',
   description: 'The local administrative body responsible for individual parish management.',
 };
-
+// test
 const ParishManagingCommitteePage = () => {
   return (
     <div className="bg-background">

@@ -8,7 +8,7 @@ export const metadata = {
   description:
     'Learn about the administrative structure and governance of the Malankara Orthodox Syrian Church — Constitution, Canon Law, Holy Episcopal Synod, Malankara Association, and more.',
 };
-
+// test
 const administrationSections = [
   {
     title: 'The Constitution of the Malankara Orthodox Church',

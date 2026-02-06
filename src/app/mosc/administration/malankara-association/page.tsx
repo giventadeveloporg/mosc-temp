@@ -7,7 +7,7 @@ export const metadata = {
   title: 'Malankara Association',
   description: 'The supreme legislative body of the church representing all parishes.',
 };
-
+// test
 const MalankaraAssociationPage = () => {
   return (
     <div className="bg-background">

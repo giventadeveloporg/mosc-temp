@@ -7,7 +7,7 @@ import type { EventWithMedia } from '@/types';
 import { useFilteredEvents } from '@/hooks/useFilteredEvents';
 import { isRecurringEvent, getNextOccurrenceDate } from '@/lib/eventUtils';
 import { isTicketedFundraiserEvent } from '@/lib/donation/utils';
-import { Ticket, ArrowRight, Sparkles, Users, Heart, Play, Pause, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, Heart, Play, Pause, ChevronLeft, ChevronRight } from 'lucide-react';
 import GivebutterDonateButton from '@/components/GivebutterDonateButton';
 
 // Extended event type
@@ -627,79 +627,93 @@ const HeroSection: React.FC = () => {
   const overlayInfo = getOverlayInfo(currentEvent);
 
   return (
-    <section className="hero-container">
-      {/* Main Hero Image */}
-      <div className="hero-image-wrapper">
-        <DynamicHeroImage onEventChange={setCurrentEvent} />
-
-        {/* Buy Tickets Overlay Image - Bottom Right Corner (matching events page style) */}
-        {overlayInfo && (
-          <div className="absolute bottom-4 right-4 z-10">
-            <Link
-              href={overlayInfo.href}
-              className="block cursor-pointer hover:scale-105 transition-transform duration-300"
-              onClick={(e) => e.stopPropagation()}
-              title={overlayInfo.alt}
-              aria-label={overlayInfo.alt}
-            >
-              <img
-                src={overlayInfo.image}
-                alt={overlayInfo.alt}
-                className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px] cursor-pointer hover:scale-105 transition-transform duration-300"
-              />
-            </Link>
+    <section className="hero-container-split">
+      {/* === TOP ROW: Two-Column Hero Layout === */}
+      <div className="hero-split-row">
+        {/* LEFT PANEL (Section 1): Static Kerala Image - Text/Logo already embedded */}
+        <div className="hero-left-panel">
+          {/* Background Image - Kerala Backwaters with embedded branding */}
+          <div className="hero-left-image">
+            <Image
+              src="/images/hero_section/wooden-boat-under-coconut-tree-riverside_ver_2.jpeg"
+              alt="Malayalees.US - Kerala Backwaters"
+              fill
+              className="object-contain"
+              sizes="(max-width: 768px) 100vw, 35vw"
+              priority
+            />
           </div>
-        )}
+          {/* Right edge fade overlay for seamless blend */}
+          <div className="hero-left-fade-right" />
+        </div>
+
+        {/* RIGHT PANEL (Section 2): Dynamic Slideshow - Functionality Unchanged */}
+        <div className="hero-right-panel">
+          {/* Left edge fade overlay for seamless blend with Section 1 */}
+          <div className="hero-right-fade-left" />
+          <div className="hero-slideshow-wrapper">
+            <DynamicHeroImage onEventChange={setCurrentEvent} />
+
+            {/* Buy Tickets Overlay Image - Bottom Right Corner */}
+            {overlayInfo && (
+              <div className="absolute bottom-4 right-4 z-10">
+                <Link
+                  href={overlayInfo.href}
+                  className="block cursor-pointer hover:scale-105 transition-transform duration-300"
+                  onClick={(e) => e.stopPropagation()}
+                  title={overlayInfo.alt}
+                  aria-label={overlayInfo.alt}
+                >
+                  <img
+                    src={overlayInfo.image}
+                    alt={overlayInfo.alt}
+                    className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px] cursor-pointer hover:scale-105 transition-transform duration-300"
+                  />
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* Single Hero Card: Unite India image (left half) + Donate button (right half) */}
-      <div className="hero-cards-section hero-cards-section-single">
-        <div className="hero-card hero-card-unified group">
-          {/* Left half: Unite India Header Branding - fills half width, enlarged */}
-          <Link href="/#about-us" className="hero-card-left-half" aria-label="United India - About our mission">
-            <div
-              className="absolute inset-0 z-[1] bg-no-repeat bg-[#f5f5f5] transition-transform duration-500 group-hover:scale-[1.02]"
-              style={{
-                backgroundImage: "url('/images/logos/Malayalees_US/Unite_India_Header_Branding.jpeg')",
-                backgroundSize: 'cover',
-                backgroundPosition: 'left center',
-              }}
-              role="img"
-              aria-label="Unite India - A Nonprofit Corporation"
+      {/* === BOTTOM ROW: Two Cards (Section 3 & 4) === */}
+      <div className="hero-bottom-row">
+        {/* Section 3: Unite India Logo + Mission */}
+        <Link href="/#about-us" className="hero-bottom-card hero-bottom-card-mission group">
+          <div className="hero-mission-bg">
+            <Image
+              src="/images/logos/Malayalees_US/Unite_India_Header_Branding.jpeg"
+              alt="Unite India - A Nonprofit Corporation"
+              fill
+              className="object-cover object-left transition-transform duration-500 group-hover:scale-[1.02]"
             />
-            {/* Gradient overlay on left half for text */}
-            <div
-              className="absolute inset-0 z-[2] pointer-events-none"
-              style={{ backgroundImage: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.15) 50%, transparent 100%)' }}
-            />
-            <div className="absolute bottom-4 left-4 right-4 z-[3]">
-              <p className="hero-card-label">About</p>
-              <p className="hero-card-title">Our Mission</p>
-            </div>
-          </Link>
+          </div>
+          <div className="hero-mission-overlay" />
+          <div className="hero-mission-content">
+            <p className="hero-card-label">About</p>
+            <p className="hero-card-title">Our Mission</p>
+          </div>
+        </Link>
 
-          {/* Right half: Donate button */}
-          <div className="hero-card-right-half">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#2d1b4e] via-[#3d2b5e] to-[#1a0a2e]" />
-            <div className="absolute inset-0 opacity-10" style={{
-              backgroundImage: `radial-gradient(circle at 20% 80%, rgba(255,255,255,0.3) 0%, transparent 50%),
-                                radial-gradient(circle at 80% 20%, rgba(245,158,11,0.3) 0%, transparent 50%)`
-            }} />
-            <div className="absolute inset-0 flex flex-col items-center justify-center p-4 z-[1]">
-              <p className="hero-card-donate-title text-white mb-3">Support Us</p>
-              <GivebutterDonateButton
-                className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 rounded-full text-white text-sm font-semibold shadow-lg hover:shadow-amber-500/30 transition-all duration-300 hover:scale-105 cursor-pointer"
-              >
-                <Heart size={16} className="fill-white" />
-                <span>Donate Now</span>
-              </GivebutterDonateButton>
-            </div>
+        {/* Section 4: Donate Button - Made Bigger/More Prominent */}
+        <div className="hero-bottom-card hero-bottom-card-donate">
+          <div className="hero-donate-bg" />
+          <div className="hero-donate-glow" />
+          <div className="hero-donate-content">
+            <p className="hero-donate-heading">Support Our Community</p>
+            <p className="hero-donate-subtext">Help us make a difference</p>
+            <GivebutterDonateButton
+              className="hero-donate-button"
+            >
+              <Heart size={20} className="fill-white" />
+              <span>Donate Now</span>
+            </GivebutterDonateButton>
           </div>
         </div>
       </div>
 
       {/* Browse All Events Link */}
-      <div className="max-w-1400px mx-auto">
+      <div className="hero-browse-container">
         <Link href="/events" className="hero-browse-link">
           <span>Browse all upcoming events</span>
           <ArrowRight size={16} />

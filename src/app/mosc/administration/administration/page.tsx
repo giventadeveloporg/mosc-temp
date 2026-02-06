@@ -7,7 +7,7 @@ export const metadata = {
   title: 'The Constitution of the Malankara Orthodox Church',
   description: 'The fundamental document that governs the structure and operation of our church.',
 };
-
+// test
 const ConstitutionPage = () => {
   return (
     <div className="bg-background">

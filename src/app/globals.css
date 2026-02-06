@@ -308,7 +308,7 @@
 }
 
 /* ========================================
-   HERO SECTION DESIGN SYSTEM - Compact Banner
+   HERO SECTION DESIGN SYSTEM - Split Layout
    ======================================== */
 
 /* Hero-specific CSS Custom Properties */
@@ -329,20 +329,409 @@
   --hero-accent-red: #ef4444;
 }
 
-/* Hero Container - Compact */
+/* ========================================
+   NEW SPLIT HERO LAYOUT
+   ======================================== */
+
+/* Split Hero Container */
+.hero-container-split {
+  position: relative;
+  background: var(--hero-bg-gradient);
+  padding-top: 5rem;
+}
+
+@media (min-width: 768px) {
+  .hero-container-split {
+    padding-top: 5.5rem;
+  }
+}
+
+/* Top Row: Two-column layout */
+.hero-split-row {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 400px;
+}
+
+@media (min-width: 768px) {
+  .hero-split-row {
+    flex-direction: row;
+    min-height: 500px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-split-row {
+    min-height: 580px;
+  }
+}
+
+/* LEFT PANEL - Section 1: Static Kerala Image */
+.hero-left-panel {
+  position: relative;
+  width: 100%;
+  min-height: 350px;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--hero-bg-primary);
+}
+
+@media (min-width: 768px) {
+  .hero-left-panel {
+    width: 35%;
+    min-height: auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-left-panel {
+    width: 32%;
+  }
+}
+
+.hero-left-image {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-left-image img {
+  object-position: center center !important;
+}
+
+/* Right edge fade - creates seamless blend from Section 1 to Section 2 */
+.hero-left-fade-right {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: -2px;
+  width: 80px;
+  z-index: 5;
+  pointer-events: none;
+  /* Jagged/organic fade effect using multiple gradients */
+  background:
+    linear-gradient(to right,
+      transparent 0%,
+      rgba(26, 10, 46, 0.05) 20%,
+      rgba(26, 10, 46, 0.15) 40%,
+      rgba(26, 10, 46, 0.35) 60%,
+      rgba(26, 10, 46, 0.6) 75%,
+      rgba(26, 10, 46, 0.85) 90%,
+      var(--hero-bg-primary) 100%
+    );
+  /* Add slight noise texture for organic feel */
+  mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"),
+    linear-gradient(to right, transparent 0%, black 100%);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"),
+    linear-gradient(to right, transparent 0%, black 100%);
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
+}
+
+@media (min-width: 768px) {
+  .hero-left-fade-right {
+    width: 120px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-left-fade-right {
+    width: 150px;
+  }
+}
+
+/* RIGHT PANEL - Section 2: Dynamic Slideshow */
+.hero-right-panel {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  min-height: 300px;
+  background: var(--hero-bg-primary);
+}
+
+@media (min-width: 768px) {
+  .hero-right-panel {
+    width: 65%;
+    min-height: auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-right-panel {
+    width: 68%;
+  }
+}
+
+/* Left edge fade - creates seamless blend from Section 2 to Section 1 */
+.hero-right-fade-left {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -2px;
+  width: 80px;
+  z-index: 10;
+  pointer-events: none;
+  /* Jagged/organic fade effect - mirror of right fade */
+  background:
+    linear-gradient(to left,
+      transparent 0%,
+      rgba(26, 10, 46, 0.05) 20%,
+      rgba(26, 10, 46, 0.15) 40%,
+      rgba(26, 10, 46, 0.35) 60%,
+      rgba(26, 10, 46, 0.6) 75%,
+      rgba(26, 10, 46, 0.85) 90%,
+      var(--hero-bg-primary) 100%
+    );
+  /* Add slight noise texture for organic feel */
+  mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"),
+    linear-gradient(to left, transparent 0%, black 100%);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"),
+    linear-gradient(to left, transparent 0%, black 100%);
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
+}
+
+@media (min-width: 768px) {
+  .hero-right-fade-left {
+    width: 120px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-right-fade-left {
+    width: 150px;
+  }
+}
+
+.hero-slideshow-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin-left: 0;
+  margin-right: 1rem;
+  border-radius: 0;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 50%, #1a0a2e 100%);
+}
+
+@media (min-width: 768px) {
+  .hero-slideshow-wrapper {
+    margin-right: 1rem;
+    border-radius: 0 1rem 1rem 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-slideshow-wrapper {
+    margin-right: 1.5rem;
+    border-radius: 0 1.25rem 1.25rem 0;
+  }
+}
+
+/* ========================================
+   BOTTOM ROW - Sections 3 & 4
+   ======================================== */
+
+.hero-bottom-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+@media (min-width: 640px) {
+  .hero-bottom-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    padding: 1.25rem 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-bottom-row {
+    gap: 1.5rem;
+    padding: 1.5rem 2rem;
+  }
+}
+
+/* Bottom Card Base */
+.hero-bottom-card {
+  position: relative;
+  min-height: 140px;
+  border-radius: 1rem;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (min-width: 768px) {
+  .hero-bottom-card {
+    min-height: 160px;
+    border-radius: 1.25rem;
+  }
+}
+
+.hero-bottom-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Section 3: Mission Card */
+.hero-bottom-card-mission {
+  cursor: pointer;
+  display: block;
+}
+
+.hero-mission-bg {
+  position: absolute;
+  inset: 0;
+}
+
+.hero-mission-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.15) 50%, transparent 100%);
+  pointer-events: none;
+}
+
+.hero-mission-content {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  right: 1rem;
+  z-index: 2;
+}
+
+@media (min-width: 768px) {
+  .hero-mission-content {
+    bottom: 1.25rem;
+    left: 1.25rem;
+    right: 1.25rem;
+  }
+}
+
+/* Section 4: Donate Card - BIGGER & More Prominent */
+.hero-bottom-card-donate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-donate-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #2d1b4e 0%, #3d2b5e 50%, #1a0a2e 100%);
+}
+
+.hero-donate-glow {
+  position: absolute;
+  inset: 0;
+  opacity: 0.15;
+  background:
+    radial-gradient(circle at 20% 80%, rgba(255,255,255,0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(245,158,11,0.4) 0%, transparent 50%);
+}
+
+.hero-donate-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1.5rem;
+}
+
+.hero-donate-heading {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.25rem;
+}
+
+@media (min-width: 768px) {
+  .hero-donate-heading {
+    font-size: 1.5rem;
+  }
+}
+
+.hero-donate-subtext {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+  .hero-donate-subtext {
+    font-size: 1rem;
+    margin-bottom: 1.25rem;
+  }
+}
+
+.hero-donate-button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 2rem;
+  background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+  border-radius: 9999px;
+  color: white;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.hero-donate-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 32px rgba(245, 158, 11, 0.5);
+  background: linear-gradient(135deg, #d97706 0%, #c2410c 100%);
+}
+
+@media (min-width: 768px) {
+  .hero-donate-button {
+    padding: 1rem 2.5rem;
+    font-size: 1.125rem;
+    gap: 0.875rem;
+  }
+}
+
+/* Browse Container */
+.hero-browse-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ========================================
+   LEGACY HERO STYLES (for backwards compat)
+   ======================================== */
+
+/* Hero Container - Compact (legacy) */
 .hero-container {
   position: relative;
   background: var(--hero-bg-gradient);
-  padding-top: 5.5rem; /* Account for fixed header (4.5rem) + extra spacing */
+  padding-top: 5.5rem;
 }
 
 @media (min-width: 768px) {
   .hero-container {
-    padding-top: 6rem; /* More padding on larger screens */
+    padding-top: 6rem;
   }
 }
 
-/* Hero Main Image Section */
+/* Hero Main Image Section (legacy) */
 .hero-image-wrapper {
   position: relative;
   width: calc(100% - 2rem);
@@ -350,7 +739,6 @@
   aspect-ratio: 16 / 9;
   overflow: hidden;
   border-radius: 1rem;
-  /* Elegant dark background for any letterboxing */
   background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 50%, #1a0a2e 100%);
 }
 

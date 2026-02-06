@@ -7,7 +7,7 @@ export const metadata = {
   title: 'The Working Committee',
   description: 'The operational committee that implements church policies and decisions.',
 };
-
+// test
 const WorkingCommitteePage = () => {
   return (
     <div className="bg-background">
