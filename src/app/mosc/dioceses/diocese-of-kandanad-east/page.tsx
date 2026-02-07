@@ -2,7 +2,6 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import DiocesesQuickLinksNav from '../DiocesesQuickLinksNav';
-import DiocesesQuickLinksNav from '../DiocesesQuickLinksNav';
 
 export const metadata = {
   title: 'Diocese of Kandanad East',

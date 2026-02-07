@@ -1,158 +1,186 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
+import QuickLinks from '../components/QuickLinks';
 
 export const metadata = {
   title: 'The Church',
-  description: 'Learn about the beliefs, history, and structure of the Syro-Malabar Church.',
+  description:
+    'The Malankara Orthodox Syrian Church — Catholicate of the East. Explore our faith, creed, theology, spirituality, Syrian heritage, history, the Holy Myron, and liturgy.',
 };
 
+const churchSections = [
+  {
+    title: 'The Malankara Orthodox Syrian Church',
+    description:
+      'Catholicate of the East. The Malankara Orthodox Syrian Church was founded by St. Thomas, one of the twelve apostles of Jesus Christ, who came to India in A.D. 52. At the heart of our faith is the apostolic tradition and the Catholicate of the East.',
+    href: '/syro/the-church/the-malankara-orthodox-syrian-church',
+    image: '/images/logos/Current_Edits/MOSC-Logo-only.png',
+  },
+  {
+    title: 'The Throne of St. Thomas',
+    description:
+      "The concept of the 'Throne of St. Thomas' is based on the words of our Lord Himself. In St. Matthew 19:28 it is written that 'Jesus said to them: Amen, I say to you that you who have followed me, in the regeneration when the Son of man shall sit on the seat of his majesty, you also shall sit on twelve thrones judging the twelve tribes of Israel.'",
+    href: '/syro/the-church/the-throne-of-st-thomas',
+    image: '/images/church/throne_of_st_thomas.jpg',
+  },
+  {
+    title: 'What do we believe?',
+    description:
+      'What do the Orthodox Believe? It is more to ask: "in whom do we put our trust?" "Believe" is a very vague word. Often it means simply holding an opinion. For the Orthodox, faith is a personal relationship with the living God—Father, Son, and Holy Spirit.',
+    href: '/syro/the-church/what-do-we-believe',
+    image: '/images/church/what-do-we-believe.jpg',
+  },
+  {
+    title: 'The Creed',
+    description:
+      'The Ecumenical Council of Nicea and Nicene Creed. The Oriental Orthodox Churches recognize only three ecumenical councils, and the Council of Nicea is the first among them. The Nicene Council, held in A.D. 325, gave us the Creed that confesses the faith of the one, holy, catholic, and apostolic Church.',
+    href: '/syro/the-church/the-creed',
+    image: '/images/church/creed.jpg',
+  },
+  {
+    title: 'Theology',
+    description:
+      'The main Doctrines of the Church. The Malankara Orthodox Church has pillars of Mystery through which it teaches and demonstrates its basic religious belief. They are called pillars due to their foundational role in Orthodox theology and spiritual life.',
+    href: '/syro/the-church/theology',
+    image: '/images/church/theology.jpg',
+  },
+  {
+    title: 'Spirituality',
+    description:
+      'Introduction. Spirituality may be defined as the life in and with the Holy Spirit. It is an ascetic and pious struggle against sin through repentance, prayer, fasting, and participation in the sacraments—the means by which we grow in the likeness of God.',
+    href: '/syro/the-church/spirituality',
+    image: '/images/church/spirituality.jpg',
+  },
+  {
+    title: 'Syrian Heritage',
+    description:
+      'Syrian Heritage of the St. Thomas Christians. Syriac is the liturgical language of the St. Thomas Christians from a very early date, even though their identity and culture remained always Indian. This heritage connects us to the ancient Christian East.',
+    href: '/syro/the-church/syrian-heritage',
+    image: '/images/church/syrian_heritage.jpg',
+  },
+  {
+    title: 'Oriental and Eastern Orthodox churches',
+    description:
+      'How Different is The Eastern Orthodox Church? Several people have asked this question in several different forms: Who are these Orthodox—Protestants or Roman Catholics? What do they believe differently? We belong to the Oriental Orthodox family of churches.',
+    href: '/syro/the-church/oriental-and-eastern-orthodox-churches',
+    image: '/images/church/oriental.jpg',
+  },
+  {
+    title: 'History',
+    description:
+      'THE ORTHODOX CHURCH OF INDIA. The Malankara Orthodox Church—hereafter referred to as the Orthodox Church of India or the Indian Orthodox Church—is the second largest faction of the St. Thomas Christians, tracing its origins to the apostolic mission of St. Thomas in A.D. 52.',
+    href: '/syro/the-church/church-history',
+    image: '/images/logos/Current_Edits/MOSC-Logo-only.png',
+  },
+  {
+    title: 'The Holy Myron',
+    description:
+      'By the divine power, we have spoken at length on the mysteries of the cross. We next write about the divine and life-giving mystery of the Holy Myron—the consecrated oil used in the sacrament of Chrismation, sealing the faithful with the gift of the Holy Spirit.',
+    href: '/syro/the-church/the-holy-myron',
+    image: '/images/church/sacraments.jpg',
+  },
+  {
+    title: 'Liturgy',
+    description:
+      '"We have seen the true Light, we have received the heavenly Spirit; we have found the true Faith, worshiping the undivided Trinity: for He has saved us." The Liturgy of St. John Chrysostom and other ancient liturgies form the heart of our worship.',
+    href: '/syro/the-church/liturgy-worship',
+    image: '/images/church/liturgy-worship.jpg',
+  },
+];
+
 const TheChurchPage = () => {
-  const churchTopics = [
-    {
-      title: 'What Do We Believe',
-      description: 'Our fundamental beliefs and Orthodox Christian doctrine',
-      href: '/syro/the-church/what-do-we-believe',
-      icon: '📖'
-    },
-    {
-      title: 'Church History',
-      description: 'The historical development of our church from apostolic times',
-      href: '/syro/the-church/church-history',
-      icon: '📜'
-    },
-    {
-      title: 'Orthodox Faith',
-      description: 'Understanding the Orthodox Christian faith and tradition',
-      href: '/syro/the-church/orthodox-faith',
-      icon: '⛪'
-    },
-    {
-      title: 'Liturgy & Worship',
-      description: 'Our liturgical tradition and forms of worship',
-      href: '/syro/the-church/liturgy-worship',
-      icon: '📿'
-    },
-    {
-      title: 'Sacraments',
-      description: 'The seven sacraments and their significance',
-      href: '/syro/the-church/sacraments',
-      icon: '💒'
-    },
-    {
-      title: 'Church Calendar',
-      description: 'Feast days, fasts, and liturgical seasons',
-      href: '/syro/the-church/church-calendar',
-      icon: '📅'
-    }
-  ];
-
-  const keyBeliefs = [
-    {
-      title: 'The Holy Trinity',
-      description: 'We believe in one God in three persons: Father, Son, and Holy Spirit',
-      icon: '☦️'
-    },
-    {
-      title: 'Incarnation',
-      description: 'Jesus Christ is fully God and fully man, the eternal Son of God',
-      icon: '✟'
-    },
-    {
-      title: 'Resurrection',
-      description: 'Christ rose from the dead, conquering death and offering eternal life',
-      icon: '🌅'
-    },
-    {
-      title: 'The Church',
-      description: 'The Orthodox Church is the one, holy, catholic, and apostolic Church',
-      icon: '⛪'
-    }
-  ];
-
   return (
     <div className="bg-syro-bg-gray">
-      {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-br from-white to-syro-light-gray">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Hero Section - MOSC styling */}
+      <section className="relative bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray min-h-[280px] flex items-center py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="text-center">
-            <div className="w-20 h-20 bg-syro-red rounded-[5px] flex items-center justify-center mx-auto mb-6 shadow-syro-card">
-              <span className="text-white text-4xl font-bold" role="img" aria-label="The Church">⛪</span>
+            <div className="w-20 h-20 bg-syro-red/10 rounded-full flex items-center justify-center mx-auto mb-6 shadow-syro-card-hover border border-syro-table-border">
+              <svg
+                className="w-10 h-10 text-syro-red"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                />
+              </svg>
             </div>
-            <h1 className="font-syro-display font-semibold text-syro-h1 text-syro-blue mb-4">
-              The Syro-Malabar Church
+            <h1 className="font-syro-display font-semibold text-4xl text-syro-blue mb-4">
+              The Church
             </h1>
-            <p className="font-syro-primary text-syro-body text-syro-text-gray max-w-3xl mx-auto leading-relaxed">
-              We are an ancient apostolic church that traces its origins to St. Thomas the Apostle,
-              who established Christianity in India in 52 AD. Our church maintains the Orthodox faith
-              and tradition while serving our community with love and compassion.
+            <p className="font-syro-primary text-lg text-syro-dark-gray max-w-3xl mx-auto leading-relaxed">
+              The Malankara Orthodox Syrian Church — Catholicate of the East. Founded by St. Thomas
+              the Apostle in A.D. 52, we preserve the Orthodox faith, creed, theology, spirituality,
+              and liturgical tradition of the one, holy, catholic, and apostolic Church.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Key Beliefs */}
+      {/* Main content - 11 sections in card grid (same pattern as administration) */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="font-syro-display font-semibold text-syro-h2 text-syro-blue mb-4">
-              Our Core Beliefs
+            <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-4">
+              The Malankara Orthodox Syrian Church
             </h2>
-            <p className="font-syro-primary text-syro-body text-syro-text-gray max-w-3xl mx-auto">
-              The foundation of our faith rests on the teachings of Christ, the apostles,
-              and the early church fathers, preserved through centuries of Orthodox tradition.
+            <p className="font-syro-primary text-lg text-syro-dark-gray max-w-3xl mx-auto">
+              Explore our faith, heritage, and tradition—from the Throne of St. Thomas to the Creed,
+              theology, spirituality, Syrian heritage, history, the Holy Myron, and liturgy.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {keyBeliefs.map((belief) => (
-              <div
-                key={belief.title}
-                className="bg-syro-bg-gray rounded-[5px] shadow-syro-card p-6 text-center hover:shadow-syro-card-hover transition-all duration-500"
-              >
-                <div className="w-16 h-16 bg-syro-red-light rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl text-syro-red" role="img" aria-label={belief.title}>{belief.icon}</span>
-                </div>
-                <h3 className="font-syro-display font-semibold text-syro-h4 text-syro-blue mb-3">
-                  {belief.title}
-                </h3>
-                <p className="font-syro-primary text-syro-small text-syro-text-gray leading-relaxed">
-                  {belief.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Church Topics */}
-      <section className="py-16 bg-syro-light-gray/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="font-syro-display font-semibold text-syro-h2 text-syro-blue mb-4">
-              Learn About Our Church
-            </h2>
-            <p className="font-syro-primary text-syro-body text-syro-text-gray max-w-3xl mx-auto">
-              Explore the rich heritage, beliefs, and traditions of the Syro-Malabar Church.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {churchTopics.map((topic) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {churchSections.map((item) => (
               <Link
-                key={topic.title}
-                href={topic.href}
-                className="bg-white rounded-[5px] shadow-syro-card p-6 hover:shadow-syro-card-hover transition-all duration-500 group"
+                key={item.title}
+                href={item.href}
+                className="bg-syro-bg-gray rounded-lg shadow-syro-card p-4 hover:shadow-syro-card-hover transition-all duration-300 group flex flex-col h-full"
               >
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-syro-red-light rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-syro-red/20 transition-all duration-300">
-                    <span className="text-2xl" role="img" aria-label={topic.title}>{topic.icon}</span>
+                {/* Image container - centered, contained, no overflow (image_containment_prevention) */}
+                <div className="relative w-full h-48 min-h-[192px] mb-3 rounded-lg overflow-hidden bg-syro-bg-gray flex items-center justify-center p-3">
+                  <div className="relative w-full h-full">
+                    <Image
+                      src={item.image}
+                      alt={item.title}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      className="object-contain object-center group-hover:scale-105 transition-all duration-300"
+                    />
                   </div>
-                  <h3 className="font-syro-display font-semibold text-syro-h4 text-syro-blue mb-3 group-hover:text-syro-red transition-all duration-300">
-                    {topic.title}
+                </div>
+
+                <div className="flex flex-col flex-1 text-left">
+                  <h3 className="font-syro-display font-semibold text-base text-syro-blue mb-1.5 group-hover:text-syro-red transition-all duration-300">
+                    {item.title}
                   </h3>
-                  <p className="font-syro-primary text-syro-small text-syro-text-gray leading-relaxed">
-                    {topic.description}
+                  <p className="font-syro-primary text-sm text-syro-dark-gray leading-relaxed line-clamp-3 mb-3">
+                    {item.description}
                   </p>
+                  <span className="inline-flex items-center gap-1.5 font-syro-primary text-sm font-medium text-syro-red mt-auto">
+                    Read More
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </span>
                 </div>
               </Link>
             ))}
@@ -160,111 +188,8 @@ const TheChurchPage = () => {
         </div>
       </section>
 
-      {/* Church Identity */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            <div>
-              <h2 className="font-syro-display font-semibold text-syro-h2 text-syro-blue mb-6">
-                Our Church Identity
-              </h2>
-              <div className="space-y-4 font-syro-primary text-syro-body text-syro-text-gray leading-relaxed">
-                <p>
-                  The Syro-Malabar Church is part of the Oriental Orthodox family of churches,
-                  which includes the Coptic, Ethiopian, Eritrean, Armenian, and Syrian Orthodox churches.
-                  We share a common faith and tradition that dates back to the early centuries of Christianity.
-                </p>
-                <p>
-                  Our church is known for its rich liturgical tradition, beautiful Syriac chant,
-                  and deep spiritual heritage. We maintain the Orthodox faith as it was received
-                  from the apostles and preserved by the early church fathers.
-                </p>
-                <p>
-                  Today, we serve millions of faithful worldwide, providing spiritual guidance,
-                  pastoral care, and community services while maintaining our ancient traditions
-                  and adapting to the needs of modern society.
-                </p>
-              </div>
-            </div>
-
-            <div className="bg-syro-bg-gray rounded-[5px] shadow-syro-card p-6">
-              <h3 className="font-syro-display font-semibold text-syro-h3 text-syro-blue mb-4">
-                Church Statistics
-              </h3>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="font-syro-primary text-syro-text-gray">Founded</span>
-                  <span className="font-syro-display font-semibold text-syro-blue">52 AD</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="font-syro-primary text-syro-text-gray">Total Members</span>
-                  <span className="font-syro-display font-semibold text-syro-blue">2.5+ Million</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="font-syro-primary text-syro-text-gray">Dioceses</span>
-                  <span className="font-syro-display font-semibold text-syro-blue">30</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="font-syro-primary text-syro-text-gray">Parishes</span>
-                  <span className="font-syro-display font-semibold text-syro-blue">2000+</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="font-syro-primary text-syro-text-gray">Countries</span>
-                  <span className="font-syro-display font-semibold text-syro-blue">50+</span>
-                </div>
-              </div>
-
-              <div className="mt-6 p-4 bg-syro-red-light rounded-[5px]">
-                <h4 className="font-syro-display font-medium text-syro-blue mb-2">
-                  Motto
-                </h4>
-                <p className="font-syro-primary text-syro-small text-syro-text-gray">
-                  "Light of the East, Light of the World"
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Mission & Vision */}
-      <section className="py-16 bg-syro-light-gray/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <div className="bg-white rounded-[5px] shadow-syro-card p-8">
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-syro-red-light rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl text-syro-red" role="img" aria-label="Mission">🎯</span>
-                </div>
-                <h3 className="font-syro-display font-semibold text-syro-h3 text-syro-blue mb-4">
-                  Our Mission
-                </h3>
-              </div>
-              <p className="font-syro-primary text-syro-body text-syro-text-gray leading-relaxed">
-                To proclaim the Gospel of Jesus Christ, to preserve and propagate the Orthodox faith,
-                to provide spiritual guidance and pastoral care to our members, and to serve humanity
-                with love, compassion, and justice in accordance with the teachings of our Lord.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-[5px] shadow-syro-card p-8">
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-syro-red-light rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl text-syro-red" role="img" aria-label="Vision">👁️</span>
-                </div>
-                <h3 className="font-syro-display font-semibold text-syro-h3 text-syro-blue mb-4">
-                  Our Vision
-                </h3>
-              </div>
-              <p className="font-syro-primary text-syro-body text-syro-text-gray leading-relaxed">
-                To be a vibrant, growing Orthodox Christian community that faithfully preserves
-                the apostolic tradition while effectively ministering to the spiritual, social,
-                and educational needs of our members and the wider community in the 21st century.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Quick Links - same style as holy synod / administration */}
+      <QuickLinks />
     </div>
   );
 };

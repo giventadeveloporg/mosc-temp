@@ -2,11 +2,14 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Metadata } from 'next';
+import QuickLinks from '../components/QuickLinks';
+import SyroPageHero from '../components/SyroPageHero';
+import SyroSectionTitle from '../components/SyroSectionTitle';
 
 export const metadata: Metadata = {
-  title: 'Photo Gallery | Syro-Malabar Church',
-  description: 'Photo gallery of significant events, ecumenical visits, and ceremonies of the Syro-Malabar Church.',
-  keywords: ['Syro-Malabar Gallery', 'Photo Gallery', 'Church Events', 'Ecumenical Visits', 'Orthodox Church'],
+  title: 'Photo Gallery | Malankara Orthodox Syrian Church',
+  description: 'Photo gallery of significant events, ecumenical visits, and ceremonies of the Malankara Orthodox Syrian Church.',
+  keywords: ['MOSC Gallery', 'Photo Gallery', 'Church Events', 'Ecumenical Visits', 'Orthodox Church'],
 };
 
 export default function GalleryPage() {
@@ -248,66 +251,18 @@ export default function GalleryPage() {
   const categories = ['All', 'Major Events', 'Ecumenical Visits', 'Special Events', 'Private Audiences', 'Receptions', 'Liturgical Events', 'Church Visits', 'Conferences'];
 
   return (
-    <div className="min-h-screen bg-syro-bg-gray" data-testid="syro-gallery-page">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-white to-syro-light-gray py-16 lg:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="flex items-center justify-center space-x-3 mb-6">
-              <div className="w-12 h-12 bg-syro-red rounded-full flex items-center justify-center shadow-syro-card">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
-            </div>
-            <h1 className="font-syro-display font-semibold text-syro-h1 text-syro-blue mb-4">
-              Photo Gallery
-            </h1>
-            <p className="font-syro-body text-lg lg:text-xl text-syro-text-gray max-w-3xl mx-auto">
-              Commemorating significant moments in the life of our church through ecumenical visits, major ceremonies, and special events.
-            </p>
-          </div>
-        </div>
-      </section>
+    <div className="bg-syro-bg-gray" data-testid="mosc-gallery-page">
+      <SyroPageHero
+        title="Photo Gallery"
+        description="Commemorating significant moments in the life of our church through ecumenical visits, major ceremonies, and special events."
+      />
 
-      {/* Stats Section */}
-      <section className="py-12 bg-white border-y border-syro-border">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="font-syro-display font-bold text-4xl text-syro-red mb-2">{albums.length}</div>
-              <div className="font-syro-body text-sm text-syro-text-gray">Photo Albums</div>
-            </div>
-            <div className="text-center">
-              <div className="font-syro-display font-bold text-4xl text-syro-red mb-2">{albums.reduce((sum, album) => sum + album.photoCount, 0)}+</div>
-              <div className="font-syro-body text-sm text-syro-text-gray">Photographs</div>
-            </div>
-            <div className="text-center">
-              <div className="font-syro-display font-bold text-4xl text-syro-red mb-2">10+</div>
-              <div className="font-syro-body text-sm text-syro-text-gray">Years Documented</div>
-            </div>
-            <div className="text-center">
-              <div className="font-syro-display font-bold text-4xl text-syro-red mb-2">15+</div>
-              <div className="font-syro-body text-sm text-syro-text-gray">Countries Visited</div>
-            </div>
-          </div>
-        </div>
-      </section>
+          <SyroSectionTitle>Browse Albums</SyroSectionTitle>
 
-      {/* Albums Grid */}
-      <section className="py-16 bg-syro-light-gray">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
-            <h2 className="font-syro-display font-semibold text-syro-h2 text-syro-blue mb-4">
-              Browse Albums
-            </h2>
-            <p className="font-syro-body text-syro-text-gray">
-              Explore our collection of memorable moments and significant events
-            </p>
-          </div>
-
-          {/* Grid Container with Conservative Gradient Background */}
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white via-syro-light-gray to-white border border-syro-border/30 shadow-syro-card-lg">
+          {/* Grid */}
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-syro-bg-gray via-white to-syro-bg-gray border border-syro-table-border/30 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] mb-12">
             {/* Subtle Radial Gradient Overlay */}
             <div className="absolute inset-0 pointer-events-none opacity-40" style={{ backgroundImage: 'radial-gradient(circle at top left, rgba(139, 125, 107, 0.08), transparent 55%)' }} />
 
@@ -328,7 +283,7 @@ export default function GalleryPage() {
               <Link
                 key={album.id}
                 href={`/syro/gallery/${album.id}`}
-                className="group bg-white rounded-[5px] shadow-syro-card hover:shadow-syro-card-lg transition-all duration-300 overflow-hidden block"
+                className="group bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 overflow-hidden block"
               >
                 <div className="relative w-full h-48 overflow-hidden">
                   {/* Album Image */}
@@ -337,7 +292,7 @@ export default function GalleryPage() {
                       src={album.imageUrl}
                       alt={album.title}
                       fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="object-cover group-hover:scale-105 transition-all duration-300"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                   ) : (
@@ -354,23 +309,23 @@ export default function GalleryPage() {
                       </svg>
                     </div>
                   )}
-                  <div className="absolute top-3 right-3 bg-syro-red text-white px-3 py-1 rounded-full text-xs font-syro-body font-medium shadow-md">
+                  <div className="absolute top-3 right-3 bg-syro-red text-syro-red-foreground px-3 py-1 rounded-full text-xs font-syro-primary font-medium shadow-md">
                     {album.photoCount} photos
                   </div>
                 </div>
                 <div className="p-6">
                   <div className="mb-3">
-                    <span className="inline-block px-3 py-1 bg-syro-red/10 text-syro-red text-xs font-syro-body font-medium rounded-full">
+                    <span className="inline-block px-3 py-1 bg-syro-red/10 text-syro-red text-xs font-syro-primary font-medium rounded-full">
                       {album.category}
                     </span>
                   </div>
-                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mb-2 line-clamp-2 group-hover:text-syro-red transition-colors duration-300">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mb-2 line-clamp-2 group-hover:text-syro-red transition-all duration-300">
                     {album.title}
                   </h3>
-                  <p className="font-syro-body text-sm text-syro-text-gray mb-4">
+                  <p className="font-syro-primary text-sm text-syro-dark-gray mb-4">
                     {album.date}
                   </p>
-                  <div className="flex items-center font-syro-body text-syro-red text-sm font-medium">
+                  <div className="flex items-center font-syro-primary text-syro-red text-sm font-medium">
                     <span>View Album</span>
                     <svg className="w-4 h-4 ml-1 group-hover:ml-2 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -383,25 +338,11 @@ export default function GalleryPage() {
               </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Note Section */}
-      <section className="py-12 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="bg-syro-red/5 rounded-[5px] p-8 border-l-4 border-syro-red">
-            <svg className="w-12 h-12 text-syro-red mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-3">
-              Photo Gallery Archive
-            </h3>
-            <p className="font-syro-body text-syro-text-gray leading-relaxed">
-              This gallery showcases significant events in the life of our church, including ecumenical visits, major ceremonies, and special occasions. Each album captures precious moments of fellowship, worship, and service that define our Orthodox Christian journey.
-            </p>
-          </div>
+          <QuickLinks />
         </div>
       </section>
     </div>
   );
 }
+
