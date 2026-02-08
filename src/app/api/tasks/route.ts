@@ -7,11 +7,6 @@ import { getAppUrl } from '@/lib/env';
 // Force Node.js runtime
 export const runtime = 'nodejs';
 
-const API_BASE_URL = getAppUrl();
-if (!API_BASE_URL) {
-  throw new Error('API base URL not configured');
-}
-
 // Validation schema for task creation and update
 const createTaskSchema = z.object({
   title: z.string().min(1, 'Title is required').max(100),
@@ -232,6 +227,10 @@ function applyFilters(tasks: UserTaskDTO[], searchParams: URLSearchParams): User
 }
 
 export async function GET(request: NextRequest, context?: { params?: { id?: string } }) {
+  const API_BASE_URL = getAppUrl();
+  if (!API_BASE_URL) {
+    return NextResponse.json({ error: 'API base URL not configured' }, { status: 503 });
+  }
   try {
     const userId = getUserId();
     // If context and params.id is present, fetch a single task
@@ -266,6 +265,10 @@ export async function GET(request: NextRequest, context?: { params?: { id?: stri
 }
 
 export async function POST(request: NextRequest) {
+  const API_BASE_URL = getAppUrl();
+  if (!API_BASE_URL) {
+    return NextResponse.json({ error: 'API base URL not configured' }, { status: 503 });
+  }
   try {
     const userId = getUserId();
     const body = await request.json();
@@ -310,6 +313,10 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
+  const API_BASE_URL = getAppUrl();
+  if (!API_BASE_URL) {
+    return NextResponse.json({ error: 'API base URL not configured' }, { status: 503 });
+  }
   try {
     const userId = getUserId();
     const body = await request.json();
@@ -383,6 +390,10 @@ export async function PUT(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const API_BASE_URL = getAppUrl();
+  if (!API_BASE_URL) {
+    return NextResponse.json({ error: 'API base URL not configured' }, { status: 503 });
+  }
   try {
     const userId = getUserId();
     const { id } = await request.json();

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { ExecutiveCommitteeTeamMemberDTO } from '@/types';
-import { getAppUrl } from '@/lib/env';
+import { getAppUrl, getTenantId } from '@/lib/env';
 import styles from './TeamSection.module.css';
 
 const TeamSection: React.FC = () => {
@@ -38,8 +38,9 @@ const TeamSection: React.FC = () => {
 
       try {
         const baseUrl = getAppUrl();
+        const tenantId = getTenantId();
         const response = await fetch(
-          `${baseUrl}/api/proxy/executive-committee-team-members?isActive.equals=true&sort=priorityOrder,asc`,
+          `${baseUrl}/api/proxy/executive-committee-team-members?tenantId.equals=${encodeURIComponent(tenantId)}&isActive.equals=true&sort=priorityOrder,asc`,
           {
             method: 'GET',
             headers: {

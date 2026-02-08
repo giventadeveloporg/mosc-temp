@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import AppIcon from './AppIcon';
 
 const AboutOurChurchSection = () => {
   const router = useRouter();
@@ -12,9 +12,9 @@ const AboutOurChurchSection = () => {
     { label: 'ADMINISTRATION', href: '/syro/administration', icon: 'Building', isInternal: true },
     { label: 'THE CHURCH', href: '/syro/the-church', icon: 'Church', isInternal: true },
     { label: 'HOLY SYNOD', href: '/syro/holy-synod', icon: 'Users', isInternal: true },
-    { label: 'ECUMENICAL', href: '/syro/ecumenical', icon: 'Handshake', isInternal: true },
+    { label: 'ECUMENICAL', href: '/syro/ecumenical', icon: 'Globe', isInternal: true },
     { label: 'DIOCESES', href: '/syro/dioceses', icon: 'MapPin', isInternal: true },
-    { label: 'SAINTS', href: '/syro/saints', icon: 'Cross', isInternal: true },
+    { label: 'SAINTS', href: '/syro/saints', icon: 'Star', isInternal: true }
   ];
 
   const quickLinks = [
@@ -30,104 +30,183 @@ const AboutOurChurchSection = () => {
     { label: 'Gallery', href: '/syro/gallery', icon: 'Image', isInternal: true }
   ];
 
-  const handleLinkClick = (link: any) => {
+  const specialLinks = [
+    { label: 'SITEMAP', href: '/syro/sitemap', icon: 'Map' },
+    { label: 'APPS', href: '/syro/apps', icon: 'Smartphone', external: true }
+  ];
+
+  const handleLinkClick = (link: { href: string; label?: string; external?: boolean; isInternal?: boolean }) => {
     if (link.external) {
       window.open(link.href, '_blank', 'noopener,noreferrer');
     } else if (link.isInternal) {
       router.push(link.href);
-    }
-  };
-
-  const getIconSVG = (iconName: string) => {
-    switch (iconName) {
-      case 'Crown':
-        return (
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-        );
-      case 'Building':
-        return (
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-        );
-      case 'Church':
-        return (
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-        );
-      case 'Users':
-        return (
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-        );
-      case 'MapPin':
-        return (
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-        );
-      case 'Handshake':
-        return (
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-        );
-      case 'Cross':
-        return (
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2v20M2 12h20" />
-        );
-      default:
-        return (
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-        );
+    } else {
+      alert(`This will navigate to: ${link.href}`);
     }
   };
 
   return (
-    <section className="py-16 bg-syro-bg-gray">
+    <section className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h2 className="text-syro-h3 font-bold text-syro-blue mb-4">
-            Explore Our Church
-          </h2>
-          <p className="text-syro-body text-syro-text-gray max-w-3xl mx-auto">
-            Discover the rich history, spiritual resources, and community services of the Syro-Malabar Church.
+          <div className="flex items-center justify-center space-x-3 mb-6">
+            <div className="w-12 h-12 bg-syro-red rounded-full flex items-center justify-center shadow-syro-card">
+              <AppIcon name="Church" size={24} color="white" />
+            </div>
+            <h2 className="font-syro-display font-semibold text-syro-h3 text-syro-blue">
+              About Our Church
+            </h2>
+          </div>
+          <p className="font-syro-primary text-syro-body text-syro-dark-gray max-w-3xl mx-auto">
+            Explore the rich heritage, administration, and spiritual resources of the Malankara Orthodox Syrian Church.
           </p>
         </div>
 
-        {/* Main Navigation Links */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-12">
-          {mainNavigationLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={(e) => {
-                e.preventDefault();
-                handleLinkClick(link);
-              }}
-              className="bg-white p-6 rounded-[5px] shadow-syro-card hover:shadow-syro-card-hover transition-all duration-500 text-center group"
-            >
-              <div className="w-14 h-14 bg-syro-blue-secondary rounded-[5px] flex items-center justify-center mx-auto mb-4 text-white">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  {getIconSVG(link.icon)}
-                </svg>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-lg shadow-syro-card p-8">
+              <div className="flex items-center space-x-3 mb-6">
+                <div className="w-8 h-8 bg-syro-blue rounded-full flex items-center justify-center">
+                  <AppIcon name="Menu" size={16} color="white" />
+                </div>
+                <h3 className="font-syro-display font-semibold text-xl text-syro-blue">
+                  Church Administration & Structure
+                </h3>
               </div>
-              <h3 className="text-syro-h6 font-semibold text-syro-blue group-hover:text-syro-red transition-colors">
-                {link.label}
-              </h3>
-            </Link>
-          ))}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {mainNavigationLinks.map((link, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleLinkClick(link)}
+                    className="flex items-center space-x-3 p-4 rounded-lg border border-syro-table-border hover:border-syro-red hover:bg-syro-bg-gray/20 transition-all duration-300 group"
+                  >
+                    <div className="w-10 h-10 bg-syro-red/10 rounded-full flex items-center justify-center group-hover:bg-syro-red/20 transition-all duration-300">
+                      <AppIcon name={link.icon} size={18} className="text-syro-red" />
+                    </div>
+                    <div className="text-left">
+                      <span className="font-syro-primary font-medium text-syro-blue group-hover:text-syro-red transition-all duration-300">
+                        {link.label}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:col-span-1">
+            <div className="space-y-6">
+              <div className="bg-white rounded-lg shadow-syro-card p-6">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="w-8 h-8 bg-syro-maroon rounded-full flex items-center justify-center">
+                    <AppIcon name="ExternalLink" size={16} color="white" />
+                  </div>
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue">Quick Access</h3>
+                </div>
+                <div className="space-y-2">
+                  {specialLinks.map((link, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleLinkClick(link)}
+                      className="w-full flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-syro-primary font-medium text-syro-blue hover:text-syro-red hover:bg-syro-bg-gray/50 transition-all duration-300"
+                    >
+                      <AppIcon name={link.icon} size={16} className="text-syro-medium-gray" />
+                      <span>{link.label}</span>
+                      {link.external && (
+                        <AppIcon name="ExternalLink" size={12} className="text-syro-medium-gray ml-auto" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-syro-card p-6">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="w-8 h-8 bg-syro-success rounded-full flex items-center justify-center">
+                    <AppIcon name="FileText" size={16} color="white" />
+                  </div>
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue">KALPANA</h3>
+                </div>
+                <p className="font-syro-primary text-syro-small text-syro-dark-gray mb-4">Read latest Kalpana.</p>
+                <button
+                  onClick={() => handleLinkClick({ href: '/syro/downloads/kalpana', label: 'DOWNLOAD', isInternal: true })}
+                  className="w-full syro-primary-button"
+                >
+                  DOWNLOAD
+                </button>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-syro-card p-6">
+                <div className="space-y-3">
+                  <button
+                    onClick={() => handleLinkClick({ href: '/syro/pilgrim-centres', label: 'PILGRIM CENTRES', isInternal: true })}
+                    className="w-full bg-syro-warning text-white rounded-md py-2 px-4 text-sm font-syro-primary font-medium hover:opacity-90 transition-all duration-300"
+                  >
+                    PILGRIM CENTRES
+                  </button>
+                  <button
+                    onClick={() => handleLinkClick({ href: '/syro/publications/malankara-sabha-magazine-masika', label: 'MALANKARA SABHA MAGAZINE', isInternal: true })}
+                    className="w-full bg-syro-warning text-white rounded-md py-2 px-4 text-sm font-syro-primary font-medium hover:opacity-90 transition-all duration-300"
+                  >
+                    MALANKARA SABHA MAGAZINE
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Quick Links */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-          {quickLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={(e) => {
-                e.preventDefault();
-                handleLinkClick(link);
-              }}
-              className="bg-white p-4 rounded-[5px] shadow-syro-card hover:shadow-syro-card-hover transition-all duration-500 text-center group"
-            >
-              <h4 className="text-syro-small font-medium text-syro-blue group-hover:text-syro-red transition-colors">
-                {link.label}
-              </h4>
-            </Link>
-          ))}
+        <div className="mt-12">
+          <div className="bg-white rounded-lg shadow-syro-card p-8">
+            <div className="flex items-center space-x-3 mb-6">
+              <div className="w-8 h-8 bg-syro-red rounded-full flex items-center justify-center">
+                <AppIcon name="Link" size={16} color="white" />
+              </div>
+              <h3 className="font-syro-display font-semibold text-xl text-syro-blue">Resources & Services</h3>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              {quickLinks.map((link, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleLinkClick(link)}
+                  className="flex flex-col items-center space-y-2 p-4 rounded-lg border border-syro-table-border hover:border-syro-red hover:bg-syro-bg-gray/20 transition-all duration-300 group cursor-pointer"
+                >
+                  <div className="w-12 h-12 bg-syro-red/10 rounded-full flex items-center justify-center group-hover:bg-syro-red/20 transition-all duration-300">
+                    <AppIcon name={link.icon} size={20} className="text-syro-red" />
+                  </div>
+                  <span className="font-syro-primary text-xs font-medium text-syro-blue group-hover:text-syro-red transition-all duration-300 text-center leading-tight">
+                    {link.label}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-12">
+          <div className="bg-syro-bg-gray/20 rounded-lg p-6">
+            <div className="flex flex-wrap items-center justify-center gap-4 text-sm font-syro-primary text-syro-dark-gray">
+              <button onClick={() => handleLinkClick({ href: 'https://catholicatenews.in/', label: 'CATHOLICATE NEWS', external: true })} className="hover:text-syro-red transition-all duration-300">
+                CATHOLICATE NEWS
+              </button>
+              <span>•</span>
+              <button onClick={() => handleLinkClick({ href: '/syro/downloads', label: 'DOWNLOADS', isInternal: true })} className="hover:text-syro-red transition-all duration-300">
+                DOWNLOADS
+              </button>
+              <span>•</span>
+              <button onClick={() => handleLinkClick({ href: '/syro/contact-form-email', label: 'E-MAIL', isInternal: true })} className="hover:text-syro-red transition-all duration-300">
+                E-MAIL
+              </button>
+              <span>•</span>
+              <button onClick={() => handleLinkClick({ href: '/syro/gallery', label: 'GALLERY', isInternal: true })} className="hover:text-syro-red transition-all duration-300">
+                GALLERY
+              </button>
+              <span>•</span>
+              <button onClick={() => handleLinkClick({ href: '/syro/contact-info', label: 'CONTACT INFO', isInternal: true })} className="hover:text-syro-red transition-all duration-300">
+                CONTACT INFO
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </section>

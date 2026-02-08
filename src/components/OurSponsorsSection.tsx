@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import type { EventSponsorsDTO } from "@/types";
-import { getAppUrl } from '@/lib/env';
+import { getAppUrl, getTenantId } from '@/lib/env';
 import { SponsorCard } from '@/components/sponsors/SponsorCard';
 
 const OurSponsorsSection: React.FC = () => {
@@ -55,15 +55,17 @@ const OurSponsorsSection: React.FC = () => {
       setLoading(true);
       setFetchError(false);
       try {
-        // Fetch sponsors sorted by priority ranking (ascending = highest priority first)
+        // Fetch sponsors sorted by priority ranking (ascending = highest priority first), tenant-scoped
+        const baseUrl = getAppUrl();
+        const tenantId = getTenantId();
         const params = new URLSearchParams({
+          'tenantId.equals': tenantId,
           sort: 'priorityRanking,asc',
           page: '0',
           size: '15', // Maximum 15 sponsors
           'isActive.equals': 'true' // Only active sponsors
         });
 
-        const baseUrl = getAppUrl();
         const response = await fetch(`${baseUrl}/api/proxy/event-sponsors?${params.toString()}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },

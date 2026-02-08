@@ -6,7 +6,7 @@ import Link from 'next/link';
 import type { EventWithMedia } from '@/types';
 import { useFilteredEvents } from '@/hooks/useFilteredEvents';
 import { isRecurringEvent, getNextOccurrenceDate } from '@/lib/eventUtils';
-import { isTicketedFundraiserEvent } from '@/lib/donation/utils';
+import { getOverlayInfo } from '@/lib/heroOverlay';
 import { ArrowRight, Heart, Play, Pause, ChevronLeft, ChevronRight } from 'lucide-react';
 import GivebutterDonateButton from '@/components/GivebutterDonateButton';
 
@@ -496,7 +496,7 @@ const DynamicHeroImage: React.FC<{
 
   return (
     <div
-      className="relative w-full h-full"
+      className="relative w-full h-full flex items-center justify-center"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onTouchStart={handleTouchStart}
@@ -504,10 +504,16 @@ const DynamicHeroImage: React.FC<{
       <Image
         src={currentImage}
         alt="Featured Event"
-        fill
-        className={`object-contain hero-image-transition ${isTransitioning ? 'transitioning' : ''}`}
-        sizes="100vw"
+        width={1200}
+        height={800}
+        className={`w-full h-auto object-contain hero-image-transition ${isTransitioning ? 'transitioning' : ''}`}
+        sizes="(max-width: 768px) 100vw, 65vw"
         priority
+        style={{
+          backgroundColor: 'transparent',
+          borderRadius: '1rem',
+          maxHeight: '100%'
+        }}
       />
 
       {/* Slider Controls - Show on hover or touch */}
@@ -578,102 +584,60 @@ const HeroSection: React.FC = () => {
   const [currentEvent, setCurrentEvent] = useState<EventWithMediaExtended | null>(null);
 
   // Determine overlay image and route based on event type (matching events page logic)
-  const getOverlayInfo = (event: EventWithMediaExtended | null) => {
-    if (!event || !event.id) return null;
-
-    // Check if event is upcoming (today or future)
-    const today = new Date();
-    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-    const eventDateStr = event.startDate ? event.startDate.split('T')[0] : null;
-
-    if (!eventDateStr) return null;
-
-    const isToday = eventDateStr === todayStr;
-    const isFuture = eventDateStr > todayStr;
-    const isUpcomingLocal = isToday || isFuture;
-
-    if (!isUpcomingLocal) return null; // Don't show overlay for past events
-
-    // Check if event is ticketed fundraiser/charity (shows special fundraiser image)
-    const isTicketedFundraiser = isTicketedFundraiserEvent(event);
-
-    if (isTicketedFundraiser) {
-      return {
-        image: '/images/buy_tickets_click_here_fundraiser.png',
-        href: `/events/${event.id}/givebutter-checkout`,
-        alt: 'Buy Tickets'
-      };
-    }
-
-    // Check if event is regular ticketed event
-    if (event.admissionType?.toUpperCase() === 'TICKETED') {
-      // Route to manual checkout if manual payment is enabled, otherwise Stripe checkout
-      const checkoutRoute =
-        event.manualPaymentEnabled === true &&
-          (event.paymentFlowMode === 'MANUAL_ONLY' || event.paymentFlowMode === 'HYBRID')
-          ? `/events/${event.id}/manual-checkout`
-          : `/events/${event.id}/checkout`;
-
-      return {
-        image: '/images/buy_tickets_click_here_red.webp',
-        href: checkoutRoute,
-        alt: 'Buy Tickets'
-      };
-    }
-
-    return null;
-  };
-
   const overlayInfo = getOverlayInfo(currentEvent);
 
   return (
     <section className="hero-container-split">
       {/* === TOP ROW: Two-Column Hero Layout === */}
       <div className="hero-split-row">
-        {/* LEFT PANEL (Section 1): Static Kerala Image - Text/Logo already embedded */}
+        {/* LEFT PANEL (Section 1): Static Kerala Image - Full visibility, elegant frame */}
         <div className="hero-left-panel">
-          {/* Background Image - Kerala Backwaters with embedded branding */}
+          {/* Image container - object-contain for full image visibility */}
           <div className="hero-left-image">
             <Image
               src="/images/hero_section/wooden-boat-under-coconut-tree-riverside_ver_2.jpeg"
               alt="Malayalees.US - Kerala Backwaters"
-              fill
-              className="object-contain"
+              width={600}
+              height={800}
+              className="w-full h-auto object-contain"
               sizes="(max-width: 768px) 100vw, 35vw"
               priority
+              style={{
+                backgroundColor: 'transparent',
+                borderRadius: '1rem'
+              }}
             />
           </div>
-          {/* Right edge fade overlay for seamless blend */}
-          <div className="hero-left-fade-right" />
         </div>
 
-        {/* RIGHT PANEL (Section 2): Dynamic Slideshow - Functionality Unchanged */}
+        {/* RIGHT PANEL (Section 2): Dynamic Slideshow - Full image visibility */}
         <div className="hero-right-panel">
-          {/* Left edge fade overlay for seamless blend with Section 1 */}
-          <div className="hero-right-fade-left" />
           <div className="hero-slideshow-wrapper">
             <DynamicHeroImage onEventChange={setCurrentEvent} />
-
-            {/* Buy Tickets Overlay Image - Bottom Right Corner */}
-            {overlayInfo && (
-              <div className="absolute bottom-4 right-4 z-10">
-                <Link
-                  href={overlayInfo.href}
-                  className="block cursor-pointer hover:scale-105 transition-transform duration-300"
-                  onClick={(e) => e.stopPropagation()}
-                  title={overlayInfo.alt}
-                  aria-label={overlayInfo.alt}
-                >
-                  <img
-                    src={overlayInfo.image}
-                    alt={overlayInfo.alt}
-                    className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px] cursor-pointer hover:scale-105 transition-transform duration-300"
-                  />
-                </Link>
-              </div>
-            )}
           </div>
+
+          {/* Buy Tickets Overlay Image - Bottom Right Corner of Section 2 */}
+          {overlayInfo && (
+            <div className="hero-ticket-overlay">
+              <Link
+                href={overlayInfo.href}
+                className="block cursor-pointer hover:scale-110 transition-transform duration-300 drop-shadow-lg"
+                onClick={(e) => e.stopPropagation()}
+                title={overlayInfo.alt}
+                aria-label={overlayInfo.alt}
+              >
+                <img
+                  src={overlayInfo.image}
+                  alt={overlayInfo.alt}
+                  className="object-contain w-[140px] h-[48px] sm:w-[180px] sm:h-[62px] md:w-[200px] md:h-[70px]"
+                />
+              </Link>
+            </div>
+          )}
         </div>
+
+        {/* Elegant vertical divider between sections */}
+        <div className="hero-split-divider" />
       </div>
 
       {/* === BOTTOM ROW: Two Cards (Section 3 & 4) === */}

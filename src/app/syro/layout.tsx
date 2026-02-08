@@ -1,5 +1,6 @@
 import React from 'react';
 import { Metadata } from 'next';
+import { headers } from 'next/headers';
 import SyroHeader from './components/SyroHeader';
 import SyroFooter from './components/SyroFooter';
 import NavigationBreadcrumb from './components/NavigationBreadcrumb';
@@ -24,7 +25,16 @@ interface SyroLayoutProps {
   children: React.ReactNode;
 }
 
-export default function SyroLayout({ children }: SyroLayoutProps) {
+export default async function SyroLayout({ children }: SyroLayoutProps) {
+  const headersList = await headers();
+  const pathname = headersList.get('x-pathname') || '';
+  const isSyroLanding = pathname === '/syro' || pathname === '/syro/';
+
+  // Landing page: static HTML has its own header/footer; render only the iframe (children)
+  if (isSyroLanding) {
+    return <>{children}</>;
+  }
+
   return (
     <div className="syro-layout min-h-screen bg-syro-bg-gray flex flex-col font-syro-primary">
       <SyroHeader />

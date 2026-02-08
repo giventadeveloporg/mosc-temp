@@ -69,10 +69,28 @@
   font-size: 0.9375rem;
   letter-spacing: 0.01em;
   color: var(--header-text-secondary);
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0.75rem;
   border-radius: 0.5rem;
   position: relative;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Ensure consistent height and alignment */
+  display: inline-flex;
+  align-items: center;
+  height: 2.25rem;
+  white-space: nowrap;
+}
+
+/* Responsive padding for navigation links */
+@media (min-width: 1024px) {
+  .header-nav-link {
+    padding: 0.5rem 0.875rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .header-nav-link {
+    padding: 0.5rem 1rem;
+  }
 }
 
 .header-nav-link::after {
@@ -307,6 +325,24 @@
   transform: rotate(180deg);
 }
 
+/* Navigation container alignment fix */
+nav[role="navigation"] {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+nav[role="navigation"] > .relative {
+  display: flex;
+  align-items: center;
+}
+
+/* Ensure dropdown triggers align with regular links */
+nav[role="navigation"] .group {
+  display: flex;
+  align-items: center;
+}
+
 /* ========================================
    HERO SECTION DESIGN SYSTEM - Split Layout
    ======================================== */
@@ -330,7 +366,8 @@
 }
 
 /* ========================================
-   NEW SPLIT HERO LAYOUT
+   NEW SPLIT HERO LAYOUT - Editorial Refined
+   Image Containment: Full visibility, no cropping
    ======================================== */
 
 /* Split Hero Container */
@@ -338,6 +375,7 @@
   position: relative;
   background: var(--hero-bg-gradient);
   padding-top: 5rem;
+  width: 100%;
 }
 
 @media (min-width: 768px) {
@@ -348,188 +386,290 @@
 
 /* Top Row: Two-column layout */
 .hero-split-row {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
-  min-height: 400px;
+  min-height: auto;
+  margin: 0;
+  padding: 0;
+  gap: 0;
 }
 
 @media (min-width: 768px) {
   .hero-split-row {
     flex-direction: row;
-    min-height: 500px;
+    align-items: stretch;
   }
 }
 
-@media (min-width: 1024px) {
-  .hero-split-row {
-    min-height: 580px;
-  }
-}
-
-/* LEFT PANEL - Section 1: Static Kerala Image */
+/* ===========================================
+   LEFT PANEL - Section 1: Kerala Image
+   Full image visibility with elegant frame
+   =========================================== */
 .hero-left-panel {
   position: relative;
   width: 100%;
-  min-height: 350px;
-  overflow: visible;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--hero-bg-primary);
+  padding: 1rem;
+  background: transparent;
 }
 
 @media (min-width: 768px) {
   .hero-left-panel {
     width: 35%;
-    min-height: auto;
+    padding: 1.5rem 0.75rem 1.5rem 1.5rem;
   }
 }
 
 @media (min-width: 1024px) {
   .hero-left-panel {
     width: 32%;
+    padding: 2rem 1rem 2rem 2rem;
   }
 }
 
+/* Image container - allows full image visibility with padding */
 .hero-left-image {
-  position: absolute;
-  inset: 0;
+  position: relative;
+  width: 100%;
+  height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.hero-left-image img {
-  object-position: center center !important;
-}
-
-/* Right edge fade - creates seamless blend from Section 1 to Section 2 */
-.hero-left-fade-right {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: -2px;
-  width: 80px;
-  z-index: 5;
-  pointer-events: none;
-  /* Jagged/organic fade effect using multiple gradients */
-  background:
-    linear-gradient(to right,
-      transparent 0%,
-      rgba(26, 10, 46, 0.05) 20%,
-      rgba(26, 10, 46, 0.15) 40%,
-      rgba(26, 10, 46, 0.35) 60%,
-      rgba(26, 10, 46, 0.6) 75%,
-      rgba(26, 10, 46, 0.85) 90%,
-      var(--hero-bg-primary) 100%
-    );
-  /* Add slight noise texture for organic feel */
-  mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"),
-    linear-gradient(to right, transparent 0%, black 100%);
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"),
-    linear-gradient(to right, transparent 0%, black 100%);
-  mask-composite: intersect;
-  -webkit-mask-composite: source-in;
+  /* Internal padding so image doesn't touch edges */
+  padding: 0.75rem;
+  /* Elegant frame effect */
+  border-radius: 1.25rem;
+  overflow: hidden;
+  /* Subtle ambient glow */
+  box-shadow:
+    0 0 60px rgba(245, 158, 11, 0.08),
+    0 0 30px rgba(255, 255, 255, 0.03),
+    0 12px 40px rgba(0, 0, 0, 0.35),
+    inset 0 0 30px rgba(0, 0, 0, 0.15);
+  /* Soft border blend */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(145deg, rgba(45, 27, 78, 0.5), rgba(26, 10, 46, 0.7));
 }
 
 @media (min-width: 768px) {
-  .hero-left-fade-right {
-    width: 120px;
+  .hero-left-image {
+    padding: 1rem;
   }
 }
 
-@media (min-width: 1024px) {
-  .hero-left-fade-right {
-    width: 150px;
-  }
+/* Ensure Next.js Image uses object-contain */
+.hero-left-image img {
+  object-fit: contain !important;
+  object-position: center center !important;
+  width: 100% !important;
+  height: auto !important;
+  border-radius: 0.75rem;
 }
 
-/* RIGHT PANEL - Section 2: Dynamic Slideshow */
+/* Decorative corner accents - subtle highlight on top edge */
+.hero-left-image::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  border-radius: 1px;
+  pointer-events: none;
+  z-index: 2;
+  background: linear-gradient(to right,
+    transparent,
+    rgba(255, 255, 255, 0.15),
+    transparent
+  );
+}
+
+/* Bottom fade elements - REMOVED (no longer needed) */
+.hero-left-fade-bottom {
+  display: none;
+}
+
+/* Right edge transition - gentle blend to section 2 */
+.hero-left-fade-right {
+  display: none;
+}
+
+/* ===========================================
+   RIGHT PANEL - Section 2: Dynamic Slideshow
+   Full image visibility with padding
+   =========================================== */
 .hero-right-panel {
   position: relative;
   width: 100%;
   flex: 1;
-  min-height: 300px;
-  background: var(--hero-bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: transparent;
 }
 
 @media (min-width: 768px) {
   .hero-right-panel {
     width: 65%;
-    min-height: auto;
+    padding: 1.5rem 1.5rem 1.5rem 0.75rem;
   }
 }
 
 @media (min-width: 1024px) {
   .hero-right-panel {
     width: 68%;
+    padding: 2rem 2rem 2rem 1rem;
   }
 }
 
-/* Left edge fade - creates seamless blend from Section 2 to Section 1 */
+/* Left edge transition - REMOVED (clean separation) */
 .hero-right-fade-left {
+  display: none;
+}
+
+/* Buy Tickets Overlay - Bottom right corner of Section 2 */
+.hero-ticket-overlay {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: -2px;
-  width: 80px;
-  z-index: 10;
-  pointer-events: none;
-  /* Jagged/organic fade effect - mirror of right fade */
-  background:
-    linear-gradient(to left,
-      transparent 0%,
-      rgba(26, 10, 46, 0.05) 20%,
-      rgba(26, 10, 46, 0.15) 40%,
-      rgba(26, 10, 46, 0.35) 60%,
-      rgba(26, 10, 46, 0.6) 75%,
-      rgba(26, 10, 46, 0.85) 90%,
-      var(--hero-bg-primary) 100%
-    );
-  /* Add slight noise texture for organic feel */
-  mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"),
-    linear-gradient(to left, transparent 0%, black 100%);
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"),
-    linear-gradient(to left, transparent 0%, black 100%);
-  mask-composite: intersect;
-  -webkit-mask-composite: source-in;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 30;
+  /* Subtle backdrop for visibility */
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
 }
 
 @media (min-width: 768px) {
-  .hero-right-fade-left {
-    width: 120px;
+  .hero-ticket-overlay {
+    bottom: 2rem;
+    right: 2rem;
   }
 }
 
 @media (min-width: 1024px) {
-  .hero-right-fade-left {
-    width: 150px;
+  .hero-ticket-overlay {
+    bottom: 2.5rem;
+    right: 2.5rem;
   }
 }
 
+/* Slideshow wrapper - clean container for full image visibility */
 .hero-slideshow-wrapper {
   position: relative;
   width: 100%;
-  height: 100%;
-  margin-left: 0;
-  margin-right: 1rem;
-  border-radius: 0;
+  height: auto;
+  min-height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Internal padding so images have breathing room */
+  padding: 0.75rem;
+  border-radius: 1.25rem;
   overflow: hidden;
-  background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 50%, #1a0a2e 100%);
+  /* Matching elegant frame with depth */
+  box-shadow:
+    0 0 60px rgba(245, 158, 11, 0.06),
+    0 0 30px rgba(255, 255, 255, 0.02),
+    0 12px 40px rgba(0, 0, 0, 0.35),
+    inset 0 0 30px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(145deg, rgba(45, 27, 78, 0.5), rgba(26, 10, 46, 0.7));
 }
 
 @media (min-width: 768px) {
   .hero-slideshow-wrapper {
-    margin-right: 1rem;
-    border-radius: 0 1rem 1rem 0;
+    min-height: 380px;
+    padding: 1rem;
   }
 }
 
 @media (min-width: 1024px) {
   .hero-slideshow-wrapper {
-    margin-right: 1.5rem;
-    border-radius: 0 1.25rem 1.25rem 0;
+    min-height: 480px;
+    padding: 1.25rem;
+  }
+}
+
+/* Subtle highlight on top edge of slideshow frame */
+.hero-slideshow-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  border-radius: 1px;
+  pointer-events: none;
+  z-index: 2;
+  background: linear-gradient(to right,
+    transparent,
+    rgba(255, 255, 255, 0.12),
+    transparent
+  );
+}
+
+/* Slideshow inner container - centers the image */
+.hero-slideshow-wrapper > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* Ensure images inside slideshow use contain */
+.hero-slideshow-wrapper img {
+  object-fit: contain !important;
+  width: 100% !important;
+  height: auto !important;
+  max-height: 100% !important;
+  border-radius: 0.75rem;
+}
+
+/* Right edge fade - REMOVED */
+.hero-slideshow-fade-right {
+  display: none;
+}
+
+/* Bottom edge fade - REMOVED */
+.hero-slideshow-fade-bottom {
+  display: none;
+}
+
+/* ===========================================
+   DIVIDER - Elegant vertical separator
+   =========================================== */
+.hero-split-divider {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .hero-split-divider {
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 35%;
+    transform: translate(-50%, -50%);
+    width: 1px;
+    height: 60%;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(245, 158, 11, 0.2) 20%,
+      rgba(245, 158, 11, 0.3) 50%,
+      rgba(245, 158, 11, 0.2) 80%,
+      transparent 100%
+    );
+    z-index: 10;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-split-divider {
+    left: 32%;
   }
 }
 
@@ -585,35 +725,41 @@
 /* Section 3: Mission Card */
 .hero-bottom-card-mission {
   cursor: pointer;
-  display: block;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 }
 
 .hero-mission-bg {
   position: absolute;
   inset: 0;
+  z-index: 0;
 }
 
 .hero-mission-overlay {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.15) 50%, transparent 100%);
+  background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.1) 70%, transparent 100%);
   pointer-events: none;
 }
 
 .hero-mission-content {
-  position: absolute;
-  bottom: 1rem;
-  left: 1rem;
-  right: 1rem;
+  position: relative;
   z-index: 2;
+  padding: 1rem;
+  margin-top: auto;
 }
 
 @media (min-width: 768px) {
   .hero-mission-content {
-    bottom: 1.25rem;
-    left: 1.25rem;
-    right: 1.25rem;
+    padding: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-mission-content {
+    padding: 1.5rem;
   }
 }
 

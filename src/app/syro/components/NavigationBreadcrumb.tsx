@@ -7,44 +7,38 @@ import { usePathname } from 'next/navigation';
 const NavigationBreadcrumb = () => {
   const pathname = usePathname();
 
-  // Don't show breadcrumb on home page
-  if (pathname === '/syro') {
-    return null;
-  }
+  if (pathname === '/syro') return null;
 
-  const pathSegments = pathname?.split('/').filter(Boolean) || [];
-  
-  // Build breadcrumb items
-  const breadcrumbItems = pathSegments.map((segment, index) => {
-    const href = '/' + pathSegments.slice(0, index + 1).join('/');
-    const label = segment
-      .split('-')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-    
-    return { href, label, isLast: index === pathSegments.length - 1 };
-  });
+  const generateBreadcrumbs = () => {
+    const segments = pathname?.split('/').filter(Boolean) || [];
+    const breadcrumbs = [{ name: 'Home', href: '/syro' }];
+    let currentPath = '/syro';
+    segments.forEach((segment) => {
+      if (segment !== 'syro') {
+        currentPath += `/${segment}`;
+        const name = segment.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        breadcrumbs.push({ name, href: currentPath });
+      }
+    });
+    return breadcrumbs;
+  };
+
+  const breadcrumbs = generateBreadcrumbs();
 
   return (
-    <nav className="bg-syro-bg-gray border-b border-syro-table-border py-3" aria-label="Breadcrumb">
+    <nav className="bg-syro-bg-gray border-b border-syro-table-border py-3" aria-label="Breadcrumb navigation" role="navigation">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <ol className="flex items-center space-x-2 text-syro-small">
-          <li>
-            <Link href="/syro" className="text-syro-text-gray hover:text-syro-red transition-colors">
-              Home
-            </Link>
-          </li>
-          {breadcrumbItems.map((item) => (
-            <li key={item.href} className="flex items-center">
-              <span className="mx-2 text-syro-medium-gray">/</span>
-              {item.isLast ? (
-                <span className="text-syro-blue font-medium">{item.label}</span>
+        <ol className="flex items-center space-x-2 text-syro-small" role="list">
+          {breadcrumbs.map((breadcrumb, index) => (
+            <li key={breadcrumb.href} className="flex items-center" role="listitem">
+              {index > 0 && (
+                <span className="text-syro-medium-gray/50 mx-2" role="img" aria-label="Separator">/</span>
+              )}
+              {index === breadcrumbs.length - 1 ? (
+                <span className="font-medium text-syro-blue" aria-current="page">{breadcrumb.name}</span>
               ) : (
-                <Link
-                  href={item.href}
-                  className="text-syro-text-gray hover:text-syro-red transition-colors"
-                >
-                  {item.label}
+                <Link href={breadcrumb.href} className="text-syro-dark-gray hover:text-syro-red transition-all duration-300">
+                  {breadcrumb.name}
                 </Link>
               )}
             </li>

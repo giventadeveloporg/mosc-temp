@@ -1,6 +1,9 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Metadata } from 'next';
+import { getDirectoryHomeData } from './getDirectoryHomeData';
+import type { DirectorySectionCard } from './types';
 
 export const metadata: Metadata = {
   title: 'Directory | Malankara Orthodox Syrian Church',
@@ -8,6 +11,7 @@ export const metadata: Metadata = {
   keywords: ['MOSC Directory', 'Malankara Orthodox Directory', 'Parishes', 'Priests', 'Dioceses', 'Church Directory'],
 };
 
+/** Static fallback sections when Strapi returns no section cards */
 type DirectorySection = {
   title: string;
   description: string;
@@ -15,60 +19,62 @@ type DirectorySection = {
   external?: boolean;
 };
 
-export default function DirectoryPage() {
-  // Content of from https://directory.mosc.in/
-  const sections: DirectorySection[] = [
-    {
-      title: 'The Holy Synod of Bishops',
-      description: 'The Episcopal Synod with the Catholicos as its president is the apex body of all bishops. The authority of the synod is final and binding. It has exclusive rights and privileges in the matter of upholding the faith of the church, its discipline and order of Apostolic Succession. As regards temporal matters the church is guided by the Malankara Syrian Christian Association.',
-      href: '/mosc/holy-synod',
-    },
-    {
-      title: 'Dioceses',
-      description: 'The Diocese is the basic church body which comprises all the parishes of a determined geographical area. It is governed by the Diocesan Bishop with the assistance of Diocesan Council.',
-      href: '/mosc/dioceses',
-    },
-    {
-      title: 'Parishes',
-      description: 'The parish is a local community of the Church having at its head a duly appointed priest and consisting of Orthodox Christians who live in accordance with the teachings of the Orthodox Church, comply with the discipline and rules of the Church, and regularly support their parish. Being subordinate to the Diocesan Authority, it is a component part of the Diocese.',
-    },
-    {
-      title: 'Priests',
-      description: 'At the head of the parish is its Vicar. According to the teachings of the Church, he is the spiritual father and teacher of his flock and the celebrant of the liturgical worship established by the Church. He teaches and edifies the People of God entrusted to his spiritual care.',
-    },
-    {
-      title: 'Institutions',
-      description: 'The institutions of the Malankara Orthodox Church consists of different organizations such as hospitals, schools, monasteries, orphanages, convents, medical colleges etc. Some of these Institutions are directly administered by the church and some others have its own leadership team.',
-      href: '/mosc/institutions',
-    },
-    {
-      title: 'Church Dignitaries',
-      description: 'The Church dignitaries consists of the Priest trustee, Lay trustee and the Association Secretary. The Priest trustee and Lay trustee are elected in the Malankara Association. The Association Secretary is elected in the Managing Committee. The tenure of the office is five years.',
-    },
-    {
-      title: 'Working Committee',
-      description: 'It is a small body of members nominated by the Malankara Metropolitan. This body prepares the agenda for the Managing Committee and helps the Malankara Metropolitan in his administrative functions. The same body is also known as the Advisory Council.',
-    },
-    {
-      title: 'The Managing Committee',
-      description: 'The members of the Managing Committee are elected by the association, two priests and four lay people representing each Diocese are elected for a period of five years. Other than the elected members, a proportionate number of members are nominated to the Managing Committee by the Malankara Metropolitan.',
-    },
-    {
-      title: 'Spiritual Organisations',
-      description: 'Spiritual organisations include all types of organizations of the Church that offer spiritual guidance to the faithful. They also include religious or spiritual study groups and other organizations that teach or offer spiritual direction and advice to the members of the Church.',
-      href: '/mosc/spiritual-organizations',
-    },
-    {
-      title: 'Pilgrim Centres',
-      description: `The major Pilgrim centres of Malankara Orthodox Church include historical churches such as Niranam St. Mary's Valiya Pally, Thiruvathamcode Arapally, which are instituted by the Apostle St. Thomas.`,
-      href: '/mosc/pilgrim-centres',
-    },
-    {
-      title: 'Seminaries',
-      description: 'There are mainly two seminaries under Malankara Orthodox Church.',
-      href: '/mosc/theological-seminaries',
-    },
-  ];
+const FALLBACK_SECTIONS: DirectorySection[] = [
+  { title: 'The Holy Synod of Bishops', description: 'The Episcopal Synod with the Catholicos as its president is the apex body of all bishops. The authority of the synod is final and binding. It has exclusive rights and privileges in the matter of upholding the faith of the church, its discipline and order of Apostolic Succession. As regards temporal matters the church is guided by the Malankara Syrian Christian Association.', href: '/mosc/directory/bishops' },
+  { title: 'Dioceses', description: 'The Diocese is the basic church body which comprises all the parishes of a determined geographical area. It is governed by the Diocesan Bishop with the assistance of Diocesan Council.', href: '/mosc/directory/dioceses' },
+  { title: 'Parishes', description: 'The parish is a local community of the Church having at its head a duly appointed priest and consisting of Orthodox Christians who live in accordance with the teachings of the Orthodox Church, comply with the discipline and rules of the Church, and regularly support their parish. Being subordinate to the Diocesan Authority, it is a component part of the Diocese.', href: '/mosc/directory/parishes' },
+  { title: 'Priests', description: 'At the head of the parish is its Vicar. According to the teachings of the Church, he is the spiritual father and teacher of his flock and the celebrant of the liturgical worship established by the Church. He teaches and edifies the People of God entrusted to his spiritual care.', href: '/mosc/directory/priests' },
+  { title: 'Institutions', description: 'The institutions of the Malankara Orthodox Church consists of different organizations such as hospitals, schools, monasteries, orphanages, convents, medical colleges etc. Some of these Institutions are directly administered by the church and some others have its own leadership team.', href: '/mosc/directory/institutions' },
+  { title: 'Church Dignitaries', description: 'The Church dignitaries consists of the Priest trustee, Lay trustee and the Association Secretary. The Priest trustee and Lay trustee are elected in the Malankara Association. The Association Secretary is elected in the Managing Committee. The tenure of the office is five years.', href: '/mosc/directory/church-dignitaries' },
+  { title: 'Working Committee', description: 'It is a small body of members nominated by the Malankara Metropolitan. This body prepares the agenda for the Managing Committee and helps the Malankara Metropolitan in his administrative functions. The same body is also known as the Advisory Council.', href: '/mosc/directory/working-committee' },
+  { title: 'The Managing Committee', description: 'The members of the Managing Committee are elected by the association, two priests and four lay people representing each Diocese are elected for a period of five years. Other than the elected members, a proportionate number of members are nominated to the Managing Committee by the Malankara Metropolitan.', href: '/mosc/directory/managing-committee' },
+  { title: 'Spiritual Organisations', description: 'Spiritual organisations include all types of organizations of the Church that offer spiritual guidance to the faithful. They also include religious or spiritual study groups and other organizations that teach or offer spiritual direction and advice to the members of the Church.', href: '/mosc/directory/spiritual-organisations' },
+  { title: 'Pilgrim Centres', description: `The major Pilgrim centres of Malankara Orthodox Church include historical churches such as Niranam St. Mary's Valiya Pally, Thiruvathamcode Arapally, which are instituted by the Apostle St. Thomas.`, href: '/mosc/directory/pilgrim-centres' },
+  { title: 'Seminaries', description: 'There are mainly two seminaries under Malankara Orthodox Church.', href: '/mosc/directory/seminaries' },
+];
+
+/** One card to render: either from API or from fallback (no image) */
+type DisplayCard = {
+  title: string;
+  description: string | null;
+  linkUrl: string | null;
+  isExternal: boolean;
+  imageUrl: string | null;
+  imageAlt: string | null;
+};
+
+function toDisplayCard(card: DirectorySectionCard): DisplayCard {
+  return {
+    title: card.title,
+    description: card.description,
+    linkUrl: card.linkUrl,
+    isExternal: (card.linkUrl?.startsWith('http') ?? false),
+    imageUrl: card.imageUrl,
+    imageAlt: card.imageAlt,
+  };
+}
+
+function fallbackToDisplayCard(section: DirectorySection): DisplayCard {
+  return {
+    title: section.title,
+    description: section.description,
+    linkUrl: section.href ?? null,
+    isExternal: section.external ?? (section.href?.startsWith('http') ?? false),
+    imageUrl: null,
+    imageAlt: null,
+  };
+}
+
+export default async function DirectoryPage() {
+  const data = await getDirectoryHomeData();
+  const displayCards: DisplayCard[] =
+    data.sectionCards.length > 0
+      ? data.sectionCards.map(toDisplayCard)
+      : FALLBACK_SECTIONS.map(fallbackToDisplayCard);
+
+  const leadText =
+    data.introText?.trim() ??
+    'The comprehensive directory of the Malankara Orthodox Syrian Church — bishops, dioceses, parishes, priests, institutions, and church administration.';
 
   return (
     <div className="min-h-screen bg-background">
@@ -87,7 +93,7 @@ export default function DirectoryPage() {
               Malankara Orthodox Directory
             </h1>
             <p className="font-body text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-              The comprehensive directory of the Malankara Orthodox Syrian Church — bishops, dioceses, parishes, priests, institutions, and church administration.
+              {leadText}
             </p>
             <a
               href="https://directory.mosc.in/"
@@ -107,35 +113,97 @@ export default function DirectoryPage() {
         </div>
       </section>
 
-      {/* Directory Sections - content from directory.mosc.in */}
+      {/* Directory Sections - from Strapi or static fallback */}
       <section className="py-16 bg-card">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-12">
-            {sections.map((section, index) => (
-              <div key={index} className="bg-muted/20 rounded-lg p-6 sacred-shadow-sm border-l-4 border-primary hover:sacred-shadow reverent-transition">
-                {section.href ? (
-                  <Link href={section.href} className="block group">
-                    <h2 className="font-heading font-semibold text-2xl text-foreground mb-3 group-hover:text-primary reverent-transition">
-                      {section.title}
-                    </h2>
-                    <p className="font-body text-muted-foreground leading-relaxed">
-                      {section.description}
-                    </p>
-                    <span className="inline-flex items-center font-body text-primary font-medium mt-3 group-hover:gap-2 reverent-transition">
-                      View more
-                      <svg className="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </span>
-                  </Link>
+            {displayCards.map((card, index) => (
+              <div key={index} className="bg-muted/20 rounded-lg overflow-hidden sacred-shadow-sm border-l-4 border-primary hover:sacred-shadow reverent-transition">
+                {card.linkUrl ? (
+                  card.isExternal ? (
+                    <a href={card.linkUrl} target="_blank" rel="noopener noreferrer" className="block group">
+                      {card.imageUrl && (
+                        <div className="relative w-full h-48 bg-muted/40">
+                          <Image
+                            src={card.imageUrl}
+                            alt={card.imageAlt ?? card.title}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 768px) 100vw, 896px"
+                          />
+                        </div>
+                      )}
+                      <div className="p-6">
+                        <h2 className="font-heading font-semibold text-2xl text-foreground mb-3 group-hover:text-primary reverent-transition">
+                          {card.title}
+                        </h2>
+                        {card.description && (
+                          <p className="font-body text-muted-foreground leading-relaxed">
+                            {card.description}
+                          </p>
+                        )}
+                        <span className="inline-flex items-center font-body text-primary font-medium mt-3 group-hover:gap-2 reverent-transition">
+                          View more
+                          <svg className="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </span>
+                      </div>
+                    </a>
+                  ) : (
+                    <Link href={card.linkUrl} className="block group">
+                      {card.imageUrl && (
+                        <div className="relative w-full h-48 bg-muted/40">
+                          <Image
+                            src={card.imageUrl}
+                            alt={card.imageAlt ?? card.title}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 768px) 100vw, 896px"
+                          />
+                        </div>
+                      )}
+                      <div className="p-6">
+                        <h2 className="font-heading font-semibold text-2xl text-foreground mb-3 group-hover:text-primary reverent-transition">
+                          {card.title}
+                        </h2>
+                        {card.description && (
+                          <p className="font-body text-muted-foreground leading-relaxed">
+                            {card.description}
+                          </p>
+                        )}
+                        <span className="inline-flex items-center font-body text-primary font-medium mt-3 group-hover:gap-2 reverent-transition">
+                          View more
+                          <svg className="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </span>
+                      </div>
+                    </Link>
+                  )
                 ) : (
                   <>
-                    <h2 className="font-heading font-semibold text-2xl text-foreground mb-3">
-                      {section.title}
-                    </h2>
-                    <p className="font-body text-muted-foreground leading-relaxed">
-                      {section.description}
-                    </p>
+                    {card.imageUrl && (
+                      <div className="relative w-full h-48 bg-muted/40">
+                        <Image
+                          src={card.imageUrl}
+                          alt={card.imageAlt ?? card.title}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, 896px"
+                        />
+                      </div>
+                    )}
+                    <div className="p-6">
+                      <h2 className="font-heading font-semibold text-2xl text-foreground mb-3">
+                        {card.title}
+                      </h2>
+                      {card.description && (
+                        <p className="font-body text-muted-foreground leading-relaxed">
+                          {card.description}
+                        </p>
+                      )}
+                    </div>
                   </>
                 )}
               </div>

@@ -1,143 +1,120 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
+import QuickLinks from '../components/QuickLinks';
+import SyroPageHero from '../components/SyroPageHero';
+import SyroSectionTitle from '../components/SyroSectionTitle';
 
 export const metadata = {
   title: 'Dioceses',
-  description: 'Explore the dioceses of the Syro-Malabar Church across India and worldwide.',
+  description: 'Explore the dioceses of the Malankara Orthodox Syrian Church across India and worldwide.',
 };
 
 const DiocesesPage = () => {
-  const dioceses = [
-    // Kerala Dioceses
-    {
-      region: 'Kerala',
-      dioceses: [
-        { name: 'Diocese of Thiruvananthapuram', href: '/syro/dioceses/diocese-of-thiruvananthapuram-diocese' },
-        { name: 'Diocese of Kollam', href: '/syro/dioceses/diocese-of-kollam' },
-        { name: 'Diocese of Kottarakara – Punalur', href: '/syro/dioceses/diocese-of-kottarakara-punalur' },
-        { name: 'Diocese of Adoor – Kadampanadu', href: '/syro/dioceses/diocese-of-adoor-kadampanadu' },
-        { name: 'Diocese of Thumpamon', href: '/syro/dioceses/diocese-of-thumpamon' },
-        { name: 'Diocese of Mavelikara', href: '/syro/dioceses/diocese-of-mavelikara' },
-        { name: 'Diocese of Chengannur', href: '/syro/dioceses/diocese-of-chengannur' },
-        { name: 'Diocese of Niranam', href: '/syro/dioceses/diocese-of-niranam' },
-        { name: 'Diocese of Nilackal', href: '/syro/dioceses/diocese-of-nilackal' },
-        { name: 'Diocese of Kottayam', href: '/syro/dioceses/diocese-of-kottayam' },
-        { name: 'Diocese of Kottayam Central', href: '/syro/dioceses/diocese-of-kottayam-central' },
-        { name: 'Diocese of Idukki', href: '/syro/dioceses/diocese-of-idukki' },
-        { name: 'Diocese of Kandanad East', href: '/syro/dioceses/diocese-of-kandanad-east' },
-        { name: 'Diocese of Kandanad West', href: '/syro/dioceses/diocese-of-kandanad-west' },
-        { name: 'Diocese of Ankamaly', href: '/syro/dioceses/diocese-of-ankamaly' },
-        { name: 'Diocese of Kochi', href: '/syro/dioceses/diocese-of-kochi' },
-        { name: 'Diocese of Thrissur', href: '/syro/dioceses/diocese-of-thrissur' },
-        { name: 'Diocese of Kunnamkulam', href: '/syro/dioceses/diocese-of-kunnamkulam' },
-        { name: 'Diocese of Malabar', href: '/syro/dioceses/diocese-of-malabar' },
-        { name: 'Diocese of Sulthan Bathery', href: '/syro/dioceses/diocese-of-sulthan-bathery-diocese' },
-        { name: 'Diocese of Brahamavar', href: '/syro/dioceses/diocese-of-brahamavar' }
-      ]
-    },
-    // Indian Dioceses (Outside Kerala)
-    {
-      region: 'India',
-      dioceses: [
-        { name: 'Diocese of Madras', href: '/syro/dioceses/diocese-of-chennai-diocese' },
-        { name: 'Diocese of Bangalore', href: '/syro/dioceses/diocese-of-bangalore' },
-        { name: 'Diocese of Bombay', href: '/syro/dioceses/diocese-of-mumbai' },
-        { name: 'Diocese of Calcutta', href: '/syro/dioceses/diocese-of-calcutta' },
-        { name: 'Diocese of Delhi', href: '/syro/dioceses/diocese-of-delhi' },
-        { name: 'Diocese of Ahmedabad', href: '/syro/dioceses/diocese-of-ahmedabad' }
-      ]
-    },
-    // International Dioceses
-    {
-      region: 'International',
-      dioceses: [
-        { name: 'Diocese of Northeast America', href: '/syro/dioceses/northeast-america' },
-        { name: 'Diocese of South West America', href: '/syro/dioceses/diocese-of-south-west-america' },
-        { name: 'Diocese of UK Europe and Africa', href: '/syro/dioceses/diocese-of-uk-europe-and-africa' }
-      ]
-    }
+  // All dioceses with excerpt and image (card style like mosc.in/dioceses)
+  const dioceseCards = [
+    { name: 'Diocese of Thiruvananthapuram', href: '/syro/dioceses/diocese-of-thiruvananthapuram-diocese', excerpt: 'On 1978, February 20th, Malankara Syrian Christian managing committee recommended a division in Kollam diocese. According to Committee\'s recommendation, On 1979, January 1st, Kollam diocese was divided into two, namely Kollam diocese and Thiruvananthapuram (Trivandrum) diocese.', image: '/images/dioceses/diocese-of-thiruvananthapuram-diocese.jpg' },
+    { name: 'Diocese of Kollam', href: '/syro/dioceses/diocese-of-kollam', excerpt: 'St Thomas, the Apostle of Jesus Christ, is the Father of Christianity in India, landed at Maliankara in Kerala founded seven churches at Maliankara, Palayur, Kottakavu, Niranam, Nilakkel, Kollam and Kokkamangalam.', image: '/images/dioceses/kollam diocese.jpg' },
+    { name: 'Diocese of Kottarakara – Punalur', href: '/syro/dioceses/diocese-of-kottarakara-punalur', excerpt: 'Kottarakkara Punalur Diocese is one of the 30 dioceses of the Malankara Orthodox Syrian Church. The diocese was created after dividing the then existed Thiruvananthapuram Diocese and Kollam Diocese.', image: '/images/dioceses/diocese-of-kottarakara-punalur.jpg' },
+    { name: 'Diocese of Adoor – Kadampanadu', href: '/syro/dioceses/diocese-of-adoor-kadampanadu', excerpt: 'One of the fastest growing Diocese of Malankara Orthodox Church which came into existence by the Kalpana of His Holiness Moran Mar Baselios Marthoma Didymus-1, Catholicose of the East & Malankara Metropolitan.', image: '/images/dioceses/kadampanadu diocese.jpg' },
+    { name: 'Diocese of Thumpamon', href: '/syro/dioceses/diocese-of-thumpamon', excerpt: 'Flipping through the historical pages of Orthodox Christian community in Kerala, Thumpamon was one of the bastions for Christians during the very first century. Thumpamon Diocese was created after the division of the then existing dioceses.', image: '/images/dioceses/thumpamon_diocese.jpg' },
+    { name: 'Diocese of Mavelikara', href: '/syro/dioceses/diocese-of-mavelikara', excerpt: 'Mavelikara has an esteemed place in the history of Syrian Christians in Kerala. It is one of the ancient Syrian Christian settlements in Kerala. Its traditional relation with the Christian community is well known.', image: '/images/dioceses/mavelikara_diocese.jpg' },
+    { name: 'Diocese of Chengannur', href: '/syro/dioceses/diocese-of-chengannur', excerpt: 'The Diocese of Chengannur came into existence on 10th March 1985 vide Kalpana No. 52/85 of H.H. Moran Mar Baselios Marthoma Mathews I Catholicose of the East and Malankara Metropolitan.', image: '/images/dioceses/chengannur_diocese.jpg' },
+    { name: 'Diocese of Niranam', href: '/syro/dioceses/diocese-of-niranam', excerpt: 'Niranam is a beautiful village situated in the delta of rivers Pampa and Manimala: part of Thiruvalla taluk and Pathanamthitta district. This is a typical Keralite agricultural village, full of natural beauty.', image: '/images/dioceses/diocese-of-niranam.jpg' },
+    { name: 'Diocese of Nilackal', href: '/syro/dioceses/diocese-of-nilackal', excerpt: 'The Diocese of Nilackal came into being on August 15, 2010 under the order issued by H.H Baselios Mar Thoma Didymos I, The Catholicos cum Malankara Metropolitan. H.G. Dr. Joshua Mar Nicodimos is the first Metropolitan.', image: '/images/dioceses/diocese-of-nilackal.jpg' },
+    { name: 'Diocese of Kottayam', href: '/syro/dioceses/diocese-of-kottayam', excerpt: 'As per the decisions of the Mulamthuruthy Synod, Kottayam Diocese was formed initially with 20 churches altogether from Kottayam and nearby places. The first diocesan metropolitan was His Grace Kadavil Paulose Mar Athanasios.', image: '/images/dioceses/diocese-of-kottayam.jpg' },
+    { name: 'Diocese of Kottayam Central', href: '/syro/dioceses/diocese-of-kottayam-central', excerpt: 'The Diocese of Kottayam Central came into existence vide Kalpana No. 110/82 dated April 21, 1982 of His Holiness Moran Mar Baselios Marthoma Mathews I, Catholicose of the East & Malankara Metropolitan.', image: '/images/dioceses/diocese-of-kottayam-central.jpg' },
+    { name: 'Diocese of Idukki', href: '/syro/dioceses/diocese-of-idukki', excerpt: 'Until 1982, the present churches of the Idukki diocese were part of Kottayam diocese. In 1982 the churches in the eastern part of Kottayam diocese were taken and formed the Idukki Diocese.', image: '/images/dioceses/diocese-of-idukki.jpg' },
+    { name: 'Diocese of Kandanad East', href: '/syro/dioceses/diocese-of-kandanad-east', excerpt: 'Kandanad Diocese is one of the oldest dioceses of the Orthodox Syrian Church. It was constituted with Kandanad St. Mary\'s Church at its centre along with two scores and odd churches.', image: '/images/dioceses/diocese-of-kandanad-east.jpg' },
+    { name: 'Diocese of Kandanad West', href: '/syro/dioceses/diocese-of-kandanad-west', excerpt: 'In 1876 Malankara Orthodox Church was divided into 7 Dioceses by Mulanthuruthy synod. Among those seven, one was Kandanad Diocese. At that time the parishes of Kandanad Diocese spread across the region.', image: '/images/dioceses/diocese-of-kandanad-west.jpg' },
+    { name: 'Diocese of Ankamaly', href: '/syro/dioceses/diocese-of-ankamaly', excerpt: 'History of the Diocese of Angamaly: It was also from the historic synod of Mulanthuruthy in 1876 that the Angamaly Diocese was formed. Metropolitans such as Kadavil Paulose Mar Athanasios have served the diocese.', image: '/images/dioceses/diocese-of-ankamaly.jpg' },
+    { name: 'Diocese of Kochi', href: '/syro/dioceses/diocese-of-kochi', excerpt: 'Kochi is one of the most prominent dioceses throughout the history of Malankara Orthodox Church. The Diocese of Kochi was formed in 1876. It has played a significant role in the church\'s growth.', image: '/images/dioceses/diocese-of-kochi.jpg' },
+    { name: 'Diocese of Thrissur', href: '/syro/dioceses/diocese-of-thrissur', excerpt: 'The diocese was formed in 1982 with parishes in Thrissur and Palakkad districts. At the time of the formation of the diocese there were 32 parishes and 26 priests. The first Metropolitan was His Grace.', image: '/images/dioceses/thrissur_diocese.jpg' },
+    { name: 'Diocese of Kunnamkulam', href: '/syro/dioceses/diocese-of-kunnamkulam', excerpt: 'A Brief History Of Kunnamkulam Diocese: Kunnamkulam is the home of the people who bear in their hearts the natural piety of spiritualism, the fragrance of tradition and the legacy of the faith.', image: '/images/dioceses/diocese-of-kunnamkulam.jpg' },
+    { name: 'Diocese of Malabar', href: '/syro/dioceses/diocese-of-malabar', excerpt: 'The Malabar Diocese, which extends across the western districts of Kerala, was formed in 1953. H.G. Paulose Mar Severios and H.G. Pathrose Mar Osthathios (1953–68) have executed its administration.', image: '/images/dioceses/malabar_diocese.png' },
+    { name: 'Diocese of Sulthan Bathery', href: '/syro/dioceses/diocese-of-sulthan-bathery-diocese', excerpt: 'In 1986, the diocese of Sultan Bathery was formed by organising all the churches from the District of Wayanad, some of the churches from the Nilagiri District of Tamilnadu and some from Karnataka.', image: '/images/dioceses/sulthan_bathery_diocese.jpg' },
+    { name: 'Diocese of Brahamavar', href: '/syro/dioceses/diocese-of-brahamavar', excerpt: 'The Diocese of Brahmavar was formed in August 2010 and was announced by His Holiness Baselios Marthoma Didymus I through the Kalpana No.389/2010 dated 3-8-2010. The formation was with the goal of shepherding the faithful in the region.', image: '/images/dioceses/bhramavar_diocese.jpg' },
+    { name: 'Diocese of Madras', href: '/syro/dioceses/diocese-of-chennai-diocese', excerpt: 'Madras City, hallowed and blessed by the martyrdom of St. Thomas the Apostle, has been the Headquarters of the Madras Diocese belonging to the Orthodox Church of India for many decades.', image: '/images/dioceses/madras_diocese.jpg' },
+    { name: 'Diocese of Bangalore', href: '/syro/dioceses/diocese-of-bangalore', excerpt: 'Dioceses in the history of the Malankara Orthodox Syrian Church were formed for the first time in 1876 consequent to the Mulanthuruthy Synod. H.H. Patriarch Mar Peter III divided the Malankara Church into dioceses.', image: '/images/dioceses/diocese-of-bangalore.jpg' },
+    { name: 'Diocese of Bombay', href: '/syro/dioceses/diocese-of-mumbai', excerpt: 'The Diocese of Bombay was carved out of the outside Kerala diocese of the Malankara Orthodox Syrian Church in the year 1976. His Grace Dr. Thomas Mar Makarios was the first Metropolitan of the Diocese.', image: '/images/dioceses/diocese-of-mumbai.jpg' },
+    { name: 'Diocese of Calcutta', href: '/syro/dioceses/diocese-of-calcutta', excerpt: 'Dioceses in the history of the Malankara Orthodox Syrian Church were formed for the first time in 1876 consequent to the Mulanthuruthy Synod. H.H. Patriarch Mar Peter III divided the Malankara Church. Calcutta Diocese serves the faithful in the region.', image: '/images/dioceses/culcutta_diocese.jpg' },
+    { name: 'Diocese of Delhi', href: '/syro/dioceses/diocese-of-delhi', excerpt: 'Once the nucleus of the Orthodox Church in north India was formed in the capital of the country, the growth of parishes in adjacent centres was rapid and the establishment of the Delhi Diocese followed.', image: '/images/dioceses/diocese-of-delhi.jpg' },
+    { name: 'Diocese of Ahmedabad', href: '/syro/dioceses/diocese-of-ahmedabad', excerpt: 'The Diocese of Ahmedabad came into existence vide Kalpana No 93/2009 dated March 2, 2009 of His Holiness Moran Mar Baselios Marthoma Didymus-1, Catholicose of the East & Malankara Metropolitan.', image: '/images/dioceses/ahmedabad_diocese.jpg' },
+    { name: 'Diocese of Northeast America', href: '/syro/dioceses/northeast-america', excerpt: 'The history of the Malankara Orthodox Syrian Church of the East in the U.S.A. begins approximately in the mid 20th century. During this period, a number of prominent priests and lay people helped establish the Church in America.', image: '/images/dioceses/northeast_america_diocese.jpg' },
+    { name: 'Diocese of South West America', href: '/syro/dioceses/diocese-of-south-west-america', excerpt: 'The Diocese was formed by order number 145/2009 signed by the then Catholicos of the Apostolic Throne of St. Thomas and Malankara Metropolitan, His Holiness Baselios Mar Thoma Didymos I.', image: '/images/dioceses/southwest_america_diocese.jpg' },
+    { name: 'Diocese of UK Europe and Africa', href: '/syro/dioceses/diocese-of-uk-europe-and-africa', excerpt: 'Diocese of the Indian Orthodox Church, UK Europe and Africa is acting as the umbrella organisation for various Indian Orthodox parishes in the UK, Rest of Europe and African Continent.', image: '/images/dioceses/diocese-of-uk-europe-and-africa.jpg' }
   ];
 
   return (
     <div className="bg-syro-bg-gray">
-      {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-br from-white to-syro-light-gray">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-syro-red rounded-[5px] flex items-center justify-center mx-auto mb-6 shadow-syro-card">
-              <span className="text-white text-4xl font-bold" role="img" aria-label="Dioceses">🗺️</span>
-            </div>
-            <h1 className="font-syro-display font-semibold text-syro-h1 text-syro-blue mb-4">
-              Dioceses of the Syro-Malabar Church
-            </h1>
-            <p className="font-syro-primary text-syro-body text-syro-text-gray max-w-3xl mx-auto leading-relaxed">
-              Our church is organized into dioceses across India and worldwide, each serving local communities
-              while maintaining unity with the global Orthodox family.
-            </p>
-          </div>
-        </div>
-      </section>
+      <SyroPageHero
+        title="Dioceses of the Malankara Orthodox Syrian Church"
+        description="Our church is organized into dioceses across India and worldwide, each serving local communities while maintaining unity with the global Orthodox family."
+      />
 
-      {/* Dioceses by Region */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="font-syro-display font-semibold text-syro-h2 text-syro-blue mb-4">
-              Our Dioceses
-            </h2>
-            <p className="font-syro-primary text-syro-body text-syro-text-gray max-w-3xl mx-auto">
-              The Syro-Malabar Church is organized into dioceses that serve communities
-              across different regions, ensuring spiritual care and administrative support for all members.
-            </p>
-          </div>
+          <SyroSectionTitle>Dioceses</SyroSectionTitle>
+          <p className="font-syro-primary text-lg text-syro-dark-gray max-w-3xl mb-10">
+            The Malankara Orthodox Syrian Church is organized into dioceses that serve communities across different regions, ensuring spiritual care and administrative support for all members.
+          </p>
 
-          {dioceses.map((region) => (
-            <div key={region.region} className="mb-12">
-              <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-syro-red-light rounded-full flex items-center justify-center mr-4">
-                  <span className="text-2xl text-syro-red" role="img" aria-label="Region">
-                    {region.region === 'Kerala' ? '🏞️' : region.region === 'India' ? '🇮🇳' : '🌍'}
-                  </span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {dioceseCards.map((card) => (
+              <Link
+                key={card.href}
+                href={card.href}
+                className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 p-0 overflow-hidden group flex flex-col"
+              >
+                <div className="relative w-full h-48 bg-syro-bg-gray/30 overflow-hidden">
+                  <Image
+                    src={card.image}
+                    alt={card.name}
+                    fill
+                    className="object-contain object-center group-hover:scale-105 transition-transform duration-300"
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                  />
                 </div>
-                <h3 className="font-syro-display font-semibold text-syro-h3 text-syro-blue">
-                  {region.region} Dioceses
-                </h3>
-              </div>
+                <div className="p-6 flex flex-col flex-1 bg-white">
+                  <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-3 group-hover:text-syro-red transition-all duration-300">
+                    {card.name}
+                  </h3>
+                  <p className="font-syro-primary text-syro-dark-gray text-sm leading-relaxed flex-1 line-clamp-4">
+                    {card.excerpt}
+                  </p>
+                  <div className="mt-auto pt-4">
+                    <span className="inline-flex items-center gap-1.5 font-syro-primary text-sm font-medium text-syro-red">
+                      Read More
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {region.dioceses.map((diocese) => (
-                  <Link
-                    key={diocese.name}
-                    href={diocese.href}
-                    className="bg-syro-bg-gray rounded-[5px] shadow-syro-card p-4 hover:shadow-syro-card-hover transition-all duration-500 group"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-syro-red-light rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-syro-red/20 transition-all duration-300">
-                        <span className="text-syro-red" role="img" aria-label="Diocese">⛪</span>
-                      </div>
-                      <span className="font-syro-primary font-medium text-syro-blue group-hover:text-syro-red transition-all duration-300">
-                        {diocese.name}
-                      </span>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Diocese Information */}
-      <section className="py-16 bg-syro-light-gray/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          {/* Diocese Information */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-16">
             <div>
-              <h2 className="font-syro-display font-semibold text-syro-h2 text-syro-blue mb-6">
+              <h2 className="text-2xl font-light text-[#798daf] pl-8 border-l-[7px] border-syro-red mb-6">
                 About Our Dioceses
               </h2>
-              <div className="space-y-4 font-syro-primary text-syro-body text-syro-text-gray leading-relaxed">
+              <div className="space-y-4 font-syro-primary text-syro-dark-gray leading-relaxed">
                 <p>
-                  Each diocese in the Syro-Malabar Church is led by a Metropolitan or Bishop
+                  Each diocese in the Malankara Orthodox Syrian Church is led by a Metropolitan or Bishop
                   who provides spiritual guidance and administrative oversight to the parishes within their jurisdiction.
                 </p>
                 <p>
@@ -152,34 +129,36 @@ const DiocesesPage = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-[5px] shadow-syro-card p-6">
-              <h3 className="font-syro-display font-semibold text-syro-h3 text-syro-blue mb-4">
+            <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-6">
+              <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-4">
                 Diocese Statistics
               </h3>
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="font-syro-primary text-syro-text-gray">Total Dioceses</span>
+                  <span className="font-syro-primary text-syro-dark-gray">Total Dioceses</span>
                   <span className="font-syro-display font-semibold text-syro-blue">30</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="font-syro-primary text-syro-text-gray">Kerala Dioceses</span>
+                  <span className="font-syro-primary text-syro-dark-gray">Kerala Dioceses</span>
                   <span className="font-syro-display font-semibold text-syro-blue">21</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="font-syro-primary text-syro-text-gray">Indian Dioceses</span>
+                  <span className="font-syro-primary text-syro-dark-gray">Indian Dioceses</span>
                   <span className="font-syro-display font-semibold text-syro-blue">6</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="font-syro-primary text-syro-text-gray">International Dioceses</span>
+                  <span className="font-syro-primary text-syro-dark-gray">International Dioceses</span>
                   <span className="font-syro-display font-semibold text-syro-blue">3</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="font-syro-primary text-syro-text-gray">Total Parishes</span>
+                  <span className="font-syro-primary text-syro-dark-gray">Total Parishes</span>
                   <span className="font-syro-display font-semibold text-syro-blue">2000+</span>
                 </div>
               </div>
             </div>
           </div>
+
+          <QuickLinks />
         </div>
       </section>
     </div>
@@ -187,3 +166,17 @@ const DiocesesPage = () => {
 };
 
 export default DiocesesPage;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
