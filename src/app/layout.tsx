@@ -100,8 +100,10 @@ export default async function RootLayout({
   // Skip only when pathname is empty to avoid edge cases. headers() is already awaited above, so auth() is safe.
   let isTenantAdmin = false;
 
-  // Perform auth + profile lookup whenever we have a pathname so Header gets correct isTenantAdmin on every page
-  if (pathname) {
+  // Perform auth + profile lookup whenever we have a pathname so Header gets correct isTenantAdmin on every page.
+  // Skip auth on /mosc/* to avoid Next.js 15+ "headers() should be awaited" when Clerk's auth() runs (isTenantAdmin false on MOSC pages).
+  const skipAuthForRoute = pathname.startsWith('/mosc');
+  if (pathname && !skipAuthForRoute) {
     try {
       // CRITICAL: Call auth() immediately after awaiting headers() to ensure proper async context
       // Do not call any other async functions before auth() completes

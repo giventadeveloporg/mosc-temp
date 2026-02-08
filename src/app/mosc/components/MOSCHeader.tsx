@@ -65,6 +65,7 @@ const MOSCHeader = () => {
     { name: 'Ecumenical', href: '/mosc/ecumenical' },
     { name: 'Dioceses', href: '/mosc/dioceses' },
     { name: 'News', href: '/mosc/news' },
+    { name: 'Directory', href: '/mosc/directory' },
     { name: 'Saints', href: '/mosc/saints' },
   ];
 

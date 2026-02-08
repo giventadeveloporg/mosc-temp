@@ -1,6 +1,6 @@
 ---
-description: Strapi 5 REST API patterns for published state and populate parameters
-globs: src/lib/strapi.ts, src/app/mosc/news/**/*.ts
+description: Strapi 5 REST API patterns for published state, populate parameters, and list-endpoint fallbacks
+globs: src/lib/strapi.ts, src/app/mosc/news/**/*.ts, src/app/mosc/directory/**/*.ts
 alwaysApply: false
 ---
 
@@ -160,6 +160,56 @@ const url = media?.data?.attributes?.url;
 ## **Exception: Simple populate**
 
 For single-field populate (e.g. `populate=media`), the simple format may work. Advertisement slots use `populate=media` successfully. If you encounter 400s with simple populate, switch to array-style: `populate[0]=media`.
+
+## **List Endpoints: Pagination and 400 Fallback**
+
+Some Strapi 5 list endpoints (e.g. `catholicos-entries`) return **400 Bad Request** when using certain query shapes (tenant filter syntax, or `pagination[limit]=1`). Use a **two-step fallback** so the app still gets data when the first shape fails.
+
+### **DO: Use pagination[pageSize] for list endpoints**
+
+```typescript
+// ✅ DO: Strapi 5 list pagination
+'pagination[pageSize]=1'
+// or
+'pagination[page]=1&pagination[pageSize]=1'
+```
+
+### **DON'T: Rely only on pagination[limit]**
+
+```typescript
+// ❌ DON'T: May trigger 400 on some Strapi 5 list endpoints
+'pagination[limit]=1'
+```
+
+### **DO: Try without tenant filter first, then with filter**
+
+When a list endpoint returns 400 with both tenant filter and pagination, try the request **without** the tenant filter first; if that succeeds, use the result. Then optionally retry with the tenant filter for tenant-scoped data.
+
+```typescript
+// ✅ DO: Two-step fallback for list endpoints that may 400
+const pathsToTry = [
+  `catholicos-entries?pagination[pageSize]=1&populate[0]=image`,
+  `catholicos-entries?filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}&pagination[pageSize]=1&populate[0]=image`,
+];
+let res: Response | null = null;
+for (const path of pathsToTry) {
+  res = await fetch(`${base}/${path}`, { headers: getStrapiHeaders(), cache: 'no-store' });
+  if (res.ok) break;
+}
+if (res?.ok) {
+  const json = await res.json();
+  // use json.data (array or single object)
+}
+```
+
+### **Apply to**
+
+- Directory **catholicos-entries** (Catholicos image fallback when bishops API returns no image)
+- Any other list endpoint that returns 400 with tenant filter or `pagination[limit]=1`
+
+### **Reference**
+
+- Implementation: [`src/app/mosc/directory/bishops/getBishopsData.ts`](mdc:src/app/mosc/directory/bishops/getBishopsData.ts) – Catholicos image fallback with two-step request
 
 ## **Strapi Image Upload Recommendations (News Article Covers)**
 

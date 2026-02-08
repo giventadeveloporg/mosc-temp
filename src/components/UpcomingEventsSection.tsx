@@ -7,6 +7,7 @@ import type { EventWithMedia, EventDetailsDTO } from "@/types";
 import { formatInTimeZone } from 'date-fns-tz';
 import { isRecurringEvent, getNextOccurrenceDate } from '@/lib/eventUtils';
 import { isDonationBasedEvent, isTicketedFundraiserEvent } from '@/lib/donation/utils';
+import { getTenantId } from '@/lib/env';
 
 // Component to handle event image loading errors and hide container when image fails
 function EventImageWithErrorHandling({
@@ -120,7 +121,9 @@ const UpcomingEventsSection: React.FC = () => {
         // Fetch more events (15) to account for recurring events being grouped into single occurrences
         // After processing, we'll limit to 6 events for display
         const today = new Date().toISOString().split('T')[0];
+        const tenantId = getTenantId();
         const upcomingParams = new URLSearchParams({
+          'tenantId.equals': tenantId,
           sort: 'startDate,asc',
           page: '0',
           size: '15', // Increased from 6 to 15 to ensure we have enough after recurring event grouping
@@ -215,13 +218,13 @@ const UpcomingEventsSection: React.FC = () => {
           const eventsWithMedia = await Promise.all(
             limitedEvents.map(async (event: EventDetailsDTO) => {
               try {
-                // First try to find homepage hero image
-                let mediaRes = await fetch(`/api/proxy/event-medias?eventId.equals=${event.id}&isHomePageHeroImage.equals=true`);
+                // First try to find homepage hero image (tenant-scoped)
+                let mediaRes = await fetch(`/api/proxy/event-medias?tenantId.equals=${encodeURIComponent(tenantId)}&eventId.equals=${event.id}&isHomePageHeroImage.equals=true`);
                 let mediaData = await mediaRes.json();
 
                 // If no homepage hero image found, try regular hero image
                 if (!mediaData || mediaData.length === 0) {
-                  mediaRes = await fetch(`/api/proxy/event-medias?eventId.equals=${event.id}&isHeroImage.equals=true`);
+                  mediaRes = await fetch(`/api/proxy/event-medias?tenantId.equals=${encodeURIComponent(tenantId)}&eventId.equals=${event.id}&isHeroImage.equals=true`);
                   mediaData = await mediaRes.json();
                 }
 
@@ -253,6 +256,7 @@ const UpcomingEventsSection: React.FC = () => {
           // Fetch more events (15) to account for recurring events being grouped into single occurrences
           // After processing, we'll limit to 6 events for display
           const pastParams = new URLSearchParams({
+            'tenantId.equals': tenantId,
             sort: 'startDate,desc',
             page: '0',
             size: '15', // Increased from 6 to 15 to ensure we have enough after recurring event grouping
@@ -345,13 +349,13 @@ const UpcomingEventsSection: React.FC = () => {
           const eventsWithMedia = await Promise.all(
             limitedPastEvents.map(async (event: EventDetailsDTO) => {
               try {
-                // First try to find homepage hero image
-                let mediaRes = await fetch(`/api/proxy/event-medias?eventId.equals=${event.id}&isHomePageHeroImage.equals=true`);
+                // First try to find homepage hero image (tenant-scoped)
+                let mediaRes = await fetch(`/api/proxy/event-medias?tenantId.equals=${encodeURIComponent(tenantId)}&eventId.equals=${event.id}&isHomePageHeroImage.equals=true`);
                 let mediaData = await mediaRes.json();
 
                 // If no homepage hero image found, try regular hero image
                 if (!mediaData || mediaData.length === 0) {
-                  mediaRes = await fetch(`/api/proxy/event-medias?eventId.equals=${event.id}&isHeroImage.equals=true`);
+                  mediaRes = await fetch(`/api/proxy/event-medias?tenantId.equals=${encodeURIComponent(tenantId)}&eventId.equals=${event.id}&isHeroImage.equals=true`);
                   mediaData = await mediaRes.json();
                 }
 
