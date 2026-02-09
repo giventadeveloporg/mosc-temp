@@ -204,7 +204,7 @@
         <div class="header">
             <h1>🧪 MOSC Pages Test Report</h1>
             <p>MOSC Public Site Pages</p>
-            <p style="margin-top: 10px; font-size: 0.9em;">Test Engine: Playwright (Local) | 19 Tests | 94.7% Success Rate</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">Test Engine: Playwright (Local) | 19 Tests | 89.5% Success Rate</p>
         </div>
 
         <div class="summary">
@@ -216,11 +216,11 @@
                 </div>
                 <div class="summary-card">
                     <h3>Passed</h3>
-                    <div class="number passed">18</div>
+                    <div class="number passed">17</div>
                 </div>
                 <div class="summary-card">
                     <h3>Failed</h3>
-                    <div class="number failed">1</div>
+                    <div class="number failed">2</div>
                 </div>
                 <div class="summary-card">
                     <h3>Skipped</h3>
@@ -228,7 +228,7 @@
                 </div>
                 <div class="summary-card">
                     <h3>Success Rate</h3>
-                    <div class="number success-rate">94.7%</div>
+                    <div class="number success-rate">89.5%</div>
                 </div>
             </div>
         </div>
@@ -272,30 +272,29 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc</div>
-                        <div class="duration">30270ms</div>
+                        <div class="duration">30213ms</div>
                         
                     </div>
                 </div>
             
-                <div class="test-item passed">
-                    <div class="test-status">✅</div>
+                <div class="test-item failed">
+                    <div class="test-status">❌</div>
                     <div class="test-info">
                         <h4>
                             <span class="test-id">mosc-001a</span>
                             MOSC Homepage Quick Links - Gallery Navigation Test
                             <span class="test-priority priority-high">high</span>
                         </h4>
-                        <p>Test completed successfully</p>
+                        <p>Error: URL verification failed. Expected to contain "/mosc/gallery", got "http://localhost:3000/mosc"</p>
                         
                         <div class="warning-details">
                             <strong>⚠️ Warnings:</strong> Some expected elements not found: [class*="gallery"], [class*="album"], [class*="grid"]; Interaction failed: page.waitForURL: Timeout 15000ms exceeded.
 =========================== logs ===========================
 waiting for navigation to "/mosc/gallery" until "load"
-  navigated to "http://localhost:3000/mosc/gallery"
 ============================================================; Interaction failed: page.waitForSelector: Timeout 5000ms exceeded.
 Call log:
 [2m  - waiting for locator('[class*="gallery"], [class*="album"], [class*="grid"]') to be visible[22m
-[2m    15 × locator resolved to 4 elements. Proceeding with the first one: <div class="grid grid-cols-2 gap-2 px-2">…</div>[22m
+[2m    14 × locator resolved to 9 elements. Proceeding with the first one: <div class="grid grid-cols-2 gap-2 px-2">…</div>[22m
 
                         </div>
                         
@@ -304,6 +303,13 @@ Call log:
                             <strong class="missing-elements">Missing Elements:</strong> <code>[class*="gallery"], [class*="album"], [class*="grid"]</code>
                         </div>
                         
+                        
+                        <div class="error-details">
+                            <strong>Errors:</strong>
+                            <ul>
+                                <li>URL verification failed. Expected to contain "/mosc/gallery", got "http://localhost:3000/mosc"</li>
+                            </ul>
+                        </div>
                         
                         
                         <div class="error-details">
@@ -316,8 +322,8 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc</div>
-                        <div class="duration">40329ms</div>
-                        
+                        <div class="duration">50130ms</div>
+                        <a href="screenshots/mosc-001a-1770341067939.png" target="_blank" class="screenshot-link">📷 Screenshot</a>
                     </div>
                 </div>
             
@@ -352,7 +358,7 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/holy-synod</div>
-                        <div class="duration">11574ms</div>
+                        <div class="duration">11017ms</div>
                         
                     </div>
                 </div>
@@ -388,7 +394,7 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/gallery</div>
-                        <div class="duration">3450ms</div>
+                        <div class="duration">3609ms</div>
                         
                     </div>
                 </div>
@@ -424,7 +430,7 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/directory</div>
-                        <div class="duration">8995ms</div>
+                        <div class="duration">9084ms</div>
                         
                     </div>
                 </div>
@@ -452,7 +458,7 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/calendar</div>
-                        <div class="duration">7311ms</div>
+                        <div class="duration">8018ms</div>
                         
                     </div>
                 </div>
@@ -488,7 +494,7 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/contact-info</div>
-                        <div class="duration">11458ms</div>
+                        <div class="duration">7926ms</div>
                         
                     </div>
                 </div>
@@ -516,7 +522,7 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/dioceses</div>
-                        <div class="duration">11590ms</div>
+                        <div class="duration">8517ms</div>
                         
                     </div>
                 </div>
@@ -544,7 +550,7 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/the-church</div>
-                        <div class="duration">18216ms</div>
+                        <div class="duration">14883ms</div>
                         
                     </div>
                 </div>
@@ -572,7 +578,7 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/spiritual-organizations</div>
-                        <div class="duration">13601ms</div>
+                        <div class="duration">10612ms</div>
                         
                     </div>
                 </div>
@@ -600,7 +606,7 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/training</div>
-                        <div class="duration">13787ms</div>
+                        <div class="duration">10969ms</div>
                         
                     </div>
                 </div>
@@ -628,7 +634,7 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/theological-seminaries</div>
-                        <div class="duration">14630ms</div>
+                        <div class="duration">9831ms</div>
                         
                     </div>
                 </div>
@@ -656,7 +662,7 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/pilgrim-centres</div>
-                        <div class="duration">8800ms</div>
+                        <div class="duration">7156ms</div>
                         
                     </div>
                 </div>
@@ -684,7 +690,7 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/institutions</div>
-                        <div class="duration">7181ms</div>
+                        <div class="duration">9303ms</div>
                         
                     </div>
                 </div>
@@ -712,7 +718,7 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/saints</div>
-                        <div class="duration">13862ms</div>
+                        <div class="duration">9038ms</div>
                         
                     </div>
                 </div>
@@ -740,7 +746,7 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/sitemap</div>
-                        <div class="duration">21535ms</div>
+                        <div class="duration">8029ms</div>
                         
                     </div>
                 </div>
@@ -768,7 +774,7 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/catholicate</div>
-                        <div class="duration">18652ms</div>
+                        <div class="duration">10524ms</div>
                         
                     </div>
                 </div>
@@ -796,7 +802,7 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/catholicate/h-h-baselios-marthoma-paulose-ii</div>
-                        <div class="duration">14088ms</div>
+                        <div class="duration">8131ms</div>
                         
                     </div>
                 </div>
@@ -824,7 +830,7 @@ Call log:
                     </div>
                     <div class="test-details">
                         <div class="url">/mosc/speeches</div>
-                        <div class="duration">8544ms</div>
+                        <div class="duration">7572ms</div>
                         
                     </div>
                 </div>
@@ -833,7 +839,7 @@ Call log:
 
         <div class="footer">
             <p>Generated by MOSC Pages Test Suite</p>
-            <p class="timestamp">Report generated on: 2/3/2026, 4:28:12 PM</p>
+            <p class="timestamp">Report generated on: 2/5/2026, 8:27:13 PM</p>
             <p class="timestamp">Base URL: http://localhost:3000</p>
             <p class="timestamp">Test Engine: Playwright (Local Browser Execution)</p>
         </div>
