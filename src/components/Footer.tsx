@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Facebook, Twitter, Linkedin, Youtube, ArrowUp, Mail, Phone, MapPin } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import { useTenantSettings } from "@/components/TenantSettingsProvider";
 
 // Back-to-top button component with comprehensive styling
 const BackToTopButton = () => {
@@ -60,7 +61,13 @@ const BackToTopButton = () => {
   );
 };
 
+const linkBaseClass =
+  'flex items-center justify-center w-10 h-10 text-gray-400 hover:text-white rounded-lg transition-all duration-300 hover:scale-110 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900';
+
 const Footer = () => {
+  const { settings } = useTenantSettings();
+  const hasAnySocial = settings?.facebookUrl?.trim() || settings?.instagramUrl?.trim() || settings?.twitterUrl?.trim() || settings?.linkedinUrl?.trim() || settings?.youtubeUrl?.trim() || settings?.tiktokUrl?.trim();
+
   return (
     <footer className="bg-gray-900 text-gray-300 footer-edge-to-edge mt-20" data-testid="main-footer" role="contentinfo">
       {/* Main Footer Content */}
@@ -68,7 +75,7 @@ const Footer = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
 
-            {/* Column 1: Logo and Social Media */}
+            {/* Column 1: Logo and Social Media - icons only when tenant URLs are set */}
             <div className="lg:col-span-1">
               <Link href="/charity-theme" className="inline-block mb-6">
                 <Image
@@ -85,75 +92,55 @@ const Footer = () => {
                 Making a difference in communities worldwide through compassionate action and sustainable impact.
               </p>
 
-              <div className="mb-6">
-                <p className="text-white font-inter font-medium text-sm mb-4">Follow our journey</p>
-                <ul className="flex space-x-4">
-                  <li>
-                    <a
-                      href="#"
-                      className="
-                        flex items-center justify-center w-10 h-10
-                        text-gray-400 hover:text-white
-                        bg-gray-800 hover:bg-blue-600
-                        rounded-lg transition-all duration-300
-                        hover:scale-110 active:scale-95
-                        focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 focus:ring-offset-gray-900
-                      "
-                      aria-label="Follow us on Facebook"
-                    >
-                      <Facebook size={18} strokeWidth={2} />
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="
-                        flex items-center justify-center w-10 h-10
-                        text-gray-400 hover:text-white
-                        bg-gray-800 hover:bg-blue-400
-                        rounded-lg transition-all duration-300
-                        hover:scale-110 active:scale-95
-                        focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-gray-900
-                      "
-                      aria-label="Follow us on Twitter"
-                    >
-                      <Twitter size={18} strokeWidth={2} />
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="
-                        flex items-center justify-center w-10 h-10
-                        text-gray-400 hover:text-white
-                        bg-gray-800 hover:bg-blue-700
-                        rounded-lg transition-all duration-300
-                        hover:scale-110 active:scale-95
-                        focus:outline-none focus:ring-2 focus:ring-blue-700 focus:ring-offset-2 focus:ring-offset-gray-900
-                      "
-                      aria-label="Connect with us on LinkedIn"
-                    >
-                      <Linkedin size={18} strokeWidth={2} />
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="
-                        flex items-center justify-center w-10 h-10
-                        text-gray-400 hover:text-white
-                        bg-gray-800 hover:bg-red-600
-                        rounded-lg transition-all duration-300
-                        hover:scale-110 active:scale-95
-                        focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-gray-900
-                      "
-                      aria-label="Subscribe to our YouTube channel"
-                    >
-                      <Youtube size={18} strokeWidth={2} />
-                    </a>
-                  </li>
-                </ul>
-              </div>
+              {hasAnySocial && (
+                <div className="mb-6">
+                  <p className="text-white font-inter font-medium text-sm mb-4">Follow our journey</p>
+                  <ul className="flex flex-wrap gap-2">
+                    {settings?.facebookUrl?.trim() && (
+                      <li>
+                        <a href={settings.facebookUrl.trim()} target="_blank" rel="noopener noreferrer" className={`${linkBaseClass} bg-gray-800 hover:bg-blue-600 focus:ring-blue-600`} aria-label="Follow us on Facebook">
+                          <Facebook size={18} strokeWidth={2} />
+                        </a>
+                      </li>
+                    )}
+                    {settings?.instagramUrl?.trim() && (
+                      <li>
+                        <a href={settings.instagramUrl.trim()} target="_blank" rel="noopener noreferrer" className={`${linkBaseClass} bg-gray-800 hover:bg-pink-600 focus:ring-pink-600`} aria-label="Follow us on Instagram">
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069z"/></svg>
+                        </a>
+                      </li>
+                    )}
+                    {settings?.twitterUrl?.trim() && (
+                      <li>
+                        <a href={settings.twitterUrl.trim()} target="_blank" rel="noopener noreferrer" className={`${linkBaseClass} bg-gray-800 hover:bg-blue-400 focus:ring-blue-400`} aria-label="Follow us on X (Twitter)">
+                          <Twitter size={18} strokeWidth={2} />
+                        </a>
+                      </li>
+                    )}
+                    {settings?.linkedinUrl?.trim() && (
+                      <li>
+                        <a href={settings.linkedinUrl.trim()} target="_blank" rel="noopener noreferrer" className={`${linkBaseClass} bg-gray-800 hover:bg-blue-700 focus:ring-blue-700`} aria-label="Connect with us on LinkedIn">
+                          <Linkedin size={18} strokeWidth={2} />
+                        </a>
+                      </li>
+                    )}
+                    {settings?.youtubeUrl?.trim() && (
+                      <li>
+                        <a href={settings.youtubeUrl.trim()} target="_blank" rel="noopener noreferrer" className={`${linkBaseClass} bg-gray-800 hover:bg-red-600 focus:ring-red-600`} aria-label="Subscribe to our YouTube channel">
+                          <Youtube size={18} strokeWidth={2} />
+                        </a>
+                      </li>
+                    )}
+                    {settings?.tiktokUrl?.trim() && (
+                      <li>
+                        <a href={settings.tiktokUrl.trim()} target="_blank" rel="noopener noreferrer" className={`${linkBaseClass} bg-gray-800 hover:bg-gray-600 focus:ring-gray-500`} aria-label="Follow us on TikTok">
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
+                        </a>
+                      </li>
+                    )}
+                  </ul>
+                </div>
+              )}
             </div>
 
             {/* Column 2: Contact Information */}

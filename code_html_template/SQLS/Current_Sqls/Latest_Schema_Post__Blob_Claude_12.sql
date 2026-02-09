@@ -1510,11 +1510,13 @@ CREATE TABLE public.event_sponsors (
     -- Status and metadata
                                        is_active boolean DEFAULT true NOT NULL,
                                        priority_ranking int4 DEFAULT 0 NOT NULL,
-    -- Social media links
+    -- Social media links (Facebook, Instagram, X (Twitter), LinkedIn, YouTube, TikTok)
                                        facebook_url varchar(1024) NULL,
+                                       instagram_url varchar(1024) NULL,
                                        twitter_url varchar(1024) NULL,
                                        linkedin_url varchar(1024) NULL,
-                                       instagram_url varchar(1024) NULL,
+                                       youtube_url varchar(1024) NULL,
+                                       tiktok_url varchar(1024) NULL,
     -- Timestamps
                                        created_at timestamp DEFAULT now() NOT NULL,
                                        updated_at timestamp DEFAULT now() NOT NULL,
@@ -1526,9 +1528,11 @@ CREATE TABLE public.event_sponsors (
     CONSTRAINT check_url_format_hero CHECK (hero_image_url IS NULL OR hero_image_url ~* '^https?://.*'),
     CONSTRAINT check_url_format_banner CHECK (banner_image_url IS NULL OR banner_image_url ~* '^https?://.*'),
     CONSTRAINT check_url_format_facebook CHECK (facebook_url IS NULL OR facebook_url ~* '^https?://.*'),
+    CONSTRAINT check_url_format_instagram CHECK (instagram_url IS NULL OR instagram_url ~* '^https?://.*'),
     CONSTRAINT check_url_format_twitter CHECK (twitter_url IS NULL OR twitter_url ~* '^https?://.*'),
     CONSTRAINT check_url_format_linkedin CHECK (linkedin_url IS NULL OR linkedin_url ~* '^https?://.*'),
-    CONSTRAINT check_url_format_instagram CHECK (instagram_url IS NULL OR instagram_url ~* '^https?://.*'),
+    CONSTRAINT check_url_format_youtube CHECK (youtube_url IS NULL OR youtube_url ~* '^https?://.*'),
+    CONSTRAINT check_url_format_tiktok CHECK (tiktok_url IS NULL OR tiktok_url ~* '^https?://.*'),
     CONSTRAINT check_email_format CHECK (contact_email IS NULL OR contact_email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'),
     CONSTRAINT fk_event_sponsors_event_id FOREIGN KEY (event_id) REFERENCES public.event_details(id) ON DELETE CASCADE
 );
@@ -2193,6 +2197,12 @@ CREATE TABLE public.tenant_settings (
                                         email_header_image_url VARCHAR(2048) NULL,
                                         email_footer_html_url VARCHAR(2048),
                                         logo_image_url VARCHAR(2048),
+                                        facebook_url varchar(1024) NULL,
+                                        instagram_url varchar(1024) NULL,
+                                        twitter_url varchar(1024) NULL,
+                                        linkedin_url varchar(1024) NULL,
+                                        youtube_url varchar(1024) NULL,
+                                        tiktok_url varchar(1024) NULL,
                                         created_at timestamp without time zone DEFAULT now() NOT NULL,
                                         updated_at timestamp without time zone DEFAULT now() NOT NULL,
                                         CONSTRAINT check_default_capacity_positive CHECK (((default_event_capacity IS NULL) OR (default_event_capacity > 0))),
@@ -2218,6 +2228,13 @@ CREATE INDEX idx_tenant_settings_organization_id ON public.tenant_settings(tenan
 COMMENT ON TABLE public.tenant_settings IS 'Tenant-specific configuration settings with enhanced options';
 
 COMMENT ON COLUMN public.tenant_settings.tenant_organization_id IS 'Foreign key reference to tenant_organization.id for standard Long->Long relationship';
+
+COMMENT ON COLUMN public.tenant_settings.facebook_url IS 'Organization Facebook profile or page URL for Follow our journey section';
+COMMENT ON COLUMN public.tenant_settings.instagram_url IS 'Organization Instagram profile URL for Follow our journey section';
+COMMENT ON COLUMN public.tenant_settings.twitter_url IS 'Organization X (Twitter) profile URL for Follow our journey section';
+COMMENT ON COLUMN public.tenant_settings.linkedin_url IS 'Organization LinkedIn profile or company page URL for Follow our journey section';
+COMMENT ON COLUMN public.tenant_settings.youtube_url IS 'Organization YouTube channel URL for Follow our journey section';
+COMMENT ON COLUMN public.tenant_settings.tiktok_url IS 'Organization TikTok profile URL for Follow our journey section';
 
 --
 -- TOC entry (class 1259 OID)
@@ -3659,9 +3676,11 @@ COMMENT ON COLUMN public.event_sponsors.banner_image_url IS 'URL to sponsor bann
 COMMENT ON COLUMN public.event_sponsors.is_active IS 'Whether the sponsor is currently active and should be displayed';
 COMMENT ON COLUMN public.event_sponsors.priority_ranking IS 'Display priority ranking (higher numbers = higher priority)';
 COMMENT ON COLUMN public.event_sponsors.facebook_url IS 'Facebook page URL';
-COMMENT ON COLUMN public.event_sponsors.twitter_url IS 'Twitter profile URL';
-COMMENT ON COLUMN public.event_sponsors.linkedin_url IS 'LinkedIn company page URL';
 COMMENT ON COLUMN public.event_sponsors.instagram_url IS 'Instagram profile URL';
+COMMENT ON COLUMN public.event_sponsors.twitter_url IS 'X (Twitter) profile URL';
+COMMENT ON COLUMN public.event_sponsors.linkedin_url IS 'LinkedIn company page URL';
+COMMENT ON COLUMN public.event_sponsors.youtube_url IS 'YouTube channel URL';
+COMMENT ON COLUMN public.event_sponsors.tiktok_url IS 'TikTok profile URL';
 
 -- event_sponsors_join column comments
 COMMENT ON COLUMN public.event_sponsors_join.event_id IS 'Foreign key reference to event_details.id';

@@ -92,7 +92,14 @@ export default function TenantSettingsForm({
       zipCode: initialData?.zipCode || '',
       country: initialData?.country || '',
       stateProvince: initialData?.stateProvince || '',
-      email: initialData?.email || ''
+      email: initialData?.email || '',
+      // Social media URLs (Follow our journey)
+      facebookUrl: initialData?.facebookUrl || '',
+      instagramUrl: initialData?.instagramUrl || '',
+      twitterUrl: initialData?.twitterUrl || '',
+      linkedinUrl: initialData?.linkedinUrl || '',
+      youtubeUrl: initialData?.youtubeUrl || '',
+      tiktokUrl: initialData?.tiktokUrl || ''
     }
   });
 
@@ -731,6 +738,44 @@ export default function TenantSettingsForm({
                 {errors.country && (
                   <p className="mt-1 text-sm text-red-600">{errors.country.message}</p>
                 )}
+              </div>
+            </div>
+
+            {/* Social Media URLs (Follow our journey) */}
+            <div className="space-y-4">
+              <h4 className="text-md font-medium text-gray-900">Social Media URLs</h4>
+              <p className="text-sm text-gray-600">Organization links for Follow our journey. Leave blank to hide the icon on the site.</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Facebook URL</label>
+                  <input type="url" {...register('facebookUrl', { maxLength: { value: 1024, message: 'Max 1024 characters' } })}
+                    className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base" placeholder="https://facebook.com/..." />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Instagram URL</label>
+                  <input type="url" {...register('instagramUrl', { maxLength: { value: 1024, message: 'Max 1024 characters' } })}
+                    className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base" placeholder="https://instagram.com/..." />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">X (Twitter) URL</label>
+                  <input type="url" {...register('twitterUrl', { maxLength: { value: 1024, message: 'Max 1024 characters' } })}
+                    className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base" placeholder="https://x.com/..." />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">LinkedIn URL</label>
+                  <input type="url" {...register('linkedinUrl', { maxLength: { value: 1024, message: 'Max 1024 characters' } })}
+                    className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base" placeholder="https://linkedin.com/..." />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">YouTube URL</label>
+                  <input type="url" {...register('youtubeUrl', { maxLength: { value: 1024, message: 'Max 1024 characters' } })}
+                    className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base" placeholder="https://youtube.com/..." />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">TikTok URL</label>
+                  <input type="url" {...register('tiktokUrl', { maxLength: { value: 1024, message: 'Max 1024 characters' } })}
+                    className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base" placeholder="https://tiktok.com/..." />
+                </div>
               </div>
             </div>
 

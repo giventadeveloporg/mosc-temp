@@ -53,11 +53,13 @@ const DEFAULT_PAGINATION: StrapiPagination = {
 };
 
 /**
- * Fetches bishops list from Strapi with optional bishopType filter and pagination.
+ * Fetches bishops list from Strapi with optional bishopType filter, name search, and pagination.
  * Returns empty list and default pagination on failure.
+ * Name search uses case-insensitive contains (Strapi filters[name][$containsi]).
  */
 export async function getBishopsData(options: {
   bishopType?: BishopType;
+  nameSearch?: string;
   page?: number;
   pageSize?: number;
 }): Promise<BishopsListResult> {
@@ -72,6 +74,10 @@ export async function getBishopsData(options: {
   params.set('filters[tenant][tenantId][$eq]', tenantId);
   if (options.bishopType) {
     params.set('filters[bishopType][$eq]', options.bishopType);
+  }
+  const nameQuery = options.nameSearch?.trim();
+  if (nameQuery) {
+    params.set('filters[name][$containsi]', nameQuery);
   }
   params.set('sort', 'order:asc,name:asc');
   params.set('populate[0]', 'diocese');

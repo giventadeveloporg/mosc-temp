@@ -610,6 +610,13 @@ export interface TenantSettingsDTO {
   country?: string;
   stateProvince?: string;
   email?: string;
+  // Social media URLs (Follow our journey / organization links)
+  facebookUrl?: string;
+  instagramUrl?: string;
+  twitterUrl?: string;
+  linkedinUrl?: string;
+  youtubeUrl?: string;
+  tiktokUrl?: string;
   createdAt: string; // date-time
   updatedAt: string; // date-time
   tenantOrganization?: TenantOrganizationDTO;
@@ -967,9 +974,11 @@ export interface EventSponsorsDTO {
   isActive: boolean;
   priorityRanking: number; // Required field based on database constraint
   facebookUrl?: string;
+  instagramUrl?: string;
   twitterUrl?: string;
   linkedinUrl?: string;
-  instagramUrl?: string;
+  youtubeUrl?: string;
+  tiktokUrl?: string;
   createdAt: string;
   updatedAt: string;
 }

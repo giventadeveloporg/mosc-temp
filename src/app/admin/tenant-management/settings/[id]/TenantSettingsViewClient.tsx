@@ -235,6 +235,18 @@ export default function TenantSettingsViewClient({ settings, settingsId, organiz
                 </dd>
               </div>
             )}
+            {/* Social media URLs - always show so admins see available fields; empty = "Not set" */}
+            <div className="sm:col-span-2 border-t border-gray-200 pt-4 mt-2">
+              <dt className="text-sm font-medium text-gray-500 mb-2">Social Media URLs</dt>
+              <dd className="mt-1 text-sm text-gray-900 space-y-1">
+                <div><span className="font-medium text-gray-600">Facebook:</span>{' '}{settings?.facebookUrl?.trim() ? <a href={settings.facebookUrl.trim()} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{settings.facebookUrl.trim()}</a> : <span className="text-gray-400 italic">Not set</span>}</div>
+                <div><span className="font-medium text-gray-600">Instagram:</span>{' '}{settings?.instagramUrl?.trim() ? <a href={settings.instagramUrl.trim()} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{settings.instagramUrl.trim()}</a> : <span className="text-gray-400 italic">Not set</span>}</div>
+                <div><span className="font-medium text-gray-600">X (Twitter):</span>{' '}{settings?.twitterUrl?.trim() ? <a href={settings.twitterUrl.trim()} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{settings.twitterUrl.trim()}</a> : <span className="text-gray-400 italic">Not set</span>}</div>
+                <div><span className="font-medium text-gray-600">LinkedIn:</span>{' '}{settings?.linkedinUrl?.trim() ? <a href={settings.linkedinUrl.trim()} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{settings.linkedinUrl.trim()}</a> : <span className="text-gray-400 italic">Not set</span>}</div>
+                <div><span className="font-medium text-gray-600">YouTube:</span>{' '}{settings?.youtubeUrl?.trim() ? <a href={settings.youtubeUrl.trim()} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{settings.youtubeUrl.trim()}</a> : <span className="text-gray-400 italic">Not set</span>}</div>
+                <div><span className="font-medium text-gray-600">TikTok:</span>{' '}{settings?.tiktokUrl?.trim() ? <a href={settings.tiktokUrl.trim()} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{settings.tiktokUrl.trim()}</a> : <span className="text-gray-400 italic">Not set</span>}</div>
+              </dd>
+            </div>
             <div>
               <dt className="text-sm font-medium text-gray-500">Created At</dt>
               <dd className="mt-1 text-sm text-gray-900">
