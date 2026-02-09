@@ -9,18 +9,36 @@ const PAGE_SIZE = 20;
 
 type Props = {
   directoryType: DirectoryEntryType;
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; q?: string }>;
 };
+
+function buildUrl(directoryType: DirectoryEntryType, page: number, q?: string): string {
+  const base = `/mosc/directory/${directoryType}`;
+  const params = new URLSearchParams();
+  if (page > 1) params.set('page', String(page));
+  if (q?.trim()) params.set('q', q.trim());
+  const query = params.toString();
+  return query ? `${base}?${query}` : base;
+}
 
 export default async function EntriesListPage({ directoryType, searchParams }: Props) {
   const params = await searchParams;
   const page = Math.max(1, parseInt(params.page ?? '1', 10) || 1);
+  const nameSearch = typeof params.q === 'string' ? params.q : undefined;
+  const searchTerm = nameSearch?.trim() ?? '';
+  const hasSearch = searchTerm.length > 0;
+
   const { entries, pagination } = await getDirectoryEntriesData({
     directoryType,
+    nameSearch: nameSearch?.trim() || undefined,
     page,
     pageSize: PAGE_SIZE,
   });
   const title = DIRECTORY_ENTRY_TYPE_LABELS[directoryType];
+  const basePath = `/mosc/directory/${directoryType}`;
+  const subtitle = hasSearch
+    ? `${pagination.total} entr${pagination.total !== 1 ? 'ies' : 'y'} matching "${searchTerm}".`
+    : `${pagination.total} entr${pagination.total !== 1 ? 'ies' : 'y'}. Data from the directory API.`;
 
   return (
     <div className="min-h-screen bg-background">
@@ -33,13 +51,35 @@ export default async function EntriesListPage({ directoryType, searchParams }: P
             {title}
           </h1>
           <p className="font-body text-muted-foreground mt-2">
-            {pagination.total} entr{pagination.total !== 1 ? 'ies' : 'y'}. Data from the directory API.
+            {subtitle}
           </p>
         </div>
       </section>
 
       <section className="py-12 bg-card">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-6" role="search" aria-label={`Search ${title.toLowerCase()} by name`}>
+            <form method="get" action={basePath} className="flex flex-wrap gap-2 items-center">
+              <label htmlFor="entries-name-search" className="sr-only">Search by name</label>
+              <input
+                id="entries-name-search"
+                type="search"
+                name="q"
+                defaultValue={nameSearch ?? ''}
+                placeholder="Search by name..."
+                className="font-body flex-1 min-w-[200px] px-4 py-2 border border-border rounded-lg bg-input text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              />
+              <button type="submit" className="font-body font-medium px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 reverent-transition">
+                Search
+              </button>
+              {hasSearch && (
+                <Link href={basePath} className="font-body text-sm text-muted-foreground hover:text-primary hover:underline">
+                  Clear search
+                </Link>
+              )}
+            </form>
+          </div>
+
           {entries.length === 0 ? (
             <div className="bg-muted/20 rounded-lg p-8 text-center">
               <p className="font-body text-muted-foreground">
@@ -64,7 +104,7 @@ export default async function EntriesListPage({ directoryType, searchParams }: P
                   <div className="flex gap-3">
                     {pagination.page > 1 && (
                       <Link
-                        href={`/mosc/directory/${directoryType}?page=${pagination.page - 1}`}
+                        href={buildUrl(directoryType, pagination.page - 1, nameSearch)}
                         className="px-4 py-2 bg-primary/10 text-primary font-body font-medium rounded-lg hover:bg-primary/20 reverent-transition"
                       >
                         Previous
@@ -72,7 +112,7 @@ export default async function EntriesListPage({ directoryType, searchParams }: P
                     )}
                     {pagination.page < pagination.pageCount && (
                       <Link
-                        href={`/mosc/directory/${directoryType}?page=${pagination.page + 1}`}
+                        href={buildUrl(directoryType, pagination.page + 1, nameSearch)}
                         className="px-4 py-2 bg-primary/10 text-primary font-body font-medium rounded-lg hover:bg-primary/20 reverent-transition"
                       >
                         Next

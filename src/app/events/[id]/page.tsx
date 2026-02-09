@@ -1132,7 +1132,7 @@ export default function EventDetailsPage() {
                   </a>
                 )}
 
-                {/* Buy Tickets Image - Show only for TICKETED events */}
+                {/* Buy Tickets / Fundraiser Image - Same link (givebutter-checkout) for fundraiser events */}
                 {(() => {
                   if (!event.startDate) return null;
 
@@ -1150,15 +1150,32 @@ export default function EventDetailsPage() {
                   const isFuture = eventDateStr > todayStr;
                   const isUpcomingLocal = isToday || isFuture;
 
-                  // Only show Buy Tickets image for TICKETED events (case-insensitive check)
-                  const showBuyTicketsButton = event.admissionType?.toUpperCase() === 'TICKETED' && isUpcomingLocal;
-                  // Show Make a Donation button for donation-based events
-                  const showDonationButton = isDonationBasedEvent(event) && isUpcomingLocal;
+                  // Ticketed fundraiser: both Buy Tickets (center) and Fundraiser badge (top right) point to givebutter-checkout
+                  const isTicketedFundraiser = isTicketedFundraiserEvent(event) && isUpcomingLocal;
+                  // Only show red Buy Tickets for TICKETED events that are NOT ticketed fundraiser
+                  const showBuyTicketsButton = event.admissionType?.toUpperCase() === 'TICKETED' && isUpcomingLocal && !isTicketedFundraiser;
+                  // Show Make a Donation for donation-based events that are NOT ticketed fundraiser
+                  const showDonationButton = isDonationBasedEvent(event) && isUpcomingLocal && !isTicketedFundraiser;
 
-                  if (!showBuyTicketsButton && !showDonationButton) return null;
+                  if (!showBuyTicketsButton && !showDonationButton && !isTicketedFundraiser) return null;
 
                   return (
                     <div className="flex flex-col gap-2">
+                      {/* Fundraiser: same image and URL as top-right badge → givebutter-checkout */}
+                      {isTicketedFundraiser && (
+                        <Link
+                          href={`/events/${event.id}/givebutter-checkout`}
+                          className="transition-transform hover:scale-105"
+                          title="Buy Tickets"
+                          aria-label="Buy Tickets"
+                        >
+                          <img
+                            alt="Buy Tickets"
+                            className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
+                            src="/images/buy_tickets_click_here_fundraiser.png"
+                          />
+                        </Link>
+                      )}
                       {showBuyTicketsButton && (
                         <Link
                           href={`/events/${event.id}/tickets`}

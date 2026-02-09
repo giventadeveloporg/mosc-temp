@@ -50,6 +50,7 @@ const DEFAULT_PAGINATION: StrapiPagination = {
 };
 
 export async function getParishesData(options: {
+  nameSearch?: string;
   page?: number;
   pageSize?: number;
 }): Promise<ParishesListResult> {
@@ -59,6 +60,8 @@ export async function getParishesData(options: {
 
   const params = new URLSearchParams();
   params.set('filters[tenant][tenantId][$eq]', tenantId);
+  const nameQuery = options.nameSearch?.trim();
+  if (nameQuery) params.set('filters[name][$containsi]', nameQuery);
   params.set('sort', 'name:asc');
   params.set('populate[0]', 'diocese');
   const page = Math.max(1, options.page ?? 1);
