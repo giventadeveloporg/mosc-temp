@@ -1,10 +1,9 @@
 import React from 'react';
 import { Metadata } from 'next';
-import { headers } from 'next/headers';
 import SyroHeader from './components/SyroHeader';
+import SyroQuickLinksBar from './components/SyroQuickLinksBar';
 import SyroFooter from './components/SyroFooter';
-import NavigationBreadcrumb from './components/NavigationBreadcrumb';
-import ImageSlider from './components/ImageSlider';
+import SyroStaticAssets from './components/SyroStaticAssets';
 import '@/styles/syro-malabar.css';
 
 export const metadata: Metadata = {
@@ -25,25 +24,14 @@ interface SyroLayoutProps {
   children: React.ReactNode;
 }
 
-export default async function SyroLayout({ children }: SyroLayoutProps) {
-  const headersList = await headers();
-  const pathname = headersList.get('x-pathname') || '';
-  const isSyroLanding = pathname === '/syro' || pathname === '/syro/';
-
-  // Landing page: static HTML has its own header/footer; render only the iframe (children)
-  if (isSyroLanding) {
-    return <>{children}</>;
-  }
-
+export default function SyroLayout({ children }: SyroLayoutProps) {
   return (
-    <div className="syro-layout min-h-screen bg-syro-bg-gray flex flex-col font-syro-primary">
+    <div className="syro-layout min-h-screen flex flex-col">
+      <SyroStaticAssets />
       <SyroHeader />
-      
-      {/* Image Slider after navbar */}
-      <ImageSlider />
+      <SyroQuickLinksBar />
 
-      <main className="syro-main flex-1">
-        <NavigationBreadcrumb />
+      <main id="mainContent" className="syro-main flex-1">
         {children}
       </main>
 

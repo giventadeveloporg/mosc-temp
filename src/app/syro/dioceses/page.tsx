@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import QuickLinks from '../components/QuickLinks';
-import SyroPageHero from '../components/SyroPageHero';
+import SyroPageBanner from '../components/SyroPageBanner';
 import SyroSectionTitle from '../components/SyroSectionTitle';
 
 export const metadata = {
@@ -47,10 +47,7 @@ const DiocesesPage = () => {
 
   return (
     <div className="bg-syro-bg-gray">
-      <SyroPageHero
-        title="Dioceses of the Malankara Orthodox Syrian Church"
-        description="Our church is organized into dioceses across India and worldwide, each serving local communities while maintaining unity with the global Orthodox family."
-      />
+      <SyroPageBanner title="Dioceses" />
 
       <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -83,23 +80,12 @@ const DiocesesPage = () => {
                     {card.excerpt}
                   </p>
                   <div className="mt-auto pt-4">
-                    <span className="inline-flex items-center gap-1.5 font-syro-primary text-sm font-medium text-syro-red">
+                    <span className="syro-read-more-btn font-syro-primary">
                       Read More
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      aria-hidden="true"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </span>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
+                    </span>
                   </div>
                 </div>
               </Link>

@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import QuickLinks from '../components/QuickLinks';
+import SyroPageBanner from '../components/SyroPageBanner';
 
 export const metadata = {
   title: 'Holy Synod',
@@ -203,24 +204,7 @@ const synodMembers: Array<{
 const HolySynodPage = () => {
   return (
     <div className="bg-syro-bg-gray">
-      {/* Hero */}
-      <section className="relative bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray min-h-[280px] flex items-center py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="text-center">
-            <div className="w-20 h-20 rounded-full border-2 border-syro-red/20 bg-syro-red/10 flex items-center justify-center mx-auto mb-6">
-              <svg className="w-10 h-10 text-syro-red" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-            </div>
-            <h1 className="font-syro-display font-semibold text-4xl text-syro-blue mb-4">
-              Holy Synod
-            </h1>
-            <p className="font-syro-primary text-lg text-syro-dark-gray max-w-3xl mx-auto leading-relaxed">
-              The bishops of the Malankara Orthodox Syrian Church and the Catholicos as the highest governing body.
-            </p>
-          </div>
-        </div>
-      </section>
+      <SyroPageBanner title="Holy Synod" />
 
       {/* Content - matches HTML structure and style */}
       <section className="py-16 bg-syro-bg-gray">
@@ -266,7 +250,7 @@ const HolySynodPage = () => {
                   {member.internalHref ? (
                     <Link
                       href={member.internalHref}
-                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-syro-red text-white font-semibold rounded-lg hover:opacity-90 transition-all duration-300 mt-auto w-fit border-r-4 border-[#be1929]"
+                      className="syro-primary-button inline-flex items-center gap-2 mt-auto w-fit"
                     >
                       <span>Read More</span>
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -278,7 +262,7 @@ const HolySynodPage = () => {
                       href="https://mosc.in/holysynod/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-syro-red text-white font-semibold rounded-lg hover:opacity-90 transition-all duration-300 mt-auto w-fit border-r-4 border-[#be1929]"
+                      className="syro-primary-button inline-flex items-center gap-2 mt-auto w-fit"
                     >
                       <span>Read More</span>
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

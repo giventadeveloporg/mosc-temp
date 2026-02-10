@@ -113,9 +113,11 @@ export async function createEventSponsorServer(sponsor: Omit<EventSponsorsDTO, '
     heroImageUrl: cleanUrlField(sponsor.heroImageUrl),
     bannerImageUrl: cleanUrlField(sponsor.bannerImageUrl),
     facebookUrl: cleanUrlField(sponsor.facebookUrl),
+    instagramUrl: cleanUrlField(sponsor.instagramUrl),
     twitterUrl: cleanUrlField(sponsor.twitterUrl),
     linkedinUrl: cleanUrlField(sponsor.linkedinUrl),
-    instagramUrl: cleanUrlField(sponsor.instagramUrl),
+    youtubeUrl: cleanUrlField(sponsor.youtubeUrl),
+    tiktokUrl: cleanUrlField(sponsor.tiktokUrl),
   };
 
   // Don't apply withTenantId here since the proxy will handle it
@@ -158,9 +160,11 @@ export async function updateEventSponsorServer(id: number, sponsor: Partial<Even
     heroImageUrl: sponsor.heroImageUrl ? cleanUrlField(sponsor.heroImageUrl) : undefined,
     bannerImageUrl: sponsor.bannerImageUrl ? cleanUrlField(sponsor.bannerImageUrl) : undefined,
     facebookUrl: sponsor.facebookUrl ? cleanUrlField(sponsor.facebookUrl) : undefined,
+    instagramUrl: sponsor.instagramUrl ? cleanUrlField(sponsor.instagramUrl) : undefined,
     twitterUrl: sponsor.twitterUrl ? cleanUrlField(sponsor.twitterUrl) : undefined,
     linkedinUrl: sponsor.linkedinUrl ? cleanUrlField(sponsor.linkedinUrl) : undefined,
-    instagramUrl: sponsor.instagramUrl ? cleanUrlField(sponsor.instagramUrl) : undefined,
+    youtubeUrl: sponsor.youtubeUrl ? cleanUrlField(sponsor.youtubeUrl) : undefined,
+    tiktokUrl: sponsor.tiktokUrl ? cleanUrlField(sponsor.tiktokUrl) : undefined,
   });
 
   console.log('🔍 PATCH payload being sent:', JSON.stringify(payload, null, 2));

@@ -108,14 +108,13 @@
     <img src="/syro/assets/images/icons/loader.gif" style="width: 150px;" alt="">
   </div>
 
-  <!-- navbar -->
   <header>
-    <div id="navbar" class="logo-container d-flex align-items-center bg-transparent justify-content-between">
+    <div id="syro-header-bar" class="logo-container d-flex align-items-center bg-transparent justify-content-between">
       <a href="/syro" class="unset-link">
         <div class="logo-box d-flex align-items-center bg-transparent pe-3">
           <div class="logo-box-img bg-transparent">
             <div class="logo-img-div">
-              <img class="lozad" data-src="/syro/assets/images/mosc_images/MOSC-logo-Brand-part.png" src="/syro/assets/images/mosc_images/MOSC-logo-Brand-part.png" style="width:110px" alt="Malankara Orthodox Syrian Church">
+              <img class="lozad" data-src="/syro/assets/images/mosc_images/MOSC-logo-Brand-part.png" src="/syro/assets/images/mosc_images/MOSC-logo-Brand-part.png" style="width:160px" alt="Malankara Orthodox Syrian Church">
             </div>
           </div>
         </div>
@@ -124,19 +123,18 @@
         <div class="left-top-menu d-none d-lg-block">
           <nav class="navbar navbar-expand-lg bg-transparent">
             <div class="container-fluid">
-              <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <div class="collapse navbar-collapse d-flex align-items-center" id="navbarSupportedContent">
                 <ul><li><a class="dropdown-item" href="/syro"><i class="fa-solid fa-house"></i></a></li></ul>&nbsp;&nbsp;
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0" id="topmenus"></ul>
+                <ul class="navbar-nav mb-2 mb-lg-0 list-unstyled">
+                  <li class="nav-item"><i class="fas fa-bars" type="button" data-bs-toggle="offcanvas" data-bs-target="#detailedmenu" aria-controls="detailedmenu" aria-label="Menu"></i></li>
+                </ul>
               </div>
             </div>
           </nav>
         </div>
-        <div class="right-top-menu d-flex">
-          <ul>
-            <li>
-              <i class="fas fa-bars" type="button" data-bs-toggle="offcanvas" data-bs-target="#detailedmenu" aria-controls="detailedmenu"></i>
-            </li>
-          </ul>
+        <div class="d-block d-lg-none">
+          <i class="fas fa-bars" type="button" data-bs-toggle="offcanvas" data-bs-target="#detailedmenu" aria-controls="detailedmenu" aria-label="Menu"></i>
         </div>
       </div>
     </div>

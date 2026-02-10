@@ -52,7 +52,7 @@ export default function DirectoryPage() {
                 href="https://directory.mosc.in/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-syro-red text-white font-semibold rounded-lg hover:opacity-90 transition-all duration-300 border-r-4 border-[#be1929]"
+                className="syro-primary-button inline-flex items-center gap-2"
               >
                 Access Directory at directory.mosc.in
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

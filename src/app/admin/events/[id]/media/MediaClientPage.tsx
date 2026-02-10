@@ -998,13 +998,13 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
             <div className="flex-1">
               <h3 className="text-sm font-semibold text-blue-800 mb-2">📸 Hero Image Specifications</h3>
               <div className="text-sm text-blue-700 space-y-2">
-                <p><strong>For Hero Images:</strong> Use 800×1200px (2:3 aspect ratio) for optimal display in the charity theme hero section.</p>
+                <p><strong>For Hero Images:</strong> Use <strong>1200×800px (3:2 landscape)</strong> for optimal display in the home page hero rotation. Portrait (e.g. 800×1200) will make the hero section excessively tall.</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
                   <div>
                     <p className="font-medium text-blue-800">Optimal Dimensions:</p>
                     <ul className="text-xs space-y-1 mt-1">
-                      <li>• <strong>Desktop:</strong> 800×1200px (2:3 ratio)</li>
-                      <li>• <strong>Mobile:</strong> 600×900px (2:3 ratio)</li>
+                      <li>• <strong>Desktop:</strong> 1200×800px (3:2 ratio)</li>
+                      <li>• <strong>Mobile:</strong> 900×600px (3:2 ratio)</li>
                       <li>• <strong>Format:</strong> WebP preferred, JPG acceptable</li>
                       <li>• <strong>Quality:</strong> 80-85%</li>
                       <li>• <strong>File Size:</strong> Under 300KB</li>
@@ -1013,20 +1013,20 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
                   <div>
                     <p className="font-medium text-blue-800">Content Guidelines:</p>
                     <ul className="text-xs space-y-1 mt-1">
-                      <li>• Main subject in upper 60% of frame</li>
+                      <li>• Main subject in center or upper 60% of frame</li>
                       <li>• Text readable at 50% scale</li>
                       <li>• High contrast for overlay visibility</li>
                       <li>• Professional, culturally relevant style</li>
                     </ul>
                   </div>
                 </div>
-                <p className="text-xs text-blue-600 mt-2 italic">These specifications ensure your hero images look perfect across all devices and maintain the professional appearance of the charity theme page.</p>
+                <p className="text-xs text-blue-600 mt-2 italic">Landscape 3:2 fits the hero display area; portrait images are not recommended.</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Featured Event Image Specifications Tip */}
+        {/* Featured Event Image Specifications Tip - Home page event strip card (see documentation/HOME_PAGE_EVENT_STRIP_IMAGE_SPEC.md) */}
         <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
           <div className="flex items-start space-x-3">
             <div className="flex-shrink-0">
@@ -1035,31 +1035,30 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
               </svg>
             </div>
             <div className="flex-1">
-              <h3 className="text-sm font-semibold text-green-800 mb-2">🎯 Featured Event Image Specifications</h3>
+              <h3 className="text-sm font-semibold text-green-800 mb-2">Featured Event Image — Home Page Event Strip</h3>
               <div className="text-sm text-green-700 space-y-2">
-                <p><strong>For Featured Event Images:</strong> Use 1920×1080px (16:9 aspect ratio) for optimal display in the featured events section.</p>
+                <p><strong>Where it appears:</strong> Home page → Live and Featured event strips → left column of each event card (70% width × 200px on desktop; full width × 192px on mobile). Image fills the slot and may be cropped (object-cover).</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
                   <div>
-                    <p className="font-medium text-green-800">Optimal Dimensions:</p>
+                    <p className="font-medium text-green-800">Recommended specs:</p>
                     <ul className="text-xs space-y-1 mt-1">
-                      <li>• <strong>Desktop:</strong> 1920×1080px (16:9 ratio)</li>
-                      <li>• <strong>Mobile:</strong> 800×450px (16:9 ratio)</li>
-                      <li>• <strong>Format:</strong> WebP preferred, JPG acceptable</li>
-                      <li>• <strong>Quality:</strong> 85-90%</li>
-                      <li>• <strong>File Size:</strong> Under 500KB</li>
+                      <li>• <strong>Aspect:</strong> Landscape 4∶1 to 2∶1</li>
+                      <li>• <strong>Size:</strong> 1200×600px or 1600×400px (min 1200×400px)</li>
+                      <li>• <strong>Format:</strong> WebP preferred, JPEG acceptable</li>
+                      <li>• <strong>File size:</strong> Under 300 KB</li>
+                      <li>• <strong>Retina:</strong> 2400px on long side if possible</li>
                     </ul>
                   </div>
                   <div>
-                    <p className="font-medium text-green-800">Content Guidelines:</p>
+                    <p className="font-medium text-green-800">Content & safe zone:</p>
                     <ul className="text-xs space-y-1 mt-1">
-                      <li>• Event venue or activity in focus</li>
-                      <li>• Good lighting and vibrant colors</li>
-                      <li>• Horizontal composition preferred</li>
-                      <li>• Professional event photography style</li>
+                      <li>• Keep important content in the <strong>center 60%</strong></li>
+                      <li>• <strong>Top-left</strong> and <strong>bottom-right</strong> can be covered by &quot;Featured Event&quot; badge and Buy Tickets/Donate button</li>
+                      <li>• Event photo, flyer, or promotional graphic; good contrast beside the light right panel</li>
                     </ul>
                   </div>
                 </div>
-                <p className="text-xs text-green-600 mt-2 italic">16:9 aspect ratio ensures your featured event images fill the container perfectly without padding and look great on all screen sizes.</p>
+                <p className="text-xs text-green-600 mt-2 italic">Landscape 2∶1 or 4∶1 ensures the image fills the strip card without heavy cropping; center composition stays visible on all screen sizes.</p>
               </div>
             </div>
           </div>
@@ -1273,6 +1272,11 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
                   </span>
                 </span>
                 <span className="mt-2 text-xs text-center select-none break-words max-w-[6rem]">Featured Event Image</span>
+                {isFeaturedEventImage && (
+                  <p className="mt-1.5 text-[10px] text-green-700 text-center max-w-[6rem] leading-tight" title="Home event strip: Use a landscape image (e.g. 1200×600px). Center important content; corners may be cropped or covered by overlays.">
+                    Tip: Landscape 1200×600px; center content; corners may be covered.
+                  </p>
+                )}
               </label>
             </div>
             <div className="custom-grid-cell">

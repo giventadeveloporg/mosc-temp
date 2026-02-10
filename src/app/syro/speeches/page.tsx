@@ -128,16 +128,11 @@ export default function SpeechesPage() {
                   <div className="mt-auto">
                     <Link
                       href={`/syro/speeches/${speech.id}`}
-                      className="inline-flex items-center font-syro-primary text-syro-red font-medium hover:gap-2 transition-all duration-300"
+                      className="syro-primary-button inline-flex items-center gap-2 font-syro-primary w-fit"
                     >
-                      Read Full Speech
-                      <svg 
-                        className="w-5 h-5 ml-1 group-hover:ml-2 transition-all duration-300" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      <span>Read Full Speech</span>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                       </svg>
                     </Link>
                   </div>

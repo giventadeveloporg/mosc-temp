@@ -55,7 +55,20 @@ export const getGivebutterCheckoutData = cache(async (eventId: string): Promise<
       throw new Error('This event does not support GiveButter embed checkout. Use the standard checkout flow.');
     }
 
-    const hasGivebutterConfig = Boolean(donationMeta.givebutterWidgetId || donationMeta.givebutterCampaignId);
+    // Prefer event-level GiveButter config; fall back to global env (NEXT_PUBLIC_GIVEBUTTER_WIDGET_ID, NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_ID)
+    const envWidgetId =
+      typeof process.env.NEXT_PUBLIC_GIVEBUTTER_WIDGET_ID === 'string'
+        ? process.env.NEXT_PUBLIC_GIVEBUTTER_WIDGET_ID.trim() || undefined
+        : undefined;
+    const envCampaignId =
+      typeof process.env.NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_ID === 'string'
+        ? process.env.NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_ID.trim() || undefined
+        : undefined;
+    const givebutterWidgetId =
+      donationMeta.givebutterWidgetId?.trim() || envWidgetId;
+    const givebutterCampaignId =
+      donationMeta.givebutterCampaignId?.trim() || envCampaignId;
+    const hasGivebutterConfig = Boolean(givebutterWidgetId || givebutterCampaignId);
     if (!hasGivebutterConfig) {
       throw new Error('GiveButter is not configured for this event. Please use donation checkout or contact the organizer.');
     }
@@ -118,8 +131,8 @@ export const getGivebutterCheckoutData = cache(async (eventId: string): Promise<
     return {
       event,
       heroImageUrl,
-      givebutterWidgetId: donationMeta.givebutterWidgetId,
-      givebutterCampaignId: donationMeta.givebutterCampaignId,
+      givebutterWidgetId,
+      givebutterCampaignId: givebutterCampaignId || undefined,
     };
   } catch (error) {
     console.error('[GivebutterCheckoutServerData] Error:', error);

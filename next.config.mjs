@@ -186,8 +186,9 @@ const nextConfig = {
     NEXT_PUBLIC_STRIPE_MAX_PRICE_ID: process.env.NEXT_PUBLIC_STRIPE_MAX_PRICE_ID,
     NEXT_PUBLIC_STRIPE_ULTRA_PRICE_ID: process.env.NEXT_PUBLIC_STRIPE_ULTRA_PRICE_ID,
 
-    // Givebutter (donate button / campaign page URL)
+    // Givebutter (donate button / campaign page URL; event fund embed widget)
     NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_ID: process.env.NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_ID,
+    NEXT_PUBLIC_GIVEBUTTER_WIDGET_ID: process.env.NEXT_PUBLIC_GIVEBUTTER_WIDGET_ID,
 
     // Additional environment variables required in production
     CLERK_WEBHOOK_SECRET: process.env.CLERK_WEBHOOK_SECRET,

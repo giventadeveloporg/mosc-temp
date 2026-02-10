@@ -80,7 +80,20 @@
              padding-top: 0;
          }
      }
+
+     /* Hide header when embedded in iframe (parent shows its own header) */
+     html.embed-header-hidden header {
+         display: none !important;
+     }
  </style>
+ <script>
+     (function() {
+         var params = new URLSearchParams(window.location.search);
+         if (params.get('embed') === '1' || window.self !== window.top) {
+             document.documentElement.classList.add('embed-header-hidden');
+         }
+     })();
+ </script>
   <constants data-common-api="https://www.apiwebser.smcimprojects.com/api/" data-api="https://apis.syromalabarchurch.in/api/" data-base="http://www.syromalabarchurch.in/"></constants>
 
   
@@ -99,64 +112,38 @@
 </div>
 
 
-  <!-- navbar -->
   <header>
-
-
-    <!--header with logo & Language switch Start-->
-    <div id="navbar" class="logo-container d-flex align-items-center bg-transparent justify-content-between">
-        <!-- <div id="navbar" class="logo-container d-flex align-items-center bg-transparent position-absolute justify-content-between"> -->
-
-        <!--Logo Box Start-->
+    <div id="syro-header-bar" class="logo-container d-flex align-items-center bg-transparent justify-content-between">
         <a href="/syro" class="unset-link">
             <div class="logo-box d-flex align-items-center bg-transparent pe-3">
                 <div class="logo-box-img bg-transparent">
                     <div class="logo-img-div">
-                        <img class="lozad" data-src="/syro/assets/images/mosc_images/MOSC-logo-Brand-part.png" src="/syro/assets/images/mosc_images/MOSC-logo-Brand-part.png" style="width:110px" alt="Syro-Malabar Church">
+                        <img class="lozad" data-src="/syro/assets/images/mosc_images/MOSC-logo-Brand-part.png" src="/syro/assets/images/mosc_images/MOSC-logo-Brand-part.png" style="width:160px" alt="Syro-Malabar Church">
                     </div>
                 </div>
             </div>
         </a>
-        <!--Logo Box End-->
-
-        <!--Menu Start-->
         <div class="main-menu d-flex align-items-center justify-content-between">
             <div class="left-top-menu d-none d-lg-block">
                 <nav class="navbar navbar-expand-lg bg-transparent">
                     <div class="container-fluid">
-
-                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul> <li><a class="dropdown-item" href="/syro"><i class="fa-solid fa-house"></i></a></li></ul>&nbsp;&nbsp;
+                        <div class="collapse navbar-collapse d-flex align-items-center" id="navbarSupportedContent">
+                            <ul><li><a class="dropdown-item" href="/syro"><i class="fa-solid fa-house"></i></a></li></ul>&nbsp;&nbsp;
                             <ul class="navbar-nav me-auto mb-2 mb-lg-0" id="topmenus"></ul>
-                           
+                            <ul class="navbar-nav mb-2 mb-lg-0 list-unstyled">
+                                <li class="nav-item">
+                                    <i class="fas fa-bars" type="button" data-bs-toggle="offcanvas" data-bs-target="#detailedmenu" aria-controls="detailedmenu" aria-label="Menu"></i>
+                                </li>
+                            </ul>
                         </div>
-
                     </div>
                 </nav>
             </div>
-
-            <div class="right-top-menu d-flex">
-                <ul>
-                    <!-- <li>
-                        <i class="fa-solid fa-magnifying-glass" id="search-btn" type="button" data-bs-toggle="modal" data-bs-target="#search-item"></i>
-
-                    </li> -->
-                    <!-- <li>
-                        <select class="form-select border-0 no-focusborder bg-color-transparent" id="change-language" aria-label="Default select example">
-                            <option selected="selected" value="en" class="bg-light hover-light">🇬🇧&nbsp;En</option>
-                            <option value="ml" class="bg-light">🇮🇳&nbsp;മ</option>
-                        </select>
-                    </li> -->
-                    <li>
-                        <i class="fas fa-bars" type="button" data-bs-toggle="offcanvas" data-bs-target="#detailedmenu" aria-controls="detailedmenu"></i>
-                    </li>
-                </ul>
+            <div class="d-block d-lg-none">
+                <i class="fas fa-bars" type="button" data-bs-toggle="offcanvas" data-bs-target="#detailedmenu" aria-controls="detailedmenu" aria-label="Menu"></i>
             </div>
         </div>
-        <!--Menu End-->
-
     </div>
-    <!--header with logo & Language switch End-->
 </header>
 
 
@@ -288,6 +275,35 @@
     <!--Hero Section Start-->
 
 <style>
+    /* Full-width banner: no side margins, fill viewport */
+    #mainContent > section.hero-banner {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+    .hero-banner .hero-body {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    .hero-banner .main-slider,
+    .hero-banner .main-slider .swiper-wrapper,
+    .hero-banner .main-slider .swiper-slide {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    .hero-banner .main-slider .swiper-slide img.w-100 {
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: none !important;
+        object-fit: cover !important;
+        object-position: center !important;
+        display: block !important;
+    }
     /* .hero-body .swiper-slide.min-h-100vh {
         max-height: 80vh !important;
     } */
@@ -820,10 +836,10 @@
             <div class="col-lg-6 order-2 order-md-1">
                 <div class="cardinal-images">
                     <div class="cardinal-black-white-div">
-                        <img id="bishop_image_front_1" class="cardinal-black-white lozad" data-src="/syro/assets/images/mosc_images/Baselios_Marthoma_Mathews_III.jpg" style="filter:none;" alt="">
+                        <img id="bishop_image_front_1" class="cardinal-black-white lozad" data-src="/syro/assets/images/mosc_images/Baselios_Marthoma_Mathews_III.jpeg" style="filter:none;" alt="">
                     </div>
                     <div class="cardinal-color-div">
-                        <img id="bishop_image_front_2" class="cardinal-color lozad" data-src="/syro/assets/images/mosc_images/Baselios_Marthoma_Mathews_III_2.webp" style="filter:none;" alt="">
+                        <img id="bishop_image_front_2" class="cardinal-color lozad" data-src="/syro/assets/images/mosc_images/Baselios_Marthoma_Mathews_III_2.jpeg" style="filter:none;" alt="">
                     </div>
                 </div>
             </div>
@@ -864,10 +880,10 @@
             <div class="col-lg-6 order-2 order-md-1">
                 <div class="cardinal-images">
                     <div class="cardinal-black-white-div">
-                        <img id="bishop_image_front_1" class="cardinal-black-white lozad" data-src="/syro/assets/images/mosc_images/Baselios_Marthoma_Mathews_III.jpg" style="filter:none;" alt="">
+                        <img id="bishop_image_front_1" class="cardinal-black-white lozad" data-src="/syro/assets/images/mosc_images/Baselios_Marthoma_Mathews_III.jpeg" style="filter:none;" alt="">
                     </div>
                     <div class="cardinal-color-div">
-                        <img id="bishop_image_front_2" class="cardinal-color lozad" data-src="/syro/assets/images/mosc_images/Baselios_Marthoma_Mathews_III_2.webp" style="filter:none;" alt="">
+                        <img id="bishop_image_front_2" class="cardinal-color lozad" data-src="/syro/assets/images/mosc_images/Baselios_Marthoma_Mathews_III_2.jpeg" style="filter:none;" alt="">
                     </div>
                 </div>
             </div>

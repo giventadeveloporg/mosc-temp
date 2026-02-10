@@ -22,13 +22,13 @@ window.onscroll = function () {
   myFunction();
 };
 
-var navbar = document.getElementById("navbar");
-var sticky = navbar.offsetTop;
+var navbar = document.getElementById("syro-header-bar");
+var sticky = navbar ? navbar.offsetTop : 0;
 
 function myFunction() {
-  if (window.pageYOffset > sticky) {
+  if (navbar && window.pageYOffset > sticky) {
     navbar.classList.add("sticky");
-  } else {
+  } else if (navbar) {
     navbar.classList.remove("sticky");
   }
 }

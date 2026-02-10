@@ -23,6 +23,7 @@ To make the donate button (and optional widget script) work, you need the follow
 | What you need | Where to get it in Givebutter | Where it’s used in the app | Required for donate button? |
 |---------------|-------------------------------|----------------------------|-----------------------------|
 | **Campaign ID** | Campaign URL: `https://givebutter.com/{CampaignID}` (e.g. `mhoZp0`). Or: open the campaign → Sharing → copy from campaign link or embed code. | Set in **`.env.local`** (and production env) as **`NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_ID`**. Read by `GivebutterDonateButton` and `GivebutterWidget`; optional `campaignId` prop overrides. Declared in `next.config.mjs` `env`. Builds URL: `https://givebutter.com/{campaignId}`. | **Yes** – without it the button would open the wrong or no campaign. |
+| **Widget ID** | Givebutter embed for **event fund** (not donation): e.g. `<givebutter-widget id="j1ek6j">`. Get the ID from the widget embed code in Givebutter. | Set in **`.env.local`** (and production env) as **`NEXT_PUBLIC_GIVEBUTTER_WIDGET_ID`** (e.g. `j1ek6j`). Used by event GiveButter checkout page (`/events/[id]/givebutter-checkout`): when the event’s `donation_metadata` has no `givebutterWidgetId`, the app falls back to this env. Declared in `next.config.mjs` `env`. | **No** for the home-page donate button. **Yes** for the event fund embed when you want a single global widget ID without storing it per event. |
 | **Account ID** | Dashboard → **Campaign** → **Sharing** → **Widgets** → **Installation**. Shown in the script snippet as `acct=...` (e.g. `mKoUpYQebNsn6RqA`). | `src/app/layout.tsx`: Givebutter script `src="...?acct={AccountID}&p=other"`. | **No** for the donate button (button only opens the campaign URL). **Yes** if you use Givebutter embed widgets (e.g. `givebutter-form`, `givebutter-button`) elsewhere. |
 | **Webhook URL** | Not “brought” into the app; you **configure** in Givebutter: Campaign or Account → Integrations / Webhooks → add endpoint. Set URL to your app’s route, e.g. `https://your-domain.com/api/webhooks/givebutter`. | Givebutter sends donation events to this URL. App route: `src/app/api/webhooks/givebutter/route.ts` (forwards to backend). | No – only needed if you want server-side handling of donation events. |
 | **Webhook signing secret** | Givebutter dashboard: when you add the webhook, Givebutter shows or lets you copy a **signing secret**. | Stored and used by the **backend** (not in Next.js env) to verify `X-Givebutter-Signature`. Backend matches secret per tenant in `payment_provider_config`. | No – backend only; not needed for the button to open. |
@@ -430,10 +431,12 @@ By opening the **full campaign URL** (`https://givebutter.com/{campaignId}`) in 
 
 ## **Environment Variables**
 
-### **Required**
-- No environment variables required for basic widget functionality
-- Account ID is embedded in script URL
-- Campaign ID is passed as prop to component
+### **Optional (recommended for production)**
+- **`NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_ID`**: Campaign ID for donate button and campaign URL (e.g. `mhoZp0`). Used when no `campaignId` prop is passed.
+- **`NEXT_PUBLIC_GIVEBUTTER_WIDGET_ID`**: Widget ID for the **event fund** embed (e.g. `j1ek6j`). Used on `/events/[id]/givebutter-checkout` when the event’s `donation_metadata` does not include `givebutterWidgetId`. This externalizes the `<givebutter-widget id="...">` ID so it can be set per environment without storing it per event.
+
+### **Other**
+- Account ID is embedded in the Givebutter script URL in `layout.tsx` (optional for donate button; required for embed widgets).
 
 ### **Optional (for Webhooks)**
 - `DEV_GBTTR_API_KEY`: Givebutter API key for webhook verification
@@ -466,7 +469,7 @@ By opening the **full campaign URL** (`https://givebutter.com/{campaignId}`) in 
 7. **Detect mobile devices** - Use user agent and screen width to determine mobile vs desktop
 
 **Implementation Checklist:**
-- [ ] **Credentials**: Campaign ID from Givebutter dashboard set in **`.env.local`** (and production env) as **`NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_ID`**; declared in `next.config.mjs` `env`. No hardcoded campaign ID; optional `campaignId` prop overrides. Optionally Account ID in layout script if using widgets. See **Credentials and configuration from Givebutter dashboard** above.
+- [ ] **Credentials**: Campaign ID set in **`.env.local`** (and production env) as **`NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_ID`**; **Widget ID** (for event fund embed) as **`NEXT_PUBLIC_GIVEBUTTER_WIDGET_ID`** (e.g. `j1ek6j`); both declared in `next.config.mjs` `env`. No hardcoded campaign or widget IDs; optional props/event metadata override. Optionally Account ID in layout script if using widgets. See **Credentials and configuration from Givebutter dashboard** above.
 - [ ] Givebutter script added to root layout with `strategy="afterInteractive"` (optional; donate button opens full campaign URL and does not require widget script)
 - [ ] TypeScript declarations file created for custom elements (for GivebutterWidget / givebutter-form if used elsewhere)
 - [ ] Donate button **always** opens full campaign page: popup (desktop) or new tab (mobile) — do **not** use `<givebutter-button>` modal so “Other amount” and minimum donation from dashboard are visible

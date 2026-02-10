@@ -48,6 +48,7 @@ const DEFAULT_PAGINATION: StrapiPagination = {
 };
 
 export async function getPriestsData(options: {
+  nameSearch?: string;
   page?: number;
   pageSize?: number;
 }): Promise<PriestsListResult> {
@@ -58,6 +59,8 @@ export async function getPriestsData(options: {
 
   const params = new URLSearchParams();
   params.set('filters[tenant][tenantId][$eq]', tenantId);
+  const nameQuery = options.nameSearch?.trim();
+  if (nameQuery) params.set('filters[name][$containsi]', nameQuery);
   params.set('sort', 'name:asc');
   params.set('populate[0]', 'diocese');
   params.set('populate[1]', 'parish');

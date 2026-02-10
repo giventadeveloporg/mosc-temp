@@ -47,6 +47,7 @@ const DEFAULT_PAGINATION: StrapiPagination = {
 
 export async function getDirectoryEntriesData(options: {
   directoryType: DirectoryEntryType;
+  nameSearch?: string;
   page?: number;
   pageSize?: number;
 }): Promise<DirectoryEntriesListResult> {
@@ -60,6 +61,8 @@ export async function getDirectoryEntriesData(options: {
   const params = new URLSearchParams();
   params.set('filters[tenant][tenantId][$eq]', tenantId);
   params.set('filters[directoryType][$eq]', options.directoryType);
+  const nameQuery = options.nameSearch?.trim();
+  if (nameQuery) params.set('filters[name][$containsi]', nameQuery);
   params.set('sort', 'order:asc,name:asc');
   params.set('populate[0]', 'image');
   const page = Math.max(1, options.page ?? 1);

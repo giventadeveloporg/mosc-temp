@@ -30,6 +30,7 @@ export default async function RootLayout({
 }) {
   // CRITICAL: Next.js 15+ - await headers() first before any other async or header-dependent code (e.g. auth()).
   // This must be the first awaited call so the request context is established for Clerk and other consumers.
+  // If you see "Route / used headers() or similar iteration" from Clerk, upgrade to @clerk/nextjs v6+ for Next.js 15 support.
   const headersList = await headers();
   const hostname = headersList.get('host') || '';
   const pathname = headersList.get('x-pathname') || '';
