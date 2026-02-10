@@ -98,11 +98,13 @@ const TheologicalSeminariesPage = () => {
                   </div>
 
                   {/* Read More Link */}
-                  <div className="mt-6 flex items-center text-syro-red group-hover:translate-x-2 transition-all duration-300">
-                    <span className="font-medium">Learn More</span>
-                    <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                  <div className="mt-6">
+                    <span className="syro-read-more-btn font-syro-primary">
+                      Learn More
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
+                    </span>
                   </div>
                 </div>
               </Link>

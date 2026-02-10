@@ -228,9 +228,9 @@ function fetchMajorArchBishop() {
   function setBishopContent() {
     bishop_name.html(bishopNameText);
     bishop_about.html(bishopAboutShort);
-    bishop_image_front_1.attr('src', 'assets/images/mosc_images/Baselios_Marthoma_Mathews_III.jpg');
+    bishop_image_front_1.attr('src', 'assets/images/mosc_images/Baselios_Marthoma_Mathews_III.jpeg');
     bishop_image_front_1.attr('alt', bishopNameText);
-    bishop_image_front_2.attr('src', 'assets/images/mosc_images/Baselios_Marthoma_Mathews_III_2.webp');
+    bishop_image_front_2.attr('src', 'assets/images/mosc_images/Baselios_Marthoma_Mathews_III_2.jpeg');
     bishop_image_front_2.attr('alt', bishopNameText);
   }
 
@@ -247,9 +247,9 @@ function fetchMajorArchBishop() {
     const majorArchBishopDetails = response.data;
     bishop_name.html(bishopNameText);
     bishop_about.html(bishopAboutShort);
-    bishop_image_front_1.attr('src', 'assets/images/mosc_images/Baselios_Marthoma_Mathews_III.jpg');
+    bishop_image_front_1.attr('src', 'assets/images/mosc_images/Baselios_Marthoma_Mathews_III.jpeg');
     bishop_image_front_1.attr('alt', majorArchBishopDetails.bishop_name || bishopNameText);
-    bishop_image_front_2.attr('src', 'assets/images/mosc_images/Baselios_Marthoma_Mathews_III_2.webp');
+    bishop_image_front_2.attr('src', 'assets/images/mosc_images/Baselios_Marthoma_Mathews_III_2.jpeg');
     bishop_image_front_2.attr('alt', majorArchBishopDetails.bishop_name || bishopNameText);
 
     loadLazyImages();
@@ -803,13 +803,13 @@ window.onscroll = function () {
   myFunction();
 };
 
-var navbar = document.getElementById("navbar");
-var sticky = navbar.offsetTop;
+var navbar = document.getElementById("syro-header-bar");
+var sticky = navbar ? navbar.offsetTop : 0;
 
 function myFunction() {
-  if (window.pageYOffset > sticky) {
+  if (navbar && window.pageYOffset > sticky) {
     navbar.classList.add("sticky");
-  } else {
+  } else if (navbar) {
     navbar.classList.remove("sticky");
   }
 }

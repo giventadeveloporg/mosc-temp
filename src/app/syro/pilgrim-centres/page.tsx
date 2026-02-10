@@ -170,11 +170,11 @@ export default function PilgrimCentresPage() {
                   {/* Read More Link */}
                   <Link
                     href={`/syro/pilgrim-centres/${getSlug(centre.name)}`}
-                    className="inline-flex items-center space-x-2 font-syro-primary text-sm text-syro-red font-medium hover:text-accent transition-all duration-300 group/link"
+                    className="syro-primary-button inline-flex items-center gap-2 font-syro-primary mt-auto w-fit"
                   >
                     <span>Read More</span>
-                    <svg className="w-4 h-4 group-hover/link:translate-x-1 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
                   </Link>
                 </div>

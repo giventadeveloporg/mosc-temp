@@ -63,29 +63,35 @@ ul {
 .hero-banner {
   /* background-image: url(https://s3.envato.com/files/324077565/Preview-Image/03_Home_V2-1.jpg); */
   background-image: url(https://www.syromalabarchurch.in/assets/images/background/bg-rectangle.png);
+  width: 100%;
+  max-width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 0;
+  padding-right: 0;
 }
 
-#navbar.logo-container .dropdown-menu {
+#syro-header-bar.logo-container .dropdown-menu {
   border-radius: 0;
   box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
 }
 
-#navbar .dropdown-item:hover {
+#syro-header-bar .dropdown-item:hover {
   color: #dc3545;
 }
 
-#navbar .dropdown-item:active{
+#syro-header-bar .dropdown-item:active{
 background-color: #dc3545;
 color: #fff;
 }
 
-#navbar .nav-item .nav-link{
+#syro-header-bar .nav-item .nav-link{
 color: #0b2848;
 font-weight: 500;
 transition: .3s;
 }
 
-#navbar .nav-item .nav-link:hover{
+#syro-header-bar .nav-item .nav-link:hover{
 color: #dc3545;
 transition: .3s;
 }
@@ -109,6 +115,22 @@ transition: .3s;
 
 .main-slider {
   /* min-height: 100vh; */
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.main-slider .swiper-wrapper,
+.main-slider .swiper-slide {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.main-slider .swiper-slide img.w-100 {
+  width: 100% !important;
+  min-width: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  display: block !important;
 }
 
 .menu-icon {
@@ -156,6 +178,10 @@ transition: .3s;
 .hero-body {
   display: flex;
   align-items: center;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 .hero-image-composition .image-wrap .perspective {
@@ -626,7 +652,7 @@ background: red; */
   margin-bottom: 0;
 }
 
-#navbar.sticky {
+#syro-header-bar.sticky {
   position: fixed !important;
   background: #fff !important;
   top: 0;
@@ -634,15 +660,15 @@ background: red; */
   box-shadow: #0b28487d 0px 10px 25px -10px;
 }
 
-#navbar.sticky.logo-container {
+#syro-header-bar.sticky.logo-container {
   padding: 0.5rem 0;
 }
 
-.logo-container#navbar.sticky .logo-box-img img {
+.logo-container#syro-header-bar.sticky .logo-box-img img {
   width: 55px;
 }
 
-.logo-container#navbar.sticky .logo-box-text h1 {
+.logo-container#syro-header-bar.sticky .logo-box-text h1 {
   font-size: 1.2rem;
 }
 
@@ -659,34 +685,34 @@ background: red; */
   padding-left: 2rem;
 }
 
-/* Navbar logo image - a little bigger (default 80px, was 60px) */
-#navbar.logo-container .logo-box-img img {
-  width: 80px;
+/* Navbar logo image */
+#syro-header-bar.logo-container .logo-box-img img {
+  width: 160px;
   height: auto;
 }
 
 @media screen and (max-width: 576px) {
-  #navbar.logo-container .logo-box .logo-box-img .logo-img-div {
+  #syro-header-bar.logo-container .logo-box .logo-box-img .logo-img-div {
     padding: 1rem 0 1rem 0.5rem !important;
   }
 
   .hero-banner
-    #navbar.sticky.logo-container
+    #syro-header-bar.sticky.logo-container
     .logo-box
     .logo-box-img
     .logo-img-div {
     padding: 0.5rem 0 0.5rem 1rem !important;
   }
 
-  #navbar.logo-container .logo-box .logo-box-img img {
+  #syro-header-bar.logo-container .logo-box .logo-box-img img {
     width: 42px;
   }
 
-  #navbar.logo-container .logo-box .logo-box-text .ms-4 {
+  #syro-header-bar.logo-container .logo-box .logo-box-text .ms-4 {
     margin-left: 0.5rem !important;
   }
 
-  #navbar.logo-container .logo-box {
+  #syro-header-bar.logo-container .logo-box {
     padding-right: 0rem !important;
   }
 
@@ -702,35 +728,35 @@ background: red; */
     height: 5px !important;
   }
 
-  .logo-container#navbar.sticky .logo-box-img img {
+  .logo-container#syro-header-bar.sticky .logo-box-img img {
     width: 36px !important;
   }
 
-  .logo-container#navbar.sticky .logo-box-text h1 {
+  .logo-container#syro-header-bar.sticky .logo-box-text h1 {
     font-size: 0.8rem;
   }
 
-  #navbar.logo-container .main-menu .right-top-menu {
+  #syro-header-bar.logo-container .main-menu .right-top-menu {
     padding-right: 0.5rem !important;
   }
 
-  #navbar.logo-container.sticky .main-menu .right-top-menu {
+  #syro-header-bar.logo-container.sticky .main-menu .right-top-menu {
     padding-right: 1rem !important;
   }
 
-  #navbar.logo-container .main-menu .right-top-menu ul {
+  #syro-header-bar.logo-container .main-menu .right-top-menu ul {
     padding-left: 0rem !important;
   }
 
-  #navbar.logo-container .main-menu .right-top-menu ul li {
+  #syro-header-bar.logo-container .main-menu .right-top-menu ul li {
     margin-right: 1rem !important;
   }
 
-  #navbar.logo-container .main-menu .right-top-menu ul li:last-child {
+  #syro-header-bar.logo-container .main-menu .right-top-menu ul li:last-child {
     margin-right: 0 !important;
   }
 
-  #navbar.logo-container .main-menu .right-top-menu ul li select {
+  #syro-header-bar.logo-container .main-menu .right-top-menu ul li select {
     /* display: none !important; */
     padding-top: 0;
     padding-bottom: 0;
@@ -2965,7 +2991,7 @@ img.cardinal-color {
   letter-spacing: 1px;
 }
 
-div#navbarSupportedContent li.nav-item {
+div#syro-header-barSupportedContent li.nav-item {
   margin: 0 !important;
 }
 
@@ -3172,8 +3198,8 @@ span.newsEventDate {
   display: none !important;
 }
 
-/* Hide menu: first ul's li in navbar (#navbarSupportedContent/ul[1]/li) */
-#navbarSupportedContent > ul:first-of-type > li {
+/* Hide menu: first ul's li in navbar (#syro-header-barSupportedContent/ul[1]/li) */
+#syro-header-barSupportedContent > ul:first-of-type > li {
   display: none !important;
 }
 

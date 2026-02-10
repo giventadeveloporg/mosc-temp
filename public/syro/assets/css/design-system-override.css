@@ -169,3 +169,9 @@ body {
     margin-bottom: 10px;
   }
 }
+
+/* Show all nav items: THE CATHOLICATE, ADMINISTRATION, THE CHURCH, HOLY SYNOD, ECUMENICAL, DIOCESES, SAINTS (override style.css which hides 3rd and 7th) */
+#syro-header-bar #topmenus li:nth-child(3),
+#syro-header-bar #topmenus li:nth-child(7) {
+  display: list-item !important;
+}

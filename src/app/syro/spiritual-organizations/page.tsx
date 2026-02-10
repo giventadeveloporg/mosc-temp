@@ -231,21 +231,10 @@ const SpiritualOrganizationsPage = () => {
                     {org.description}
                   </p>
                   <div className="mt-auto pt-4">
-                    <span className="inline-flex items-center gap-1.5 font-syro-primary text-sm font-medium text-syro-red">
+                    <span className="syro-read-more-btn font-syro-primary">
                       Read More
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 5l7 7-7 7"
-                        />
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                       </svg>
                     </span>
                   </div>

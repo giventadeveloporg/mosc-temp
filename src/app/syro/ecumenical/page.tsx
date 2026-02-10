@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import QuickLinks from '../components/QuickLinks';
-import SyroPageHero from '../components/SyroPageHero';
+import SyroPageBanner from '../components/SyroPageBanner';
 import SyroIntroCard from '../components/SyroIntroCard';
 import SyroSectionTitle from '../components/SyroSectionTitle';
 
@@ -30,10 +30,7 @@ const ECUMENICAL_ARTICLES = [
 const EcumenicalPage = () => {
   return (
     <div className="bg-syro-bg-gray">
-      <SyroPageHero
-        title="Ecumenical"
-        description="Department of Ecumenical Relations — fraternal relations of the Church and engagement with Christian communities worldwide."
-      />
+      <SyroPageBanner title="Ecumenical" />
 
       <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -75,7 +72,7 @@ const EcumenicalPage = () => {
                   <p className="font-syro-primary text-base text-syro-dark-gray flex-1 line-clamp-3 leading-relaxed">
                     {article.excerpt}
                   </p>
-                  <span className="inline-flex items-center gap-2 mt-4 font-syro-primary text-syro-red font-semibold text-sm">
+                  <span className="syro-read-more-btn font-syro-primary mt-4">
                     Read More
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import AppIcon from './AppIcon';
 import Button from './ui/Button';
 
@@ -79,7 +80,15 @@ const AnnouncementsSection = () => {
                 <span className="font-syro-primary text-sm text-syro-dark-gray">{formatDate(announcement?.date)}</span>
               </div>
               <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6 whitespace-pre-line">{announcement?.excerpt}</p>
-              <Button variant="ghost" size="sm" iconName="ArrowRight" iconPosition="right">Read More</Button>
+              <Link
+                href="/syro/news"
+                className="syro-primary-button inline-flex items-center gap-2 font-syro-primary w-fit"
+              >
+                <span>Read More</span>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </Link>
             </div>
           ))}
         </div>

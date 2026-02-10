@@ -98,7 +98,7 @@ export default function DownloadsPage() {
                   <div className="flex-1 min-h-[24px]" aria-hidden="true" />
                   <Link
                     href={item.link}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-syro-red text-white font-semibold rounded-lg hover:opacity-90 transition-all duration-300 w-fit border-r-4 border-[#be1929]"
+                    className="syro-primary-button inline-flex items-center gap-2 w-fit"
                     onClick={(e) => {
                       if (isPlaceholder) {
                         e.preventDefault();

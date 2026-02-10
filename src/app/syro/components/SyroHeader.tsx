@@ -5,141 +5,177 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
-const SyroHeader = () => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
+const navigationItems = [
+  { name: 'THE CATHOLICATE', href: '/syro/catholicate' },
+  { name: 'ADMINISTRATION', href: '/syro/administration' },
+  { name: 'THE CHURCH', href: '/syro/the-church' },
+  { name: 'HOLY SYNOD', href: '/syro/holy-synod' },
+  { name: 'ECUMENICAL', href: '/syro/ecumenical' },
+  { name: 'DIOCESES', href: '/syro/dioceses' },
+  { name: 'SAINTS', href: '/syro/saints' },
+];
+
+export default function SyroHeader() {
+  const [offcanvasOpen, setOffcanvasOpen] = useState(false);
   const pathname = usePathname();
 
-  // Track scroll position for header shadow effect
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Close mobile menu on route change
-  useEffect(() => {
-    setIsMobileMenuOpen(false);
+    setOffcanvasOpen(false);
   }, [pathname]);
 
-  const navigationItems = [
-    { name: 'The Catholicate', href: '/syro/catholicate' },
-    { name: 'Administration', href: '/syro/administration' },
-    { name: 'The Church', href: '/syro/the-church' },
-    { name: 'Holy Synod', href: '/syro/holy-synod' },
-    { name: 'Ecumenical', href: '/syro/ecumenical' },
-    { name: 'Dioceses', href: '/syro/dioceses' },
-    { name: 'Saints', href: '/syro/saints' },
-  ];
+  useEffect(() => {
+    if (offcanvasOpen) {
+      document.body.classList.add('offcanvas-backdrop');
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.classList.remove('offcanvas-backdrop');
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.classList.remove('offcanvas-backdrop');
+      document.body.style.overflow = '';
+    };
+  }, [offcanvasOpen]);
 
-  const isActive = (href: string) => {
-    return pathname?.startsWith(href) ?? false;
-  };
+  const isActive = (href: string) => pathname?.startsWith(href) ?? false;
+  const isHomeActive = pathname === '/syro' || pathname === '/syro/';
 
   return (
-    <header
-      className={`
-        bg-white border-b border-syro-table-border overflow-hidden sticky top-0 z-50
-        transition-all duration-300
-        ${isScrolled ? 'shadow-syro-header' : ''}
-      `}
-    >
-      {/* Main Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <Link href="/syro" className="flex items-center space-x-3">
-            <div className="h-48 aspect-square flex items-center justify-center">
-              <Image
-                src="/images/logos/MOSC-logo-Brand-part.png"
-                alt="Syro-Malabar Church Logo"
-                width={160}
-                height={160}
-                className="object-contain w-full h-full"
-                priority
-              />
+    <>
+      <header>
+        <div id="syro-header-bar" className="logo-container d-flex align-items-center bg-transparent justify-content-between">
+          <Link href="/syro" className="unset-link">
+            <div className="logo-box d-flex align-items-center bg-transparent pe-3">
+              <div className="logo-box-img bg-transparent">
+                <div className="logo-img-div">
+                  <Image
+                    src="/syro/assets/images/mosc_images/MOSC-logo-Brand-part.png"
+                    alt="Syro-Malabar Church"
+                    width={160}
+                    height={80}
+                    className="lozad"
+                    style={{ width: '160px', height: 'auto' }}
+                    priority
+                  />
+                </div>
+              </div>
             </div>
           </Link>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-1" role="navigation" aria-label="Main navigation">
-            {navigationItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`
-                  px-4 py-2 rounded-lg text-syro-label font-medium transition-all duration-300
-                  ${isActive(item.href)
-                    ? 'bg-syro-red text-white'
-                    : 'text-syro-blue hover:bg-syro-red-light hover:text-syro-red'
-                  }
-                `}
+          <div className="main-menu d-flex align-items-center justify-content-between">
+            <div className="left-top-menu d-none d-lg-block">
+              <nav className="navbar navbar-expand-lg bg-transparent">
+                <div className="container-fluid">
+                  <div className="collapse navbar-collapse show d-flex align-items-center">
+                    <ul className="list-unstyled mb-0">
+                      <li>
+                        <Link
+                          href="/syro"
+                          className={`dropdown-item ${isHomeActive ? 'active' : ''}`}
+                          aria-label="Home"
+                        >
+                          <i className="fa-solid fa-house" />
+                        </Link>
+                      </li>
+                    </ul>
+                    <span className="d-none d-lg-inline">&nbsp;&nbsp;</span>
+                    <ul className="navbar-nav me-auto mb-2 mb-lg-0" id="topmenus">
+                      {navigationItems.map((item) => (
+                        <li key={item.href} className="nav-item">
+                          <Link
+                            href={item.href}
+                            className={`nav-link ${isActive(item.href) ? 'active' : ''}`}
+                          >
+                            {item.name}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                    <ul className="navbar-nav mb-2 mb-lg-0 list-unstyled">
+                      <li className="nav-item">
+                        <button
+                          type="button"
+                          onClick={() => setOffcanvasOpen(true)}
+                          className="btn btn-link border-0 p-2"
+                          aria-label="Menu"
+                        >
+                          <i className="fas fa-bars" />
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </nav>
+            </div>
+            <div className="d-block d-lg-none">
+              <button
+                type="button"
+                onClick={() => setOffcanvasOpen(true)}
+                className="btn btn-link border-0 p-2"
+                aria-label="Menu"
               >
-                {item.name}
-              </Link>
-            ))}
-          </nav>
+                <i className="fas fa-bars" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
 
-          {/* Mobile Menu Button */}
+      {/* Detailed Menu Offcanvas (match static #detailedmenu) */}
+      <div
+        className={`offcanvas offcanvas-start ${offcanvasOpen ? 'show' : ''}`}
+        tabIndex={-1}
+        id="detailedmenu"
+        aria-labelledby="detailedmenuLabel"
+        style={offcanvasOpen ? { visibility: 'visible' } : undefined}
+      >
+        <div className="offcanvas-header pe-5 ps-5">
+          <h5 className="offcanvas-title" id="detailedmenuLabel">Detailed Menu</h5>
           <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="lg:hidden p-2 text-syro-blue hover:bg-syro-red-light rounded-lg transition-colors"
-            aria-label="Toggle menu"
-            aria-expanded={isMobileMenuOpen}
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              {isMobileMenuOpen ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              )}
-            </svg>
-          </button>
+            type="button"
+            className="btn-close"
+            onClick={() => setOffcanvasOpen(false)}
+            aria-label="Close"
+          />
+        </div>
+        <div className="offcanvas-body">
+          <div className="container mt-5 menu-overlay">
+            <div className="row">
+              <div className="col-12">
+                <nav className="d-flex flex-column gap-1">
+                  <Link
+                    href="/syro"
+                    onClick={() => setOffcanvasOpen(false)}
+                    className={`nav-link ${isHomeActive ? 'active fw-bold' : ''}`}
+                  >
+                    Home
+                  </Link>
+                  {navigationItems.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setOffcanvasOpen(false)}
+                      className={`nav-link ${isActive(item.href) ? 'active fw-bold' : ''}`}
+                    >
+                      {item.name}
+                    </Link>
+                  ))}
+                </nav>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
-      {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <div className="lg:hidden border-t border-syro-table-border bg-white">
-          <nav className="px-4 py-4 space-y-2" role="navigation" aria-label="Mobile navigation">
-            {navigationItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={`
-                  block px-4 py-3 rounded-lg text-syro-label font-medium transition-all duration-300
-                  ${isActive(item.href)
-                    ? 'bg-syro-red text-white'
-                    : 'text-syro-blue hover:bg-syro-red-light hover:text-syro-red'
-                  }
-                `}
-              >
-                {item.name}
-              </Link>
-            ))}
-          </nav>
-        </div>
+      {offcanvasOpen && (
+        <div
+          className="offcanvas-backdrop fade show"
+          style={{ backgroundColor: 'rgba(0,0,0,.5)' }}
+          onClick={() => setOffcanvasOpen(false)}
+          onKeyDown={(e) => e.key === 'Escape' && setOffcanvasOpen(false)}
+          role="button"
+          tabIndex={0}
+          aria-label="Close menu"
+        />
       )}
-    </header>
+    </>
   );
-};
-
-export default SyroHeader;
+}

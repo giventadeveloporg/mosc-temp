@@ -509,6 +509,18 @@ function fetchTopMenu() {
             firstLi.after('<li class="nav-item ms-2 me-2"><a class="nav-link" href="/syro/administration" target="_top">Administration</a></li>');
         }
 
+        /* Insert "The Church" before "Holy Synod" (if not already present) */
+        $("#topmenus > li").each(function () {
+            var menuText = $(this).find(".dropdown-toggle, .nav-link").first().text().trim();
+            if (menuText === "Holy Synod") {
+                var prevText = $(this).prev("li").find(".dropdown-toggle, .nav-link").first().text().trim();
+                if (prevText !== "The Church") {
+                    $(this).before('<li class="nav-item ms-2 me-2"><a class="nav-link" href="/syro/the-church" target="_top">The Church</a></li>');
+                }
+                return false;
+            }
+        });
+
         /* Hide Eparchies, Major Archbishop, and Curia menus by marking their li */
         $("#topmenus > li").each(function () {
             var menuText = $(this).find(".dropdown-toggle, .nav-link").first().text().trim().toLowerCase();

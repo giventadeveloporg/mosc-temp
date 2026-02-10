@@ -53,11 +53,12 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
         // Syro-Malabar Design System Colors (namespaced with syro- prefix to avoid conflicts)
+        // Primary red matches design_systems/syro_malabar/syromalabar_site_general_design_final.json and https://www.syromalabarchurch.in/
         "syro-red": {
-          DEFAULT: "#bf451e",
+          DEFAULT: "#dc3545",
           darker: "#be1929",
           hover: "#990b3f",
-          light: "#bf451e33",
+          light: "#dc354533",
         },
         "syro-blue": {
           DEFAULT: "#0b2848",
