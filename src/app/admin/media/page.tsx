@@ -3,7 +3,7 @@ import React, { useRef, useState, useEffect, useCallback, useTransition } from "
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { EventMediaDTO } from "@/types";
-import { FaUsers, FaPhotoVideo, FaCalendarAlt, FaTimes, FaChevronLeft, FaChevronRight, FaTicketAlt, FaUpload, FaTags, FaHome } from 'react-icons/fa';
+import { FaUsers, FaPhotoVideo, FaCalendarAlt, FaTimes, FaChevronLeft, FaChevronRight, FaTicketAlt, FaUpload, FaTags, FaHome, FaFolderOpen } from 'react-icons/fa';
 import AdminNavigation from '@/components/AdminNavigation';
 import { createPortal } from "react-dom";
 import { Modal } from "@/components/Modal";
@@ -515,6 +515,436 @@ function EditMediaModal({ media, onClose, onSave, loading }: EditMediaModalProps
   );
 }
 
+/** Upload modal for /admin/media: uploads media without an event (event_id NULL). Backend/DB support null event_id. */
+function UploadMediaModal({
+  isOpen,
+  onClose,
+  onSuccess,
+  onUploadStart,
+  onUploadEnd,
+  loading: externalLoading,
+  message: externalMessage,
+  setMessage: setExternalMessage,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
+  onUploadStart: () => void;
+  onUploadEnd: () => void;
+  loading: boolean;
+  message: string | null;
+  setMessage: (m: string | null) => void;
+}) {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [files, setFiles] = useState<FileList | null>(null);
+  const [eventFlyer, setEventFlyer] = useState(false);
+  const [isEventManagementOfficialDocument, setIsEventManagementOfficialDocument] = useState(false);
+  const [isHeroImage, setIsHeroImage] = useState(false);
+  const [isActiveHeroImage, setIsActiveHeroImage] = useState(false);
+  const [isFeaturedEventImage, setIsFeaturedEventImage] = useState(false);
+  const [isLiveEventImage, setIsLiveEventImage] = useState(false);
+  const [isHomePageHeroImage, setIsHomePageHeroImage] = useState(false);
+  const [isPublic, setIsPublic] = useState(true);
+  const [startDisplayingFromDate, setStartDisplayingFromDate] = useState("");
+  const [heroDisplayDurationMinutes, setHeroDisplayDurationMinutes] = useState<number | "">("");
+  const [heroDisplayDurationSeconds, setHeroDisplayDurationSeconds] = useState<number | "">("");
+  const [isDragOver, setIsDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFiles(e.target.files);
+      if (fileInputRef.current && e.target !== fileInputRef.current) {
+        const dataTransfer = new DataTransfer();
+        Array.from(e.target.files).forEach(file => dataTransfer.items.add(file));
+        fileInputRef.current.files = dataTransfer.files;
+      }
+    }
+  };
+
+  const handleFolderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFiles(e.target.files);
+      if (fileInputRef.current) {
+        const dataTransfer = new DataTransfer();
+        Array.from(e.target.files).forEach(file => dataTransfer.items.add(file));
+        fileInputRef.current.files = dataTransfer.files;
+      }
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+  };
+
+  /** Recursively read all files from a directory entry (used when user drops a folder). */
+  const readDirectoryFiles = (dirEntry: FileSystemDirectoryEntry): Promise<File[]> => {
+    const files: File[] = [];
+    const reader = dirEntry.createReader();
+    const readBatch = (): Promise<void> =>
+      new Promise((resolve, reject) => {
+        reader.readEntries((entries) => {
+          if (entries.length === 0) {
+            resolve();
+            return;
+          }
+          Promise.all(
+            entries.map((entry) => {
+              if (entry.isFile) {
+                return new Promise<void>((res, rej) => {
+                  (entry as FileSystemFileEntry).file((file) => {
+                    files.push(file);
+                    res();
+                  }, rej);
+                });
+              }
+              return readDirectoryFiles(entry as FileSystemDirectoryEntry).then((sub) => files.push(...sub));
+            })
+          ).then(() => readBatch()).then(resolve).catch(reject);
+        }, reject);
+      });
+    return readBatch().then(() => files);
+  };
+
+  /** Get flat list of File objects from drop; expands dropped folders so we never send directory placeholders (which cause ERR_ACCESS_DENIED). */
+  const getFilesFromDrop = (dataTransfer: DataTransfer): Promise<File[]> => {
+    const items = dataTransfer.items;
+    if (!items || !items.length) {
+      const list = dataTransfer.files ? Array.from(dataTransfer.files) : [];
+      return Promise.resolve(list.filter((f) => f.size > 0 || f.type !== ""));
+    }
+    const files: File[] = [];
+    let index = 0;
+    const processNext = (): Promise<void> => {
+      if (index >= items.length) return Promise.resolve();
+      const item = items[index];
+      index += 1;
+      const entry = item.webkitGetAsEntry?.();
+      if (!entry) {
+        const file = item.getAsFile();
+        if (file && (file.size > 0 || file.type !== "")) files.push(file);
+        return processNext();
+      }
+      if (entry.isFile) {
+        return new Promise((resolve, reject) => {
+          (entry as FileSystemFileEntry).file((file) => {
+            files.push(file);
+            resolve();
+          }, reject);
+        }).then(processNext);
+      }
+      if (entry.isDirectory) {
+        return readDirectoryFiles(entry as FileSystemDirectoryEntry).then((dirFiles) => {
+          files.push(...dirFiles);
+          return processNext();
+        });
+      }
+      return processNext();
+    };
+    return processNext().then(() => files);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+    getFilesFromDrop(e.dataTransfer).then((fileList) => {
+      if (fileList.length === 0) {
+        setExternalMessage("No valid files in the drop. Use \"Upload Folder\" to select a folder.");
+        return;
+      }
+      const dt = new DataTransfer();
+      fileList.forEach((f) => dt.items.add(f));
+      setFiles(dt.files);
+      if (fileInputRef.current) {
+        fileInputRef.current.files = dt.files;
+      }
+    }).catch((err) => {
+      setExternalMessage(err?.message || "Could not read dropped files. Try \"Upload Folder\" instead.");
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setExternalMessage(null);
+    if (!files || files.length === 0) {
+      setExternalMessage("Please select at least one file to upload.");
+      return;
+    }
+    // Exclude directory placeholders (size 0, no type) to avoid net::ERR_ACCESS_DENIED when sending FormData
+    const validFiles = Array.from(files).filter((file) => file.size > 0 || file.type !== "");
+    if (validFiles.length === 0) {
+      setExternalMessage("No valid files to upload. Dropped folders are expanded automatically; if you still see this, use the \"Upload Folder\" button.");
+      return;
+    }
+    const tenantId = process.env.NEXT_PUBLIC_TENANT_ID;
+    if (!tenantId) {
+      setExternalMessage("NEXT_PUBLIC_TENANT_ID is not set.");
+      return;
+    }
+    onUploadStart();
+    const formData = new FormData();
+    validFiles.forEach((file) => formData.append("files", file));
+    // Do NOT append eventId - upload creates media with no event (event_id NULL in DB).
+    formData.append("eventFlyer", String(eventFlyer));
+    formData.append("isEventManagementOfficialDocument", String(isEventManagementOfficialDocument));
+    formData.append("isHeroImage", String(isHeroImage));
+    formData.append("isActiveHeroImage", String(isActiveHeroImage));
+    formData.append("isFeaturedEventImage", String(isFeaturedEventImage));
+    formData.append("isLiveEventImage", String(isLiveEventImage));
+    formData.append("isHomePageHeroImage", String(isHomePageHeroImage));
+    formData.append("isPublic", String(isPublic));
+    formData.append("tenantId", tenantId);
+    formData.append("isTeamMemberProfileImage", "false");
+    validFiles.forEach(() => {
+      formData.append("titles", title);
+      formData.append("descriptions", description || "");
+    });
+    if (startDisplayingFromDate) formData.append("startDisplayingFromDate", startDisplayingFromDate);
+    if (isHomePageHeroImage) {
+      const min = typeof heroDisplayDurationMinutes === "number" ? heroDisplayDurationMinutes : 0;
+      const sec = typeof heroDisplayDurationSeconds === "number" ? heroDisplayDurationSeconds : 0;
+      const total = min * 60 + sec;
+      if (total > 0 && total <= 600) formData.append("homePageHeroDisplayDurationSeconds", String(total));
+    }
+    try {
+      const res = await fetch("/api/proxy/event-medias/upload-multiple", { method: "POST", body: formData });
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(err || `Upload failed (${res.status})`);
+      }
+      onSuccess();
+      onClose();
+      setTitle("");
+      setDescription("");
+      setFiles(null);
+      setEventFlyer(false);
+      setIsEventManagementOfficialDocument(false);
+      setIsHeroImage(false);
+      setIsActiveHeroImage(false);
+      setIsFeaturedEventImage(false);
+      setIsLiveEventImage(false);
+      setIsHomePageHeroImage(false);
+      setStartDisplayingFromDate("");
+      setHeroDisplayDurationMinutes("");
+      setHeroDisplayDurationSeconds("");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    } catch (err: unknown) {
+      setExternalMessage(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      onUploadEnd();
+    }
+  };
+
+  if (!isOpen) return null;
+  return (
+    <Modal open={true} onClose={onClose} title="Upload New Media (no event)">
+      <p className="text-sm text-gray-600 mb-4">
+        This media will not be linked to an event. You can link it to an event later from the edit page.
+      </p>
+      <form onSubmit={handleSubmit} className="space-y-4 max-w-2xl">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+          <input
+            type="text"
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+            className="mt-1 block w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+          <textarea
+            value={description}
+            onChange={e => setDescription(e.target.value)}
+            rows={2}
+            className="mt-1 block w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3"
+          />
+        </div>
+
+        {/* Drag and Drop Area - same as /admin/events/[id]/media */}
+        <div className="flex flex-col gap-4 mt-2 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Files *</label>
+          <div
+            className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${isDragOver
+              ? "border-blue-500 bg-blue-50"
+              : files && files.length > 0
+                ? "border-green-400 bg-green-50"
+                : "border-gray-300 bg-gray-50"
+              }`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
+            <div className="space-y-4">
+              {isDragOver ? (
+                <div className="text-blue-600">
+                  <FaUpload className="w-12 h-12 mx-auto mb-2" />
+                  <p className="text-lg font-semibold">Drop files here to upload</p>
+                </div>
+              ) : files && files.length > 0 ? (
+                <div className="text-green-600">
+                  <FaPhotoVideo className="w-12 h-12 mx-auto mb-2" />
+                  <p className="text-lg font-semibold">{files.length} file(s) selected</p>
+                  <div className="flex flex-wrap justify-center gap-2 mt-4">
+                    {Array.from(files).map((file, idx) => (
+                      <span key={idx} className="bg-green-100 border border-green-300 rounded px-2 py-1 text-xs truncate max-w-xs" title={file.name}>
+                        {file.name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-gray-500">
+                  <FaFolderOpen className="w-12 h-12 mx-auto mb-2" />
+                  <p className="text-lg font-semibold mb-2">Drag & drop files here</p>
+                  <p className="text-sm">or click the button below to browse</p>
+                </div>
+              )}
+            </div>
+            <input
+              type="file"
+              multiple
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+              accept="image/*,video/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.svg"
+            />
+          </div>
+
+          {/* Browse Files + Upload Folder buttons */}
+          <div className="flex justify-center gap-3 flex-wrap">
+            <label className="relative cursor-pointer">
+              <span className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6">
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-blue-700">Browse Files</span>
+              </span>
+              <input
+                type="file"
+                multiple
+                onChange={handleFileChange}
+                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                accept="image/*,video/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.svg"
+              />
+            </label>
+            <label className="relative cursor-pointer">
+              <span className="flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6">
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-green-700">Upload Folder</span>
+              </span>
+              <input
+                type="file"
+                {...({ webkitdirectory: "" } as React.InputHTMLAttributes<HTMLInputElement>)}
+                onChange={handleFolderChange}
+                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                accept="image/*,video/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.svg"
+              />
+            </label>
+          </div>
+          {files && files.length > 0 && (
+            <div className="text-center mt-2">
+              <p className="text-sm text-gray-600">
+                <span className="font-semibold text-blue-600">{files.length} file{files.length !== 1 ? "s" : ""}</span> selected for upload
+              </p>
+            </div>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Start Displaying From Date</label>
+          <input
+            type="date"
+            value={startDisplayingFromDate}
+            onChange={e => setStartDisplayingFromDate(e.target.value)}
+            className="mt-1 block w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3"
+          />
+        </div>
+        {isHomePageHeroImage && (
+          <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Home Page Hero Display Duration (seconds)</label>
+            <div className="flex gap-4">
+              <input
+                type="number"
+                min={0}
+                max={10}
+                value={heroDisplayDurationMinutes}
+                onChange={e => setHeroDisplayDurationMinutes(e.target.value === "" ? "" : Math.max(0, Math.min(10, parseInt(e.target.value, 10) || 0)))}
+                placeholder="Min"
+                className="w-24 border border-gray-400 rounded-lg px-3 py-2"
+              />
+              <input
+                type="number"
+                min={0}
+                max={59}
+                value={heroDisplayDurationSeconds}
+                onChange={e => setHeroDisplayDurationSeconds(e.target.value === "" ? "" : Math.max(0, Math.min(59, parseInt(e.target.value, 10) || 0)))}
+                placeholder="Sec"
+                className="w-24 border border-gray-400 rounded-lg px-3 py-2"
+              />
+            </div>
+          </div>
+        )}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          {[
+            { state: eventFlyer, set: setEventFlyer, label: "Event Flyer" },
+            { state: isEventManagementOfficialDocument, set: setIsEventManagementOfficialDocument, label: "Official Doc" },
+            { state: isHeroImage, set: setIsHeroImage, label: "Hero Image" },
+            { state: isActiveHeroImage, set: setIsActiveHeroImage, label: "Active Hero" },
+            { state: isFeaturedEventImage, set: setIsFeaturedEventImage, label: "Featured Event" },
+            { state: isLiveEventImage, set: setIsLiveEventImage, label: "Live Event" },
+            { state: isHomePageHeroImage, set: setIsHomePageHeroImage, label: "Home Page Hero" },
+            { state: isPublic, set: setIsPublic, label: "Public" },
+          ].map(({ state, set, label }) => (
+            <label key={label} className="flex items-center gap-2">
+              <input type="checkbox" checked={state} onChange={e => set(e.target.checked)} className="rounded border-gray-400" />
+              <span className="text-sm">{label}</span>
+            </label>
+          ))}
+        </div>
+        {externalMessage && (
+          <div className={`p-3 rounded-lg text-sm ${externalMessage.startsWith("Please") || externalMessage.includes("not set") ? "bg-amber-50 text-amber-800" : "bg-red-50 text-red-800"}`}>
+            {externalMessage}
+          </div>
+        )}
+        <div className="flex gap-3 pt-4">
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex-1 h-12 rounded-xl bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold transition-all disabled:opacity-50"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={externalLoading}
+            className="flex-1 h-12 rounded-xl bg-green-100 hover:bg-green-200 text-green-700 font-semibold transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            {externalLoading ? "Uploading…" : "Upload"}
+          </button>
+        </div>
+      </form>
+    </Modal>
+  );
+}
+
 export default function AdminMediaPage() {
   const [mediaList, setMediaList] = useState<EventMediaDTO[]>([]);
   const [loading, setLoading] = useState(true);
@@ -541,6 +971,12 @@ export default function AdminMediaPage() {
   const tooltipTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const mediaGridRef = useRef<HTMLDivElement>(null);
   const pageTopRef = useRef<HTMLDivElement>(null);
+
+  // Upload modal state (media without event - upload from /admin/media)
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [uploadLoading, setUploadLoading] = useState(false);
+  const [uploadMessage, setUploadMessage] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -580,7 +1016,7 @@ export default function AdminMediaPage() {
       fetchMedia();
     }, 500); // Debounce search
     return () => clearTimeout(timer);
-  }, [page, pageSize, searchTerm, eventFlyerOnly]);
+  }, [page, pageSize, searchTerm, eventFlyerOnly, refreshKey]);
 
   function handleCellMouseEnter(media: EventMediaDTO, e: React.MouseEvent<HTMLDivElement>, type: 'uploadedMedia', serialNumber: number) {
     // Don't show tooltip if it was recently closed
@@ -774,17 +1210,18 @@ export default function AdminMediaPage() {
       <div className="flex justify-between items-center mb-8 gap-4">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex-1 min-w-0">Manage Media Files</h1>
         <div className="flex space-x-2">
-          <Link
-            href="/admin/media"
+          <button
+            type="button"
+            onClick={() => { setIsUploadModalOpen(true); setUploadMessage(null); }}
             className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-3 sm:px-6"
-            title="Upload New Media"
+            title="Upload New Media (no event)"
             aria-label="Upload New Media"
           >
             <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
               <FaUpload className="w-10 h-10 text-blue-600 p-2" />
             </div>
             <span className="font-semibold text-blue-700 hidden sm:inline">Upload New Media</span>
-          </Link>
+          </button>
         </div>
       </div>
 
@@ -1064,6 +1501,19 @@ export default function AdminMediaPage() {
           onClose={handleCloseModal}
           onSave={handleSave}
           loading={editLoading}
+        />
+      )}
+
+      {isUploadModalOpen && (
+        <UploadMediaModal
+          isOpen={isUploadModalOpen}
+          onClose={() => { setIsUploadModalOpen(false); setUploadMessage(null); }}
+          onSuccess={() => setRefreshKey(k => k + 1)}
+          onUploadStart={() => setUploadLoading(true)}
+          onUploadEnd={() => setUploadLoading(false)}
+          loading={uploadLoading}
+          message={uploadMessage}
+          setMessage={setUploadMessage}
         />
       )}
       <MediaDetailsTooltip

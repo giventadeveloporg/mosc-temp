@@ -12,6 +12,16 @@ This rule defines the standard pattern for hero section image rotation on the ho
 - **Default Image Display**: Shows default image for first 2 seconds before rotation begins
 - **User Experience**: Smooth transitions between event images with proper navigation links and manual control
 
+## **Hero Image Display Dimensions (Upload Spec)**
+
+The rotating hero uses **object-contain** in a wide container (~65% viewport width, min-height 280–480px). The `<Image>` component uses **width={1200} height={800}** (3:2 landscape). **Recommended upload dimensions** so the hero section does not become excessively tall:
+
+- **Desktop**: **1200×800px (3:2 landscape)**
+- **Mobile**: **900×600px (3:2)** or same file scales down
+- **Do not use portrait 800×1200 (2:3)** — portrait images make the hero block too tall.
+
+Keep admin/upload copy and docs (e.g. `HERO_SECTION_IMAGE_SPECIFICATIONS.md`, MediaClientPage hero tip) aligned with 1200×800 (3:2).
+
 ## **Core Pattern**
 
 ### **Component Structure**
@@ -1167,6 +1177,51 @@ const DynamicHeroImage: React.FC = () => {
 8. **Pause State**: When user clicks pause, rotation stops immediately and interval is cleared
 9. **Resume State**: When user clicks play, rotation resumes and interval is recreated
 
+## **Hero Image Source by 4-Month Window**
+
+Hero image sources depend on whether there are **events in the next 4 months** that qualify for hero display (same event/hero criteria, with `startDate` within the next 4 months).
+
+### **Definition: Events in Next 4 Months**
+- **Events in next 4 months**: Among the hero-qualifying processed events (after recurring handling and sorting), at least one has `startDate` between **today** (inclusive) and **today + 4 months** (inclusive).
+- **Four-month boundary**: `fourMonthsFromNow = new Date(); fourMonthsFromNow.setMonth(fourMonthsFromNow.getMonth() + 4);`
+
+### **When There Are NO Events in the Next 4 Months**
+- **Source**: Use **standalone** hero images from the **event_media** table (**event_id** IS NULL).
+- **Filter**: **Either** `is_home_page_hero_image = true` **or** `is_hero_image = true`; `startDisplayingFromDate` valid (null or <= today).
+- **Limit**: Select **at most 6** images for the hero loop.
+- **Display**: Same rotation, per-image duration (`home_page_hero_display_duration_seconds`), and default image at end. **No event overlay** (no event object for these slides; `currentEvent` remains null for all these images).
+- **API**: Fetch by hero flags then filter client-side (do **not** rely on `eventId.specified=false` — many backends don't support it or return empty). (1) `isHeroImage.equals=true&size=50`, (2) if needed `isHomePageHeroImage.equals=true&size=50`; merge/dedupe by id, filter by `event_id` null + `isStandaloneHeroEligible` + `startDisplayingFromDate`, sort by `displayOrder`, take first 6.
+
+### **When There ARE Events in the Next 4 Months**
+- **Primary source**: Keep current behavior — hero loop is built from hero-qualifying events (event-based images with overlay where applicable).
+- **Additional source**: Add **at most 2** hero images from **event_media** that are **not associated with any event** (`event_id` IS NULL).
+- **Filter**: **Either** `is_home_page_hero_image = true` **or** `is_hero_image = true`; `startDisplayingFromDate` valid (null or <= today).
+- **Limit**: **Maximum 2** standalone images, appended to the loop after event-based images (before the default image).
+- **Display**: Same animation and rotation; for these 2 slides **no event overlay** (do not add them to `upcomingEvents`; `currentEvent` is null when showing these indices).
+- **API**: Fetch by hero flags then filter client-side. (1) `isHeroImage.equals=true&size=30`, (2) if needed `isHomePageHeroImage.equals=true&size=30`; merge/dedupe by id, filter by `event_id` null + `isStandaloneHeroEligible` + `startDisplayingFromDate`, sort by `displayOrder`, take first 2.
+
+### **Preserved Behavior**
+- **Animation and display**: No change to transition, refs, per-image duration, or default image (first 2s, then rotation).
+- **Overlay**: Event overlay only for slides that have an associated event; standalone or “no events in 4 months” slides have no overlay.
+- **Play/Pause/Prev/Next**: Unchanged; controls and rotation logic use the same `dynamicImages` / `imageDurations` / `upcomingEvents` pattern.
+
+### **event_media Fields Used**
+- `event_id`: NULL = standalone hero image; NOT NULL = assigned to an event.
+- `is_home_page_hero_image` / `isHomePageHeroImage`: For event-based hero, must be true. For **standalone** only, either this **or** `is_hero_image` can be true.
+- `is_hero_image` / `isHeroImage`: For **standalone** selection only, accepted as alternative to `is_home_page_hero_image` (either flag true).
+- `start_displaying_from_date` / `startDisplayingFromDate`: If set, only show when <= today.
+- `file_url` / `fileUrl`: Image URL.
+- `home_page_hero_display_duration_seconds` / `homePageHeroDisplayDurationSeconds`: Per-slide duration (default 8s if null).
+
+### **Standalone Hero Image Data Requirement (event_id NULL only)**
+For **standalone** hero images (no event) to be selected and shown on the home page hero section:
+
+1. **`event_id` IS NULL** — Media must not be tied to any event (standalone).
+2. **Either** **`is_home_page_hero_image = true`** **or** **`is_hero_image = true`** — For standalone selection only, the frontend accepts either flag. Event-based hero image retrieval still requires `is_home_page_hero_image = true` only.
+
+- **API for standalone (implementation)**: Do **not** rely on `eventId.specified=false` — many backends don't support it or return no rows. Instead: (1) Fetch `isHeroImage.equals=true&size=30` (or 50 for no-events-in-4-months), (2) optionally fetch `isHomePageHeroImage.equals=true&size=30` (or 50) and merge; (3) filter client-side with `isStandaloneHeroMedia(m)` (event_id/eventId null), `isStandaloneHeroEligible(m)` (is_home_page_hero_image OR is_hero_image), and `isHeroMediaDisplayDateValid(m)`; (4) dedupe by id, sort by displayOrder, take first 2 (or 6 for no-events case).
+- **Admin / inserts**: When creating standalone hero media, set either **`is_home_page_hero_image = true`** or **`is_hero_image = true`** (or both).
+
 ## **Event Selection Rules**
 
 ### **Primary Selection Criteria (BOTH Required)**
@@ -1349,6 +1404,11 @@ if (!filteredEvents || filteredEvents.length === 0) {
 - **Check**: Is `scheduleNextRotation` accessing arrays from refs? (Should use `.current` not direct state)
 - **Check**: Is guard being reset on cleanup? (Should set `lastScheduledIndexRef.current = null`)
 - **Check**: Is effect restarting prematurely? (Should NOT include `currentImageIndex` in dependencies)
+
+### **Standalone Hero Images Not Showing?**
+- **Check**: In the database, standalone rows must have `event_id` IS NULL and **either** `is_home_page_hero_image = true` **or** `is_hero_image = true`. The frontend filters standalone media client-side by this rule (see **Standalone Hero Image Data Requirement** above).
+- **Check**: Admin/INSERTs for standalone hero media should set at least one of `is_home_page_hero_image = true` or `is_hero_image = true`.
+- **Backend**: The implementation does **not** use `eventId.specified=false`; it fetches by `isHeroImage.equals=true` and optionally `isHomePageHeroImage.equals=true`, then filters client-side for `event_id` null. If standalone still don't appear, confirm the backend returns media with `event_id` NULL when querying by `isHeroImage.equals=true` (or `isHomePageHeroImage.equals=true`), and that `size` is large enough (30 or 50).
 
 ### **All Images Using 8 Seconds (Per-Image Duration Not Working)?**
 - **Check**: Is `imageDurationsRef.current` being used instead of `imageDurations`? (Should use ref to avoid stale closure)

@@ -57,11 +57,12 @@ const FeaturedEventsSection: React.FC = () => {
   return (
     <section className="py-0 md:py-0.5 bg-gradient-to-r from-blue-50 to-indigo-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="text-center mb-6">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-            Featured Events
-          </h2>
+        {/* Section Header - Yellow bar and label only (h2 removed per request) */}
+        <div className="mb-16">
+          <div className="flex items-center space-x-2 mb-6">
+            <div className="w-5 h-2 bg-yellow-400 rounded"></div>
+            <p className="text-gray-600">Featured</p>
+          </div>
         </div>
 
         {/* Featured Events Strip - max 3 */}
@@ -69,11 +70,11 @@ const FeaturedEventsSection: React.FC = () => {
           {displayedEvents.map((featuredEvent, index) => (
             <div
               key={featuredEvent.event.id}
-              className="bg-white rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300 overflow-hidden h-auto md:min-h-[180px] md:max-h-[220px]"
+              className="bg-white rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300 overflow-hidden h-auto md:h-[200px]"
             >
-              <div className="flex flex-col md:flex-row md:h-full">
-                {/* Left Column - Featured Event Image (55% width on desktop) */}
-                <div className="w-full md:w-[55%] h-48 md:h-full md:min-h-[180px] relative overflow-hidden rounded-t-2xl md:rounded-t-none md:rounded-l-2xl">
+              <div className="flex flex-col md:flex-row h-full">
+                {/* Left Column - Image only; 70% width on desktop; height = card (200px) */}
+                <div className="w-full md:w-[70%] h-48 md:h-full relative overflow-hidden rounded-t-2xl md:rounded-t-none md:rounded-l-2xl">
                   {featuredEvent.media.fileUrl ? (
                     <Image
                       src={featuredEvent.media.fileUrl}
@@ -130,27 +131,28 @@ const FeaturedEventsSection: React.FC = () => {
                   })()}
                 </div>
 
-                {/* Right Column - Event Details - Editorial refined design */}
-                <div className="w-full md:w-[45%] min-w-0 p-4 md:p-5 flex flex-col justify-between bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 rounded-b-2xl md:rounded-b-none md:rounded-r-2xl relative overflow-hidden">
+                {/* Right Column - Same height as image (200px); compact content, no scrollbar */}
+                <div className="w-full md:w-[30%] md:h-full min-h-0 flex flex-col bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 rounded-b-2xl md:rounded-b-none md:rounded-r-2xl relative">
                   {/* Subtle decorative accent */}
                   <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-indigo-100/40 to-transparent rounded-bl-full pointer-events-none" />
 
-                  <div className="relative z-10 space-y-3">
-                    {/* Event Title */}
-                    <h3 className="text-base md:text-lg font-bold text-slate-800 line-clamp-2 leading-snug tracking-tight">
+                  <div className="relative z-10 flex-1 min-h-0 flex flex-col justify-between p-3 md:p-4 overflow-hidden">
+                    <div className="space-y-1.5 min-w-0">
+                    {/* Event Title - compact, single line on desktop */}
+                    <h3 className="text-sm md:text-base font-bold text-slate-800 line-clamp-1 leading-tight tracking-tight">
                       {featuredEvent.event.title}
                     </h3>
 
-                    {/* Event Meta - Clean compact layout */}
-                    <div className="space-y-2">
+                    {/* Event Meta - compact icons and text */}
+                    <div className="space-y-1">
                       {/* Date */}
-                      <div className="flex items-center gap-2.5 text-slate-600">
-                        <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
-                          <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      <div className="flex items-center gap-2 text-slate-600">
+                        <div className="flex-shrink-0 w-7 h-7 rounded-lg bg-blue-100 flex items-center justify-center">
+                          <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
                         </div>
-                        <span className="text-xs md:text-sm font-medium truncate">
+                        <span className="text-xs font-medium truncate">
                           {featuredEvent.event.timezone
                             ? formatInTimeZone(featuredEvent.event.startDate, featuredEvent.event.timezone, 'EEE, MMM d, yyyy')
                             : new Date(featuredEvent.event.startDate).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
@@ -160,78 +162,82 @@ const FeaturedEventsSection: React.FC = () => {
 
                       {/* Time */}
                       {featuredEvent.event.startTime && (
-                        <div className="flex items-center gap-2.5 text-slate-600">
-                          <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
-                            <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <div className="flex items-center gap-2 text-slate-600">
+                          <div className="flex-shrink-0 w-7 h-7 rounded-lg bg-green-100 flex items-center justify-center">
+                            <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                           </div>
-                          <span className="text-xs md:text-sm font-medium">{featuredEvent.event.startTime}</span>
+                          <span className="text-xs font-medium">{featuredEvent.event.startTime}</span>
                         </div>
                       )}
 
                       {/* Location */}
                       {featuredEvent.event.location && (
-                        <div className="flex items-center gap-2.5 text-slate-600">
-                          <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
-                            <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <div className="flex items-center gap-2 text-slate-600">
+                          <div className="flex-shrink-0 w-7 h-7 rounded-lg bg-purple-100 flex items-center justify-center">
+                            <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
                           </div>
-                          <span className="text-xs md:text-sm font-medium truncate">{featuredEvent.event.location}</span>
+                          <span className="text-xs font-medium truncate">{featuredEvent.event.location}</span>
                         </div>
                       )}
                     </div>
-                  </div>
+                    </div>
 
-                  {/* Action Buttons */}
-                  <div className="relative z-10 pt-3 flex flex-wrap gap-2 mt-auto">
-                    {/* Primary CTA */}
-                    <Link
-                      href={`/events/${featuredEvent.event.id}`}
-                      className="group flex-1 min-w-[120px] h-9 rounded-lg bg-slate-800 hover:bg-slate-900 flex items-center justify-center gap-1.5 transition-all duration-300 shadow-sm hover:shadow-md"
-                      title="View Details"
-                      aria-label="View Event Details"
-                    >
-                      <svg className="w-3.5 h-3.5 text-white/80 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                      <span className="font-semibold text-xs text-white">View Details</span>
-                    </Link>
-
-                    {/* Add to Calendar - Secondary */}
-                    {(() => {
-                      const currentDate = new Date();
-                      currentDate.setHours(0, 0, 0, 0);
-                      const eventDate = featuredEvent.event.startDate ? new Date(featuredEvent.event.startDate) : null;
-                      if (eventDate) eventDate.setHours(0, 0, 0, 0);
-                      const isUpcoming = eventDate && eventDate >= currentDate;
-
-                      if (!isUpcoming || !featuredEvent.event.startDate || !featuredEvent.event.startTime) return null;
-
-                      const start = toGoogleCalendarDate(featuredEvent.event.startDate, featuredEvent.event.startTime);
-                      const end = toGoogleCalendarDate(featuredEvent.event.endDate || featuredEvent.event.startDate, featuredEvent.event.endTime || featuredEvent.event.startTime);
-                      const text = encodeURIComponent(featuredEvent.event.title);
-                      const details = encodeURIComponent(featuredEvent.event.description || '');
-                      const location = encodeURIComponent(featuredEvent.event.location || '');
-                      const calendarLink = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${start}/${end}&details=${details}&location=${location}`;
-
-                      return (
-                        <a
-                          href={calendarLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="h-9 px-3 rounded-lg bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-800 text-xs font-medium border border-slate-200 hover:border-slate-300 transition-all duration-200 flex items-center justify-center gap-1.5 shadow-sm"
-                        >
-                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
+                    {/* Action Buttons - compact */}
+                    <div className="relative z-10 pt-2 flex flex-wrap gap-2 flex-shrink-0">
+                      <Link
+                        href={`/events/${featuredEvent.event.id}`}
+                        className="flex-1 min-w-0 flex-shrink-0 h-9 rounded-lg bg-green-100 hover:bg-green-200 flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105"
+                        title="View Event Details"
+                        aria-label="View Event Details"
+                      >
+                        <div className="flex-shrink-0 w-6 h-6 rounded bg-green-200 flex items-center justify-center">
+                          <svg className="w-3.5 h-3.5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                           </svg>
-                          <span>Calendar</span>
-                        </a>
-                      );
-                    })()}
+                        </div>
+                        <span className="text-xs font-semibold text-green-700 truncate">View</span>
+                      </Link>
+                      {(() => {
+                        const currentDate = new Date();
+                        currentDate.setHours(0, 0, 0, 0);
+                        const eventDate = featuredEvent.event.startDate ? new Date(featuredEvent.event.startDate) : null;
+                        if (eventDate) eventDate.setHours(0, 0, 0, 0);
+                        const isUpcoming = eventDate && eventDate >= currentDate;
+
+                        if (!isUpcoming || !featuredEvent.event.startDate || !featuredEvent.event.startTime) return null;
+
+                        const start = toGoogleCalendarDate(featuredEvent.event.startDate, featuredEvent.event.startTime);
+                        const end = toGoogleCalendarDate(featuredEvent.event.endDate || featuredEvent.event.startDate, featuredEvent.event.endTime || featuredEvent.event.startTime);
+                        const text = encodeURIComponent(featuredEvent.event.title);
+                        const details = encodeURIComponent(featuredEvent.event.description || '');
+                        const location = encodeURIComponent(featuredEvent.event.location || '');
+                        const calendarLink = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${start}/${end}&details=${details}&location=${location}`;
+
+                        return (
+                          <a
+                            href={calendarLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-shrink-0 h-9 rounded-lg bg-orange-100 hover:bg-orange-200 flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 px-3"
+                            title="Add to Calendar"
+                            aria-label="Add to Calendar"
+                          >
+                            <div className="flex-shrink-0 w-6 h-6 rounded bg-orange-200 flex items-center justify-center">
+                              <svg className="w-3.5 h-3.5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                            </div>
+                            <span className="text-xs font-semibold text-orange-700">Calendar</span>
+                          </a>
+                        );
+                      })()}
+                    </div>
                   </div>
                 </div>
               </div>
