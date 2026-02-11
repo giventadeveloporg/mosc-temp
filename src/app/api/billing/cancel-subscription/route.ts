@@ -19,7 +19,7 @@ const getStripe = () => {
 
 export async function POST(req: Request) {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
     const stripe = getStripe(); // Initialize Stripe only when needed
 
     if (!userId) {
