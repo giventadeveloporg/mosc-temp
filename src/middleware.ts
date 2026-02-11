@@ -306,10 +306,13 @@ export default async function middleware(req: NextRequest, event: NextFetchEvent
       });
       return nextRes;
     }
+    // Public route and Clerk allowed through (200): return nextRes so request keeps x-pathname
+    // and we don't build an invalid response from nextRes.body (pass-through stream).
     console.log('[MIDDLEWARE] ✅ Public route', pathname, 'allowed through with status', response.status);
+    return nextRes;
   }
 
-  // Copy Clerk's response headers/status to our response (preserves set-cookie, etc.)
+  // Non-public route: copy Clerk's response headers/status (preserves set-cookie, redirect, etc.)
   if (response instanceof NextResponse) {
     const headers = new Headers(nextRes.headers);
     response.headers.forEach((value, key) => {
