@@ -13,9 +13,9 @@ interface AdSlotsProps {
 export function AdSlots({ slots }: AdSlotsProps) {
   if (slots.length === 0) {
     return (
-      <div className="rounded-xl bg-white border border-syro-table-border shadow-syro-card-sm overflow-hidden p-4">
-        <h3 className="font-syro-display font-semibold text-lg text-syro-blue mb-2">Advertisement</h3>
-        <p className="font-syro-primary text-sm text-syro-dark-gray">No advertisements at the moment.</p>
+      <div className="rounded-xl bg-card border border-border sacred-shadow-sm overflow-hidden p-4">
+        <h3 className="font-heading font-semibold text-lg text-foreground mb-2">Advertisement</h3>
+        <p className="font-body text-sm text-muted-foreground">No advertisements at the moment.</p>
       </div>
     );
   }
@@ -25,7 +25,7 @@ export function AdSlots({ slots }: AdSlotsProps) {
       {slots.map((slot) => (
         <div
           key={slot.id}
-          className="rounded-xl bg-white border border-syro-table-border shadow-syro-card-sm overflow-hidden p-4"
+          className="rounded-xl bg-card border border-border sacred-shadow-sm overflow-hidden p-4"
         >
           {slot.embedHtml && slot.embedHtml.trim().length > 0 ? (
             <div
@@ -38,7 +38,7 @@ export function AdSlots({ slots }: AdSlotsProps) {
                 href={slot.linkUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block rounded-lg overflow-hidden border border-syro-table-border hover:opacity-90 transition-all duration-300"
+                className="block rounded-lg overflow-hidden border border-border hover:opacity-90 reverent-transition"
               >
                 <div className="relative aspect-[120/60] w-full">
                   <Image
@@ -52,7 +52,7 @@ export function AdSlots({ slots }: AdSlotsProps) {
                 </div>
               </a>
             ) : (
-              <div className="relative aspect-[120/60] w-full rounded-lg overflow-hidden border border-syro-table-border">
+              <div className="relative aspect-[120/60] w-full rounded-lg overflow-hidden border border-border">
                 <Image
                   src={slot.mediaUrl}
                   alt="Advertisement"

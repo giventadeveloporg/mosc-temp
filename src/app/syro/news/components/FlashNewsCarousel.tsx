@@ -51,7 +51,7 @@ export function FlashNewsCarousel({ items }: FlashNewsCarouselProps) {
     >
       {/* Title label - reference: .flash-title (#db1111, clip-path) */}
       <div
-        className="flash-title flex-shrink-0 flex items-center px-4 py-2 font-syro-display font-semibold text-white"
+        className="flash-title flex-shrink-0 flex items-center px-4 py-2 font-heading font-semibold text-white"
         style={{
           background: '#db1111',
           clipPath: 'polygon(0 0, 90% 0%, 100% 100%, 0% 100%)',
@@ -68,7 +68,7 @@ export function FlashNewsCarousel({ items }: FlashNewsCarouselProps) {
         onMouseLeave={handleMouseLeave}
       >
         <div
-          className="flex items-center gap-8 font-syro-primary text-sm font-medium text-[#1a1a1a] whitespace-nowrap flash-ticker-track"
+          className="flex items-center gap-8 font-body text-sm font-medium text-[#1a1a1a] whitespace-nowrap flash-ticker-track"
           style={{
             animationPlayState: paused ? 'paused' : 'running',
           }}
