@@ -4,7 +4,12 @@ import { auth, currentUser } from '@clerk/nextjs/server';
 import { getAppUrl, getTenantId } from '@/lib/env';
 import { getCachedApiJwt, generateApiJwt } from '@/lib/api/jwt';
 import type { UserProfileDTO } from '@/types';
-import { updateUserProfileServer, createUserProfileServer } from './ApiServerActions';
+import {
+  updateUserProfileServer,
+  createUserProfileServer,
+  fetchUserProfileByEmailServer,
+  generateEmailSubscriptionTokenServer,
+} from './ApiServerActions';
 
 /**
  * Server action to trigger profile reconciliation after authentication
@@ -223,6 +228,22 @@ export async function updateUserProfileAction(profileId: number, payload: Partia
  */
 export async function createUserProfileAction(payload: Omit<UserProfileDTO, 'id' | 'createdAt' | 'updatedAt'>): Promise<UserProfileDTO | null> {
   return createUserProfileServer(payload);
+}
+
+/**
+ * Fetch user profile by email - server action wrapper for use from client components.
+ * Keeps ApiServerActions (Clerk server) out of the client bundle.
+ */
+export async function fetchUserProfileByEmailAction(email: string): Promise<UserProfileDTO | null> {
+  return fetchUserProfileByEmailServer(email);
+}
+
+/**
+ * Generate email subscription token - server action wrapper for use from client components.
+ * Keeps ApiServerActions (Clerk server) out of the client bundle.
+ */
+export async function generateEmailSubscriptionTokenAction(profileId: number): Promise<{ success: boolean; token?: string; error?: string }> {
+  return generateEmailSubscriptionTokenServer(profileId);
 }
 
 export async function resubscribeEmailAction(email: string, token: string): Promise<{ success: boolean; message: string }> {

@@ -1,21 +1,24 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useAuth, useUser } from '@clerk/nextjs';
 import { UserProfileDTO } from '@/types';
 import ProfileForm from '@/components/ProfileForm';
-import { ProfileReconciliationTrigger } from '@/components/ProfileReconciliationTrigger';
 import ErrorDialog from '@/components/ErrorDialog';
 import { ProfileBootstrapper } from '@/components/ProfileBootstrapper';
 import Image from 'next/image';
 
 /**
  * Client-side profile page wrapper that shows loading state
- * while fetching profile data from the server
+ * while fetching profile data from the server.
+ * Receives initialUserId from server to avoid requiring ClerkProvider context.
  */
-export default function ProfilePageWithLoading() {
-  const { userId, isLoaded } = useAuth();
-  const { user } = useUser();
+interface ProfilePageWithLoadingProps {
+  initialUserId: string;
+}
+
+export default function ProfilePageWithLoading({ initialUserId }: ProfilePageWithLoadingProps) {
+  const userId = initialUserId;
+  const isLoaded = true;
   const [profile, setProfile] = useState<UserProfileDTO | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
