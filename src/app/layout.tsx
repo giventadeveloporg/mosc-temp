@@ -103,8 +103,7 @@ export default async function RootLayout({
   let isTenantAdmin = false;
 
   // Perform auth + profile lookup whenever we have a pathname so Header gets correct isTenantAdmin on every page.
-  // Skip auth on /mosc/* and /syro/* (section routes with their own layout) to avoid Next.js 15+ "headers() should be awaited"
-  // when Clerk's auth() runs. Admin menu is not shown on these section pages (ConditionalLayout renders only children).
+  // Skip auth on /mosc/* and /syro/* (section routes with their own layout).
   const skipAuthForRoute = pathname.startsWith('/mosc') || pathname.startsWith('/syro');
   if (pathname && !skipAuthForRoute) {
     try {
