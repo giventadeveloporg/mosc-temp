@@ -8,6 +8,8 @@ frontend:
         - bash fix-apostrophes.sh
     build:
       commands:
+        # Prevent JavaScript heap out of memory during Next.js build (Amplify default heap is too small)
+        - export NODE_OPTIONS="--max-old-space-size=4096"
         - npm run build
   artifacts:
     baseDirectory: .next
