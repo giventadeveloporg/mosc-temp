@@ -190,6 +190,7 @@ export default function InstitutionsPage() {
               </p>
             </div>
           </div>
+          </div>
 
           <QuickLinks />
         </div>
