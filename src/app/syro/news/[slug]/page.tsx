@@ -30,7 +30,7 @@ export default async function NewsArticlePage({ params }: PageProps) {
   if (!article) notFound();
 
   return (
-    <div className="bg-syro-bg-gray">
+    <div className="bg-background">
       {/* Same header as news index: title, description, section + external links */}
       <NewsPageHeader />
 
@@ -44,14 +44,14 @@ export default async function NewsArticlePage({ params }: PageProps) {
       <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <Link
           href="/syro/news"
-          className="inline-flex items-center gap-2 font-syro-primary text-sm text-syro-red hover:underline mb-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="inline-flex items-center gap-2 font-body text-sm text-primary hover:underline mb-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <span aria-hidden="true">←</span> Back to News
         </Link>
 
         <header className="mb-8">
           {article.coverUrl && (
-            <div className="relative w-full h-auto rounded-xl overflow-hidden bg-syro-bg-gray mb-6 p-4">
+            <div className="relative w-full h-auto rounded-xl overflow-hidden bg-muted mb-6 p-4">
               <Image
                 src={article.coverUrl}
                 alt={article.coverAlt || article.title}
@@ -64,10 +64,10 @@ export default async function NewsArticlePage({ params }: PageProps) {
               />
             </div>
           )}
-          <h1 className="font-syro-display font-semibold text-3xl md:text-4xl text-syro-blue">
+          <h1 className="font-heading font-semibold text-3xl md:text-4xl text-foreground">
             {article.title}
           </h1>
-          <div className="flex flex-wrap gap-4 mt-4 font-syro-primary text-sm text-syro-dark-gray">
+          <div className="flex flex-wrap gap-4 mt-4 font-caption text-sm text-muted-foreground">
             {article.publishedAt && (
               <time dateTime={article.publishedAt}>
                 {new Date(article.publishedAt).toLocaleDateString('en-IN', {
@@ -80,11 +80,11 @@ export default async function NewsArticlePage({ params }: PageProps) {
           </div>
         </header>
 
-        <div className="prose prose-lg font-syro-primary text-syro-blue max-w-none prose-headings:font-syro-display prose-a:text-syro-red">
+        <div className="prose prose-lg font-body text-foreground max-w-none prose-headings:font-heading prose-a:text-primary">
           {article.body ? (
             <div dangerouslySetInnerHTML={{ __html: article.body }} />
           ) : (
-            article.excerpt && <p className="text-syro-dark-gray">{article.excerpt}</p>
+            article.excerpt && <p className="text-muted-foreground">{article.excerpt}</p>
           )}
         </div>
       </article>

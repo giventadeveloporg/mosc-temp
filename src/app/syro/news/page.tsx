@@ -29,14 +29,14 @@ export default async function NewsPage() {
   const data = await getNewsHomePageData();
 
   return (
-    <div className="bg-syro-bg-gray">
+    <div className="bg-background">
       {/* Hero / Page title */}
-      <section className="py-12 bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray border-b border-syro-table-border">
+      <section className="py-12 bg-gradient-to-br from-background to-muted border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="font-syro-display font-semibold text-3xl md:text-4xl text-syro-blue">
+          <h1 className="font-heading font-semibold text-3xl md:text-4xl text-foreground">
             News
           </h1>
-          <p className="font-syro-primary text-syro-dark-gray mt-2">
+          <p className="font-body text-muted-foreground mt-2">
             Latest news, featured stories, and press releases from the Church.
           </p>
           {/* Navigation links per layout (catholicatenews_strapi_content_mapping, index.html) */}
@@ -45,7 +45,7 @@ export default async function NewsPage() {
               <a
                 key={href}
                 href={href}
-                className="font-syro-primary text-sm font-medium text-syro-red hover:text-accent hover:underline transition-all duration-300 px-3 py-1.5 rounded-lg bg-syro-bg-gray/50 hover:bg-syro-bg-gray"
+                className="font-body text-sm font-medium text-primary hover:text-accent hover:underline reverent-transition px-3 py-1.5 rounded-lg bg-muted/50 hover:bg-muted"
               >
                 {label}
               </a>
@@ -56,7 +56,7 @@ export default async function NewsPage() {
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-syro-primary text-sm font-medium text-syro-red hover:text-accent hover:underline transition-all duration-300 px-3 py-1.5 rounded-lg bg-syro-bg-gray/50 hover:bg-syro-bg-gray"
+                className="font-body text-sm font-medium text-primary hover:text-accent hover:underline reverent-transition px-3 py-1.5 rounded-lg bg-muted/50 hover:bg-muted"
               >
                 {label}
               </a>

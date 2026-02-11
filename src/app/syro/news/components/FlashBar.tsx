@@ -15,7 +15,7 @@ export function FlashBar({ message }: FlashBarProps) {
       aria-live="polite"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <p className="font-syro-primary text-sm font-medium truncate" title={message}>
+        <p className="font-body text-sm font-medium truncate" title={message}>
           {message}
         </p>
       </div>

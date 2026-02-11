@@ -7,6 +7,7 @@ import type { EventWithMedia, EventDetailsDTO } from "@/types";
 import { formatInTimeZone } from 'date-fns-tz';
 import { isRecurringEvent, getNextOccurrenceDate } from '@/lib/eventUtils';
 import { isDonationBasedEvent, isTicketedFundraiserEvent } from '@/lib/donation/utils';
+import { isTicketedEventCube } from '@/lib/eventcube/utils';
 import { getTenantId } from '@/lib/env';
 
 // Component to handle event image loading errors and hide container when image fails
@@ -645,11 +646,37 @@ const UpcomingEventsSection: React.FC = () => {
                           </Link>
                         )}
 
-                        {/* Buy Tickets Button - Only for TICKETED events and upcoming events (case-insensitive) */}
-                        {/* BUT NOT if it's a ticketed fundraiser (use fundraiser image instead) */}
-                        {isUpcomingEvents && event.admissionType?.toUpperCase() === 'TICKETED' && !isTicketedFundraiserEvent(event) && (
+                        {/* Event Cube: Buy Tickets → eventcube-checkout (red image) */}
+                        {isUpcomingEvents && isTicketedEventCube(event) && (
                           <Link
-                            href={`/events/${event.id}/checkout`}
+                            href={`/events/${event.id}/eventcube-checkout`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="transition-transform hover:scale-105 inline-block"
+                            title="Buy Tickets"
+                            aria-label="Buy Tickets"
+                          >
+                            <img
+                              src="/images/buy_tickets_click_here_red.webp"
+                              alt="Buy Tickets"
+                              className="object-contain"
+                              style={{
+                                width: '200px',
+                                height: '70px'
+                              }}
+                            />
+                          </Link>
+                        )}
+
+                        {/* Buy Tickets Button - Only for TICKETED events and upcoming events (case-insensitive) */}
+                        {/* BUT NOT if Event Cube or ticketed fundraiser (use their dedicated links instead) */}
+                        {isUpcomingEvents && event.admissionType?.toUpperCase() === 'TICKETED' && !isTicketedFundraiserEvent(event) && !isTicketedEventCube(event) && (
+                          <Link
+                            href={
+                              event.manualPaymentEnabled === true &&
+                              (event.paymentFlowMode === 'MANUAL_ONLY' || event.paymentFlowMode === 'HYBRID')
+                                ? `/events/${event.id}/manual-checkout`
+                                : `/events/${event.id}/checkout`
+                            }
                             onClick={(e) => e.stopPropagation()}
                             className="transition-transform hover:scale-105 inline-block"
                             title="Buy Tickets"

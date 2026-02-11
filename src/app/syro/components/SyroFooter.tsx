@@ -159,19 +159,7 @@ export default function SyroFooter() {
           <div className="col-lg-8 footer-section-2 made-by pe-5">
             <ul className="d-none d-lg-block list-unstyled">
               <li className="float-end">
-                <p className="text-white mb-0">
-                  Made with <i className="fa-solid fa-heart text-danger" /> by{' '}
-                  <Link href="/syro#!">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src="/syro/assets/images/resources/smcim_footer.svg"
-                      alt="SMCIM"
-                      width={60}
-                      height={24}
-                      className="lozad d-inline-block"
-                    />
-                  </Link>
-                </p>
+                <p className="text-white mb-0">Giventa Inc. USA</p>
               </li>
             </ul>
             <div className="footer-bottom">
@@ -179,19 +167,7 @@ export default function SyroFooter() {
                 <Link href="/syro#!" className="text-start">Terms &amp; Conditions</Link>{' '}
                 <Link href="/syro#!" className="float-end">Disclaimers</Link>
               </p>
-              <p className="text-white text-center mb-2 d-block d-lg-none">
-                Made with <i className="fa-solid fa-heart text-danger" /> by{' '}
-                <Link href="/syro#!">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="/syro/assets/images/resources/smcim_footer.svg"
-                    alt="SMCIM"
-                    width={60}
-                    height={24}
-                    className="lozad d-inline-block"
-                  />
-                </Link>
-              </p>
+              <p className="text-white text-center mb-2 d-block d-lg-none">Giventa Inc. USA</p>
               <p className="text-white text-center mb-2 d-block d-lg-none">
                 © 2026 The Malankara Orthodox Church. All rights reserved.
               </p>

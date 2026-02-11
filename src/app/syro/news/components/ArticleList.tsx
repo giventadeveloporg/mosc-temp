@@ -28,8 +28,8 @@ function CalendarIcon({ className }: { className?: string }) {
  */
 export function ArticleList({ title, articles, baseHref, compact, id }: ArticleListProps) {
   return (
-    <section id={id} className="scroll-mt-24 rounded-xl bg-white border border-syro-table-border shadow-syro-card-sm overflow-hidden">
-      <h2 className="font-syro-display font-semibold text-xl text-syro-blue border-b border-syro-table-border px-6 py-4 bg-syro-bg-gray">
+    <section id={id} className="scroll-mt-24 rounded-xl bg-card border border-border sacred-shadow-sm overflow-hidden">
+      <h2 className="font-heading font-semibold text-xl text-foreground border-b border-border px-6 py-4 bg-muted/30">
         {title}
       </h2>
       {articles.length > 0 ? (
@@ -38,11 +38,11 @@ export function ArticleList({ title, articles, baseHref, compact, id }: ArticleL
             <li key={article.id}>
               <Link
                 href={`${baseHref}/${article.slug || article.documentId || article.id}`}
-                className="block group rounded-lg overflow-hidden border border-syro-table-border hover:border-primary/30 hover:shadow-md transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-white"
+                className="block group rounded-lg overflow-hidden border border-border hover:border-primary/30 hover:shadow-md reverent-transition focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-card"
               >
                 {/* Image on top - object-contain so header/top is not cropped (image_containment_prevention) */}
                 {article.coverUrl && (
-                  <div className="relative w-full h-auto rounded-t-lg overflow-hidden bg-syro-bg-gray p-3">
+                  <div className="relative w-full h-auto rounded-t-lg overflow-hidden bg-muted p-3">
                     <Image
                       src={article.coverUrl}
                       alt={article.coverAlt || article.title}
@@ -57,12 +57,12 @@ export function ArticleList({ title, articles, baseHref, compact, id }: ArticleL
                 )}
                 {/* Title, date, description below */}
                 <div className="p-4">
-                  <h3 className="font-syro-primary font-semibold text-syro-blue line-clamp-2 group-hover:text-syro-red transition-all duration-300">
+                  <h3 className="font-body font-semibold text-foreground line-clamp-2 group-hover:text-primary reverent-transition">
                     {article.title}
                   </h3>
                   {article.publishedAt && (
                     <time
-                      className="font-syro-primary text-sm text-syro-dark-gray mt-2 flex items-center gap-1.5"
+                      className="font-caption text-sm text-muted-foreground mt-2 flex items-center gap-1.5"
                       dateTime={article.publishedAt}
                     >
                       <CalendarIcon className="w-4 h-4 flex-shrink-0" />
@@ -72,7 +72,7 @@ export function ArticleList({ title, articles, baseHref, compact, id }: ArticleL
                     </time>
                   )}
                   {!compact && article.excerpt && (
-                    <p className="font-syro-primary text-sm text-syro-dark-gray mt-2 line-clamp-3">
+                    <p className="font-body text-sm text-muted-foreground mt-2 line-clamp-3">
                       {article.excerpt}
                     </p>
                   )}
@@ -83,7 +83,7 @@ export function ArticleList({ title, articles, baseHref, compact, id }: ArticleL
         </ul>
       ) : (
         <div className="px-6 py-8 text-center">
-          <p className="font-syro-primary text-sm text-syro-dark-gray">
+          <p className="font-body text-sm text-muted-foreground">
             No articles at the moment. Check back later.
           </p>
         </div>

@@ -21,12 +21,12 @@ const THE_CHURCH_LINKS: SidebarItem[] = [
     label: 'Theology',
     children: [
       { href: '/syro/the-church/theology/christology', label: 'Christology' },
-      { href: '/syro/the-church/theology#ecclesiology', label: 'Ecclesiology' },
-      { href: '/syro/the-church/theology#missiology', label: 'Missiology' },
-      { href: '/syro/the-church/theology#pneumatology', label: 'Pneumatology' },
-      { href: '/syro/the-church/theology#st-mary-the-mother-of-god', label: 'St. Mary the Mother of God' },
-      { href: '/syro/the-church/theology#the-ministry-of-an-episcopos', label: 'The Ministry of an Episcopos' },
-      { href: '/syro/the-church/theology#theology-of-dialogue', label: 'Theology of Dialogue' },
+      { href: '/syro/the-church/theology/ecclesiology', label: 'Ecclesiology' },
+      { href: '/syro/the-church/theology/missiology', label: 'Missiology' },
+      { href: '/syro/the-church/theology/pneumatology', label: 'Pneumatology' },
+      { href: '/syro/the-church/theology/st-mary-the-mother-of-god', label: 'St. Mary the Mother of God' },
+      { href: '/syro/the-church/theology/the-ministry-of-an-episcopos', label: 'The Ministry of an Episcopos' },
+      { href: '/syro/the-church/theology/theology-of-dialogue', label: 'Theology of Dialogue' },
     ],
   },
   { href: '/syro/the-church/orthodox-faith', label: 'Orthodox Faith' },
@@ -34,12 +34,12 @@ const THE_CHURCH_LINKS: SidebarItem[] = [
     href: '/syro/the-church/spirituality',
     label: 'Spirituality',
     children: [
-      { href: '/syro/the-church/spirituality#the-christian-life', label: 'The Christian Life' },
-      { href: '/syro/the-church/spirituality#deification', label: 'Deification' },
-      { href: '/syro/the-church/spirituality#fasting-and-abstinence', label: 'Fasting and abstinence' },
-      { href: '/syro/the-church/spirituality#lent', label: 'Lent' },
+      { href: '/syro/the-church/spirituality/the-christian-life', label: 'The Christian Life' },
+      { href: '/syro/the-church/spirituality/deification', label: 'Deification' },
+      { href: '/syro/the-church/spirituality/fasting-and-abstinence', label: 'Fasting and abstinence' },
+      { href: '/syro/the-church/spirituality/lent', label: 'Lent' },
       { href: '/syro/the-church/spirituality#the-great-lent', label: 'The Great Lent' },
-      { href: '/syro/the-church/spirituality#what-is-prayer', label: 'What is Prayer?' },
+      { href: '/syro/the-church/spirituality/what-is-prayer', label: 'What is Prayer?' },
       { href: '/syro/the-church/spirituality#shubqono', label: 'Shubqono' },
     ],
   },
@@ -96,8 +96,9 @@ export default function TheChurchSidebar() {
             ? 'block px-3 py-2 bg-syro-red text-white rounded-md font-syro-primary text-sm transition-all duration-300'
             : 'block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300';
 
+          const isHidden = href === '/syro/the-church/orthodox-faith';
           return (
-            <div key={href}>
+            <div key={href} className={isHidden ? 'hidden' : undefined}>
               <Link href={href} className={linkClass}>
                 {item.label}
               </Link>

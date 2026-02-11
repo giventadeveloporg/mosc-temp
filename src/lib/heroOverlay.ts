@@ -1,5 +1,6 @@
 import type { EventDetailsDTO } from '@/types';
 import { isTicketedFundraiserEvent } from '@/lib/donation/utils';
+import { isTicketedEventCube } from '@/lib/eventcube/utils';
 
 export interface HeroOverlayInfo {
   image: string;
@@ -33,6 +34,14 @@ export function getOverlayInfo(event: EventDetailsDTO | null): HeroOverlayInfo |
     return {
       image: '/images/buy_tickets_click_here_fundraiser.png',
       href: `/events/${event.id}/givebutter-checkout`,
+      alt: 'Buy Tickets',
+    };
+  }
+
+  if (isTicketedEventCube(event)) {
+    return {
+      image: '/images/buy_tickets_click_here_red.webp',
+      href: `/events/${event.id}/eventcube-checkout`,
       alt: 'Buy Tickets',
     };
   }

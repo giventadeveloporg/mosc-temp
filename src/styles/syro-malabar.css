@@ -75,6 +75,12 @@ body:has(.syro-layout) {
   position: relative;
 }
 
+/* Remove underlines from all text links in Syro subpages */
+.syro-layout a,
+.syro-layout a:hover {
+  text-decoration: none !important;
+}
+
 /* Liturgy (section 6): keep image in flow so section gets height and doesn't collapse */
 .syro-layout section.liturgy {
   overflow: visible;

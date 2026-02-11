@@ -12,6 +12,8 @@ const navigationItems = [
   { name: 'HOLY SYNOD', href: '/syro/holy-synod' },
   { name: 'ECUMENICAL', href: '/syro/ecumenical' },
   { name: 'DIOCESES', href: '/syro/dioceses' },
+  { name: 'NEWS', href: '/syro/news' },
+  { name: 'DIRECTORY', href: '/syro/directory' },
   { name: 'SAINTS', href: '/syro/saints' },
 ];
 

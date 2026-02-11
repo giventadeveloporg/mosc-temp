@@ -5,6 +5,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { EventDetailsDTO } from '@/types';
 import { getAppUrl } from '@/lib/env';
+import { isTicketedFundraiserEvent } from '@/lib/donation/utils';
+import { isTicketedEventCube } from '@/lib/eventcube/utils';
 
 // Add EventWithMedia type for local use
 interface EventWithMedia extends EventDetailsDTO {
@@ -403,7 +405,13 @@ const DynamicHeroImage: React.FC = () => {
         {hasTicketedEvents && currentEvent && isShowingEventFlyer && currentEvent.id && (
           <div className="absolute bottom-4 right-4 z-10">
             <Link
-              href={`/events/${currentEvent.id}/checkout`}
+              href={
+                isTicketedEventCube(currentEvent)
+                  ? `/events/${currentEvent.id}/eventcube-checkout`
+                  : isTicketedFundraiserEvent(currentEvent)
+                    ? `/events/${currentEvent.id}/givebutter-checkout`
+                    : `/events/${currentEvent.id}/checkout`
+              }
               className="block cursor-pointer hover:scale-105 transition-transform duration-300"
               onClick={(e) => e.stopPropagation()}
             >
