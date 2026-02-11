@@ -12,6 +12,7 @@ import styles from './GalleryThumbnails.module.css';
 import cardGridStyles from './CenteredCardGrid.module.css';
 import { SponsorCard } from '@/components/sponsors/SponsorCard';
 import { isDonationBasedEvent, isTicketedFundraiserEvent } from '@/lib/donation/utils';
+import { isTicketedEventCube } from '@/lib/eventcube/utils';
 
 // Helper function to get initials from a name
 function getInitials(name: string): string {
@@ -532,18 +533,19 @@ export default function EventDetailsPage() {
 
                 // Determine which buttons to show
                 const showRegisterButton = event.isRegistrationRequired === true && isUpcomingLocal;
+                // Event Cube ticketed: link to eventcube-checkout (priority over Givebutter)
+                const isTicketedEventCubeEvent = isTicketedEventCube(event) && isUpcomingLocal;
                 // Check if event is ticketed fundraiser/charity (shows special fundraiser image)
                 const isTicketedFundraiser = isTicketedFundraiserEvent(event) && isUpcomingLocal;
                 // Only show Buy Tickets button for TICKETED events (case-insensitive check)
-                // Handles both 'TICKETED' and 'ticketed' from database/backend
-                // BUT NOT if it's a ticketed fundraiser (use fundraiser image instead)
-                const showBuyTicketsButton = event.admissionType?.toUpperCase() === 'TICKETED' && isUpcomingLocal && !isTicketedFundraiser;
+                // BUT NOT if Event Cube or ticketed fundraiser (use their dedicated links instead)
+                const showBuyTicketsButton = event.admissionType?.toUpperCase() === 'TICKETED' && isUpcomingLocal && !isTicketedFundraiser && !isTicketedEventCubeEvent;
                 // Show Make a Donation button for donation-based events
                 // BUT NOT if it's a ticketed fundraiser (use fundraiser image instead)
                 const showDonationButton = isDonationBasedEvent(event) && isUpcomingLocal && !isTicketedFundraiser;
 
                 // Don't render if no buttons should be shown
-                if (!showRegisterButton && !showBuyTicketsButton && !showDonationButton && !isTicketedFundraiser) return null;
+                if (!showRegisterButton && !showBuyTicketsButton && !showDonationButton && !isTicketedFundraiser && !isTicketedEventCubeEvent) return null;
 
                 return (
                   <div className="absolute top-4 right-4 lg:top-6 lg:right-6 z-10 flex flex-col gap-2">
@@ -562,6 +564,22 @@ export default function EventDetailsPage() {
                         </div>
                         <span className="font-semibold text-blue-700">Register Here</span>
                       </Link>
+                    )}
+
+                    {/* Event Cube: Buy Tickets → eventcube-checkout */}
+                    {isTicketedEventCubeEvent && (
+                    <Link
+                      href={`/events/${event.id}/eventcube-checkout`}
+                      className={`transition-transform hover:scale-105 ${isPast ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      title="Buy Tickets"
+                      aria-label="Buy Tickets"
+                    >
+                      <img
+                        alt="Buy Tickets"
+                        className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
+                        src="/images/buy_tickets_click_here_red.webp"
+                      />
+                    </Link>
                     )}
 
                     {/* Fundraiser Image - Show for ticketed fundraiser/charity events (replaces both Buy Tickets and Make a Donation buttons) */}
@@ -1150,17 +1168,34 @@ export default function EventDetailsPage() {
                   const isFuture = eventDateStr > todayStr;
                   const isUpcomingLocal = isToday || isFuture;
 
+                  // Event Cube ticketed: link to eventcube-checkout (priority over Givebutter)
+                  const isTicketedEventCubeEvent = isTicketedEventCube(event) && isUpcomingLocal;
                   // Ticketed fundraiser: both Buy Tickets (center) and Fundraiser badge (top right) point to givebutter-checkout
                   const isTicketedFundraiser = isTicketedFundraiserEvent(event) && isUpcomingLocal;
-                  // Only show red Buy Tickets for TICKETED events that are NOT ticketed fundraiser
-                  const showBuyTicketsButton = event.admissionType?.toUpperCase() === 'TICKETED' && isUpcomingLocal && !isTicketedFundraiser;
+                  // Only show red Buy Tickets for TICKETED events that are NOT Event Cube or ticketed fundraiser
+                  const showBuyTicketsButton = event.admissionType?.toUpperCase() === 'TICKETED' && isUpcomingLocal && !isTicketedFundraiser && !isTicketedEventCubeEvent;
                   // Show Make a Donation for donation-based events that are NOT ticketed fundraiser
                   const showDonationButton = isDonationBasedEvent(event) && isUpcomingLocal && !isTicketedFundraiser;
 
-                  if (!showBuyTicketsButton && !showDonationButton && !isTicketedFundraiser) return null;
+                  if (!showBuyTicketsButton && !showDonationButton && !isTicketedFundraiser && !isTicketedEventCubeEvent) return null;
 
                   return (
                     <div className="flex flex-col gap-2">
+                      {/* Event Cube: Buy Tickets → eventcube-checkout (red image) */}
+                      {isTicketedEventCubeEvent && (
+                        <Link
+                          href={`/events/${event.id}/eventcube-checkout`}
+                          className="transition-transform hover:scale-105"
+                          title="Buy Tickets"
+                          aria-label="Buy Tickets"
+                        >
+                          <img
+                            alt="Buy Tickets"
+                            className="object-contain w-[150px] h-[52px] sm:w-[200px] sm:h-[70px]"
+                            src="/images/buy_tickets_click_here_red.webp"
+                          />
+                        </Link>
+                      )}
                       {/* Fundraiser: same image and URL as top-right badge → givebutter-checkout */}
                       {isTicketedFundraiser && (
                         <Link
