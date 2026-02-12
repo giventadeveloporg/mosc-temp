@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCachedApiJwt, generateApiJwt } from '@/lib/api/jwt';
-import { getTenantId } from '@/lib/env';
+import { getTenantId, getApiBaseUrl } from '@/lib/env';
 
 // Force Node.js runtime
 export const runtime = 'nodejs';
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
     console.log('[GIVEBUTTER-WEBHOOK] Configured tenant ID:', configuredTenantId);
     console.log('[GIVEBUTTER-WEBHOOK] Environment:', process.env.NODE_ENV);
     console.log('[GIVEBUTTER-WEBHOOK] App URL:', process.env.NEXT_PUBLIC_APP_URL);
-    console.log('[GIVEBUTTER-WEBHOOK] API Base URL:', process.env.NEXT_PUBLIC_API_BASE_URL);
+    console.log('[GIVEBUTTER-WEBHOOK] API Base URL:', getApiBaseUrl());
     console.log('[GIVEBUTTER-WEBHOOK] ============================================');
 
     // CRITICAL: Forward webhook to backend for processing
@@ -91,7 +91,7 @@ export async function POST(req: NextRequest) {
     console.log('[GIVEBUTTER-WEBHOOK] Backend will verify signature and identify tenant from payment_provider_config');
 
     // Get backend API base URL
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+    const API_BASE_URL = getApiBaseUrl();
     if (!API_BASE_URL) {
       console.error('[GIVEBUTTER-WEBHOOK] NEXT_PUBLIC_API_BASE_URL is not configured');
       return new NextResponse('Backend API URL not configured', { status: 500 });

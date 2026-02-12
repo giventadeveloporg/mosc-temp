@@ -1,6 +1,6 @@
 import { cache } from 'react';
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
-import { getTenantId, getAppUrl } from '@/lib/env';
+import { getTenantId, getAppUrl, getApiBaseUrl } from '@/lib/env';
 
 /**
  * Server-side data fetching for checkout page
@@ -67,7 +67,7 @@ const DEFAULT_HERO_IMAGE = '/images/default_placeholder_hero_image.jpeg';
  * NOTE: To force refresh, restart the dev server or clear Next.js cache
  */
 export const getCheckoutData = cache(async (eventId: string): Promise<CheckoutData> => {
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const API_BASE_URL = getApiBaseUrl();
 
   if (!API_BASE_URL) {
     throw new Error('API_BASE_URL not configured');

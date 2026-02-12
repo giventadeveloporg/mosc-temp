@@ -3,7 +3,7 @@ import ManualCheckoutClient from './ManualCheckoutClient';
 import { unstable_noStore } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
-import { getTenantId } from '@/lib/env';
+import { getTenantId, getApiBaseUrl } from '@/lib/env';
 import type { EventDetailsDTO } from '@/types';
 import Link from 'next/link';
 
@@ -24,7 +24,7 @@ export default async function ManualCheckoutPage({ params }: PageProps) {
 
   try {
     // Fetch event details to check payment_flow_mode
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+    const API_BASE_URL = getApiBaseUrl();
     if (!API_BASE_URL) {
       throw new Error('API_BASE_URL not configured');
     }

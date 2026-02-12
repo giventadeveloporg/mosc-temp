@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getCachedApiJwt } from '@/lib/api/jwt';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+import { getApiBaseUrl } from '@/lib/env';
 
 function buildQueryString(query: Record<string, any>) {
   const params = new URLSearchParams();
@@ -22,6 +21,7 @@ console.log('user-tasks proxy handler loaded (single segment test)');
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     console.log('[proxy] user-tasks:', { method: req.method, slug: req.query.slug, query: req.query });
+    const API_BASE_URL = getApiBaseUrl();
     if (!API_BASE_URL) {
       res.status(500).json({ error: 'API base URL not configured', code: 'MISSING_ENV' });
       return;

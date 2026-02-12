@@ -8,7 +8,7 @@ import getRawBody from 'raw-body';
 import { fetchUserProfileServer } from '@/app/admin/ApiServerActions';
 import { createEventTicketTransactionServer, updateTicketTypeInventoryServer } from './ApiServerActions';
 import { getCachedApiJwt, generateApiJwt } from '@/lib/api/jwt';
-import { getTenantId, getPaymentMethodDomainId } from '@/lib/env';
+import { getTenantId, getPaymentMethodDomainId, getApiBaseUrl } from '@/lib/env';
 import { withTenantId } from '@/lib/withTenantId';
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 
@@ -85,7 +85,7 @@ async function handleChargeFeeUpdate(charge: Stripe.Charge) {
       return new NextResponse('No payment_intent on charge', { status: 200 });
     }
     // Direct backend call (not proxy)
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+    const API_BASE_URL = getApiBaseUrl();
     const jwt = await getCachedApiJwt();
     let txnData = null;
     let found = false;
@@ -369,7 +369,7 @@ export async function POST(req: NextRequest) {
     console.log('[STRIPE-WEBHOOK] Configured tenant ID:', configuredTenantId);
     console.log('[STRIPE-WEBHOOK] Environment:', process.env.NODE_ENV);
     console.log('[STRIPE-WEBHOOK] App URL:', process.env.NEXT_PUBLIC_APP_URL);
-    console.log('[STRIPE-WEBHOOK] API Base URL:', process.env.NEXT_PUBLIC_API_BASE_URL);
+    console.log('[STRIPE-WEBHOOK] API Base URL:', getApiBaseUrl());
     console.log('[STRIPE-WEBHOOK] NEXT_PUBLIC_TENANT_ID from env:', process.env.NEXT_PUBLIC_TENANT_ID);
     console.log('[STRIPE-WEBHOOK] ============================================');
 
@@ -384,7 +384,7 @@ export async function POST(req: NextRequest) {
     console.log('[STRIPE-WEBHOOK] Backend will verify signature and identify tenant from payment_provider_config');
 
     // Get backend API base URL
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+    const API_BASE_URL = getApiBaseUrl();
     if (!API_BASE_URL) {
       console.error('[STRIPE-WEBHOOK] NEXT_PUBLIC_API_BASE_URL is not configured');
       return new NextResponse('Backend API URL not configured', { status: 500 });

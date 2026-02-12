@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { fetchUserProfileServer } from '@/app/profile/ApiServerActions';
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
+import { getApiBaseUrl } from '@/lib/env';
 
 export const dynamic = 'force-dynamic';
 
@@ -41,7 +42,7 @@ export async function POST(request: NextRequest) {
       console.log('[PROFILE-FETCH-API] ℹ️ Profile not found, creating automatically...');
 
       const tenantId = process.env.NEXT_PUBLIC_TENANT_ID || 'tenant_demo_001';
-      const backendUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
+      const backendUrl = getApiBaseUrl() || 'http://localhost:8080';
 
       const syncPayload = {
         clerkUserId: user.id,

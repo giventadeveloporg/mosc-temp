@@ -1,6 +1,6 @@
 import { auth } from '@clerk/nextjs/server';
 import { UserProfileDTO } from '@/types';
-import { getTenantId, getAppUrl } from '@/lib/env';
+import { getTenantId, getAppUrl, getApiBaseUrl } from '@/lib/env';
 import { getCachedApiJwt, generateApiJwt } from '@/lib/api/jwt';
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 
@@ -129,7 +129,7 @@ export async function updateUserProfileServer(profileId: number, payload: Partia
     };
 
     // Direct backend call using NEXT_PUBLIC_API_BASE_URL
-    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    const apiBaseUrl = getApiBaseUrl();
     if (!apiBaseUrl) {
       throw new Error('NEXT_PUBLIC_API_BASE_URL is not configured');
     }
@@ -260,7 +260,7 @@ export async function fetchUserProfileByEmailServer(email: string): Promise<User
  * Uses centralized fetchWithJwtRetry helper - complies with .cursor/rules/nextjs_api_routes.mdc
  */
 export async function generateEmailSubscriptionTokenServer(profileId: number): Promise<{ success: boolean; token?: string; error?: string }> {
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const API_BASE_URL = getApiBaseUrl();
 
   try {
     // Generate a new token (UUID-like string)

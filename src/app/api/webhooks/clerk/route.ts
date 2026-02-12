@@ -1,6 +1,6 @@
 import { WebhookEvent } from '@clerk/nextjs/server';
 import { Webhook } from 'svix';
-import { getTenantId } from '@/lib/env';
+import { getTenantId, getApiBaseUrl } from '@/lib/env';
 import type { UserProfileDTO } from '@/types';
 import { withTenantId } from '@/lib/withTenantId';
 
@@ -183,7 +183,7 @@ export async function POST(request: Request) {
     console.log(`[CLERK-WEBHOOK] 📨 Processing Clerk webhook event: ${eventType}`);
     console.log(`[CLERK-WEBHOOK] 📊 Event data structure:`, JSON.stringify(evt.data, null, 2));
 
-    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    const apiBaseUrl = getApiBaseUrl();
     if (!apiBaseUrl) {
       throw new Error('API base URL not configured');
     }
