@@ -24,7 +24,6 @@ import {
   deleteEventSponsorJoinServer,
   deleteEventSponsorServer,
 } from './ApiServerActions';
-import { getApiBaseUrl } from '@/lib/env';
 
 export default function EventSponsorsPage() {
   const { userId } = useAuth();
