@@ -1,7 +1,7 @@
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import { withTenantId } from '@/lib/withTenantId';
-import type {
 import { getApiBaseUrl } from '@/lib/env';
+import type {
   TenantOrganizationDTO,
   TenantOrganizationFormDTO,
   TenantOrganizationFilters,
