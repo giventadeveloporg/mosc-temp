@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Standalone output for AWS Amplify Lambda deployment
+  // Creates a self-contained build with all dependencies bundled
+  output: 'standalone',
   eslint: {
     ignoreDuringBuilds: true,
   },
