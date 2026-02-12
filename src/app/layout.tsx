@@ -28,15 +28,17 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  let isTenantAdmin = false;
+  const primaryDomain = process.env.NEXT_PUBLIC_PRIMARY_DOMAIN || process.env.AMPLIFY_NEXT_PUBLIC_PRIMARY_DOMAIN || 'www.event-site-manager.com';
+  const satelliteDomain = process.env.NEXT_PUBLIC_CLERK_DOMAIN || process.env.AMPLIFY_NEXT_PUBLIC_CLERK_DOMAIN || 'www.mosc-temp.com';
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.AMPLIFY_NEXT_PUBLIC_APP_URL || '';
+  let clerkProps: { isSatellite?: boolean; domain?: string; signInUrl?: string; signUpUrl?: string; allowedRedirectOrigins?: string[] } = appUrl ? { allowedRedirectOrigins: [appUrl] } : {};
+
+  try {
   // CRITICAL: Next.js 15+ - await headers() first before any other async or header-dependent code (e.g. auth()).
-  // This must be the first awaited call so the request context is established for Clerk and other consumers.
-  // If you see "Route / used headers() or similar iteration" from Clerk, upgrade to @clerk/nextjs v6+ for Next.js 15 support.
   const headersList = await headers();
   const hostname = headersList.get('host') || '';
   const pathname = headersList.get('x-pathname') || '';
-
-  // Satellite domain configuration for multi-domain support
-  // Primary domain: NEXT_PUBLIC_PRIMARY_DOMAIN; Satellite: NEXT_PUBLIC_CLERK_DOMAIN / NEXT_PUBLIC_APP_URL
 
   // Define public routes that don't require authentication checks
   // These routes can skip auth() calls to avoid Next.js 15+ headers() async errors
@@ -73,35 +75,23 @@ export default async function RootLayout({
   // This ensures TestSprite/Playwright tests can run on public pages without headers() errors
   const isPublicRoute = !pathname || publicRoutePatterns.some(pattern => pattern.test(pathname));
 
-  // Get primary domain from environment variable
-  const primaryDomain = process.env.NEXT_PUBLIC_PRIMARY_DOMAIN || 'www.event-site-manager.com';
-
-  // Get satellite domain from environment variable
-  const satelliteDomain = process.env.NEXT_PUBLIC_CLERK_DOMAIN || 'www.mosc-temp.com';
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || '';
-
   // Detect if this is a satellite domain (check if hostname matches satellite domain or APP_URL)
   const isSatellite = hostname.includes('mosc-temp.com') ||
     (satelliteDomain && hostname.includes(satelliteDomain.replace('www.', '')));
 
   // Satellite domains must redirect to primary domain for authentication
-  const clerkProps = isSatellite
+  clerkProps = isSatellite
     ? {
       isSatellite: true,
-      domain: satelliteDomain, // Use env var to match DNS record
+      domain: satelliteDomain,
       signInUrl: `https://${primaryDomain}/sign-in`,
       signUpUrl: `https://${primaryDomain}/sign-up`,
     }
     : {
-      // Primary domain allows redirects from satellites
       allowedRedirectOrigins: appUrl ? [appUrl] : [],
     };
 
   // Determine tenant-scoped admin flag on the server
-  // Run admin check on ALL routes (including public) so the Header shows the Admin menu when a logged-in admin visits any page (e.g. homepage).
-  // Skip only when pathname is empty to avoid edge cases. headers() is already awaited above, so auth() is safe.
-  let isTenantAdmin = false;
-
   // Perform auth + profile lookup whenever we have a pathname so Header gets correct isTenantAdmin on every page.
   // Skip auth on /mosc/* and /syro/* (section routes with their own layout).
   const skipAuthForRoute = pathname.startsWith('/mosc') || pathname.startsWith('/syro');
@@ -335,6 +325,12 @@ export default async function RootLayout({
   }
 
   console.log('[Layout] 🔍 Final admin status:', { isTenantAdmin, isPublicRoute, pathname });
+  } catch (layoutError: unknown) {
+    const err = layoutError instanceof Error ? layoutError : new Error(String(layoutError));
+    console.error('[LAYOUT-ERROR] Root layout failed:', err.message);
+    console.error('[LAYOUT-ERROR] Stack:', err.stack);
+    isTenantAdmin = false;
+  }
 
   return (
     <ClerkProvider
