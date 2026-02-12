@@ -1,10 +1,9 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import type { NextRequest, NextFetchEvent } from "next/server";
+import { createLogger } from "@/lib/logger";
 
-const CLERK_KEY = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || '';
-
-console.log('[MIDDLEWARE-MODULE] Middleware module loaded, Clerk:', CLERK_KEY ? 'enabled' : 'disabled');
+const logger = createLogger('MIDDLEWARE');
 
 /**
  * Clerk SDK Middleware (v4 compatible)
@@ -19,11 +18,12 @@ console.log('[MIDDLEWARE-MODULE] Middleware module loaded, Clerk:', CLERK_KEY ? 
  * 2. Clerk middleware runs for all routes (including public routes) so auth() works in layout.tsx
  * 3. The wrapper only intercepts 401/redirect responses for Playwright tests, it doesn't prevent Clerk from running
  *
- * When Clerk is configured: uses clerkMiddleware to process auth sessions,
- * then sets x-pathname header. This enables server-side auth() to work.
+ * This ensures:
+ * - ✅ Playwright tests work (public routes don't get 401)
+ * - ✅ auth() calls work in layout.tsx (Clerk middleware runs)
+ * - ✅ Admin menu appears correctly (admin lookup in layout.tsx works via userRole === 'ADMIN')
  *
- * When Clerk is NOT configured (e.g., Amplify without Clerk env vars):
- * simple passthrough that sets x-pathname header only.
+ * See: .cursor/rules/clerk_auth_admin_user_lookup.mdc for the complete pattern
  */
 
 // Compute satellite config safely for production to avoid missing domain/proxyUrl
@@ -180,10 +180,16 @@ const clerkMiddlewareInstance = clerkMiddleware(
 // - ✅ Admin menu appears correctly (admin lookup in layout.tsx works)
 export default async function middleware(req: NextRequest, event: NextFetchEvent) {
   const pathname = req.nextUrl.pathname;
+  const isPublic = isPublicRoute(pathname);
+
+  if (isPublic) {
+    console.log('[MIDDLEWARE] Public route detected:', pathname);
+  }
+
+  // CRITICAL: Add x-pathname to REQUEST headers so layout can read it via headers()
+  // Next.js 15+ requires this for layout to avoid "headers() should be awaited" when calling auth()
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set('x-pathname', pathname);
-  return NextResponse.next({ request: { headers: requestHeaders } });
-}
 
   // Always call Clerk middleware (even for public routes) so auth() works in layout.tsx
   let response = clerkMiddlewareInstance(req, event);
@@ -193,6 +199,8 @@ export default async function middleware(req: NextRequest, event: NextFetchEvent
 
   // Build response that forwards request with x-pathname
   const nextRes = NextResponse.next({ request: { headers: requestHeaders } });
+
+  let finalResponse: NextResponse = nextRes;
 
   if (isPublic && response instanceof NextResponse) {
     const location = response.headers.get('location');
@@ -214,26 +222,33 @@ export default async function middleware(req: NextRequest, event: NextFetchEvent
           nextRes.headers.set(key, value);
         }
       });
-      return nextRes;
+      finalResponse = nextRes;
+    } else {
+      console.log('[MIDDLEWARE] ✅ Public route', pathname, 'allowed through with status', response.status);
     }
-    console.log('[MIDDLEWARE] ✅ Public route', pathname, 'allowed through with status', response.status);
-  }
-
-  // Use the response that has request headers (x-pathname) so layout and routes receive them.
-  // For redirects (307/308) or 401, return Clerk's response so the client redirects or gets 401.
-  if (response instanceof NextResponse) {
+  } else if (response instanceof NextResponse) {
+    // Use the response that has request headers (x-pathname) so layout and routes receive them.
+    // For redirects (307/308) or 401, return Clerk's response so the client redirects or gets 401.
     const isRedirectOrUnauthorized = response.status === 401 || response.status === 307 || response.status === 308;
-    if (isRedirectOrUnauthorized) return response;
-    // Success: copy Clerk's headers (e.g. set-cookie) onto nextRes and return it so request keeps x-pathname.
-    response.headers.forEach((value, key) => nextRes.headers.set(key, value));
-    return nextRes;
+    if (isRedirectOrUnauthorized) {
+      finalResponse = response;
+    } else {
+      // Success: copy Clerk's headers (e.g. set-cookie) onto nextRes so request keeps x-pathname.
+      response.headers.forEach((value, key) => nextRes.headers.set(key, value));
+      finalResponse = nextRes;
+    }
+  } else {
+    finalResponse = response as NextResponse;
   }
 
-export default middleware;
+  return finalResponse;
+}
 
-// Match all routes except static assets and Next.js internals
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|images/|uploads/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js)$).*)',
+    // Skip Next.js internals and all static files
+    '/((?!_next|[^?]*\\.[\\w]+$).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
   ],
 };
