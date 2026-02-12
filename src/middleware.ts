@@ -52,43 +52,55 @@ export default clerkMiddleware(
     const pathname = req.nextUrl.pathname;
     const requestHeaders = new Headers(req.headers);
     requestHeaders.set('x-pathname', pathname);
+    let nextRes: NextResponse;
 
-    const authData = await auth();
-    console.log('[MIDDLEWARE] afterAuth called for:', pathname);
-    console.log('[MIDDLEWARE] Auth state:', { userId: authData?.userId ?? null, sessionId: (authData as { sessionId?: string })?.sessionId ?? null });
-
-    const isApiRoute = pathname.startsWith('/api/');
-    const isApiProxy = pathname.startsWith('/api/proxy');
-    const isDiagnostic = pathname.startsWith('/api/diagnostic');
-    const userAgent = req.headers.get('user-agent') || 'unknown';
-    const userAgentMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|WhatsApp|Mobile|CriOS|FxiOS/i.test(userAgent);
-    const isMobile = userAgentMobile ||
-      req.headers.get('cloudfront-is-mobile-viewer') === 'true' ||
-      req.headers.get('cloudfront-is-android-viewer') === 'true' ||
-      req.headers.get('cloudfront-is-ios-viewer') === 'true';
-
-    if (isApiRoute) {
-      logger.info('API REQUEST DETECTED', {
-        pathname,
-        method: req.method,
-        isMobile,
-        isProxy: isApiProxy,
-        isDiagnostic,
-        userAgent: userAgent.substring(0, 150),
-        timestamp: new Date().toISOString(),
-      });
-      console.log('[MIDDLEWARE] ===== API REQUEST DETECTED =====', pathname, req.method);
+    try {
+      const authData = await auth();
+      console.log('[MIDDLEWARE] afterAuth called for:', pathname);
+      console.log('[MIDDLEWARE] Auth state:', { userId: authData?.userId ?? null, sessionId: (authData as { sessionId?: string })?.sessionId ?? null });
+    } catch (middlewareErr: unknown) {
+      const err = middlewareErr instanceof Error ? middlewareErr : new Error(String(middlewareErr));
+      console.error('[MIDDLEWARE-ERROR]', err.message, err.stack);
     }
 
-    const nextRes = NextResponse.next({ request: { headers: requestHeaders } });
-    const isPublic = isPublicRoute(pathname);
+    try {
+      const isApiRoute = pathname.startsWith('/api/');
+      const isApiProxy = pathname.startsWith('/api/proxy');
+      const isDiagnostic = pathname.startsWith('/api/diagnostic');
+      const userAgent = req.headers.get('user-agent') || 'unknown';
+      const userAgentMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|WhatsApp|Mobile|CriOS|FxiOS/i.test(userAgent);
+      const isMobile = userAgentMobile ||
+        req.headers.get('cloudfront-is-mobile-viewer') === 'true' ||
+        req.headers.get('cloudfront-is-android-viewer') === 'true' ||
+        req.headers.get('cloudfront-is-ios-viewer') === 'true';
 
-    if (isPublic) {
-      console.log('[MIDDLEWARE] ✅ Public route', pathname, 'allowed through');
+      if (isApiRoute) {
+        try {
+          logger.info('API REQUEST DETECTED', {
+            pathname,
+            method: req.method,
+            isMobile,
+            isProxy: isApiProxy,
+            isDiagnostic,
+            userAgent: userAgent.substring(0, 150),
+            timestamp: new Date().toISOString(),
+          });
+        } catch (_) {}
+        console.log('[MIDDLEWARE] ===== API REQUEST DETECTED =====', pathname, req.method);
+      }
+
+      nextRes = NextResponse.next({ request: { headers: requestHeaders } });
+      const isPublic = isPublicRoute(pathname);
+
+      if (isPublic) {
+        console.log('[MIDDLEWARE] ✅ Public route', pathname, 'allowed through');
+      }
       return nextRes;
+    } catch (wrapErr: unknown) {
+      const err = wrapErr instanceof Error ? wrapErr : new Error(String(wrapErr));
+      console.error('[MIDDLEWARE-ERROR] Unhandled:', err.message, err.stack);
+      return NextResponse.next({ request: { headers: requestHeaders } });
     }
-
-    return nextRes;
   },
   {
     ...satConfig,
