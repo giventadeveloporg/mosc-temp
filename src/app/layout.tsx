@@ -183,7 +183,10 @@ export default async function RootLayout({
                     });
 
                     // Use direct backend call with JWT (not proxy) for PATCH operations
-                    const API_BASE_URL = getApiBaseUrl();
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 
                     // CRITICAL: Build update payload that ONLY updates userId/clerkUserId
                     // Preserve ALL existing fields - do NOT include fields that might overwrite existing data
@@ -227,7 +230,7 @@ export default async function RootLayout({
 
                     console.log('[Layout] Sending PATCH request with payload:', JSON.stringify(updatePayload, null, 2));
 
-                    const updateRes = await fetchWithJwtRetry(`${API_BASE_URL}/api/user-profiles/${existingProfile.id}`, {
+                    const updateRes = await fetchWithJwtRetry(`${getApiBase()}/api/user-profiles/${existingProfile.id}`, {
                       method: 'PATCH',
                       headers: { 'Content-Type': 'application/merge-patch+json' },
                       body: JSON.stringify(updatePayload),

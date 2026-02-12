@@ -147,7 +147,10 @@ export async function updateEventSponsorServer(id: number, sponsor: Partial<Even
   };
 
   const currentTime = new Date().toISOString();
-  const API_BASE_URL = getApiBaseUrl();
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 
   // Direct backend call pattern for PATCH/PUT operations
   const payload = withTenantId({
@@ -169,7 +172,7 @@ export async function updateEventSponsorServer(id: number, sponsor: Partial<Even
 
   console.log('🔍 PATCH payload being sent:', JSON.stringify(payload, null, 2));
 
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-sponsors/${id}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-sponsors/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/merge-patch+json' },
     body: JSON.stringify(payload),

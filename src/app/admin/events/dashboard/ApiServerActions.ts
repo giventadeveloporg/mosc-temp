@@ -2,7 +2,10 @@ import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import { getAppUrl, getApiBaseUrl } from '@/lib/env';
 import type { EventDetailsDTO, EventAttendeeDTO, EventAttendeeGuestDTO } from '@/types';
 
-const API_BASE_URL = getApiBaseUrl();
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 
 export interface EventDashboardData {
   eventDetails: EventDetailsDTO | null;

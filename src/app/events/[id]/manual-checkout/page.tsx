@@ -24,14 +24,17 @@ export default async function ManualCheckoutPage({ params }: PageProps) {
 
   try {
     // Fetch event details to check payment_flow_mode
-    const API_BASE_URL = getApiBaseUrl();
-    if (!API_BASE_URL) {
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
+    if (!getApiBase()) {
       throw new Error('API_BASE_URL not configured');
     }
 
     const tenantId = getTenantId();
     const eventRes = await fetchWithJwtRetry(
-      `${API_BASE_URL}/api/event-details/${eventId}`,
+      `${getApiBase()}/api/event-details/${eventId}`,
       { cache: 'no-store' }
     );
 

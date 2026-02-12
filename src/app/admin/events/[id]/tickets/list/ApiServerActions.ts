@@ -4,9 +4,12 @@ import { getTenantId, getAppUrl, getApiBaseUrl } from '@/lib/env';
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import type { EventTicketTransactionDTO } from '@/types';
 
-const API_BASE_URL = getApiBaseUrl();
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 
-if (!API_BASE_URL) {
+if (!getApiBase()) {
   throw new Error('NEXT_PUBLIC_API_BASE_URL is not configured');
 }
 
@@ -149,7 +152,7 @@ export async function triggerStripeTicketBatchRefundServer(
     }
 
     // Call backend batch job API endpoint (NOT a proxy endpoint - direct backend call)
-    const url = `${API_BASE_URL}/api/cron/stripe-ticket-batch-refund`;
+    const url = `${getApiBase()}/api/cron/stripe-ticket-batch-refund`;
     const response = await fetchWithJwtRetry(url, {
       method: 'POST',
       headers: {

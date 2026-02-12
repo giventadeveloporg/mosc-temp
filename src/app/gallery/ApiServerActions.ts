@@ -4,7 +4,10 @@ import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import { getTenantId, getApiBaseUrl } from '@/lib/env';
 import type { EventDetailsDTO, EventMediaDTO, GalleryAlbumDTO, GalleryAlbumWithMedia } from '@/types';
 
-const API_BASE_URL = getApiBaseUrl();
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 
 export interface GalleryEventWithMedia {
   event: EventDetailsDTO;
@@ -62,7 +65,7 @@ export async function fetchEventsForGallery(
         }
 
     // Fetch events
-    const eventsUrl = `${API_BASE_URL}/api/event-details?${eventParams.toString()}`;
+    const eventsUrl = `${getApiBase()}/api/event-details?${eventParams.toString()}`;
     const eventsResponse = await fetchWithJwtRetry(eventsUrl, { cache: 'no-store' });
 
     if (!eventsResponse.ok) {
@@ -93,7 +96,7 @@ export async function fetchEventsForGallery(
         mediaParams.append('sort', 'updatedAt,desc');
         mediaParams.append('size', '50');
 
-        const mediaUrl = `${API_BASE_URL}/api/event-medias?${mediaParams.toString()}`;
+        const mediaUrl = `${getApiBase()}/api/event-medias?${mediaParams.toString()}`;
         console.log(`Fetching media for event ${event.id}: ${mediaUrl}`);
         const mediaResponse = await fetchWithJwtRetry(mediaUrl, { cache: 'no-store' });
 
@@ -163,7 +166,7 @@ export async function fetchEventMedia(
     params.append('page', page.toString());
     params.append('size', size.toString());
 
-    const url = `${API_BASE_URL}/api/event-medias?${params.toString()}`;
+    const url = `${getApiBase()}/api/event-medias?${params.toString()}`;
     const response = await fetchWithJwtRetry(url, { cache: 'no-store' });
 
     if (!response.ok) {
@@ -208,7 +211,7 @@ export async function searchEventsForGallery(
       params.append('startDate.lessThanOrEqual', endDate);
     }
 
-    const url = `${API_BASE_URL}/api/event-details?${params.toString()}`;
+    const url = `${getApiBase()}/api/event-details?${params.toString()}`;
     const response = await fetchWithJwtRetry(url, { cache: 'no-store' });
 
     if (!response.ok) {
@@ -265,7 +268,7 @@ export async function fetchAlbumsForGallery(
     }
 
     // Fetch albums
-    const albumsUrl = `${API_BASE_URL}/api/gallery-albums?${albumParams.toString()}`;
+    const albumsUrl = `${getApiBase()}/api/gallery-albums?${albumParams.toString()}`;
     const albumsResponse = await fetchWithJwtRetry(albumsUrl, { cache: 'no-store' });
 
     if (!albumsResponse.ok) {
@@ -295,7 +298,7 @@ export async function fetchAlbumsForGallery(
         mediaParams.append('sort', 'updatedAt,desc');
         mediaParams.append('size', '50');
 
-        const mediaUrl = `${API_BASE_URL}/api/event-medias?${mediaParams.toString()}`;
+        const mediaUrl = `${getApiBase()}/api/event-medias?${mediaParams.toString()}`;
         console.log(`Fetching media for album ${album.id}: ${mediaUrl}`);
         const mediaResponse = await fetchWithJwtRetry(mediaUrl, { cache: 'no-store' });
 
@@ -355,7 +358,7 @@ export async function fetchAlbumWithMedia(
 ): Promise<GalleryAlbumWithMedia | null> {
   try {
     // Fetch album
-    const albumUrl = `${API_BASE_URL}/api/gallery-albums/${albumId}`;
+    const albumUrl = `${getApiBase()}/api/gallery-albums/${albumId}`;
     const albumResponse = await fetchWithJwtRetry(albumUrl, { cache: 'no-store' });
 
     if (!albumResponse.ok) {
@@ -376,7 +379,7 @@ export async function fetchAlbumWithMedia(
     mediaParams.append('sort', 'updatedAt,desc');
     mediaParams.append('size', '100');
 
-    const mediaUrl = `${API_BASE_URL}/api/event-medias?${mediaParams.toString()}`;
+    const mediaUrl = `${getApiBase()}/api/event-medias?${mediaParams.toString()}`;
     const mediaResponse = await fetchWithJwtRetry(mediaUrl, { cache: 'no-store' });
 
     let media: EventMediaDTO[] = [];

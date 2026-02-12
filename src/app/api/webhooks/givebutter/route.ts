@@ -91,8 +91,11 @@ export async function POST(req: NextRequest) {
     console.log('[GIVEBUTTER-WEBHOOK] Backend will verify signature and identify tenant from payment_provider_config');
 
     // Get backend API base URL
-    const API_BASE_URL = getApiBaseUrl();
-    if (!API_BASE_URL) {
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
+    if (!getApiBase()) {
       console.error('[GIVEBUTTER-WEBHOOK] NEXT_PUBLIC_API_BASE_URL is not configured');
       return new NextResponse('Backend API URL not configured', { status: 500 });
     }
@@ -100,7 +103,7 @@ export async function POST(req: NextRequest) {
     try {
       // Forward webhook to backend
       // Backend endpoint: POST /api/webhooks/givebutter
-      const backendWebhookUrl = `${API_BASE_URL}/api/webhooks/givebutter`;
+      const backendWebhookUrl = `${getApiBase()}/api/webhooks/givebutter`;
 
       console.log('[GIVEBUTTER-WEBHOOK] Forwarding to backend:', backendWebhookUrl);
       console.log('[GIVEBUTTER-WEBHOOK] Body length:', rawBody.length);

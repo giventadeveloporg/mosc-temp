@@ -9,7 +9,10 @@ import type {
   PaginatedResponse
 } from '@/app/admin/tenant-management/types';
 
-const API_BASE_URL = getApiBaseUrl();
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 
 /**
  * Fetch paginated list of tenant settings
@@ -40,7 +43,7 @@ export async function fetchTenantSettings(
     }
 
     const response = await fetchWithJwtRetry(
-      `${API_BASE_URL}/api/tenant-settings?${params.toString()}`,
+      `${getApiBase()}/api/tenant-settings?${params.toString()}`,
       { cache: 'no-store' }
     );
 
@@ -70,7 +73,7 @@ export async function fetchTenantSettings(
 export async function fetchTenantSetting(id: number): Promise<TenantSettingsDTO | null> {
   try {
     const response = await fetchWithJwtRetry(
-      `${API_BASE_URL}/api/tenant-settings/${id}`,
+      `${getApiBase()}/api/tenant-settings/${id}`,
       { cache: 'no-store' }
     );
 
@@ -98,7 +101,7 @@ export async function fetchTenantSettingsByTenantId(tenantId: string): Promise<T
     params.append('tenantId.equals', tenantId);
 
     const response = await fetchWithJwtRetry(
-      `${API_BASE_URL}/api/tenant-settings?${params.toString()}`,
+      `${getApiBase()}/api/tenant-settings?${params.toString()}`,
       { cache: 'no-store' }
     );
 
@@ -125,7 +128,7 @@ export async function createTenantSetting(data: TenantSettingsFormDTO): Promise<
       updatedAt: new Date().toISOString(),
     });
 
-    const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/tenant-settings`, {
+    const response = await fetchWithJwtRetry(`${getApiBase()}/api/tenant-settings`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -206,7 +209,7 @@ export async function updateTenantSetting(
       hasOrganization: !!tenantOrganization
     });
 
-    const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/tenant-settings/${id}`, {
+    const response = await fetchWithJwtRetry(`${getApiBase()}/api/tenant-settings/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -286,7 +289,7 @@ export async function patchTenantSetting(
       hasOrganization: !!tenantOrganization
     });
 
-    const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/tenant-settings/${id}`, {
+    const response = await fetchWithJwtRetry(`${getApiBase()}/api/tenant-settings/${id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/merge-patch+json',
@@ -311,7 +314,7 @@ export async function patchTenantSetting(
  */
 export async function deleteTenantSetting(id: number): Promise<void> {
   try {
-    const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/tenant-settings/${id}`, {
+    const response = await fetchWithJwtRetry(`${getApiBase()}/api/tenant-settings/${id}`, {
       method: 'DELETE',
     });
 

@@ -3,14 +3,17 @@ import { getAppUrl, getApiBaseUrl } from '@/lib/env';
 import { withTenantId } from '@/lib/withTenantId';
 import type { EventEmailsDTO } from '@/types';
 
-const API_BASE_URL = getApiBaseUrl();
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 const baseUrl = getAppUrl();
 
 export async function fetchEventEmailsServer(eventId: number) {
   const params = new URLSearchParams();
   params.append('eventId.equals', eventId.toString());
 
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-emails?${params.toString()}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-emails?${params.toString()}`, {
     cache: 'no-store',
   });
 
@@ -22,7 +25,7 @@ export async function fetchEventEmailsServer(eventId: number) {
 }
 
 export async function fetchEventEmailServer(id: number) {
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-emails/${id}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-emails/${id}`, {
     cache: 'no-store',
   });
 
@@ -41,7 +44,7 @@ export async function createEventEmailServer(email: Omit<EventEmailsDTO, 'id' | 
     updatedAt: currentTime,
   });
 
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-emails`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-emails`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
@@ -58,7 +61,7 @@ export async function createEventEmailServer(email: Omit<EventEmailsDTO, 'id' | 
 export async function updateEventEmailServer(id: number, email: Partial<EventEmailsDTO>) {
   const payload = withTenantId({ ...email, id });
 
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-emails/${id}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-emails/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/merge-patch+json' },
     body: JSON.stringify(payload),
@@ -78,7 +81,7 @@ export async function updateEventEmailServer(id: number, email: Partial<EventEma
  */
 export async function associateEmailWithEventServer(emailId: number, eventId: number) {
   const response = await fetchWithJwtRetry(
-    `${API_BASE_URL}/api/event-emails/${emailId}/associate/${eventId}`,
+    `${getApiBase()}/api/event-emails/${emailId}/associate/${eventId}`,
     {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -99,7 +102,7 @@ export async function associateEmailWithEventServer(emailId: number, eventId: nu
  */
 export async function disassociateEmailFromEventServer(emailId: number) {
   const response = await fetchWithJwtRetry(
-    `${API_BASE_URL}/api/event-emails/${emailId}/disassociate`,
+    `${getApiBase()}/api/event-emails/${emailId}/disassociate`,
     {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -116,7 +119,7 @@ export async function disassociateEmailFromEventServer(emailId: number) {
 }
 
 export async function deleteEventEmailServer(id: number) {
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-emails/${id}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-emails/${id}`, {
     method: 'DELETE',
   });
 
@@ -144,7 +147,7 @@ export async function fetchAvailableEmailsServer(eventId: number, page = 0, size
     try {
       // Fetch all emails for the tenant (no eventId filter)
       const params = new URLSearchParams();
-      const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-emails?${params.toString()}`, {
+      const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-emails?${params.toString()}`, {
         cache: 'no-store',
       });
 

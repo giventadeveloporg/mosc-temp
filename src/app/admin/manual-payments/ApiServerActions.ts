@@ -5,9 +5,12 @@ import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import { getTenantId, getApiBaseUrl } from '@/lib/env';
 import type { ManualPaymentRequestDTO, ManualPaymentSummaryReportDTO } from '@/types';
 
-const API_BASE_URL = getApiBaseUrl();
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 
-if (!API_BASE_URL) {
+if (!getApiBase()) {
   throw new Error('NEXT_PUBLIC_API_BASE_URL is not configured');
 }
 
@@ -57,7 +60,7 @@ export async function fetchManualPaymentsServer(
     params.append('sort', 'createdAt,desc');
   }
 
-  const url = `${API_BASE_URL}/api/manual-payments?${params.toString()}`;
+  const url = `${getApiBase()}/api/manual-payments?${params.toString()}`;
   const response = await fetchWithJwtRetry(url, { cache: 'no-store' });
 
   if (!response.ok) {
@@ -132,7 +135,7 @@ export async function fetchManualPaymentsServer(
 export async function createManualPaymentRequestServer(
   paymentRequest: Omit<ManualPaymentRequestDTO, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<ManualPaymentRequestDTO> {
-  const url = `${API_BASE_URL}/api/manual-payments`;
+  const url = `${getApiBase()}/api/manual-payments`;
 
   // Backend expects paymentMethodType (not manualPaymentMethodType) and tenantId
   // Map frontend DTO to backend DTO format
@@ -233,7 +236,7 @@ export async function createManualPaymentRequestServer(
  * Fetch a single manual payment request by ID
  */
 export async function fetchManualPaymentByIdServer(paymentId: number): Promise<ManualPaymentRequestDTO | null> {
-  const url = `${API_BASE_URL}/api/manual-payments/${paymentId}`;
+  const url = `${getApiBase()}/api/manual-payments/${paymentId}`;
   const response = await fetchWithJwtRetry(url, { cache: 'no-store' });
 
   if (!response.ok) {
@@ -260,7 +263,7 @@ export async function updateManualPaymentStatusServer(
   receivedBy?: string,
   voidReason?: string
 ): Promise<ManualPaymentRequestDTO> {
-  const url = `${API_BASE_URL}/api/manual-payments/${paymentId}`;
+  const url = `${getApiBase()}/api/manual-payments/${paymentId}`;
 
   const payload: any = {
     id: paymentId,
@@ -322,7 +325,7 @@ export async function updateManualPaymentServer(
     throw new Error('Payment not found');
   }
 
-  const url = `${API_BASE_URL}/api/manual-payments/${paymentId}`;
+  const url = `${getApiBase()}/api/manual-payments/${paymentId}`;
   const tenantId = getTenantId();
 
   // Map frontend DTO to backend DTO format
@@ -455,7 +458,7 @@ export async function fetchManualPaymentSummaryServer(
   // Add size limit for performance
   params.append('size', '1000');
 
-  const url = `${API_BASE_URL}/api/manual-payment-summary?${params.toString()}`;
+  const url = `${getApiBase()}/api/manual-payment-summary?${params.toString()}`;
   const response = await fetchWithJwtRetry(url, { cache: 'no-store' });
 
   if (!response.ok) {
@@ -522,7 +525,7 @@ export async function fetchManualPaymentSummaryServer(
  * Fetch available manual payment methods for tenant
  */
 export async function fetchManualPaymentMethodsServer(): Promise<Array<{ providerName: string; enabled: boolean; config?: any }>> {
-  const url = `${API_BASE_URL}/api/manual-payment-methods`;
+  const url = `${getApiBase()}/api/manual-payment-methods`;
   const response = await fetchWithJwtRetry(url, { cache: 'no-store' });
 
   if (!response.ok) {
@@ -589,7 +592,7 @@ export async function triggerManualPaymentSummaryBatchJobServer(
     }
 
     // Call backend batch job API endpoint (NOT a proxy endpoint - direct backend call)
-    const url = `${API_BASE_URL}/api/cron/manual-payment-summary`;
+    const url = `${getApiBase()}/api/cron/manual-payment-summary`;
     const response = await fetchWithJwtRetry(url, {
       method: 'POST',
       headers: {

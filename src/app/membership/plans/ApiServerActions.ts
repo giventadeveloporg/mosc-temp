@@ -3,7 +3,10 @@ import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import { getAppUrl, getTenantId, getApiBaseUrl } from '@/lib/env';
 import type { MembershipPlanDTO } from '@/types';
 
-const API_BASE_URL = getApiBaseUrl();
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 
 export interface FetchMembershipPlansFilters {
   isActive?: boolean;
@@ -18,7 +21,7 @@ export interface FetchMembershipPlansFilters {
 export async function fetchMembershipPlansServer(
   filters: FetchMembershipPlansFilters = {}
 ): Promise<MembershipPlanDTO[]> {
-  if (!API_BASE_URL) {
+  if (!getApiBase()) {
     throw new Error('API base URL not configured');
   }
 

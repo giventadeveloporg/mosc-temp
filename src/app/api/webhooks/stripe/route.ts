@@ -85,7 +85,10 @@ async function handleChargeFeeUpdate(charge: Stripe.Charge) {
       return new NextResponse('No payment_intent on charge', { status: 200 });
     }
     // Direct backend call (not proxy)
-    const API_BASE_URL = getApiBaseUrl();
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
     const jwt = await getCachedApiJwt();
     let txnData = null;
     let found = false;
@@ -93,7 +96,7 @@ async function handleChargeFeeUpdate(charge: Stripe.Charge) {
     const delayMs = 4000;
     for (let i = 0; i < maxRetries; i++) {
       const txnRes = await fetch(
-        `${API_BASE_URL}/api/event-ticket-transactions?stripePaymentIntentId.equals=${paymentIntentId}&tenantId.equals=${getTenantId()}`,
+        `${getApiBase()}/api/event-ticket-transactions?stripePaymentIntentId.equals=${paymentIntentId}&tenantId.equals=${getTenantId()}`,
         {
           headers: {
             'Authorization': `Bearer ${jwt}`,
@@ -271,7 +274,7 @@ async function handleChargeFeeUpdate(charge: Stripe.Charge) {
         stripeFeeAmount: feeAmount,
         // Don't override finalAmount - preserve the original amount from Stripe
       };
-      const patchRes = await fetch(`${API_BASE_URL}/api/event-ticket-transactions/${transaction.id}`, {
+      const patchRes = await fetch(`${getApiBase()}/api/event-ticket-transactions/${transaction.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/merge-patch+json',
@@ -384,8 +387,11 @@ export async function POST(req: NextRequest) {
     console.log('[STRIPE-WEBHOOK] Backend will verify signature and identify tenant from payment_provider_config');
 
     // Get backend API base URL
-    const API_BASE_URL = getApiBaseUrl();
-    if (!API_BASE_URL) {
+    // Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
+    if (!getApiBase()) {
       console.error('[STRIPE-WEBHOOK] NEXT_PUBLIC_API_BASE_URL is not configured');
       return new NextResponse('Backend API URL not configured', { status: 500 });
     }
@@ -393,7 +399,7 @@ export async function POST(req: NextRequest) {
     try {
       // Forward webhook to backend
       // Backend endpoint: POST /api/webhooks/stripe
-      const backendWebhookUrl = `${API_BASE_URL}/api/webhooks/stripe`;
+      const backendWebhookUrl = `${getApiBase()}/api/webhooks/stripe`;
 
       console.log('[STRIPE-WEBHOOK] Forwarding to backend:', backendWebhookUrl);
       console.log('[STRIPE-WEBHOOK] Body length:', rawBody.length);

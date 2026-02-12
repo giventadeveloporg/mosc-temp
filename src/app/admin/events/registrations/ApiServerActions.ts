@@ -2,7 +2,10 @@ import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import { getAppUrl, getApiBaseUrl } from '@/lib/env';
 import type { EventAttendeeDTO, EventAttendeeGuestDTO, EventDetailsDTO } from '@/types';
 
-const API_BASE_URL = getApiBaseUrl();
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 
 export interface RegistrationManagementData {
   attendees: EventAttendeeDTO[];
@@ -39,7 +42,7 @@ export async function fetchRegistrationManagementData(
     eventsParams.append('size', '50');
 
     const eventsResponse = await fetchWithJwtRetry(
-      `${API_BASE_URL}/api/event-details?${eventsParams.toString()}`,
+      `${getApiBase()}/api/event-details?${eventsParams.toString()}`,
       {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
@@ -95,7 +98,7 @@ export async function fetchRegistrationManagementData(
 
     // Fetch attendees using fetchWithJwtRetry
     const attendeesResponse = await fetchWithJwtRetry(
-      `${API_BASE_URL}/api/event-attendees?${params.toString()}`,
+      `${getApiBase()}/api/event-attendees?${params.toString()}`,
       {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
@@ -118,7 +121,7 @@ export async function fetchRegistrationManagementData(
     countParams.append('size', '1');
 
     const countResponse = await fetchWithJwtRetry(
-      `${API_BASE_URL}/api/event-attendees?${countParams.toString()}`,
+      `${getApiBase()}/api/event-attendees?${countParams.toString()}`,
       {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
@@ -137,7 +140,7 @@ export async function fetchRegistrationManagementData(
     let selectedEvent: EventDetailsDTO | null = null;
     if (eventId) {
       const eventResponse = await fetchWithJwtRetry(
-        `${API_BASE_URL}/api/event-details/${eventId}`,
+        `${getApiBase()}/api/event-details/${eventId}`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -201,7 +204,7 @@ export async function searchEvents(
     }
 
     const eventsResponse = await fetchWithJwtRetry(
-      `${API_BASE_URL}/api/event-details?${params.toString()}`,
+      `${getApiBase()}/api/event-details?${params.toString()}`,
       {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
@@ -331,9 +334,12 @@ export async function updateAttendeeStatus(
 ): Promise<boolean> {
   try {
     const { fetchWithJwtRetry } = await import('@/lib/proxyHandler');
-    const API_BASE_URL = getApiBaseUrl();
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 
-    if (!API_BASE_URL) {
+    if (!getApiBase()) {
       console.error('API_BASE_URL is not configured');
       return false;
     }
@@ -345,7 +351,7 @@ export async function updateAttendeeStatus(
     };
 
     const response = await fetchWithJwtRetry(
-      `${API_BASE_URL}/api/event-attendees/${attendeeId}`,
+      `${getApiBase()}/api/event-attendees/${attendeeId}`,
       {
         method: 'PATCH',
         headers: {
@@ -372,9 +378,12 @@ export async function updateAttendeeRegistration(
 ): Promise<boolean> {
   try {
     const { fetchWithJwtRetry } = await import('@/lib/proxyHandler');
-    const API_BASE_URL = getApiBaseUrl();
+    // Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 
-    if (!API_BASE_URL) {
+    if (!getApiBase()) {
       console.error('API_BASE_URL is not configured');
       return false;
     }
@@ -386,7 +395,7 @@ export async function updateAttendeeRegistration(
     };
 
     const response = await fetchWithJwtRetry(
-      `${API_BASE_URL}/api/event-attendees/${attendeeId}`,
+      `${getApiBase()}/api/event-attendees/${attendeeId}`,
       {
         method: 'PATCH',
         headers: {
@@ -410,15 +419,18 @@ export async function updateAttendeeRegistration(
 export async function deleteAttendeeRegistration(attendeeId: number): Promise<boolean> {
   try {
     const { fetchWithJwtRetry } = await import('@/lib/proxyHandler');
-    const API_BASE_URL = getApiBaseUrl();
+    // Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 
-    if (!API_BASE_URL) {
+    if (!getApiBase()) {
       console.error('API_BASE_URL is not configured');
       return false;
     }
 
     const response = await fetchWithJwtRetry(
-      `${API_BASE_URL}/api/event-attendees/${attendeeId}`,
+      `${getApiBase()}/api/event-attendees/${attendeeId}`,
       {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },

@@ -3,7 +3,10 @@ import { getAppUrl, getTenantId, getApiBaseUrl } from '@/lib/env';
 import { withTenantId } from '@/lib/withTenantId';
 import type { EventSponsorsDTO, EventSponsorsJoinDTO, EventMediaDTO } from '@/types';
 
-const API_BASE_URL = getApiBaseUrl();
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 const baseUrl = getAppUrl();
 
 export async function fetchEventSponsorsServer(page: number = 0, pageSize: number = 10) {
@@ -16,7 +19,7 @@ export async function fetchEventSponsorsServer(page: number = 0, pageSize: numbe
   const tenantId = getTenantId();
   params.append('tenantId.equals', tenantId);
 
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-sponsors?${params.toString()}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-sponsors?${params.toString()}`, {
     cache: 'no-store',
   });
 
@@ -39,7 +42,7 @@ export async function fetchEventSponsorsServer(page: number = 0, pageSize: numbe
 }
 
 export async function fetchEventSponsorServer(id: number) {
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-sponsors/${id}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-sponsors/${id}`, {
     cache: 'no-store',
   });
 
@@ -53,7 +56,7 @@ export async function fetchEventSponsorServer(id: number) {
 export async function createEventSponsorServer(sponsor: Omit<EventSponsorsDTO, 'id' | 'createdAt' | 'updatedAt'>) {
   const payload = withTenantId(sponsor);
 
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-sponsors`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-sponsors`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
@@ -70,7 +73,7 @@ export async function createEventSponsorServer(sponsor: Omit<EventSponsorsDTO, '
 export async function updateEventSponsorServer(id: number, sponsor: Partial<EventSponsorsDTO>) {
   const payload = withTenantId({ ...sponsor, id });
 
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-sponsors/${id}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-sponsors/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/merge-patch+json' },
     body: JSON.stringify(payload),
@@ -85,7 +88,7 @@ export async function updateEventSponsorServer(id: number, sponsor: Partial<Even
 }
 
 export async function deleteEventSponsorServer(id: number) {
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-sponsors/${id}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-sponsors/${id}`, {
     method: 'DELETE',
   });
 
@@ -104,7 +107,7 @@ export async function fetchEventSponsorsJoinServer(eventId?: number) {
     params.append('eventId.equals', eventId.toString());
   }
 
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-sponsors-join${params.toString() ? `?${params.toString()}` : ''}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-sponsors-join${params.toString() ? `?${params.toString()}` : ''}`, {
     cache: 'no-store',
   });
 
@@ -118,7 +121,7 @@ export async function fetchEventSponsorsJoinServer(eventId?: number) {
 export async function createEventSponsorJoinServer(sponsorJoin: Omit<EventSponsorsJoinDTO, 'id' | 'createdAt' | 'updatedAt'>) {
   const payload = withTenantId(sponsorJoin);
 
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-sponsors-join`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-sponsors-join`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
@@ -135,7 +138,7 @@ export async function createEventSponsorJoinServer(sponsorJoin: Omit<EventSponso
 export async function updateEventSponsorJoinServer(id: number, sponsorJoin: Partial<EventSponsorsJoinDTO>) {
   const payload = withTenantId({ ...sponsorJoin, id });
 
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-sponsors-join/${id}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-sponsors-join/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/merge-patch+json' },
     body: JSON.stringify(payload),
@@ -150,7 +153,7 @@ export async function updateEventSponsorJoinServer(id: number, sponsorJoin: Part
 }
 
 export async function deleteEventSponsorJoinServer(id: number) {
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-sponsors-join/${id}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-sponsors-join/${id}`, {
     method: 'DELETE',
   });
 
@@ -527,8 +530,11 @@ export async function updateEventMediaServer(
   updates: Partial<EventMediaDTO>,
   tenantId?: string
 ): Promise<EventMediaDTO> {
-  const API_BASE_URL = getApiBaseUrl();
-  if (!API_BASE_URL) {
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
+  if (!getApiBase()) {
     throw new Error('API base URL not configured');
   }
 
@@ -571,8 +577,11 @@ export async function updateMediaPriorityRankingServer(
   const existingMedia = await fetchEventMediaServer(mediaId, tenantId);
 
   // Use fetchWithJwtRetry for authenticated backend call
-  const API_BASE_URL = getApiBaseUrl();
-  if (!API_BASE_URL) {
+  // Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
+  if (!getApiBase()) {
     throw new Error('API base URL not configured');
   }
 
@@ -593,7 +602,7 @@ export async function updateMediaPriorityRankingServer(
     isLiveEventImage: existingMedia.isLiveEventImage ?? false,
   });
 
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-medias/${mediaId}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-medias/${mediaId}`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/merge-patch+json',
@@ -616,12 +625,15 @@ export async function fetchEventMediaServer(
   mediaId: number,
   tenantId?: string
 ): Promise<EventMediaDTO> {
-  const API_BASE_URL = getApiBaseUrl();
-  if (!API_BASE_URL) {
+  // Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
+  if (!getApiBase()) {
     throw new Error('API base URL not configured');
   }
 
-  const url = `${API_BASE_URL}/api/event-medias/${mediaId}`;
+  const url = `${getApiBase()}/api/event-medias/${mediaId}`;
   const response = await fetchWithJwtRetry(url, {
     cache: 'no-store',
   });
@@ -641,12 +653,15 @@ export async function deleteEventMediaServer(
   mediaId: number,
   tenantId?: string
 ): Promise<boolean> {
-  const API_BASE_URL = getApiBaseUrl();
-  if (!API_BASE_URL) {
+  // Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
+  if (!getApiBase()) {
     throw new Error('API base URL not configured');
   }
 
-  const url = `${API_BASE_URL}/api/event-medias/${mediaId}`;
+  const url = `${getApiBase()}/api/event-medias/${mediaId}`;
   const response = await fetchWithJwtRetry(url, {
     method: 'DELETE',
   });
