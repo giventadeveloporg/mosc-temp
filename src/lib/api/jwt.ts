@@ -1,4 +1,3 @@
-import jwt from 'jsonwebtoken';
 import { getApiJwtUser, getApiJwtPass, getApiBaseUrl } from '../env';
 
 /**

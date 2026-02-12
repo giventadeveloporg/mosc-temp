@@ -34,8 +34,11 @@ export async function updateQrCodeCheckIn(
 }
 
 export async function updateEventTicketTransactionCheckIn(transactionId: string, payload: Partial<EventTicketTransactionDTO>) {
-  const API_BASE_URL = getApiBaseUrl();
-  const url = `${API_BASE_URL}/api/event-ticket-transactions/${transactionId}`;
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
+  const url = `${getApiBase()}/api/event-ticket-transactions/${transactionId}`;
   let token = await getCachedApiJwt();
   if (!token) {
     token = await generateApiJwt();

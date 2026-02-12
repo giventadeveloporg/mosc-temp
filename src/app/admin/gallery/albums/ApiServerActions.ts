@@ -5,7 +5,10 @@ import { getTenantId, getAppUrl, getApiBaseUrl } from '@/lib/env';
 import { withTenantId } from '@/lib/withTenantId';
 import type { GalleryAlbumDTO, EventMediaDTO } from '@/types';
 
-const API_BASE_URL = getApiBaseUrl();
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 const baseUrl = getAppUrl();
 
 /**
@@ -21,7 +24,7 @@ export async function createAlbumServer(
       updatedAt: new Date().toISOString(),
     });
 
-    const url = `${API_BASE_URL}/api/gallery-albums`;
+    const url = `${getApiBase()}/api/gallery-albums`;
     const res = await fetchWithJwtRetry(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -68,7 +71,7 @@ export async function fetchAlbumsServer(
       params.append('isPublic.equals', isPublic.toString());
     }
 
-    const url = `${API_BASE_URL}/api/gallery-albums?${params.toString()}`;
+    const url = `${getApiBase()}/api/gallery-albums?${params.toString()}`;
     const res = await fetchWithJwtRetry(url, { cache: 'no-store' });
 
     if (!res.ok) {
@@ -92,7 +95,7 @@ export async function fetchAlbumsServer(
  */
 export async function fetchAlbumServer(albumId: number): Promise<GalleryAlbumDTO | null> {
   try {
-    const url = `${API_BASE_URL}/api/gallery-albums/${albumId}`;
+    const url = `${getApiBase()}/api/gallery-albums/${albumId}`;
     const res = await fetchWithJwtRetry(url, { cache: 'no-store' });
 
     if (!res.ok) {
@@ -124,7 +127,7 @@ export async function updateAlbumServer(
       updatedAt: new Date().toISOString(),
     });
 
-    const url = `${API_BASE_URL}/api/gallery-albums/${albumId}`;
+    const url = `${getApiBase()}/api/gallery-albums/${albumId}`;
     const res = await fetchWithJwtRetry(url, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/merge-patch+json' },
@@ -150,7 +153,7 @@ export async function updateAlbumServer(
  */
 export async function deleteAlbumServer(albumId: number): Promise<void> {
   try {
-    const url = `${API_BASE_URL}/api/gallery-albums/${albumId}`;
+    const url = `${getApiBase()}/api/gallery-albums/${albumId}`;
     const res = await fetchWithJwtRetry(url, {
       method: 'DELETE',
       cache: 'no-store',
@@ -174,7 +177,7 @@ export async function addMediaToAlbumServer(albumId: number, mediaIds: number[])
   try {
     // Update each media item to set album_id and clear event_id
     for (const mediaId of mediaIds) {
-      const url = `${API_BASE_URL}/api/event-medias/${mediaId}`;
+      const url = `${getApiBase()}/api/event-medias/${mediaId}`;
       const payload = {
         id: mediaId,
         albumId,
@@ -206,7 +209,7 @@ export async function addMediaToAlbumServer(albumId: number, mediaIds: number[])
  */
 export async function removeMediaFromAlbumServer(mediaId: number): Promise<void> {
   try {
-    const url = `${API_BASE_URL}/api/event-medias/${mediaId}`;
+    const url = `${getApiBase()}/api/event-medias/${mediaId}`;
     const payload = {
       id: mediaId,
       albumId: null,
@@ -249,7 +252,7 @@ export async function fetchAlbumMediaServer(
     params.append('sort', 'displayOrder,asc');
     params.append('sort', 'updatedAt,desc');
 
-    const url = `${API_BASE_URL}/api/event-medias?${params.toString()}`;
+    const url = `${getApiBase()}/api/event-medias?${params.toString()}`;
     const res = await fetchWithJwtRetry(url, { cache: 'no-store' });
 
     if (!res.ok) {
@@ -274,7 +277,7 @@ export async function fetchAlbumMediaServer(
  */
 export async function setAlbumCoverImageServer(albumId: number, coverImageUrl: string): Promise<GalleryAlbumDTO> {
   try {
-    const url = `${API_BASE_URL}/api/gallery-albums/${albumId}`;
+    const url = `${getApiBase()}/api/gallery-albums/${albumId}`;
     const payload = withTenantId({
       id: albumId,
       coverImageUrl,
@@ -306,7 +309,7 @@ export async function setAlbumCoverImageServer(albumId: number, coverImageUrl: s
  */
 export async function editAlbumMediaServer(mediaId: number | string, payload: Partial<EventMediaDTO>): Promise<EventMediaDTO> {
   try {
-    const url = `${API_BASE_URL}/api/event-medias/${mediaId}`;
+    const url = `${getApiBase()}/api/event-medias/${mediaId}`;
     const cleanedPayload = withTenantId({
       ...payload,
       id: Number(mediaId),
@@ -339,7 +342,7 @@ export async function editAlbumMediaServer(mediaId: number | string, payload: Pa
  */
 export async function deleteAlbumMediaServer(mediaId: number | string): Promise<void> {
   try {
-    const url = `${API_BASE_URL}/api/event-medias/${mediaId}?tenantId.equals=${getTenantId()}`;
+    const url = `${getApiBase()}/api/event-medias/${mediaId}?tenantId.equals=${getTenantId()}`;
     const res = await fetchWithJwtRetry(url, {
       method: 'DELETE',
       cache: 'no-store',

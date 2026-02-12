@@ -3,7 +3,10 @@ import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import type { EventTicketTransactionDTO } from '@/types';
 import { getApiBaseUrl } from '@/lib/env';
 
-const API_BASE_URL = getApiBaseUrl();
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 
 /**
  * Parse QR code data to extract transaction ID and event ID
@@ -74,12 +77,12 @@ function parseQrCodeData(qrData: string): { transactionId?: string; eventId?: st
  * Fetch transaction by ID from backend
  */
 async function fetchTransaction(transactionId: string): Promise<EventTicketTransactionDTO | null> {
-  if (!API_BASE_URL) {
+  if (!getApiBase()) {
     throw new Error('API_BASE_URL not configured');
   }
 
   try {
-    const url = `${API_BASE_URL}/api/event-ticket-transactions/${transactionId}`;
+    const url = `${getApiBase()}/api/event-ticket-transactions/${transactionId}`;
     const response = await fetchWithJwtRetry(url, { cache: 'no-store' });
 
     if (!response.ok) {

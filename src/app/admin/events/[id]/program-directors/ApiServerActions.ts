@@ -3,14 +3,17 @@ import { getAppUrl, getTenantId, getApiBaseUrl } from '@/lib/env';
 import { withTenantId } from '@/lib/withTenantId';
 import type { EventProgramDirectorsDTO, EventMediaDTO } from '@/types';
 
-const API_BASE_URL = getApiBaseUrl();
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 const baseUrl = getAppUrl();
 
 export async function fetchEventProgramDirectorsServer(eventId: number) {
   const params = new URLSearchParams();
   params.append('eventId.equals', eventId.toString());
 
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-program-directors?${params.toString()}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-program-directors?${params.toString()}`, {
     cache: 'no-store',
   });
 
@@ -22,7 +25,7 @@ export async function fetchEventProgramDirectorsServer(eventId: number) {
 }
 
 export async function fetchEventProgramDirectorServer(id: number) {
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-program-directors/${id}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-program-directors/${id}`, {
     cache: 'no-store',
   });
 
@@ -48,7 +51,7 @@ export async function createEventProgramDirectorServer(director: Omit<EventProgr
     photoUrl: cleanUrlField(director.photoUrl),
   });
 
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-program-directors`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-program-directors`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
@@ -75,7 +78,7 @@ export async function updateEventProgramDirectorServer(id: number, director: Par
     photoUrl: director.photoUrl ? cleanUrlField(director.photoUrl) : undefined,
   });
 
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-program-directors/${id}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-program-directors/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/merge-patch+json' },
     body: JSON.stringify(payload),
@@ -95,7 +98,7 @@ export async function updateEventProgramDirectorServer(id: number, director: Par
  */
 export async function associateDirectorWithEventServer(directorId: number, eventId: number) {
   const response = await fetchWithJwtRetry(
-    `${API_BASE_URL}/api/event-program-directors/${directorId}/associate/${eventId}`,
+    `${getApiBase()}/api/event-program-directors/${directorId}/associate/${eventId}`,
     {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -116,7 +119,7 @@ export async function associateDirectorWithEventServer(directorId: number, event
  */
 export async function disassociateDirectorFromEventServer(directorId: number) {
   const response = await fetchWithJwtRetry(
-    `${API_BASE_URL}/api/event-program-directors/${directorId}/disassociate`,
+    `${getApiBase()}/api/event-program-directors/${directorId}/disassociate`,
     {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -133,7 +136,7 @@ export async function disassociateDirectorFromEventServer(directorId: number) {
 }
 
 export async function deleteEventProgramDirectorServer(id: number) {
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-program-directors/${id}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-program-directors/${id}`, {
     method: 'DELETE',
   });
 
@@ -161,7 +164,7 @@ export async function fetchAvailableProgramDirectorsServer(eventId: number, page
     try {
       // Fetch all program directors for the tenant (no eventId filter)
       const params = new URLSearchParams();
-      const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-program-directors?${params.toString()}`, {
+      const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-program-directors?${params.toString()}`, {
         cache: 'no-store',
       });
 
@@ -356,8 +359,11 @@ export async function updateMediaPriorityRankingServer(
   const existingMedia = await fetchEventMediaServer(mediaId, tenantId);
 
   // Use fetchWithJwtRetry for authenticated backend call
-  const API_BASE_URL = getApiBaseUrl();
-  if (!API_BASE_URL) {
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
+  if (!getApiBase()) {
     throw new Error('API base URL not configured');
   }
 
@@ -378,7 +384,7 @@ export async function updateMediaPriorityRankingServer(
     isLiveEventImage: existingMedia.isLiveEventImage ?? false,
   });
 
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-medias/${mediaId}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-medias/${mediaId}`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/merge-patch+json',
@@ -401,12 +407,15 @@ export async function fetchEventMediaServer(
   mediaId: number,
   tenantId?: string
 ): Promise<EventMediaDTO> {
-  const API_BASE_URL = getApiBaseUrl();
-  if (!API_BASE_URL) {
+  // Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
+  if (!getApiBase()) {
     throw new Error('API base URL not configured');
   }
 
-  const url = `${API_BASE_URL}/api/event-medias/${mediaId}`;
+  const url = `${getApiBase()}/api/event-medias/${mediaId}`;
   const response = await fetchWithJwtRetry(url, {
     cache: 'no-store',
   });
@@ -426,12 +435,15 @@ export async function deleteEventMediaServer(
   mediaId: number,
   tenantId?: string
 ): Promise<boolean> {
-  const API_BASE_URL = getApiBaseUrl();
-  if (!API_BASE_URL) {
+  // Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
+  if (!getApiBase()) {
     throw new Error('API base URL not configured');
   }
 
-  const url = `${API_BASE_URL}/api/event-medias/${mediaId}`;
+  const url = `${getApiBase()}/api/event-medias/${mediaId}`;
   const response = await fetchWithJwtRetry(url, {
     method: 'DELETE',
   });

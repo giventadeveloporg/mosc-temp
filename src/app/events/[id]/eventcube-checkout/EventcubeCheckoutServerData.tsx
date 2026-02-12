@@ -27,15 +27,18 @@ const DEFAULT_HERO_IMAGE = '/images/default_placeholder_hero_image.jpeg';
  * Returns hero image and Event Cube embed URL.
  */
 export const getEventcubeCheckoutData = cache(async (eventId: string): Promise<EventcubeCheckoutData> => {
-  const API_BASE_URL = getApiBaseUrl();
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 
-  if (!API_BASE_URL) {
+  if (!getApiBase()) {
     throw new Error('API_BASE_URL not configured');
   }
 
   try {
     const eventRes = await fetchWithJwtRetry(
-      `${API_BASE_URL}/api/event-details/${eventId}`,
+      `${getApiBase()}/api/event-details/${eventId}`,
       { cache: 'no-store' }
     );
 

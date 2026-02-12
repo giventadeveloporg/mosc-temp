@@ -3,7 +3,10 @@ import { getAppUrl, getTenantId, getApiBaseUrl } from '@/lib/env';
 import { withTenantId } from '@/lib/withTenantId';
 import type { EventFeaturedPerformersDTO, EventMediaDTO } from '@/types';
 
-const API_BASE_URL = getApiBaseUrl();
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 const baseUrl = getAppUrl();
 
 export async function fetchEventFeaturedPerformersServer(eventId?: number, page: number = 0, size: number = 10) {
@@ -14,7 +17,7 @@ export async function fetchEventFeaturedPerformersServer(eventId?: number, page:
   params.append('page', page.toString());
   params.append('size', size.toString());
 
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-featured-performers?${params.toString()}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-featured-performers?${params.toString()}`, {
     cache: 'no-store',
   });
 
@@ -41,7 +44,7 @@ export async function fetchEventFeaturedPerformersServer(eventId?: number, page:
 }
 
 export async function fetchEventFeaturedPerformerServer(id: number) {
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-featured-performers/${id}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-featured-performers/${id}`, {
     cache: 'no-store',
   });
 
@@ -55,7 +58,7 @@ export async function fetchEventFeaturedPerformerServer(id: number) {
 export async function createEventFeaturedPerformerServer(performer: Omit<EventFeaturedPerformersDTO, 'id' | 'createdAt' | 'updatedAt'>) {
   const payload = withTenantId(performer);
 
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-featured-performers`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-featured-performers`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
@@ -72,7 +75,7 @@ export async function createEventFeaturedPerformerServer(performer: Omit<EventFe
 export async function updateEventFeaturedPerformerServer(id: number, performer: Partial<EventFeaturedPerformersDTO>) {
   const payload = withTenantId({ ...performer, id });
 
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-featured-performers/${id}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-featured-performers/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/merge-patch+json' },
     body: JSON.stringify(payload),
@@ -87,7 +90,7 @@ export async function updateEventFeaturedPerformerServer(id: number, performer: 
 }
 
 export async function deleteEventFeaturedPerformerServer(id: number) {
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-featured-performers/${id}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-featured-performers/${id}`, {
     method: 'DELETE',
   });
 
@@ -217,8 +220,11 @@ export async function updateEventMediaServer(
   updates: Partial<EventMediaDTO>,
   tenantId?: string
 ): Promise<EventMediaDTO> {
-  const API_BASE_URL = getApiBaseUrl();
-  if (!API_BASE_URL) {
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
+  if (!getApiBase()) {
     throw new Error('API base URL not configured');
   }
 
@@ -254,12 +260,15 @@ export async function fetchEventMediaServer(
   mediaId: number,
   tenantId?: string
 ): Promise<EventMediaDTO> {
-  const API_BASE_URL = getApiBaseUrl();
-  if (!API_BASE_URL) {
+  // Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
+  if (!getApiBase()) {
     throw new Error('API base URL not configured');
   }
 
-  const url = `${API_BASE_URL}/api/event-medias/${mediaId}`;
+  const url = `${getApiBase()}/api/event-medias/${mediaId}`;
   const response = await fetchWithJwtRetry(url, {
     cache: 'no-store',
   });

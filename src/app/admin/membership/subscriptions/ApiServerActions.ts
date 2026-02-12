@@ -4,7 +4,10 @@ import { getAppUrl, getTenantId, getApiBaseUrl } from '@/lib/env';
 import { withTenantId } from '@/lib/withTenantId';
 import type { MembershipSubscriptionDTO } from '@/types';
 
-const API_BASE_URL = getApiBaseUrl();
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 
 export interface FetchSubscriptionsFilters {
   userProfileId?: number;
@@ -21,7 +24,7 @@ export interface FetchSubscriptionsFilters {
 export async function fetchAllSubscriptionsServer(
   filters: FetchSubscriptionsFilters = {}
 ): Promise<{ data: MembershipSubscriptionDTO[]; totalCount: number }> {
-  if (!API_BASE_URL) {
+  if (!getApiBase()) {
     throw new Error('API base URL not configured');
   }
 
@@ -75,7 +78,7 @@ export async function fetchAllSubscriptionsServer(
 export async function getSubscriptionDetailsServer(
   subscriptionId: number
 ): Promise<MembershipSubscriptionDTO | null> {
-  if (!API_BASE_URL) {
+  if (!getApiBase()) {
     throw new Error('API base URL not configured');
   }
 
@@ -107,7 +110,7 @@ export async function cancelUserSubscriptionServer(
   subscriptionId: number,
   cancellationReason?: string
 ): Promise<MembershipSubscriptionDTO> {
-  if (!API_BASE_URL) {
+  if (!getApiBase()) {
     throw new Error('API base URL not configured');
   }
 
@@ -119,7 +122,7 @@ export async function cancelUserSubscriptionServer(
     cancelledAt: new Date().toISOString(),
   });
 
-  const url = `${API_BASE_URL}/api/membership-subscriptions/${subscriptionId}`;
+  const url = `${getApiBase()}/api/membership-subscriptions/${subscriptionId}`;
   const res = await fetchWithJwtRetry(url, {
     method: 'PATCH',
     headers: {

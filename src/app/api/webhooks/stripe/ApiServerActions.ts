@@ -4,10 +4,13 @@ import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import { EventTicketTransactionDTO, EventTicketTypeDTO } from '@/types';
 import { getTenantId, getPaymentMethodDomainId, getApiBaseUrl } from '@/lib/env';
 
-const API_BASE_URL = getApiBaseUrl();
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 
 export async function createEventTicketTransactionServer(transaction: Omit<EventTicketTransactionDTO, 'id'>): Promise<EventTicketTransactionDTO> {
-  const url = `${API_BASE_URL}/api/event-ticket-transactions`;
+  const url = `${getApiBase()}/api/event-ticket-transactions`;
 
   // CRITICAL: Verify tenant ID before sending to backend
   const expectedTenantId = getTenantId();
@@ -112,7 +115,7 @@ export async function createEventTicketTransactionServer(transaction: Omit<Event
 
 // Helper to bulk create transaction items
 export async function createTransactionItemsBulkServer(items: any[]): Promise<any[]> {
-  const url = `${API_BASE_URL}/api/event-ticket-transaction-items/bulk`;
+  const url = `${getApiBase()}/api/event-ticket-transaction-items/bulk`;
 
   // Get triple validation values from environment variables
   const expectedTenantId = getTenantId();
@@ -220,7 +223,7 @@ export async function createTransactionItemsBulkServer(items: any[]): Promise<an
 }
 
 export async function updateTicketTypeInventoryServer(ticketTypeId: number, quantityPurchased: number): Promise<void> {
-  const getUrl = `${API_BASE_URL}/api/event-ticket-types/${ticketTypeId}`;
+  const getUrl = `${getApiBase()}/api/event-ticket-types/${ticketTypeId}`;
 
   // 1. Get the current ticket type
   const getRes = await fetchWithJwtRetry(getUrl);
@@ -236,7 +239,7 @@ export async function updateTicketTypeInventoryServer(ticketTypeId: number, quan
   };
 
   // 3. PUT the updated ticket type back
-  const putUrl = `${API_BASE_URL}/api/event-ticket-types/${ticketTypeId}`;
+  const putUrl = `${getApiBase()}/api/event-ticket-types/${ticketTypeId}`;
   const putRes = await fetchWithJwtRetry(putUrl, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },

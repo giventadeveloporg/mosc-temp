@@ -60,9 +60,12 @@ const DEFAULT_HERO_IMAGE = '/images/default_placeholder_hero_image.jpeg';
  * Uses fetchWithJwtRetry for backend API calls (cursor rules pattern)
  */
 export const getDonationCheckoutData = cache(async (eventId: string): Promise<DonationCheckoutData> => {
-  const API_BASE_URL = getApiBaseUrl();
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 
-  if (!API_BASE_URL) {
+  if (!getApiBase()) {
     throw new Error('API_BASE_URL not configured');
   }
 
@@ -75,7 +78,7 @@ export const getDonationCheckoutData = cache(async (eventId: string): Promise<Do
     let eventRes;
     try {
       eventRes = await fetchWithJwtRetry(
-        `${API_BASE_URL}/api/event-details/${eventId}`,
+        `${getApiBase()}/api/event-details/${eventId}`,
         {
           cache: 'no-store',
         }
@@ -110,7 +113,7 @@ export const getDonationCheckoutData = cache(async (eventId: string): Promise<Do
     if (isTicketedFundraiser || event.admissionType?.toUpperCase() === 'TICKETED') {
       try {
         const ticketRes = await fetchWithJwtRetry(
-          `${API_BASE_URL}/api/event-ticket-types?eventId.equals=${eventId}&isActive.equals=true&tenantId.equals=${tenantId}`,
+          `${getApiBase()}/api/event-ticket-types?eventId.equals=${eventId}&isActive.equals=true&tenantId.equals=${tenantId}`,
           {
             cache: 'no-store',
           }
@@ -130,7 +133,7 @@ export const getDonationCheckoutData = cache(async (eventId: string): Promise<Do
     let discounts: DiscountCode[] = [];
     try {
       const discountRes = await fetchWithJwtRetry(
-        `${API_BASE_URL}/api/discount-codes?eventId.equals=${eventId}&isActive.equals=true&tenantId.equals=${tenantId}`,
+        `${getApiBase()}/api/discount-codes?eventId.equals=${eventId}&isActive.equals=true&tenantId.equals=${tenantId}`,
         {
           cache: 'no-store',
         }

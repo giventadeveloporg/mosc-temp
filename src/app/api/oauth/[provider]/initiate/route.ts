@@ -17,9 +17,12 @@ export async function GET(
   { params }: { params: Promise<{ provider: string }> }
 ) {
   try {
-    const API_BASE_URL = getApiBaseUrl();
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 
-    if (!API_BASE_URL) {
+    if (!getApiBase()) {
       console.error('[OAuth Initiate] API_BASE_URL not configured');
       return NextResponse.json(
         { error: 'API base URL not configured' },
@@ -54,7 +57,7 @@ export async function GET(
     const tenantId = getTenantId();
 
     // Build backend OAuth URL with query parameters
-    const backendOAuthUrl = `${API_BASE_URL}/api/oauth/${provider}/initiate`;
+    const backendOAuthUrl = `${getApiBase()}/api/oauth/${provider}/initiate`;
     const backendParams = new URLSearchParams();
     backendParams.append('tenantId', tenantId);
     backendParams.append('redirectUrl', redirectUrl);

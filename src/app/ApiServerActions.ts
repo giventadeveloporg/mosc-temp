@@ -10,8 +10,11 @@ import { fetchWithJwtRetry } from '@/lib/proxyHandler';
  */
 export async function fetchTenantSettingsServer(): Promise<TenantSettingsDTO | null> {
   try {
-    const API_BASE_URL = getApiBaseUrl();
-    if (!API_BASE_URL) {
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
+    if (!getApiBase()) {
       console.error('[fetchTenantSettingsServer] API base URL not configured');
       return null;
     }
@@ -20,7 +23,7 @@ export async function fetchTenantSettingsServer(): Promise<TenantSettingsDTO | n
     console.log('[fetchTenantSettingsServer] 🔍 Fetching tenant settings for:', tenantId);
 
     const response = await fetchWithJwtRetry(
-      `${API_BASE_URL}/api/tenant-settings?tenantId.equals=${encodeURIComponent(tenantId)}`,
+      `${getApiBase()}/api/tenant-settings?tenantId.equals=${encodeURIComponent(tenantId)}`,
       {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
