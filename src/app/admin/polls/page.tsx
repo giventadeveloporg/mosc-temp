@@ -1,10 +1,10 @@
-import { auth } from '@clerk/nextjs';
+import { safeAuth } from '@/lib/safe-auth';
 import { redirect } from 'next/navigation';
 import { PollManagementClient } from './PollManagementClient';
 import { fetchEventPollsServer } from './ApiServerActions';
 
 export default async function PollsPage() {
-  const { userId } = await auth();
+  const { userId } = await safeAuth();
 
   if (!userId) {
     redirect('/sign-in');

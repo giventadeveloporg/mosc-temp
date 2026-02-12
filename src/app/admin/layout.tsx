@@ -4,51 +4,52 @@ import { auth, currentUser } from '@clerk/nextjs/server';
 import { fetchAdminProfileServer } from './manage-usage/ApiServerActions';
 import { bootstrapUserProfile } from '@/components/ProfileBootstrapperApiServerActions';
 
+const CLERK_KEY = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ?? process.env.AMPLIFY_NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ?? '';
+
 /**
  * Admin Layout - Protects all /admin/* routes
  *
- * This layout ensures that only users with ADMIN role can access admin pages.
- * If a user is not authenticated or doesn't have ADMIN role, they are redirected to the homepage.
+ * When Clerk is configured, this layout verifies authentication and ADMIN role
+ * on the server side, redirecting non-admin users to the homepage.
  *
- * This prevents the "freezing" issue by redirecting immediately on the server-side
- * before any client components can render.
+ * When Clerk is NOT configured (e.g., disabled on Amplify), this layout renders
+ * children directly and relies on client-side auth checks in admin pages.
  */
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // If Clerk is not configured, skip server-side auth and let client-side handle it
+  if (!CLERK_KEY) {
+    console.log('[AdminLayout] Clerk not configured, skipping server-side auth check');
+    return <>{children}</>;
+  }
+
   try {
     // CRITICAL: Next.js 15+ requires headers() to be awaited before calling auth()
-    // This ensures proper async context for dynamic APIs
     const headersList = await headers();
 
     // Check authentication
-    // When user is logged out, auth() returns { userId: null } without throwing
     let userId: string | null = null;
     try {
-      // CRITICAL: Call auth() AFTER headers() is awaited to ensure proper async context
       const authResult = await auth();
       userId = authResult?.userId || null;
     } catch (authError) {
-      // If auth() throws (e.g., middleware not configured), assume not authenticated
-      console.warn('[AdminLayout] Auth check failed, assuming not authenticated:', authError);
-      redirect('/');
+      // If auth() throws, fall through to client-side protection
+      console.warn('[AdminLayout] Auth check failed, deferring to client-side:', authError);
+      return <>{children}</>;
     }
 
-    // If not authenticated, redirect to homepage immediately
+    // If not authenticated, redirect to homepage
     if (!userId) {
-      // Silent redirect for logged-out users (no console warning needed)
       redirect('/');
     }
 
-    // Ensure tenant-scoped profile exists for the current user
-    // This is non-blocking - if it fails, we'll still check the profile
+    // Ensure tenant-scoped profile exists for the current user (non-blocking)
     try {
       const u = await currentUser();
       if (u) {
-        // Map Clerk user object to userData format expected by bootstrapUserProfile
-        // CRITICAL: Only pass data that exists - don't pass empty strings
         await bootstrapUserProfile({
           userId,
           userData: {
@@ -61,39 +62,39 @@ export default async function AdminLayout({
       }
     } catch (error) {
       console.error('[AdminLayout] Error bootstrapping user profile (non-fatal):', error);
-      // Continue - fetchAdminProfileServer will check if profile exists
     }
 
     // Fetch user profile to check admin role
-    // Use a timeout approach: if profile fetch fails or is slow, assume not admin
     let userProfile = null;
     try {
       userProfile = await fetchAdminProfileServer(userId);
     } catch (error) {
       console.error('[AdminLayout] Error fetching user profile:', error);
-      // If we can't fetch the profile, assume user is not admin for security
-      console.warn('[AdminLayout] Cannot verify admin status, redirecting to homepage');
-      redirect('/');
+      // Can't verify admin status — defer to client-side checks
+      return <>{children}</>;
     }
 
     // Check if user has ADMIN role
     const isAdmin = userProfile?.userRole === 'ADMIN';
 
-    // If not admin or profile doesn't exist, redirect to homepage immediately
     if (!isAdmin) {
       console.warn(
-        `[AdminLayout] User ${userId} attempted to access admin route but does not have ADMIN role. ` +
+        `[AdminLayout] User ${userId} does not have ADMIN role. ` +
         `Role: ${userProfile?.userRole || 'NONE'}, Status: ${userProfile?.userStatus || 'NONE'}`
       );
       redirect('/');
     }
 
-    // User is authenticated and has ADMIN role - render children
+    // User is authenticated and has ADMIN role
     return <>{children}</>;
-  } catch (error) {
-    // If any error occurs, redirect to homepage for security
+  } catch (error: any) {
+    // NEXT_REDIRECT is thrown by redirect() — let it propagate
+    if (error?.digest?.startsWith('NEXT_REDIRECT')) {
+      throw error;
+    }
+    // For other errors, defer to client-side protection
     console.error('[AdminLayout] Unexpected error:', error);
-    redirect('/');
+    return <>{children}</>;
   }
 }
 

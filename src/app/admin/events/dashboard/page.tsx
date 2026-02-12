@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import { auth } from '@clerk/nextjs';
+import { safeAuth } from '@/lib/safe-auth';
 import { getAppUrl } from '@/lib/env';
 import type { EventDetailsDTO, EventAttendeeDTO, EventAttendeeGuestDTO } from '@/types';
 import EventDashboardClient from './EventDashboardClient';
@@ -54,7 +54,7 @@ function LoadingSkeleton() {
 }
 
 export default async function EventDashboardPage({ searchParams }: DashboardPageProps) {
-  const { userId } = await auth();
+  const { userId } = await safeAuth();
 
   if (!userId) {
     notFound();

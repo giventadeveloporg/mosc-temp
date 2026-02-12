@@ -1,4 +1,4 @@
-import { auth } from '@clerk/nextjs/server';
+import { safeAuth } from '@/lib/safe-auth';
 import { redirect } from 'next/navigation';
 import TicketTypeListClient from './TicketTypeListClient';
 import type { EventDetailsDTO, EventTicketTypeDTO } from '@/types';
@@ -13,7 +13,7 @@ interface PageProps {
 
 export default async function TicketTypeListPage({ params }: PageProps) {
   // Fix for Next.js 15+: await auth() before using
-  const { userId } = await auth();
+  const { userId } = await safeAuth();
 
   if (!userId) {
     redirect('/sign-in');

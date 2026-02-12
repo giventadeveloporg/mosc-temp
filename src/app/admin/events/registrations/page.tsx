@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import { auth } from '@clerk/nextjs';
+import { safeAuth } from '@/lib/safe-auth';
 import { getAppUrl } from '@/lib/env';
 import type { EventAttendeeDTO, EventAttendeeGuestDTO, EventDetailsDTO } from '@/types';
 import RegistrationManagementClient from './RegistrationManagementClient';
@@ -35,7 +35,7 @@ function LoadingSkeleton() {
 }
 
 export default async function RegistrationManagementPage({ searchParams }: RegistrationPageProps) {
-  const { userId } = await auth();
+  const { userId } = await safeAuth();
 
   if (!userId) {
     notFound();

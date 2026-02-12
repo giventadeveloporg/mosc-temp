@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import { auth } from '@clerk/nextjs';
+import { safeAuth } from '@/lib/safe-auth';
 import AdminNavigation from '@/components/AdminNavigation';
 import {
   FaDownload,
@@ -31,7 +31,7 @@ function LoadingSkeleton() {
 }
 
 export default async function AdminEventsReportsPage() {
-  const { userId } = await auth();
+  const { userId } = await safeAuth();
 
   if (!userId) {
     notFound();

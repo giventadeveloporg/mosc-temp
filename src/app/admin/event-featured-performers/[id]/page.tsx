@@ -1,5 +1,5 @@
 import { notFound, redirect } from 'next/navigation';
-import { auth } from '@clerk/nextjs/server';
+import { safeAuth } from '@/lib/safe-auth';
 import { fetchEventFeaturedPerformerServer, fetchPerformerMediaServer } from '../ApiServerActions';
 import PerformerEditClient from './PerformerEditClient';
 
@@ -9,7 +9,7 @@ interface PerformerEditPageProps {
 }
 
 export default async function PerformerEditPage({ params, searchParams }: PerformerEditPageProps) {
-  const { userId } = await auth();
+  const { userId } = await safeAuth();
   if (!userId) {
     redirect('/sign-in');
   }
