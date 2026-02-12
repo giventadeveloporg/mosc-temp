@@ -200,6 +200,8 @@ export default async function middleware(req: NextRequest, event: NextFetchEvent
   // Build response that forwards request with x-pathname
   const nextRes = NextResponse.next({ request: { headers: requestHeaders } });
 
+  let finalResponse: NextResponse = nextRes;
+
   if (isPublic && response instanceof NextResponse) {
     const location = response.headers.get('location');
     const isRedirectToSignIn = location && (location.includes('/sign-in') || location.includes('sign-in'));
@@ -220,22 +222,26 @@ export default async function middleware(req: NextRequest, event: NextFetchEvent
           nextRes.headers.set(key, value);
         }
       });
-      return nextRes;
+      finalResponse = nextRes;
+    } else {
+      console.log('[MIDDLEWARE] ✅ Public route', pathname, 'allowed through with status', response.status);
     }
-    console.log('[MIDDLEWARE] ✅ Public route', pathname, 'allowed through with status', response.status);
-  }
-
-  // Use the response that has request headers (x-pathname) so layout and routes receive them.
-  // For redirects (307/308) or 401, return Clerk's response so the client redirects or gets 401.
-  if (response instanceof NextResponse) {
+  } else if (response instanceof NextResponse) {
+    // Use the response that has request headers (x-pathname) so layout and routes receive them.
+    // For redirects (307/308) or 401, return Clerk's response so the client redirects or gets 401.
     const isRedirectOrUnauthorized = response.status === 401 || response.status === 307 || response.status === 308;
-    if (isRedirectOrUnauthorized) return response;
-    // Success: copy Clerk's headers (e.g. set-cookie) onto nextRes and return it so request keeps x-pathname.
-    response.headers.forEach((value, key) => nextRes.headers.set(key, value));
-    return nextRes;
+    if (isRedirectOrUnauthorized) {
+      finalResponse = response;
+    } else {
+      // Success: copy Clerk's headers (e.g. set-cookie) onto nextRes so request keeps x-pathname.
+      response.headers.forEach((value, key) => nextRes.headers.set(key, value));
+      finalResponse = nextRes;
+    }
+  } else {
+    finalResponse = response as NextResponse;
   }
 
-  return response;
+  return finalResponse;
 }
 
 export const config = {
