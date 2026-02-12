@@ -2,7 +2,7 @@
 
 import { auth } from '@clerk/nextjs/server';
 import { UserProfileDTO } from '@/types';
-import { getTenantId, getAppUrl } from '@/lib/env';
+import { getTenantId, getAppUrl, getApiBaseUrl } from '@/lib/env';
 import { getCachedApiJwt, generateApiJwt } from '@/lib/api/jwt';
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 
@@ -131,7 +131,7 @@ export async function updateUserProfileServer(profileId: number, payload: Partia
     };
 
     // Direct backend call using NEXT_PUBLIC_API_BASE_URL
-    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    const apiBaseUrl = getApiBaseUrl();
     if (!apiBaseUrl) {
       throw new Error('NEXT_PUBLIC_API_BASE_URL is not configured');
     }
@@ -262,14 +262,17 @@ export async function fetchUserProfileByEmailServer(email: string): Promise<User
  * Uses centralized fetchWithJwtRetry helper - complies with .cursor/rules/nextjs_api_routes.mdc
  */
 export async function generateEmailSubscriptionTokenServer(profileId: number): Promise<{ success: boolean; token?: string; error?: string }> {
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 
   try {
     // Generate a new token (UUID-like string)
     const newToken = `sub_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
 
     // Update the user profile with the new token using centralized JWT retry helper
-    const url = `${API_BASE_URL}/api/user-profiles/${profileId}`;
+    const url = `${getApiBase()}/api/user-profiles/${profileId}`;
     const response = await fetchWithJwtRetry(url, {
       method: 'PATCH',
       headers: {

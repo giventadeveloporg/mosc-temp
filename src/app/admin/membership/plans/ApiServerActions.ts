@@ -1,9 +1,12 @@
 "use server";
-import { getAppUrl, getTenantId } from '@/lib/env';
+import { getAppUrl, getTenantId, getApiBaseUrl } from '@/lib/env';
 import type { MembershipPlanDTO } from '@/types';
 import { stripe } from '@/lib/stripe';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 
 /**
  * Fetch all membership plans for admin with pagination support
@@ -15,7 +18,7 @@ export async function fetchAllMembershipPlansServer(
     sort?: string;
   } = {}
 ): Promise<{ plans: MembershipPlanDTO[]; totalCount: number }> {
-  if (!API_BASE_URL) {
+  if (!getApiBase()) {
     throw new Error('API base URL not configured');
   }
 
@@ -66,7 +69,7 @@ export async function fetchAllMembershipPlansServer(
 export async function createMembershipPlanServer(
   plan: Omit<MembershipPlanDTO, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<MembershipPlanDTO> {
-  if (!API_BASE_URL) {
+  if (!getApiBase()) {
     throw new Error('API base URL not configured');
   }
 
@@ -217,7 +220,7 @@ export async function updateMembershipPlanServer(
   planId: number,
   plan: Partial<MembershipPlanDTO>
 ): Promise<MembershipPlanDTO> {
-  if (!API_BASE_URL) {
+  if (!getApiBase()) {
     throw new Error('API base URL not configured');
   }
 
@@ -269,7 +272,7 @@ export async function updateMembershipPlanServer(
  * Delete a membership plan
  */
 export async function deleteMembershipPlanServer(planId: number): Promise<void> {
-  if (!API_BASE_URL) {
+  if (!getApiBase()) {
     throw new Error('API base URL not configured');
   }
 

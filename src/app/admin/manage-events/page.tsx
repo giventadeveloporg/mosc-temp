@@ -72,37 +72,37 @@ export default function ManageEventsPage() {
       // Determine which view we're loading (future or past)
       let loadingPastEvents = showPastEvents;
 
-      // On initial load, check both future and past event counts
+      // On initial load, check both future and past event counts in parallel
       if (checkInitialLoad && !hasCheckedInitialLoad && pageNum === 0 && !searchTitle && !searchId && !searchCaption && !searchStartDate && !searchEndDate) {
-        // Check future events count
         const futureParams: any = {
           admissionType: searchAdmissionType,
           sort: 'startDate,asc',
           pageNum: 0,
-          pageSize: 1, // Just need count, not data
+          pageSize: 1,
           startDate: today,
         };
-        const { totalCount: futureCount } = await fetchEventsFilteredServer(futureParams);
-        setFutureEventCount(futureCount);
-
-        // Check past events count
         const pastParams: any = {
           admissionType: searchAdmissionType,
           sort: 'startDate,desc',
           pageNum: 0,
-          pageSize: 1, // Just need count, not data
+          pageSize: 1,
           endDate: today,
         };
-        const { totalCount: pastCount } = await fetchEventsFilteredServer(pastParams);
-        setPastEventCount(pastCount);
 
+        // Parallel count checks instead of sequential
+        const [{ totalCount: futureCount }, { totalCount: pastCount }] = await Promise.all([
+          fetchEventsFilteredServer(futureParams),
+          fetchEventsFilteredServer(pastParams),
+        ]);
+        setFutureEventCount(futureCount);
+        setPastEventCount(pastCount);
         setHasCheckedInitialLoad(true);
 
         // Auto-switch to past events if no future events but past events exist
         if (futureCount === 0 && pastCount > 0) {
           setIsAutoSwitching(true);
           setShowPastEvents(true);
-          loadingPastEvents = true; // Load past events data in this same call
+          loadingPastEvents = true;
         }
       }
 
@@ -131,11 +131,14 @@ export default function ManageEventsPage() {
       else if (searchField === 'id') filterParams.id = searchId;
       else if (searchField === 'caption') filterParams.caption = searchCaption;
 
-      const { events: eventsResult, totalCount: fetchedTotalCount } = await fetchEventsFilteredServer(filterParams);
-      const types = await fetchEventTypesServer();
-      const calendarEventsResult = await fetchCalendarEventsServer();
-      setEvents(eventsResult);
-      setTotalCount(fetchedTotalCount);
+      // Parallel data fetches instead of sequential
+      const [eventsData, types, calendarEventsResult] = await Promise.all([
+        fetchEventsFilteredServer(filterParams),
+        fetchEventTypesServer(),
+        fetchCalendarEventsServer(),
+      ]);
+      setEvents(eventsData.events);
+      setTotalCount(eventsData.totalCount);
       setEventTypes(types);
       setCalendarEvents(calendarEventsResult);
     } catch (e: any) {

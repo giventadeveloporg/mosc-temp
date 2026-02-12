@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { getCachedApiJwt, generateApiJwt } from '@/lib/api/jwt';
 import { withTenantId } from '@/lib/withTenantId';
 import { getRawBody } from '@/lib/getRawBody';
-import { getTenantId } from '@/lib/env';
+import { getTenantId, getApiBaseUrl } from '@/lib/env';
 import { createLogger } from '@/lib/logger';
 
 const logger = createLogger('PROXY-HANDLER');
@@ -52,7 +52,7 @@ export function createProxyHandler({ injectTenantId = true, allowedMethods = ['G
     console.log('[PROXY-HANDLER-START] ============================================');
 
     try {
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+      const API_BASE_URL = getApiBaseUrl();
       console.log('[ProxyHandler] API_BASE_URL:', API_BASE_URL);
       if (!API_BASE_URL) {
         res.status(500).json({ error: 'API base URL not configured' });

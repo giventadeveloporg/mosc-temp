@@ -1,9 +1,10 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import type { NextRequest, NextFetchEvent } from "next/server";
-import { createLogger } from "@/lib/logger";
+import type { NextRequest } from "next/server";
 
-const logger = createLogger('MIDDLEWARE');
+const CLERK_KEY = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || '';
+
+console.log('[MIDDLEWARE-MODULE] Middleware module loaded, Clerk:', CLERK_KEY ? 'enabled' : 'disabled');
 
 /**
  * Clerk SDK Middleware (v4 compatible)
@@ -18,12 +19,11 @@ const logger = createLogger('MIDDLEWARE');
  * 2. Clerk middleware runs for all routes (including public routes) so auth() works in layout.tsx
  * 3. The wrapper only intercepts 401/redirect responses for Playwright tests, it doesn't prevent Clerk from running
  *
- * This ensures:
- * - ✅ Playwright tests work (public routes don't get 401)
- * - ✅ auth() calls work in layout.tsx (Clerk middleware runs)
- * - ✅ Admin menu appears correctly (admin lookup in layout.tsx works via userRole === 'ADMIN')
+ * When Clerk is configured: uses clerkMiddleware to process auth sessions,
+ * then sets x-pathname header. This enables server-side auth() to work.
  *
- * See: .cursor/rules/clerk_auth_admin_user_lookup.mdc for the complete pattern
+ * When Clerk is NOT configured (e.g., Amplify without Clerk env vars):
+ * simple passthrough that sets x-pathname header only.
  */
 
 // Compute satellite config safely for production to avoid missing domain/proxyUrl
@@ -180,16 +180,10 @@ const clerkMiddlewareInstance = clerkMiddleware(
 // - ✅ Admin menu appears correctly (admin lookup in layout.tsx works)
 export default async function middleware(req: NextRequest, event: NextFetchEvent) {
   const pathname = req.nextUrl.pathname;
-  const isPublic = isPublicRoute(pathname);
-
-  if (isPublic) {
-    console.log('[MIDDLEWARE] Public route detected:', pathname);
-  }
-
-  // CRITICAL: Add x-pathname to REQUEST headers so layout can read it via headers()
-  // Next.js 15+ requires this for layout to avoid "headers() should be awaited" when calling auth()
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set('x-pathname', pathname);
+  return NextResponse.next({ request: { headers: requestHeaders } });
+}
 
   // Always call Clerk middleware (even for public routes) so auth() works in layout.tsx
   let response = clerkMiddlewareInstance(req, event);
@@ -235,14 +229,11 @@ export default async function middleware(req: NextRequest, event: NextFetchEvent
     return nextRes;
   }
 
-  return response;
-}
+export default middleware;
 
+// Match all routes except static assets and Next.js internals
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files
-    '/((?!_next|[^?]*\\.[\\w]+$).*)',
-    // Always run for API routes
-    '/(api|trpc)(.*)',
+    '/((?!_next/static|_next/image|favicon.ico|images/|uploads/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js)$).*)',
   ],
 };

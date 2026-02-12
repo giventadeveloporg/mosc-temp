@@ -31,7 +31,7 @@ function LoadingSkeleton() {
 }
 
 export default async function AdminEventsReportsPage() {
-  const { userId } = await auth();
+  const { userId } = await safeAuth();
 
   if (!userId) {
     notFound();

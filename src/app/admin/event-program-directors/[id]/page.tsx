@@ -1,5 +1,5 @@
 import { notFound, redirect } from 'next/navigation';
-import { auth } from '@clerk/nextjs/server';
+import { safeAuth } from '@/lib/safe-auth';
 import { fetchEventProgramDirectorServer, fetchDirectorMediaServer } from '../ApiServerActions';
 import DirectorEditClient from './DirectorEditClient';
 
@@ -9,7 +9,7 @@ interface DirectorEditPageProps {
 }
 
 export default async function DirectorEditPage({ params, searchParams }: DirectorEditPageProps) {
-  const { userId } = await auth();
+  const { userId } = await safeAuth();
   if (!userId) {
     redirect('/sign-in');
   }

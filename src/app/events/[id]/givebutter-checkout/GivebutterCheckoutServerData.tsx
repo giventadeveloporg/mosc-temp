@@ -1,6 +1,6 @@
 import { cache } from 'react';
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
-import { getAppUrl } from '@/lib/env';
+import { getAppUrl, getApiBaseUrl } from '@/lib/env';
 import { getDonationMetadata, isTicketedFundraiserEvent } from '@/lib/donation/utils';
 import type { EventDetailsDTO } from '@/types';
 
@@ -28,9 +28,12 @@ const DEFAULT_HERO_IMAGE = '/images/default_placeholder_hero_image.jpeg';
  * Returns hero image and GiveButter widget/campaign IDs from donation_metadata.
  */
 export const getGivebutterCheckoutData = cache(async (eventId: string): Promise<GivebutterCheckoutData> => {
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 
-  if (!API_BASE_URL) {
+  if (!getApiBase()) {
     throw new Error('API_BASE_URL not configured');
   }
 
@@ -38,7 +41,7 @@ export const getGivebutterCheckoutData = cache(async (eventId: string): Promise<
     console.log('[GivebutterCheckoutServerData] Fetching event data for eventId:', eventId);
 
     const eventRes = await fetchWithJwtRetry(
-      `${API_BASE_URL}/api/event-details/${eventId}`,
+      `${getApiBase()}/api/event-details/${eventId}`,
       { cache: 'no-store' }
     );
 

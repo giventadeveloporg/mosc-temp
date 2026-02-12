@@ -29,8 +29,8 @@ const createTaskSchema = z.object({
 });
 const updateTaskSchema = createTaskSchema.partial();
 
-function getUserId() {
-  const { userId } = auth();
+async function getUserId() {
+  const { userId } = await auth();
   if (!userId) throw new Error('Unauthorized');
   return userId;
 }
@@ -232,7 +232,7 @@ export async function GET(request: NextRequest, context?: { params?: { id?: stri
     return NextResponse.json({ error: 'API base URL not configured' }, { status: 503 });
   }
   try {
-    const userId = getUserId();
+    const userId = await getUserId();
     // If context and params.id is present, fetch a single task
     if (context && context.params && context.params.id) {
       const response = await fetch(`${API_BASE_URL}/api/proxy/user-tasks/${context.params.id}`, {
@@ -270,7 +270,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'API base URL not configured' }, { status: 503 });
   }
   try {
-    const userId = getUserId();
+    const userId = await getUserId();
     const body = await request.json();
     const validatedData = createTaskSchema.parse(body);
     const now = new Date().toISOString();
@@ -318,7 +318,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: 'API base URL not configured' }, { status: 503 });
   }
   try {
-    const userId = getUserId();
+    const userId = await getUserId();
     const body = await request.json();
     const { id, ...updateData } = body;
     if (!id) {
@@ -395,7 +395,7 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: 'API base URL not configured' }, { status: 503 });
   }
   try {
-    const userId = getUserId();
+    const userId = await getUserId();
     const { id } = await request.json();
     if (!id) {
       return NextResponse.json({ error: 'Task id is required' }, { status: 400 });

@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { auth } from '@clerk/nextjs/server';
+import { safeAuth } from '@/lib/safe-auth';
 import { fetchAllSubscriptionsServer } from './ApiServerActions';
 import { AdminSubscriptionsClient } from './AdminSubscriptionsClient';
 
@@ -14,7 +14,7 @@ export default async function AdminSubscriptionsPage({
 }: {
   searchParams: Promise<{ page?: string; status?: string }>;
 }) {
-  const { userId } = await auth();
+  const { userId } = await safeAuth();
   if (!userId) {
     redirect('/sign-in?redirect_url=/admin/membership/subscriptions');
   }

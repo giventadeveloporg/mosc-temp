@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { safeAuth } from '@/lib/safe-auth';
 import { fetchNewsletterEmailTemplateServer } from '../ApiServerActions';
 import NewsletterEmailTemplateEditClient from './NewsletterEmailTemplateEditClient';
 
@@ -6,7 +6,7 @@ export default async function PromotionEmailTemplateEditPage(
   props: { params: Promise<{ id: string }> | { id: string } }
 ) {
   const { params } = props;
-  const { userId } = await auth();
+  const { userId } = await safeAuth();
 
   if (!userId) {
     return <div>You must be logged in to view this page.</div>;

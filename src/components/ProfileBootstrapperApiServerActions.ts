@@ -1,8 +1,11 @@
 "use server";
 import { getCachedApiJwt, generateApiJwt } from '@/lib/api/jwt';
-import { getTenantId } from '@/lib/env';
+import { getTenantId, getApiBaseUrl } from '@/lib/env';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+// Lazy getter - evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 
 export async function bootstrapUserProfile({
   userId,
@@ -28,7 +31,7 @@ export async function bootstrapUserProfile({
     // 1. Try to fetch by userId + tenantId
     // CRITICAL: If profile exists with correct userId, do NOT update anything
     // This prevents overwriting existing firstName, lastName, email fields
-    let res = await fetch(`${API_BASE_URL}/api/user-profiles/by-user/${userId}?tenantId.equals=${tenantId}`, {
+    let res = await fetch(`${getApiBase()}/api/user-profiles/by-user/${userId}?tenantId.equals=${tenantId}`, {
       headers: { Authorization: `Bearer ${token}` },
       cache: 'no-store',
       signal: controller.signal,
@@ -39,7 +42,7 @@ export async function bootstrapUserProfile({
       const newController = new AbortController();
       const newTimeout = setTimeout(() => newController.abort(), 15000);
       token = await generateApiJwt();
-      res = await fetch(`${API_BASE_URL}/api/user-profiles/by-user/${userId}?tenantId.equals=${tenantId}`, {
+      res = await fetch(`${getApiBase()}/api/user-profiles/by-user/${userId}?tenantId.equals=${tenantId}`, {
         headers: { Authorization: `Bearer ${token}` },
         cache: 'no-store',
         signal: newController.signal,
@@ -68,13 +71,13 @@ export async function bootstrapUserProfile({
       const email = userData?.email || "";
       if (email) {
         let emailToken = token;
-        let emailRes = await fetch(`${API_BASE_URL}/api/user-profiles?email.equals=${encodeURIComponent(email)}&tenantId.equals=${tenantId}`, {
+        let emailRes = await fetch(`${getApiBase()}/api/user-profiles?email.equals=${encodeURIComponent(email)}&tenantId.equals=${tenantId}`, {
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${emailToken}` },
           cache: 'no-store',
         });
         if (emailRes.status === 401) {
           emailToken = await generateApiJwt();
-          emailRes = await fetch(`${API_BASE_URL}/api/user-profiles?email.equals=${encodeURIComponent(email)}&tenantId.equals=${tenantId}`, {
+          emailRes = await fetch(`${getApiBase()}/api/user-profiles?email.equals=${encodeURIComponent(email)}&tenantId.equals=${tenantId}`, {
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${emailToken}` },
             cache: 'no-store',
           });
@@ -182,14 +185,14 @@ export async function bootstrapUserProfile({
             }
 
             let updateToken = token;
-            let updateRes = await fetch(`${API_BASE_URL}/api/user-profiles/${userProfile.id}`, {
+            let updateRes = await fetch(`${getApiBase()}/api/user-profiles/${userProfile.id}`, {
               method: 'PATCH', // Use PATCH instead of PUT to avoid overwriting fields
               headers: { 'Content-Type': 'application/merge-patch+json', Authorization: `Bearer ${updateToken}` },
               body: JSON.stringify(updatePayload),
             });
             if (updateRes.status === 401) {
               updateToken = await generateApiJwt();
-              updateRes = await fetch(`${API_BASE_URL}/api/user-profiles/${userProfile.id}`, {
+              updateRes = await fetch(`${getApiBase()}/api/user-profiles/${userProfile.id}`, {
                 method: 'PATCH', // Use PATCH instead of PUT
                 headers: { 'Content-Type': 'application/merge-patch+json', Authorization: `Bearer ${updateToken}` },
                 body: JSON.stringify(updatePayload),
@@ -212,14 +215,14 @@ export async function bootstrapUserProfile({
         updatedAt: now,
       };
       let createToken = token;
-      let createRes = await fetch(`${API_BASE_URL}/api/user-profiles`, {
+      let createRes = await fetch(`${getApiBase()}/api/user-profiles`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${createToken}` },
         body: JSON.stringify(profile),
       });
       if (createRes.status === 401) {
         createToken = await generateApiJwt();
-        createRes = await fetch(`${API_BASE_URL}/api/user-profiles`, {
+        createRes = await fetch(`${getApiBase()}/api/user-profiles`, {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${createToken}` },
           body: JSON.stringify(profile),

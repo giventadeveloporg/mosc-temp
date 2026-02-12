@@ -9,6 +9,7 @@ import DataTable, { Column } from '@/components/ui/DataTable';
 import Modal, { ConfirmModal } from '@/components/ui/Modal';
 import ImageUpload from '@/components/ui/ImageUpload';
 import type { EventSponsorsDTO, EventSponsorsJoinDTO, EventDetailsDTO } from '@/types';
+import { getApiBaseUrl } from '@/lib/env';
 import {
   fetchEventSponsorsServer,
   fetchEventSponsorsJoinServer,
@@ -385,7 +386,7 @@ export default function EventSponsorsPage() {
     console.log('🔍 Testing direct backend call for event ID:', eventId);
     try {
       // Test the specific endpoint
-      const specificUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/event-sponsors-join/event/${eventId}`;
+      const specificUrl = `${getApiBaseUrl()}/api/event-sponsors-join/event/${eventId}`;
       console.log('🔍 Testing specific URL:', specificUrl);
 
       const specificResponse = await fetch(specificUrl, {
@@ -399,7 +400,7 @@ export default function EventSponsorsPage() {
       console.log('🔍 Specific endpoint data:', JSON.stringify(specificData, null, 2));
 
       // Test the generic endpoint with query parameters
-      const genericUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/event-sponsors-join?eventId.equals=${eventId}`;
+      const genericUrl = `${getApiBaseUrl()}/api/event-sponsors-join?eventId.equals=${eventId}`;
       console.log('🔍 Testing generic URL:', genericUrl);
 
       const genericResponse = await fetch(genericUrl, {

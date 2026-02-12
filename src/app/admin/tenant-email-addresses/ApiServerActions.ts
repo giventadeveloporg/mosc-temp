@@ -1,11 +1,14 @@
 "use server";
 
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
-import { getTenantId } from '@/lib/env';
+import { getTenantId, getApiBaseUrl } from '@/lib/env';
 import { withTenantId } from '@/lib/withTenantId';
 import type { TenantEmailAddressDTO } from '@/types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 
 /**
  * Fetch tenant email addresses for the current tenant with pagination.
@@ -20,7 +23,7 @@ export async function fetchTenantEmailAddressesServer(page: number = 0, size: nu
   params.append('page', page.toString());
   params.append('size', size.toString());
 
-  const url = `${API_BASE_URL}/api/tenant-email-addresses?${params.toString()}`;
+  const url = `${getApiBase()}/api/tenant-email-addresses?${params.toString()}`;
   const res = await fetchWithJwtRetry(url, { cache: 'no-store' });
 
   if (!res.ok) {
@@ -41,7 +44,7 @@ export async function fetchTenantEmailAddressesServer(page: number = 0, size: nu
  * Fetch a single tenant email address by ID.
  */
 export async function fetchTenantEmailAddressServer(id: number): Promise<TenantEmailAddressDTO | null> {
-  const url = `${API_BASE_URL}/api/tenant-email-addresses/${id}`;
+  const url = `${getApiBase()}/api/tenant-email-addresses/${id}`;
   const res = await fetchWithJwtRetry(url, { cache: 'no-store' });
 
   if (!res.ok) {
@@ -60,7 +63,7 @@ export async function fetchTenantEmailAddressesCountServer(): Promise<number> {
   const params = new URLSearchParams();
   params.append('tenantId.equals', getTenantId());
 
-  const url = `${API_BASE_URL}/api/tenant-email-addresses/count?${params.toString()}`;
+  const url = `${getApiBase()}/api/tenant-email-addresses/count?${params.toString()}`;
   const res = await fetchWithJwtRetry(url, { cache: 'no-store' });
 
   if (!res.ok) {
@@ -95,7 +98,7 @@ export async function createTenantEmailAddressServer(
 
   const payload = withTenantId(basePayload);
 
-  const url = `${API_BASE_URL}/api/tenant-email-addresses`;
+  const url = `${getApiBase()}/api/tenant-email-addresses`;
   const res = await fetchWithJwtRetry(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -127,7 +130,7 @@ export async function updateTenantEmailAddressServer(
 
   const payload = withTenantId(basePatch as any);
 
-  const url = `${API_BASE_URL}/api/tenant-email-addresses/${id}`;
+  const url = `${getApiBase()}/api/tenant-email-addresses/${id}`;
   const res = await fetchWithJwtRetry(url, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/merge-patch+json' },
@@ -146,7 +149,7 @@ export async function updateTenantEmailAddressServer(
  * Delete a tenant email address by ID.
  */
 export async function deleteTenantEmailAddressServer(id: number): Promise<void> {
-  const url = `${API_BASE_URL}/api/tenant-email-addresses/${id}`;
+  const url = `${getApiBase()}/api/tenant-email-addresses/${id}`;
   const res = await fetchWithJwtRetry(url, { method: 'DELETE' });
 
   if (!res.ok) {

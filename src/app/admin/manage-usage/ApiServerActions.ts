@@ -1,10 +1,13 @@
 // This file was renamed from actions.ts to ApiServerActions.ts as a standard for server-side API calls in this module.
 "use server";
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
-import { getTenantId } from '@/lib/env';
+import { getTenantId, getApiBaseUrl } from '@/lib/env';
 import { UserProfileDTO } from '@/types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 
 async function fetchWithJwt(url: string, options: any = {}) {
   const { getCachedApiJwt, generateApiJwt } = await import('@/lib/api/jwt');
@@ -19,7 +22,7 @@ async function fetchWithJwt(url: string, options: any = {}) {
 }
 
 export async function fetchAllUsersServer(): Promise<UserProfileDTO[]> {
-  const url = `${API_BASE_URL}/api/user-profiles?tenantId.equals=${getTenantId()}`;
+  const url = `${getApiBase()}/api/user-profiles?tenantId.equals=${getTenantId()}`;
   const res = await fetchWithJwt(url, { cache: 'no-store' });
   if (!res.ok) return [];
   return res.json();
@@ -33,7 +36,7 @@ export async function fetchAdminProfileServer(userId: string): Promise<UserProfi
     params.append('userId.equals', userId);
     params.append('tenantId.equals', getTenantId());
     params.append('size', '1');
-    const url = `${API_BASE_URL}/api/user-profiles?${params.toString()}`;
+    const url = `${getApiBase()}/api/user-profiles?${params.toString()}`;
 
     // Use fetchWithJwtRetry which handles retries and timeouts better
     const res = await fetchWithJwtRetry(url, {
@@ -69,7 +72,7 @@ export async function fetchUsersServer({ search, searchField, status, role, page
   params.append('page', String(page - 1));
   params.append('size', String(pageSize));
   params.append('tenantId.equals', getTenantId());
-  const res = await fetchWithJwtRetry(`${API_BASE_URL}/api/user-profiles?${params.toString()}`, {
+  const res = await fetchWithJwtRetry(`${getApiBase()}/api/user-profiles?${params.toString()}`, {
     cache: 'no-store',
   });
   const totalCount = res.headers.get('X-Total-Count');
@@ -78,7 +81,7 @@ export async function fetchUsersServer({ search, searchField, status, role, page
 }
 
 export async function patchUserProfileServer(userId: number, payload: Partial<UserProfileDTO>) {
-  const url = `${API_BASE_URL}/api/user-profiles/${userId}`;
+  const url = `${getApiBase()}/api/user-profiles/${userId}`;
 
   const finalPayload = {
     ...payload,
@@ -104,7 +107,7 @@ export async function patchUserProfileServer(userId: number, payload: Partial<Us
 }
 
 export async function bulkUploadUsersServer(users: any[]) {
-  const res = await fetchWithJwtRetry(`${API_BASE_URL}/api/user-profiles/bulk`, {
+  const res = await fetchWithJwtRetry(`${getApiBase()}/api/user-profiles/bulk`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

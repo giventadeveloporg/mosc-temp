@@ -1,12 +1,15 @@
 "use server";
 
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
-import { getAppUrl } from '@/lib/env';
+import { getAppUrl, getApiBaseUrl } from '@/lib/env';
 import type { ManualPaymentRequestDTO, EventTicketTransactionDTO, EventDetailsDTO } from '@/types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 
-if (!API_BASE_URL) {
+if (!getApiBase()) {
   throw new Error('NEXT_PUBLIC_API_BASE_URL is not configured');
 }
 
