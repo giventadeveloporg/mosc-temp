@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { auth } from '@clerk/nextjs/server';
+import { safeAuth } from '@/lib/safe-auth';
 import { fetchAllMembershipPlansServer } from './ApiServerActions';
 import { AdminMembershipPlansClient } from './AdminMembershipPlansClient';
 import type { MembershipPlanDTO } from '@/types';
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default async function AdminMembershipPlansPage(props: {
   searchParams?: Promise<{ page?: string }> | { page?: string };
 }) {
-  const { userId } = await auth();
+  const { userId } = await safeAuth();
   if (!userId) {
     redirect('/sign-in?redirect_url=/admin/membership/plans');
   }

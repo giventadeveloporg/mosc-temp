@@ -1,6 +1,6 @@
 import { fetchAlbumServer, fetchAlbumMediaServer } from '../../ApiServerActions';
 import { fetchUserProfileServer } from '@/app/admin/events/[id]/media/ApiServerActions';
-import { auth } from '@clerk/nextjs/server';
+import { safeAuth } from '@/lib/safe-auth';
 import AdminNavigation from '@/components/AdminNavigation';
 import AlbumMediaClientPage from './AlbumMediaClientPage';
 import { notFound } from 'next/navigation';
@@ -24,7 +24,7 @@ export default async function AlbumMediaPage({
 
   const { media, totalCount } = await fetchAlbumMediaServer(albumId, 0, 100);
 
-  const { userId } = await auth();
+  const { userId } = await safeAuth();
   let userProfileId = null;
   if (userId) {
     try {

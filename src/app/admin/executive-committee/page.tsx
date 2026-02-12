@@ -1,4 +1,4 @@
-import { auth } from '@clerk/nextjs/server';
+import { safeAuth } from '@/lib/safe-auth';
 import { redirect } from 'next/navigation';
 import ExecutiveCommitteeClient from './ExecutiveCommitteeClient';
 import { fetchExecutiveCommitteeMembers } from './ApiServerActions';
@@ -6,7 +6,7 @@ import AdminNavigation from '@/components/AdminNavigation';
 
 export default async function ExecutiveCommitteePage() {
   // Fix for Next.js 15+: await auth() before using
-  const { userId } = await auth();
+  const { userId } = await safeAuth();
 
   if (!userId) {
     redirect('/sign-in');
