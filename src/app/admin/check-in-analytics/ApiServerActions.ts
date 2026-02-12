@@ -2,8 +2,9 @@
 
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import type { EventTicketTransactionDTO } from '@/types';
+import { getApiBaseUrl } from '@/lib/env';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_BASE_URL = getApiBaseUrl();
 
 if (!API_BASE_URL) {
   throw new Error('NEXT_PUBLIC_API_BASE_URL is not configured');

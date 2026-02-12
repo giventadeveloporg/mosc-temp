@@ -1,7 +1,7 @@
 "use server";
 
 import { auth, currentUser } from '@clerk/nextjs/server';
-import { getAppUrl, getTenantId } from '@/lib/env';
+import { getAppUrl, getTenantId, getApiBaseUrl } from '@/lib/env';
 import { getCachedApiJwt, generateApiJwt } from '@/lib/api/jwt';
 import type { UserProfileDTO } from '@/types';
 import {
@@ -35,7 +35,7 @@ export async function triggerProfileReconciliationServer() {
     console.log('[PROFILE-RECONCILIATION-SERVER] 👤 User authenticated:', userId);
 
     // Get API base URL
-    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    const apiBaseUrl = getApiBaseUrl();
     if (!apiBaseUrl) {
       throw new Error('API base URL not configured');
     }
@@ -253,7 +253,7 @@ export async function resubscribeEmailAction(email: string, token: string): Prom
     console.log('[RESUBSCRIBE-EMAIL-SERVER] 🔑 Token:', token);
 
     // Get API base URL
-    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    const apiBaseUrl = getApiBaseUrl();
     if (!apiBaseUrl) {
       throw new Error('API base URL not configured');
     }
@@ -325,7 +325,7 @@ export async function unsubscribeEmailAction(email: string, token: string): Prom
     console.log('[UNSUBSCRIBE-EMAIL-SERVER] 🔑 Token:', token);
 
     // Get API base URL
-    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    const apiBaseUrl = getApiBaseUrl();
     if (!apiBaseUrl) {
       throw new Error('API base URL not configured');
     }

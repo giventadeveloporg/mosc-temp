@@ -1,9 +1,9 @@
 "use server";
-import { getAppUrl, getTenantId } from '@/lib/env';
+import { getAppUrl, getTenantId, getApiBaseUrl } from '@/lib/env';
 import type { MembershipPlanDTO } from '@/types';
 import { stripe } from '@/lib/stripe';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_BASE_URL = getApiBaseUrl();
 
 /**
  * Fetch all membership plans for admin with pagination support

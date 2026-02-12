@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { getApiJwtUser, getApiJwtPass } from '../env';
+import { getApiJwtUser, getApiJwtPass, getApiBaseUrl } from '../env';
 
 /**
  * Generates a JWT token for API authentication using env credentials.
@@ -10,7 +10,7 @@ export async function generateApiJwt() {
   const userHelper = getApiJwtUser();
   const passHelper = getApiJwtPass();
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const API_BASE_URL = getApiBaseUrl();
 
   // Debug logging to see what we're getting
   console.log('[JWT DEBUG] Helper getApiJwtUser():', userHelper ? 'SET' : 'UNDEFINED');

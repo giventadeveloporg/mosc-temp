@@ -1,6 +1,6 @@
 import { cache } from 'react';
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
-import { getAppUrl } from '@/lib/env';
+import { getAppUrl, getApiBaseUrl } from '@/lib/env';
 import { getDonationMetadata, isTicketedFundraiserEvent } from '@/lib/donation/utils';
 import type { EventDetailsDTO } from '@/types';
 
@@ -28,7 +28,7 @@ const DEFAULT_HERO_IMAGE = '/images/default_placeholder_hero_image.jpeg';
  * Returns hero image and GiveButter widget/campaign IDs from donation_metadata.
  */
 export const getGivebutterCheckoutData = cache(async (eventId: string): Promise<GivebutterCheckoutData> => {
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const API_BASE_URL = getApiBaseUrl();
 
   if (!API_BASE_URL) {
     throw new Error('API_BASE_URL not configured');

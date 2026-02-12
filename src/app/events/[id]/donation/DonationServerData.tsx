@@ -1,5 +1,5 @@
 import { cache } from 'react';
-import { getTenantId } from '@/lib/env';
+import { getTenantId, getApiBaseUrl } from '@/lib/env';
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import { isDonationBasedEvent, getDonationMetadata } from '@/lib/donation/utils';
 import type { EventDetailsDTO } from '@/types';
@@ -20,7 +20,7 @@ const DEFAULT_HERO_IMAGE = '/images/default_placeholder_hero_image.jpeg';
  * Uses fetchWithJwtRetry for backend API calls (cursor rules pattern)
  */
 export const getDonationCheckoutData = cache(async (eventId: string): Promise<DonationCheckoutData> => {
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const API_BASE_URL = getApiBaseUrl();
 
   if (!API_BASE_URL) {
     throw new Error('API_BASE_URL not configured');

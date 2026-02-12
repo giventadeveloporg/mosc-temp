@@ -12,7 +12,7 @@ import MobileDebugConsole from "../components/MobileDebugConsole";
 import { TenantSettingsProvider } from "../components/TenantSettingsProvider";
 import { headers } from "next/headers";
 import { auth, currentUser } from "@clerk/nextjs";
-import { getAppUrl, getTenantId } from "@/lib/env";
+import { getAppUrl, getTenantId, getApiBaseUrl } from "@/lib/env";
 import { fetchWithJwtRetry } from "@/lib/proxyHandler";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -181,7 +181,7 @@ export default async function RootLayout({
                     });
 
                     // Use direct backend call with JWT (not proxy) for PATCH operations
-                    const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+                    const API_BASE_URL = getApiBaseUrl();
 
                     // CRITICAL: Build update payload that ONLY updates userId/clerkUserId
                     // Preserve ALL existing fields - do NOT include fields that might overwrite existing data

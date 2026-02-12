@@ -157,11 +157,25 @@ export function getAuthJwtSecret(): string {
 }
 
 /**
+ * Get the API base URL, prioritizing AMPLIFY_ prefix for AWS Amplify production.
+ * This should be used everywhere instead of reading process.env.NEXT_PUBLIC_API_BASE_URL directly.
+ */
+export function getApiBaseUrl(): string {
+  const url =
+    process.env.AMPLIFY_NEXT_PUBLIC_API_BASE_URL ||
+    process.env.NEXT_PUBLIC_API_BASE_URL;
+  if (!url) {
+    console.error('[getApiBaseUrl] CRITICAL: API base URL not set. Check AMPLIFY_NEXT_PUBLIC_API_BASE_URL or NEXT_PUBLIC_API_BASE_URL.');
+  }
+  return url || '';
+}
+
+/**
  * Get Backend API Base URL for OAuth and API calls
  * Returns the backend server URL (e.g., "http://localhost:8080" or "https://api.yourdomain.com")
  */
 export function getBackendApiUrl(): string {
-  return process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
+  return getApiBaseUrl() || 'http://localhost:8080';
 }
 
 /**

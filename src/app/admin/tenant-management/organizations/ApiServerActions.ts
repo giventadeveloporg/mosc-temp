@@ -1,6 +1,7 @@
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import { withTenantId } from '@/lib/withTenantId';
 import type {
+import { getApiBaseUrl } from '@/lib/env';
   TenantOrganizationDTO,
   TenantOrganizationFormDTO,
   TenantOrganizationFilters,
@@ -8,7 +9,7 @@ import type {
   PaginatedResponse
 } from '@/app/admin/tenant-management/types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_BASE_URL = getApiBaseUrl();
 
 /**
  * Fetch paginated list of tenant organizations

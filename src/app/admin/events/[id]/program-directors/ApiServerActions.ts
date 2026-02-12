@@ -1,9 +1,9 @@
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
-import { getAppUrl, getTenantId } from '@/lib/env';
+import { getAppUrl, getTenantId, getApiBaseUrl } from '@/lib/env';
 import { withTenantId } from '@/lib/withTenantId';
 import type { EventProgramDirectorsDTO, EventMediaDTO } from '@/types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_BASE_URL = getApiBaseUrl();
 const baseUrl = getAppUrl();
 
 export async function fetchEventProgramDirectorsServer(eventId: number) {
@@ -356,7 +356,7 @@ export async function updateMediaPriorityRankingServer(
   const existingMedia = await fetchEventMediaServer(mediaId, tenantId);
 
   // Use fetchWithJwtRetry for authenticated backend call
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const API_BASE_URL = getApiBaseUrl();
   if (!API_BASE_URL) {
     throw new Error('API base URL not configured');
   }
@@ -401,7 +401,7 @@ export async function fetchEventMediaServer(
   mediaId: number,
   tenantId?: string
 ): Promise<EventMediaDTO> {
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const API_BASE_URL = getApiBaseUrl();
   if (!API_BASE_URL) {
     throw new Error('API base URL not configured');
   }
@@ -426,7 +426,7 @@ export async function deleteEventMediaServer(
   mediaId: number,
   tenantId?: string
 ): Promise<boolean> {
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const API_BASE_URL = getApiBaseUrl();
   if (!API_BASE_URL) {
     throw new Error('API base URL not configured');
   }

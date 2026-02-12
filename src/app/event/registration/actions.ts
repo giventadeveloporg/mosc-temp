@@ -2,10 +2,10 @@
 
 import { getCachedApiJwt, generateApiJwt } from '@/lib/api/jwt';
 import { withTenantId } from '@/lib/withTenantId';
-import { getTenantId } from '@/lib/env';
+import { getTenantId, getApiBaseUrl } from '@/lib/env';
 import type { EventAttendeeDTO, EventAttendeeGuestDTO, UserProfileDTO } from '@/types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_BASE_URL = getApiBaseUrl();
 
 async function fetchWithJwtRetry(apiUrl: string, options: any = {}, debugLabel = '') {
   let token = await getCachedApiJwt();
