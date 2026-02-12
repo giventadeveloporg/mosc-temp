@@ -1,12 +1,15 @@
 "use server";
 
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
-import { getTenantId } from '@/lib/env';
+import { getTenantId, getApiBaseUrl } from '@/lib/env';
 import type { EventTicketTransactionDTO, EventDetailsDTO, ManualPaymentRequestDTO, ManualPaymentMethodType, ManualPaymentSummaryReportDTO } from '@/types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 
-if (!API_BASE_URL) {
+if (!getApiBase()) {
   throw new Error('NEXT_PUBLIC_API_BASE_URL is not configured');
 }
 
@@ -109,7 +112,7 @@ export async function fetchSalesDataServer(
     params.append('sort', 'purchaseDate,desc');
   }
 
-  const url = `${API_BASE_URL}/api/event-ticket-transactions?${params.toString()}`;
+  const url = `${getApiBase()}/api/event-ticket-transactions?${params.toString()}`;
   const response = await fetchWithJwtRetry(url, { cache: 'no-store' });
 
   if (!response.ok) {
@@ -151,7 +154,7 @@ async function fetchManualPaymentSummaryForAnalytics(
       params.append('snapshotDate.lessThanOrEqual', endDate);
     }
 
-    const summaryUrl = `${API_BASE_URL}/api/manual-payment-summary?${params.toString()}`;
+    const summaryUrl = `${getApiBase()}/api/manual-payment-summary?${params.toString()}`;
     const summaryResponse = await fetchWithJwtRetry(summaryUrl, { cache: 'no-store' });
 
     if (summaryResponse.ok) {
@@ -200,7 +203,7 @@ async function fetchManualPaymentSummaryForAnalytics(
 
     // Fallback: Fetch from manual_payment_request table and aggregate
     console.log(`[Sales Analytics] Summary table empty, falling back to manual_payment_request table`);
-    const manualPaymentsUrl = `${API_BASE_URL}/api/manual-payments?eventId.equals=${eventId}&tenantId.equals=${tenantId}&size=1000`;
+    const manualPaymentsUrl = `${getApiBase()}/api/manual-payments?eventId.equals=${eventId}&tenantId.equals=${tenantId}&size=1000`;
     const manualPaymentsResponse = await fetchWithJwtRetry(manualPaymentsUrl, { cache: 'no-store' });
     
     if (!manualPaymentsResponse.ok) {
@@ -275,7 +278,7 @@ export async function calculateSalesMetricsServer(
       stripeParams.append('purchaseDate.lessThanOrEqual', endDate);
     }
 
-    const stripeUrl = `${API_BASE_URL}/api/event-ticket-transactions?${stripeParams.toString()}`;
+    const stripeUrl = `${getApiBase()}/api/event-ticket-transactions?${stripeParams.toString()}`;
     
     // Fetch both in parallel to reduce total time
     const [stripeResponse, manualPaymentSummaryResult] = await Promise.all([
@@ -326,7 +329,7 @@ export async function calculateSalesMetricsServer(
   } else if (fromFallback) {
     // If we used fallback, fetch manual payment requests to build transaction reference mapping
     try {
-      const manualPaymentsUrl = `${API_BASE_URL}/api/manual-payments?eventId.equals=${eventId}&tenantId.equals=${tenantId}&size=1000`;
+      const manualPaymentsUrl = `${getApiBase()}/api/manual-payments?eventId.equals=${eventId}&tenantId.equals=${tenantId}&size=1000`;
       const manualPaymentsResponse = await fetchWithJwtRetry(manualPaymentsUrl, { cache: 'no-store' });
       if (manualPaymentsResponse.ok) {
         const manualPayments: ManualPaymentRequestDTO[] = await manualPaymentsResponse.json();
@@ -793,7 +796,7 @@ export async function calculateSalesMetricsServer(
 export async function fetchEventDetailsForPaymentFlow(eventId: number): Promise<EventDetailsDTO | null> {
   try {
     const tenantId = getTenantId();
-    const url = `${API_BASE_URL}/api/event-details/${eventId}?tenantId.equals=${tenantId}`;
+    const url = `${getApiBase()}/api/event-details/${eventId}?tenantId.equals=${tenantId}`;
     const res = await fetchWithJwtRetry(url, { cache: 'no-store' });
     if (!res.ok) {
       console.error(`Failed to fetch event details for eventId ${eventId}:`, res.status);
@@ -852,7 +855,7 @@ export async function triggerStripeFeesTaxUpdateServer(
     }
 
     // Call backend batch job API endpoint (NOT a proxy endpoint - direct backend call)
-    const url = `${API_BASE_URL}/api/cron/stripe-fees-tax-update`;
+    const url = `${getApiBase()}/api/cron/stripe-fees-tax-update`;
     const response = await fetchWithJwtRetry(url, {
       method: 'POST',
       headers: {

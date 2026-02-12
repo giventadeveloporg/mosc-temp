@@ -1,11 +1,12 @@
-import { auth, currentUser } from '@clerk/nextjs/server';
+import { currentUser } from '@clerk/nextjs/server';
+import { safeAuth } from '@/lib/safe-auth';
 import { fetchAdminProfileServer } from './ApiServerActions';
 import ManageUsageClient from './ManageUsageClient';
 import { bootstrapUserProfile } from '@/components/ProfileBootstrapperApiServerActions';
 
 export default async function ManageUsagePage() {
   // Fix for Next.js 15+: await auth() before using
-  const { userId } = await auth();
+  const { userId } = await safeAuth();
   let adminProfile = null;
   if (userId) {
     // Add timeout wrapper to prevent hanging

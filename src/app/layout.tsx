@@ -1,8 +1,6 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
-// NOTE: Using Clerk SDK for OAuth (works with custom Google credentials)
-// Backend webhook syncs users to multi-tenant system
 import TrpcProvider from "@/lib/trpc/Provider";
 import Script from "next/script";
 import Header from "../components/Header";
@@ -14,6 +12,10 @@ import { headers } from "next/headers";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { getAppUrl, getTenantId } from "@/lib/env";
 import { fetchWithJwtRetry } from "@/lib/proxyHandler";
+
+console.log('[LAYOUT-MODULE] Layout module loaded');
+
+const CLERK_KEY = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ?? process.env.AMPLIFY_NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ?? '';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,15 +30,18 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  console.log('[LAYOUT] Root layout executing');
+  let isTenantAdmin = false;
+  const primaryDomain = process.env.NEXT_PUBLIC_PRIMARY_DOMAIN || process.env.AMPLIFY_NEXT_PUBLIC_PRIMARY_DOMAIN || 'www.event-site-manager.com';
+  const satelliteDomain = process.env.NEXT_PUBLIC_CLERK_DOMAIN || process.env.AMPLIFY_NEXT_PUBLIC_CLERK_DOMAIN || 'www.mosc-temp.com';
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.AMPLIFY_NEXT_PUBLIC_APP_URL || '';
+  let clerkProps: { isSatellite?: boolean; domain?: string; signInUrl?: string; signUpUrl?: string; allowedRedirectOrigins?: string[] } = appUrl ? { allowedRedirectOrigins: [appUrl] } : {};
+
+  try {
   // CRITICAL: Next.js 15+ - await headers() first before any other async or header-dependent code (e.g. auth()).
-  // This must be the first awaited call so the request context is established for Clerk and other consumers.
-  // If you see "Route / used headers() or similar iteration" from Clerk, upgrade to @clerk/nextjs v6+ for Next.js 15 support.
   const headersList = await headers();
   const hostname = headersList.get('host') || '';
   const pathname = headersList.get('x-pathname') || '';
-
-  // Satellite domain configuration for multi-domain support
-  // Primary domain: NEXT_PUBLIC_PRIMARY_DOMAIN; Satellite: NEXT_PUBLIC_CLERK_DOMAIN / NEXT_PUBLIC_APP_URL
 
   // Define public routes that don't require authentication checks
   // These routes can skip auth() calls to avoid Next.js 15+ headers() async errors
@@ -55,6 +60,7 @@ export default async function RootLayout({
     /^\/api\/diagnostic/,
     /^\/api\/logs/,
     /^\/mosc/,
+    /^\/syro/,
     /^\/events/,
     /^\/sponsors/,
     /^\/gallery/,
@@ -72,38 +78,26 @@ export default async function RootLayout({
   // This ensures TestSprite/Playwright tests can run on public pages without headers() errors
   const isPublicRoute = !pathname || publicRoutePatterns.some(pattern => pattern.test(pathname));
 
-  // Get primary domain from environment variable
-  const primaryDomain = process.env.NEXT_PUBLIC_PRIMARY_DOMAIN || 'www.event-site-manager.com';
-
-  // Get satellite domain from environment variable
-  const satelliteDomain = process.env.NEXT_PUBLIC_CLERK_DOMAIN || 'www.mosc-temp.com';
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || '';
-
   // Detect if this is a satellite domain (check if hostname matches satellite domain or APP_URL)
   const isSatellite = hostname.includes('mosc-temp.com') ||
     (satelliteDomain && hostname.includes(satelliteDomain.replace('www.', '')));
 
   // Satellite domains must redirect to primary domain for authentication
-  const clerkProps = isSatellite
+  clerkProps = isSatellite
     ? {
       isSatellite: true,
-      domain: satelliteDomain, // Use env var to match DNS record
+      domain: satelliteDomain,
       signInUrl: `https://${primaryDomain}/sign-in`,
       signUpUrl: `https://${primaryDomain}/sign-up`,
     }
     : {
-      // Primary domain allows redirects from satellites
       allowedRedirectOrigins: appUrl ? [appUrl] : [],
     };
 
   // Determine tenant-scoped admin flag on the server
-  // Run admin check on ALL routes (including public) so the Header shows the Admin menu when a logged-in admin visits any page (e.g. homepage).
-  // Skip only when pathname is empty to avoid edge cases. headers() is already awaited above, so auth() is safe.
-  let isTenantAdmin = false;
-
   // Perform auth + profile lookup whenever we have a pathname so Header gets correct isTenantAdmin on every page.
-  // Skip auth on /mosc/* to avoid Next.js 15+ "headers() should be awaited" when Clerk's auth() runs (isTenantAdmin false on MOSC pages).
-  const skipAuthForRoute = pathname.startsWith('/mosc');
+  // Skip auth on /mosc/* and /syro/* (section routes with their own layout).
+  const skipAuthForRoute = pathname.startsWith('/mosc') || pathname.startsWith('/syro');
   if (pathname && !skipAuthForRoute) {
     try {
       // CRITICAL: Call auth() immediately after awaiting headers() to ensure proper async context
@@ -112,7 +106,7 @@ export default async function RootLayout({
       let currentUserData: any = null;
       try {
         // Call auth() first - it internally uses headers() which we've already awaited
-        const authResult = await auth();
+        const authResult = CLERK_KEY ? await auth() : null;
         userId = authResult?.userId || null;
         console.log('[Layout] 🔍 Auth check result:', { userId, hasUserId: !!userId });
 
@@ -120,7 +114,7 @@ export default async function RootLayout({
         // This ensures headers() async context is properly maintained
         if (userId) {
           try {
-            currentUserData = await currentUser();
+            currentUserData = CLERK_KEY ? await currentUser() : null;
           } catch (currentUserError: any) {
             // Handle currentUser() errors gracefully - it also uses headers() internally
             if (currentUserError?.message?.includes('headers()') || currentUserError?.message?.includes('sync-dynamic-apis')) {
@@ -189,7 +183,10 @@ export default async function RootLayout({
                     });
 
                     // Use direct backend call with JWT (not proxy) for PATCH operations
-                    const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 
                     // CRITICAL: Build update payload that ONLY updates userId/clerkUserId
                     // Preserve ALL existing fields - do NOT include fields that might overwrite existing data
@@ -233,7 +230,7 @@ export default async function RootLayout({
 
                     console.log('[Layout] Sending PATCH request with payload:', JSON.stringify(updatePayload, null, 2));
 
-                    const updateRes = await fetchWithJwtRetry(`${API_BASE_URL}/api/user-profiles/${existingProfile.id}`, {
+                    const updateRes = await fetchWithJwtRetry(`${getApiBase()}/api/user-profiles/${existingProfile.id}`, {
                       method: 'PATCH',
                       headers: { 'Content-Type': 'application/merge-patch+json' },
                       body: JSON.stringify(updatePayload),
@@ -334,12 +331,14 @@ export default async function RootLayout({
   }
 
   console.log('[Layout] 🔍 Final admin status:', { isTenantAdmin, isPublicRoute, pathname });
+  } catch (layoutError: unknown) {
+    const err = layoutError instanceof Error ? layoutError : new Error(String(layoutError));
+    console.error('[LAYOUT-ERROR] Root layout failed:', err.message);
+    console.error('[LAYOUT-ERROR] Stack:', err.stack);
+    isTenantAdmin = false;
+  }
 
-  return (
-    <ClerkProvider
-      publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
-      {...clerkProps}
-    >
+  const layoutContent = (
       <html lang="en" suppressHydrationWarning>
         <head>
           {/* Header Design System Fonts - DM Serif Display + Plus Jakarta Sans */}
@@ -382,6 +381,14 @@ export default async function RootLayout({
           <MobileDebugConsole />
         </body>
       </html>
-    </ClerkProvider>
   );
+
+  if (CLERK_KEY) {
+    return (
+      <ClerkProvider publishableKey={CLERK_KEY} {...clerkProps}>
+        {layoutContent}
+      </ClerkProvider>
+    );
+  }
+  return layoutContent;
 }

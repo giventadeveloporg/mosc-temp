@@ -1,9 +1,12 @@
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
-import { getAppUrl, getTenantId } from '@/lib/env';
+import { getAppUrl, getTenantId, getApiBaseUrl } from '@/lib/env';
 import { withTenantId } from '@/lib/withTenantId';
 import type { EventProgramDirectorsDTO, EventMediaDTO } from '@/types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 const baseUrl = getAppUrl();
 
 export async function fetchEventProgramDirectorsServer(eventId?: number, page: number = 0, size: number = 10) {
@@ -14,7 +17,7 @@ export async function fetchEventProgramDirectorsServer(eventId?: number, page: n
   params.append('page', page.toString());
   params.append('size', size.toString());
 
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-program-directors?${params.toString()}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-program-directors?${params.toString()}`, {
     cache: 'no-store',
   });
 
@@ -41,7 +44,7 @@ export async function fetchEventProgramDirectorsServer(eventId?: number, page: n
 }
 
 export async function fetchEventProgramDirectorServer(id: number) {
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-program-directors/${id}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-program-directors/${id}`, {
     cache: 'no-store',
   });
 
@@ -67,7 +70,7 @@ export async function createEventProgramDirectorServer(director: Omit<EventProgr
     photoUrl: cleanUrlField(director.photoUrl),
   });
 
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-program-directors`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-program-directors`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
@@ -84,7 +87,7 @@ export async function createEventProgramDirectorServer(director: Omit<EventProgr
 export async function updateEventProgramDirectorServer(id: number, director: Partial<EventProgramDirectorsDTO>) {
   const payload = withTenantId({ ...director, id });
 
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-program-directors/${id}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-program-directors/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/merge-patch+json' },
     body: JSON.stringify(payload),
@@ -99,7 +102,7 @@ export async function updateEventProgramDirectorServer(id: number, director: Par
 }
 
 export async function deleteEventProgramDirectorServer(id: number) {
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-program-directors/${id}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-program-directors/${id}`, {
     method: 'DELETE',
   });
 
@@ -222,8 +225,11 @@ export async function updateEventMediaServer(
   updates: Partial<EventMediaDTO>,
   tenantId?: string
 ): Promise<EventMediaDTO> {
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-  if (!API_BASE_URL) {
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
+  if (!getApiBase()) {
     throw new Error('API base URL not configured');
   }
 

@@ -4,7 +4,7 @@ import SpiritualOrganizationsSidebar from '../SpiritualOrganizationsSidebar';
 
 export const metadata = {
   title: 'Mission Board and Mission Society | MOSC',
-  description: 'Mission Board and Mission Society fulfils the Church\'s mission in India. President H. G. Dr. Gabriel Mar Gregorios Metropolitan. Secretary, St. Pauls Mission Centre, Mavelikara.',
+  description: `Mission Board and Mission Society fulfils the Church's mission in India. President H. G. Dr. Gabriel Mar Gregorios Metropolitan. Secretary, St. Pauls Mission Centre, Mavelikara.`,
 };
 
 const MissionBoardPage = () => {

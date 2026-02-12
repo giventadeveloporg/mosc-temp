@@ -1,5 +1,5 @@
 import { notFound, redirect } from 'next/navigation';
-import { auth } from '@clerk/nextjs/server';
+import { safeAuth } from '@/lib/safe-auth';
 import { fetchEventSponsorServer, fetchSponsorMediaServer } from '../ApiServerActions';
 import SponsorEditClient from './SponsorEditClient';
 
@@ -9,7 +9,7 @@ interface SponsorEditPageProps {
 }
 
 export default async function SponsorEditPage({ params, searchParams }: SponsorEditPageProps) {
-  const { userId } = await auth();
+  const { userId } = await safeAuth();
   if (!userId) {
     redirect('/sign-in');
   }

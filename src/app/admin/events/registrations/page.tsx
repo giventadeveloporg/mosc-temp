@@ -35,7 +35,7 @@ function LoadingSkeleton() {
 }
 
 export default async function RegistrationManagementPage({ searchParams }: RegistrationPageProps) {
-  const { userId } = await auth();
+  const { userId } = await safeAuth();
 
   if (!userId) {
     notFound();

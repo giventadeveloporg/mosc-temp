@@ -6,8 +6,12 @@ import { useAuth } from "@clerk/nextjs";
 import { flushSync } from "react-dom";
 import { UserProfileDTO } from "@/types";
 import { getTenantId } from '@/lib/env';
-import { resubscribeEmailAction, unsubscribeEmailAction } from '@/app/profile/actions';
-import { generateEmailSubscriptionTokenServer, fetchUserProfileByEmailServer } from '@/app/profile/ApiServerActions';
+import {
+  resubscribeEmailAction,
+  unsubscribeEmailAction,
+  fetchUserProfileByEmailAction,
+  generateEmailSubscriptionTokenAction,
+} from '@/app/profile/actions';
 
 type UserProfileFormData = Omit<UserProfileDTO, 'createdAt' | 'updatedAt' | 'id'> & { id?: number };
 const defaultFormData: UserProfileFormData = {
@@ -388,7 +392,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
       if (!token || !profileId) {
         console.log('[ProfileForm] No email subscription token or profile ID found, fetching profile by email...');
 
-        const profile = await fetchUserProfileByEmailServer(email);
+        const profile = await fetchUserProfileByEmailAction(email);
         if (!profile) {
           setResubscribeError('User profile not found. Please make sure you have completed your profile setup first.');
           return;
@@ -412,7 +416,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
       if (!token) {
         console.log('[ProfileForm] No email subscription token found in profile, generating new one...');
 
-        const tokenResult = await generateEmailSubscriptionTokenServer(profileId);
+        const tokenResult = await generateEmailSubscriptionTokenAction(profileId);
         if (!tokenResult.success) {
           setResubscribeError(`Failed to generate email subscription token: ${tokenResult.error}`);
           return;

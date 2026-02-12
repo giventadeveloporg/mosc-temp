@@ -1,16 +1,19 @@
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
-import { getAppUrl, getTenantId } from '@/lib/env';
+import { getAppUrl, getTenantId, getApiBaseUrl } from '@/lib/env';
 import { withTenantId } from '@/lib/withTenantId';
 import type { EventFeaturedPerformersDTO, EventMediaDTO } from '@/types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
+function getApiBase() {
+  return getApiBaseUrl();
+}
 const baseUrl = getAppUrl();
 
 export async function fetchEventFeaturedPerformersServer(eventId: number) {
   const params = new URLSearchParams();
   params.append('eventId.equals', eventId.toString());
 
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-featured-performers?${params.toString()}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-featured-performers?${params.toString()}`, {
     cache: 'no-store',
   });
 
@@ -22,7 +25,7 @@ export async function fetchEventFeaturedPerformersServer(eventId: number) {
 }
 
 export async function fetchEventFeaturedPerformerServer(id: number) {
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-featured-performers/${id}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-featured-performers/${id}`, {
     cache: 'no-store',
   });
 
@@ -60,7 +63,7 @@ export async function createEventFeaturedPerformerServer(performer: Omit<EventFe
     galleryImageUrls: cleanUrlField(performer.galleryImageUrls),
   });
 
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-featured-performers`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-featured-performers`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
@@ -96,7 +99,7 @@ export async function updateEventFeaturedPerformerServer(id: number, performer: 
     galleryImageUrls: performer.galleryImageUrls ? cleanUrlField(performer.galleryImageUrls) : undefined,
   });
 
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-featured-performers/${id}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-featured-performers/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/merge-patch+json' },
     body: JSON.stringify(payload),
@@ -116,7 +119,7 @@ export async function updateEventFeaturedPerformerServer(id: number, performer: 
  */
 export async function associatePerformerWithEventServer(performerId: number, eventId: number) {
   const response = await fetchWithJwtRetry(
-    `${API_BASE_URL}/api/event-featured-performers/${performerId}/associate/${eventId}`,
+    `${getApiBase()}/api/event-featured-performers/${performerId}/associate/${eventId}`,
     {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -137,7 +140,7 @@ export async function associatePerformerWithEventServer(performerId: number, eve
  */
 export async function disassociatePerformerFromEventServer(performerId: number) {
   const response = await fetchWithJwtRetry(
-    `${API_BASE_URL}/api/event-featured-performers/${performerId}/disassociate`,
+    `${getApiBase()}/api/event-featured-performers/${performerId}/disassociate`,
     {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -154,7 +157,7 @@ export async function disassociatePerformerFromEventServer(performerId: number) 
 }
 
 export async function deleteEventFeaturedPerformerServer(id: number) {
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-featured-performers/${id}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-featured-performers/${id}`, {
     method: 'DELETE',
   });
 
@@ -182,7 +185,7 @@ export async function fetchAvailablePerformersServer(eventId: number, page = 0, 
     try {
       // Fetch all performers for the tenant (no eventId filter)
       const params = new URLSearchParams();
-      const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-featured-performers?${params.toString()}`, {
+      const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-featured-performers?${params.toString()}`, {
         cache: 'no-store',
       });
 
@@ -347,7 +350,7 @@ export async function updateMediaPriorityRankingServer(
   mediaId: number,
   priorityRanking: number
 ): Promise<EventMediaDTO> {
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-medias/${mediaId}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-medias/${mediaId}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/merge-patch+json' },
     body: JSON.stringify({ priorityRanking }),
@@ -366,7 +369,7 @@ export async function updateMediaPriorityRankingServer(
  * Delete event media
  */
 export async function deleteEventMediaServer(mediaId: number): Promise<void> {
-  const response = await fetchWithJwtRetry(`${API_BASE_URL}/api/event-medias/${mediaId}`, {
+  const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-medias/${mediaId}`, {
     method: 'DELETE',
     cache: 'no-store',
   });
