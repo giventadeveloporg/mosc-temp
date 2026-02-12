@@ -194,7 +194,6 @@ export default function InstitutionsPage() {
 
           <QuickLinks />
         </div>
-        </div>
       </section>
     </div>
   );
