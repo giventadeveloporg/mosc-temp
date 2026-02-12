@@ -115,7 +115,11 @@ body:has(.syro-layout) {
   visibility: visible !important;
 }
 #syro-header-bar .main-menu .nav-link,
-#syro-header-bar .main-menu .dropdown-item,
+#syro-header-bar .main-menu .dropdown-item {
+  color: #0b2848;
+  text-decoration: none;
+  font-size: 0.75rem;
+}
 #syro-header-bar .main-menu .btn-link {
   color: #0b2848;
   text-decoration: none;
@@ -146,7 +150,7 @@ body:has(.syro-layout) {
   overflow-x: auto;
 }
 .syro-quicklinks-inner {
-  font-size: 0.875rem;
+  font-size: calc(0.875rem * 0.75);
   column-gap: 0.5rem;
   row-gap: 0;
   white-space: nowrap;
@@ -190,7 +194,7 @@ body:has(.syro-layout) {
 }
 .syro-quicklinks-bullet {
   color: rgba(0, 0, 0, 0.35);
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * 0.75);
   user-select: none;
 }
 
