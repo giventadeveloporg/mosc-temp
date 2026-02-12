@@ -11,7 +11,7 @@ import ConditionalLayout from "../components/ConditionalLayout";
 import MobileDebugConsole from "../components/MobileDebugConsole";
 import { TenantSettingsProvider } from "../components/TenantSettingsProvider";
 import { headers } from "next/headers";
-import { auth, currentUser } from "@clerk/nextjs";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { getAppUrl, getTenantId } from "@/lib/env";
 import { fetchWithJwtRetry } from "@/lib/proxyHandler";
 

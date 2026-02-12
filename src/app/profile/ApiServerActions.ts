@@ -1,3 +1,5 @@
+'use server';
+
 import { auth } from '@clerk/nextjs/server';
 import { UserProfileDTO } from '@/types';
 import { getTenantId, getAppUrl } from '@/lib/env';

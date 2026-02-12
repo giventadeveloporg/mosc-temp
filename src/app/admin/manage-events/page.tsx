@@ -157,7 +157,7 @@ export default function ManageEventsPage() {
       loadAll(page, isInitialLoad);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, searchTitle, searchId, searchCaption, searchField, searchStartDate, searchEndDate, searchAdmissionType, sort, showPastEvents]);
+  }, [userId, page, searchTitle, searchId, searchCaption, searchField, searchStartDate, searchEndDate, searchAdmissionType, sort, showPastEvents]);
 
   async function handleDeleteClick(event: EventDetailsDTO, mode: 'soft' | 'hard' = 'soft') {
     setEventToDelete(event);
