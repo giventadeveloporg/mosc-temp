@@ -10,7 +10,7 @@ import MobileDebugConsole from "../components/MobileDebugConsole";
 import { TenantSettingsProvider } from "../components/TenantSettingsProvider";
 import { headers } from "next/headers";
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { getAppUrl, getTenantId, getApiBaseUrl } from "@/lib/env";
+import { getAppUrl, getTenantId } from "@/lib/env";
 import { fetchWithJwtRetry } from "@/lib/proxyHandler";
 
 console.log('[LAYOUT-MODULE] Layout module loaded');

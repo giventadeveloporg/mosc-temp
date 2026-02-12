@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import { safeAuth } from '@/lib/safe-auth';
+import { auth } from '@clerk/nextjs/server';
 import Link from 'next/link';
 import {
   FaChartLine,
