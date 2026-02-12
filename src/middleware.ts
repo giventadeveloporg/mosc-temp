@@ -18,9 +18,8 @@ export default function middleware(req: NextRequest) {
   return NextResponse.next({ request: { headers: requestHeaders } });
 }
 
+// TEMPORARILY disabled matcher to test if middleware causes 500 on Amplify
+// If the app works with empty matcher, the issue is in middleware Edge Runtime
 export const config = {
-  matcher: [
-    '/((?!_next|[^?]*\\.[\\w]+$).*)',
-    '/(api|trpc)(.*)',
-  ],
+  matcher: [],
 };
