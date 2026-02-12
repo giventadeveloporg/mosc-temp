@@ -1,8 +1,6 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
-// NOTE: Using Clerk SDK for OAuth (works with custom Google credentials)
-// Backend webhook syncs users to multi-tenant system
 import TrpcProvider from "@/lib/trpc/Provider";
 import Script from "next/script";
 import Header from "../components/Header";
@@ -11,9 +9,13 @@ import ConditionalLayout from "../components/ConditionalLayout";
 import MobileDebugConsole from "../components/MobileDebugConsole";
 import { TenantSettingsProvider } from "../components/TenantSettingsProvider";
 import { headers } from "next/headers";
-import { auth, currentUser } from "@clerk/nextjs";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { getAppUrl, getTenantId, getApiBaseUrl } from "@/lib/env";
 import { fetchWithJwtRetry } from "@/lib/proxyHandler";
+
+console.log('[LAYOUT-MODULE] Layout module loaded');
+
+const CLERK_KEY = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ?? process.env.AMPLIFY_NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ?? '';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -104,7 +106,7 @@ export default async function RootLayout({
       let currentUserData: any = null;
       try {
         // Call auth() first - it internally uses headers() which we've already awaited
-        const authResult = await auth();
+        const authResult = CLERK_KEY ? await auth() : null;
         userId = authResult?.userId || null;
         console.log('[Layout] 🔍 Auth check result:', { userId, hasUserId: !!userId });
 
@@ -112,7 +114,7 @@ export default async function RootLayout({
         // This ensures headers() async context is properly maintained
         if (userId) {
           try {
-            currentUserData = await currentUser();
+            currentUserData = CLERK_KEY ? await currentUser() : null;
           } catch (currentUserError: any) {
             // Handle currentUser() errors gracefully - it also uses headers() internally
             if (currentUserError?.message?.includes('headers()') || currentUserError?.message?.includes('sync-dynamic-apis')) {
@@ -333,12 +335,7 @@ export default async function RootLayout({
     isTenantAdmin = false;
   }
 
-  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ?? process.env.AMPLIFY_NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ?? '';
-  return (
-    <ClerkProvider
-      publishableKey={publishableKey}
-      {...clerkProps}
-    >
+  const layoutContent = (
       <html lang="en" suppressHydrationWarning>
         <head>
           {/* Header Design System Fonts - DM Serif Display + Plus Jakarta Sans */}
@@ -381,6 +378,14 @@ export default async function RootLayout({
           <MobileDebugConsole />
         </body>
       </html>
-    </ClerkProvider>
   );
+
+  if (CLERK_KEY) {
+    return (
+      <ClerkProvider publishableKey={CLERK_KEY} {...clerkProps}>
+        {layoutContent}
+      </ClerkProvider>
+    );
+  }
+  return layoutContent;
 }
