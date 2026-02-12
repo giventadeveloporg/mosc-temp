@@ -31,18 +31,7 @@ const nextConfig = {
     unoptimized: true,
   },
 
-  // Configure environment variables
-  serverRuntimeConfig: {
-    // Will only be available on the server side
-    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY || process.env.AMPLIFY_STRIPE_SECRET_KEY,
-    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET || process.env.AMPLIFY_STRIPE_WEBHOOK_SECRET,
-  },
-
-  publicRuntimeConfig: {
-    // Will be available on both server and client
-    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || process.env.AMPLIFY_NEXT_PUBLIC_APP_URL,
-    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || process.env.AMPLIFY_NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
-  },
+  // Runtime config removed (deprecated in Next 16). Use process.env / AMPLIFY_ prefix in Amplify.
 
   // Enable SWC minification for improved performance
   // swcMinify: true,
