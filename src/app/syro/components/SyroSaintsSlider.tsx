@@ -5,10 +5,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 const SAINTS = [
-  { name: 'St.Mary Mother of God', image: '/syro/assets/images/mosc_images/St_Mother_Mary.jpg', href: '/syro/saints' },
-  { name: 'St. Baselios Yeldho', image: '/syro/assets/images/mosc_images/St_Baselios_Yeldho.jpg', href: '/syro/saints' },
-  { name: 'St. Geevarghese', image: '/syro/assets/images/mosc_images/St_Geevarghese.jpg', href: '/syro/saints' },
-  { name: 'St. Gregorios Of Parumala', image: '/syro/assets/images/mosc_images/St_Gregorios_Parumala.jpg', href: '/syro/saints' },
+  { name: 'St.Mary Mother of God', image: '/syro/assets/images/mosc_images/St_Mother_Mary.jpg', href: '/syro/saints/st-mary-mother-of-god' },
+  { name: 'St. Baselios Yeldho', image: '/syro/assets/images/mosc_images/St_Baselios_Yeldho.jpg', href: '/syro/saints/st-baselios-yeldho-kothamangalam-bava' },
+  { name: 'St. Geevarghese', image: '/syro/assets/images/mosc_images/St_Geevarghese.jpg', href: '/syro/saints/st-geevarghese-mar-dionysius-vattasseril' },
+  { name: 'St. Gregorios Of Parumala', image: '/syro/assets/images/mosc_images/St_Gregorios_Parumala.jpg', href: '/syro/saints/st-gregorios-of-parumala-metropolitan-geevarghese-mar-gregorios' },
 ] as const;
 
 /** Duplicated for seamless infinite loop */

@@ -112,7 +112,7 @@ const TheChurchPage = () => {
             {churchSections.map((item) => (
               <Link
                 key={item.title}
-                href={item.href}
+                href={`${item.href}?from=the-church`}
                 className="bg-syro-bg-gray rounded-lg shadow-syro-card p-4 hover:shadow-syro-card-hover transition-all duration-300 group flex flex-col h-full"
               >
                 {/* Image container - centered, contained, no overflow (image_containment_prevention) */}

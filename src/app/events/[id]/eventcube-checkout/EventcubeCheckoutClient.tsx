@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { EventcubeCheckoutData } from './EventcubeCheckoutServerData';
@@ -14,15 +14,18 @@ const IFRAME_RESIZER_SRC = 'https://d20c5uea2cqk8c.cloudfront.net/_shared/iframe
 
 /**
  * Event Cube embed checkout – hero at top, embedded Event Cube iframe below.
- * Loads Event Cube iframe resizer script and injects iframe with eventcubeEmbedUrl.
+ * When eventcubeOrderUrl is set, shows a "Load checkout in this page" button so users can
+ * load the order/checkout step in the same iframe (workaround when Event Cube opens order in a new tab).
  */
 export default function EventcubeCheckoutClient({ initialData, eventId }: EventcubeCheckoutClientProps) {
-  const { event, heroImageUrl, eventcubeEmbedUrl } = initialData;
+  const { event, heroImageUrl, eventcubeEmbedUrl, eventcubeOrderUrl } = initialData;
   const containerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [iframeSrc, setIframeSrc] = useState<string>(eventcubeEmbedUrl);
+  const [showOrderInEmbed, setShowOrderInEmbed] = useState(false);
 
   useEffect(() => {
-    if (!eventcubeEmbedUrl || !containerRef.current) return;
+    if (!iframeSrc || !containerRef.current) return;
 
     const iframeId = `ecEmbedIframe_${eventId}`;
 
@@ -54,7 +57,14 @@ export default function EventcubeCheckoutClient({ initialData, eventId }: Eventc
     };
 
     loadScript();
-  }, [eventId, eventcubeEmbedUrl]);
+  }, [eventId, iframeSrc]);
+
+  const loadCheckoutInPage = () => {
+    if (eventcubeOrderUrl?.trim()) {
+      setIframeSrc(eventcubeOrderUrl.trim());
+      setShowOrderInEmbed(true);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -85,11 +95,37 @@ export default function EventcubeCheckoutClient({ initialData, eventId }: Eventc
       {/* Event Cube embed */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
         <div className="bg-card rounded-2xl sacred-shadow p-6 sm:p-8 lg:p-10">
+          {eventcubeOrderUrl && (
+            <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex flex-wrap items-center gap-3">
+              {!showOrderInEmbed ? (
+                <>
+                  <p className="text-sm text-amber-800">
+                    If Event Cube opened the order page in a new tab, click below to load checkout here instead.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={loadCheckoutInPage}
+                    className="px-4 py-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-800 font-semibold border border-amber-300 transition-colors"
+                  >
+                    Load checkout in this page
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => { setIframeSrc(eventcubeEmbedUrl); setShowOrderInEmbed(false); }}
+                  className="px-4 py-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-800 font-semibold border border-amber-300 transition-colors"
+                >
+                  ← Back to event / change tickets
+                </button>
+              )}
+            </div>
+          )}
           <div ref={containerRef} id={`ecEmbed_${eventId}`} className="min-h-[200px]">
             <iframe
               ref={iframeRef}
               id={`ecEmbedIframe_${eventId}`}
-              src={eventcubeEmbedUrl}
+              src={iframeSrc}
               title="Event Cube – Buy tickets"
               frameBorder={0}
               style={{

@@ -14,6 +14,10 @@ export interface Parish {
   state: string | null;
   postalCode: string | null;
   country: string | null;
+  /** Resolved image URL when parish has image media (populate image). */
+  imageUrl: string | null;
+  /** Alt text for parish image. */
+  imageAlt: string | null;
 }
 
 export interface StrapiPagination {

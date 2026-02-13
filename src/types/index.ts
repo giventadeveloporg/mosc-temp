@@ -123,8 +123,10 @@ export interface EventDetailsDTO {
   metadata?: string;
   /** Donation metadata - For fundraiser/charity configuration (JSON string) */
   donationMetadata?: string;
-  /** Event Cube embed URL - iframe src for Event Cube ticketing (when admission is TICKETED) */
+  /** Event Cube embed URL - iframe src for event page (when admission is TICKETED) */
   eventcubeEmbedUrl?: string;
+  /** Event Cube order/checkout URL - when set, can be loaded in same iframe so checkout stays embedded (workaround when event page opens order in new tab) */
+  eventcubeOrderUrl?: string;
   /** Event recurrence metadata - For recurrence configuration (JSON string) */
   eventRecurrenceMetadata?: string;
   /** Is recurring event */

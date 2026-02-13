@@ -22,9 +22,9 @@ async function authenticatePage(page, baseUrl, credentials) {
   try {
     console.log(`   🔐 Authenticating as ${credentials.email}...`);
 
-    // Navigate to sign-in page
+    // Navigate to sign-in page (domcontentloaded: Clerk sign-in often never reaches networkidle)
     await page.goto(`${baseUrl}/sign-in`, {
-      waitUntil: 'networkidle',
+      waitUntil: 'domcontentloaded',
       timeout: 45000
     });
 
@@ -306,7 +306,7 @@ async function authenticatePage(page, baseUrl, credentials) {
     // Click submit (only if we didn't use Enter key)
     if (submitButton && submitButton !== 'found-by-text') {
       // Wait for any network activity after clicking
-      const navigationPromise = page.waitForNavigation({ waitUntil: 'networkidle', timeout: 30000 }).catch(() => null);
+      const navigationPromise = page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 30000 }).catch(() => null);
       await page.click(submitButton);
       console.log('   ✅ Submit button clicked');
 

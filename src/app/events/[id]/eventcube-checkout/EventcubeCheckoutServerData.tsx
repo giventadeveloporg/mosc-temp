@@ -17,6 +17,8 @@ export interface EventcubeCheckoutData {
   event: EventDetailsDTO;
   heroImageUrl: string;
   eventcubeEmbedUrl: string;
+  /** Optional order/checkout URL – when set, user can load it in same iframe to keep checkout embedded */
+  eventcubeOrderUrl?: string;
 }
 
 const DEFAULT_HERO_IMAGE = '/images/default_placeholder_hero_image.jpeg';
@@ -57,6 +59,7 @@ function getApiBase() {
     if (!embedUrl) {
       throw new Error('Event Cube is not configured for this event. Please set the Event Cube embed URL.');
     }
+    const orderUrl = event.eventcubeOrderUrl?.trim() || undefined;
 
     // Resolve hero image (same priority as givebutter-checkout)
     let heroImageUrl = DEFAULT_HERO_IMAGE;
@@ -116,6 +119,7 @@ function getApiBase() {
       event,
       heroImageUrl,
       eventcubeEmbedUrl: embedUrl,
+      eventcubeOrderUrl: orderUrl,
     };
   } catch (error) {
     console.error('[EventcubeCheckoutServerData] Error:', error);

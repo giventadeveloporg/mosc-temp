@@ -37,7 +37,7 @@ export default function SyroAboutSection() {
                 </p>
               </div>
 
-              <Link href="/syro/the-church" className="primary-button">
+              <Link href="/syro/the-church/the-malankara-orthodox-syrian-church" className="primary-button">
                 <span>Know More</span>
                 <i className="fa-solid fa-arrow-right-long ms-3" />
               </Link>
