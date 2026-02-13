@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
 import TheChurchSidebar from '../TheChurchSidebar';
 
 export const metadata = {
@@ -10,40 +11,17 @@ export const metadata = {
     'The Orthodox Church of India. The Malankara Orthodox Church is the second largest faction of the ancient church of the St. Thomas Christians in India, tracing its origins to the apostolic mission of St. Thomas.',
 };
 
-const ChurchHistoryPage = () => {
+export default async function ChurchHistoryPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string }>;
+}) {
+  const params = await searchParams;
+  const breadcrumbFrom = params.from === 'the-church' ? 'the-church' : 'home';
+
   return (
     <div className="bg-syro-bg-gray">
-      {/* Hero Section - MOSC styling */}
-      <section className="py-16 bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-syro-red/10 rounded-full flex items-center justify-center mx-auto mb-6 shadow-syro-card-hover border border-syro-table-border">
-              <svg
-                className="w-10 h-10 text-syro-red"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-            </div>
-            <h1 className="font-syro-display font-semibold text-4xl text-syro-blue mb-4">
-              History
-            </h1>
-            <p className="font-syro-primary text-lg text-syro-dark-gray max-w-3xl mx-auto leading-relaxed">
-              The Orthodox Church of India. The Malankara Orthodox Church—hereafter referred to as
-              the Orthodox Church of India or the Indian Orthodox Church—is the second largest
-              faction of the ancient church of the St. Thomas Christians in India.
-            </p>
-          </div>
-        </div>
-      </section>
+      <SyroPageBanner title="History" breadcrumbFrom={breadcrumbFrom} />
 
       {/* Main Content */}
       <section className="py-16 bg-white">
@@ -255,6 +233,4 @@ const ChurchHistoryPage = () => {
       </section>
     </div>
   );
-};
-
-export default ChurchHistoryPage;
+}

@@ -1,32 +1,23 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata = {
   title: 'Church Fathers',
   description: 'The early church fathers and their theological contributions',
 };
 
-const churchfathersPage = () => {
+export default async function ChurchFathersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string }>;
+}) {
+  const params = await searchParams;
+  const breadcrumbFrom = params.from === 'saints' ? 'saints' : 'home';
   return (
     <div className="bg-syro-bg-gray">
-      {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-syro-red rounded-lg flex items-center justify-center mx-auto mb-6 shadow-syro-card-hover">
-              <span className="text-syro-red-foreground text-4xl font-bold" role="img" aria-label="Saint">📚</span>
-            </div>
-            <h1 className="font-syro-display font-semibold text-4xl text-syro-blue mb-4">
-              Church Fathers
-            </h1>
-            <p className="font-syro-primary text-lg text-syro-dark-gray max-w-3xl mx-auto leading-relaxed">
-              The early church fathers and their theological contributions
-            </p>
-          </div>
-        </div>
-      </section>
-
+      <SyroPageBanner title="Church Fathers" breadcrumbFrom={breadcrumbFrom} />
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -91,7 +82,7 @@ The fourth and fifth centuries may be regarded as the greatest centuries as far 
                     </Link>
                   <Link 
                       href="/syro/saints/church-fathers" 
-                      className="block px-3 py-2 bg-syro-red text-syro-red-foreground rounded-md font-syro-primary text-sm transition-all duration-300"
+                      className="block px-3 py-2 bg-syro-red text-white rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
                       Church Fathers
                     </Link>
@@ -197,5 +188,3 @@ The fourth and fifth centuries may be regarded as the greatest centuries as far 
     </div>
   );
 };
-
-export default churchfathersPage;

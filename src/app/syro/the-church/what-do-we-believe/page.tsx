@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
 import TheChurchSidebar from '../TheChurchSidebar';
 
 export const metadata = {
@@ -9,25 +9,17 @@ export const metadata = {
   description: 'What do the Orthodox believe? Our trust is in the One True God—Father, Son and Holy Spirit. The faith of the Malankara Orthodox Syrian Church.',
 };
 
-const WhatDoWeBelievePage = () => {
+export default async function WhatDoWeBelievePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string }>;
+}) {
+  const params = await searchParams;
+  const breadcrumbFrom = params.from === 'the-church' ? 'the-church' : 'home';
+
   return (
     <div className="bg-syro-bg-gray">
-      {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-syro-red rounded-lg flex items-center justify-center mx-auto mb-6 shadow-syro-card-hover">
-              <span className="text-syro-red-foreground text-4xl font-bold" role="img" aria-label="What Do We Believe">📖</span>
-            </div>
-            <h1 className="font-syro-display font-semibold text-4xl text-syro-blue mb-4">
-              What do we believe?
-            </h1>
-            <p className="font-syro-primary text-lg text-syro-dark-gray max-w-3xl mx-auto leading-relaxed">
-              What do the Orthodox believe? In whom do we put our trust?
-            </p>
-          </div>
-        </div>
-      </section>
+      <SyroPageBanner title="What do we believe?" breadcrumbFrom={breadcrumbFrom} />
 
       {/* Main Content */}
       <section className="py-16 bg-white">
@@ -89,4 +81,3 @@ const WhatDoWeBelievePage = () => {
   );
 };
 
-export default WhatDoWeBelievePage;

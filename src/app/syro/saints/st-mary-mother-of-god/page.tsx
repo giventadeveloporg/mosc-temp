@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import SyroPageBanner from '../../components/SyroPageBanner';
 import { SAINTS_SIDEBAR_LINKS } from '../saintsSidebarLinks';
 
 export const metadata = {
@@ -8,28 +9,18 @@ export const metadata = {
   description: 'The Theotokos and her role in salvation history',
 };
 
-const currentSlug = '/mosc/saints/st-mary-mother-of-god';
+const currentSlug = '/syro/saints/st-mary-mother-of-god';
 
-export default function StMaryMotherOfGodPage() {
+export default async function StMaryMotherOfGodPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string }>;
+}) {
+  const params = await searchParams;
+  const breadcrumbFrom = params.from === 'saints' ? 'saints' : 'home';
   return (
     <div className="bg-syro-bg-gray">
-      {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-syro-red rounded-lg flex items-center justify-center mx-auto mb-6 shadow-syro-card-hover">
-              <span className="text-syro-red-foreground text-4xl font-bold" role="img" aria-label="Saint">👸</span>
-            </div>
-            <h1 className="font-syro-display font-semibold text-4xl text-syro-blue mb-4">
-              St. Mary Mother of God
-            </h1>
-            <p className="font-syro-primary text-lg text-syro-dark-gray max-w-3xl mx-auto leading-relaxed">
-              The Theotokos and her role in salvation history
-            </p>
-          </div>
-        </div>
-      </section>
-
+      <SyroPageBanner title="St. Mary Mother of God" breadcrumbFrom={breadcrumbFrom} />
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -108,10 +99,10 @@ export default function StMaryMotherOfGodPage() {
                   {SAINTS_SIDEBAR_LINKS.map((link) => (
                     <Link
                       key={link.href}
-                      href={link.href}
+                      href={link.href === '/syro/saints' ? link.href : `${link.href}?from=saints`}
                       className={`block px-3 py-2 rounded-md font-syro-primary text-sm transition-all duration-300 ${
                         link.href === currentSlug
-                          ? 'bg-syro-red text-syro-red-foreground'
+                          ? 'bg-syro-red text-white'
                           : 'text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray'
                       }`}
                     >

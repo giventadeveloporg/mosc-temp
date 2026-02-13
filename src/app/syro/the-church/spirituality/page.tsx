@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
 import TheChurchSidebar from '../TheChurchSidebar';
 
 export const metadata = {
@@ -10,40 +11,17 @@ export const metadata = {
     'Spirituality may be defined as the life in and with the Holy Spirit—an ascetic and pious struggle through repentance, prayer, fasting, and participation in the sacramental life of the Church.',
 };
 
-const SpiritualityPage = () => {
+export default async function SpiritualityPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string }>;
+}) {
+  const params = await searchParams;
+  const breadcrumbFrom = params.from === 'the-church' ? 'the-church' : 'home';
+
   return (
     <div className="bg-syro-bg-gray">
-      {/* Hero Section - MOSC styling */}
-      <section className="py-16 bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-syro-red/10 rounded-full flex items-center justify-center mx-auto mb-6 shadow-syro-card-hover border border-syro-table-border">
-              <svg
-                className="w-10 h-10 text-syro-red"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                />
-              </svg>
-            </div>
-            <h1 className="font-syro-display font-semibold text-4xl text-syro-blue mb-4">
-              Spirituality
-            </h1>
-            <p className="font-syro-primary text-lg text-syro-dark-gray max-w-3xl mx-auto leading-relaxed">
-              Spirituality may be defined as the life in and with the Holy Spirit. It is an ascetic
-              and pious struggle against sin through repentance, prayer, fasting, and participation
-              in the sacramental life of the Church.
-            </p>
-          </div>
-        </div>
-      </section>
+      <SyroPageBanner title="Spirituality" breadcrumbFrom={breadcrumbFrom} />
 
       {/* Main Content */}
       <section className="py-16 bg-white">
@@ -358,4 +336,3 @@ const SpiritualityPage = () => {
   );
 };
 
-export default SpiritualityPage;

@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
 import TheChurchSidebar from '../TheChurchSidebar';
 
 export const metadata = {
@@ -10,39 +11,17 @@ export const metadata = {
     'The divine and life-giving mystery of the Holy Myron. By the divine power, we speak of the mysteries of the cross and the holy anointing—its origin, meaning, and consecration in the Orthodox tradition.',
 };
 
-const TheHolyMyronPage = () => {
+export default async function TheHolyMyronPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string }>;
+}) {
+  const params = await searchParams;
+  const breadcrumbFrom = params.from === 'the-church' ? 'the-church' : 'home';
+
   return (
     <div className="bg-syro-bg-gray">
-      {/* Hero Section - MOSC styling */}
-      <section className="py-16 bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-syro-red/10 rounded-full flex items-center justify-center mx-auto mb-6 shadow-syro-card-hover border border-syro-table-border">
-              <svg
-                className="w-10 h-10 text-syro-red"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                />
-              </svg>
-            </div>
-            <h1 className="font-syro-display font-semibold text-4xl text-syro-blue mb-4">
-              The Holy Myron
-            </h1>
-            <p className="font-syro-primary text-lg text-syro-dark-gray max-w-3xl mx-auto leading-relaxed">
-              By the divine power, we have spoken at length on the mysteries of the cross. We next
-              write about the divine and life-giving mystery of the Holy Myron.
-            </p>
-          </div>
-        </div>
-      </section>
+      <SyroPageBanner title="The Holy Myron" breadcrumbFrom={breadcrumbFrom} />
 
       {/* Main Content */}
       <section className="py-16 bg-white">
@@ -833,4 +812,3 @@ const TheHolyMyronPage = () => {
   );
 };
 
-export default TheHolyMyronPage;

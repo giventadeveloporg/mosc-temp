@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getParishByDocumentId } from '../getParishesData';
@@ -33,6 +34,22 @@ export default async function ParishDetailPage({ params }: PageProps) {
           {parish.dioceseName && <p className="font-body text-muted-foreground mt-1">{parish.dioceseName}</p>}
         </div>
       </section>
+
+      {parish.imageUrl && (
+        <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-4 mb-8">
+          <div className="relative w-full h-auto min-h-[200px] sm:min-h-[280px] rounded-2xl overflow-hidden bg-muted/40">
+            <Image
+              src={parish.imageUrl}
+              alt={parish.imageAlt ?? parish.name}
+              width={1200}
+              height={400}
+              className="w-full h-auto object-contain sm:object-cover min-h-[200px] sm:min-h-[280px]"
+              style={{ backgroundColor: 'transparent', borderRadius: '1rem' }}
+              priority
+            />
+          </div>
+        </section>
+      )}
 
       <section className="py-12 bg-card">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">

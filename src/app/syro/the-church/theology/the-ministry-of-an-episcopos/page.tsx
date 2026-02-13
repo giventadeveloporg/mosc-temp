@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import QuickLinks from '../../../components/QuickLinks';
+import SyroPageBanner from '../../../components/SyroPageBanner';
 import TheChurchSidebar from '../../TheChurchSidebar';
 
 export const metadata = {
@@ -9,39 +10,17 @@ export const metadata = {
     'The meaning, functions, and role of the bishop (episcopos) in the Malankara Orthodox Church. Orthodox ecclesiology, Eucharistic presidency, and apostolic succession.',
 };
 
-const TheMinistryOfAnEpiscoposPage = () => {
+export default async function TheMinistryOfAnEpiscoposPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string }>;
+}) {
+  const params = await searchParams;
+  const breadcrumbFrom = params.from === 'the-church' ? 'the-church' : 'home';
+
   return (
     <div className="bg-syro-bg-gray">
-      {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-syro-red/10 rounded-full flex items-center justify-center mx-auto mb-6 shadow-syro-card-hover border border-syro-table-border">
-              <svg
-                className="w-10 h-10 text-syro-red"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                />
-              </svg>
-            </div>
-            <h1 className="font-syro-display font-semibold text-4xl text-syro-blue mb-4">
-              The Ministry of an Episcopos
-            </h1>
-            <p className="font-syro-primary text-lg text-syro-dark-gray max-w-3xl mx-auto leading-relaxed">
-              The meaning, functions, and role of the bishop in the Malankara Orthodox Church.
-              Orthodox ecclesiology, Eucharistic presidency, and apostolic succession.
-            </p>
-          </div>
-        </div>
-      </section>
+      <SyroPageBanner title="The Ministry of an Episcopos" breadcrumbFrom={breadcrumbFrom} />
 
       {/* Main Content */}
       <section className="py-16 bg-white">
@@ -273,4 +252,3 @@ const TheMinistryOfAnEpiscoposPage = () => {
   );
 };
 
-export default TheMinistryOfAnEpiscoposPage;

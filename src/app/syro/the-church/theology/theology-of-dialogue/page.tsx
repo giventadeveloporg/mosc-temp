@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import QuickLinks from '../../../components/QuickLinks';
+import SyroPageBanner from '../../../components/SyroPageBanner';
 import TheChurchSidebar from '../../TheChurchSidebar';
 
 export const metadata = {
@@ -9,39 +10,17 @@ export const metadata = {
     'Christian dialogue with people of other faiths. Theological considerations, spirit and attitudes, and lessons from experience. From the Orthodox Tradition.',
 };
 
-const TheologyOfDialoguePage = () => {
+export default async function TheologyOfDialoguePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string }>;
+}) {
+  const params = await searchParams;
+  const breadcrumbFrom = params.from === 'the-church' ? 'the-church' : 'home';
+
   return (
     <div className="bg-syro-bg-gray">
-      {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-syro-red/10 rounded-full flex items-center justify-center mx-auto mb-6 shadow-syro-card-hover border border-syro-table-border">
-              <svg
-                className="w-10 h-10 text-syro-red"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                />
-              </svg>
-            </div>
-            <h1 className="font-syro-display font-semibold text-4xl text-syro-blue mb-4">
-              Theology of Dialogue
-            </h1>
-            <p className="font-syro-primary text-lg text-syro-dark-gray max-w-3xl mx-auto leading-relaxed">
-              Dialogue with world religions. Theological considerations, spirit and attitudes, and
-              lessons from experience—from the Orthodox Tradition.
-            </p>
-          </div>
-        </div>
-      </section>
+      <SyroPageBanner title="Theology of Dialogue" breadcrumbFrom={breadcrumbFrom} />
 
       {/* Main Content */}
       <section className="py-16 bg-white">
@@ -270,4 +249,3 @@ const TheologyOfDialoguePage = () => {
   );
 };
 
-export default TheologyOfDialoguePage;

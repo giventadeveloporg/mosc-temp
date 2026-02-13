@@ -95,11 +95,12 @@ export default function TheChurchSidebar() {
           const linkClass = isActive
             ? 'block px-3 py-2 bg-syro-red text-white rounded-md font-syro-primary text-sm transition-all duration-300'
             : 'block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300';
+          const linkHref = href === '/syro/the-church' ? href : `${href}?from=the-church`;
 
           const isHidden = href === '/syro/the-church/orthodox-faith';
           return (
             <div key={href} className={isHidden ? 'hidden' : undefined}>
-              <Link href={href} className={linkClass}>
+              <Link href={linkHref} className={linkClass}>
                 {item.label}
               </Link>
               {isItemWithChildren(item) && (
@@ -109,11 +110,12 @@ export default function TheChurchSidebar() {
                     const isFullPage = !sub.href.includes('#');
                     const subActive = isFullPage && (pathname === subPath || pathname === subPath.replace(/\/$/, ''));
                     const subClass = subActive
-                      ? 'block py-1.5 px-2 text-syro-red font-syro-primary text-sm transition-all duration-300 rounded-md bg-syro-red/10'
+                      ? 'block py-1.5 px-2 bg-syro-red text-white font-syro-primary text-sm transition-all duration-300 rounded-md'
                       : 'block py-1.5 px-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300';
+                    const subHref = sub.href.includes('#') ? sub.href : `${sub.href}?from=the-church`;
                     return (
                       <li key={sub.href}>
-                        <Link href={sub.href} className={subClass}>
+                        <Link href={subHref} className={subClass}>
                           {sub.label}
                         </Link>
                       </li>

@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import QuickLinks from '../../../components/QuickLinks';
+import SyroPageBanner from '../../../components/SyroPageBanner';
 import TheChurchSidebar from '../../TheChurchSidebar';
 
 export const metadata = {
@@ -9,39 +10,17 @@ export const metadata = {
     'Lent: A stone jar for our renewal and growth. Preparation for the Resurrection, spiritual warfare, and the St. Thomas Christian Lenten heritage in Kerala.',
 };
 
-const LentPage = () => {
+export default async function LentPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string }>;
+}) {
+  const params = await searchParams;
+  const breadcrumbFrom = params.from === 'the-church' ? 'the-church' : 'home';
+
   return (
     <div className="bg-syro-bg-gray">
-      {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-syro-red/10 rounded-full flex items-center justify-center mx-auto mb-6 shadow-syro-card-hover border border-syro-table-border">
-              <svg
-                className="w-10 h-10 text-syro-red"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-            </div>
-            <h1 className="font-syro-display font-semibold text-4xl text-syro-blue mb-4">
-              Lent
-            </h1>
-            <p className="font-syro-primary text-lg text-syro-dark-gray max-w-3xl mx-auto leading-relaxed">
-              Lent: A stone jar for our renewal and growth. Preparation for the feast of feasts—the
-              Resurrection of Christ—and for heavenly joy which is growing and lasting.
-            </p>
-          </div>
-        </div>
-      </section>
+      <SyroPageBanner title="Lent" breadcrumbFrom={breadcrumbFrom} />
 
       {/* Main Content */}
       <section className="py-16 bg-white">
@@ -204,4 +183,3 @@ const LentPage = () => {
   );
 };
 
-export default LentPage;

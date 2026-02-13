@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Metadata } from 'next';
 import { getParishesData } from './getParishesData';
 import type { Parish } from './types';
@@ -38,7 +39,7 @@ export default async function ParishesPage({ searchParams }: PageProps) {
 
   const subtitle = hasSearch
     ? `${pagination.total} paris${pagination.total !== 1 ? 'hes' : 'h'} matching "${searchTerm}".`
-    : `${pagination.total} paris${pagination.total !== 1 ? 'hes' : 'h'}. Data from the directory API.`;
+    : `${pagination.total} paris${pagination.total !== 1 ? 'hes' : 'h'}. Data from the directory Parish API.`;
 
   return (
     <div className="min-h-screen bg-background">
@@ -82,7 +83,7 @@ export default async function ParishesPage({ searchParams }: PageProps) {
 
           {parishes.length === 0 ? (
             <div className="bg-muted/20 rounded-lg p-8 text-center">
-              <p className="font-body text-muted-foreground">No parishes listed yet. Data is loaded from the directory API.</p>
+              <p className="font-body text-muted-foreground">No parishes listed yet. Data is loaded from the directory Parish API.</p>
               <Link href="/syro/directory" className="font-body text-primary font-medium mt-4 inline-block hover:underline">Back to Directory</Link>
             </div>
           ) : (
@@ -114,20 +115,40 @@ export default async function ParishesPage({ searchParams }: PageProps) {
 }
 
 function ParishCard({ parish }: { parish: Parish }) {
+  const locationParts = [parish.addressLine1, parish.city, parish.state].filter(Boolean);
+  const locationLine = locationParts.length ? locationParts.join(', ') : parish.address ?? null;
+
   return (
-    <li className="bg-muted/20 rounded-lg p-6 sacred-shadow-sm border-l-4 border-primary hover:sacred-shadow reverent-transition">
+    <li className="bg-muted/20 rounded-lg overflow-hidden sacred-shadow-sm border-l-4 border-primary hover:sacred-shadow reverent-transition">
       <Link href={`/syro/directory/parishes/${parish.documentId}`} className="block group">
-        <h2 className="font-heading font-semibold text-xl text-foreground group-hover:text-primary reverent-transition">{parish.name}</h2>
-        {parish.dioceseName && <p className="font-body text-sm text-muted-foreground mt-1">{parish.dioceseName}</p>}
-        {(parish.city || parish.state) && (
-          <p className="font-body text-sm text-muted-foreground mt-1">{[parish.city, parish.state].filter(Boolean).join(', ')}</p>
-        )}
-        <span className="inline-flex items-center font-body text-primary text-sm font-medium mt-2">
-          View details
-          <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </span>
+        <div className="flex flex-col sm:flex-row gap-4 p-6">
+          {parish.imageUrl && (
+            <div className="relative w-full sm:w-32 h-40 sm:h-28 flex-shrink-0 rounded-lg overflow-hidden bg-muted/40">
+              <Image
+                src={parish.imageUrl}
+                alt={parish.imageAlt ?? parish.name}
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 100vw, 128px"
+              />
+            </div>
+          )}
+          <div className="min-w-0 flex-1">
+            <h2 className="font-heading font-semibold text-xl text-foreground group-hover:text-primary reverent-transition">{parish.name}</h2>
+            {parish.dioceseName && <p className="font-body text-sm text-muted-foreground mt-1">{parish.dioceseName}</p>}
+            {locationLine && (
+              <p className="font-body text-sm text-muted-foreground mt-1">
+                {locationLine}
+              </p>
+            )}
+            <span className="inline-flex items-center font-body text-primary text-sm font-medium mt-2">
+              View details
+              <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </span>
+          </div>
+        </div>
       </Link>
     </li>
   );

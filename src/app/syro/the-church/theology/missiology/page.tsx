@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import QuickLinks from '../../../components/QuickLinks';
+import SyroPageBanner from '../../../components/SyroPageBanner';
 import TheChurchSidebar from '../../TheChurchSidebar';
 
 export const metadata = {
@@ -9,39 +10,17 @@ export const metadata = {
     'The mission of the Church from an Orthodox perspective. Liturgy after liturgy, paradigm shifts in mission, and developing mission paradigms for the 21st century.',
 };
 
-const MissiologyPage = () => {
+export default async function MissiologyPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string }>;
+}) {
+  const params = await searchParams;
+  const breadcrumbFrom = params.from === 'the-church' ? 'the-church' : 'home';
+
   return (
     <div className="bg-syro-bg-gray">
-      {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-syro-red/10 rounded-full flex items-center justify-center mx-auto mb-6 shadow-syro-card-hover border border-syro-table-border">
-              <svg
-                className="w-10 h-10 text-syro-red"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0h.5a2.5 2.5 0 002.5-2.5V8m0 4a2.5 2.5 0 01-2.5 2.5h-.5a2 2 0 00-2 2 2 2 0 01-4 0h-.5a2.5 2.5 0 01-2.5-2.5m0-6V3.935m0 6V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0h.5a2.5 2.5 0 002.5-2.5M20.945 11h-2.945a2 2 0 00-2 2v1a2 2 0 01-2 2 2 2 0 01-2-2v-2.945"
-                />
-              </svg>
-            </div>
-            <h1 className="font-syro-display font-semibold text-4xl text-syro-blue mb-4">
-              Missiology
-            </h1>
-            <p className="font-syro-primary text-lg text-syro-dark-gray max-w-3xl mx-auto leading-relaxed">
-              The mission of the Church from an Orthodox perspective. Liturgy after liturgy, and
-              developing mission paradigms for the 21st century.
-            </p>
-          </div>
-        </div>
-      </section>
+      <SyroPageBanner title="Missiology" breadcrumbFrom={breadcrumbFrom} />
 
       {/* Main Content */}
       <section className="py-16 bg-white">
@@ -313,4 +292,3 @@ const MissiologyPage = () => {
   );
 };
 
-export default MissiologyPage;

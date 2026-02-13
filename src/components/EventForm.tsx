@@ -73,6 +73,7 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
   // Event Cube ticketing (external embed)
   const [useEventCube, setUseEventCube] = useState(false);
   const [eventcubeEmbedUrl, setEventcubeEmbedUrl] = useState<string>('');
+  const [eventcubeOrderUrl, setEventcubeOrderUrl] = useState<string>('');
 
   // Recurrence configuration state
   const [isRecurring, setIsRecurring] = useState(false);
@@ -140,10 +141,13 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
             console.error('Failed to parse donation metadata', e);
           }
         }
-        // Load Event Cube embed URL
+        // Load Event Cube embed URL and optional order/checkout URL
         if (event.eventcubeEmbedUrl?.trim()) {
           setUseEventCube(true);
           setEventcubeEmbedUrl(event.eventcubeEmbedUrl.trim());
+        }
+        if (event.eventcubeOrderUrl?.trim()) {
+          setEventcubeOrderUrl(event.eventcubeOrderUrl.trim());
         }
 
         // Fallback: Load from old metadata field (backward compatibility)
@@ -845,6 +849,7 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
     setGivebutterCampaignId('');
     setUseEventCube(false);
     setEventcubeEmbedUrl('');
+    setEventcubeOrderUrl('');
     // Reset recurrence configuration
     setIsRecurring(false);
     setRecurrencePattern('');
@@ -1013,6 +1018,7 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
       paymentFlowMode: form.paymentFlowMode || 'STRIPE_ONLY',
       manualPaymentEnabled: !!form.manualPaymentEnabled,
       eventcubeEmbedUrl: useEventCube ? (eventcubeEmbedUrl?.trim() || undefined) : undefined,
+      eventcubeOrderUrl: useEventCube ? (eventcubeOrderUrl?.trim() || undefined) : undefined,
     };
     onSubmit(sanitizedForm);
   }
@@ -1500,7 +1506,7 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
       <div className="border-t border-gray-200 pt-6 mt-6 bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 rounded-xl p-6 border border-amber-200/60 shadow-sm">
         <h3 className="text-lg font-semibold mb-4 text-gray-800">Event Cube ticketing</h3>
         <p className="text-sm text-gray-600 mb-4">
-          Use Event Cube for ticket sales to send buyers to a dedicated embed page. Set Admission type to &quot;Ticketed&quot; and paste the iframe <code className="bg-white px-1 rounded">src</code> URL from your Event Cube embed code.
+          Use Event Cube for ticket sales so the entire flow (event, basket, checkout) stays embedded on the MOSC site. Set Admission type to &quot;Ticketed&quot; and paste the iframe <code className="bg-white px-1 rounded">src</code> URL from your Event Cube embed code (with <code className="bg-white px-1 rounded">?embed=true</code>).
         </p>
         <div className="space-y-4">
           <label className="flex items-center gap-3 cursor-pointer" htmlFor="useEventCube">
@@ -1557,7 +1563,22 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
                 <div className="text-red-500 text-sm mt-1">{errors.eventcubeEmbedUrl}</div>
               )}
               <p className="text-xs text-gray-500 mt-1">
-                Paste the iframe <code className="bg-white px-1 rounded">src</code> URL from the Event Cube embed code (e.g. <code className="bg-white px-1 rounded">https://….eventcube.io/events/93642/event-name/?embed=true</code>).
+                Paste the iframe <code className="bg-white px-1 rounded">src</code> URL from the Event Cube embed code (event page). Example: <code className="bg-white px-1 rounded">https://….eventcube.io/events/93642/event-name/?embed=true</code>
+              </p>
+              <label htmlFor="eventcubeOrderUrl" className="block font-medium mb-1 text-gray-700 mt-4">
+                Event Cube order/checkout URL (optional – keep checkout in embed)
+              </label>
+              <input
+                ref={(el) => { if (el) fieldRefs.current.eventcubeOrderUrl = el; }}
+                type="url"
+                id="eventcubeOrderUrl"
+                value={eventcubeOrderUrl}
+                onChange={(e) => setEventcubeOrderUrl(e.target.value)}
+                placeholder="https://….eventcube.io/order?embed=true"
+                className="w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                If Event Cube opens the order page in a new tab when users click &quot;Buy Tickets&quot;, add the order page URL here (with <code className="bg-white px-1 rounded">?embed=true</code> if supported). Users can then click &quot;Load checkout in this page&quot; on the checkout page to show the order step in the same embed.
               </p>
             </div>
           )}

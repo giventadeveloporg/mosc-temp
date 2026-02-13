@@ -74,7 +74,7 @@ const SaintsPage = () => {
             {SAINTS_CARDS.map((card) => (
               <Link
                 key={card.href}
-                href={card.href}
+                href={`${card.href}?from=saints`}
                 className="bg-syro-bg-gray rounded-lg shadow-syro-card p-0 overflow-hidden hover:shadow-syro-card-hover transition-all duration-300 group flex flex-col"
               >
                 {/* Image area - padded container, object-contain per image_containment_prevention rule */}
