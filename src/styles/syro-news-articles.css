@@ -1,0 +1,121 @@
+/**
+ * Syro News article styles – matches catholicatenews.in (index.html + style.css).
+ * Fonts: Noto Sans Malayalam UI, Open Sans. Colors and sizes from .article-block, .article-details.
+ * Use on /syro/news and /syro/news/[slug] only (scoped under .syro-layout when needed).
+ */
+
+@import url('https://fonts.googleapis.com/earlyaccess/notosansmalayalamui.css');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700;800&display=swap');
+
+/* ---- Catholicatenews palette (from style.css, color-theme.css) ---- */
+:root {
+  --syro-news-body: #555;
+  --syro-news-body-alt: #595959;
+  --syro-news-heading: #000;
+  --syro-news-heading-alt: #111;
+  --syro-news-meta: #979797;
+  --syro-news-link: #d0144e;
+  --syro-news-link-hover: #8d0831;
+  --syro-news-caption: #999;
+}
+
+/* ---- News list: section title (Main News, Featured News, etc.) – red text + red line like catholicatenews ---- */
+.syro-news-section-title {
+  font-family: 'Open Sans', Helvetica, Arial, sans-serif !important;
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em !important;
+  text-transform: uppercase !important;
+  color: var(--syro-news-link) !important;
+  border-bottom: 3px solid var(--syro-news-link) !important;
+  margin: 0 !important;
+}
+
+/* ---- News list: article card title (h3) – match .article-block h3 ---- */
+.syro-news-article-section .syro-article-card-title,
+.syro-article-card-title {
+  font-family: 'Noto Sans Malayalam UI', 'Open Sans', Helvetica, Arial, sans-serif !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  line-height: 22px !important;
+  color: #000 !important;
+  margin: 0 0 5px !important;
+  padding: 0 !important;
+}
+.syro-news-article-section a:hover .syro-article-card-title,
+a:hover .syro-article-card-title {
+  color: var(--syro-news-link) !important;
+}
+
+/* ---- News list: article card description/excerpt – match .article-block p ---- */
+.syro-news-article-section .syro-article-card-desc,
+.syro-article-card-desc {
+  font-family: 'Noto Sans Malayalam UI', 'Open Sans', Helvetica, Arial, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  color: #555 !important;
+  line-height: 20px !important;
+  margin: 0 !important;
+}
+
+/* ---- News list: article card meta (date) – match .article-block .post-info ---- */
+.syro-news-article-section .syro-article-card-meta,
+.syro-article-card-meta {
+  font-family: 'Open Sans', Helvetica, Arial, sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  color: #979797 !important;
+}
+.syro-news-article-section .syro-article-card-meta svg,
+.syro-article-card-meta svg {
+  color: #c3bebe !important;
+  flex-shrink: 0;
+}
+
+/* ---- News detail: article title (h1) ---- */
+.syro-article-detail-title {
+  font-family: 'Noto Sans Malayalam UI', 'Open Sans', Helvetica, Arial, sans-serif !important;
+  font-size: 32px !important;
+  font-weight: 700 !important;
+  color: var(--syro-news-heading) !important;
+  line-height: 1.2 !important;
+}
+
+/* ---- News detail: posted on / by meta ---- */
+.syro-article-detail-meta {
+  font-family: 'Open Sans', Helvetica, Arial, sans-serif !important;
+  font-size: 13px !important;
+  color: var(--syro-news-meta) !important;
+  text-transform: uppercase !important;
+}
+
+/* ---- News detail: body content ---- */
+.syro-article-detail-body,
+.syro-article-detail-body p {
+  font-family: 'Open Sans', Helvetica, Arial, sans-serif !important;
+  font-size: 15px !important;
+  color: var(--syro-news-body-alt) !important;
+  line-height: 24px !important;
+}
+.syro-article-detail-body a {
+  color: var(--syro-news-link) !important;
+}
+.syro-article-detail-body a:hover {
+  color: var(--syro-news-link-hover) !important;
+}
+
+/* ---- News detail: lead excerpt (when no body) ---- */
+.syro-article-detail-lead {
+  font-family: 'Open Sans', Helvetica, Arial, sans-serif !important;
+  font-size: 15px !important;
+  color: var(--syro-news-body) !important;
+  line-height: 24px !important;
+}
+
+/* ---- News links (list card link, back link) use brand color ---- */
+.syro-news-link {
+  color: var(--syro-news-link) !important;
+}
+.syro-news-link:hover {
+  color: var(--syro-news-link-hover) !important;
+}

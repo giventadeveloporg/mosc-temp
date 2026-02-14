@@ -5,6 +5,7 @@ import SyroQuickLinksBar from './components/SyroQuickLinksBar';
 import SyroFooter from './components/SyroFooter';
 import SyroStaticAssets from './components/SyroStaticAssets';
 import '@/styles/syro-malabar.css';
+import '@/styles/syro-news-articles.css';
 
 export const metadata: Metadata = {
   title: {

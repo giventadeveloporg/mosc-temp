@@ -62,4 +62,6 @@ export interface NewsHomePageData {
   adSlots: AdSlot[];
   /** Top banner ad slots (position=top) */
   topAdSlots: AdSlot[];
+  /** Between-sections ad slots (position=between_sections) */
+  betweenSectionsAdSlots: AdSlot[];
 }
