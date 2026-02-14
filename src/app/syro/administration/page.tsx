@@ -1,4 +1,6 @@
 import React from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
 import QuickLinks from '../components/QuickLinks';
 import SyroPageBanner from '../components/SyroPageBanner';
 
@@ -13,55 +15,55 @@ const adminCards = [
     title: 'The Constitution of the Malankara Orthodox Church',
     excerpt:
       'The church had no written constitution until 1934, but was governed by consensus, traditions and precedence. It was the vision of Mor Dionysius, Vattasseril to have a clearly defined uniform...',
-    href: 'https://mosc.in/administration/administration/',
+    href: '/syro/administration/administration',
   },
   {
     title: 'The Canon Law of the Malankara Orthodox Church',
     excerpt:
       'The Canon Law accepted and followed by the Orthodox church of Malankara was collected and codified by Mar Gregorios Bar Hebraeus, Catholicos of Edessa (AD. 1226-1286) in the thirteenth century....',
-    href: 'https://mosc.in/administration/he-canon-law-of-the-malankara-orthodox-church/',
+    href: '/syro/administration/he-canon-law-of-the-malankara-orthodox-church',
   },
   {
     title: 'The Holy Episcopal Synod',
     excerpt:
       'The Episcopal Synod with the Catholicos as its president is the apex body of all bishops. The authority of the synod is final and binding. It has exclusive rights and...',
-    href: 'https://mosc.in/administration/the-holy-episcopal-synod/',
+    href: '/syro/administration/the-holy-episcopal-synod',
   },
   {
     title: 'Malankara Association',
     excerpt:
       'It was in the Mulamthuruthy synod summoned by the patriarch peter III in 1876 that resolved to have an elected body called the Malankara Syria Christian Association to manage and...',
-    href: 'https://mosc.in/administration/malankara-association/',
+    href: '/syro/administration/malankara-association',
   },
   {
     title: 'The Managing Committee',
     excerpt:
       'In the Mulamthuruthy synod which formulated the Malankara association had laid down the provision for the managing committee, a smaller body to look into the financial and other administrative matters....',
-    href: 'https://mosc.in/administration/the-managing-committee/',
+    href: '/syro/administration/the-managing-committee',
   },
   {
     title: 'The Working Committee',
     excerpt:
       'It is a small body of members nominated by the Malankara Metropolitan. This body prepares the agenda for the Managing Committee and helps the Malankara Metropolitan in his administrative functions....',
-    href: 'https://mosc.in/administration/the-working-committee/',
+    href: '/syro/administration/the-working-committee',
   },
   {
     title: 'The Diocesan General Body',
     excerpt:
       'Every diocese will have a Diocesan Assembly. The Diocesan bishop presides over the meetings. All matters related to the Diocese is discussed and decided in the General body assembly including...',
-    href: 'https://mosc.in/administration/the-diocesan-general-body/',
+    href: '/syro/administration/the-diocesan-general-body',
   },
   {
     title: 'The Parish Managing Committee',
     excerpt:
       'The members of the Parish Managing Committee excluding the priests will be elected by the Parish Assembly and their term of office will be one year. Every Parish Managing Committee...',
-    href: 'https://mosc.in/administration/the-parish-managing-committee/',
+    href: '/syro/administration/the-parish-managing-committee',
   },
   {
     title: 'The Parish General Body',
     excerpt:
       'Every parish is within the frame work of the church constitution. It is neither outside the umbrella of the constitution nor an independent entity. Each Parish has a general body....',
-    href: 'https://mosc.in/administration/the-parish-general-body/',
+    href: '/syro/administration/the-parish-general-body',
   },
 ];
 
@@ -90,28 +92,125 @@ const AdministrationPage = () => {
 
           {/* Cards grid - no images (HTML .admin-card) */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            {adminCards.map((card) => (
+            {adminCards.map((card, index) => (
               <div
                 key={card.title}
                 className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 p-8 flex flex-col h-full"
               >
+                {index === 0 && (
+                  <div className="mb-5 flex justify-center">
+                    <Image
+                      src="/images/logos/Current_Edits/MOSC-Logo-only.png"
+                      alt="MOSC Logo"
+                      width={120}
+                      height={120}
+                      className="object-contain"
+                    />
+                  </div>
+                )}
+                {index === 1 && (
+                  <div className="mb-5 flex justify-center">
+                    <Image
+                      src="/images/administration/canon-law.jpg"
+                      alt="The Canon Law of the Malankara Orthodox Church"
+                      width={280}
+                      height={168}
+                      className="w-full max-w-[280px] h-auto object-contain rounded-lg"
+                    />
+                  </div>
+                )}
+                {index === 2 && (
+                  <div className="mb-5 flex justify-center">
+                    <Image
+                      src="/images/administration/holy-episcopal-synod.jpg"
+                      alt="The Holy Episcopal Synod"
+                      width={280}
+                      height={168}
+                      className="w-full max-w-[280px] h-auto object-contain rounded-lg"
+                    />
+                  </div>
+                )}
+                {index === 3 && (
+                  <div className="mb-5 flex justify-center">
+                    <Image
+                      src="/images/administration/malankara-association.jpg"
+                      alt="Malankara Association"
+                      width={280}
+                      height={168}
+                      className="w-full max-w-[280px] h-auto object-contain rounded-lg"
+                    />
+                  </div>
+                )}
+                {index === 4 && (
+                  <div className="mb-5 flex justify-center">
+                    <Image
+                      src="/images/administration/managing-committee.jpg"
+                      alt="The Managing Committee"
+                      width={280}
+                      height={168}
+                      className="w-full max-w-[280px] h-auto object-contain rounded-lg"
+                    />
+                  </div>
+                )}
+                {index === 5 && (
+                  <div className="mb-5 flex justify-center">
+                    <Image
+                      src="/images/administration/working-committee.jpg"
+                      alt="The Working Committee"
+                      width={280}
+                      height={168}
+                      className="w-full max-w-[280px] h-auto object-contain rounded-lg"
+                    />
+                  </div>
+                )}
+                {index === 6 && (
+                  <div className="mb-5 flex justify-center">
+                    <Image
+                      src="/images/administration/diocesan-general-body.jpg"
+                      alt="The Diocesan General Body"
+                      width={280}
+                      height={168}
+                      className="w-full max-w-[280px] h-auto object-contain rounded-lg"
+                    />
+                  </div>
+                )}
+                {index === 7 && (
+                  <div className="mb-5 flex justify-center">
+                    <Image
+                      src="/images/administration/parish-managing-committee.jpg"
+                      alt="The Parish Managing Committee"
+                      width={280}
+                      height={168}
+                      className="w-full max-w-[280px] h-auto object-contain rounded-lg"
+                    />
+                  </div>
+                )}
+                {index === 8 && (
+                  <div className="mb-5 flex justify-center">
+                    <Image
+                      src="/images/administration/parish-general-body.jpg"
+                      alt="The Parish General Body"
+                      width={280}
+                      height={168}
+                      className="w-full max-w-[280px] h-auto object-contain rounded-lg"
+                    />
+                  </div>
+                )}
                 <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug">
                   {card.title}
                 </h3>
                 <p className="font-syro-primary text-base text-syro-dark-gray flex-1 mb-5 leading-relaxed">
                   {card.excerpt}
                 </p>
-                <a
+                <Link
                   href={card.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="syro-primary-button inline-flex items-center gap-2 mt-auto w-fit"
                 >
                   <span>Read More</span>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
-                </a>
+                </Link>
               </div>
             ))}
           </div>

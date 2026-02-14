@@ -2,15 +2,20 @@ import React from 'react';
 import Image from 'next/image';
 import SynodMembersSidebar from '../../components/SynodMembersSidebar';
 import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata = {
   title: 'H. G. Dr. Thomas Mar Athanasius Metropolitan',
-  description: 'Biography and information about H. G. Dr. Thomas Mar Athanasius Metropolitan.',
+  description: 'His Grace Dr. Thomas Mar Athanasius Metropolitan, Bishop of Kandanad Diocese. Scholar, social worker, and author.',
 };
 
 const HisGraceDrThomasMarAthanasiusPage = () => {
   return (
     <div className="bg-syro-bg-gray">
+      <SyroPageBanner
+        title="H. G. Dr. Thomas Mar Athanasius Metropolitan"
+        breadcrumbFrom="home"
+      />
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

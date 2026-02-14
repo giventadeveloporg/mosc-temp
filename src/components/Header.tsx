@@ -34,7 +34,7 @@ const navItems = [
       { name: 'Focus Groups', href: '/focus-groups' },
       { name: 'Profile', href: '/profile', requiresAuth: true },
       { name: 'Membership', href: '/membership' },
-      { name: 'MOSC', href: '/mosc' }
+      { name: 'MOSC', href: '/syro' }
     ]
   },
   {
@@ -771,7 +771,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                       (subItem: any) => subItem.href === pathname ||
                         (subItem.href === '/profile' && pathname === '/profile') ||
                         (subItem.href === '/membership' && pathname?.startsWith('/membership')) ||
-                        (subItem.href === '/mosc' && pathname?.startsWith('/mosc'))
+                        (subItem.href === '/syro' && pathname?.startsWith('/syro'))
                     );
 
                     return (
@@ -1083,7 +1083,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
 
                             const isSubItemActive = subItem.href === pathname ||
                               (subItem.href === '/membership' && pathname?.startsWith('/membership')) ||
-                              (subItem.href === '/mosc' && pathname?.startsWith('/mosc')) ||
+                              (subItem.href === '/syro' && pathname?.startsWith('/syro')) ||
                               (subItem.href === '/#about-us' && typeof window !== 'undefined' && window.location.hash === '#about-us') ||
                               (subItem.href === '/team' && pathname === '/team') ||
                               (subItem.href === '/sponsors' && pathname === '/sponsors');

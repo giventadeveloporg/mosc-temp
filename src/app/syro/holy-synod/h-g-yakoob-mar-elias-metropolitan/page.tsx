@@ -2,15 +2,20 @@ import React from 'react';
 import Image from 'next/image';
 import SynodMembersSidebar from '../../components/SynodMembersSidebar';
 import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata = {
   title: 'H.G. Yakob Mar Elias Metropolitan',
-  description: 'Biography and information about H.G. Yakob Mar Elias Metropolitan.',
+  description: 'His Grace Yakob Mar Elias, Metropolitan of Brahmavar Diocese. Director, St. Basil Bible School; Vice President, Orthodox Christian Youth Movement; Secretary, Kottayam Diocese.',
 };
 
 const HGYakoobMarEliasMetropolitanPage = () => {
   return (
     <div className="bg-syro-bg-gray">
+      <SyroPageBanner
+        title="H.G. Yakob Mar Elias Metropolitan"
+        breadcrumbFrom="home"
+      />
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -44,24 +49,16 @@ const HGYakoobMarEliasMetropolitanPage = () => {
 
                     <div className="prose prose-lg max-w-none">
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        He is elected as the Metropolitan candidate on 17th February at the Malankara Association held at Sasthamkotta. He is consecrated as Metropolitan on 12th May 2010 at Mar Elia Cathedral, Kottayam.His Grace is serving the Brahmavar Diocese as its Metropolitan.
+                        His Grace was born on 24 February 1953 as the son of Chackaleth Viruthiyath Kizhakkethil Mathai and Mariamma. He is a member of St. Elias Orthodox Church, Budhanoor, Chengannoor Diocese. After taking his Master&apos;s degree from Kerala University, he joined the Orthodox Theological Seminary, Kottayam, for theological studies. From the Orthodox Theological Seminary, Kottayam, he received the Graduate Degree in Sacred Theology (GST) and the Bachelor of Divinity (B.D.) from the Senate of Serampore University. His Grace has held several key positions in the Church: Manager, Mar Elia Chapel, Sasthamkotta; Director, St. Basil Bible School; Vice President, Orthodox Christian Youth Movement; Secretary, Kottayam Diocese; Member, Ecumenical Relations Committee; Member, Mission Training Centre, Mavelikkara; Member, Orthodox Bible Preparation Committee; Member, Malankara Sabha Editorial Board; Member, Oriental and Anglican Forum. He was elected as Metropolitan candidate on 17 February at the Malankara Association held at Sasthamkotta, and was consecrated as Metropolitan on 12 May 2010 at Mar Elia Cathedral, Kottayam. His Grace is serving the Brahmavar Diocese as its Metropolitan.
                       </p>
 
-                      <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace was born on 24-02-1953 as the son of Chackaleth Viruthiyath Kizhakkethil Mathai and Mariamma. His Grace is a member of St. Elias Orthodox Church, Budhanoor, Chengannoor Diocese. After taking his Masters Degree from Kerala University, he joined the Orthodox Theological Seminary, Kottayam, for theological studies. From the Orthodox Theological Seminary, Kottayam, he took Graduate Degree in Sacred Theology (GST) and the Bachelor of Divinity (BD) degree at the Senate of Serampore University.
-                      </p>
-
-                      <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace took several key positions of the church Position held – Manager, Mar Elia Chapel, Sasthamkotta, Director, St. Basil Bible School, Vice President, Orthodox Christian Youth Movement, Secretary, Kottayam Diocese, Member, Ecumenical Relations Committee.Member, Mission Tranining Centre, Member, Mavelikkara, Orthodox Bible Preparation Committee, Member, Malankara Sabha Editorial Board, Member, Oriental and Anglican Forum.
-                      </p>
-
-                      <div className="mt-6 pt-6 border-t border-syro-table-border">
-                        <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-2">
-                          Address: Mount Horeb Bishop\'s House, Balikashram Road, Kankanady, Mangalore - 575 002, Karnataka, India
-                        </p>
-                        <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-2">
-                          Email: metropolitanelias@yahoo.com Ph: 0824- 2013157, 09483530018
-                        </p>
+                      <h4 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
+                        Contact
+                      </h4>
+                      <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
+                        <p>Mount Horeb Bishop&apos;s House, Balikashram Road, Kankanady, Mangalore – 575 002, Karnataka, India</p>
+                        <p>Tel: 0824-2013157 | Mobile: 09483530018</p>
+                        <p>Email: metropolitanelias@yahoo.com</p>
                       </div>
                     </div>
                   </div>

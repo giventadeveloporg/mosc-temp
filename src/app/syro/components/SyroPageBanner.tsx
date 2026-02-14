@@ -8,8 +8,8 @@ export interface SyroPageBannerProps {
   title: string;
   /** When true, center the title and breadcrumb text (e.g. on saints subpages) */
   centerText?: boolean;
-  /** Breadcrumb path: 'home' = Home / Title, 'saints' = Saints / Title, 'the-church' = The Church / Title */
-  breadcrumbFrom?: 'home' | 'saints' | 'the-church';
+  /** Breadcrumb path: 'home' = Home / Title, 'saints' = Saints / Title, 'the-church' = The Church / Title, 'catholicate' = The Catholicate / Title, 'administration' = Administration / Title */
+  breadcrumbFrom?: 'home' | 'saints' | 'the-church' | 'catholicate' | 'administration';
 }
 
 /**
@@ -23,6 +23,8 @@ const BREADCRUMB_CONFIG = {
   home: { href: '/syro', label: 'Home' },
   saints: { href: '/syro/saints', label: 'Saints' },
   'the-church': { href: '/syro/the-church', label: 'The Church' },
+  catholicate: { href: '/syro/catholicate', label: 'The Catholicate' },
+  administration: { href: '/syro/administration', label: 'Administration' },
 } as const;
 
 export default function SyroPageBanner({ title, centerText, breadcrumbFrom = 'home' }: SyroPageBannerProps) {

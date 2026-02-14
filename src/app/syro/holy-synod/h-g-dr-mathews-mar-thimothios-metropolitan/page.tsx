@@ -2,15 +2,20 @@ import React from 'react';
 import Image from 'next/image';
 import SynodMembersSidebar from '../../components/SynodMembersSidebar';
 import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata = {
   title: 'H. G. Dr. Mathews Mar Thimothios Metropolitan',
-  description: 'Biography and information about H. G. Dr. Mathews Mar Thimothios Metropolitan.',
+  description: 'His Grace Dr. Mathews Mar Thimothios, Metropolitan of Chengannur Diocese. Scholar in Scripture and Biblical archaeology; Dean of Postgraduate Studies and Registrar of Orthodox Theological Seminary.',
 };
 
 const HGDrMathewsMarThimothiosMetropolitanPage = () => {
   return (
     <div className="bg-syro-bg-gray">
+      <SyroPageBanner
+        title="H. G. Dr. Mathews Mar Thimothios Metropolitan"
+        breadcrumbFrom="home"
+      />
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -44,32 +49,32 @@ const HGDrMathewsMarThimothiosMetropolitanPage = () => {
 
                     <div className="prose prose-lg max-w-none">
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace has served as assistant vicar and vicar in eight parishes in Kollam and Mavelikkara Dioceses. His Grace has prepared O. V. B. S text books, teacher\'s guide and a study based on the 24th Psalm.
+                        His Grace was born on 3rd May 1963 as the eldest son of Mr P.J. Baby and Mrs Thankamma Baby of Painuvilla Puthenveettil family. His Grace is a member of St Mary’s Cathedral Puthiakavu, Mavelikkara.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        Mob: 9447718511
+                        His Grace took his degree as a student of Bishop Moore College, Mavelikkara, G.S.T. from Orthodox Theological Seminary and B.D. and M.Th. from Serampore University. His Grace has also attained the Licentiate in Sacred Scripture from the Pontifical Institute in Rome and a Diploma in Biblical Archaeology from the Pontifical Bible Institute in Jerusalem.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace was born on 3rd May 1963 as the eldest son of Mr. P.J. Baby and Mrs. Thankamma Baby of Painuvilla Puthenveettil family. His Grace is a member of St. Mary\'s Cathedral Puthiakavu, Mavelikkara.
+                        His Grace is a scholar in Italian, French, German, Aramaic and Hebrew apart from English and Malayalam. His Grace has served as Joint Secretary of St Thomas Orthodox Vaidika Sanghom, Publisher of “Purohithan” Magazine, Executive Committee Member of the Priest Fellowship in Rome, Secretary of Vattasseril Mar Divanyasios Charitable Fund, Dean of Postgraduate Studies and Registrar of Orthodox Theological Seminary.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace took his degree as a student of Bishop Moore College Mavelikkara, G. S. T. from Orthodox Theological Seminary and B. D and M.Th. from Serampore University. His Grace has also attained the Licentiate in sacred scripture from the Pontifical Institute in Rome and Diploma in Biblical Archeology from the Pontifical Bible Institute in Jerusalem.
+                        His Grace has served as assistant vicar and vicar in eight parishes in Kollam and Mavelikkara Dioceses. His Grace has prepared O.V.B.S. textbooks, teacher’s guide and a study based on the 24th Psalm.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace is a scholar in Italian, French, German, Aramic and Hebrew apart from English and Malayalam. His Grace has served as Joint Secretary of St. Thomas Orthodox Vaidika Sanghom, Publisher of "Purohithan" Magazine, Executive Committee Member of the Priest Fellowship in Rome, Secretary of Vattasseril Mar Divanyasios Charitable Fund, Dean of Postgraduate Studies and Registrar of Orthodox Theological Seminary.
+                        His Grace is serving the Chengannur Diocese as its Metropolitan.
                       </p>
 
-                      <div className="mt-6 pt-6 border-t border-syro-table-border">
-                        <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-2">
-                          Address: Bethel Mar Gregorios Aramana, Chengannur, P.O- 689121
-                        </p>
-                        <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-2">
-                          Email: thimothiosmathews@gmail.com
-                        </p>
+                      <h4 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
+                        Contact
+                      </h4>
+                      <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
+                        <p>Bethel Mar Gregorios Aramana, Chengannur P.O. – 689 121</p>
+                        <p>Mob: 9447718511</p>
+                        <p>Email: thimothiosmathews@gmail.com</p>
                       </div>
                     </div>
                   </div>

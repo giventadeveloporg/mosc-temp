@@ -2,15 +2,20 @@ import React from 'react';
 import Image from 'next/image';
 import SynodMembersSidebar from '../../components/SynodMembersSidebar';
 import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata = {
-  title: 'H.G.Yuhanon Mar Policarpos Metropolitan',
-  description: 'Biography and information about H.G.Yuhanon Mar Policarpos Metropolitan.',
+  title: 'H.G. Yuhanon Mar Policarpos Metropolitan',
+  description: 'His Grace Yuhanon Mar Policarpos, Metropolitan of Ankamaly Diocese. Founder and Principal of Baselius Vidya Nikethan; former Parumala Seminary Manager.',
 };
 
 const HGYouhanonMarPolycarpusMetropolitanPage = () => {
   return (
     <div className="bg-syro-bg-gray">
+      <SyroPageBanner
+        title="H.G. Yuhanon Mar Policarpos Metropolitan"
+        breadcrumbFrom="home"
+      />
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -24,7 +29,7 @@ const HGYouhanonMarPolycarpusMetropolitanPage = () => {
                     <div className="relative w-72 h-[28rem] md:w-80 md:h-[32rem] lg:w-96 lg:h-[36rem] rounded-lg overflow-hidden shadow-syro-card-hover">
                       <Image
                         src="/images/holy-synod/poly.jpg"
-                        alt="H.G.Yuhanon Mar Policarpos Metropolitan"
+                        alt="H.G. Yuhanon Mar Policarpos Metropolitan"
                         fill
                         sizes="(max-width: 768px) 288px, (max-width: 1024px) 320px, 384px"
                         className="object-cover object-top"
@@ -39,28 +44,25 @@ const HGYouhanonMarPolycarpusMetropolitanPage = () => {
                   {/* Content - Right Side of Image */}
                   <div className="flex-1">
                     <h3 className="font-syro-display font-semibold text-2xl text-syro-blue mb-6">
-                      H.G.Yuhanon Mar Policarpos Metropolitan
+                      H.G. Yuhanon Mar Policarpos Metropolitan
                     </h3>
 
                     <div className="prose prose-lg max-w-none">
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace was born on 30th March 1955 as the son of Mr.P.V.Zachariah and Mrs.Annamma Zachariah of Panniyankara Parakunnil family in Vadakkanchery, Palakkad. His Grace is a member of Mar.Gregorios Church, Thenidukku. His Grace had his schooling in AbhayakkadChami Iyer High School, and graduated from S.N.College Alathoor. His Grace took his Masters degree in Sociology from the University of Kerala. His Grace learned Syriac from Very Rev.Thomas Ramban during the period 1973 – 1974. His Grace passed G.S.T in 1978 and B D in 1979 from the Orthodox Theological Seminary. His Grace ordained sub-deacon on 25th March 1977, deacon on 8th December and priest on 7th January 1980. His Grace was ordained as Ramban by his Holiness Baselius Marthoma Didimus Catholicos. His Grace received a diploma in 1990 from Geneeva.
+                        His Grace was born on 30th March 1955 as the son of Mr P.V. Zachariah and Mrs Annamma Zachariah of Panniyankara Parakunnil family in Vadakkanchery, Palakkad. His Grace is a member of Mar Gregorios Church, Thenidukku. His Grace had his schooling in Abhayakkad Chami Iyer High School, and graduated from S.N. College Alathoor. His Grace took his Masters degree in Sociology from the University of Kerala. His Grace learned Syriac from Very Rev. Thomas Ramban during the period 1973–1974. His Grace passed G.S.T in 1978 and B.D. in 1979 from the Orthodox Theological Seminary. His Grace was ordained sub-deacon on 25th March 1977, deacon on 8th December and priest on 7th January 1980. His Grace was ordained as Ramban by His Holiness Baselios Marthoma Didymos I Catholicos. His Grace received a diploma in 1990 from Geneva.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace served the church in several capacities – Sunday School Director; Cochin Diocese, Koratty Sion Seminary Manager, Parumala Seminary Manager, C.M.I Kerala Region Chaplain,Vettikal Health centre Director, Thalakkod St.Mary’s Boy’s Home Director & Board Member, Kolenchery Medical College Chaplain and Governing Body Member, Founder and Principal of Baselius Vidya Nikethan till 2006.He is serving the Ankamaly Diocese as its Metropolitan.
+                        His Grace served the church in several capacities – Sunday School Director, Cochin Diocese; Koratty Sion Seminary Manager, Parumala Seminary Manager, C.M.I Kerala Region Chaplain, Vettikal Health Centre Director, Thalakkod St Mary’s Boy’s Home Director & Board Member, Kolenchery Medical College Chaplain and Governing Body Member, Founder and Principal of Baselius Vidya Nikethan till 2006. He is serving the Ankamaly Diocese as its Metropolitan.
                       </p>
 
-                      <div className="mt-6 pt-6 border-t border-syro-table-border">
-                        <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-2">
-                          Address: Thrikkunnathu Seminary PB NO.61, Aluva-683101.
-                        </p>
-                        <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-2">
-                          ph: 0484 2622339 Mob: 94474 75544
-                        </p>
-                        <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-2">
-                          email: marpolicarpos@yahoo.com
-                        </p>
+                      <h4 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
+                        Contact
+                      </h4>
+                      <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
+                        <p>Thrikkunnathu Seminary PB No. 61, Aluva – 683 101</p>
+                        <p>Ph: 0484 2622339 | Mob: 94474 75544</p>
+                        <p>Email: marpolicarpos@yahoo.com</p>
                       </div>
                     </div>
                   </div>
