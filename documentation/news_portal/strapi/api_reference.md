@@ -21,10 +21,17 @@ Strapi auto-exposes REST endpoints for each content type. The following are avai
 | **Flash News Item** | `GET /api/flash-news-items`, `GET /api/flash-news-items/:documentId` | Via bootstrap (public find) |
 | **Sidebar Promotional Block** | `GET /api/sidebar-promotional-block` | Via bootstrap (public find) |
 | **Homepage Layout** | `GET /api/homepage` | Configure in Admin |
+| **Directory – Home** | `GET /api/directory-home` | Via bootstrap (public find) |
+| **Directory – Bishops** | `GET /api/bishops`, `GET /api/bishops/:documentId` | Via bootstrap (public find, findOne) |
+| **Directory – Dioceses** | `GET /api/dioceses`, `GET /api/dioceses/:documentId` | Via bootstrap (public find, findOne) |
+| **Directory – Parishes** | `GET /api/parishes`, `GET /api/parishes/:documentId` | Via bootstrap (public find, findOne) |
+| **Directory – Churches** | `GET /api/churches`, `GET /api/churches/:documentId` | Via bootstrap (public find, findOne) |
+| **Directory – Priests** | `GET /api/priests`, `GET /api/priests/:documentId` | Via bootstrap (public find, findOne) |
+| **Directory – Entries** | `GET /api/directory-entries`, `GET /api/directory-entries/:documentId` | Via bootstrap (public find, findOne) |
 | **Tenant** | `GET /api/tenants`, `GET /api/tenants/:documentId` | Configure in Admin (usually restricted) |
 | **Editor Tenant Assignment** | `GET /api/editor-tenant-assignments`, etc. | Admin-only (no public access) |
 
-**Note:** The seed script grants public `find` and `findOne` for: article, category, author, global, about. Bootstrap also grants public find for: homepage, sidebar-promotional-block, advertisement-slot, flash-news-item.
+**Note:** The seed script grants public `find` and `findOne` for: article, category, author, global, about. Bootstrap also grants public find for: homepage, sidebar-promotional-block, advertisement-slot, flash-news-item, directory-home, bishop, diocese, parish, church, priest, directory-entry.
 
 ---
 
@@ -262,6 +269,8 @@ Never expose the token in client-side JavaScript (e.g. `NEXT_PUBLIC_*`) if it ha
 
 For detailed frontend examples, see `documentation/catholicatenews_strapi_content_mapping.md`.
 
+For **directory-related APIs** (Directory Home, Bishops, Dioceses, Parishes, Churches, Priests, Directory Entries) with full field definitions and examples, see `documentation/directory_api_reference.md`.
+
 ---
 
 ## 5. Encryption key (viewing tokens in Admin)
@@ -347,3 +356,87 @@ If ads return 0 items, the filter may not match your data. The frontend filters 
 ### Homepage and sidebar-promotional-block 404
 
 These single types need public find permission. Restart Strapi after the bootstrap runs — it now grants public `find` for `homepage`, `sidebar-promotional-block`, and `advertisement-slot`.
+
+---
+
+## 8. Article Cover Images Not Showing on Frontend
+
+If article cover images appear correctly in the Strapi admin panel but **do not show on the frontend** after import or in production, check the following.
+
+### 1. Populate the cover relation
+
+The `cover` field is a media relation. By default, Strapi does **not** include relations in the response. You must explicitly populate it:
+
+```http
+GET /api/articles?...&populate[0]=cover&populate[1]=category&populate[2]=author
+```
+
+Or using the shorthand:
+
+```http
+GET /api/articles?...&populate=cover,category,author
+```
+
+Without `populate=cover`, the response will have `cover: null` or an empty object, so no image can be displayed.
+
+### 2. Use the full image URL
+
+Strapi returns image URLs as **relative paths** (e.g. `/uploads/asmara_2_1024x543_abc123.jpg`). The frontend must prepend the Strapi base URL to build a working image URL.
+
+```javascript
+const STRAPI_URL = process.env.STRAPI_URL || 'http://localhost:1337';
+
+// After fetching article with populate=cover
+const cover = article.cover;
+let imageUrl = null;
+if (cover?.url) {
+  // Prepend Strapi base URL if url is relative
+  imageUrl = cover.url.startsWith('http')
+    ? cover.url
+    : `${STRAPI_URL}${cover.url.startsWith('/') ? '' : '/'}${cover.url}`;
+}
+
+// Use imageUrl in <img src={imageUrl} alt={article.title} />
+```
+
+### 3. Verify the cover in the API response
+
+Call the API directly and inspect the response:
+
+```http
+GET http://localhost:1337/api/articles?populate=cover&pagination[limit]=1
+```
+
+Check that `data[0].cover` is an object with `url`, `alternativeText`, etc. If `cover` is null, the article has no cover assigned, or the relation was not populated.
+
+### Summary
+
+| Cause | Fix |
+|-------|-----|
+| Cover not populated | Add `populate=cover` (or `populate[0]=cover`) to the articles API request |
+| Relative URL not resolved | Prepend `STRAPI_URL` (e.g. `http://localhost:1337`) to `cover.url` when rendering images |
+
+---
+
+## 9. Rendering Article Description (Rich Text Blocks)
+
+The article `description` field is **Rich Text (Blocks)**. The API returns it as an **array of blocks**, not a string. If the frontend renders it as plain text, everything will appear as one line and images will show as raw links.
+
+### Use a block renderer (React)
+
+Install the official renderer and pass `article.description` as `content`:
+
+```bash
+npm install @strapi/blocks-react-renderer react react-dom
+```
+
+```jsx
+import { BlocksRenderer, type BlocksContent } from '@strapi/blocks-react-renderer';
+
+// article.description is blocks or null
+const content: BlocksContent = article?.description ?? [];
+
+<BlocksRenderer content={content} />
+```
+
+This renders paragraphs, headings, lists, **images**, and links correctly. For full editor and frontend guidance (including why Markdown image syntax does not render as images), see **[documentation/rich_text_description_guide.md](rich_text_description_guide.md)**.

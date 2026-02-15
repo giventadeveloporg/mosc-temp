@@ -6,6 +6,7 @@
  */
 
 import { fetchStrapi, getStrapiUrl, getStrapiTenantId } from '@/lib/strapi';
+import type { BlocksContent } from '@strapi/blocks-react-renderer';
 import type { NewsHomePageData, NewsArticle, FlashNews, FlashNewsItemUI, SidebarPromoBlock, AdSlot } from './types';
 
 /** Strapi 5: Array-style populate; comma-separated populate triggers 400. */
@@ -95,13 +96,20 @@ function normalizeArticle(raw: { id?: number; documentId?: string; attributes?: 
   const categorySlug = category?.data?.attributes?.slug ?? category?.slug;
   const categoryName = category?.data?.attributes?.name ?? category?.name;
   const authorName = author?.data?.attributes?.name ?? author?.name;
+  const descRaw = attrs?.description;
+  const descriptionBlocks: BlocksContent | undefined =
+    Array.isArray(descRaw) && descRaw.length > 0 ? (descRaw as BlocksContent) : undefined;
+  const descStr = typeof descRaw === 'string' ? (descRaw as string).trim() : '';
+  const bodyRaw = attrs?.body;
+  const bodyStr = typeof bodyRaw === 'string' ? bodyRaw.trim() : '';
   return {
     id: (raw?.id ?? attrs?.id ?? 0) as number,
     documentId: raw?.documentId as string | undefined,
     title: (attrs?.title ?? '') as string,
     slug: (attrs?.slug ?? '') as string,
-    excerpt: (attrs?.excerpt ?? undefined) as string | undefined,
-    body: (attrs?.body ?? undefined) as string | undefined,
+    excerpt: (attrs?.excerpt ?? (descStr ? descStr.slice(0, 300) + (descStr.length > 300 ? '…' : '') : undefined)) as string | undefined,
+    description: descriptionBlocks,
+    body: bodyStr || descStr || undefined,
     publishedAt: (attrs?.publishedAt ?? undefined) as string | undefined,
     views: (attrs?.views ?? undefined) as number | undefined,
     coverUrl,

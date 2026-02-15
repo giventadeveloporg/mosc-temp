@@ -2,15 +2,20 @@ import React from 'react';
 import Image from 'next/image';
 import SynodMembersSidebar from '../../components/SynodMembersSidebar';
 import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata = {
   title: 'H. G. Mathews Mar Theodosius Metropolitan',
-  description: 'Biography and information about H. G. Mathews Mar Theodosius Metropolitan.',
+  description: 'His Grace Mathews Mar Theodosius, Metropolitan. Superior of Bethany Ashram; Secretary of Sanyasi-Sanyasini Sangham; former Principal of Bethany St John’s Higher Secondary School.',
 };
 
 const HGMathewsMarTheodosiusPage = () => {
   return (
     <div className="bg-syro-bg-gray">
+      <SyroPageBanner
+        title="H. G. Mathews Mar Theodosius Metropolitan"
+        breadcrumbFrom="home"
+      />
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -44,7 +49,7 @@ const HGMathewsMarTheodosiusPage = () => {
 
                     <div className="prose prose-lg max-w-none">
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace was born on 15th September 1955 as the eldest son of Mr.P.M.George and Mrs. Aleyamma George of Punchayil family in Pandankary, Edathua, Alapuzha. His Grace is a member of St. Mary\'s Orthodox Church, Padankary.
+                        His Grace was born on 15th September 1955 as the eldest son of Mr P.M. George and Mrs Aleyamma George of Punchayil family in Pandankary, Edathua, Alapuzha. His Grace is a member of St Mary’s Orthodox Church, Padankary.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
@@ -52,17 +57,18 @@ const HGMathewsMarTheodosiusPage = () => {
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace took M. A. in History from the University of Kerala and B.Ed. from Sardar Patel University. His Grace was the Principal of Bethany St. John\'s Higher Secondary School during the period between 1987 and 1996. His Grace had been the President of Perunad YMCA for a long time. His Grace is the Secretary of the Sanyasi-Sanyasini Sangham of the Malankara Orthodox Church.
+                        His Grace took M.A. in History from the University of Kerala and B.Ed. from Sardar Patel University. His Grace was the Principal of Bethany St John’s Higher Secondary School during the period between 1987 and 1996. His Grace had been the President of Perunad YMCA for a long time. His Grace is the Secretary of the Sanyasi-Sanyasini Sangham of the Malankara Orthodox Church.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        From 1996 His Grace has been the Superior of Bethany Ashram. His Grace has also served as the Manager of Angamuzhy Orthodox Centre and member of the Ecumenical Trust. His Grace was ordained as Ramban at Parumala on 4th December. His Grace was ordinated as bishop on 19 feb 2009 at Puthupally st george orthodox church.
+                        From 1996 His Grace has been the Superior of Bethany Ashram. His Grace has also served as the Manager of Angamuzhy Orthodox Centre and member of the Ecumenical Trust. His Grace was ordained as Ramban at Parumala on 4th December. His Grace was ordained as bishop on 19 February 2009 at Puthupally St George Orthodox Church.
                       </p>
 
-                      <div className="mt-6 pt-6 border-t border-syro-table-border">
-                        <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-2">
-                          Email: mathewsmartheodosius@gmail.com
-                        </p>
+                      <h4 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
+                        Contact
+                      </h4>
+                      <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
+                        <p>Email: mathewsmartheodosius@gmail.com</p>
                       </div>
                     </div>
                   </div>

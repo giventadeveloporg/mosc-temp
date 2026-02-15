@@ -2,15 +2,20 @@ import React from 'react';
 import Image from 'next/image';
 import SynodMembersSidebar from '../../components/SynodMembersSidebar';
 import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata = {
-  title: 'H. G. Alexios mar Eusebius Metropolitan',
-  description: 'Biography and information about H. G. Alexios mar Eusebius Metropolitan.',
+  title: 'H. G. Alexios Mar Eusebius Metropolitan',
+  description: 'His Grace Alexios Mar Eusebius, Metropolitan of Calcutta Diocese. Former first Metropolitan of South-west America; Old Testament scholar and author of Vachanathejas.',
 };
 
 const HGAlexiosMarEusebiusMetropolitanPage = () => {
   return (
     <div className="bg-syro-bg-gray">
+      <SyroPageBanner
+        title="H. G. Alexios Mar Eusebius Metropolitan"
+        breadcrumbFrom="home"
+      />
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -24,7 +29,7 @@ const HGAlexiosMarEusebiusMetropolitanPage = () => {
                     <div className="relative w-72 h-[28rem] md:w-80 md:h-[32rem] lg:w-96 lg:h-[36rem] rounded-lg overflow-hidden shadow-syro-card-hover">
                       <Image
                         src="/images/holy-synod/eusebius.jpg"
-                        alt="H. G. Alexios mar Eusebius Metropolitan"
+                        alt="H. G. Alexios Mar Eusebius Metropolitan"
                         fill
                         sizes="(max-width: 768px) 288px, (max-width: 1024px) 320px, 384px"
                         className="object-cover object-top"
@@ -39,7 +44,7 @@ const HGAlexiosMarEusebiusMetropolitanPage = () => {
                   {/* Content - Right Side of Image */}
                   <div className="flex-1">
                     <h3 className="font-syro-display font-semibold text-2xl text-syro-blue mb-6">
-                      H. G. Alexios mar Eusebius Metropolitan
+                      H. G. Alexios Mar Eusebius Metropolitan
                     </h3>
 
                     <div className="prose prose-lg max-w-none">
@@ -52,7 +57,7 @@ const HGAlexiosMarEusebiusMetropolitanPage = () => {
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        On May 15,1993 he was ordained as a deacon and on 4th May 1995, H. H Baselious Marthoma Mathews II ordained him to the priesthood. As a priest he has served the parishes in Bangalore, Germany and in the Calcutta diocese.
+                        On May 15,1993 he was ordained as a deacon and on 4th May 1995, H.H. Baselios Marthoma Mathews II ordained him to the priesthood. As a priest he has served the parishes in Bangalore, Germany and in the Calcutta diocese.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
@@ -68,24 +73,24 @@ const HGAlexiosMarEusebiusMetropolitanPage = () => {
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        The Malankara Syrian Christian association held at Pampakuda on 2008 September 11 elected him with six others to be metropolitans of the church. On 2009 February 19 H.H. Baselios Marthoma Didymus I Catholicos with the assistance of the holy Episcopal synod, ordained him as Metropolitan along with the six other candidates at Puthupally St. George Orthodox Church.
+                        The Malankara Syrian Christian association held at Pampakuda on 2008 September 11 elected him with six others to be metropolitans of the church. On 2009 February 19 H.H. Baselios Marthoma Didymos I Catholicos with the assistance of the holy Episcopal synod, ordained him as Metropolitan along with the six other candidates at Puthupally St. George Orthodox Church.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        When the Diocese of South-west America was formed in 2009, His Grace was appointed as the first Metropolitan of that Diocese from April 1, 2009. He took leadership in building the Diocese from scratches. The beautiful diocesan center at Beasley, Houston in 100 Acres is one of the greatest achievements in his time. A Liturgical Resource Development Committee was formed and initiated to translate all our liturgical books to English Language. About 15 new churches and congregations were established in the cities where the Malankara Orthodox church Mission had not yet started.
+                        When the Diocese of South-west America was formed in 2009, His Grace was appointed as the first Metropolitan of that Diocese from April 1, 2009. He took leadership in building the Diocese from scratch. The beautiful diocesan center at Beasley, Houston in 100 Acres is one of the greatest achievements in his time. A Liturgical Resource Development Committee was formed and initiated to translate all our liturgical books to English Language. About 15 new churches and congregations were established in the cities where the Malankara Orthodox church Mission had not yet started.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
                         From 2022 November onwards, His Grace is serving as the Metropolitan of the Calcutta Diocese. Apart from the administrative responsibilities of the diocese H.G. Mar Eusebius currently holds the office of the vice president of Kerala Council of Churches.
                       </p>
 
-                      <div className="mt-6 pt-6 border-t border-syro-table-border">
-                        <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-2">
-                          Address: St. Thomas Ashram, Kailash Nagar, Bhilai, Chattisgarh 490 001.
-                        </p>
-                        <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-2">
-                          Telephone: +91 8547058607; Email: mareusebius@gmail.com
-                        </p>
+                      <h4 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
+                        Contact
+                      </h4>
+                      <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
+                        <p>St Thomas Ashram, Kailash Nagar, Bhilai, Chhattisgarh – 490 001</p>
+                        <p>Telephone: +91 8547058607</p>
+                        <p>Email: mareusebius@gmail.com</p>
                       </div>
                     </div>
                   </div>

@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -28,8 +30,8 @@ function CalendarIcon({ className }: { className?: string }) {
  */
 export function ArticleList({ title, articles, baseHref, compact, id }: ArticleListProps) {
   return (
-    <section id={id} className="scroll-mt-24 rounded-xl bg-card border border-border sacred-shadow-sm overflow-hidden">
-      <h2 className="font-heading font-semibold text-xl text-foreground border-b border-border px-6 py-4 bg-muted/30">
+    <section id={id} className="syro-news-article-section scroll-mt-24 rounded-xl bg-card border border-border sacred-shadow-sm overflow-hidden">
+      <h2 className="syro-news-section-title px-6 py-4 bg-muted/30">
         {title}
       </h2>
       {articles.length > 0 ? (
@@ -37,7 +39,7 @@ export function ArticleList({ title, articles, baseHref, compact, id }: ArticleL
           {articles.map((article) => (
             <li key={article.id}>
               <Link
-                href={`${baseHref}/${article.slug || article.documentId || article.id}`}
+                href={`${baseHref}/${article.documentId || article.slug || String(article.id)}`}
                 className="block group rounded-lg overflow-hidden border border-border hover:border-primary/30 hover:shadow-md reverent-transition focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-card"
               >
                 {/* Image on top - object-contain so header/top is not cropped (image_containment_prevention) */}
@@ -57,12 +59,12 @@ export function ArticleList({ title, articles, baseHref, compact, id }: ArticleL
                 )}
                 {/* Title, date, description below */}
                 <div className="p-4">
-                  <h3 className="font-body font-semibold text-foreground line-clamp-2 group-hover:text-primary reverent-transition">
+                  <h3 className="syro-article-card-title line-clamp-2 reverent-transition">
                     {article.title}
                   </h3>
                   {article.publishedAt && (
                     <time
-                      className="font-caption text-sm text-muted-foreground mt-2 flex items-center gap-1.5"
+                      className="syro-article-card-meta mt-2 flex items-center gap-1.5"
                       dateTime={article.publishedAt}
                     >
                       <CalendarIcon className="w-4 h-4 flex-shrink-0" />
@@ -72,7 +74,7 @@ export function ArticleList({ title, articles, baseHref, compact, id }: ArticleL
                     </time>
                   )}
                   {!compact && article.excerpt && (
-                    <p className="font-body text-sm text-muted-foreground mt-2 line-clamp-3">
+                    <p className="syro-article-card-desc mt-2 line-clamp-3">
                       {article.excerpt}
                     </p>
                   )}

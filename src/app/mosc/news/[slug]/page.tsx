@@ -6,6 +6,7 @@ import { getArticleBySlug, getFlashNewsForNewsPages } from '../getNewsHomePageDa
 import { NewsPageHeader } from '../components/NewsPageHeader';
 import { FlashNewsCarousel } from '../components/FlashNewsCarousel';
 import { FlashBar } from '../components/FlashBar';
+import { ArticleContent } from '@/components/news/ArticleContent';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -80,11 +81,15 @@ export default async function NewsArticlePage({ params }: PageProps) {
           </div>
         </header>
 
-        <div className="prose prose-lg font-body text-foreground max-w-none prose-headings:font-heading prose-a:text-primary">
-          {article.body ? (
-            <div dangerouslySetInnerHTML={{ __html: article.body }} />
-          ) : (
-            article.excerpt && <p className="text-muted-foreground">{article.excerpt}</p>
+        <div className="prose prose-lg font-body text-foreground max-w-none min-w-0 break-words overflow-x-hidden prose-headings:font-heading prose-a:text-primary prose-p:break-words [&>*]:min-w-0 [&>*]:break-words">
+          <ArticleContent
+            description={article.description}
+            body={article.body}
+            excerpt={article.excerpt}
+            emptyMessage="No additional content for this article."
+          />
+          {article.excerpt && !(Array.isArray(article.description) && article.description.length > 0) && !(typeof article.body === 'string' && article.body.trim()) && (
+            <p className="text-muted-foreground mt-4">{article.excerpt}</p>
           )}
         </div>
       </article>

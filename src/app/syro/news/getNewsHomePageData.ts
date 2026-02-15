@@ -6,16 +6,17 @@
  */
 
 import { fetchStrapi, getStrapiUrl, getStrapiTenantId } from '@/lib/strapi';
+import type { BlocksContent } from '@strapi/blocks-react-renderer';
 import type { NewsHomePageData, NewsArticle, FlashNews, FlashNewsItemUI, SidebarPromoBlock, AdSlot } from './types';
 
-/** Strapi 5: Array-style populate; comma-separated populate triggers 400. */
+/** Strapi 5: Array-style populate; comma-separated populate triggers 400. Include cover so list/detail show images. */
 const POPULATE = 'populate[0]=cover&populate[1]=category&populate[2]=author';
 
 /**
  * Extracts media URL from Strapi 4 or Strapi 5 response structure.
- * Strapi 4: media.data.attributes.url
- * Strapi 5: media.url or media.data.url (flattened)
- * Also handles: formats.thumbnail.url, array of media (takes first).
+ * Handles: populated relation (data.attributes.url), flattened (url, data.url),
+ * formats.thumbnail, and relative URLs (prepends Strapi base URL).
+ * baseUrl should be Strapi server root (no trailing slash, no /api).
  */
 function getMediaUrl(media: unknown, baseUrl: string): string | null {
   if (!media || !baseUrl) return null;
@@ -33,26 +34,31 @@ function getMediaUrl(media: unknown, baseUrl: string): string | null {
     url = data?.url as string | undefined;
   }
   if (!url) {
-    // Strapi 4: data.attributes.url
+    // Strapi 4 / Strapi 5 populated relation: data.attributes.url (common after imports)
     const data = m?.data as Record<string, unknown> | undefined;
     const attrs = data?.attributes as Record<string, unknown> | undefined;
     url = attrs?.url as string | undefined;
   }
   if (!url && m?.formats) {
-    // Fallback: formats.thumbnail.url or formats.small.url
     const formats = m.formats as Record<string, { url?: string }>;
     url = formats?.thumbnail?.url ?? formats?.small?.url ?? formats?.medium?.url;
   }
   if (!url || typeof url !== 'string') return null;
-  return url.startsWith('http') ? url : `${baseUrl}${url}`;
+  // Relative URLs: prepend base URL; ensure one slash between base and path
+  if (url.startsWith('http')) return url;
+  const base = baseUrl.replace(/\/$/, '');
+  const path = url.startsWith('/') ? url : `/${url}`;
+  return `${base}${path}`;
 }
 
 /**
  * Extracts alternativeText/caption from Strapi 4 or 5 media structure.
+ * Handles populated relation: data.attributes.alternativeText.
  */
 function getMediaAlt(media: unknown): string | undefined {
   if (!media) return undefined;
-  const m = media as Record<string, unknown>;
+  let m = media as Record<string, unknown>;
+  if (Array.isArray(media) && media.length > 0) m = media[0] as Record<string, unknown>;
   let alt = m?.alternativeText as string | undefined;
   if (!alt) {
     const data = m?.data as Record<string, unknown> | undefined;
@@ -68,6 +74,7 @@ function getMediaAlt(media: unknown): string | undefined {
 
 /** Builds article query path (relative to Content API base /api).
  * Strapi 5: Use filters[publishedAt][$notNull]=true (status=published can cause validation errors).
+ * Only published articles are returned; drafts (publishedAt null) do not appear on the news page.
  */
 function buildArticleQuery(filters: string, sort: string, limit: number): string {
   const tenantId = getStrapiTenantId();
@@ -95,13 +102,22 @@ function normalizeArticle(raw: { id?: number; documentId?: string; attributes?: 
   const categorySlug = category?.data?.attributes?.slug ?? category?.slug;
   const categoryName = category?.data?.attributes?.name ?? category?.name;
   const authorName = author?.data?.attributes?.name ?? author?.name;
+  // Strapi "Editorial - Article" uses "description" as Rich Text (Blocks) or legacy string
+  const descRaw = attrs?.description;
+  const descStr = typeof descRaw === 'string' ? (descRaw as string).trim() : '';
+  const descriptionBlocks: BlocksContent | undefined =
+    Array.isArray(descRaw) && descRaw.length > 0 ? (descRaw as BlocksContent) : undefined;
+  const bodyRaw = attrs?.body;
+  const bodyStr = typeof bodyRaw === 'string' ? bodyRaw.trim() : '';
+  const excerptStr = typeof attrs?.excerpt === 'string' ? (attrs.excerpt as string).trim() : '';
   return {
     id: (raw?.id ?? attrs?.id ?? 0) as number,
     documentId: raw?.documentId as string | undefined,
     title: (attrs?.title ?? '') as string,
     slug: (attrs?.slug ?? '') as string,
-    excerpt: (attrs?.excerpt ?? undefined) as string | undefined,
-    body: (attrs?.body ?? undefined) as string | undefined,
+    excerpt: excerptStr || (descStr ? descStr.slice(0, 300) + (descStr.length > 300 ? '…' : '') : undefined),
+    description: descriptionBlocks,
+    body: bodyStr || descStr || undefined,
     publishedAt: (attrs?.publishedAt ?? undefined) as string | undefined,
     views: (attrs?.views ?? undefined) as number | undefined,
     coverUrl,
@@ -215,6 +231,7 @@ export async function getNewsHomePageData(): Promise<NewsHomePageData> {
     sidebarPromo: null,
     adSlots: [],
     topAdSlots: [],
+    betweenSectionsAdSlots: [],
   };
 
   let tenantId: string;
@@ -252,7 +269,7 @@ export async function getNewsHomePageData(): Promise<NewsHomePageData> {
     fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=press-release', 'publishedAt:desc', 10)),
     fetchStrapi<unknown[]>(buildArticleQuery('', 'views:desc', 5)),
     fetchStrapi<{ id?: number; attributes?: Record<string, unknown> }>('/sidebar-promotional-block?populate=*'),
-    fetchStrapi<unknown[]>(`/advertisement-slots?filters[$or][0][position][$eq]=sidebar&filters[$or][1][position][$eq]=top&filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}&populate=media`),
+    fetchStrapi<unknown[]>(`/advertisement-slots?filters[$or][0][position][$eq]=sidebar&filters[$or][1][position][$eq]=top&filters[$or][2][position][$eq]=between_sections&filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}&populate=media`),
   ]);
 
   const flashList = Array.isArray(flashRes?.data) ? flashRes.data : [];
@@ -270,6 +287,7 @@ export async function getNewsHomePageData(): Promise<NewsHomePageData> {
   const allAds = (adsList ?? []).map((a) => normalizeAdSlot(a as { id?: number; attributes?: Record<string, unknown> }));
   const sidebarSlots = allAds.filter((a) => (a.position ?? '').toLowerCase() === 'sidebar');
   const topSlots = allAds.filter((a) => (a.position ?? '').toLowerCase() === 'top');
+  const betweenSectionsSlots = allAds.filter((a) => (a.position ?? '').toLowerCase().replace(/-/g, '_') === 'between_sections');
 
   const result = {
     flash: normalizeHomepage(homepageRes?.data ?? null),
@@ -281,9 +299,13 @@ export async function getNewsHomePageData(): Promise<NewsHomePageData> {
     sidebarPromo: normalizeSidebarPromo(sidebarRes?.data ?? null),
     adSlots: sidebarSlots,
     topAdSlots: topSlots,
+    betweenSectionsAdSlots: betweenSectionsSlots,
   };
   const totalArticles = result.featured.length + result.mainNews.length + result.pressRelease.length + result.mostRead.length;
-  console.info(`[STRAPI-NEWS] Homepage data loaded: ${totalArticles} articles, flash=${!!result.flash?.active}, flashItems=${result.flashNewsItems.length}, sidebar=${!!result.sidebarPromo}, sidebarAds=${result.adSlots.length}, topAds=${result.topAdSlots.length}`);
+  console.info(`[STRAPI-NEWS] Homepage data loaded: ${totalArticles} articles, flash=${!!result.flash?.active}, flashItems=${result.flashNewsItems.length}, sidebar=${!!result.sidebarPromo}, sidebarAds=${result.adSlots.length}, topAds=${result.topAdSlots.length}, betweenSectionsAds=${result.betweenSectionsAdSlots.length}`);
+  if (totalArticles === 0) {
+    console.info('[STRAPI-NEWS] Tip: Only published articles are shown. If you see 0 articles, ensure entries are Published (not Draft) in Strapi and have the correct category and tenant.');
+  }
   return result;
   } catch (e) {
     console.warn('[STRAPI-NEWS] getNewsHomePageData failed:', e);
@@ -371,6 +393,39 @@ export async function getArticleBySlug(slugOrId: string): Promise<NewsArticle | 
 
     if (!first) return null;
     return normalizeArticle(first);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Fetches recent articles (by publishedAt desc) for sidebar "Recent Posts".
+ */
+export async function getRecentArticles(limit: number = 5): Promise<NewsArticle[]> {
+  if (!getStrapiUrl()) return [];
+  try {
+    const tenantId = getStrapiTenantId();
+    const path = `/articles?filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}&filters[publishedAt][$notNull]=true&${POPULATE}&sort=publishedAt:desc&pagination[limit]=${limit}`;
+    const res = await fetchStrapi<unknown[]>(path);
+    const list = Array.isArray(res?.data) ? res.data : [];
+    return list.map((raw) => normalizeArticle(raw as { id?: number; documentId?: string; attributes?: Record<string, unknown> }));
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Fetches the article published immediately before the given date (for "Previous Post" link).
+ */
+export async function getPreviousArticle(beforePublishedAt: string): Promise<NewsArticle | null> {
+  if (!getStrapiUrl() || !beforePublishedAt) return null;
+  try {
+    const tenantId = getStrapiTenantId();
+    const path = `/articles?filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}&filters[publishedAt][$notNull]=true&filters[publishedAt][$lt]=${encodeURIComponent(beforePublishedAt)}&${POPULATE}&sort=publishedAt:desc&pagination[limit]=1`;
+    const res = await fetchStrapi<unknown[]>(path);
+    const list = Array.isArray(res?.data) ? res.data : [];
+    const first = list[0] as { id?: number; documentId?: string; attributes?: Record<string, unknown> } | undefined;
+    return first ? normalizeArticle(first) : null;
   } catch {
     return null;
   }

@@ -2,15 +2,20 @@ import React from 'react';
 import Image from 'next/image';
 import SynodMembersSidebar from '../../components/SynodMembersSidebar';
 import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata = {
   title: 'H.H. Baselios Marthoma Mathews III, The Ninth Catholicos of the East in Malankara',
-  description: 'Biography and information about H.H. Baselios Marthoma Mathews III, The Ninth Catholicos of the East in Malankara.',
+  description: 'His Holiness Baselios Marthoma Mathews III was enthroned as the Catholicos of the East & Malankara Metropolitan on 15 October 2021. The 92nd Primate on the Apostolic Throne of St. Thomas.',
 };
 
 const HisHolinessBaseliosMarthomaMathewsIiiPage = () => {
   return (
     <div className="bg-syro-bg-gray">
+      <SyroPageBanner
+        title="H.H. Baselios Marthoma Mathews III"
+        breadcrumbFrom="home"
+      />
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

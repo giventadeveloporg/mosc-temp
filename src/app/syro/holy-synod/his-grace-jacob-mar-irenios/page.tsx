@@ -2,15 +2,20 @@ import React from 'react';
 import Image from 'next/image';
 import SynodMembersSidebar from '../../components/SynodMembersSidebar';
 import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata = {
   title: 'H.G. Dr. Yakoob Mar Irenaios Metropolitan',
-  description: 'Biography and information about H.G. Dr. Yakoob Mar Irenaios Metropolitan.',
+  description: 'His Grace Dr. Yakoob Mar Irenaios (Jacob Mar Irenios), Metropolitan of Kochi Diocese. Former President of Orthodox Youth Movement, Sunday School Association, and MOC publications.',
 };
 
 const HisGraceJacobMarIreniosPage = () => {
   return (
     <div className="bg-syro-bg-gray">
+      <SyroPageBanner
+        title="H.G. Dr. Yakoob Mar Irenaios Metropolitan"
+        breadcrumbFrom="home"
+      />
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -44,22 +49,16 @@ const HisGraceJacobMarIreniosPage = () => {
 
                     <div className="prose prose-lg max-w-none">
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace was born on 15 August 1949 to Mr T. O Cherian Mrs Kunjelyamma Cherian of Aruvidan Pallikal Family, Kallupara. He did his high-schooling at MGD High School, Puthussery and pre-degree course at Chengannur Christian College. He had his bachelors and masters in English literature from Madras University. Thereupon, he did his BEd and MEd from Kerala University. He took an additional MA in philosophy from Kerala University and then did his PhD. Coming to the theological front, His Grace did his BD degree from Serampore University and D Th from St Peter’s Pontifical Institute Bangalore, MTh from the US. He was ordained a deacon in 1970 by late His Grace Thoma Mar Dionysius and a priest in 1975 by H.H. Baselios Marthoma Didymos I. He became a Ramban on 19 December 1992. On 16 August 1993, HH Baselios Mar Thoma Mathews II consecrated him as Episcopa and named as Jacob Mar Irenios. In August 1995, he was given charge of the Malabar Diocese as the Assistant Metropolitan. When Zacharia Mar Dionysius departed for the eternal life, His Grace was given the charge of Madras Diocese. His Grace has served the church in different capacities as President, Orthodox Youth Movement, President Orthodox Sunday School Association, President Orthodox Bala Samajam, President MOC publications, President Divya Bodhanam, Manager MOC Colleges. His Grace is presently given the charge of Kochi Diocese.
+                        His Grace was born on 15 August 1949 to Mr T. O Cherian and Mrs Kunjelyamma Cherian of Aruvidan Pallikal Family, Kallupara. He did his high-schooling at MGD High School, Puthussery and pre-degree course at Chengannur Christian College. He had his bachelors and masters in English literature from Madras University. Thereupon, he did his BEd and MEd from Kerala University. He took an additional MA in philosophy from Kerala University and then did his PhD. Coming to the theological front, His Grace did his BD degree from Serampore University and D Th from St Peter’s Pontifical Institute Bangalore, MTh from the US. He was ordained a deacon in 1970 by late His Grace Thoma Mar Dionysius and a priest in 1975 by H.H. Baselios Marthoma Didymos I. He became a Ramban on 19 December 1992. On 16 August 1993, HH Baselios Mar Thoma Mathews II consecrated him as Episcopa and named as Jacob Mar Irenios. In August 1995, he was given charge of the Malabar Diocese as the Assistant Metropolitan. When Zacharia Mar Dionysius departed for the eternal life, His Grace was given the charge of Madras Diocese. His Grace has served the church in different capacities as President, Orthodox Youth Movement, President Orthodox Sunday School Association, President Orthodox Bala Samajam, President MOC publications, President Divya Bodhanam, Manager MOC Colleges. His Grace is presently given the charge of Kochi Diocese.
                       </p>
 
-                      <div className="mt-6 pt-6 border-t border-syro-table-border">
-                        <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-2">
-                          Address: Zion Seminary, Koratty East P.O. 680 308, Chalakkudy.
-                        </p>
-                        <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-2">
-                          Tel. 0480-2734818,
-                        </p>
-                        <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-2">
-                          Mob: 9495703344
-                        </p>
-                        <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-2">
-                          Email: marirenaios@yahoo.co.in drmarirenaios@gmail.com
-                        </p>
+                      <h4 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
+                        Contact
+                      </h4>
+                      <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
+                        <p>Zion Seminary, Koratty East P.O. 680 308, Chalakkudy</p>
+                        <p>Tel.: 0480-2734818 | Mob: 9495703344</p>
+                        <p>Email: marirenaios@yahoo.co.in / drmarirenaios@gmail.com</p>
                       </div>
                     </div>
                   </div>

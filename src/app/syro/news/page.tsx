@@ -97,6 +97,12 @@ export default async function NewsPage() {
                 articles={data.featured}
                 baseHref="/syro/news"
               />
+              {/* Between-sections ad slots (position=between_sections) */}
+              {data.betweenSectionsAdSlots.length > 0 && (
+                <div className="py-4">
+                  <AdSlots slots={data.betweenSectionsAdSlots} />
+                </div>
+              )}
               <ArticleList
                 id="press-release"
                 title="Press Release"

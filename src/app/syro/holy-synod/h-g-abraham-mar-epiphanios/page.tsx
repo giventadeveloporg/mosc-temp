@@ -2,15 +2,20 @@ import React from 'react';
 import Image from 'next/image';
 import SynodMembersSidebar from '../../components/SynodMembersSidebar';
 import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata = {
   title: 'H. G. Abraham Mar Epiphanios Metropolitan',
-  description: 'Biography and information about H. G. Abraham Mar Epiphanios Metropolitan.',
+  description: 'His Grace Abraham Mar Epiphanios, Metropolitan of Mavelikara Diocese. Former Manager of Parumala Seminary and Devalokam Catholicate Aramana; Vicar of St Thomas Cathedral.',
 };
 
 const HGAbrahamMarEpiphaniosPage = () => {
   return (
     <div className="bg-syro-bg-gray">
+      <SyroPageBanner
+        title="H. G. Abraham Mar Epiphanios Metropolitan"
+        breadcrumbFrom="home"
+      />
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -44,29 +49,20 @@ const HGAbrahamMarEpiphaniosPage = () => {
 
                     <div className="prose prose-lg max-w-none">
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace was born on 17th September 1960 as the son of Mr. V. A. Oommen and Mrs. Gracy Oommen. His Grace is a member of St. Mary\'s Cathedral, Malaysia. His Grace had his education in Pathanamthitta Catholicate School and College, the Orthodox Theological Seminary and stands with his M.Th. degree from Serampore University. His Grace was ordained as deacon and Priest in 1986 and 1987 respectively; on 31st March 2002 His Grace became Ramban. His Grace has spent a long time in the Ashrams in Parumala and Madras from 1990 to 1996. His Grace served as Vicar of St. Thomas Cathedral from 1996 to 2002. Thereafter His Grace served as the Manager of Bishop\'s House, Madras in 2003 From 2004-2006 His Grace was served as the Manager at Parumala Seminary and Devalokam Catholicate Aramana. His Grace is serving the Mavelikara Diocese as its Metropolitan.
+                        His Grace was born on 17th September 1960 as the son of Mr V.A. Oommen and Mrs Gracy Oommen. His Grace is a member of St Mary’s Cathedral, Malaysia. His Grace had his education in Pathanamthitta Catholicate School and College and the Orthodox Theological Seminary, and holds his M.Th. degree from Serampore University. His Grace was ordained as deacon and priest in 1986 and 1987 respectively; on 31st March 2002 His Grace became Ramban. His Grace has spent a long time in the Ashrams in Parumala and Madras from 1990 to 1996. His Grace served as Vicar of St Thomas Cathedral from 1996 to 2002. Thereafter His Grace served as the Manager of Bishop’s House, Madras in 2003. From 2004–2006 His Grace served as the Manager at Parumala Seminary and Devalokam Catholicate Aramana.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
                         His Grace is serving the Mavelikara Diocese as its Metropolitan.
                       </p>
 
-                      <div className="mt-6 pt-6 border-t border-syro-table-border">
-                        <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-2">
-                          Address: Theobhavan Aramana, Thazhakara – Post, Mavelikara, Kerala - 690102
-                        </p>
-                        <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-2">
-                          Mob: 9447908814
-                        </p>
-                        <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-2">
-                          Email: marepiphanios@gmail.com
-                        </p>
-                        <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-2">
-                          Address: Theobhavan Aramana, Thazhakara – Post, Mavelikara, Kerala - 690102
-                        </p>
-                        <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-2">
-                          Email: marepiphanios@gmail.com
-                        </p>
+                      <h4 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
+                        Contact
+                      </h4>
+                      <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
+                        <p>Theobhavan Aramana, Thazhakara – Post, Mavelikara, Kerala – 690 102</p>
+                        <p>Mob: 9447908814</p>
+                        <p>Email: marepiphanios@gmail.com</p>
                       </div>
                     </div>
                   </div>

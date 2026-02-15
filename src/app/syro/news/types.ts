@@ -2,12 +2,16 @@
  * Types for News Portal (Strapi-backed) used by the MOSC news homepage and article detail.
  */
 
+import type { BlocksContent } from '@strapi/blocks-react-renderer';
+
 export interface NewsArticle {
   id: number;
   documentId?: string;
   title: string;
   slug: string;
   excerpt?: string;
+  /** Rich text blocks from Strapi (description field). When set, render with BlocksRenderer. */
+  description?: BlocksContent;
   body?: string;
   publishedAt?: string;
   views?: number;
@@ -62,4 +66,6 @@ export interface NewsHomePageData {
   adSlots: AdSlot[];
   /** Top banner ad slots (position=top) */
   topAdSlots: AdSlot[];
+  /** Between-sections ad slots (position=between_sections) */
+  betweenSectionsAdSlots: AdSlot[];
 }

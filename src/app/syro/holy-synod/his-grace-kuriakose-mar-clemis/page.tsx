@@ -2,15 +2,20 @@ import React from 'react';
 import Image from 'next/image';
 import SynodMembersSidebar from '../../components/SynodMembersSidebar';
 import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata = {
   title: 'H.G. Kuriakose Mar Clemis Metropolitan',
-  description: 'Biography and information about H.G. Kuriakose Mar Clemis Metropolitan.',
+  description: 'His Grace Kuriakose Mar Clemis Metropolitan, Metropolitan of Sultan Bathery (Sultan Battery) Diocese. Social worker and author.',
 };
 
 const HisGraceKuriakoseMarClemisPage = () => {
   return (
     <div className="bg-syro-bg-gray">
+      <SyroPageBanner
+        title="H.G. Kuriakose Mar Clemis Metropolitan"
+        breadcrumbFrom="home"
+      />
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -44,7 +49,7 @@ const HisGraceKuriakoseMarClemisPage = () => {
 
                     <div className="prose prose-lg max-w-none">
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace was born in 1936 at Nellikkal, Koipram Village in Thiruvalla Taluk as the second son to Perumethmannil Mr PK Mathai and Mrs Sosamma. He has one brother and two sisters. He belongs to Koorthamala St.Mary\'s Orthodox Church in Chengannur Diocese.
+                        His Grace was born in 1936 at Nellikkal, Koipram Village in Thiruvalla Taluk as the second son to Perumethmannil Mr PK Mathai and Mrs Sosamma. He has one brother and two sisters. He belongs to Koorthamala St. Mary&apos;s Orthodox Church in Chengannur Diocese.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
@@ -56,20 +61,20 @@ const HisGraceKuriakoseMarClemisPage = () => {
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace is actively involved in many social activities. He is the President of a special school for mentally challenged children--Olivemala and Baselious Gregorios Mercy Home. He has so far extended helping hands poor and also runs a secret fund and educational fund for the economically weaker sections.
+                        His Grace is actively involved in many social activities. He is the President of a special school for mentally challenged children--Olivemala and Baselious Gregorios Mercy Home. He has so far extended helping hands to the poor and also runs a secret fund and educational fund for the economically weaker sections.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
                         His Grace has many published articles to his credit. He is known for his simplicity and sweet voice.
                       </p>
 
-                      <div className="mt-6 pt-6 border-t border-syro-table-border">
-                        <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-2">
-                          Address: Basil Aramana ,Pathanamthitta -689 645 Tel.: 0468-2222243 /9495694429
-                        </p>
-                        <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-2">
-                          Email: hgmarclemis@gmail.com
-                        </p>
+                      <h4 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
+                        Contact
+                      </h4>
+                      <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
+                        <p>Basil Aramana, Pathanamthitta – 689 645</p>
+                        <p>Tel.: 0468-2222243 / 9495694429</p>
+                        <p>Email: hgmarclemis@gmail.com</p>
                       </div>
                     </div>
                   </div>

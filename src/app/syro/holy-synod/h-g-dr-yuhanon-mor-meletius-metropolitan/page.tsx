@@ -1,16 +1,22 @@
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import SynodMembersSidebar from '../../components/SynodMembersSidebar';
 import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata = {
   title: 'H.G. Dr. Yuhanon Mar Meletius Metropolitan',
-  description: 'Biography and information about H.G. Dr. Yuhanon Mar Meletius Metropolitan.',
+  description: 'His Grace Dr. Yuhanon Mar Meletius Metropolitan, Metropolitan of Thrissur Diocese. Scholar, visiting professor, and author.',
 };
 
 const HGDrYuhanonMorMeletiusMetropolitanPage = () => {
   return (
     <div className="bg-syro-bg-gray">
+      <SyroPageBanner
+        title="H.G. Dr. Yuhanon Mar Meletius Metropolitan"
+        breadcrumbFrom="home"
+      />
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -52,23 +58,31 @@ const HGDrYuhanonMorMeletiusMetropolitanPage = () => {
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        Mar Meletius got into the services of Our Lord being ordained a deacon in 1973 by His Grace Paulose Mar Phelexinos, the then metropolitan of Kandanad Diocese. He was ordained a priest in 1986 by His Beatitude Catholicos Baselios Paulose II. HH Patriarc Ignatius Zakka I, ordained him as Ramban on 22 December 1990 and as Bishop on 23 December 1990 in Damascus. Since then, he is serving the Trissur Diocese as its Metropolitan.
+                        Mar Meletius got into the services of Our Lord being ordained a deacon in 1973 by His Grace Paulose Mar Phelexinos, the then metropolitan of Kandanad Diocese. He was ordained a priest in 1986 by His Beatitude Catholicos Baselios Paulose II. HH Patriarch Ignatius Zakka I, ordained him as Ramban on 22 December 1990 and as Bishop on 23 December 1990 in Damascus. Since then, he is serving the Trissur Diocese as its Metropolitan.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
                         As a priest, he was teaching at MSOT Seminary, Udaigiri. He was also serving as the vicar of St Mary’s Church, Valampur, for about four years. His Grace is also served as the president of Orthodox Christian Youth Movement.
                       </p>
 
-                      <div className="mt-6 pt-6 border-t border-syro-table-border">
-                        <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-2">
-                          A scholar, His Grace is a visiting professor to the Orthodox seminaries at Nagpur and Kottayam. An accomplished writer, Mar Meletius has few books—Verukal Thedi, Manavikathayude Kazhchapadukal, Swatantravum Swayam Paryapthathayum—to his credit.
-                        </p>
-                        <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-2">
-                          This widely travelled Bishop has also published numerous articles in different publications.Visit the new website of H.G.Mar Meletius Metropolitan: www.yuhanonmeletius.org
-                        </p>
-                        <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-2">
-                          Address:Gedseemon Seminary , Mannuthy, Thrissur, Kerala, India.- 680651 Phone: 0487 2371039, 2371748, 9447037174 Email: yuhanonmilitos@hotmail.com / mormilitos@gmail.com
-                        </p>
+                      <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
+                        A scholar, His Grace is a visiting professor to the Orthodox seminaries at Nagpur and Kottayam. An accomplished writer, Mar Meletius has few books—Verukal Thedi, Manavikathayude Kazhchapadukal, Swatantravum Swayam Paryapthathayum—to his credit.
+                      </p>
+
+                      <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
+                        This widely travelled Bishop has also published numerous articles in different publications. Visit the new website of H.G. Mar Meletius Metropolitan:{' '}
+                        <Link href="https://www.yuhanonmeletius.org" target="_blank" rel="noopener noreferrer" className="text-syro-blue hover:underline">
+                          www.yuhanonmeletius.org
+                        </Link>
+                      </p>
+
+                      <h4 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
+                        Contact
+                      </h4>
+                      <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
+                        <p>Gedseemon Seminary, Mannuthy, Thrissur, Kerala, India – 680651</p>
+                        <p>Phone: 0487 2371039, 2371748, 9447037174</p>
+                        <p>Email: yuhanonmilitos@hotmail.com / mormilitos@gmail.com</p>
                       </div>
                     </div>
                   </div>
