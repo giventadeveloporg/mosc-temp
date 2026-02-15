@@ -32,7 +32,7 @@ export default function SyroLayout({ children }: SyroLayoutProps) {
       <SyroHeader />
       <SyroQuickLinksBar />
 
-      <main id="mainContent" className="syro-main flex-1">
+      <main id="mainContent" className="syro-main flex-1 min-w-0 overflow-x-hidden">
         {children}
       </main>
 

@@ -13,6 +13,7 @@ import { FlashNewsCarousel } from '../components/FlashNewsCarousel';
 import { FlashBar } from '../components/FlashBar';
 import { ArticleShareButtons } from '../components/ArticleShareButtons';
 import { FollowUsFacebook } from '../components/FollowUsFacebook';
+import { ArticleContent } from '@/components/news/ArticleContent';
 import { getAppUrl } from '@/lib/env';
 
 interface PageProps {
@@ -59,7 +60,7 @@ export default async function NewsArticlePage({ params }: PageProps) {
         <FlashBar message={flashData.flash.message} />
       ) : null}
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 overflow-x-hidden">
         <Link
           href="/syro/news"
           className="syro-news-link inline-flex items-center gap-2 font-body text-sm hover:underline mb-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -67,9 +68,9 @@ export default async function NewsArticlePage({ params }: PageProps) {
           <span aria-hidden="true">←</span> Back to News
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-12 min-w-0">
           {/* Main content */}
-          <article className="lg:col-span-2">
+          <article className="lg:col-span-2 min-w-0 overflow-x-hidden max-w-full">
             <header className="mb-6">
               <h1 className="syro-article-detail-title">
                 {article.title}
@@ -98,18 +99,19 @@ export default async function NewsArticlePage({ params }: PageProps) {
               </div>
             )}
 
-            {article.excerpt && !(typeof article.body === 'string' && article.body.trim()) && (
+            {article.excerpt && !(Array.isArray(article.description) && article.description.length > 0) && !(typeof article.body === 'string' && article.body.trim()) && (
               <p className="syro-article-detail-lead mb-6 border-l-4 border-primary/30 pl-4">
                 {article.excerpt}
               </p>
             )}
 
-            <div className="syro-article-detail-body prose prose-lg max-w-none prose-headings:font-heading prose-headings:text-foreground prose-headings:font-semibold prose-p:leading-relaxed prose-p:text-base prose-a:no-underline">
-              {typeof article.body === 'string' && article.body.trim() ? (
-                <div dangerouslySetInnerHTML={{ __html: article.body }} />
-              ) : article.excerpt ? null : (
-                <p>No additional content for this article.</p>
-              )}
+            <div className="syro-article-detail-body prose prose-lg max-w-full min-w-0 break-words overflow-x-clip prose-headings:font-heading prose-headings:text-foreground prose-headings:font-semibold prose-p:leading-relaxed prose-p:text-base prose-p:break-words prose-a:no-underline prose-pre:overflow-x-hidden prose-pre:max-w-full prose-pre:whitespace-pre-wrap prose-pre:break-words [&>*]:min-w-0 [&>*]:max-w-full [&>*]:break-words [&_p]:break-words [&_li]:break-words">
+              <ArticleContent
+                description={article.description}
+                body={article.body}
+                excerpt={article.excerpt}
+                emptyMessage="No additional content for this article."
+              />
             </div>
 
             <div className="mt-8 pt-6 border-t border-border">

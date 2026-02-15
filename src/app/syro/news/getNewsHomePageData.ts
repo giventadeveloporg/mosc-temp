@@ -6,6 +6,7 @@
  */
 
 import { fetchStrapi, getStrapiUrl, getStrapiTenantId } from '@/lib/strapi';
+import type { BlocksContent } from '@strapi/blocks-react-renderer';
 import type { NewsHomePageData, NewsArticle, FlashNews, FlashNewsItemUI, SidebarPromoBlock, AdSlot } from './types';
 
 /** Strapi 5: Array-style populate; comma-separated populate triggers 400. Include cover so list/detail show images. */
@@ -101,8 +102,11 @@ function normalizeArticle(raw: { id?: number; documentId?: string; attributes?: 
   const categorySlug = category?.data?.attributes?.slug ?? category?.slug;
   const categoryName = category?.data?.attributes?.name ?? category?.name;
   const authorName = author?.data?.attributes?.name ?? author?.name;
-  // Strapi "Editorial - Article" uses "description" for main content; map to body when body is absent
-  const description = typeof attrs?.description === 'string' ? attrs.description.trim() : '';
+  // Strapi "Editorial - Article" uses "description" as Rich Text (Blocks) or legacy string
+  const descRaw = attrs?.description;
+  const descStr = typeof descRaw === 'string' ? (descRaw as string).trim() : '';
+  const descriptionBlocks: BlocksContent | undefined =
+    Array.isArray(descRaw) && descRaw.length > 0 ? (descRaw as BlocksContent) : undefined;
   const bodyRaw = attrs?.body;
   const bodyStr = typeof bodyRaw === 'string' ? bodyRaw.trim() : '';
   const excerptStr = typeof attrs?.excerpt === 'string' ? (attrs.excerpt as string).trim() : '';
@@ -111,8 +115,9 @@ function normalizeArticle(raw: { id?: number; documentId?: string; attributes?: 
     documentId: raw?.documentId as string | undefined,
     title: (attrs?.title ?? '') as string,
     slug: (attrs?.slug ?? '') as string,
-    excerpt: excerptStr || (description ? description.slice(0, 300) + (description.length > 300 ? '…' : '') : undefined),
-    body: bodyStr || description || undefined,
+    excerpt: excerptStr || (descStr ? descStr.slice(0, 300) + (descStr.length > 300 ? '…' : '') : undefined),
+    description: descriptionBlocks,
+    body: bodyStr || descStr || undefined,
     publishedAt: (attrs?.publishedAt ?? undefined) as string | undefined,
     views: (attrs?.views ?? undefined) as number | undefined,
     coverUrl,

@@ -89,13 +89,31 @@ a:hover .syro-article-card-title {
   text-transform: uppercase !important;
 }
 
-/* ---- News detail: body content ---- */
+/* ---- News detail: body content (contain horizontal overflow, no page scrollbar) ---- */
+.syro-article-detail-body {
+  overflow-x: clip;
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
 .syro-article-detail-body,
 .syro-article-detail-body p {
   font-family: 'Open Sans', Helvetica, Arial, sans-serif !important;
   font-size: 15px !important;
   color: var(--syro-news-body-alt) !important;
   line-height: 24px !important;
+}
+.syro-article-detail-body * {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+/* Pre/code: wrap long lines so no horizontal scrollbar inside pre */
+.syro-article-detail-body pre,
+.syro-article-detail-body pre code {
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
+  overflow-x: hidden !important;
+  max-width: 100% !important;
 }
 .syro-article-detail-body a {
   color: var(--syro-news-link) !important;
