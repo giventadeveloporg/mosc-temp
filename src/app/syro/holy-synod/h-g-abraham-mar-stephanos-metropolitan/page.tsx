@@ -6,7 +6,7 @@ import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata = {
   title: 'H.G. Abraham Mar Stephanos Metropolitan',
-  description: 'His Grace Abraham Mar Stephanos, Metropolitan of UK, Europe, and Africa dioceses. M.Th. (FFRRC), MA Late Antiquity and Byzantine Studies, King\'s College London; ordained Metropolitan 2022.',
+  description: "His Grace Abraham Mar Stephanos, Metropolitan of UK, Europe, and Africa dioceses. M.Th. (FFRRC), MA Late Antiquity and Byzantine Studies, King's College London; ordained Metropolitan 2022.",
 };
 
 const HGAbrahamMarStephanosMetropolitanPage = () => {
