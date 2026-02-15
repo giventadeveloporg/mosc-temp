@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -37,7 +39,7 @@ export function ArticleList({ title, articles, baseHref, compact, id }: ArticleL
           {articles.map((article) => (
             <li key={article.id}>
               <Link
-                href={`${baseHref}/${article.slug || article.documentId || article.id}`}
+                href={`${baseHref}/${article.documentId || article.slug || String(article.id)}`}
                 className="block group rounded-lg overflow-hidden border border-border hover:border-primary/30 hover:shadow-md reverent-transition focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-card"
               >
                 {/* Image on top - object-contain so header/top is not cropped (image_containment_prevention) */}
