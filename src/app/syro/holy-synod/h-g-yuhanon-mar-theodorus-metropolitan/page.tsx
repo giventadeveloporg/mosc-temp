@@ -6,7 +6,7 @@ import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata = {
   title: 'H.G. Dr. Yuhanon Mar Thevodoros Metropolitan',
-  description: 'His Grace Dr. Yuhanon Mar Thevodoros, Metropolitan of Kottarakara–Punalur Diocese. Principal, Mavelikkara Mission Training Centre; Superior, St. Paul\'s Ashram Puthuppady; Managing Editor, Doothan Magazine.',
+  description: "His Grace Dr. Yuhanon Mar Thevodoros, Metropolitan of Kottarakara–Punalur Diocese. Principal, Mavelikkara Mission Training Centre; Superior, St. Paul's Ashram Puthuppady; Managing Editor, Doothan Magazine.",
 };
 
 const HGYuhanonMarTheodorusMetropolitanPage = () => {
