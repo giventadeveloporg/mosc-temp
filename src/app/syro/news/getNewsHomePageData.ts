@@ -217,8 +217,20 @@ function filterFlashNewsByDate(items: FlashNewsItemUI[]): FlashNewsItemUI[] {
   });
 }
 
+/** Max fetch attempts when Strapi returns errors (e.g. 401, network). No retry when Strapi succeeds with 0 articles. */
+const MAX_STRAPI_ATTEMPTS = 5;
+
+/** Delay in ms before retrying after a failed attempt. */
+const RETRY_DELAY_MS = 1500;
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 /**
  * Fetches all data needed for the news homepage. Returns empty sections if Strapi is unavailable or on error.
+ * Retries up to MAX_STRAPI_ATTEMPTS times only when Strapi requests fail (401, network, etc.). Does not retry
+ * when Strapi succeeds and returns 0 articles (valid empty state).
  */
 export async function getNewsHomePageData(): Promise<NewsHomePageData> {
   const empty: NewsHomePageData = {
@@ -248,69 +260,107 @@ export async function getNewsHomePageData(): Promise<NewsHomePageData> {
     return empty;
   }
 
-  console.info(`[STRAPI-NEWS] Fetching news homepage data (tenant: ${tenantId}, Strapi: ${strapiUrl})`);
-  try {
   const flashNewsPath = `/flash-news-items?filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}&filters[publishedAt][$notNull]=true&sort=order:asc,publishedAt:desc&populate[0]=article&pagination[limit]=20`;
+  const adsPath = `/advertisement-slots?filters[$or][0][position][$eq]=sidebar&filters[$or][1][position][$eq]=top&filters[$or][2][position][$eq]=between_sections&filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}&populate=media`;
 
-  const [
-    homepageRes,
-    flashRes,
-    featuredRes,
-    mainRes,
-    pressRes,
-    mostReadRes,
-    sidebarRes,
-    adsRes,
-  ] = await Promise.all([
-    fetchStrapi<{ id?: number; attributes?: Record<string, unknown> }>('/homepage?populate=*'),
-    fetchStrapi<unknown[]>(flashNewsPath),
-    fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=featured-news', 'publishedAt:desc', 6)),
-    fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=main-news', 'publishedAt:desc', 10)),
-    fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=press-release', 'publishedAt:desc', 10)),
-    fetchStrapi<unknown[]>(buildArticleQuery('', 'views:desc', 5)),
-    fetchStrapi<{ id?: number; attributes?: Record<string, unknown> }>('/sidebar-promotional-block?populate=*'),
-    fetchStrapi<unknown[]>(`/advertisement-slots?filters[$or][0][position][$eq]=sidebar&filters[$or][1][position][$eq]=top&filters[$or][2][position][$eq]=between_sections&filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}&populate=media`),
-  ]);
+  let lastResult: NewsHomePageData = empty;
+  let lastError: unknown;
 
-  const flashList = Array.isArray(flashRes?.data) ? flashRes.data : [];
-  const featuredList = Array.isArray(featuredRes?.data) ? featuredRes.data : [];
-  const mainList = Array.isArray(mainRes?.data) ? mainRes.data : [];
-  const pressList = Array.isArray(pressRes?.data) ? pressRes.data : [];
-  const mostReadList = Array.isArray(mostReadRes?.data) ? mostReadRes.data : [];
-  const adsList = Array.isArray(adsRes?.data) ? adsRes.data : [];
+  for (let attempt = 1; attempt <= MAX_STRAPI_ATTEMPTS; attempt++) {
+    try {
+      console.info(`[STRAPI-NEWS] Fetching news homepage data (tenant: ${tenantId}, Strapi: ${strapiUrl}) attempt ${attempt}/${MAX_STRAPI_ATTEMPTS}`);
 
-  const allFlashItems = (flashList ?? [])
-    .map((f) => normalizeFlashNewsItem(f as RawFlashNewsItem))
-    .filter((f) => f.content && f.content.length > 0);
-  const flashNewsItems = filterFlashNewsByDate(allFlashItems);
+      const [
+        homepageRes,
+        flashRes,
+        featuredRes,
+        mainRes,
+        pressRes,
+        mostReadRes,
+        sidebarRes,
+        adsRes,
+      ] = await Promise.all([
+        fetchStrapi<{ id?: number; attributes?: Record<string, unknown> }>('/homepage?populate=*'),
+        fetchStrapi<unknown[]>(flashNewsPath),
+        fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=featured-news', 'publishedAt:desc', 6)),
+        fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=main-news', 'publishedAt:desc', 10)),
+        fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=press-release', 'publishedAt:desc', 10)),
+        fetchStrapi<unknown[]>(buildArticleQuery('', 'views:desc', 5)),
+        fetchStrapi<{ id?: number; attributes?: Record<string, unknown> }>('/sidebar-promotional-block?populate=*'),
+        fetchStrapi<unknown[]>(adsPath),
+      ]);
 
-  const allAds = (adsList ?? []).map((a) => normalizeAdSlot(a as { id?: number; attributes?: Record<string, unknown> }));
-  const sidebarSlots = allAds.filter((a) => (a.position ?? '').toLowerCase() === 'sidebar');
-  const topSlots = allAds.filter((a) => (a.position ?? '').toLowerCase() === 'top');
-  const betweenSectionsSlots = allAds.filter((a) => (a.position ?? '').toLowerCase().replace(/-/g, '_') === 'between_sections');
+      const hadError =
+        homepageRes == null ||
+        flashRes == null ||
+        featuredRes == null ||
+        mainRes == null ||
+        pressRes == null ||
+        mostReadRes == null ||
+        sidebarRes == null ||
+        adsRes == null;
 
-  const result = {
-    flash: normalizeHomepage(homepageRes?.data ?? null),
-    flashNewsItems,
-    featured: (featuredList ?? []).map((a) => normalizeArticle(a as { id?: number; documentId?: string; attributes?: Record<string, unknown> })),
-    mainNews: (mainList ?? []).map((a) => normalizeArticle(a as { id?: number; documentId?: string; attributes?: Record<string, unknown> })),
-    pressRelease: (pressList ?? []).map((a) => normalizeArticle(a as { id?: number; documentId?: string; attributes?: Record<string, unknown> })),
-    mostRead: (mostReadList ?? []).map((a) => normalizeArticle(a as { id?: number; documentId?: string; attributes?: Record<string, unknown> })),
-    sidebarPromo: normalizeSidebarPromo(sidebarRes?.data ?? null),
-    adSlots: sidebarSlots,
-    topAdSlots: topSlots,
-    betweenSectionsAdSlots: betweenSectionsSlots,
-  };
-  const totalArticles = result.featured.length + result.mainNews.length + result.pressRelease.length + result.mostRead.length;
-  console.info(`[STRAPI-NEWS] Homepage data loaded: ${totalArticles} articles, flash=${!!result.flash?.active}, flashItems=${result.flashNewsItems.length}, sidebar=${!!result.sidebarPromo}, sidebarAds=${result.adSlots.length}, topAds=${result.topAdSlots.length}, betweenSectionsAds=${result.betweenSectionsAdSlots.length}`);
-  if (totalArticles === 0) {
-    console.info('[STRAPI-NEWS] Tip: Only published articles are shown. If you see 0 articles, ensure entries are Published (not Draft) in Strapi and have the correct category and tenant.');
+      const flashList = Array.isArray(flashRes?.data) ? flashRes.data : [];
+      const featuredList = Array.isArray(featuredRes?.data) ? featuredRes.data : [];
+      const mainList = Array.isArray(mainRes?.data) ? mainRes.data : [];
+      const pressList = Array.isArray(pressRes?.data) ? pressRes.data : [];
+      const mostReadList = Array.isArray(mostReadRes?.data) ? mostReadRes.data : [];
+      const adsList = Array.isArray(adsRes?.data) ? adsRes.data : [];
+
+      const allFlashItems = (flashList ?? [])
+        .map((f) => normalizeFlashNewsItem(f as RawFlashNewsItem))
+        .filter((f) => f.content && f.content.length > 0);
+      const flashNewsItems = filterFlashNewsByDate(allFlashItems);
+
+      const allAds = (adsList ?? []).map((a) => normalizeAdSlot(a as { id?: number; attributes?: Record<string, unknown> }));
+      const sidebarSlots = allAds.filter((a) => (a.position ?? '').toLowerCase() === 'sidebar');
+      const topSlots = allAds.filter((a) => (a.position ?? '').toLowerCase() === 'top');
+      const betweenSectionsSlots = allAds.filter((a) => (a.position ?? '').toLowerCase().replace(/-/g, '_') === 'between_sections');
+
+      const result: NewsHomePageData = {
+        flash: normalizeHomepage(homepageRes?.data ?? null),
+        flashNewsItems,
+        featured: (featuredList ?? []).map((a) => normalizeArticle(a as { id?: number; documentId?: string; attributes?: Record<string, unknown> })),
+        mainNews: (mainList ?? []).map((a) => normalizeArticle(a as { id?: number; documentId?: string; attributes?: Record<string, unknown> })),
+        pressRelease: (pressList ?? []).map((a) => normalizeArticle(a as { id?: number; documentId?: string; attributes?: Record<string, unknown> })),
+        mostRead: (mostReadList ?? []).map((a) => normalizeArticle(a as { id?: number; documentId?: string; attributes?: Record<string, unknown> })),
+        sidebarPromo: normalizeSidebarPromo(sidebarRes?.data ?? null),
+        adSlots: sidebarSlots,
+        topAdSlots: topSlots,
+        betweenSectionsAdSlots: betweenSectionsSlots,
+      };
+
+      const totalArticles = result.featured.length + result.mainNews.length + result.pressRelease.length + result.mostRead.length;
+      console.info(`[STRAPI-NEWS] Homepage data loaded: ${totalArticles} articles, flash=${!!result.flash?.active}, flashItems=${result.flashNewsItems.length}, sidebar=${!!result.sidebarPromo}, sidebarAds=${result.adSlots.length}, topAds=${result.topAdSlots.length}, betweenSectionsAds=${result.betweenSectionsAdSlots.length}`);
+      if (totalArticles === 0 && !hadError) {
+        console.info('[STRAPI-NEWS] Tip: Only published articles are shown. If you see 0 articles, ensure entries are Published (not Draft) in Strapi and have the correct category and tenant.');
+      }
+
+      if (!hadError) {
+        return result;
+      }
+
+      lastResult = result;
+      if (attempt < MAX_STRAPI_ATTEMPTS) {
+        console.warn(`[STRAPI-NEWS] Some Strapi requests failed (attempt ${attempt}/${MAX_STRAPI_ATTEMPTS}). Retrying in ${RETRY_DELAY_MS}ms.`);
+        await sleep(RETRY_DELAY_MS);
+      }
+    } catch (e) {
+      lastError = e;
+      console.warn(`[STRAPI-NEWS] getNewsHomePageData attempt ${attempt}/${MAX_STRAPI_ATTEMPTS} failed:`, e);
+      if (attempt < MAX_STRAPI_ATTEMPTS) {
+        console.warn(`[STRAPI-NEWS] Retrying in ${RETRY_DELAY_MS}ms.`);
+        await sleep(RETRY_DELAY_MS);
+      }
+    }
   }
-  return result;
-  } catch (e) {
-    console.warn('[STRAPI-NEWS] getNewsHomePageData failed:', e);
+
+  if (lastError) {
+    console.warn('[STRAPI-NEWS] All attempts failed. Returning empty news data.', lastError);
     return empty;
   }
+  console.warn(`[STRAPI-NEWS] All ${MAX_STRAPI_ATTEMPTS} attempts had partial/failed Strapi responses. Returning last result.`);
+  return lastResult;
 }
 
 /** Result for shared news layout (header + flash) on index and article detail pages. */

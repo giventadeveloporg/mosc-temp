@@ -818,6 +818,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                                     <Link
                                       key={subItem.name}
                                       href={subItem.href}
+                                      prefetch={subItem.href === '/syro' ? false : undefined}
                                       onClick={(e) => {
                                         // Handle smooth scroll for hash links
                                         if (subItem.href.startsWith('/#')) {
@@ -1092,6 +1093,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                               <li key={subItem.name}>
                                 <Link
                                   href={subItem.href}
+                                  prefetch={subItem.href === '/syro' ? false : undefined}
                                   onClick={(e) => {
                                     // Handle smooth scroll for hash links
                                     if (subItem.href.startsWith('/#')) {
@@ -1308,6 +1310,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                             <Link
                               key={subItem.name}
                               href={subItem.href}
+                              prefetch={subItem.href === '/syro' ? false : undefined}
                               className={`header-mobile-link block text-sm py-2.5 ${pathname?.startsWith(subItem.href) ? 'active' : ''}`}
                               onClick={closeMobileMenu}
                               role="menuitem"
