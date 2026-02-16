@@ -14,7 +14,7 @@ const HGDrYuhanonMarDemetriusMetropolitanPage = () => {
     <div className="bg-syro-bg-gray">
       <SyroPageBanner
         title="H.G. Dr. Youhanon Mar Demetrios Metropolitan"
-        breadcrumbFrom="home"
+        breadcrumbFrom="holy-synod"
       />
       {/* Main Content */}
       <section className="py-16 bg-white">

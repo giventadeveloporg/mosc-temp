@@ -14,7 +14,7 @@ const HisHolinessBaseliosMarthomaMathewsIiiPage = () => {
     <div className="bg-syro-bg-gray">
       <SyroPageBanner
         title="H.H. Baselios Marthoma Mathews III"
-        breadcrumbFrom="home"
+        breadcrumbFrom="holy-synod"
       />
       {/* Main Content */}
       <section className="py-16 bg-white">
