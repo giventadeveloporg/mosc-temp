@@ -4,6 +4,8 @@ import type { NextRequest } from "next/server";
 import { createLogger } from "@/lib/logger";
 
 const logger = createLogger('MIDDLEWARE');
+const DEBUG_MIDDLEWARE = process.env.NEXT_PUBLIC_DEBUG_MIDDLEWARE === 'true';
+const debugLog = (...args: unknown[]) => { if (DEBUG_MIDDLEWARE) console.log(...args); };
 
 /**
  * Clerk v6 Middleware
@@ -83,8 +85,8 @@ export default clerkMiddleware(
     }
 
     const resolvedAuth = await auth();
-    console.log('[MIDDLEWARE] afterAuth called for:', pathname);
-    console.log('[MIDDLEWARE] Auth state:', { userId: resolvedAuth?.userId ?? null, sessionId: resolvedAuth?.sessionId ?? null });
+    debugLog('[MIDDLEWARE] afterAuth called for:', pathname);
+    debugLog('[MIDDLEWARE] Auth state:', { userId: resolvedAuth?.userId ?? null, sessionId: resolvedAuth?.sessionId ?? null });
 
     const userAgentMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|WhatsApp|Mobile|CriOS|FxiOS/i.test(userAgent);
     const cloudfrontMobile = req.headers.get('cloudfront-is-mobile-viewer') === 'true';
@@ -102,15 +104,15 @@ export default clerkMiddleware(
         userAgent: userAgent.substring(0, 150),
         timestamp: new Date().toISOString(),
       });
-      console.log('[MIDDLEWARE] ===== API REQUEST DETECTED =====');
-      console.log('[MIDDLEWARE] Pathname:', pathname);
-      console.log('[MIDDLEWARE] Method:', req.method);
-      console.log('[MIDDLEWARE] Is Mobile:', isMobile);
-      console.log('[MIDDLEWARE] Is Proxy:', isApiProxy);
-      console.log('[MIDDLEWARE] Is Diagnostic:', isDiagnostic);
-      console.log('[MIDDLEWARE] User-Agent:', userAgent.substring(0, 150));
-      console.log('[MIDDLEWARE] Timestamp:', new Date().toISOString());
-      console.log('[MIDDLEWARE] ===== END API REQUEST LOG =====');
+      debugLog('[MIDDLEWARE] ===== API REQUEST DETECTED =====');
+      debugLog('[MIDDLEWARE] Pathname:', pathname);
+      debugLog('[MIDDLEWARE] Method:', req.method);
+      debugLog('[MIDDLEWARE] Is Mobile:', isMobile);
+      debugLog('[MIDDLEWARE] Is Proxy:', isApiProxy);
+      debugLog('[MIDDLEWARE] Is Diagnostic:', isDiagnostic);
+      debugLog('[MIDDLEWARE] User-Agent:', userAgent.substring(0, 150));
+      debugLog('[MIDDLEWARE] Timestamp:', new Date().toISOString());
+      debugLog('[MIDDLEWARE] ===== END API REQUEST LOG =====');
     }
 
     // Next.js 15+: pass x-pathname so layout can read it via headers()

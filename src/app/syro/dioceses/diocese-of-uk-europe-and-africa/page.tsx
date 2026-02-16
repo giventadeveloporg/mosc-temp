@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import DiocesesQuickLinksNav from '../DiocesesQuickLinksNav';
+import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata = {
   title: 'Diocese of UK Europe and Africa',
@@ -11,22 +12,7 @@ export const metadata = {
 const dioceseofukeuropeandafricaPage = () => {
   return (
     <div className="bg-syro-bg-gray">
-      {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-syro-red rounded-lg flex items-center justify-center mx-auto mb-6 shadow-syro-card-hover">
-              <span className="text-syro-red-foreground text-4xl font-bold" role="img" aria-label="Diocese">⛪</span>
-            </div>
-            <h1 className="font-syro-display font-semibold text-4xl text-syro-blue mb-4">
-              Diocese of UK Europe and Africa
-            </h1>
-            <p className="font-syro-primary text-lg text-syro-dark-gray max-w-3xl mx-auto leading-relaxed">
-              International Diocese of the Malankara Orthodox Syrian Church
-            </p>
-          </div>
-        </div>
-      </section>
+      <SyroPageBanner title="Diocese of UK Europe and Africa" breadcrumbFrom="dioceses" />
 
       {/* Main Content */}
       <section className="py-16 bg-white">
@@ -111,7 +97,7 @@ There are number of social organisations working under the Diocese as shown on t
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-uk-europe-and-africa" 
-                      className="block px-3 py-2 bg-syro-red text-syro-red-foreground rounded-md font-syro-primary text-sm transition-all duration-300"
+                      className="block px-3 py-2 bg-syro-red text-white rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
                       Diocese of UK Europe and Africa
                     </Link>

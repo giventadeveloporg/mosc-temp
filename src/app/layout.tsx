@@ -13,7 +13,8 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { getAppUrl, getTenantId } from "@/lib/env";
 import { fetchWithJwtRetry } from "@/lib/proxyHandler";
 
-console.log('[LAYOUT-MODULE] Layout module loaded');
+const DEBUG_LAYOUT = process.env.NEXT_PUBLIC_DEBUG_LAYOUT === 'true';
+const debugLog = (...args: unknown[]) => { if (DEBUG_LAYOUT) console.log(...args); };
 
 const CLERK_KEY = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ?? process.env.AMPLIFY_NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ?? '';
 
@@ -30,7 +31,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  console.log('[LAYOUT] Root layout executing');
+  debugLog('[LAYOUT] Root layout executing');
   let isTenantAdmin = false;
   const primaryDomain = process.env.NEXT_PUBLIC_PRIMARY_DOMAIN || process.env.AMPLIFY_NEXT_PUBLIC_PRIMARY_DOMAIN || 'www.event-site-manager.com';
   const satelliteDomain = process.env.NEXT_PUBLIC_CLERK_DOMAIN || process.env.AMPLIFY_NEXT_PUBLIC_CLERK_DOMAIN || 'www.mosc-temp.com';
@@ -108,7 +109,7 @@ export default async function RootLayout({
         // Call auth() first - it internally uses headers() which we've already awaited
         const authResult = CLERK_KEY ? await auth() : null;
         userId = authResult?.userId || null;
-        console.log('[Layout] 🔍 Auth check result:', { userId, hasUserId: !!userId });
+        debugLog('[Layout] 🔍 Auth check result:', { userId, hasUserId: !!userId });
 
         // CRITICAL: Only call currentUser() after auth() completes successfully
         // This ensures headers() async context is properly maintained
@@ -139,13 +140,13 @@ export default async function RootLayout({
       if (userId) {
         const baseUrl = getAppUrl();
         const tenantId = getTenantId();
-        console.log('[Layout] 🔍 Fetching user profile:', { userId, tenantId, baseUrl });
+        debugLog('[Layout] 🔍 Fetching user profile:', { userId, tenantId, baseUrl });
 
         // Step 1: Check if userId + tenantId combination exists
         const url = `${baseUrl}/api/proxy/user-profiles?userId.equals=${encodeURIComponent(userId)}&tenantId.equals=${encodeURIComponent(tenantId)}&size=1`;
-        console.log('[Layout] 🔍 Profile fetch URL:', url);
+        debugLog('[Layout] 🔍 Profile fetch URL:', url);
         const resp = await fetch(url, { cache: 'no-store', headers: { 'Content-Type': 'application/json' } });
-        console.log('[Layout] 🔍 Profile fetch response:', { status: resp.status, ok: resp.ok });
+        debugLog('[Layout] 🔍 Profile fetch response:', { status: resp.status, ok: resp.ok });
 
         if (resp.ok) {
           const arr = await resp.json();
@@ -174,9 +175,9 @@ export default async function RootLayout({
                     // UPDATE the existing record's userId to match current Clerk userId
                     // CRITICAL: Preserve all existing fields - only update userId and clerkUserId
                     // DO NOT overwrite firstName, lastName, email if they already have values
-                    console.log('[Layout] Found existing profile with same email but different userId. Updating userId...');
-                    console.log('[Layout] Old userId:', existingProfile.userId, '→ New userId:', userId);
-                    console.log('[Layout] Preserving existing profile data:', {
+                    debugLog('[Layout] Found existing profile with same email but different userId. Updating userId...');
+                    debugLog('[Layout] Old userId:', existingProfile.userId, '→ New userId:', userId);
+                    debugLog('[Layout] Preserving existing profile data:', {
                       firstName: existingProfile.firstName,
                       lastName: existingProfile.lastName,
                       email: existingProfile.email
@@ -228,7 +229,7 @@ function getApiBase() {
                     }
                     // Preserve existing profileImageUrl - do NOT update
 
-                    console.log('[Layout] Sending PATCH request with payload:', JSON.stringify(updatePayload, null, 2));
+                    debugLog('[Layout] Sending PATCH request with payload:', JSON.stringify(updatePayload, null, 2));
 
                     const updateRes = await fetchWithJwtRetry(`${getApiBase()}/api/user-profiles/${existingProfile.id}`, {
                       method: 'PATCH',
@@ -238,7 +239,7 @@ function getApiBase() {
 
                     if (updateRes.ok) {
                       const updated = await updateRes.json();
-                      console.log('[Layout] 🔍 Updated profile data:', {
+                      debugLog('[Layout] 🔍 Updated profile data:', {
                         id: updated?.id,
                         userId: updated?.userId,
                         email: updated?.email,
@@ -248,7 +249,7 @@ function getApiBase() {
                         rawProfile: JSON.stringify(updated, null, 2)
                       });
                       isTenantAdmin = updated?.userRole === 'ADMIN';
-                      console.log('[Layout] ✅ Successfully updated userId. Admin status:', {
+                      debugLog('[Layout] ✅ Successfully updated userId. Admin status:', {
                         isTenantAdmin,
                         userRole: updated?.userRole,
                         roleMatch: updated?.userRole === 'ADMIN',
@@ -262,7 +263,7 @@ function getApiBase() {
                     }
                   } else {
                     // Step 4: No existing profile found - Create new profile
-                    console.log('[Layout] Creating new user profile for userId:', userId);
+                    debugLog('[Layout] Creating new user profile for userId:', userId);
                     const now = new Date().toISOString();
                     const payload = {
                       userId,
@@ -286,7 +287,7 @@ function getApiBase() {
                     if (!createRes.ok) {
                       console.error('[Layout] Failed to create user profile:', createRes.status);
                     } else {
-                      console.log('[Layout] Successfully created new user profile');
+                      debugLog('[Layout] Successfully created new user profile');
                     }
                   }
                 }
@@ -299,7 +300,7 @@ function getApiBase() {
             }
           } else {
             // Step 5: Profile found by userId + tenantId - check admin status
-            console.log('[Layout] 🔍 Profile data:', {
+            debugLog('[Layout] 🔍 Profile data:', {
               id: p?.id,
               userId: p?.userId,
               email: p?.email,
@@ -309,7 +310,7 @@ function getApiBase() {
               rawProfile: JSON.stringify(p, null, 2)
             });
             isTenantAdmin = p?.userRole === 'ADMIN';
-            console.log('[Layout] ✅ Found existing profile. Admin status:', {
+            debugLog('[Layout] ✅ Found existing profile. Admin status:', {
               isTenantAdmin,
               userRole: p?.userRole,
               roleMatch: p?.userRole === 'ADMIN',
@@ -326,11 +327,11 @@ function getApiBase() {
     }
   } else {
     // pathname empty - skip auth to avoid edge cases
-    console.log('[Layout] 🔍 No pathname, skipping auth checks');
+    debugLog('[Layout] 🔍 No pathname, skipping auth checks');
     isTenantAdmin = false;
   }
 
-  console.log('[Layout] 🔍 Final admin status:', { isTenantAdmin, isPublicRoute, pathname });
+  debugLog('[Layout] 🔍 Final admin status:', { isTenantAdmin, isPublicRoute, pathname });
   } catch (layoutError: unknown) {
     const err = layoutError instanceof Error ? layoutError : new Error(String(layoutError));
     console.error('[LAYOUT-ERROR] Root layout failed:', err.message);

@@ -135,84 +135,98 @@ const synodMembers: Array<{
     excerpt:
       'His Grace was Born on 18-12-1952 as the son of Palamoottil Mathews and Mercy. Home parish is St. Thomas Orthodox Cathedral, Kollam Diocese. After completing the formal education, His Grace...',
     image: `${IMAGE_BASE}/Dr_Youhanon_Demetrios.jpg`,
+    internalHref: '/syro/holy-synod/h-g-dr-yuhanon-mar-demetrius-metropolitan',
   },
   {
     title: 'H.G. Dr. Yuhanon Mar Thevodoros Metropolitan',
     excerpt:
       'His Grace was born on 10-02-1953 as the son of hoppil Thekkathil George and Thankamma Mavelikkara Diocese. His Grace is a member of Mavelikkara Vazhuvady Mar Baselios Church.. After taking his...',
     image: `${IMAGE_BASE}/Dr_Yuhanon_Thevodoros.jpg`,
+    internalHref: '/syro/holy-synod/h-g-yuhanon-mar-theodorus-metropolitan',
   },
   {
     title: 'H.G. Yakob Mar Elias Metropolitan',
     excerpt:
       'His Grace was born on 24-02-1953 as the son of Chackaleth Viruthiyath Kizhakkethil Mathai and Mariamma. His Grace is a member of St. Elias Orthodox Church, Budhanoor, Chengannoor Diocese. After taking...',
     image: `${IMAGE_BASE}/H_G_Yakob.jpg`,
+    internalHref: '/syro/holy-synod/h-g-yakoob-mar-elias-metropolitan',
   },
   {
     title: 'H. G. Dr. Joshua Mar Nicodimos Metropolitan',
     excerpt:
       'His Grace was Born on 8th October 1962 as the youngest son of Mr.Philipose Mathai and Mrs.Thankamma Mathai, Sankarathil Nediyavilayil, Kurampala, Pandalam. Home parish is St.Thomas Orthodox Valiyapally Kurampala, Pandalam,...',
     image: `${IMAGE_BASE}/Dr_Joshua.jpg`,
+    internalHref: '/syro/holy-synod/h-g-joshua-mar-nicodemus-metropolitan',
   },
   {
     title: 'H.G. Dr. Zacharias Mar Aprem Metropolitan',
     excerpt:
       'His Grace was born as the son of E.K. Kuriakose and Sossama Kuriakose. His Grace is a member of St. George Valiyapally, Chungathara , Malabar Diocese. After taking his Bachelors...',
     image: `${IMAGE_BASE}/Dr_Zakariah.jpg`,
+    internalHref: '/syro/holy-synod/h-g-dr-zacharias-mar-aprem-metropolitan',
   },
   {
     title: 'H.G. Dr. Geevarghese Mar Yulios Metropolitan',
     excerpt:
       'His Grace Dr. Geevarghese Mar Yulios, Bishop and Metropolitan in the Malankara Orthodox Syrian Church, was born on May 17, 1967, to Late Mr. P. V. Pavu and Mrs. K....',
     image: `${IMAGE_BASE}/Dr_Geevarghese_Yulios.jpg`,
+    internalHref: '/syro/holy-synod/h-g-dr-geevarghese-mar-julius-metropolitan',
   },
   {
     title: 'H.G. Dr. Abraham Mar Seraphim Metropolitan',
     excerpt:
       'His Grace was born on 28 December 1969 as the son of Mr. V. A. Mathews and Mrs. Annie Mathews,Vaduthala Puthenveedu, Mathoor. He is a member of St. George Orthodox...',
     image: `${IMAGE_BASE}/Dr_Abraham_Ceraphim.png`,
+    internalHref: '/syro/holy-synod/h-g-dr-abraham-mar-seraphim-metropolitan',
   },
   {
     title: 'H.G. Abraham Mar Stephanos Metropolitan',
     excerpt:
       'Born to Late Mr. K. A. Thomas and Mrs. Annamma, Kadakkamannil House, Mylapra in Pathanamthitta on June 11, His Grace belongs to the parish of St. George Orthodox Church (Valiyapalli),...',
     image: `${IMAGE_BASE}/Dr_Abraham_Stephanos.png`,
+    internalHref: '/syro/holy-synod/h-g-abraham-mar-stephanos-metropolitan',
   },
   {
     title: 'H.G. Dr. Thomas Mar Ivanios Metropolitan',
     excerpt:
       'Born to of Late Mr. Thomas Chacko and Mrs. Annamma , in Pulluparampil house, Aleppey on 13 th December 1969, His Grace Thomas Mar Ivanios Metropolitan belongs to the parish...',
     image: `${IMAGE_BASE}/Dr_Thomas_Ivanios.png`,
+    internalHref: '/syro/holy-synod/h-g-thomas-mar-ivanios-metropolitan',
   },
   {
     title: 'H.G. Dr. Geevarghese Mar Theophilos Metropolitan',
     excerpt:
       'Born as the son of Mr. P. C. Joshua and Mrs. P. C. Marykutty in Kizhakkemannil House, Chenneerkkara, Thumpamon on 8 th August 1971, His Grace belongs to the parish...',
     image: `${IMAGE_BASE}/Dr_Geevarghese_Thiophilos.png`,
+    internalHref: '/syro/holy-synod/hg-dr-geevarghese-mar-theophilos-metropolitan',
   },
   {
     title: 'H.G. Geevarghese Mar Philoxenos Metropolitan',
     excerpt:
       'H. G. Geevarghese Mar Philoxenos Metropolitan was born in Maleth house, Arattupuzha as the son of Mr. M. G. George and Mrs. Accamma on 30 th May 1972 . His...',
     image: `${IMAGE_BASE}/Geevarghese-Mar-Philaxenos.png`,
+    internalHref: '/syro/holy-synod/h-g-geevarghese-mar-philaxenos-metropolitan',
   },
   {
     title: 'H.G. Geevarghese Mar Pachomios Metropolitan',
     excerpt:
       'Born in Kochuparambil house as the son of Mr. K.M. Elias and Lt. Mrs. Omana on 6 th March 1973 , H. G. Geevarghese Mar Pachomios Metropolitan belongs to the...',
     image: `${IMAGE_BASE}/Geevarghese-Mar-Pachomios.jpg`,
+    internalHref: '/syro/holy-synod/h-g-geevarghese-mar-pachomios-metropolitan',
   },
   {
     title: 'H.G. Dr. Geevarghese Mar Barnabas Metropolitan',
     excerpt:
       'Born to Mr. Kochupappi and Mrs. Ammini in Kattuparambil House on April 10, 1973, His Grace belongs to the parish of St. Mary\'s Orthodox Church, Muttam under Mavelikkara diocese. His...',
     image: `${IMAGE_BASE}/Geevarghese-Mar-Barnabas.png`,
+    internalHref: '/syro/holy-synod/h-g-dr-geevarghese-mar-barnabas-metropolitan',
   },
   {
     title: 'H.G. Zachariah Mar Severios Metropolitan',
     excerpt:
       'Born in Chirathilatt House as the son of Very Rev. C. John Cor- Episcopa and Mrs. Lissy on 19 th August, 1978, His Grace belongs to the parish of St....',
     image: `${IMAGE_BASE}/Zakeriah_Mar_severios.jpg`,
+    internalHref: '/syro/holy-synod/h-g-zacharia-mar-severios-metropolitan',
   },
 ];
 

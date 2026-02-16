@@ -14,7 +14,7 @@ const HGDrAbrahamMarSeraphimMetropolitanPage = () => {
     <div className="bg-syro-bg-gray">
       <SyroPageBanner
         title="H.G. Dr. Abraham Mar Seraphim Metropolitan"
-        breadcrumbFrom="home"
+        breadcrumbFrom="holy-synod"
       />
       {/* Main Content */}
       <section className="py-16 bg-white">

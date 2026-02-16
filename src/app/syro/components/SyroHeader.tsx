@@ -53,10 +53,10 @@ export default function SyroHeader() {
                   <Image
                     src="/syro/assets/images/mosc_images/MOSC-logo-Brand-part.png"
                     alt="Syro-Malabar Church"
-                    width={160}
-                    height={80}
+                    width={200}
+                    height={100}
                     className="lozad"
-                    style={{ width: '160px', height: 'auto' }}
+                    style={{ width: '200px', height: 'auto' }}
                     priority
                   />
                 </div>
