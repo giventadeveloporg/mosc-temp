@@ -1,6 +1,6 @@
 ---
 description: Strapi 5 REST API patterns for published state, populate parameters, and list-endpoint fallbacks
-globs: src/lib/strapi.ts, src/app/mosc/news/**/*.ts, src/app/mosc/directory/**/*.ts
+globs: src/lib/strapi.ts, src/app/mosc/news/**/*.ts, src/app/mosc/directory/**/*.ts, src/app/syro/news/**/*.ts
 alwaysApply: false
 ---
 
@@ -98,13 +98,22 @@ Strapi may store category slugs with different casing (e.g. `Main-News`, `Press-
 
 ## **Article Detail Page (slug or id)**
 
-The detail route `/mosc/news/[slug]` accepts slug, numeric id, or documentId:
+The detail route `/mosc/news/[slug]` and `/syro/news/[slug]` accept slug, numeric id, or documentId:
 
-1. **Slug** (text): `filters[slug][$eqi]=<slug>` — preferred for SEO
-2. **Numeric id** (e.g. `7`): `filters[id][$eq]=7` — when slug is empty
-3. **documentId** (Strapi 5): `filters[documentId][$eq]=<documentId>` — alphanumeric
+1. **documentId** (Strapi 5, first when param looks like documentId): `filters[documentId][$eq]=<documentId>` — alphanumeric 15–35 chars (e.g. `o42fs0slvzzj9os0g9xtc11d`). Try documentId first when param matches `/^[a-z0-9]{15,35}$/` so URLs from Strapi admin or links using documentId work even when slug differs.
+2. **Slug** (text): `filters[slug][$eqi]=<slug>` — preferred for SEO
+3. **Numeric id** (e.g. `7`): `filters[id][$eq]=7` — when slug is empty
 
 Article links use: `article.slug || article.documentId || article.id`. No Strapi model changes needed; ensure articles have slug populated for SEO-friendly URLs.
+
+### **Article not found: Troubleshooting**
+
+When the API returns 200 but 0 items and the frontend shows "Article not found":
+
+- **Try documentId first**: Ensure `getArticleBySlug` tries `documentId` first when the URL param looks like a Strapi 5 documentId (alphanumeric, 15–35 chars). Admin URLs and many links use documentId; slug may differ.
+- **Tenant fallback**: When tenant-scoped queries return 0 items, retry without tenant filter. Articles without tenant relation set will be found this way. Log a warning and ask the user to add tenant in Strapi for proper scoping.
+- **Tenant**: Article must have `tenant.tenantId` matching `NEXT_PUBLIC_TENANT_ID` (e.g. `tenant_demo_002`). Check the tenant relation in Strapi admin. If missing, the tenant-free fallback will return the article but log a warning.
+- **publishedAt**: Article must be Published (not Draft). Filter `filters[publishedAt][$notNull]=true` excludes drafts. If the article is draft, set Status to Published in Strapi.
 
 ## **Advertisement Slots (Position: sidebar + top)**
 

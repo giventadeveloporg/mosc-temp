@@ -371,6 +371,7 @@ body:has(.syro-layout) {
     margin-left: 0;
     margin-right: 0;
     margin-top: 28px;
+    margin-bottom: 0;
     padding: 0;
     position: relative;
     z-index: 5;
@@ -402,9 +403,12 @@ body:has(.syro-layout) {
   }
 
   .syro-saints-slider-container {
-    margin: 50px 0 0 0;
+    margin: 32px 0 0 0;
     position: relative;
     width: 100%;
+  }
+  .about-data .syro-saints-slider-container {
+    margin-top: 24px;
   }
 
   /* Viewport: no scrollbar, no page movement (like static tiny-slider) */
@@ -545,7 +549,7 @@ body:has(.syro-layout) {
     background-color: #fff;
     background-image: radial-gradient(circle, #e8e8e8 1px, transparent 1px);
     background-size: 20px 20px;
-    padding: 60px 0 80px;
+    padding: 90px 0 80px; /* extra top padding so Catholicos heading is visible below saints slider */
   }
   .syro-cardinal-images.cardinal-images {
     position: relative;
@@ -600,15 +604,20 @@ body:has(.syro-layout) {
   }
   .syro-cardinal-details.cardinal-new-details {
     position: relative;
-    padding-left: 2rem;
+    padding-left: 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    width: 100%;
   }
   .syro-cardinal-section-title.section-title {
-    position: absolute;
+    position: relative;
     left: 0;
     top: 0;
-    bottom: 0;
+    height: fit-content;
     margin: 0;
     width: 40px;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -618,10 +627,15 @@ body:has(.syro-layout) {
     position: absolute;
     left: 0;
     top: 0;
-    bottom: 0;
+    height: 100%;
     width: 5px;
     background-color: #dc3545;
     border-radius: 0;
+  }
+  .syro-cardinal-container {
+    padding-left: 1rem;
+    flex: 1;
+    min-width: 0;
   }
   /* Match section[6] (Liturgy) .section-title h6 text style */
   .syro-cardinal-section-title.section-title h6 {
@@ -639,20 +653,25 @@ body:has(.syro-layout) {
   .syro-cardinal-container .syro-cardinal-heading {
     margin-bottom: 1.25rem;
     font-size: clamp(1.5rem, 4vw, 2.2rem);
-    line-height: 1.2;
+    line-height: 1;
     font-weight: 700;
   }
   .syro-cardinal-heading-red {
     color: #dc3545;
     display: block;
+    margin-bottom: 0;
+    line-height: 1;
   }
   .syro-cardinal-heading-blue {
     color: #0b2848;
     display: block;
     font-size: 0.9em;
+    margin-top: -0.5em;
+    margin-bottom: 0;
+    line-height: 1;
   }
   .syro-cardinal-name-bar {
-    background: linear-gradient(to right, #0b2848 0%, #0b2848 25%, #ffffff 100%);
+    background: linear-gradient(to right, #0b2848 0%, #0b2848 72%, #ffffff 100%);
     color: #fff;
     padding: 12px 20px;
     border-radius: 8px;
@@ -714,4 +733,11 @@ body:has(.syro-layout) {
     border-left: 3px solid #dc3545;
     padding-left: 8px;
   }
+}
+
+/* Footer quick links: always display in capitals */
+#footer-quicklinks,
+#footer-quicklinks p,
+#footer-quicklinks a {
+  text-transform: uppercase;
 }

@@ -82,21 +82,41 @@ export default async function BishopDetailPage({ params }: PageProps) {
             {bishop.address && (
               <div>
                 <h3 className="font-heading font-medium text-foreground mb-1">Address</h3>
-                <p className="font-body text-muted-foreground whitespace-pre-line">{bishop.address}</p>
+                <p className="font-body text-muted-foreground whitespace-pre-line">
+                  {bishop.address
+                    .split(/[,\n]+/)
+                    .map((s) => s.trim())
+                    .filter(Boolean)
+                    .join('\n')}
+                </p>
               </div>
             )}
             {bishop.email && (
               <div>
                 <h3 className="font-heading font-medium text-foreground mb-1">Email</h3>
-                <a href={`mailto:${bishop.email}`} className="font-body text-primary hover:underline">
-                  {bishop.email}
-                </a>
+                <div className="font-body text-primary space-y-1">
+                  {bishop.email
+                    .split(/[,\n]+/)
+                    .map((s) => s.trim())
+                    .filter(Boolean)
+                    .map((email) => (
+                      <a key={email} href={`mailto:${email}`} className="hover:underline block">
+                        {email}
+                      </a>
+                    ))}
+                </div>
               </div>
             )}
             {bishop.phones && (
               <div>
                 <h3 className="font-heading font-medium text-foreground mb-1">Phone(s)</h3>
-                <p className="font-body text-muted-foreground">{bishop.phones}</p>
+                <p className="font-body text-muted-foreground whitespace-pre-line">
+                  {bishop.phones
+                    .split(/[,\n]+/)
+                    .map((s) => s.trim())
+                    .filter(Boolean)
+                    .join('\n')}
+                </p>
               </div>
             )}
           </div>

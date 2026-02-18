@@ -30,8 +30,8 @@ function CalendarIcon({ className }: { className?: string }) {
  */
 export function ArticleList({ title, articles, baseHref, compact, id }: ArticleListProps) {
   return (
-    <section id={id} className="syro-news-article-section scroll-mt-24 rounded-xl bg-card border border-border sacred-shadow-sm overflow-hidden">
-      <h2 className="syro-news-section-title px-6 py-4 bg-muted/30">
+    <section id={id} className="syro-news-article-section scroll-mt-24 rounded-xl bg-white border border-syro-table-border sacred-shadow-sm overflow-hidden shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]">
+      <h2 className="syro-news-section-title px-6 py-4 bg-syro-bg-gray border-b border-syro-table-border text-syro-blue">
         {title}
       </h2>
       {articles.length > 0 ? (
@@ -40,11 +40,11 @@ export function ArticleList({ title, articles, baseHref, compact, id }: ArticleL
             <li key={article.id}>
               <Link
                 href={`${baseHref}/${article.documentId || article.slug || String(article.id)}`}
-                className="block group rounded-lg overflow-hidden border border-border hover:border-primary/30 hover:shadow-md reverent-transition focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-card"
+                className="block group rounded-lg overflow-hidden border border-syro-table-border hover:border-syro-red/30 hover:shadow-md reverent-transition focus:outline-none focus-visible:ring-2 focus-visible:ring-syro-red focus-visible:ring-offset-2 bg-white"
               >
                 {/* Image on top - object-contain so header/top is not cropped (image_containment_prevention) */}
                 {article.coverUrl && (
-                  <div className="relative w-full h-auto rounded-t-lg overflow-hidden bg-muted p-3">
+                  <div className="relative w-full h-auto rounded-t-lg overflow-hidden bg-syro-bg-gray p-3">
                     <Image
                       src={article.coverUrl}
                       alt={article.coverAlt || article.title}
@@ -85,7 +85,7 @@ export function ArticleList({ title, articles, baseHref, compact, id }: ArticleL
         </ul>
       ) : (
         <div className="px-6 py-8 text-center">
-          <p className="font-body text-sm text-muted-foreground">
+          <p className="font-body text-sm text-syro-dark-gray">
             No articles at the moment. Check back later.
           </p>
         </div>

@@ -4,16 +4,12 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 
 const QUICK_LINKS = [
-  { name: 'Spiritual Organisations', href: '/syro/spiritual-organizations' },
-  { name: 'Publications', href: '/syro/publications' },
-  { name: 'Institutions', href: '/syro/institutions' },
-  { name: 'Directory', href: '/syro/directory' },
-  { name: 'Training', href: '/syro/training' },
-  { name: 'Theological Seminaries', href: '/syro/theological-seminaries' },
-  { name: 'Lectionary', href: '/syro/lectionary' },
-  { name: 'Downloads', href: '/syro/downloads' },
-  { name: 'Calendar', href: '/syro/calendar' },
-  { name: 'Gallery', href: '/syro/gallery' },
+  { name: 'CATHOLICATE', href: '/syro/catholicate' },
+  { name: 'NEWS', href: '/syro/news' },
+  { name: 'DOWNLOADS', href: '/syro/downloads' },
+  { name: 'E-MAIL', href: '/syro/email' },
+  { name: 'GALLERY', href: '/syro/gallery' },
+  { name: 'CONTACT INFO', href: '/syro/contact-info' },
 ];
 
 export default function SyroFooter() {

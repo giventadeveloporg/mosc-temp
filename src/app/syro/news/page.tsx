@@ -29,14 +29,14 @@ export default async function NewsPage() {
   const data = await getNewsHomePageData();
 
   return (
-    <div className="bg-background">
+    <div className="bg-syro-bg-gray">
       {/* Hero / Page title */}
-      <section className="py-12 bg-gradient-to-br from-background to-muted border-b border-border">
+      <section className="py-12 bg-syro-bg-gray border-b border-syro-light-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="font-heading font-semibold text-3xl md:text-4xl text-foreground">
+          <h1 className="font-heading font-semibold text-3xl md:text-4xl text-syro-blue">
             News
           </h1>
-          <p className="font-body text-muted-foreground mt-2">
+          <p className="font-body text-syro-dark-gray mt-2">
             Latest news, featured stories, and press releases from the Church.
           </p>
           {/* Navigation links per layout (catholicatenews_strapi_content_mapping, index.html) */}
@@ -45,18 +45,18 @@ export default async function NewsPage() {
               <a
                 key={href}
                 href={href}
-                className="font-body text-sm font-medium text-primary hover:text-accent hover:underline reverent-transition px-3 py-1.5 rounded-lg bg-muted/50 hover:bg-muted"
+                className="font-body text-sm font-medium text-syro-blue hover:text-syro-red hover:underline reverent-transition px-3 py-1.5 rounded-lg bg-syro-light-gray/80 hover:bg-syro-light-gray"
               >
                 {label}
               </a>
             ))}
-            {EXTERNAL_LINKS.map(({ label, href, external }) => (
+            {EXTERNAL_LINKS.map(({ label, href }) => (
               <a
                 key={href}
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-body text-sm font-medium text-primary hover:text-accent hover:underline reverent-transition px-3 py-1.5 rounded-lg bg-muted/50 hover:bg-muted"
+                className="font-body text-sm font-medium text-syro-blue hover:text-syro-red hover:underline reverent-transition px-3 py-1.5 rounded-lg bg-syro-light-gray/80 hover:bg-syro-light-gray"
               >
                 {label}
               </a>
@@ -80,7 +80,7 @@ export default async function NewsPage() {
       )}
 
       {/* Main content: one column + sidebar - all sections always visible with empty placeholders */}
-      <section className="py-10">
+      <section className="py-10 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_380px] gap-10">
             {/* Main column - order per PRD: Main News, Featured News, Press Release, Most Read */}

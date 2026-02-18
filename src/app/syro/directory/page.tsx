@@ -77,29 +77,29 @@ export default async function DirectoryPage() {
     'The comprehensive directory of the Malankara Orthodox Syrian Church — bishops, dioceses, parishes, priests, institutions, and church administration.';
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-syro-bg-gray">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-background to-muted py-16 lg:py-20">
+      <section className="relative bg-syro-bg-gray py-16 lg:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="flex items-center justify-center space-x-3 mb-6">
-              <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center sacred-shadow">
-                <svg className="w-6 h-6 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 bg-syro-red rounded-full flex items-center justify-center sacred-shadow">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
               </div>
             </div>
-            <h1 className="font-heading font-semibold text-4xl lg:text-5xl text-foreground mb-4">
+            <h1 className="font-heading font-semibold text-4xl lg:text-5xl text-syro-blue mb-4">
               Malankara Orthodox Directory
             </h1>
-            <p className="font-body text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+            <p className="font-body text-lg lg:text-xl text-syro-dark-gray max-w-3xl mx-auto mb-8">
               {leadText}
             </p>
             <a
               href="https://directory.mosc.in/"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center px-8 py-4 bg-primary text-white font-body font-semibold text-lg rounded-lg hover:bg-primary/90 reverent-transition sacred-shadow hover:sacred-shadow-lg"
+              className="syro-primary-button inline-flex items-center px-8 py-4 font-body font-semibold text-lg"
             >
               <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -114,16 +114,16 @@ export default async function DirectoryPage() {
       </section>
 
       {/* Directory Sections - from Strapi or static fallback */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-12">
             {displayCards.map((card, index) => (
-              <div key={index} className="bg-muted/20 rounded-lg overflow-hidden sacred-shadow-sm border-l-4 border-primary hover:sacred-shadow reverent-transition">
+              <div key={index} className="bg-white rounded-lg overflow-hidden sacred-shadow-sm border-l-4 border-syro-red hover:sacred-shadow reverent-transition shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]">
                 {card.linkUrl ? (
                   card.isExternal ? (
                     <a href={card.linkUrl} target="_blank" rel="noopener noreferrer" className="block group">
                       {card.imageUrl && (
-                        <div className="relative w-full h-48 bg-muted/40">
+                        <div className="relative w-full h-48 bg-syro-bg-gray">
                           <Image
                             src={card.imageUrl}
                             alt={card.imageAlt ?? card.title}
@@ -134,15 +134,15 @@ export default async function DirectoryPage() {
                         </div>
                       )}
                       <div className="p-6">
-                        <h2 className="font-heading font-semibold text-2xl text-foreground mb-3 group-hover:text-primary reverent-transition">
+                        <h2 className="font-heading font-semibold text-2xl text-syro-blue mb-3 group-hover:text-syro-red reverent-transition">
                           {card.title}
                         </h2>
                         {card.description && (
-                          <p className="font-body text-muted-foreground leading-relaxed">
+                          <p className="font-body text-syro-dark-gray leading-relaxed">
                             {card.description}
                           </p>
                         )}
-                        <span className="inline-flex items-center font-body text-primary font-medium mt-3 group-hover:gap-2 reverent-transition">
+                        <span className="inline-flex items-center font-body text-syro-blue font-medium mt-3 group-hover:gap-2 reverent-transition">
                           View more
                           <svg className="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -153,7 +153,7 @@ export default async function DirectoryPage() {
                   ) : (
                     <Link href={card.linkUrl} className="block group">
                       {card.imageUrl && (
-                        <div className="relative w-full h-48 bg-muted/40">
+                        <div className="relative w-full h-48 bg-syro-bg-gray">
                           <Image
                             src={card.imageUrl}
                             alt={card.imageAlt ?? card.title}
@@ -164,15 +164,15 @@ export default async function DirectoryPage() {
                         </div>
                       )}
                       <div className="p-6">
-                        <h2 className="font-heading font-semibold text-2xl text-foreground mb-3 group-hover:text-primary reverent-transition">
+                        <h2 className="font-heading font-semibold text-2xl text-syro-blue mb-3 group-hover:text-syro-red reverent-transition">
                           {card.title}
                         </h2>
                         {card.description && (
-                          <p className="font-body text-muted-foreground leading-relaxed">
+                          <p className="font-body text-syro-dark-gray leading-relaxed">
                             {card.description}
                           </p>
                         )}
-                        <span className="inline-flex items-center font-body text-primary font-medium mt-3 group-hover:gap-2 reverent-transition">
+                        <span className="inline-flex items-center font-body text-syro-blue font-medium mt-3 group-hover:gap-2 reverent-transition">
                           View more
                           <svg className="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -184,7 +184,7 @@ export default async function DirectoryPage() {
                 ) : (
                   <>
                     {card.imageUrl && (
-                      <div className="relative w-full h-48 bg-muted/40">
+                      <div className="relative w-full h-48 bg-syro-bg-gray">
                         <Image
                           src={card.imageUrl}
                           alt={card.imageAlt ?? card.title}
@@ -195,11 +195,11 @@ export default async function DirectoryPage() {
                       </div>
                     )}
                     <div className="p-6">
-                      <h2 className="font-heading font-semibold text-2xl text-foreground mb-3">
+                      <h2 className="font-heading font-semibold text-2xl text-syro-blue mb-3">
                         {card.title}
                       </h2>
                       {card.description && (
-                        <p className="font-body text-muted-foreground leading-relaxed">
+                        <p className="font-body text-syro-dark-gray leading-relaxed">
                           {card.description}
                         </p>
                       )}
@@ -213,37 +213,37 @@ export default async function DirectoryPage() {
       </section>
 
       {/* Update directory info / Login */}
-      <section className="py-12 bg-muted">
+      <section className="py-12 bg-syro-bg-gray">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="font-body text-muted-foreground mb-4">
+          <p className="font-body text-syro-dark-gray mb-4">
             Need to update your Directory information?
           </p>
           <a
             href="mailto:webmanager@mosc.in"
-            className="font-body text-primary font-medium hover:underline"
+            className="font-body text-syro-blue font-medium hover:underline"
           >
             Email webmanager@mosc.in
           </a>
-          <p className="font-body text-sm text-muted-foreground mt-6">
+          <p className="font-body text-sm text-syro-dark-gray mt-6">
             Login only for admin
           </p>
         </div>
       </section>
 
       {/* Official links - mosc.in & catholicatenews.in */}
-      <section className="py-12 bg-card">
+      <section className="py-12 bg-syro-bg-gray">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <a
               href="https://mosc.in"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-muted/20 rounded-lg p-6 sacred-shadow-sm border-l-4 border-primary hover:sacred-shadow reverent-transition text-center group"
+              className="bg-white rounded-lg p-6 sacred-shadow-sm border-l-4 border-syro-red hover:sacred-shadow reverent-transition text-center group shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]"
             >
-              <span className="font-heading font-semibold text-lg text-foreground group-hover:text-primary reverent-transition block">
+              <span className="font-heading font-semibold text-lg text-syro-blue group-hover:text-syro-red reverent-transition block">
                 mosc.in
               </span>
-              <span className="font-body text-sm text-muted-foreground block mt-1">
+              <span className="font-body text-sm text-syro-dark-gray block mt-1">
                 The Malankara Orthodox Syrian Church
               </span>
             </a>
@@ -251,12 +251,12 @@ export default async function DirectoryPage() {
               href="https://catholicatenews.in"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-muted/20 rounded-lg p-6 sacred-shadow-sm border-l-4 border-primary hover:sacred-shadow reverent-transition text-center group"
+              className="bg-white rounded-lg p-6 sacred-shadow-sm border-l-4 border-syro-red hover:sacred-shadow reverent-transition text-center group shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]"
             >
-              <span className="font-heading font-semibold text-lg text-foreground group-hover:text-primary reverent-transition block">
+              <span className="font-heading font-semibold text-lg text-syro-blue group-hover:text-syro-red reverent-transition block">
                 catholicatenews.in
               </span>
-              <span className="font-body text-sm text-muted-foreground block mt-1">
+              <span className="font-body text-sm text-syro-dark-gray block mt-1">
                 The official news portal of the Indian Orthodox Church
               </span>
             </a>
@@ -265,64 +265,64 @@ export default async function DirectoryPage() {
       </section>
 
       {/* Address Info - from directory.mosc.in */}
-      <section className="py-16 bg-muted">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-heading font-semibold text-2xl text-foreground mb-6 text-center">
+          <h2 className="font-heading font-semibold text-2xl text-syro-blue mb-6 text-center">
             Address Info
           </h2>
-          <div className="bg-card rounded-lg sacred-shadow p-8 border-l-4 border-primary">
-            <p className="font-body text-foreground font-medium mb-2">
+          <div className="bg-white rounded-lg sacred-shadow p-8 border-l-4 border-syro-red shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]">
+            <p className="font-body text-syro-blue font-medium mb-2">
               Malankara Orthodox Church
             </p>
-            <p className="font-body text-muted-foreground">
+            <p className="font-body text-syro-dark-gray">
               Catholicate Palace,<br />
               Devalokam,<br />
               Kottayam - 686 004
             </p>
-            <p className="font-body text-muted-foreground mt-4">
-              <span className="font-medium text-foreground">Phone:</span> 0481 2578500, 0481 2578499
+            <p className="font-body text-syro-dark-gray mt-4">
+              <span className="font-medium text-syro-blue">Phone:</span> 0481 2578500, 0481 2578499
             </p>
           </div>
         </div>
       </section>
 
       {/* Related internal links */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-heading font-semibold text-3xl text-foreground mb-8 text-center">
+          <h2 className="font-heading font-semibold text-3xl text-syro-blue mb-8 text-center">
             Related Resources
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Link
               href="/syro/dioceses"
-              className="bg-muted/20 rounded-lg p-6 sacred-shadow-sm hover:sacred-shadow reverent-transition text-center group border-l-4 border-primary"
+              className="bg-white rounded-lg p-6 sacred-shadow-sm hover:sacred-shadow reverent-transition text-center group border-l-4 border-syro-red shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]"
             >
-              <h3 className="font-heading font-medium text-lg text-foreground mb-2 group-hover:text-primary reverent-transition">
+              <h3 className="font-heading font-medium text-lg text-syro-blue mb-2 group-hover:text-syro-red reverent-transition">
                 Dioceses
               </h3>
-              <p className="font-body text-sm text-muted-foreground">
+              <p className="font-body text-sm text-syro-dark-gray">
                 View all dioceses and their information
               </p>
             </Link>
             <Link
               href="/syro/institutions"
-              className="bg-muted/20 rounded-lg p-6 sacred-shadow-sm hover:sacred-shadow reverent-transition text-center group border-l-4 border-primary"
+              className="bg-white rounded-lg p-6 sacred-shadow-sm hover:sacred-shadow reverent-transition text-center group border-l-4 border-syro-red shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]"
             >
-              <h3 className="font-heading font-medium text-lg text-foreground mb-2 group-hover:text-primary reverent-transition">
+              <h3 className="font-heading font-medium text-lg text-syro-blue mb-2 group-hover:text-syro-red reverent-transition">
                 Institutions
               </h3>
-              <p className="font-body text-sm text-muted-foreground">
+              <p className="font-body text-sm text-syro-dark-gray">
                 Schools, hospitals, monasteries, and more
               </p>
             </Link>
             <Link
               href="/syro/spiritual-organizations"
-              className="bg-muted/20 rounded-lg p-6 sacred-shadow-sm hover:sacred-shadow reverent-transition text-center group border-l-4 border-primary"
+              className="bg-white rounded-lg p-6 sacred-shadow-sm hover:sacred-shadow reverent-transition text-center group border-l-4 border-syro-red shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]"
             >
-              <h3 className="font-heading font-medium text-lg text-foreground mb-2 group-hover:text-primary reverent-transition">
+              <h3 className="font-heading font-medium text-lg text-syro-blue mb-2 group-hover:text-syro-red reverent-transition">
                 Spiritual Organisations
               </h3>
-              <p className="font-body text-sm text-muted-foreground">
+              <p className="font-body text-sm text-syro-dark-gray">
                 Organisations offering spiritual guidance
               </p>
             </Link>
@@ -331,9 +331,9 @@ export default async function DirectoryPage() {
       </section>
 
       {/* Footer note */}
-      <section className="py-8 bg-muted">
+      <section className="py-8 bg-syro-bg-gray">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="font-body text-sm text-muted-foreground">
+          <p className="font-body text-sm text-syro-dark-gray">
             © {new Date().getFullYear()} Malankara Orthodox Directory. All Rights Reserved. Created by: ipsr solutions ltd.
           </p>
         </div>

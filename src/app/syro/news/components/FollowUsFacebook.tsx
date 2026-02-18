@@ -31,8 +31,8 @@ function FacebookIcon({ className }: { className?: string }) {
 
 export function FollowUsFacebook() {
   return (
-    <div className="rounded-xl bg-card border border-border sacred-shadow-sm overflow-hidden">
-      <h3 className="font-heading font-semibold text-lg text-foreground border-b border-border px-4 py-3 bg-muted/30 flex items-center gap-2">
+    <div className="rounded-xl bg-white border border-syro-table-border sacred-shadow-sm overflow-hidden shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]">
+      <h3 className="font-heading font-semibold text-lg text-syro-blue border-b border-syro-table-border px-4 py-3 bg-syro-bg-gray flex items-center gap-2">
         <FacebookIcon className="w-5 h-5 text-[#1877F2]" />
         <span>Follow Us</span>
       </h3>

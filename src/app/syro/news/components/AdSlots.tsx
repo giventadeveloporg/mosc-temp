@@ -13,9 +13,9 @@ interface AdSlotsProps {
 export function AdSlots({ slots }: AdSlotsProps) {
   if (slots.length === 0) {
     return (
-      <div className="rounded-xl bg-card border border-border sacred-shadow-sm overflow-hidden p-4">
-        <h3 className="font-heading font-semibold text-lg text-foreground mb-2">Advertisement</h3>
-        <p className="font-body text-sm text-muted-foreground">No advertisements at the moment.</p>
+      <div className="rounded-xl bg-white border border-syro-table-border sacred-shadow-sm overflow-hidden p-4 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]">
+        <h3 className="font-heading font-semibold text-lg text-syro-blue mb-2">Advertisement</h3>
+        <p className="font-body text-sm text-syro-dark-gray">No advertisements at the moment.</p>
       </div>
     );
   }
@@ -25,7 +25,7 @@ export function AdSlots({ slots }: AdSlotsProps) {
       {slots.map((slot) => (
         <div
           key={slot.id}
-          className="rounded-xl bg-card border border-border sacred-shadow-sm overflow-hidden p-4"
+          className="rounded-xl bg-white border border-syro-table-border sacred-shadow-sm overflow-hidden p-4 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]"
         >
           {slot.embedHtml && slot.embedHtml.trim().length > 0 ? (
             <div
