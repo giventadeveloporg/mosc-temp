@@ -24,14 +24,14 @@ export default async function Before1653Page({
 
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 <div className="mb-8 flex justify-center">
                   <div className="relative w-full max-w-[280px] h-auto">
                     <Image
                       src="/images/logos/Current_Edits/MOSC-Logo-only.png"
-                      alt="Church History – Before 1653"
+                      alt="Church History â€“ Before 1653"
                       width={280}
                       height={180}
                       className="w-full h-auto object-contain rounded-lg"
@@ -148,7 +148,7 @@ export default async function Before1653Page({
                     Thoma by the laying on of hands of twelve leading priests at Allangad on May 22,
                     1653, with the unanimous consent of the whole Church. Despite efforts by Rome and
                     the Portuguese to regain control, about half of the people did not yield and
-                    maintained their Eastern character and ecclesiastical freedom—the tradition that
+                    maintained their Eastern character and ecclesiastical freedomâ€”the tradition that
                     continues today in the Malankara Orthodox Syrian Church.
                   </p>
                 </div>

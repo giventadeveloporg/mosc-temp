@@ -13,19 +13,19 @@ interface AdSlotsProps {
 export function AdSlots({ slots }: AdSlotsProps) {
   if (slots.length === 0) {
     return (
-      <div className="rounded-xl bg-white border border-syro-table-border sacred-shadow-sm overflow-hidden p-4 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]">
-        <h3 className="font-heading font-semibold text-lg text-syro-blue mb-2">Advertisement</h3>
-        <p className="font-body text-sm text-syro-dark-gray">No advertisements at the moment.</p>
+      <div className="rounded-[5px] bg-white overflow-hidden p-syro-xxl shadow-syro-card font-syro-primary">
+        <h3 className="text-syro-h3 font-semibold text-syro-blue mb-2">Advertisement</h3>
+        <p className="text-syro-small text-syro-dark-gray">No advertisements at the moment.</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-syro-lg">
       {slots.map((slot) => (
         <div
           key={slot.id}
-          className="rounded-xl bg-white border border-syro-table-border sacred-shadow-sm overflow-hidden p-4 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]"
+          className="rounded-[5px] bg-white overflow-hidden p-syro-xxl shadow-syro-card font-syro-primary"
         >
           {slot.embedHtml && slot.embedHtml.trim().length > 0 ? (
             <div

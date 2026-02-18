@@ -19,7 +19,7 @@ const HisGraceDrThomasMarAthanasiusPage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -49,7 +49,7 @@ const HisGraceDrThomasMarAthanasiusPage = () => {
 
                     <div className="prose prose-lg max-w-none">
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace was born on 28 June 1952 at Arikuzha, Thodupuzha, to Rev. Fr Yohannan Puttanil and Mrs Mariam. He did his schooling at Government UPS School Arikuzha and NSS High School, Manakad. Thereupon he joined New Man College, Thodupuzha and passed out his Pre-degree and Degree from there. He did his MA from St John’s College, Agra.
+                        His Grace was born on 28 June 1952 at Arikuzha, Thodupuzha, to Rev. Fr Yohannan Puttanil and Mrs Mariam. He did his schooling at Government UPS School Arikuzha and NSS High School, Manakad. Thereupon he joined New Man College, Thodupuzha and passed out his Pre-degree and Degree from there. He did his MA from St Johnâ€™s College, Agra.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
@@ -70,7 +70,7 @@ const HisGraceDrThomasMarAthanasiusPage = () => {
 
                       <div className="mt-6 pt-6 border-t border-syro-table-border">
                         <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-2">
-                          Address: Bishop’s House, Cathedral Road, Moovattupuzha,Kerala – 686 661 ph : 0485 2833401 Cell: 9447083340
+                          Address: Bishopâ€™s House, Cathedral Road, Moovattupuzha,Kerala â€“ 686 661 ph : 0485 2833401 Cell: 9447083340
                         </p>
                         <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-2">
                           Email: thomasmarathanasius@gmail.com

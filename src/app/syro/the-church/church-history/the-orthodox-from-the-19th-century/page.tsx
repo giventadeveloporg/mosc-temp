@@ -27,14 +27,14 @@ export default async function Orthodox19thCenturyPage({
 
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 <div className="mb-8 flex justify-center">
                   <div className="relative w-full max-w-[280px] h-auto">
                     <Image
                       src="/images/logos/Current_Edits/MOSC-Logo-only.png"
-                      alt="Church History – 19th Century"
+                      alt="Church History â€“ 19th Century"
                       width={280}
                       height={180}
                       className="w-full h-auto object-contain rounded-lg"
@@ -53,8 +53,8 @@ export default async function Orthodox19thCenturyPage({
                     Anglican Christians of evangelical persuasion, befriended both Roman and
                     Orthodox communities and departed from the Portuguese and Dutch policy of
                     oppressing or ignoring the Orthodox. A Trust Fund was instituted with the East
-                    India Company; Munro helped found the Seminary at Kottayam (1815)—now the
-                    Orthodox Theological Seminary—and promoted a “Mission of Help” by the Church
+                    India Company; Munro helped found the Seminary at Kottayam (1815)â€”now the
+                    Orthodox Theological Seminaryâ€”and promoted a â€œMission of Helpâ€ by the Church
                     Missionary Society (CMS) in collaboration with the Orthodox Church.
                   </p>
 
@@ -69,9 +69,9 @@ export default async function Orthodox19thCenturyPage({
                     resident refused to accept him as bishop instead of the Indian bishops and
                     asked him to leave. The pro-patriarchal party blamed the missionaries for their
                     failure. When Bishop Daniel Wilson of Calcutta proposed a six-point programme in
-                    1835, the Church at Mavelikara (January 1836) rejected it, declaring: “We are
-                    Jacobite Syrians subject to the patriarch of Antioch… We cannot permit the
-                    same.” Thus ended the CMS collaboration after twenty years. The missionaries
+                    1835, the Church at Mavelikara (January 1836) rejected it, declaring: â€œWe are
+                    Jacobite Syrians subject to the patriarch of Antiochâ€¦ We cannot permit the
+                    same.â€ Thus ended the CMS collaboration after twenty years. The missionaries
                     claimed most assets; a reform movement within the Church led to divisions and
                     eventually to the Mar Thoma Church and the Jacobite Syrian Church.
                   </p>
@@ -83,7 +83,7 @@ export default async function Orthodox19thCenturyPage({
                     Patriarch Peter IV came to Kerala in 1875, dethroned Mar Athanasius (the reform
                     party leader), and convened a synod at Mulanthuruthy in June 1876. The Synod
                     decided to adhere closely to West Syrian doctrinal, liturgical and disciplinary
-                    norms and to accept the Patriarch’s jurisdictional claims. The Patriarch then
+                    norms and to accept the Patriarchâ€™s jurisdictional claims. The Patriarch then
                     consecrated six bishops on his own authority. The outcomes were momentous: the
                     faith, liturgy, episcopacy and administration of the Orthodox in India were
                     aligned with the West Syrian Church. Litigation between the party under

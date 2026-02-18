@@ -17,7 +17,7 @@ const dioceseofthrissurPage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -40,13 +40,13 @@ const dioceseofthrissurPage = () => {
                   </h2>
 
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      The diocese was formed in 1982 with parishes in Thrissur and Palakkad districts. At the time of the formation of the diocese there were 32 parishes and 26 priests.The first metropolitan with independent charge of the diocese assumed the office on 26 December 1990. The present diocesan headquarters was completed in 1995. The consecration of the headquarters was done on July 20, 1995.The headquarters of the diocese is at Mannuthy.The Diocese leads to new vision under the spiritual  leadership of H.G. Yuhanon Mar Meletius Metropolitan
+                      The diocese was formed in 1982 with parishes in Thrissur and Palakkad districts. At the time of the formation of the diocese there were 32 parishes and 26 priests.The first metropolitan with independent charge of the diocese assumed the office on 26 December 1990. The present diocesan headquarters was completed in 1995. The consecration of the headquarters was done on July 20, 1995.The headquarters of the diocese is at Mannuthy.The Diocese leads to new vision under the spiritualÂ  leadership of H.G. Yuhanon Mar Meletius Metropolitan
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       Address: Gedseemon Orthodox Bishop's House, Mannuthy, Thrissur, Kerala, INDIA. 680651.
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Ph:  0487-2371039, 2371748
+                      Ph: Â 0487-2371039, 2371748
                     </p>
                 </div>
               </div>
@@ -85,13 +85,13 @@ const dioceseofthrissurPage = () => {
                       href="/syro/dioceses/diocese-of-kottarakara-punalur" 
                       className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Kottarakara – Punalur
+                      Diocese of Kottarakara â€“ Punalur
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-adoor-kadampanadu" 
                       className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Adoor – Kadampanadu
+                      Diocese of Adoor â€“ Kadampanadu
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-thumpamon" 

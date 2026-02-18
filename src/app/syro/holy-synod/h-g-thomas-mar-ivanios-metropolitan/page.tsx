@@ -19,7 +19,7 @@ const HGThomasMarIvaniosMetropolitanPage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -49,7 +49,7 @@ const HGThomasMarIvaniosMetropolitanPage = () => {
 
                     <div className="prose prose-lg max-w-none">
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        Born to Late Mr. Thomas Chacko and Mrs. Annamma, in Pulluparampil house, Aleppey on 13 December 1969, His Grace Thomas Mar Ivanios Metropolitan belongs to the parish of St. Thomas Orthodox Church, Chennankari under Kottayam diocese. His Grace completed his school education from St. Joseph High School, Chennankari (1985), following which H.G. completed degree in Malayalam (1986-88) from SD College, Aleppey. He joined Kottayam Old Seminary in 1992 and completed GST (1992-96). Later, he did M.Th. (1997–99) from FFRRC and a degree in Doctor of Ministry (D. Min). He was ordained sub-deaconship, by H.G. Geevarghese Mar Ivanios Metropolitan at Orthodox Theological Seminary, Kottayam on 8 December 1996. He was ordained deaconship (1999) at Mar Baselios Dayara, Njaliyakuzhi, and priesthood at St. Thomas Orthodox church, Chennankari on 18 September 1999. He was chosen as Metropolitan in the Malankara Syrian Christian Association held at Kolencherry on 25 February 2022. He received the status of Ramban at the Parumala Seminary on 2 June 2022. He was ordained as a Metropolitan by the name ‘Mar Ivanios’ by H.H. Baselios Mar Thoma Mathews III Catholicos at St. Mary’s Cathedral, Pazhanji on 28 July 2022. H.G. has taken charge of the diocese of South-West America since 3 November 2022.
+                        Born to Late Mr. Thomas Chacko and Mrs. Annamma, in Pulluparampil house, Aleppey on 13 December 1969, His Grace Thomas Mar Ivanios Metropolitan belongs to the parish of St. Thomas Orthodox Church, Chennankari under Kottayam diocese. His Grace completed his school education from St. Joseph High School, Chennankari (1985), following which H.G. completed degree in Malayalam (1986-88) from SD College, Aleppey. He joined Kottayam Old Seminary in 1992 and completed GST (1992-96). Later, he did M.Th. (1997â€“99) from FFRRC and a degree in Doctor of Ministry (D. Min). He was ordained sub-deaconship, by H.G. Geevarghese Mar Ivanios Metropolitan at Orthodox Theological Seminary, Kottayam on 8 December 1996. He was ordained deaconship (1999) at Mar Baselios Dayara, Njaliyakuzhi, and priesthood at St. Thomas Orthodox church, Chennankari on 18 September 1999. He was chosen as Metropolitan in the Malankara Syrian Christian Association held at Kolencherry on 25 February 2022. He received the status of Ramban at the Parumala Seminary on 2 June 2022. He was ordained as a Metropolitan by the name â€˜Mar Ivaniosâ€™ by H.H. Baselios Mar Thoma Mathews III Catholicos at St. Maryâ€™s Cathedral, Pazhanji on 28 July 2022. H.G. has taken charge of the diocese of South-West America since 3 November 2022.
                       </p>
 
                       <h4 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">

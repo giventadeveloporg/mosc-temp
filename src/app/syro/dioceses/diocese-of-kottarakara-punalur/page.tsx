@@ -5,19 +5,19 @@ import DiocesesQuickLinksNav from '../DiocesesQuickLinksNav';
 import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata = {
-  title: 'Diocese of Kottarakara – Punalur',
-  description: 'Learn about the Diocese of Kottarakara – Punalur of the Malankara Orthodox Syrian Church.',
+  title: 'Diocese of Kottarakara â€“ Punalur',
+  description: 'Learn about the Diocese of Kottarakara â€“ Punalur of the Malankara Orthodox Syrian Church.',
 };
 
 const dioceseofkottarakarapunalurPage = () => {
   return (
     <div className="bg-syro-bg-gray">
-      <SyroPageBanner title="Diocese of Kottarakara – Punalur" breadcrumbFrom="dioceses" />
+      <SyroPageBanner title="Diocese of Kottarakara â€“ Punalur" breadcrumbFrom="dioceses" />
 
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -25,7 +25,7 @@ const dioceseofkottarakarapunalurPage = () => {
                 <div className="mb-8">
                   <Image
                     src="/images/dioceses/diocese-of-kottarakara-punalur.jpg"
-                    alt="Diocese of Kottarakara – Punalur"
+                    alt="Diocese of Kottarakara â€“ Punalur"
                     width={500}
                     height={300}
                     className="rounded-lg shadow-syro-card w-full h-auto"
@@ -43,7 +43,7 @@ const dioceseofkottarakarapunalurPage = () => {
                       Kottarakkara Punalur Diocese is one of the 30 dioceses of the Malankara Orthodox Syrian Church. The diocese was created after dividing the then existed Thiruvananthapuram Diocese and Kollam Diocese on 15 August 2010. The new diocese was inagurated on 23 January 2011. H.G. Yuhanon Mar Thevodoros was installed the first Metropolitan of the diocese.Kottarakkara Kottappuram Seminary is the Bishop house of the Diocese
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Address: - Kottapuram Seminary, Pulamon, Kottarakara.
+                      Address: - Kottapuram Seminary,Â Pulamon,Â Kottarakara.
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       Phone: 0474- 2652755, 9446664270
@@ -88,13 +88,13 @@ const dioceseofkottarakarapunalurPage = () => {
                       href="/syro/dioceses/diocese-of-kottarakara-punalur" 
                       className="block px-3 py-2 bg-syro-red text-white rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Kottarakara – Punalur
+                      Diocese of Kottarakara â€“ Punalur
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-adoor-kadampanadu" 
                       className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Adoor – Kadampanadu
+                      Diocese of Adoor â€“ Kadampanadu
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-thumpamon" 

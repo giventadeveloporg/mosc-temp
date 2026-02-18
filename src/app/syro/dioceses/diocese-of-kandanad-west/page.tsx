@@ -17,7 +17,7 @@ const dioceseofkandanadwestPage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -40,7 +40,7 @@ const dioceseofkandanadwestPage = () => {
                   </h2>
 
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      In 1876 Malankara Orthodox Church was divided as 7 Dioceses by mulanthuruthy synod. Among that seven one diocese was Kandanad Diocese, at that time the parishes of  Kandanad Diocese spread in Kottayam , Idukki and Ernakulam District.
+                      In 1876 Malankara Orthodox Church was divided as 7 Dioceses by mulanthuruthy synod. Among that seven one diocese was Kandanad Diocese, at that time the parishes of Â Kandanad Diocese spread in Kottayam , Idukki and Ernakulam District.
 The first Metropolitan of this diocese was H.G Paulose mar Ivanios (murimattathil bava). Later First Catholicos of Malankara Orthodox Church, who belongs to Kolenchery St. Peter's and St. Paul's orthodox church.
 Followed by him this diocese was governed by the following Metropoltans.
 H.G Yuyakim Mar Ivanios
@@ -85,13 +85,13 @@ H.G Joseph Mar Pachomiose
                       href="/syro/dioceses/diocese-of-kottarakara-punalur" 
                       className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Kottarakara – Punalur
+                      Diocese of Kottarakara â€“ Punalur
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-adoor-kadampanadu" 
                       className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Adoor – Kadampanadu
+                      Diocese of Adoor â€“ Kadampanadu
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-thumpamon" 

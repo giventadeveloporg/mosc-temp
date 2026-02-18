@@ -17,7 +17,7 @@ const dioceseofmalabarPage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -40,7 +40,7 @@ const dioceseofmalabarPage = () => {
                   </h2>
 
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      The Malabar Diocese, which has extended in the western districts of Kerala, was formed in 1953. H.G. Paulose Mar Severios and H.G. Pathrose Mar Osthathios (1953–68) have executed its administration at different times. Since 11 November 1966, H.G.Thomas Mar Timotheos became the diocesan Metropolitan (H.H.Baselius Didymus I, Catholicose of the East.) Mount Hermon Aramana in Kozhikode is the diocesan headquarters. The Aramana is situated 100 meters away from the Kattamgal junction on the Kozhikode- Mukkam route near the NIT, Kozhikode.
+                      The Malabar Diocese, which has extended in the western districts of Kerala, was formed in 1953. H.G. Paulose Mar Severios and H.G. Pathrose Mar Osthathios (1953â€“68) have executed its administration at different times. Since 11 November 1966, H.G.Thomas Mar Timotheos became the diocesan Metropolitan (H.H.Baselius Didymus I, Catholicose of the East.) Mount Hermon Aramana in Kozhikode is the diocesan headquarters. The Aramana is situated 100 meters away from the Kattamgal junction on the Kozhikode- Mukkam route near the NIT, Kozhikode.
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       Key Projects and Institutions
@@ -82,13 +82,13 @@ const dioceseofmalabarPage = () => {
                       href="/syro/dioceses/diocese-of-kottarakara-punalur" 
                       className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Kottarakara – Punalur
+                      Diocese of Kottarakara â€“ Punalur
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-adoor-kadampanadu" 
                       className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Adoor – Kadampanadu
+                      Diocese of Adoor â€“ Kadampanadu
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-thumpamon" 

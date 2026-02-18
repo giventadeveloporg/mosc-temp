@@ -6,7 +6,7 @@ import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata = {
   title: 'H.G. Dr. Youhanon Mar Demetrios Metropolitan',
-  description: 'His Grace Dr. Youhanon Mar Demetrios, Metropolitan of Delhi Diocese. Professor, Orthodox Theological Seminary; General Secretary, Orthodox Vaidika Sangham; Co-Secretary, Orthodox–Catholic Church Dialogue.',
+  description: 'His Grace Dr. Youhanon Mar Demetrios, Metropolitan of Delhi Diocese. Professor, Orthodox Theological Seminary; General Secretary, Orthodox Vaidika Sangham; Co-Secretary, Orthodoxâ€“Catholic Church Dialogue.',
 };
 
 const HGDrYuhanonMarDemetriusMetropolitanPage = () => {
@@ -19,7 +19,7 @@ const HGDrYuhanonMarDemetriusMetropolitanPage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -49,7 +49,7 @@ const HGDrYuhanonMarDemetriusMetropolitanPage = () => {
 
                     <div className="prose prose-lg max-w-none">
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace was born on 18 December 1952 as the son of Palamoottil Mathews and Mercy. His home parish is St. Thomas Orthodox Cathedral, Kollam Diocese. After completing formal education, His Grace received his M.R.E. from Gordon-Conwell Theological Seminary in South Hamilton, Massachusetts, and his Ph.D. from Fordham University. He is well versed in Malayalam, Greek, and Syriac. His Grace has held several key positions in the Church: Professor at the Orthodox Theological Seminary, Kottayam; Secretary, Ecumenical Relations Committee; General Secretary, Orthodox Vaidika Sangham; Co-Secretary, Orthodox–Catholic Church Dialogue; Delegate, W.C.C. Commission on Education and Ecumenical Formation; Representative of the Church at many international conferences; Registrar, F.F.R.R.C.; Dean of Doctoral Studies. He was elected as Metropolitan candidate on 17 February at the Malankara Association held at Sasthamkotta, and was consecrated as Metropolitan on 12 May 2010 at Mar Elia Cathedral, Kottayam. His Grace is serving the Delhi Diocese as its Metropolitan.
+                        His Grace was born on 18 December 1952 as the son of Palamoottil Mathews and Mercy. His home parish is St. Thomas Orthodox Cathedral, Kollam Diocese. After completing formal education, His Grace received his M.R.E. from Gordon-Conwell Theological Seminary in South Hamilton, Massachusetts, and his Ph.D. from Fordham University. He is well versed in Malayalam, Greek, and Syriac. His Grace has held several key positions in the Church: Professor at the Orthodox Theological Seminary, Kottayam; Secretary, Ecumenical Relations Committee; General Secretary, Orthodox Vaidika Sangham; Co-Secretary, Orthodoxâ€“Catholic Church Dialogue; Delegate, W.C.C. Commission on Education and Ecumenical Formation; Representative of the Church at many international conferences; Registrar, F.F.R.R.C.; Dean of Doctoral Studies. He was elected as Metropolitan candidate on 17 February at the Malankara Association held at Sasthamkotta, and was consecrated as Metropolitan on 12 May 2010 at Mar Elia Cathedral, Kottayam. His Grace is serving the Delhi Diocese as its Metropolitan.
                       </p>
 
                       <h4 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">

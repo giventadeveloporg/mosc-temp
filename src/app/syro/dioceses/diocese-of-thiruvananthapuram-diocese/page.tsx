@@ -17,7 +17,7 @@ const dioceseofthiruvananthapuramdiocesePage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -60,13 +60,13 @@ Ph - 0475 2273493 ,Email:gabrielmargregorios@gmail.com Web:http://www.tvmdiocese
                       As youngest son to Kunjupappi and Achamma of Thevarvelil family in Kozhencherry was born Geevarghese Mar Dioscorus on 12 October 1926. He did his intermediate education from Madurai American college in 1948 and soon after joined Madras Christian College. After graduating in 1950, he did his Masters in Sociology from Bombay School of Economics. He was serving as the Secretary of the Co- operative Bank in Kozhenchery. While undergoing Officers Training Course in Reserve Bank of India he had the divine call to join the Ministry of God. He resigned from Reserve Bank and joined Orthodox Theological Seminary at Kottayam for studies in Divinity.
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      He was ordained as a deacon in April 1963, and as priest in 1964 by His Holiness Geevarghese Catholicose II. In 1966 he went to Jerusalem for further studies. In 1970 he founded The Holy Trinity Ashram at Ranni and started to reside there. Very soon in 1973 he became the Diocesan Secretary of Thumpamon Diocese. On 16 may 1977 the Malankara Association that met at Mavelikkara elected him for the Episcopal order. He was consecrated as Episcopa Geevarghese Mar Dioscorus by His Holiness Baselios Mar Thoma Mathews I, Catholicos of the East on 15 may 1978 at Pazhani Church. On 28 February 1981 he was consecrated as a Metropolitan in the Pazhaya Seminary Chapel. He became the First Metropolitan of the newly formed Thiruvananthapuram Diocese.
+                      He was ordained as a deacon in April 1963, and as priest in 1964 by His Holiness GeevargheseÂ Catholicose II. In 1966 he went to Jerusalem for further studies. In 1970 he founded The Holy Trinity Ashram at Ranni and started to reside there. Very soon in 1973 he became the Diocesan Secretary ofÂ Thumpamon Diocese. On 16 may 1977 the Malankara Association that met at Mavelikkara elected him for the Episcopal order. He was consecrated as Episcopa Geevarghese Mar Dioscorus by His Holiness Baselios Mar Thoma Mathews I, Catholicos of the East on 15 may 1978 at Pazhani Church. On 28Â February 1981 he was consecrated as a Metropolitan in the Pazhaya Seminary Chapel.Â He became the First Metropolitan of the newly formed Thiruvananthapuram Diocese.
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       His Grace always conformed to the laws and wishes of God, devout and pious with all endeavours on a divine prospective. Being the first Metropolitan of Thiruvananthapuram Diocese, His Grace was fully responsible for the growth of the Orthodox Church in Thiruvananthapuram and establishing various institutes in Thiruvananthapuram for the poor and the destitudes like schools,convents and welfare centres. Ranny Holy Trinity Ashram, Ulloor Orthodox Church Centre, Edamulaikal V.M.D.M Centre, Sreekariyam Handicapped Children's welfare Centre, Thiruvananthapuram Holy Trinity School and Convent are all the fruits of his endeavours.
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      He died on 23rd July 1999 and was interred in Holy Trinity Ashram, Ranny.
+                      He died on 23rd July 1999 and was interred in Holy TrinityÂ Ashram, Ranny.
                     </p>
                 </div>
               </div>
@@ -105,13 +105,13 @@ Ph - 0475 2273493 ,Email:gabrielmargregorios@gmail.com Web:http://www.tvmdiocese
                       href="/syro/dioceses/diocese-of-kottarakara-punalur" 
                       className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Kottarakara – Punalur
+                      Diocese of Kottarakara â€“ Punalur
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-adoor-kadampanadu" 
                       className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Adoor – Kadampanadu
+                      Diocese of Adoor â€“ Kadampanadu
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-thumpamon" 

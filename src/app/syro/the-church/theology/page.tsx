@@ -26,7 +26,7 @@ export default async function TheologyPage({
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 {/* Featured Image - centered, contained */}
@@ -70,7 +70,7 @@ export default async function TheologyPage({
                     ecclesiologically, the concept has deeper and wide meanings. There could be a
                     fundamental difference between tradition and traditions even. When traditions
                     cover the concepts and practices which were handed down from ancestors,
-                    tradition embodies the integral part of everything—it includes all the
+                    tradition embodies the integral part of everythingâ€”it includes all the
                     socio-economic and religious background in its integrity. When we transfer this
                     aspect into ecclesiology, we reach the point that &quot;the Church itself is
                     in the traditions.&quot;
@@ -90,7 +90,7 @@ export default async function TheologyPage({
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The OT and NT are Holy Scripture. The OT predicted and expected a Saviour, the
                     Messiah, in the fullness of time. In the incarnation of Jesus, the prediction of
-                    the OT—one part of the Holy Scripture—was fulfilled. This fulfilment was
+                    the OTâ€”one part of the Holy Scriptureâ€”was fulfilled. This fulfilment was
                     recorded and preserved in literary form, which is the NT.
                   </p>
 
@@ -124,7 +124,7 @@ export default async function TheologyPage({
                     apostles, says: &quot;First of all you must understand this, that no prophecy
                     of scripture is a matter of one&apos;s own interpretation, because no prophecy
                     ever came by human will, but men and women moved by the Holy Spirit spoke from
-                    God&quot; (II Pt. 1:20–21).
+                    God&quot; (II Pt. 1:20â€“21).
                   </p>
 
                   <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
@@ -147,7 +147,7 @@ export default async function TheologyPage({
                     scripture for the benefit of the Christian community. The apostle Paul says,
                     &quot;All scripture is inspired by God and is useful for teaching, for reproof,
                     for correction and for training in righteousness, so that everyone who belongs to
-                    God may be proficient, equipped for every good work&quot; (2 Tim 3:16–17).
+                    God may be proficient, equipped for every good work&quot; (2 Tim 3:16â€“17).
                   </p>
 
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
@@ -167,7 +167,7 @@ export default async function TheologyPage({
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Tradition is, to be exact, a bond between the present and the past. The Greek
                     word used is <em>parodosis</em>, meaning handing down, or to hand over, to
-                    deliver. Since it is a bond, there is certainly a relation within the Church—a
+                    deliver. Since it is a bond, there is certainly a relation within the Churchâ€”a
                     cyclic one. Apostolic teachings are there which substantiate the concept of
                     tradition and its need in the Church.
                   </p>
@@ -196,7 +196,7 @@ export default async function TheologyPage({
                     could be certain factors that are set apart. Tradition includes all traditions,
                     but the tradition may not include every tradition in its integrity. What Paul
                     meant in II Thes. 2:15 and in I Cor. 11:2 about &apos;traditions&apos; is its
-                    integral aspect—that is, the Church itself. It is within this
+                    integral aspectâ€”that is, the Church itself. It is within this
                     &apos;tradition&apos;, and all &quot;traditions&quot; in their integral aspect,
                     that the Holy Scripture was formulated, and not the Holy Scripture that formed
                     the Church. Behind every literal work, there lies an oral or written tradition.

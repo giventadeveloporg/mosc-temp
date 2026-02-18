@@ -17,7 +17,7 @@ const OrthodoxSyrianSundaySchoolAssociationOfTheEastPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="w-20 h-20 bg-syro-red rounded-lg flex items-center justify-center mx-auto mb-6 shadow-syro-card-hover">
-              <span className="text-syro-red-foreground text-4xl font-bold" role="img" aria-label="Orthodox Syrian Sunday School Association of the East (SUNDAY SCHOOL)">📚</span>
+              <span className="text-syro-red-foreground text-4xl font-bold" role="img" aria-label="Orthodox Syrian Sunday School Association of the East (SUNDAY SCHOOL)">ðŸ“š</span>
             </div>
             <h1 className="font-syro-display font-semibold text-4xl text-syro-blue mb-4">
               Orthodox Syrian Sunday School Association of the East (SUNDAY SCHOOL)
@@ -32,7 +32,7 @@ const OrthodoxSyrianSundaySchoolAssociationOfTheEastPage = () => {
       {/* Content Section */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-0 overflow-hidden">
                 {/* Featured Image */}

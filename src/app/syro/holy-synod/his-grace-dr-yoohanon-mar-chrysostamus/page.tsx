@@ -19,7 +19,7 @@ const HisGraceDrYoohanonMarChrysostamusPage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -53,7 +53,7 @@ const HisGraceDrYoohanonMarChrysostamusPage = () => {
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        Metropolitan Geevarghese Mar Osthathios ordained Varghese John a deacon on 19 April 1982, and he received his priesthood from HH Baselios Marthoma Mathews II on 5 June 1982. On 28 January 1998, H.H. Baselios Marthoma Mathews II made him a Ramban at Parumala Seminary. Ramban Yoohanon was the Secretary of the Karunagiri MGD Ashram and Balabhavan. He has held the post of Principal, St Paul’s Mission Training Center, Mavelikkara, visiting faculty of St Thomas Orthodox Theological Seminary, Nagpur, coordinator of Malankara Orthodox Mission Board, St Thomas Karunya Guidance Center, Ulloor, Trivandrum, Karunya Vishranthi Bhavan Kattela, Trivandrum, Marriage Assistance Foundation (MAF), Sick Aid Foundation (SAF), Member of Malankara Association Managing Committee, Council Member of Parumala Seminary, Member of Catholic-Orthodox Dialogue Commission and many other posts of distinction. Besides being a scholar, exceptionally good organizer, and preacher at conventions, he has participated in and given leadership to many meetings and conferences.
+                        Metropolitan Geevarghese Mar Osthathios ordained Varghese John a deacon on 19 April 1982, and he received his priesthood from HH Baselios Marthoma Mathews II on 5 June 1982. On 28 January 1998, H.H. Baselios Marthoma Mathews II made him a Ramban at Parumala Seminary. Ramban Yoohanon was the Secretary of the Karunagiri MGD Ashram and Balabhavan. He has held the post of Principal, St Paulâ€™s Mission Training Center, Mavelikkara, visiting faculty of St Thomas Orthodox Theological Seminary, Nagpur, coordinator of Malankara Orthodox Mission Board, St Thomas Karunya Guidance Center, Ulloor, Trivandrum, Karunya Vishranthi Bhavan Kattela, Trivandrum, Marriage Assistance Foundation (MAF), Sick Aid Foundation (SAF), Member of Malankara Association Managing Committee, Council Member of Parumala Seminary, Member of Catholic-Orthodox Dialogue Commission and many other posts of distinction. Besides being a scholar, exceptionally good organizer, and preacher at conventions, he has participated in and given leadership to many meetings and conferences.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
@@ -64,7 +64,7 @@ const HisGraceDrYoohanonMarChrysostamusPage = () => {
                         Contact
                       </h4>
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
-                        <p>Bethany Aramana, Thiruvalla, Kerala – 689 101</p>
+                        <p>Bethany Aramana, Thiruvalla, Kerala â€“ 689 101</p>
                         <p>Tel.: 0469-2701357 / 2603357 | Fax: 0469-2342709 | Mob: 9447045543</p>
                         <p>Email: yuhanonmarchrysostomos@gmail.com</p>
                       </div>

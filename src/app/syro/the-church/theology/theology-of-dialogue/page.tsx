@@ -25,7 +25,7 @@ export default async function TheologyOfDialoguePage({
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 <div className="mb-8 flex justify-center">
@@ -159,7 +159,7 @@ export default async function TheologyOfDialoguePage({
                     understand each other in their varying religious traditions, and to be mutually
                     helped in one&apos;s own grasp of the truth. In evangelization, the baptised
                     believer speaks on behalf of Christ and His Church to declare the good news.
-                    Evangelisation is a charisma—a gift of the Spirit. Dialogue and evangelisation
+                    Evangelisation is a charismaâ€”a gift of the Spirit. Dialogue and evangelisation
                     are both tasks of the Church. The Church does not use dialogue as a means of
                     evangelisation. In engaging in dialogue with people of other religions, the
                     Christian keeps in mind the following principles:
@@ -173,7 +173,7 @@ export default async function TheologyOfDialoguePage({
                     <li>In dialogue one accepts the possibility that one&apos;s own views may be radically changed by the dialogue.</li>
                     <li>In preparation for dialogue, one should make a study of the religious scriptures, customs, ritual writings, practices, etc.</li>
                     <li>Dialogue cannot be a single act; it is a process of living together in openness.</li>
-                    <li>Dialogue may lead to practical consequences—perhaps to work together, perhaps to issue joint statements.</li>
+                    <li>Dialogue may lead to practical consequencesâ€”perhaps to work together, perhaps to issue joint statements.</li>
                     <li>Dialogue begun should not be broken abruptly.</li>
                   </ol>
 

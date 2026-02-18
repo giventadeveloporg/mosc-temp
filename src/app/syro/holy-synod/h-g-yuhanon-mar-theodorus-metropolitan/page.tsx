@@ -6,7 +6,7 @@ import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata = {
   title: 'H.G. Dr. Yuhanon Mar Thevodoros Metropolitan',
-  description: "His Grace Dr. Yuhanon Mar Thevodoros, Metropolitan of Kottarakara–Punalur Diocese. Principal, Mavelikkara Mission Training Centre; Superior, St. Paul's Ashram Puthuppady; Managing Editor, Doothan Magazine.",
+  description: "His Grace Dr. Yuhanon Mar Thevodoros, Metropolitan of Kottarakaraâ€“Punalur Diocese. Principal, Mavelikkara Mission Training Centre; Superior, St. Paul's Ashram Puthuppady; Managing Editor, Doothan Magazine.",
 };
 
 const HGYuhanonMarTheodorusMetropolitanPage = () => {
@@ -19,7 +19,7 @@ const HGYuhanonMarTheodorusMetropolitanPage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -49,7 +49,7 @@ const HGYuhanonMarTheodorusMetropolitanPage = () => {
 
                     <div className="prose prose-lg max-w-none">
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace was born on 10 February 1953 as the son of Hoppil Thekkathil George and Thankamma, Mavelikkara Diocese. He is a member of Mavelikkara Vazhuvady Mar Baselios Church. After taking his Master&apos;s degree he joined the Orthodox Theological Seminary, Kottayam, for theological studies. From the Orthodox Theological Seminary, Kottayam, he received the Graduate Degree in Sacred Theology (GST) and the Bachelor of Divinity (B.D.) from the Senate of Serampore University, and his M.Th. from Serampore University. His Grace has held several key positions in the Church: Principal, Mavelikkara Mission Training Centre; Secretary, Malankara Orthodox Church Mission Society; Superior, St. Paul&apos;s Ashram Puthuppady; Managing Editor, Doothan Magazine; Secretary, Snehasandesham Sanchara Suvishasha Sangam; Member, St. Gregorios Balagram Board, Yacharam. He was elected as Metropolitan candidate on 17 February at the Malankara Association held at Sasthamkotta, and was consecrated as Metropolitan on 12 May 2010 at Mar Elia Cathedral, Kottayam. His Grace is serving the Kottarakara–Punalur Diocese as its Metropolitan.
+                        His Grace was born on 10 February 1953 as the son of Hoppil Thekkathil George and Thankamma, Mavelikkara Diocese. He is a member of Mavelikkara Vazhuvady Mar Baselios Church. After taking his Master&apos;s degree he joined the Orthodox Theological Seminary, Kottayam, for theological studies. From the Orthodox Theological Seminary, Kottayam, he received the Graduate Degree in Sacred Theology (GST) and the Bachelor of Divinity (B.D.) from the Senate of Serampore University, and his M.Th. from Serampore University. His Grace has held several key positions in the Church: Principal, Mavelikkara Mission Training Centre; Secretary, Malankara Orthodox Church Mission Society; Superior, St. Paul&apos;s Ashram Puthuppady; Managing Editor, Doothan Magazine; Secretary, Snehasandesham Sanchara Suvishasha Sangam; Member, St. Gregorios Balagram Board, Yacharam. He was elected as Metropolitan candidate on 17 February at the Malankara Association held at Sasthamkotta, and was consecrated as Metropolitan on 12 May 2010 at Mar Elia Cathedral, Kottayam. His Grace is serving the Kottarakaraâ€“Punalur Diocese as its Metropolitan.
                       </p>
 
                       <h4 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">

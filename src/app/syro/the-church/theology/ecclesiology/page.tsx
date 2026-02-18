@@ -25,7 +25,7 @@ export default async function EcclesiologyPage({
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 <div className="mb-8 flex justify-center">
@@ -181,8 +181,8 @@ export default async function EcclesiologyPage({
                     Four Marks of the Church
                   </h2>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                    The Nicene – Constantinopolitan creed formulated by the first two ecumenical
-                    Councils attaches four adjectives to the Church—Catholic, Apostolic, One, and
+                    The Nicene â€“ Constantinopolitan creed formulated by the first two ecumenical
+                    Councils attaches four adjectives to the Churchâ€”Catholic, Apostolic, One, and
                     Holy. Catholicity, Apostolicity, Unity and Holiness have become the four
                     principal marks of the church.
                   </p>

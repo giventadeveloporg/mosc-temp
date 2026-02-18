@@ -17,7 +17,7 @@ const dioceseofahmedabadPage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -55,15 +55,15 @@ const dioceseofahmedabadPage = () => {
                       The Diocese of Ahmedabad is presently functioning from the premises of St Mary's School, Naroda, provided by the St Mary's Orthodox Syrian Church, Ahmedabad.
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Address:  St Mary's Higher Secondary School Campus,
+                      Address: Â St Mary's Higher Secondary School Campus,
 Naroda, Ahmedabad, Gujarat
 India 382 330
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Ph:  046922980253
+                      Ph: Â 046922980253
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Email:  ahmedabaddiocese@gmail.com
+                      Email: Â ahmedabaddiocese@gmail.com
                     </p>
                 </div>
               </div>

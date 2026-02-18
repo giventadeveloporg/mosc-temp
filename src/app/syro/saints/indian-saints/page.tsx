@@ -21,7 +21,7 @@ export default async function IndianSaintsPage({
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -40,7 +40,7 @@ export default async function IndianSaintsPage({
                 {/* Content */}
                 <div className="prose prose-lg max-w-none">
                   <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-6">
-                    St. Gregorios Of Parumala – Metropolitan Geevarghese Mar Gregorios.
+                    St. Gregorios Of Parumala â€“ Metropolitan Geevarghese Mar Gregorios.
                   </h2>
 
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
@@ -52,7 +52,7 @@ He was ordained as a reader-deacon (Korooyo) on 14th Sept, 1858 at the age of te
 VETTICKAL DAYARA
 The new priest's short stay at Mulanthuruthy Marthommen Church gave him an inner conviction that he should lead a hermit's life in a quieter place. Therefore he shifted his residence to Vettickal Dayara. At Vettickal Dayara, Corepiscopa Geevarghese started a strenuous life of prayer and fasting. Having heard about the vigorous asceticism practised by corepiscopa Geevarghese, the then Malankara Metropolitan Pulikkottil Joseph Mar Dionysius made him a 'Ramban' (Monk Priest) in 1872.
 PATRIARCHAL VISIT AND THE SYNOD OF MULAMTHURUTHY
-In 1875, the Antioch Patriarch His Holiness Peter III visited Malankara. The Patriarch chose Ramban  Geevarghese as his Secretary and translator during the entire visit. Along with the Patriarch , the Ramban visited many churches. Ramban Geevarghese also assisted the Patriarch in the consecration of the Holy Mooron and in the historic synod of Mulanthuruthy in 1876.
+In 1875, the Antioch Patriarch His Holiness Peter III visited Malankara. The Patriarch chose RambanÂ  Geevarghese as his Secretary and translator during the entire visit. Along with the Patriarch , the Ramban visited many churches. Ramban Geevarghese also assisted the Patriarch in the consecration of the Holy Mooron and in the historic synod of Mulanthuruthy in 1876.
 CONSECRATION AS METROPOLITAN
 Being pleased with the Ramban Geevarghese, the Patriarch decided to consecrate him as Metropolitan. On December 10, 1876 the Patriarch consecrated six priests as bishops including Ramban Geevarghese at St. Thomas Church, N Paravur. He was given the new name Geevarghese Mar Gregorios and was given the charge of Niranam Diocese. The other bishops and their Diocese were:
 Murimattath Mar Ivanios (Kandanad)
@@ -75,9 +75,9 @@ Mar Gregorios believed that the church should engage in educational activity esp
 A major task of Mar Gregorios was to motivate the clergy for effective ministry. With this aim, he formed the Malankara Syrian Clergy Association and took many progressive decisions and made many suggestions for the effective functioning of the priestly ministry.
 DISCIPLES OF THIRUMENI
 Among the many disciples of Mar Gregorios, three deserve special notice:
-1. Vattasseril Rev.Fr.Geevarghese (later, Malankara Metropolitan Geevarghese Mar Dionysius)
-2. Kuttikattu Rev.Fr.Paulose (later, Paulose Mar Athanasios of Aluva)
-3. Kallasseril Rev.Fr,Geevarghese (Punnoose) (later, Catholicos Baselios Geevarghese II)
+1.Â Vattasseril Rev.Fr.Geevarghese (later, Malankara Metropolitan Geevarghese Mar Dionysius)
+2.Â Kuttikattu Rev.Fr.Paulose (later, Paulose Mar Athanasios of Aluva)
+3.Â Kallasseril Rev.Fr,Geevarghese (Punnoose) (later, Catholicos Baselios Geevarghese II)
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       DEPARTURE FROM THE WORLD

@@ -15,24 +15,24 @@ const EXTERNAL_LINKS = [
 
 /**
  * Shared hero/header for News index and article detail pages.
- * Matches the news home layout: title, description, section + external links.
+ * Design system: mainTitle h1 2.8rem/700, p 20px/#506276, container 1200px.
  */
 export function NewsPageHeader() {
   return (
-    <section className="py-12 bg-syro-bg-gray border-b border-syro-light-gray">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="font-heading font-semibold text-3xl md:text-4xl text-syro-blue">
+    <section className="py-syro-xxxl bg-syro-bg-gray border-b border-syro-table-border font-syro-primary">
+      <div className="max-w-[1200px] mx-auto px-[15px]">
+        <h1 className="font-syro-display font-bold text-syro-h1 text-syro-blue mb-2.5">
           News
         </h1>
-        <p className="font-body text-syro-dark-gray mt-2">
+        <p className="text-syro-body text-syro-dark-gray mb-syro-xxl">
           Latest news, featured stories, and press releases from the Church.
         </p>
-        <nav className="mt-6 flex flex-wrap gap-3" aria-label="News sections">
+        <nav className="flex flex-wrap gap-syro-xl" aria-label="News sections">
           {SECTION_LINKS.map(({ label, href }) => (
             <a
               key={href}
               href={href}
-              className="font-body text-sm font-medium text-syro-blue hover:text-syro-red hover:underline reverent-transition px-3 py-1.5 rounded-lg bg-syro-light-gray/80 hover:bg-syro-light-gray"
+              className="text-syro-small font-medium text-syro-blue hover:text-syro-red transition-colors duration-300 px-syro-md py-syro-sm rounded-[5px] bg-syro-light-gray/80 hover:bg-syro-light-gray"
             >
               {label}
             </a>
@@ -43,7 +43,7 @@ export function NewsPageHeader() {
               href={href}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-body text-sm font-medium text-syro-blue hover:text-syro-red hover:underline reverent-transition px-3 py-1.5 rounded-lg bg-syro-light-gray/80 hover:bg-syro-light-gray"
+              className="text-syro-small font-medium text-syro-blue hover:text-syro-red transition-colors duration-300 px-syro-md py-syro-sm rounded-[5px] bg-syro-light-gray/80 hover:bg-syro-light-gray"
             >
               {label}
             </a>

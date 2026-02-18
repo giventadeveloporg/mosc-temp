@@ -17,7 +17,7 @@ const northeastamericaPage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -48,16 +48,16 @@ const northeastamericaPage = () => {
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       Beginning 
 In 1965, the United States' legislation passed a new bill which cleared the way for thousands of professionally qualified individuals to make their way to America. Many Malankara Orthodox Christians, who were in search of a better life for themselves and their families, came to the United States during this time.
-After 1970, the Malankara Orthodox Church gradually began to take root in many of the major US cities. Many of the new congregations were faced with uncertainties regarding the fate of the Church in America. As time passed, the growing number of clergy and laity proved that the Malankara Orthodox Church would be a permanent body in the United States. The question of ecclesiastical authority and how this body should be structured was a chief point of concern among the clergy and other church officials.  Despite the hardships taking place within the Church, "pioneer" priests worked hard to establish parishes in order to serve the needs of the growing number of Malankara immigrants to the United States.
+After 1970, the Malankara Orthodox Church gradually began to take root in many of the major US cities. Many of the new congregations were faced with uncertainties regarding the fate of the Church in America. As time passed, the growing number of clergy and laity proved that the Malankara Orthodox Church would be a permanent body in the United States. The question of ecclesiastical authority and how this body should be structured was a chief point of concern among the clergy and other church officials.Â Â Despite the hardships taking place within the Church, "pioneer" priests worked hard to establish parishes in order to serve the needs of the growing number of Malankara immigrants to the United States.
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      The year 1976 was a very important year for the Church, especially here in America. The Holy Synod decided to establish more dioceses to better administer the flock in various parts of the world. At this time, the numerous churches in America were placed under the authority of the Metropolitan of the Bombay Diocese, Thomas Mar Makarios, who had spent time in America as a student.  Under the leadership of Mar Makarios, the Holy Synod made a momentous decision and granted the parishes in America their own Diocese, creating the American Diocese. Mar Makarios was given authority of the American Diocese and the enthronement of the newly elected Metropolitan Mar Makarios was held at the Cathedral Church of St. John the Divine in Manhattan, under the authority of the Catholicos of the East and Malankara Metropolitan, Baselius Mar Thoma Mathews I, on July 14, 1979.  The enthronement was well attended by many leaders of the Orthodox Churches, as well as representatives from various other denominations. Notable during this time was the grand celebration of Saint Thomas Day by parishioners and church leaders across the nation at Union Theological Seminary, NY.  During the tenure of Mar Makarios as Metropolitan, the Diocese saw growth in a dramatic fashion and the number of parishes grew to almost fifty strong. Along with this, the dedicated service of the priests in America added to the unity, prosperity and growth of the Diocese.
+                      The year 1976 was a very important year for the Church, especially here in America. The Holy Synod decided to establish more dioceses to better administer the flock in various parts of the world. At this time, the numerous churches in America were placed under the authority of the Metropolitan of the Bombay Diocese, Thomas Mar Makarios, who had spent time in America as a student.Â Â Under the leadership of Mar Makarios, the Holy Synod made a momentous decision and granted the parishes in America their own Diocese, creating the American Diocese. Mar Makarios was given authority of the American Diocese and the enthronement of the newly elected Metropolitan Mar Makarios was held at the Cathedral Church of St. John the Divine in Manhattan, under the authority of the Catholicos of the East and Malankara Metropolitan, Baselius Mar Thoma Mathews I, on July 14, 1979. Â The enthronement was well attended by many leaders of the Orthodox Churches, as well as representatives from various other denominations. Notable during this time was the grand celebration of Saint Thomas Day by parishioners and church leaders across the nation at Union Theological Seminary, NY.Â Â During the tenure of Mar Makarios as Metropolitan, the Diocese saw growth in a dramatic fashion and the number of parishes grew to almost fifty strong. Along with this, the dedicated service of the priests in America added to the unity, prosperity and growth of the Diocese.
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      In 1991, the Diocese came under the direct control of a Malankara Metropolitan who was assisted by Mathews Mar Barnabas, our present Metropolitan. For one year, the Diocese continued in this manner, until control came under the full authority of Mathews Mar Barnabas.  The enthronement ceremony was held in March 1993 on a grand scale at St. Mary's West Sayville under the authority of the Catholicos of the East, Baselius Mar Thoma Mathews II, and was attended by representatives from across the Diocese.
+                      In 1991, the Diocese came under the direct control of a Malankara Metropolitan who was assisted by Mathews Mar Barnabas, our present Metropolitan. For one year, the Diocese continued in this manner, until control came under the full authority of Mathews Mar Barnabas.Â  The enthronement ceremony was held in March 1993 on a grand scale at St. Mary's West Sayville under the authority of the Catholicos of the East, Baselius Mar Thoma Mathews II, and was attended by representatives from across the Diocese.
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Under the leadership of Mar Barnabas, the Diocese has grown both spiritually and physically. Most notable of all Mar Barnabus' accomplishments is the development of spiritual organizations, such as MGOCSM and Sunday School. He gave both organizations a national structure and administration.  In 2002, Zacharias Mar Nicholovos, a young, talented leader and orator joined the Diocese as the assistant to Mar Barnabas. With his assistance, the Diocese has grown even further.
+                      Under the leadership of Mar Barnabas, the Diocese has grown both spiritually and physically.Â Most notable of all Mar Barnabus' accomplishments is the development of spiritual organizations, such as MGOCSM and Sunday School. He gave both organizations a national structure and administration.Â  In 2002, Zacharias Mar Nicholovos, a young, talented leader and orator joined the Diocese as the assistant to Mar Barnabas. With his assistance, the Diocese has grown even further.
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       Today
@@ -67,13 +67,13 @@ After 1970, the Malankara Orthodox Church gradually began to take root in many o
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       Mailing Address:
-Indian Orthodox Church Centre, 2158 route 106, mutton Town, New York-11791
+Indian Orthodox Church Centre,Â 2158 route 106, mutton Town, New York-11791
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Ph:  2153421500
+                      Ph: Â 2153421500
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Email:  neamdio@neamericandiocese.org , northeastamericandiocese@gmail.com
+                      Email: Â neamdio@neamericandiocese.org , northeastamericandiocese@gmail.com
 Web: www.neamericandiocese.org
                     </p>
                 </div>

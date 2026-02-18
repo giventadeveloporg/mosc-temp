@@ -26,7 +26,7 @@ export default async function ChurchHistoryPage({
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 {/* Featured Image - centered, contained */}
@@ -48,17 +48,17 @@ export default async function ChurchHistoryPage({
                   </h2>
 
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                    The Malankara Orthodox Church—hereafter referred to as the Orthodox Church of
-                    India or the Indian Orthodox Church—is the second largest faction of the ancient
+                    The Malankara Orthodox Churchâ€”hereafter referred to as the Orthodox Church of
+                    India or the Indian Orthodox Churchâ€”is the second largest faction of the ancient
                     church of the St. Thomas Christians in India, which stood till 1657 as a single
                     and united Church with an indigenous character of its own. This ancient church
                     of the St. Thomas Christians is an Apostolic Church like all other Apostolic
                     Churches around the world and originated from the evangelical labours of St.
-                    Thomas—the Apostle not only of Malabar and South India but also of India and all
+                    Thomasâ€”the Apostle not only of Malabar and South India but also of India and all
                     of Asia. In that sense this church is one of the oldest churches in the
                     Christian world and also in India, because Roman Catholic Christians came to
                     India only in the 16th century and Protestant Christians in the 18th
-                    century—all following Western colonialism. The Malankara Church is an
+                    centuryâ€”all following Western colonialism. The Malankara Church is an
                     indigenous Church with a distinctive heritage and characteristics of its own,
                     deeply rooted in Indian soil. Moreover it is a church which stood for centuries
                     in close contact with the East Syrian Church which once flourished in the present
@@ -73,7 +73,7 @@ export default async function ChurchHistoryPage({
                     In the 16th century it came in contact with the Roman Catholic Church through
                     Portuguese colonialism, which after a century&apos;s contact and interactions
                     resulted in the enforced domination of Roman Catholicism over the church of the
-                    St. Thomas Christians. The Synod of Udayamperoor—1599 played the decisive role in
+                    St. Thomas Christians. The Synod of Udayamperoorâ€”1599 played the decisive role in
                     this regard. Thus this synod laid the firm foundation for all the problems which
                     arose later on in this church. For about 54 years thereafter the St. Thomas
                     Christians remained under Rome&apos;s occupation and then onwards in a divided
@@ -92,8 +92,8 @@ export default async function ChurchHistoryPage({
                     broken, mainly due to the overwhelming action of the Roman Catholics who had
                     immense support from the Colonial powers; a group of the Thomas Christians were
                     induced to the Roman Catholic side and later on became the champions in the
-                    propagation of Roman Catholicism among the Thomas Christians. Moreover they—i.e.,
-                    those who were taken over to the Roman Catholic side—did not allow their
+                    propagation of Roman Catholicism among the Thomas Christians. Moreover theyâ€”i.e.,
+                    those who were taken over to the Roman Catholic sideâ€”did not allow their
                     opponents, who had discarded Rome, to travel on freely to their destination as a
                     free church. After many years of intense tribulation, struggles and loss of
                     faithful to the Roman Catholics, those who stood against Rome emerged as an
@@ -111,7 +111,7 @@ export default async function ChurchHistoryPage({
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     This Church of the St. Thomas Christians who had freed themselves from Roman
                     Catholicism were led till 1816 by Indian bishops of their own native origin and
-                    they were known by a common name—Mar Thoma. It is this church, which continued
+                    they were known by a common nameâ€”Mar Thoma. It is this church, which continued
                     thereafter under bishops known as Mar Dionysius; now known by the name the
                     Indian Orthodox Church. During the 17th, 18th and 19th centuries they were also
                     known by some names, which in most cases were appellations imposed upon them by
@@ -183,13 +183,13 @@ export default async function ChurchHistoryPage({
                       <div className="bg-white rounded-lg p-4 shadow-syro-card-sm border border-syro-table-border/30">
                         <h5 className="font-syro-display font-medium text-syro-blue mb-2">1599</h5>
                         <p className="font-syro-primary text-syro-dark-gray text-sm">
-                          Synod of Udayamperoor—Portuguese influence and enforced domination
+                          Synod of Udayamperoorâ€”Portuguese influence and enforced domination
                         </p>
                       </div>
                       <div className="bg-white rounded-lg p-4 shadow-syro-card-sm border border-syro-table-border/30">
                         <h5 className="font-syro-display font-medium text-syro-blue mb-2">1653</h5>
                         <p className="font-syro-primary text-syro-dark-gray text-sm">
-                          The Great Revolt—Freedom from Roman Catholicism through the Oath
+                          The Great Revoltâ€”Freedom from Roman Catholicism through the Oath
                         </p>
                       </div>
                       <div className="bg-white rounded-lg p-4 shadow-syro-card-sm border border-syro-table-border/30">
@@ -201,7 +201,7 @@ export default async function ChurchHistoryPage({
                       <div className="bg-white rounded-lg p-4 shadow-syro-card-sm border border-syro-table-border/30">
                         <h5 className="font-syro-display font-medium text-syro-blue mb-2">1934</h5>
                         <p className="font-syro-primary text-syro-dark-gray text-sm">
-                          Church constitution formed—Malankara Orthodox Syrian Church
+                          Church constitution formedâ€”Malankara Orthodox Syrian Church
                         </p>
                       </div>
                       <div className="bg-white rounded-lg p-4 shadow-syro-card-sm border border-syro-table-border/30">

@@ -19,3 +19,9 @@ export const SYRO_CATHOLICOS_LINKS: CatholicosLinkItem[] = [
   { name: 'H.H. Baselios Marthoma Didymos I', period: '2005–2010', description: 'The Seventh Catholicos of the East in Malankara', href: '/syro/catholicate/his-holiness-baselios-marthoma-didymos-i-seventh-catholicos-of-the-east-in-malankara' },
   { name: 'H.H. Baselios Marthoma Paulose II', period: '2010–2021', description: 'The Eighth Catholicos of the East in Malankara', href: '/syro/catholicate/h-h-baselios-marthoma-paulose-ii' },
 ];
+
+/** Full sidebar list: Introduction, then all Catholicoi. Use for consistent right sidebar on all catholicate subpages. */
+export const SYRO_CATHOLICATE_SIDEBAR_LINKS: (CatholicosLinkItem & { period?: string; description?: string })[] = [
+  { name: 'The Catholicate — Introduction', href: '/syro/catholicate-intro', period: '', description: '' },
+  ...SYRO_CATHOLICOS_LINKS,
+];

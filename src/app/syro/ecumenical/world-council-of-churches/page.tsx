@@ -17,7 +17,7 @@ const worldcouncilofchurchesPage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -55,13 +55,13 @@ const worldcouncilofchurchesPage = () => {
                       President: H.G. Dr. Youhanon Mar Demetrios Metropolitan
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Email: mar.demetrios@gmail.com
+                      Email:Â mar.demetrios@gmail.com
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       Secretary: Fr. Aswin Fernandis
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Email: ecumenical@mosc.in
+                      Email:Â ecumenical@mosc.in
                     </p>
                 </div>
               </div>

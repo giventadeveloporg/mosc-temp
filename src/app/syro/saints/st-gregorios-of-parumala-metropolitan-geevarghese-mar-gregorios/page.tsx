@@ -5,7 +5,7 @@ import SyroPageBanner from '../../components/SyroPageBanner';
 import { SAINTS_SIDEBAR_LINKS } from '../saintsSidebarLinks';
 
 export const metadata = {
-  title: 'St. Gregorios Of Parumala – Metropolitan Geevarghese Mar Gregorios',
+  title: 'St. Gregorios Of Parumala â€“ Metropolitan Geevarghese Mar Gregorios',
   description: 'Saint Gregorios of Parumala is popularly known as Parumala Thirumeni. Metropolitan Geevarghese Mar Gregorios of the Malankara Orthodox Church.',
 };
 
@@ -20,16 +20,16 @@ export default async function StGregoriosOfParumalaPage({
   const breadcrumbFrom = params.from === 'saints' ? 'saints' : 'home';
   return (
     <div className="bg-syro-bg-gray">
-      <SyroPageBanner title="St. Gregorios Of Parumala – Metropolitan Geevarghese Mar Gregorios" breadcrumbFrom={breadcrumbFrom} />
+      <SyroPageBanner title="St. Gregorios Of Parumala â€“ Metropolitan Geevarghese Mar Gregorios" breadcrumbFrom={breadcrumbFrom} />
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 <div className="mb-8">
                   <Image
                     src="/images/saints/st-gregorios-of-parumala.jpg"
-                    alt="St. Gregorios Of Parumala – Metropolitan Geevarghese Mar Gregorios"
+                    alt="St. Gregorios Of Parumala â€“ Metropolitan Geevarghese Mar Gregorios"
                     width={500}
                     height={300}
                     className="rounded-lg shadow-syro-card w-full h-auto object-contain"
@@ -70,7 +70,7 @@ export default async function StGregoriosOfParumalaPage({
                   <p>
                     Mar Gregorios engaged in a threefold activity of tireless service for the church: Diocesan administration, Ministerial formation of deacons, Missionary witness of the church through inner spiritual and theological consolidation, along with evangelical reaching out. In addition to these, Mar Gregorios undertook the task of building a church and seminary at Parumala. The diocesan administration, in the mean time, was extended to two more dioceses, Thumpamon and Quilon. The newly constructed church was consecrated in 1895. Mar Gregorios was the co-celebrant for the consecration of two ex-Roman Catholic priests as bishops: Fr.Alvaris as Alvaris Mar Kulius for Bombay-Mangalore Diocese; Fr.Rene Vilatti as Rene Vilatti Mar Timotheos for America.
                   </p>
-                  <h2 className="font-syro-display font-semibold text-xl text-syro-blue pt-4">HOLY LAND – PILGRIMAGE</h2>
+                  <h2 className="font-syro-display font-semibold text-xl text-syro-blue pt-4">HOLY LAND â€“ PILGRIMAGE</h2>
                   <p>
                     Mar Gregorios made the Holy Land Pilgrimage in 1895 as the fulfillment of a long cherished dream. On his return he published a travelogue under the title &lsquo;Oorslem yathra vivaranam&rsquo; (a narrative of the Jerusalem visit). This book, published in 1895 is to be considered as the earliest printed travelogue in Malayalam. This book had its centenary edition in 1996 and translation into English in 2000.
                   </p>

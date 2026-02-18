@@ -12,6 +12,8 @@ const QUICK_LINKS = [
   { name: 'CONTACT INFO', href: '/syro/contact-info' },
 ];
 
+const currentYear = () => new Date().getFullYear();
+
 export default function SyroFooter() {
   const [formData, setFormData] = useState({ full_name: '', email_address: '', phone_number: '', feedback: '' });
 
@@ -148,7 +150,7 @@ export default function SyroFooter() {
                 <Link href="/syro">Disclaimers</Link>
               </li>
               <li className="float-end copy-right">
-                <Link href="/syro">© 2026 The Malankara Orthodox Church. All rights reserved.</Link>
+                <Link href="/syro">© {currentYear()} The Malankara Orthodox Church. All rights reserved.</Link>
               </li>
             </ul>
           </div>
@@ -165,7 +167,7 @@ export default function SyroFooter() {
               </p>
               <p className="text-white text-center mb-2 d-block d-lg-none">Giventa Inc. USA</p>
               <p className="text-white text-center mb-2 d-block d-lg-none">
-                © 2026 The Malankara Orthodox Church. All rights reserved.
+                © {currentYear()} The Malankara Orthodox Church. All rights reserved.
               </p>
             </div>
           </div>

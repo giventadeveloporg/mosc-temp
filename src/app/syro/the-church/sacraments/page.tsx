@@ -21,37 +21,37 @@ export default async function SacramentsPage({
     {
       name: 'Baptism',
       description: 'The sacrament of initiation into the Christian faith, washing away original sin and incorporating the person into the Body of Christ.',
-      icon: '💧'
+      icon: 'ðŸ’§'
     },
     {
       name: 'Chrismation',
       description: 'The sacrament of confirmation, sealing the baptized with the gift of the Holy Spirit and completing their initiation.',
-      icon: '🕊️'
+      icon: 'ðŸ•Šï¸'
     },
     {
       name: 'Holy Eucharist',
       description: 'The central sacrament of the Church, where we receive the Body and Blood of Christ for our spiritual nourishment.',
-      icon: '🍞'
+      icon: 'ðŸž'
     },
     {
       name: 'Confession',
       description: 'The sacrament of repentance and forgiveness, where we confess our sins and receive absolution from the priest.',
-      icon: '🙏'
+      icon: 'ðŸ™'
     },
     {
       name: 'Holy Unction',
       description: 'The sacrament of healing for the sick, both physically and spiritually, through anointing with holy oil.',
-      icon: '🩹'
+      icon: 'ðŸ©¹'
     },
     {
       name: 'Holy Matrimony',
       description: 'The sacrament of marriage, uniting a man and woman in holy matrimony before God and the Church.',
-      icon: '💒'
+      icon: 'ðŸ’’'
     },
     {
       name: 'Holy Orders',
       description: 'The sacrament of ordination, conferring the grace and authority to serve as deacon, priest, or bishop.',
-      icon: '👨‍💼'
+      icon: 'ðŸ‘¨â€ðŸ’¼'
     }
   ];
 
@@ -62,7 +62,7 @@ export default async function SacramentsPage({
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">

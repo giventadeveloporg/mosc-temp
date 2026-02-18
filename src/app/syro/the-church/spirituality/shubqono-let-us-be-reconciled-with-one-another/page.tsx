@@ -5,7 +5,7 @@ import SyroPageBanner from '../../../components/SyroPageBanner';
 import TheChurchSidebar from '../../TheChurchSidebar';
 
 export const metadata = {
-  title: 'Shubqono – Let us be Reconciled with One Another',
+  title: 'Shubqono â€“ Let us be Reconciled with One Another',
   description:
     'The Service of Reconciliation (Shubqono) at the threshold of Great Lent. The Church enters the season of penitence and mutual forgiveness.',
 };
@@ -21,20 +21,20 @@ export default async function ShubqonoPage({
   return (
     <div className="bg-syro-bg-gray">
       <SyroPageBanner
-        title="Shubqono – Let us be Reconciled with One Another"
+        title="Shubqono â€“ Let us be Reconciled with One Another"
         breadcrumbFrom={breadcrumbFrom}
       />
 
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 <div className="mb-8 flex justify-center">
                   <div className="relative w-full max-w-[280px] h-auto">
                     <Image
                       src="/images/church/spirituality.jpg"
-                      alt="Shubqono – Service of Reconciliation"
+                      alt="Shubqono â€“ Service of Reconciliation"
                       width={280}
                       height={180}
                       className="w-full h-auto object-contain rounded-lg"
@@ -44,7 +44,7 @@ export default async function ShubqonoPage({
 
                 <div className="prose prose-lg max-w-none">
                   <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mt-6 mb-4">
-                    SHUBQONO – Let us be Reconciled with One Another
+                    SHUBQONO â€“ Let us be Reconciled with One Another
                   </h2>
 
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
@@ -77,7 +77,7 @@ export default async function ShubqonoPage({
 
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The scene painted by the hymns of the day is one of a great and terrible sorrow.
-                    We lament the loss of so great a gift – the gift to be children of God. Our sins
+                    We lament the loss of so great a gift â€“ the gift to be children of God. Our sins
                     have forced us to be exiles from glory. We are in want. No more can we look upon
                     the Lord our God and Maker. As Great Lent begins, we are reminded in language
                     stronger and more direct than ever before of the gravity of our condition in sin.

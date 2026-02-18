@@ -6,7 +6,7 @@ import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata = {
   title: 'H. G. Mathews Mar Theodosius Metropolitan',
-  description: 'His Grace Mathews Mar Theodosius, Metropolitan. Superior of Bethany Ashram; Secretary of Sanyasi-Sanyasini Sangham; former Principal of Bethany St John’s Higher Secondary School.',
+  description: 'His Grace Mathews Mar Theodosius, Metropolitan. Superior of Bethany Ashram; Secretary of Sanyasi-Sanyasini Sangham; former Principal of Bethany St Johnâ€™s Higher Secondary School.',
 };
 
 const HGMathewsMarTheodosiusPage = () => {
@@ -19,7 +19,7 @@ const HGMathewsMarTheodosiusPage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -49,15 +49,15 @@ const HGMathewsMarTheodosiusPage = () => {
 
                     <div className="prose prose-lg max-w-none">
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace was born on 15th September 1955 as the eldest son of Mr P.M. George and Mrs Aleyamma George of Punchayil family in Pandankary, Edathua, Alapuzha. His Grace is a member of St Mary’s Orthodox Church, Padankary.
+                        His Grace was born on 15th September 1955 as the eldest son of Mr P.M. George and Mrs Aleyamma George of Punchayil family in Pandankary, Edathua, Alapuzha. His Grace is a member of St Maryâ€™s Orthodox Church, Padankary.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace’s early education was in Thalavady. After passing the S. S. L. C. Examination His Grace became a member of Perunad Bethany Ashram. Graduating in English literature as a student of Baselius College Kottayam, His Grace joined the Orthodox Theological Seminary, took his B. D. degree and was ordained as a priest in 1982.
+                        His Graceâ€™s early education was in Thalavady. After passing the S. S. L. C. Examination His Grace became a member of Perunad Bethany Ashram. Graduating in English literature as a student of Baselius College Kottayam, His Grace joined the Orthodox Theological Seminary, took his B. D. degree and was ordained as a priest in 1982.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace took M.A. in History from the University of Kerala and B.Ed. from Sardar Patel University. His Grace was the Principal of Bethany St John’s Higher Secondary School during the period between 1987 and 1996. His Grace had been the President of Perunad YMCA for a long time. His Grace is the Secretary of the Sanyasi-Sanyasini Sangham of the Malankara Orthodox Church.
+                        His Grace took M.A. in History from the University of Kerala and B.Ed. from Sardar Patel University. His Grace was the Principal of Bethany St Johnâ€™s Higher Secondary School during the period between 1987 and 1996. His Grace had been the President of Perunad YMCA for a long time. His Grace is the Secretary of the Sanyasi-Sanyasini Sangham of the Malankara Orthodox Church.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">

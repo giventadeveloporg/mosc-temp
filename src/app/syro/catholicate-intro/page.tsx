@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import QuickLinks from '@/app/syro/components/QuickLinks';
 import SyroPageBanner from '@/app/syro/components/SyroPageBanner';
+import { SYRO_CATHOLICOS_LINKS } from '@/app/syro/catholicate/catholicosLinks';
 
 export const metadata = {
   title: 'The Catholicate — Introduction',
@@ -165,7 +166,7 @@ const CatholicateIntroPage = () => {
               </div>
             </div>
 
-            {/* Sidebar - Back to Catholicate */}
+            {/* Sidebar - Back to Catholicate + Catholicate History page links */}
             <div className="space-y-6">
               <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-6">
                 <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-4 pl-4 border-l-4 border-syro-red">
@@ -173,13 +174,50 @@ const CatholicateIntroPage = () => {
                 </h3>
                 <Link
                   href="/syro/catholicate"
-                  className="syro-primary-button inline-flex items-center gap-2 w-full justify-center"
+                  className="syro-primary-button inline-flex items-center gap-2 w-full justify-center py-1.5 leading-tight"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
                   <span>Back to The Catholicate</span>
                 </Link>
+                <div className="mt-3 space-y-1.5">
+                  <Link
+                    href="/syro/catholicate-intro"
+                    className="block p-2 rounded-lg bg-syro-blue/5 border border-syro-blue/20 transition-colors group leading-tight"
+                  >
+                    <div className="flex items-start space-x-2">
+                      <div className="w-6 h-6 bg-syro-blue/10 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-syro-blue/20 transition-colors">
+                        <span className="text-xs text-syro-blue" role="img" aria-label="Introduction">👑</span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-syro-display font-medium text-sm text-syro-dark-gray group-hover:text-syro-blue transition-colors leading-tight mt-0 mb-0">
+                          The Catholicate — Introduction
+                        </h4>
+                      </div>
+                    </div>
+                  </Link>
+                  {SYRO_CATHOLICOS_LINKS.map((catholicos) => (
+                    <Link
+                      key={catholicos.name}
+                      href={catholicos.href}
+                      className="block p-2 rounded-lg hover:bg-syro-bg-gray/50 transition-colors group leading-tight"
+                    >
+                      <div className="flex items-start space-x-2">
+                        <div className="w-6 h-6 bg-syro-blue/10 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-syro-blue/20 transition-colors">
+                          <span className="text-xs text-syro-blue" role="img" aria-label="Catholicos">👑</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-syro-display font-medium text-sm text-syro-dark-gray group-hover:text-syro-blue transition-colors leading-tight mt-0 mb-0">
+                            {catholicos.name}
+                          </h4>
+                          <p className="font-syro-primary text-xs text-syro-blue font-medium leading-tight mt-0 mb-0">{catholicos.period}</p>
+                          <p className="font-syro-primary text-xs text-[#798daf] leading-tight mt-0 mb-0">{catholicos.description}</p>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

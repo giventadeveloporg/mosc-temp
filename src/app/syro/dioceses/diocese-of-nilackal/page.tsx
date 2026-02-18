@@ -17,7 +17,7 @@ const dioceseofnilackalPage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -40,13 +40,13 @@ const dioceseofnilackalPage = () => {
                   </h2>
 
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      The Diocese of Nilackal came in to being on August 15, 2010 under the order issued by H.H Baselios Mar Thoma Didymos I, The Catholicos cum Malankara  Metropolitan. H.G.Dr Joshua Mar Nicodimos is the Ist Metropolitan of the Diocese.
-The name Nilackal is associated with the Christian Community founded by St.Thomas, the Apostle of India during the Ist century itself. Comprising the revenue     districts of Pathanamthitta and  Kottayam, the newly formed diocese consist of 39     parishes ranging from 13 to 200 families. The parishes are divided  in to 5 ecclesiastical districts namely Ayroor, Vayalathala, Ranni, Nilackal & Kanakappalam. The total families of the diocese is 2953.
-All the spiritual organizations of Malankara Orthodox Church and the movements like Ecology Commission, Sushrushaka Sangam, Lehari Virudha Sangam, Dasamsadayaka Sangam,  INAMS are also performing at its best.
-The Diocese purchased a building of about 12000 Sq.feet in Ranni Town and  made it the head quarters of the diocese with the name St.Thomas Aramana. Many major  projects like construction of a Convention Centre at Catholicate Centre Ranni, Completion of the Catholicate Centre at Angamoozhi, Nilackal, beginning of St.Gregorios Mission Centre at Vellayil, Ayroor and starting of an  Education Institution are under serious consideration. The new diocese also made initiative in various charitable activities by supporting the poor and the needy of the diocese as well as the society around.
+                      The Diocese of Nilackal came in to being on August 15, 2010 under the order issued by H.H Baselios Mar Thoma Didymos I, The Catholicos cum MalankaraÂ  Metropolitan. H.G.Dr Joshua Mar Nicodimos is the Ist Metropolitan of the Diocese.
+The name Nilackal is associated with the Christian Community founded by St.Thomas, the Apostle of India during the Ist century itself. Comprising the revenue Â  Â  districts of Pathanamthitta andÂ  Kottayam, the newly formed diocese consist of 39 Â  Â  parishes ranging from 13 to 200 families. The parishes are dividedÂ  in to 5 ecclesiastical districts namely Ayroor, Vayalathala, Ranni, Nilackal & Kanakappalam. The total families of the diocese is 2953.
+All the spiritual organizations of Malankara Orthodox Church and the movements like Ecology Commission, Sushrushaka Sangam, Lehari Virudha Sangam, Dasamsadayaka Sangam,Â  INAMS are also performing at its best.
+The Diocese purchased a building of about 12000 Sq.feet in Ranni Town andÂ  made it the head quarters of the diocese with the name St.Thomas Aramana. Many majorÂ  projects like construction of a Convention Centre at Catholicate Centre Ranni, Completion of the Catholicate Centre at Angamoozhi, Nilackal, beginning of St.Gregorios Mission Centre at Vellayil, Ayroor and starting of anÂ  Education Institution are under serious consideration. The new diocese also made initiative in various charitable activities by supporting the poor and the needy of the diocese as well as the society around.
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Address: Nilackal Orthodox diocesan Centre,  St.Thomas Aramana, Pazhavangadi P.O, Ranni, Pathanamthitta- 689673
+                      Address: Nilackal Orthodox diocesan Centre, Â St.Thomas Aramana, Pazhavangadi P.O, Ranni, Pathanamthitta- 689673
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       Phone: 04735- 224477
@@ -91,13 +91,13 @@ The Diocese purchased a building of about 12000 Sq.feet in Ranni Town and  made
                       href="/syro/dioceses/diocese-of-kottarakara-punalur" 
                       className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Kottarakara – Punalur
+                      Diocese of Kottarakara â€“ Punalur
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-adoor-kadampanadu" 
                       className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Adoor – Kadampanadu
+                      Diocese of Adoor â€“ Kadampanadu
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-thumpamon" 

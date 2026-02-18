@@ -25,7 +25,7 @@ export default async function MissiologyPage({
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 <div className="mb-8 flex justify-center">
@@ -49,7 +49,7 @@ export default async function MissiologyPage({
                     Orthodox Mission in his work &quot;Go Forth in Peace: Orthodox Perspectives on
                     Mission&quot;. According to Bria, &apos;The mission of the Church is based on
                     Christ&apos;s mission. A proper understanding of this mission requires, in the
-                    first place, an application of Trinitarian theology…. Trinitarian theology points
+                    first place, an application of Trinitarian theologyâ€¦. Trinitarian theology points
                     to the fact that the God is in God&apos;s own self a life of communion and that
                     God&apos;s involvement in history aims at drawing humanity and creation in general
                     in to this communion with God&apos;s very life.&apos; Regarding the aim of
@@ -157,7 +157,7 @@ export default async function MissiologyPage({
                     subjugated and oppressed. The church&apos;s mission should involve teaching
                     people to adopt life-styles that use fewer of the world&apos;s resources.
                     Committed to recycling waste, driving automobiles less, using resources sparingly
-                    and wisely—these are practices that Christians can cultivate and proclaim. In
+                    and wiselyâ€”these are practices that Christians can cultivate and proclaim. In
                     third world countries such as India, the land of the tribals, Dalits and other
                     marginalized people are taken away from them in the name of progress. The
                     churches can join hands with these people arguing for the rights of the

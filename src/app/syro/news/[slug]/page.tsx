@@ -51,7 +51,7 @@ export default async function NewsArticlePage({ params }: PageProps) {
     });
 
   return (
-    <div className="bg-syro-bg-gray">
+    <div className="bg-syro-bg-gray font-syro-primary text-[#0b2848] min-h-screen">
       <NewsPageHeader />
 
       {flashData.flashNewsItems?.length > 0 ? (
@@ -60,15 +60,15 @@ export default async function NewsArticlePage({ params }: PageProps) {
         <FlashBar message={flashData.flash.message} />
       ) : null}
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 overflow-x-hidden">
+      <div className="max-w-[1200px] mx-auto px-[15px] py-syro-xxxl overflow-x-hidden">
         <Link
           href="/syro/news"
-          className="syro-news-link inline-flex items-center gap-2 font-body text-sm text-syro-blue hover:underline mb-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-syro-red"
+          className="syro-news-link inline-flex items-center gap-2 text-syro-small text-syro-blue hover:text-syro-red transition-colors duration-300 mb-syro-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-syro-red"
         >
           <span aria-hidden="true">←</span> Back to News
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-12 min-w-0">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-syro-xl min-w-0">
           {/* Main content */}
           <article className="lg:col-span-2 min-w-0 overflow-x-hidden max-w-full">
             <header className="mb-6">

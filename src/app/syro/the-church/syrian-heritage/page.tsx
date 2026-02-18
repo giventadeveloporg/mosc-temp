@@ -26,7 +26,7 @@ export default async function SyrianHeritagePage({
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 {/* Featured Image - centered, contained */}
@@ -66,10 +66,10 @@ export default async function SyrianHeritagePage({
                     Edessa that it began to be used as an independent language. Soon it acquired
                     the status of the language of Christian communities of Mesopotamia and Syria.
                     These Christians began to be called as Syrians after the Roman province in
-                    which they lived—Syria—and their language was called Syriac. It did not take
-                    long for this language to reach Persia and from there to India—where it
+                    which they livedâ€”Syriaâ€”and their language was called Syriac. It did not take
+                    long for this language to reach Persia and from there to Indiaâ€”where it
                     remains even today as the basic liturgical language of some Christian
-                    communities—and even up to China.
+                    communitiesâ€”and even up to China.
                   </p>
 
                   <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 mt-8">

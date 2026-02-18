@@ -6,7 +6,7 @@ import { SAINTS_SIDEBAR_LINKS } from '../saintsSidebarLinks';
 
 export const metadata = {
   title: 'Early Church Fathers',
-  description: 'Church Fathers during the 4th and 5th centuries—Pamphilus, Eusebius, Athanasius, Basil, the Gregories, John Chrysostom, Cyril of Jerusalem.',
+  description: 'Church Fathers during the 4th and 5th centuriesâ€”Pamphilus, Eusebius, Athanasius, Basil, the Gregories, John Chrysostom, Cyril of Jerusalem.',
 };
 
 const currentSlug = '/syro/saints/early-church-father';
@@ -23,7 +23,7 @@ export default async function EarlyChurchFatherPage({
       <SyroPageBanner title="Early Church Fathers" breadcrumbFrom={breadcrumbFrom} />
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 <div className="mb-8">
@@ -89,7 +89,7 @@ export default async function EarlyChurchFatherPage({
                     Those were the days when Arius&apos; heresies were rocking the Church Athanasius realized that Arius&apos; denial of Christ&apos;s divinity would ruin the basis of Christian faith. Immediately he started using his tongue and pen against Arius. He argued that the basis of Christian faith is that God saved man by incarnation, and that if Jesus Christ is not God, we had not been saved. In the end, Emperor Constantine convened the synod of Nice to resolve the issues including this.
                   </p>
                   <p className="text-justify">
-                    Athanasius attended the synod as the Secretary of Bishop Alexander. The synod lasted for three months and Athanasius&apos; voice reverberated in it. It was very difficult to take decisions against Arius. Athanasius stood firmly for the phrase ὁμοουσιον τω πατρι (of the same substance with the Father) to qualify the Son. He was not ready to accept even the phrase ὁμοιουσιον τω πατρι (of the similar substance with the Father) suggested by moderates like Eusebius of Caesarea. The essential part of the Creed about faith in the Son of God was written in the Nicene Synod under the leadership of Athanasius.
+                    Athanasius attended the synod as the Secretary of Bishop Alexander. The synod lasted for three months and Athanasius&apos; voice reverberated in it. It was very difficult to take decisions against Arius. Athanasius stood firmly for the phrase á½Î¼Î¿Î¿Ï…ÏƒÎ¹Î¿Î½ Ï„Ï‰ Ï€Î±Ï„ÏÎ¹ (of the same substance with the Father) to qualify the Son. He was not ready to accept even the phrase á½Î¼Î¿Î¹Î¿Ï…ÏƒÎ¹Î¿Î½ Ï„Ï‰ Ï€Î±Ï„ÏÎ¹ (of the similar substance with the Father) suggested by moderates like Eusebius of Caesarea. The essential part of the Creed about faith in the Son of God was written in the Nicene Synod under the leadership of Athanasius.
                   </p>
                   <p className="text-justify">
                     In 328 AD, he succeeds Alexander in the see of Alexandria. Then he visited the Churches under his jurisdiction and confirmed the believers in true faith. The problem created by Arius was a headache to him. They influenced the Emperor and brought forward many allegations against Athanasius. At last, the exiled Arius and his companions were called back; Athanasius was accused of theft, adultery and murder. However, they failed to prove their allegations. Later he was accused of treason and false witnesses were presented against him. The allegation was that Athanasius blocked the ship bringing corn from Egypt to Byzantium. Hearing the words of the false witnesses the Emperor ordered Athanasius to be exiled to Tyre in 335 AD.
@@ -103,7 +103,7 @@ export default async function EarlyChurchFatherPage({
                   </p>
                   <p className="text-justify font-semibold">MAIN TEACHINGS OF ATHANASIUS OF ALEXANDRIA</p>
                   <p className="text-justify">
-                    The Father, The Son and The Holy Spirit are of the same substance (ὁμοουσιος). Jesus Christ is perfect God and perfect Man. Athanasius&apos; main teaching on Christ is contained in the phrase ὁμοουσιος (consubstantial) and in this statement: He became man so that we might be made God; and He manifested Himself in the flesh, so that we might grasp the idea of the unseen father; and he endured the insolence of men, so that we might receive the inheritance of immortality (On Incarnation 54:3). The doctrine of salvation would have been in danger, if the heresy of Arius had gained momentum. Athanasius found in the Incarnation and Crucifixion a single act of God in His attempt to redeem humanity. He refused to see them as two different actions. Athanasius taught about the Divinity of the Holy Spirit and His emanation from God.
+                    The Father, The Son and The Holy Spirit are of the same substance (á½Î¼Î¿Î¿Ï…ÏƒÎ¹Î¿Ï‚). Jesus Christ is perfect God and perfect Man. Athanasius&apos; main teaching on Christ is contained in the phrase á½Î¼Î¿Î¿Ï…ÏƒÎ¹Î¿Ï‚ (consubstantial) and in this statement: He became man so that we might be made God; and He manifested Himself in the flesh, so that we might grasp the idea of the unseen father; and he endured the insolence of men, so that we might receive the inheritance of immortality (On Incarnation 54:3). The doctrine of salvation would have been in danger, if the heresy of Arius had gained momentum. Athanasius found in the Incarnation and Crucifixion a single act of God in His attempt to redeem humanity. He refused to see them as two different actions. Athanasius taught about the Divinity of the Holy Spirit and His emanation from God.
                   </p>
 
                   <h3 className="font-syro-display font-medium text-lg text-syro-blue mt-8 mb-2">4. BASIL THE GREAT OF CAESAREA</h3>

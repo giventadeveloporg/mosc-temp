@@ -14,9 +14,9 @@ export function SidebarPromo({ block }: SidebarPromoProps) {
   const hasEmbed = block.embedCode && block.embedCode.trim().length > 0;
 
   return (
-    <div className="rounded-xl bg-white border border-syro-table-border sacred-shadow-sm overflow-hidden p-4 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]">
+    <div className="rounded-[5px] bg-white overflow-hidden p-syro-xxl shadow-syro-card font-syro-primary">
       {block.title && (
-        <h3 className="font-heading font-semibold text-lg text-syro-blue mb-3">
+        <h3 className="text-syro-h3 font-semibold text-syro-blue mb-syro-md">
           {block.title}
         </h3>
       )}
@@ -44,13 +44,13 @@ export function SidebarPromo({ block }: SidebarPromoProps) {
               />
             </div>
           ) : (
-            <span className="block py-8 text-center font-body text-syro-dark-gray text-sm">
+            <span className="block py-8 text-center font-syro-primary text-syro-small text-syro-dark-gray">
               Watch video
             </span>
           )}
         </a>
       ) : (
-        <p className="font-body text-sm text-syro-dark-gray">
+        <p className="font-syro-primary text-syro-small text-syro-dark-gray">
           No promotional content configured.
         </p>
       )}

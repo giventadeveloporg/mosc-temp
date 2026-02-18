@@ -7,7 +7,7 @@ import TheChurchSidebar from '../../TheChurchSidebar';
 export const metadata = {
   title: 'Connection with the Syrian Churches',
   description:
-    'West Syrianization of the Orthodox Thomas Christians, the Patriarch’s jurisdictional claims, and the end of East Syrian connection.',
+    'West Syrianization of the Orthodox Thomas Christians, the Patriarchâ€™s jurisdictional claims, and the end of East Syrian connection.',
 };
 
 export default async function ConnectionWithSyrianChurchesPage({
@@ -27,7 +27,7 @@ export default async function ConnectionWithSyrianChurchesPage({
 
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 <div className="mb-8 flex justify-center">
@@ -64,11 +64,11 @@ export default async function ConnectionWithSyrianChurchesPage({
                     When accepting the services of Mar Gregorios, the Orthodox of Malabar did not
                     place themselves under the jurisdictional setup of the Antiochene Syrian Church.
                     The West Syrian Patriarch, however, from the beginning desired that the Indian
-                    church formally accept him as Supreme Head—similar to the Portuguese extracting
+                    church formally accept him as Supreme Headâ€”similar to the Portuguese extracting
                     submission to Rome in 1599. Mar Thoma V and VI foiled attempts to realize this
                     claim; a party favourable to the Patriarch had formed by the middle of the 18th
                     century and troubled the Mar Thoma bishops. This party was very active during the
-                    CMS collaboration (1816–1836) and was a major factor in its collapse.
+                    CMS collaboration (1816â€“1836) and was a major factor in its collapse.
                   </p>
 
                   <h3 className="font-syro-display font-semibold text-xl text-syro-blue mt-8 mb-3">
@@ -86,7 +86,7 @@ export default async function ConnectionWithSyrianChurchesPage({
                     V clashed with Mar Gabriel both theologically and administratively; Mar Gabriel
                     died without a successor, and with this event the connection of the Indian church
                     with the East Syrian church came to an end. The Portuguese condemnation of the
-                    East Syrian Church as Nestorian, and the West Syrian contact’s denunciation of
+                    East Syrian Church as Nestorian, and the West Syrian contactâ€™s denunciation of
                     East Syrian Christianity as heretical, gradually led the Indian Orthodox to quit
                     their East Syrian identity and embrace West Syrian identity.
                   </p>

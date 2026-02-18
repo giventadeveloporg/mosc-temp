@@ -24,7 +24,7 @@ export default async function WestSyrianWorshipPage({
 
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 <div className="mb-8 flex justify-center">
@@ -57,7 +57,7 @@ export default async function WestSyrianWorshipPage({
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Following the Council of Chalcedon (451), the Eastern Church was divided; both
                     groups continued to use the Greek version of St. James. The Byzantine emperor
-                    Justin (518–527) expelled the Non-Chalcedonians from Antioch; they took refuge in
+                    Justin (518â€“527) expelled the Non-Chalcedonians from Antioch; they took refuge in
                     Syriac-speaking Mesopotamia. Gradually the Antiochene liturgical rites were
                     translated into Syriac, and new elements such as Syriac hymns were introduced. It
                     was Mar Gregorios of Jerusalem, who came to Malankara in 1665, who introduced

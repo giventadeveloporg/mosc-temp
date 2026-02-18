@@ -27,7 +27,7 @@ export default async function LiturgyAndSpiritualPracticesPage({
 
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 <div className="mb-8 flex justify-center">
@@ -59,7 +59,7 @@ export default async function LiturgyAndSpiritualPracticesPage({
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Christian life is described in the Book of Acts as continuing &quot;steadfastly
                     in the apostle&apos;s doctrine and fellowship, in the breaking of bread, and in
-                    the prayers.&quot; The liturgy is the common work of the people of God—the
+                    the prayers.&quot; The liturgy is the common work of the people of Godâ€”the
                     offering of praise, thanksgiving, and the Eucharist in which we participate in
                     the Body and Blood of Christ. In the Malankara Orthodox Syrian Church, the
                     liturgy and spiritual practices are rooted in the West Syrian (Antiochene)
@@ -69,7 +69,7 @@ export default async function LiturgyAndSpiritualPracticesPage({
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Through the liturgy we encounter the limitless God in time and space; we offer
                     moments and places purified for worship. The aim of the liturgical year and
-                    spiritual practices is that our entire life be filled with God&apos;s presence—
+                    spiritual practices is that our entire life be filled with God&apos;s presenceâ€”
                     through humility, submission, service, lent, fasting, and participation in the
                     liturgical services with ever-increasing preparation and devotion.
                   </p>

@@ -5,19 +5,19 @@ import DiocesesQuickLinksNav from '../DiocesesQuickLinksNav';
 import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata = {
-  title: 'Diocese of Adoor – Kadampanadu',
-  description: 'Learn about the Diocese of Adoor – Kadampanadu of the Malankara Orthodox Syrian Church.',
+  title: 'Diocese of Adoor â€“ Kadampanadu',
+  description: 'Learn about the Diocese of Adoor â€“ Kadampanadu of the Malankara Orthodox Syrian Church.',
 };
 
 const dioceseofadoorkadampanaduPage = () => {
   return (
     <div className="bg-syro-bg-gray">
-      <SyroPageBanner title="Diocese of Adoor – Kadampanadu" breadcrumbFrom="dioceses" />
+      <SyroPageBanner title="Diocese of Adoor â€“ Kadampanadu" breadcrumbFrom="dioceses" />
 
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -25,7 +25,7 @@ const dioceseofadoorkadampanaduPage = () => {
                 <div className="mb-8">
                   <Image
                     src="/images/dioceses/kadampanadu diocese.jpg"
-                    alt="Diocese of Adoor – Kadampanadu"
+                    alt="Diocese of Adoor â€“ Kadampanadu"
                     width={500}
                     height={300}
                     className="rounded-lg shadow-syro-card w-full h-auto"
@@ -40,15 +40,15 @@ const dioceseofadoorkadampanaduPage = () => {
                   </h2>
 
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      One of the fastest growing Diocese of Malankara Orthodox Church which  came into existence by the Kalpana of His Holiness Moran Mar Baselios Marthoma Didymus-1, Catholicose of the East & Malankara Metropolitan.The Diocese started functioning on August 15, 2010. The new diocese is formed  by taking churches from kollam diocese and consists of ... parishes.
+                      One of the fastest growing Diocese of Malankara Orthodox Church whichÂ  came into existence by the Kalpana of His Holiness Moran Mar Baselios Marthoma Didymus-1, Catholicose of the East & Malankara Metropolitan.The Diocese started functioning on August 15, 2010. The new diocese is formedÂ  by taking churches from kollam diocese and consists of ... parishes.
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      H.G. Zacharias mar Aprem appointed as the first metropolitan  of Adoor - Kadampanadu diocese.Under the Spiritual Guidance and friutful leadership of mar Aprem Metropolitan ,the diocese started a couple of Spiritual and charitable initiatives.More over the diocese runs Sreyas Art and Graphics Dept., Sreyas Art and Theology Dept.,Sreyas Old age and retirement home etc.
+                      H.G. Zacharias mar Aprem appointed as the first metropolitanÂ  of Adoor - Kadampanadu diocese.Under the Spiritual Guidance and friutful leadership of mar Aprem Metropolitan ,the diocese started a couple of Spiritual and charitable initiatives.More over the diocese runs Sreyas Art and Graphics Dept., Sreyas Art and Theology Dept.,Sreyas Old age and retirement home etc.
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       Address:
 Sreyas Aramana, Mar Epiphanios Centre, Kannamcode, Adoor P.O
-Pathanamthitta – 691523
+Pathanamthitta â€“ 691523
 drzachariasmaraprem@gmail.com, akdiocese@gmail.com
 Ph: 04734 227117, 227271
                     </p>
@@ -89,13 +89,13 @@ Ph: 04734 227117, 227271
                       href="/syro/dioceses/diocese-of-kottarakara-punalur" 
                       className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Kottarakara – Punalur
+                      Diocese of Kottarakara â€“ Punalur
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-adoor-kadampanadu" 
                       className="block px-3 py-2 bg-syro-red text-white rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Adoor – Kadampanadu
+                      Diocese of Adoor â€“ Kadampanadu
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-thumpamon" 

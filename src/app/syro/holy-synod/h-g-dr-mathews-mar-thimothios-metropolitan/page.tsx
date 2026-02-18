@@ -19,7 +19,7 @@ const HGDrMathewsMarThimothiosMetropolitanPage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -49,7 +49,7 @@ const HGDrMathewsMarThimothiosMetropolitanPage = () => {
 
                     <div className="prose prose-lg max-w-none">
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace was born on 3rd May 1963 as the eldest son of Mr P.J. Baby and Mrs Thankamma Baby of Painuvilla Puthenveettil family. His Grace is a member of St Mary’s Cathedral Puthiakavu, Mavelikkara.
+                        His Grace was born on 3rd May 1963 as the eldest son of Mr P.J. Baby and Mrs Thankamma Baby of Painuvilla Puthenveettil family. His Grace is a member of St Maryâ€™s Cathedral Puthiakavu, Mavelikkara.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
@@ -57,11 +57,11 @@ const HGDrMathewsMarThimothiosMetropolitanPage = () => {
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace is a scholar in Italian, French, German, Aramaic and Hebrew apart from English and Malayalam. His Grace has served as Joint Secretary of St Thomas Orthodox Vaidika Sanghom, Publisher of “Purohithan” Magazine, Executive Committee Member of the Priest Fellowship in Rome, Secretary of Vattasseril Mar Divanyasios Charitable Fund, Dean of Postgraduate Studies and Registrar of Orthodox Theological Seminary.
+                        His Grace is a scholar in Italian, French, German, Aramaic and Hebrew apart from English and Malayalam. His Grace has served as Joint Secretary of St Thomas Orthodox Vaidika Sanghom, Publisher of â€œPurohithanâ€ Magazine, Executive Committee Member of the Priest Fellowship in Rome, Secretary of Vattasseril Mar Divanyasios Charitable Fund, Dean of Postgraduate Studies and Registrar of Orthodox Theological Seminary.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace has served as assistant vicar and vicar in eight parishes in Kollam and Mavelikkara Dioceses. His Grace has prepared O.V.B.S. textbooks, teacher’s guide and a study based on the 24th Psalm.
+                        His Grace has served as assistant vicar and vicar in eight parishes in Kollam and Mavelikkara Dioceses. His Grace has prepared O.V.B.S. textbooks, teacherâ€™s guide and a study based on the 24th Psalm.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
@@ -72,7 +72,7 @@ const HGDrMathewsMarThimothiosMetropolitanPage = () => {
                         Contact
                       </h4>
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
-                        <p>Bethel Mar Gregorios Aramana, Chengannur P.O. – 689 121</p>
+                        <p>Bethel Mar Gregorios Aramana, Chengannur P.O. â€“ 689 121</p>
                         <p>Mob: 9447718511</p>
                         <p>Email: thimothiosmathews@gmail.com</p>
                       </div>

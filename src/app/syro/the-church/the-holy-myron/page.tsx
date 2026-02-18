@@ -8,7 +8,7 @@ import TheChurchSidebar from '../TheChurchSidebar';
 export const metadata = {
   title: 'The Holy Myron',
   description:
-    'The divine and life-giving mystery of the Holy Myron. By the divine power, we speak of the mysteries of the cross and the holy anointing—its origin, meaning, and consecration in the Orthodox tradition.',
+    'The divine and life-giving mystery of the Holy Myron. By the divine power, we speak of the mysteries of the cross and the holy anointingâ€”its origin, meaning, and consecration in the Orthodox tradition.',
 };
 
 export default async function TheHolyMyronPage({
@@ -26,7 +26,7 @@ export default async function TheHolyMyronPage({
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 {/* Featured Image */}
@@ -57,11 +57,11 @@ export default async function TheHolyMyronPage({
                   </h3>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The word &apos;Myron&apos; is translated in the Syriac language as
-                    &apos;muro&apos;. Etymologically the word muro—with which the dead are
-                    embalmed—signifies mortality. Thus it signifies the mortality of Our Lord for
+                    &apos;muro&apos;. Etymologically the word muroâ€”with which the dead are
+                    embalmedâ€”signifies mortality. Thus it signifies the mortality of Our Lord for
                     our sake. Solomon also called Him &quot;Oil of Myrrh&quot; (Songs 1:2). The
                     Greeks too call it Myron in the Greek language. In two ways it is called Myron:
-                    first, because of the fragrance—every kind of oil composed from many fragrant
+                    first, because of the fragranceâ€”every kind of oil composed from many fragrant
                     plants is called Myron; aromatic herbs are also called Myron.
                   </p>
 
@@ -98,7 +98,7 @@ export default async function TheHolyMyronPage({
                     the mysteries of the Church, He also commanded him saying, &quot;Take the
                     finest aromatics: the flower of chosen Myron five hundred shekels, Cinnamon,
                     Cassia and Olive oil etc. and make the oil of anointing, and you shall anoint
-                    the tent of the testimony, etc.&quot; (Ex. 30:23–26). And this type was handed
+                    the tent of the testimony, etc.&quot; (Ex. 30:23â€“26). And this type was handed
                     down till Christ and the old anointing of Moses came to an end, when Our Lord
                     handed over the key to Simon on the Mount Tabor. And thus the new anointing
                     originated. These things are enough.
@@ -121,7 +121,7 @@ export default async function TheHolyMyronPage({
                     the Holy Spirit taught the apostles to make the Myron when He descended upon
                     them in the form of the tongues of fire. This is evident from what the Son had
                     said: &quot;From that which is Mine He takes and informs you&quot; (cf. Jn.
-                    16:13–15).
+                    16:13â€“15).
                   </p>
 
                   <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
@@ -133,7 +133,7 @@ export default async function TheHolyMyronPage({
                     that there was the horn of oil for the apostles? You say that it was raised up
                     amongst you. Again, show us where is it written that the apostles consecrated
                     the Myron for baptism, and that they anointed the baptized with it, as your
-                    elders do—for when one wishes to baptize, he consecrates the oil? If you say
+                    elders doâ€”for when one wishes to baptize, he consecrates the oil? If you say
                     that it is not written that the apostles consecrated the Myron, and therefore
                     we do not consecrate it, then show us where is it written to adore the cross,
                     to build the churches in the eastward direction, to celebrate the baptism in the
@@ -238,7 +238,7 @@ export default async function TheHolyMyronPage({
                     The same one is visible and invisible. Just as the constitution of the Myron is
                     from oils and substances that are separate and different in essence, yet nobody
                     says after the composition of Myron that there are many oils, but a single
-                    Myron—similarly, it is not right to separate Christ, that true Myron, into two
+                    Myronâ€”similarly, it is not right to separate Christ, that true Myron, into two
                     natures after the union with the flesh.
                   </p>
 
@@ -274,8 +274,8 @@ export default async function TheHolyMyronPage({
                   </h3>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     It has been asked: Why do the bishops alone compose the Myron? We say as an
-                    argument that Christ united to Himself an animated body—and so the bishop alone
-                    compounds it—for one is the Only-Begotten Son who is from the Father. Again, for
+                    argument that Christ united to Himself an animated bodyâ€”and so the bishop alone
+                    compounds itâ€”for one is the Only-Begotten Son who is from the Father. Again, for
                     He alone, and His Holy Spirit, know how He was &apos;compounded&apos; with the
                     flesh.
                   </p>
@@ -350,7 +350,7 @@ export default async function TheHolyMyronPage({
                     Chapter 21
                   </h3>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                    The Myron leaves and goes around the nave and returns—just as the Word, when
+                    The Myron leaves and goes around the nave and returnsâ€”just as the Word, when
                     He became flesh, left heaven (just as the Myron leaves the Holy of Holies), and
                     He went around the world (just as the Myron goes around the nave). He fulfilled
                     the divine economy and returned to heaven, from where He descended.
@@ -410,14 +410,14 @@ export default async function TheHolyMyronPage({
                     Chapter 25
                   </h3>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                    On the Myron and its mysteries—it is necessary that we may continue with the
+                    On the Myron and its mysteriesâ€”it is necessary that we may continue with the
                     same contemplation (spiritual sense) and compare the types to the truth. Thus
                     the twelve deacons who surround the Myron represent the twelve legions of the
                     angels. Others say that the deacons represent the Seraphim who surround the
                     Word. Their fans indicate the six wings of the Seraphim, who covered their faces
                     with two (that is from His divinity), with two they covered their feet (that
-                    is from His humanity)—as someone may say, they do not search out His divinity
-                    and investigate about His humanity—and with the middle wings they fly, seeing
+                    is from His humanity)â€”as someone may say, they do not search out His divinity
+                    and investigate about His humanityâ€”and with the middle wings they fly, seeing
                     that they possess an intermediary knowledge about Him, because &quot;He is the
                     mediator between God and men,&quot; as Paul had said (1 Tim 2:5). Again, the
                     fact that the deacons conceal the Myron is the type of the Seraphim who conceal
@@ -503,7 +503,7 @@ export default async function TheHolyMyronPage({
                     Chapter 34
                   </h3>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                    The number twelve—whether twelve censers, twelve lamps or twelve fans—indicates
+                    The number twelveâ€”whether twelve censers, twelve lamps or twelve fansâ€”indicates
                     the twelve tribes. As the tribes were twelve, the stones were twelve, and
                     twelve hours make a day, and there are twelve months in a year, and also man is
                     known in twelve parts.
@@ -658,7 +658,7 @@ export default async function TheHolyMyronPage({
                   </h3>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Again, in order to show the Myron to the people, just as Our Lord was suspended
-                    on the cross in the sight of all the creation—He was seen.
+                    on the cross in the sight of all the creationâ€”He was seen.
                   </p>
 
                   <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
@@ -666,7 +666,7 @@ export default async function TheHolyMyronPage({
                   </h3>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     By extolling it, he indicates the following: When Emmanuel was raised on the
-                    cross and extended, He received the anointing of the Spirit—not that He had not
+                    cross and extended, He received the anointing of the Spiritâ€”not that He had not
                     yet received the Spirit, for Jesus had not yet been glorified.
                   </p>
 
@@ -708,7 +708,7 @@ export default async function TheHolyMyronPage({
                     to the Word. The one into which it is poured typifies our flesh, for through
                     baptism we receive it. Again the Myron is hidden in the Holy of Holies and is
                     not left revealed like the crosses and the similar orders in the church, for the
-                    mystery of the economy of the Word—whom it typifies—is hidden. His judgments are
+                    mystery of the economy of the Wordâ€”whom it typifiesâ€”is hidden. His judgments are
                     inscrutable, being a great depth, and therefore it is not lawful to show the
                     mysteries openly.
                   </p>
@@ -750,7 +750,7 @@ export default async function TheHolyMyronPage({
                     became flesh: &quot;Your name is the myron poured out&quot; (Songs 1:3).
                     Qurbana and the altar were named during the time of the dispensation and the
                     person of humanity. Moses Bar Kepha, bishop of Mosul, says otherwise: Myron,
-                    Qurbana, altar or bishop—one is not more valuable than the other, because all
+                    Qurbana, altar or bishopâ€”one is not more valuable than the other, because all
                     four indicate Christ and occupy the place of Christ. Christ is the Myron. As
                     Paul had said, &quot;In the end of the world, He offered Himself once for all
                     through His sacrifice&quot; (Heb 9:26). He is the altar, as &quot;an altar not
@@ -762,7 +762,7 @@ export default async function TheHolyMyronPage({
                     mutually, and are sanctified and perfected by others. Myron is consecrated so
                     that things might be anointed with it, and so that churches as well as baptismal
                     water might be consecrated, the baptized might be signed with it and so be
-                    distinguished from the non-baptized—in order to confer adoption as sons and the
+                    distinguished from the non-baptizedâ€”in order to confer adoption as sons and the
                     garment of life to those who wear it, to anoint our spiritual head, to gladden our
                     faces that were blackened with sins, to help the spiritual athletes and to give
                     virtue to those who have entered the world and good company to those who are
@@ -777,7 +777,7 @@ export default async function TheHolyMyronPage({
                     say that we meditate with the eyes of the soul on God the Word, who unites
                     Himself with the bread and wine and the oil. He is the Qurbana; He is the
                     Myron, and the Word of Life to those who are saved, and death to those who
-                    perish. The operations of the Myron precede the Qurbana—for without Myron, the
+                    perish. The operations of the Myron precede the Qurbanaâ€”for without Myron, the
                     church is not consecrated, nor the altar, nor the baptism, the Qurbana nor the
                     priest, and these are the fundamental operations. The operations of the Qurbana
                     are the final and complete, because the church that is consecrated with Myron,
