@@ -16,7 +16,10 @@ async function fetchEventsForGroup(baseUrl: string, groupId: number) {
   }
 }
 
-export default async function FocusGroupsPage({ searchParams }: { searchParams?: { [k: string]: string | string[] | undefined } }) {
+export default async function FocusGroupsPage(props: { searchParams?: Promise<{ [k: string]: string | string[] | undefined }> | { [k: string]: string | string[] | undefined } }) {
+  const searchParams = props.searchParams != null && typeof (props.searchParams as Promise<unknown>).then === 'function'
+    ? await (props.searchParams as Promise<{ [k: string]: string | string[] | undefined }>)
+    : (props.searchParams ?? {});
   const baseUrl = getAppUrl();
   const page = toInt(typeof searchParams?.page === 'string' ? searchParams?.page : undefined, 0);
   const size = toInt(typeof searchParams?.size === 'string' ? searchParams?.size : undefined, 9);

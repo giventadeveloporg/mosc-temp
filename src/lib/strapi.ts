@@ -116,3 +116,30 @@ export async function fetchStrapi<T = unknown>(
 export function getStrapiTenantId(): string {
   return getTenantId();
 }
+
+/** Cached tenant documentId per tenantId (avoids repeated /tenants calls in one request). */
+let cachedTenantDocumentId: { tenantId: string; documentId: string } | null = null;
+
+/**
+ * Resolves Strapi tenant documentId from tenantId (e.g. tenant_demo_002).
+ * Strapi 5 may require filtering articles by relation documentId instead of nested tenantId.
+ * Returns null if tenants endpoint fails or no match; caller should fall back to tenantId filter.
+ */
+export async function getStrapiTenantDocumentId(): Promise<string | null> {
+  const tenantId = getStrapiTenantId();
+  if (cachedTenantDocumentId?.tenantId === tenantId) return cachedTenantDocumentId.documentId;
+  const base = getStrapiApiBase();
+  if (!base) return null;
+  // Try tenantId first (camelCase); Strapi may expose as tenant_id (snake_case)
+  for (const key of ['tenantId', 'tenant_id']) {
+    const path = `/tenants?filters[${key}][$eq]=${encodeURIComponent(tenantId)}&pagination[pageSize]=1`;
+    const res = await fetchStrapi<unknown[]>(path);
+    const list = Array.isArray(res?.data) ? res.data : [];
+    const first = list[0] as { documentId?: string } | undefined;
+    if (first?.documentId) {
+      cachedTenantDocumentId = { tenantId, documentId: first.documentId };
+      return first.documentId;
+    }
+  }
+  return null;
+}

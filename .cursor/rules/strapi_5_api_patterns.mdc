@@ -1,6 +1,6 @@
 ---
 description: Strapi 5 REST API patterns for published state, populate parameters, and list-endpoint fallbacks
-globs: src/lib/strapi.ts, src/app/mosc/news/**/*.ts, src/app/mosc/directory/**/*.ts, src/app/syro/news/**/*.ts
+globs: src/lib/strapi.ts, src/app/mosc/news/**/*.ts, src/app/mosc/directory/**/*.ts, src/app/syro/news/**/*.ts, src/app/syro/directory/**/*.ts
 alwaysApply: false
 ---
 
@@ -15,6 +15,27 @@ This rule defines correct patterns for Strapi 5 Content API calls, particularly 
 - **status=published** – Can cause validation errors in Strapi 5 setups; use `filters[publishedAt][$notNull]=true` instead
 - **Comma-separated populate** – `populate=cover,category,author` triggers 400s; Strapi 5 expects array-style populate
 - **Category slug case mismatch** – Strapi may store slugs as `Main-News` while the filter uses `main-news`; use `$eqi` for case-insensitive match
+
+## **Tenant Filtering (Required — No Fallback)**
+
+All directory and news list/detail requests **must** use the tenant filter. Display only data scoped to the current tenant.
+
+### **DO: Always filter by tenant**
+
+- **Directory** (e.g. bishops, parishes): `filters[tenant][tenantId][$eq]=${tenantId}` — no fallback. If the API returns 200 with 0 items, show 0 items.
+- **News** (articles, flash-news-items, advertisement-slots): Same. Always include `filters[tenant][tenantId][$eq]=${tenantId}`. Do **not** retry without the tenant filter when the response is 200 with empty data.
+
+### **DON'T: Fall back to no-tenant when response is 200 with 0 items**
+
+```typescript
+// ❌ DON'T: Retry without tenant when tenant filter returns 0 items
+if (list.length === 0) {
+  const noTenant = await fetch('/articles?filters[publishedAt][$notNull]=true&...');
+  list = noTenant.data; // Wrong — shows other tenants' data
+}
+```
+
+When the API returns **200** with an empty list, the correct behavior is to show no items (and ensure entries in Strapi have the tenant relation set). The only exception is the **400 Bad Request** fallback below (different endpoints, different reason).
 
 ## **Published State Filter**
 
@@ -111,8 +132,7 @@ Article links use: `article.slug || article.documentId || article.id`. No Strapi
 When the API returns 200 but 0 items and the frontend shows "Article not found":
 
 - **Try documentId first**: Ensure `getArticleBySlug` tries `documentId` first when the URL param looks like a Strapi 5 documentId (alphanumeric, 15–35 chars). Admin URLs and many links use documentId; slug may differ.
-- **Tenant fallback**: When tenant-scoped queries return 0 items, retry without tenant filter. Articles without tenant relation set will be found this way. Log a warning and ask the user to add tenant in Strapi for proper scoping.
-- **Tenant**: Article must have `tenant.tenantId` matching `NEXT_PUBLIC_TENANT_ID` (e.g. `tenant_demo_002`). Check the tenant relation in Strapi admin. If missing, the tenant-free fallback will return the article but log a warning.
+- **Tenant**: Article must have `tenant.tenantId` matching `NEXT_PUBLIC_TENANT_ID` (e.g. `tenant_demo_002`). Check the tenant relation in Strapi admin. We do **not** retry without tenant — only tenant-scoped articles are shown.
 - **publishedAt**: Article must be Published (not Draft). Filter `filters[publishedAt][$notNull]=true` excludes drafts. If the article is draft, set Status to Published in Strapi.
 
 ## **Advertisement Slots (Position: sidebar + top)**
@@ -170,9 +190,9 @@ const url = media?.data?.attributes?.url;
 
 For single-field populate (e.g. `populate=media`), the simple format may work. Advertisement slots use `populate=media` successfully. If you encounter 400s with simple populate, switch to array-style: `populate[0]=media`.
 
-## **List Endpoints: Pagination and 400 Fallback**
+## **List Endpoints: Pagination and 400-Only Fallback**
 
-Some Strapi 5 list endpoints (e.g. `catholicos-entries`) return **400 Bad Request** when using certain query shapes (tenant filter syntax, or `pagination[limit]=1`). Use a **two-step fallback** so the app still gets data when the first shape fails.
+Use `pagination[page]=1` and `pagination[pageSize]=N` for list endpoints (not `pagination[limit]=N`). Some Strapi 5 list endpoints (e.g. `catholicos-entries`) return **400 Bad Request** when using certain query shapes; a **400-only** fallback is allowed in those cases.
 
 ### **DO: Use pagination[pageSize] for list endpoints**
 
@@ -190,12 +210,15 @@ Some Strapi 5 list endpoints (e.g. `catholicos-entries`) return **400 Bad Reques
 'pagination[limit]=1'
 ```
 
-### **DO: Try without tenant filter first, then with filter**
+### **400-only fallback (not for 200 with 0 items)**
 
-When a list endpoint returns 400 with both tenant filter and pagination, try the request **without** the tenant filter first; if that succeeds, use the result. Then optionally retry with the tenant filter for tenant-scoped data.
+The two-step fallback (try without tenant, then with tenant) applies **only when the request returns 400 Bad Request** (syntax/validation error). It does **not** apply when the API returns **200** with 0 items — in that case, show 0 items and do not retry without tenant.
+
+- **Articles, bishops, flash-news-items, advertisement-slots**: Always use tenant filter. Never retry without tenant when the response is 200 with empty data.
+- **Exception**: Endpoints that return 400 with tenant + pagination (e.g. `catholicos-entries`) may use a 400-only fallback: try without tenant first; if that returns 200, use the result (e.g. for Catholicos image fallback in bishop detail).
 
 ```typescript
-// ✅ DO: Two-step fallback for list endpoints that may 400
+// ✅ DO: 400-only fallback — try without tenant only when first request returns 400
 const pathsToTry = [
   `catholicos-entries?pagination[pageSize]=1&populate[0]=image`,
   `catholicos-entries?filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}&pagination[pageSize]=1&populate[0]=image`,
@@ -203,7 +226,7 @@ const pathsToTry = [
 let res: Response | null = null;
 for (const path of pathsToTry) {
   res = await fetch(`${base}/${path}`, { headers: getStrapiHeaders(), cache: 'no-store' });
-  if (res.ok) break;
+  if (res.ok) break; // Use first successful response (200)
 }
 if (res?.ok) {
   const json = await res.json();
@@ -213,8 +236,8 @@ if (res?.ok) {
 
 ### **Apply to**
 
-- Directory **catholicos-entries** (Catholicos image fallback when bishops API returns no image)
-- Any other list endpoint that returns 400 with tenant filter or `pagination[limit]=1`
+- Directory **catholicos-entries** (Catholicos image fallback when bishops API returns no image) — 400-only fallback allowed
+- **Not** for articles, bishops list, flash-news-items, advertisement-slots — those must use tenant filter only, no fallback when 200 with 0 items
 
 ### **Reference**
 

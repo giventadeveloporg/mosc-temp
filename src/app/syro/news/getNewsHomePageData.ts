@@ -73,18 +73,22 @@ function getMediaAlt(media: unknown): string | undefined {
 }
 
 /** Builds article query path (relative to Content API base /api).
- * Strapi 5: Use filters[publishedAt][$notNull]=true (status=published can cause validation errors).
- * Only published articles are returned; drafts (publishedAt null) do not appear on the news page.
+ * Same tenant filter pattern as bishops: filters[tenant][tenantId][$eq]=tenantId.
+ * Strapi 5 list endpoints: use pagination[page] and pagination[pageSize] (not pagination[limit]).
+ * See .cursor/rules/strapi_5_api_patterns.mdc and bishops getBishopsData.ts.
  */
-function buildArticleQuery(filters: string, sort: string, limit: number): string {
+function buildArticleQuery(filters: string, sort: string, pageSize: number, withTenant: boolean): string {
   const tenantId = getStrapiTenantId();
   const parts = [
-    `filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}`,
     'filters[publishedAt][$notNull]=true',
     POPULATE,
     `sort=${sort}`,
-    `pagination[limit]=${limit}`,
+    'pagination[page]=1',
+    `pagination[pageSize]=${pageSize}`,
   ];
+  if (withTenant) {
+    parts.unshift(`filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}`);
+  }
   if (filters) parts.unshift(filters);
   return `/articles?${parts.join('&')}`;
 }
@@ -93,14 +97,21 @@ function normalizeArticle(raw: { id?: number; documentId?: string; attributes?: 
   // Strapi 4: raw.attributes; Strapi 5: raw has fields at top level
   const attrs = (raw?.attributes ?? raw) as Record<string, unknown>;
   const cover = attrs?.cover;
-  const category = attrs?.category as { data?: { attributes?: { slug?: string; name?: string } }; documentId?: string; slug?: string; name?: string } | undefined;
+  const category = attrs?.category as { data?: Record<string, unknown> | { attributes?: { slug?: string; name?: string } }; attributes?: { slug?: string; name?: string }; documentId?: string; slug?: string; name?: string } | undefined;
   const author = attrs?.author as { data?: { attributes?: { name?: string } }; name?: string } | undefined;
   const baseUrl = getStrapiUrl();
   const coverUrl = getMediaUrl(cover, baseUrl) ?? undefined;
   const coverAlt = getMediaAlt(cover);
-  // Category: Strapi 4 data.attributes.slug; Strapi 5 slug at top level
-  const categorySlug = category?.data?.attributes?.slug ?? category?.slug;
-  const categoryName = category?.data?.attributes?.name ?? category?.name;
+  // Category: Strapi 4 data.attributes; Strapi 5 top-level or category.data (object) slug/name
+  const catData = category?.data as Record<string, unknown> | undefined;
+  const categorySlug =
+    category?.data?.attributes?.slug ??
+    (catData && typeof catData.slug === 'string' ? catData.slug : undefined) ??
+    category?.slug;
+  const categoryName =
+    category?.data?.attributes?.name ??
+    (catData && typeof catData.name === 'string' ? catData.name : undefined) ??
+    category?.name;
   const authorName = author?.data?.attributes?.name ?? author?.name;
   // Strapi "Editorial - Article" uses "description" as Rich Text (Blocks) or legacy string
   const descRaw = attrs?.description;
@@ -270,6 +281,7 @@ export async function getNewsHomePageData(): Promise<NewsHomePageData> {
     try {
       console.info(`[STRAPI-NEWS] Fetching news homepage data (tenant: ${tenantId}, Strapi: ${strapiUrl}) attempt ${attempt}/${MAX_STRAPI_ATTEMPTS}`);
 
+      // Article lists: tenant filter only (no fallback). Same as bishops — only show data scoped to tenant.
       const [
         homepageRes,
         flashRes,
@@ -282,29 +294,29 @@ export async function getNewsHomePageData(): Promise<NewsHomePageData> {
       ] = await Promise.all([
         fetchStrapi<{ id?: number; attributes?: Record<string, unknown> }>('/homepage?populate=*'),
         fetchStrapi<unknown[]>(flashNewsPath),
-        fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=featured-news', 'publishedAt:desc', 6)),
-        fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=main-news', 'publishedAt:desc', 10)),
-        fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=press-release', 'publishedAt:desc', 10)),
-        fetchStrapi<unknown[]>(buildArticleQuery('', 'views:desc', 5)),
+        fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=featured-news', 'publishedAt:desc', 6, true)),
+        fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=main-news', 'publishedAt:desc', 10, true)),
+        fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=press-release', 'publishedAt:desc', 10, true)),
+        fetchStrapi<unknown[]>(buildArticleQuery('', 'views:desc', 5, true)),
         fetchStrapi<{ id?: number; attributes?: Record<string, unknown> }>('/sidebar-promotional-block?populate=*'),
         fetchStrapi<unknown[]>(adsPath),
       ]);
 
-      const hadError =
-        homepageRes == null ||
-        flashRes == null ||
-        featuredRes == null ||
-        mainRes == null ||
-        pressRes == null ||
-        mostReadRes == null ||
-        sidebarRes == null ||
-        adsRes == null;
-
-      const flashList = Array.isArray(flashRes?.data) ? flashRes.data : [];
       const featuredList = Array.isArray(featuredRes?.data) ? featuredRes.data : [];
       const mainList = Array.isArray(mainRes?.data) ? mainRes.data : [];
       const pressList = Array.isArray(pressRes?.data) ? pressRes.data : [];
       const mostReadList = Array.isArray(mostReadRes?.data) ? mostReadRes.data : [];
+
+      // Single types (homepage, sidebar-promotional-block) may not exist in every Strapi project (e.g. prod 404).
+      // Only treat collection endpoint failures as hard errors for retries. Article lists are tenant-only (no fallback).
+      const hadOptionalMissing = homepageRes == null || sidebarRes == null;
+      if (hadOptionalMissing) {
+        console.info('[STRAPI-NEWS] Optional single-type(s) missing (homepage and/or sidebar-promotional-block). Add them in Strapi if needed; continuing with other data.');
+      }
+      const hadRequiredError = flashRes == null || adsRes == null;
+      const hadError = hadRequiredError;
+
+      const flashList = Array.isArray(flashRes?.data) ? flashRes.data : [];
       const adsList = Array.isArray(adsRes?.data) ? adsRes.data : [];
 
       const allFlashItems = (flashList ?? [])
@@ -420,7 +432,7 @@ export async function getArticleBySlug(slugOrId: string): Promise<NewsArticle | 
   } catch {
     return null;
   }
-  const base = `filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}&filters[publishedAt][$notNull]=true&${POPULATE}`;
+  const base = `filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}&filters[publishedAt][$notNull]=true&${POPULATE}&pagination[page]=1&pagination[pageSize]=1`;
   const param = slugOrId.trim();
   try {
     let path: string;
@@ -428,23 +440,19 @@ export async function getArticleBySlug(slugOrId: string): Promise<NewsArticle | 
     let list: unknown[];
     let first: { id?: number; documentId?: string; attributes?: Record<string, unknown> } | undefined;
 
-    // 1. If param looks like Strapi 5 documentId (admin URLs, links), try documentId first
+    // Tenant filter only (no fallback). Same as bishops — only return article when it belongs to tenant.
     if (DOCUMENT_ID_PATTERN.test(param)) {
       path = `/articles?filters[documentId][$eq]=${encodeURIComponent(param)}&${base}`;
       res = await fetchStrapi<unknown[]>(path);
       list = Array.isArray(res?.data) ? res.data : [];
       first = list[0] as typeof first;
     }
-
-    // 2. If not found, try slug (text) — use $eqi for case-insensitive match
     if (!first) {
       path = `/articles?filters[slug][$eqi]=${encodeURIComponent(param)}&${base}`;
       res = await fetchStrapi<unknown[]>(path);
       list = Array.isArray(res?.data) ? res.data : [];
       first = list[0] as typeof first;
     }
-
-    // 3. If not found and param looks numeric, try by id (Strapi v4 or when id is used)
     if (!first && /^\d+$/.test(param)) {
       const id = parseInt(param, 10);
       path = `/articles?filters[id][$eq]=${id}&${base}`;
@@ -452,36 +460,12 @@ export async function getArticleBySlug(slugOrId: string): Promise<NewsArticle | 
       list = Array.isArray(res?.data) ? res.data : [];
       first = list[0] as typeof first;
     }
-
-    // 4. Fallback: try documentId for non-numeric params (e.g. long alphanumeric that didn't match pattern)
     if (!first && param.length > 10 && !DOCUMENT_ID_PATTERN.test(param)) {
       path = `/articles?filters[documentId][$eq]=${encodeURIComponent(param)}&${base}`;
       res = await fetchStrapi<unknown[]>(path);
       list = Array.isArray(res?.data) ? res.data : [];
       first = list[0] as typeof first;
     }
-
-    // 5. When tenant-scoped queries return 0, retry without tenant filter (article may have no tenant set in Strapi)
-    const baseNoTenant = `filters[publishedAt][$notNull]=true&${POPULATE}`;
-    if (!first && DOCUMENT_ID_PATTERN.test(param)) {
-      path = `/articles?filters[documentId][$eq]=${encodeURIComponent(param)}&${baseNoTenant}`;
-      res = await fetchStrapi<unknown[]>(path);
-      list = Array.isArray(res?.data) ? res.data : [];
-      first = list[0] as typeof first;
-      if (first) {
-        console.warn(`[STRAPI-NEWS] Article ${param} found without tenant filter. Add tenant (${tenantId}) in Strapi for proper scoping.`);
-      }
-    }
-    if (!first) {
-      path = `/articles?filters[slug][$eqi]=${encodeURIComponent(param)}&${baseNoTenant}`;
-      res = await fetchStrapi<unknown[]>(path);
-      list = Array.isArray(res?.data) ? res.data : [];
-      first = list[0] as typeof first;
-      if (first) {
-        console.warn(`[STRAPI-NEWS] Article slug ${param} found without tenant filter. Add tenant (${tenantId}) in Strapi for proper scoping.`);
-      }
-    }
-
     if (!first) return null;
     return normalizeArticle(first);
   } catch {
@@ -491,12 +475,13 @@ export async function getArticleBySlug(slugOrId: string): Promise<NewsArticle | 
 
 /**
  * Fetches recent articles (by publishedAt desc) for sidebar "Recent Posts".
+ * Uses same pattern as bishops: filters[tenant][tenantId][$eq], pagination[pageSize].
  */
 export async function getRecentArticles(limit: number = 5): Promise<NewsArticle[]> {
   if (!getStrapiUrl()) return [];
   try {
     const tenantId = getStrapiTenantId();
-    const path = `/articles?filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}&filters[publishedAt][$notNull]=true&${POPULATE}&sort=publishedAt:desc&pagination[limit]=${limit}`;
+    const path = `/articles?filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}&filters[publishedAt][$notNull]=true&${POPULATE}&sort=publishedAt:desc&pagination[page]=1&pagination[pageSize]=${limit}`;
     const res = await fetchStrapi<unknown[]>(path);
     const list = Array.isArray(res?.data) ? res.data : [];
     return list.map((raw) => normalizeArticle(raw as { id?: number; documentId?: string; attributes?: Record<string, unknown> }));
@@ -512,7 +497,7 @@ export async function getPreviousArticle(beforePublishedAt: string): Promise<New
   if (!getStrapiUrl() || !beforePublishedAt) return null;
   try {
     const tenantId = getStrapiTenantId();
-    const path = `/articles?filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}&filters[publishedAt][$notNull]=true&filters[publishedAt][$lt]=${encodeURIComponent(beforePublishedAt)}&${POPULATE}&sort=publishedAt:desc&pagination[limit]=1`;
+    const path = `/articles?filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}&filters[publishedAt][$notNull]=true&filters[publishedAt][$lt]=${encodeURIComponent(beforePublishedAt)}&${POPULATE}&sort=publishedAt:desc&pagination[page]=1&pagination[pageSize]=1`;
     const res = await fetchStrapi<unknown[]>(path);
     const list = Array.isArray(res?.data) ? res.data : [];
     const first = list[0] as { id?: number; documentId?: string; attributes?: Record<string, unknown> } | undefined;
