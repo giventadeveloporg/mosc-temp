@@ -74,6 +74,23 @@ const isPublicRouteClerk = createRouteMatcher([
 export default clerkMiddleware(
   async (auth, req: NextRequest) => {
     const pathname = req.nextUrl.pathname;
+    const searchParams = req.nextUrl.searchParams;
+
+    // Workaround: Strip __clerk_* query params (e.g. __clerk_synced=true) so the site loads reliably.
+    // Clerk adds these on satellite/production for root (e.g. https://www.mosc-temp.com?__clerk_synced=true)
+    // and other paths (e.g. /syro?__clerk_synced=true); they can cause "site not available" or stuck loading.
+    const hasClerkParam = Array.from(searchParams.keys()).some((key) => key.startsWith('__clerk_'));
+    if (hasClerkParam) {
+      const cleanParams = new URLSearchParams();
+      searchParams.forEach((value, key) => {
+        if (!key.startsWith('__clerk_')) cleanParams.set(key, value);
+      });
+      const cleanSearch = cleanParams.toString();
+      const path = pathname || '/';
+      const cleanUrl = new URL(path + (cleanSearch ? `?${cleanSearch}` : ''), req.nextUrl.origin);
+      return NextResponse.redirect(cleanUrl, 307);
+    }
+
     const isApiRoute = pathname.startsWith('/api/');
     const isApiProxy = pathname.startsWith('/api/proxy');
     const isDiagnostic = pathname.startsWith('/api/diagnostic');
