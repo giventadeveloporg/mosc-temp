@@ -6,6 +6,7 @@ import Script from "next/script";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import ConditionalLayout from "../components/ConditionalLayout";
+import ClerkSyncUrlCleanup from "../components/ClerkSyncUrlCleanup";
 import MobileDebugConsole from "../components/MobileDebugConsole";
 import { TenantSettingsProvider } from "../components/TenantSettingsProvider";
 import { headers } from "next/headers";
@@ -349,6 +350,7 @@ function getApiBase() {
           <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
         </head>
         <body className={inter.className + " flex flex-col min-h-screen"} suppressHydrationWarning>
+          <ClerkSyncUrlCleanup />
           <TrpcProvider>
             <TenantSettingsProvider>
               <ConditionalLayout
