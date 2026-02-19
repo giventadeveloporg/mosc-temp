@@ -16,10 +16,92 @@ const currentYear = () => new Date().getFullYear();
 
 export default function SyroFooter() {
   const [formData, setFormData] = useState({ full_name: '', email_address: '', phone_number: '', feedback: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [submitMessage, setSubmitMessage] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Static form posts to external URL; for Next we could use API route or leave as-is
+
+    const name = formData.full_name.trim();
+    const email = formData.email_address.trim();
+    const message = formData.feedback.trim();
+
+    if (!name || name.length < 2) {
+      setSubmitStatus('error');
+      setSubmitMessage('Please enter your name (at least 2 characters).');
+      return;
+    }
+    if (!email) {
+      setSubmitStatus('error');
+      setSubmitMessage('Please enter your email address.');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setSubmitStatus('error');
+      setSubmitMessage('Please enter a valid email address.');
+      return;
+    }
+    if (!message || message.length < 10) {
+      setSubmitStatus('error');
+      setSubmitMessage('Please enter a message (at least 10 characters).');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+    setSubmitMessage('');
+
+    const [firstName, ...restNameParts] = name.split(' ');
+    const lastName = restNameParts.join(' ').trim() || 'N/A';
+    const messageBody = formData.phone_number.trim()
+      ? `${message}\n\nPhone: ${formData.phone_number.trim()}`
+      : message;
+
+    const payload = {
+      firstName,
+      lastName,
+      messageBody,
+      fromEmail: email,
+      toEmail: process.env.NEXT_PUBLIC_MOSC_CONTACT_TO_EMAIL || 'info@mosc.in',
+    };
+
+    try {
+      const response = await fetch('/api/proxy/contact-form-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSubmitStatus('success');
+        setSubmitMessage('Thank you for your message! We will get back to you soon.');
+        setFormData({ full_name: '', email_address: '', phone_number: '', feedback: '' });
+        setTimeout(() => {
+          setSubmitStatus('idle');
+          setSubmitMessage('');
+        }, 5000);
+      } else {
+        setSubmitStatus('error');
+        setSubmitMessage(data.error || 'Failed to send message. Please try again.');
+        setTimeout(() => {
+          setSubmitStatus('idle');
+          setSubmitMessage('');
+        }, 5000);
+      }
+    } catch (err) {
+      setSubmitStatus('error');
+      setSubmitMessage('An error occurred. Please try again later.');
+      console.error('Footer contact form error:', err);
+      setTimeout(() => {
+        setSubmitStatus('idle');
+        setSubmitMessage('');
+      }, 5000);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -29,7 +111,7 @@ export default function SyroFooter() {
           <div className="col-lg-4 footer-section-1">
             <span className="contact-title">CONTACT US</span>
             <form
-              action="https://www.syromalabarchurch.in/save_contact_us"
+              action="#"
               className=""
               id="contact-form"
               autoComplete="off"
@@ -47,6 +129,7 @@ export default function SyroFooter() {
                     placeholder="Enter Your Name"
                     value={formData.full_name}
                     onChange={(e) => setFormData((p) => ({ ...p, full_name: e.target.value }))}
+                    disabled={isSubmitting}
                   />
                   <label htmlFor="contact-name">Name</label>
                 </div>
@@ -60,6 +143,7 @@ export default function SyroFooter() {
                     pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
                     value={formData.email_address}
                     onChange={(e) => setFormData((p) => ({ ...p, email_address: e.target.value }))}
+                    disabled={isSubmitting}
                   />
                   <label htmlFor="contact-email">Email</label>
                 </div>
@@ -72,6 +156,7 @@ export default function SyroFooter() {
                     placeholder="Phone"
                     value={formData.phone_number}
                     onChange={(e) => setFormData((p) => ({ ...p, phone_number: e.target.value }))}
+                    disabled={isSubmitting}
                   />
                   <label htmlFor="contact-phone">Phone</label>
                 </div>
@@ -84,13 +169,19 @@ export default function SyroFooter() {
                     id="contact-message"
                     value={formData.feedback}
                     onChange={(e) => setFormData((p) => ({ ...p, feedback: e.target.value }))}
+                    disabled={isSubmitting}
                   />
                   <label htmlFor="contact-message">Message</label>
                 </div>
-                <button type="submit" className="primary-button submit-btn">
-                  <span>Submit</span>
+                <button type="submit" className="primary-button submit-btn" disabled={isSubmitting}>
+                  <span>{isSubmitting ? 'Sending...' : 'Submit'}</span>
                   <i className="fa-solid fa-arrow-right-long ms-3" />
                 </button>
+                {submitStatus !== 'idle' && (
+                  <p className="mt-2 mb-0 text-white-50 small">
+                    {submitMessage}
+                  </p>
+                )}
               </div>
             </form>
           </div>

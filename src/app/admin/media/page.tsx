@@ -913,9 +913,23 @@ function UploadMediaModal({
             { state: isHomePageHeroImage, set: setIsHomePageHeroImage, label: "Home Page Hero" },
             { state: isPublic, set: setIsPublic, label: "Public" },
           ].map(({ state, set, label }) => (
-            <label key={label} className="flex items-center gap-2">
-              <input type="checkbox" checked={state} onChange={e => set(e.target.checked)} className="rounded border-gray-400" />
-              <span className="text-sm">{label}</span>
+            <label key={label} className="flex items-center gap-2 cursor-pointer">
+              <span className="relative flex items-center justify-center flex-shrink-0">
+                <input
+                  type="checkbox"
+                  checked={state}
+                  onChange={e => set(e.target.checked)}
+                  className="custom-checkbox"
+                />
+                <span className="custom-checkbox-tick">
+                  {state && (
+                    <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l5 5L19 7" />
+                    </svg>
+                  )}
+                </span>
+              </span>
+              <span className="text-sm select-none">{label}</span>
             </label>
           ))}
         </div>
