@@ -29,34 +29,30 @@ export default async function NewsPage() {
   const data = await getNewsHomePageData();
 
   return (
-    <div className="bg-background">
-      {/* Hero / Page title */}
-      <section className="py-12 bg-gradient-to-br from-background to-muted border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="font-heading font-semibold text-3xl md:text-4xl text-foreground">
+    <div className="bg-syro-bg-gray font-syro-primary text-[#0b2848] min-h-screen">
+      {/* Hero / Page title - design system mainTitle: h1 2.8rem/700, p 20px/#506276 */}
+      <section className="py-syro-xxxl bg-syro-bg-gray border-b border-syro-table-border">
+        <div className="max-w-[1200px] mx-auto px-[15px]">
+          <h1 className="font-syro-display font-bold text-syro-h1 text-syro-blue mb-2.5">
             News
           </h1>
-          <p className="font-body text-muted-foreground mt-2">
+          <p className="text-syro-body text-syro-dark-gray mb-syro-xxl">
             Latest news, featured stories, and press releases from the Church.
           </p>
-          {/* Navigation links per layout (catholicatenews_strapi_content_mapping, index.html) */}
-          <nav className="mt-6 flex flex-wrap gap-3" aria-label="News sections">
+          {/* Navigation - same style as Syro home "Know More" button (primary-button) */}
+          <nav className="flex flex-wrap gap-syro-xl" aria-label="News sections">
             {SECTION_LINKS.map(({ label, href }) => (
-              <a
-                key={href}
-                href={href}
-                className="font-body text-sm font-medium text-primary hover:text-accent hover:underline reverent-transition px-3 py-1.5 rounded-lg bg-muted/50 hover:bg-muted"
-              >
+              <a key={href} href={href} className="primary-button">
                 {label}
               </a>
             ))}
-            {EXTERNAL_LINKS.map(({ label, href, external }) => (
+            {EXTERNAL_LINKS.map(({ label, href }) => (
               <a
                 key={href}
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-body text-sm font-medium text-primary hover:text-accent hover:underline reverent-transition px-3 py-1.5 rounded-lg bg-muted/50 hover:bg-muted"
+                className="primary-button"
               >
                 {label}
               </a>
@@ -74,17 +70,17 @@ export default async function NewsPage() {
 
       {/* Top banner ads (position=top) */}
       {data.topAdSlots.length > 0 && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="max-w-[1200px] mx-auto px-[15px] py-syro-lg">
           <AdSlots slots={data.topAdSlots} />
         </div>
       )}
 
-      {/* Main content: one column + sidebar - all sections always visible with empty placeholders */}
-      <section className="py-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_380px] gap-10">
-            {/* Main column - order per PRD: Main News, Featured News, Press Release, Most Read */}
-            <div className="space-y-12">
+      {/* Main content - design system: container 1200px, section padding 60px, grid gap 30px */}
+      <section className="py-syro-xxxl bg-syro-bg-gray">
+        <div className="max-w-[1200px] mx-auto px-[15px]">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_380px] gap-syro-xl">
+            {/* Main column - order per PRD: Main News, Featured News, Press Release, Most Read; design system section margin 60px */}
+            <div className="space-y-syro-xxxl">
               <ArticleList
                 id="main-news"
                 title="Main News"
@@ -99,7 +95,7 @@ export default async function NewsPage() {
               />
               {/* Between-sections ad slots (position=between_sections) */}
               {data.betweenSectionsAdSlots.length > 0 && (
-                <div className="py-4">
+                <div className="py-syro-lg">
                   <AdSlots slots={data.betweenSectionsAdSlots} />
                 </div>
               )}
@@ -118,8 +114,8 @@ export default async function NewsPage() {
               />
             </div>
 
-            {/* Sidebar - always visible: Strapi promo or default Facebook Follow Us (from legacy index.html) */}
-            <aside className="space-y-8">
+            {/* Sidebar - design system component spacing */}
+            <aside className="space-y-syro-xl">
               {data.sidebarPromo ? (
                 <SidebarPromo block={data.sidebarPromo} />
               ) : (

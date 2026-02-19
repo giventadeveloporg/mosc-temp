@@ -7,7 +7,7 @@ import TheChurchSidebar from '../../TheChurchSidebar';
 export const metadata = {
   title: 'The Christian Life',
   description:
-    'The cultivation of the Christian life. Four introductory propositions, content and manner of the Christian life—from mission vs. life, community, creation, and death/resurrection.',
+    'The cultivation of the Christian life. Four introductory propositions, content and manner of the Christian lifeâ€”from mission vs. life, community, creation, and death/resurrection.',
 };
 
 export default async function TheChristianLifePage({
@@ -25,7 +25,7 @@ export default async function TheChristianLifePage({
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 <div className="mb-8 flex justify-center">
@@ -68,12 +68,12 @@ export default async function TheChristianLifePage({
                     Reformers. Its currency in Christian parlance happens to coincide with the
                     mission of the West European powers to colonize and civilize the rest of the
                     world. The Greek word for mission &quot;Apostle&quot; is used a total of four
-                    times in the whole New Testament—Acts 1:25, Romans 1:5, 1 Cor. 9:8, and Gal. 2:8.
+                    times in the whole New Testamentâ€”Acts 1:25, Romans 1:5, 1 Cor. 9:8, and Gal. 2:8.
                     In each case it refers specifically to the ministry of the Twelve or of St. Paul,
                     as distinct from the ministry of the whole Church. Being an Apostle was not
                     everybody&apos;s business in the New Testament church. St. Paul never exhorted
                     the Christians to whom he writes to become missionaries. The centrality of the
-                    Cross and Resurrection could just as well have been taken for granted—yet he
+                    Cross and Resurrection could just as well have been taken for grantedâ€”yet he
                     dwells on these themes at some length. New Testament standards for a church are
                     always the depth of faith, the binding quality of love, the steadfastness of its
                     hope, the holiness of its life. An authentic mission can ensue only from an
@@ -112,7 +112,7 @@ export default async function TheChristianLifePage({
                     of the glory of the children of God.&quot; Whatever heaven may be, it must
                     include a liberated and reconstituted material creation. Matter has been assumed
                     by the Logos and is therefore redeemed. The Church is like a tree planted on the
-                    earth—it has to have roots in the earth to draw nourishment, and leafy branches
+                    earthâ€”it has to have roots in the earth to draw nourishment, and leafy branches
                     open to the light of heaven. Both are equally essential to its life and growth.
                     The cultivation of the Christian life cannot neglect either the rootage in the
                     earth or the openness to light.
@@ -180,7 +180,7 @@ export default async function TheChristianLifePage({
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     If there is one thing that is clear about the mysterious private life of Jesus,
                     it is that he was a man of prayer. He could continue all night in prayer to
-                    God—a feat acquired only by prolonged discipline and practice. Prayer is the
+                    Godâ€”a feat acquired only by prolonged discipline and practice. Prayer is the
                     lost art of the Church. Modern man cannot pray. Truly to pray is to experience a
                     kind of death of the consciousness. Prayer is the means by which the image of
                     God is imprinted on the life of man, as individuals and in community. Prayer is
@@ -198,7 +198,7 @@ export default async function TheChristianLifePage({
                     play. Man is called upon to rise up, to take hold of that creative process, and
                     to mould it. To emancipate oneself from the bondage to the turbulent forces of
                     Creation, to reflect upon and understand these forces, and then to mould them in
-                    accordance with the general purpose of God—this is the calling of man.
+                    accordance with the general purpose of Godâ€”this is the calling of man.
                   </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     (a) To be freed: Christ has conquered the turbulent forces of Creation. We need

@@ -7,7 +7,7 @@ import TheChurchSidebar from '../../TheChurchSidebar';
 export const metadata = {
   title: 'Before the Portuguese Arrival',
   description:
-    'The Thomas Christians before the Portuguese arrival: their close connection with East Syrian Christianity, travelers’ records, migrations, and Persian sources.',
+    'The Thomas Christians before the Portuguese arrival: their close connection with East Syrian Christianity, travelersâ€™ records, migrations, and Persian sources.',
 };
 
 export default async function BeforePortugueseArrivalPage({
@@ -27,14 +27,14 @@ export default async function BeforePortugueseArrivalPage({
 
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 <div className="mb-8 flex justify-center">
                   <div className="relative w-full max-w-[280px] h-auto">
                     <Image
                       src="/images/logos/Current_Edits/MOSC-Logo-only.png"
-                      alt="Church History – Before the Portuguese Arrival"
+                      alt="Church History â€“ Before the Portuguese Arrival"
                       width={280}
                       height={180}
                       className="w-full h-auto object-contain rounded-lg"
@@ -68,7 +68,7 @@ export default async function BeforePortugueseArrivalPage({
                     Conti (c. 1440). All mention a church or shrine of St. Thomas in India at
                     Mylapur. The first unquestionable historical evidence of an Indian church and
                     its relation with the East Syrian church is from Cosmos the Alexandrine traveler
-                    (520–530), who mentions in his Christian Topography well-organized Christian
+                    (520â€“530), who mentions in his Christian Topography well-organized Christian
                     churches in Ceylon, Malabar, Calliana, and Socotra with bishops appointed from
                     Persia.
                   </p>
@@ -96,11 +96,11 @@ export default async function BeforePortugueseArrivalPage({
                   </h3>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The Chronicle of Seert (7th century) mentions that Dudi, bishop of Basra,
-                    left his see between AD 295–300 and went to India where he evangelized many
+                    left his see between AD 295â€“300 and went to India where he evangelized many
                     people. At the beginning of the 5th century (410) the bishopric of Rewardashir
                     was elevated to a Metropolitanate and given jurisdiction over relations with
-                    India. Patriarch Ishoyahb II (628–43) appointed a Metropolitan for India
-                    separately. Patriarch Timothy I (779–823) in his letters attests to the Indian
+                    India. Patriarch Ishoyahb II (628â€“43) appointed a Metropolitan for India
+                    separately. Patriarch Timothy I (779â€“823) in his letters attests to the Indian
                     church under the East Syrian Patriarchate. A lectionary composed at
                     Crangannore in 1301 refers to the compiler as deacon Zachariah and to Mar Jacob
                     as the leader of the Holy Indian church occupying the See of the Apostle St.
@@ -114,7 +114,7 @@ export default async function BeforePortugueseArrivalPage({
                     By and large Christianity in India till 1599 belonged to the East Syrian
                     church. Its supreme head was the Catholicos-Patriarch of Babylon. India had
                     bishops and enjoyed Metropolitan status; the bishops were always East Syrian.
-                    The church of India never had a native ecclesiastical language—Syriac was its
+                    The church of India never had a native ecclesiastical languageâ€”Syriac was its
                     liturgical tongue. The Thomas Christians enjoyed a sound social status and lived
                     an appreciable indigenous lifestyle in harmony with non-Christian communities,
                     but in church matters they were followers of the East Syrian Church and its

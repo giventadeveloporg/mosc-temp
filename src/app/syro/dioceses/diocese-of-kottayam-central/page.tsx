@@ -17,7 +17,7 @@ const dioceseofkottayamcentralPage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -43,10 +43,10 @@ const dioceseofkottayamcentralPage = () => {
                       The Diocese of Kottayam Central came into existence vide Kalpana No. 110/82 dated April 21,.1982 of His Holiness Moran Mar Baselios Marthoma Mathews I, Catholicose of the East & Malankara Metropolitan. The new Diocese was carved out of the Dioceses of Kottayam.The Head Quarters of Kottayam Central Diocese is at Devalokam Aramana.
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      The Catholicose of the East & Malankara Metropolitan is  the diocesan metropolitan of Kottayam Central Diocese
+                      The Catholicose of the East & Malankara Metropolitan isÂ  the diocesan metropolitan of Kottayam Central Diocese
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Address:  Catholicate Aramana, Devalokam P.O,  Muttambalam Via, Kottayam- 686004
+                      Address: Â Catholicate Aramana, Devalokam P.O, Â Muttambalam Via, Kottayam- 686004
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       Phone: 0481-2578499, 2578500
@@ -88,13 +88,13 @@ const dioceseofkottayamcentralPage = () => {
                       href="/syro/dioceses/diocese-of-kottarakara-punalur" 
                       className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Kottarakara – Punalur
+                      Diocese of Kottarakara â€“ Punalur
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-adoor-kadampanadu" 
                       className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Adoor – Kadampanadu
+                      Diocese of Adoor â€“ Kadampanadu
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-thumpamon" 

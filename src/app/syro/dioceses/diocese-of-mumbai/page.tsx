@@ -17,7 +17,7 @@ const dioceseofmumbaiPage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -49,7 +49,7 @@ const dioceseofmumbaiPage = () => {
                       Today the Diocese had grown to be a giant among the rest of the dioceses in many ways and more than 70 churches, schools, clinics, hostels etc are efficiently managed by about 50 sincere and dedicated priests along with the lay representatives opportunely
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Address:  Orthodox Church Centre, Dr. Mar Theophilius marg, Sector 10- A, Vashi, Juhu Nagar,  New Mumbai- 400703
+                      Address: Â Orthodox Church Centre, Dr. Mar Theophilius marg, Sector 10- A, Vashi, Juhu Nagar, Â New Mumbai- 400703
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       Ph: 02227801427,27669850

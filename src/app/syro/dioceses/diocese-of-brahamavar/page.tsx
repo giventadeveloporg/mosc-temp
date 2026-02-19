@@ -17,7 +17,7 @@ const dioceseofbrahamavarPage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -91,8 +91,8 @@ const dioceseofbrahamavarPage = () => {
                       The Priests, faithful People, Diocesan General Assembly, Brahmavar Diocese Development Commitees, including one in Abu Dhabi, Malankara Association Managing Committee members, Diocesan Council Members and Many well wishers and friends are praying and helping for the development of this Diocese. We remember with prayer and thanks all of them. The Diocese is ever thankful to God ,and grateful to all the members of the Holy Church, to His Holiness Bava Thirumeni and to all the members of the Holy Episcopal Synod. We prayerfully remember all Our departed Metropolitans and priests who had served all the parishes in this Diocese. We beseech the prayers and intercessions of Holy and Blessed Virgin Mary, The Theotokos, St. Thomas, St. Gregorios of Parumala, St. Dionysius, St. Yeldho Mar Baselios and all other saints and the late Blessed Arch Bishop St. Alvares Mar Julius I.
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Contact Address: Office : Mount Horeb Bishop's House,
-Balikashram Road, Kankanady,
+                      Contact Address:Â Office : Mount Horeb Bishop's House,
+Balikashram Road,Â Kankanady,
 Mangalore - 575 002
 Karnataka, India
 Ph: 0824 2210018 & 09483530018
@@ -137,13 +137,13 @@ Ph: 0824 2210018 & 09483530018
                       href="/syro/dioceses/diocese-of-kottarakara-punalur" 
                       className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Kottarakara – Punalur
+                      Diocese of Kottarakara â€“ Punalur
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-adoor-kadampanadu" 
                       className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Adoor – Kadampanadu
+                      Diocese of Adoor â€“ Kadampanadu
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-thumpamon" 

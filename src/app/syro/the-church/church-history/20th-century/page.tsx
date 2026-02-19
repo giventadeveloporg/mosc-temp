@@ -24,14 +24,14 @@ export default async function TwentiethCenturyPage({
 
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 <div className="mb-8 flex justify-center">
                   <div className="relative w-full max-w-[280px] h-auto">
                     <Image
                       src="/images/logos/Current_Edits/MOSC-Logo-only.png"
-                      alt="Church History – 20th Century"
+                      alt="Church History â€“ 20th Century"
                       width={280}
                       height={180}
                       className="w-full h-auto object-contain rounded-lg"
@@ -57,7 +57,7 @@ export default async function TwentiethCenturyPage({
                     with that of the Catholicos. Litigations from 1913 to 1958 ended in favour of
                     the Orthodox; a truce was reached in 1958. From 1972 the patriarchal side
                     resumed conflict; Supreme Court verdicts from 1995 onward have not produced a
-                    full amicable solution, and the two sections continue—one under the Patriarch
+                    full amicable solution, and the two sections continueâ€”one under the Patriarch
                     and one under the Catholicos.
                   </p>
 
@@ -74,7 +74,7 @@ export default async function TwentiethCenturyPage({
                     Catholicate to defend the independence of the Indian Church. Abdul Messiah, the
                     predecessor of Abdulla II, was invited; he came to Kerala and established the
                     Catholicate in September 1912. The Orthodox division declared their freedom.
-                    The first Catholicos was Moran Mar Baselios Paulose I (1912–14); subsequent
+                    The first Catholicos was Moran Mar Baselios Paulose I (1912â€“14); subsequent
                     Catholicoses were elevated by the Synod of the Indian Orthodox bishops,
                     showing the autocephalous and autonomous status of the Indian Church. The
                     Catholicate now represents the supreme head of the Malankara Orthodox Syrian
@@ -85,14 +85,14 @@ export default async function TwentiethCenturyPage({
                     The Catholicoses and Recent History
                   </h3>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                    Catholicos Geevarghese II (1929–64) served for 35 years. During his time the
+                    Catholicos Geevarghese II (1929â€“64) served for 35 years. During his time the
                     Church introduced a constitution, won the final legal victory in 1958, and
                     associated with the World Council of Churches. In 1962 the headquarters of the
-                    Catholicos was shifted to Devalokam, Kottayam. Catholicos Augen I (1964–75)
+                    Catholicos was shifted to Devalokam, Kottayam. Catholicos Augen I (1964â€“75)
                     was a great Malayalam and Syriac scholar. From August 1974 all relation with
-                    the Patriarch broke down again over the Patriarch’s denial of the Throne of St.
+                    the Patriarch broke down again over the Patriarchâ€™s denial of the Throne of St.
                     Thomas and the autonomy of the Church under the Catholicos. The Orthodox section
-                    of the Church continues as the Malankara Orthodox Syrian Church—independent and
+                    of the Church continues as the Malankara Orthodox Syrian Churchâ€”independent and
                     autonomous under the Catholicos.
                   </p>
                 </div>

@@ -25,7 +25,7 @@ export default async function DeificationPage({
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 <div className="mb-8 flex justify-center">
@@ -50,7 +50,7 @@ export default async function DeificationPage({
                     or formation of life? The Church who brings us up with great love and care gives
                     also a clear picture about the major goal of spiritual progress which is nothing
                     but deification or theosis. As St. Irenaeus wrote in the second century, God the
-                    Father uses his two hands—namely Christ and Holy Spirit—to reconstruct human
+                    Father uses his two handsâ€”namely Christ and Holy Spiritâ€”to reconstruct human
                     beings in the Church in His image. Lives of the saints are articles which
                     illustrate the beauty of the progress in this reconstruction or deification.
                   </p>
@@ -118,7 +118,7 @@ export default async function DeificationPage({
                     humanity in history. So to be like God means to be like Christ, the perfect
                     image of God. By acquiring the qualities of God as reflected in the life of
                     Christ we can be perfect. The Church highlights the life of Christ in her feasts,
-                    fasts, sacraments—especially in the Holy Qurbana—and calls for a constant
+                    fasts, sacramentsâ€”especially in the Holy Qurbanaâ€”and calls for a constant
                     communion with Him. Becoming like Christ is salvation.
                   </p>
 
@@ -155,8 +155,8 @@ export default async function DeificationPage({
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     &quot;Whatever you want people to do to you, do also to them&quot; (Matt 7:12;
                     Lk 6:31). This Golden Rule is a key to understand theosis and fullness of life.
-                    It appears in all great religious and ethical traditions—Confucius, Hinduism,
-                    Buddhism, Jainism, Islam, Rabbi Hillel—and can become a foundation of a Global
+                    It appears in all great religious and ethical traditionsâ€”Confucius, Hinduism,
+                    Buddhism, Jainism, Islam, Rabbi Hillelâ€”and can become a foundation of a Global
                     Ethic.
                   </p>
 
@@ -169,7 +169,7 @@ export default async function DeificationPage({
                     necessary grace or Spirit through the sacraments and spiritual exercises. Those
                     who are in Christ need to grow in Him by making use of confession, Holy Qurbana,
                     prayer, silence, meditation of Scripture, and exposure to the weak and suffering.
-                    This is not &quot;Marjara Nyaya&quot; but &quot;Markada Nyaya&quot;—as the child
+                    This is not &quot;Marjara Nyaya&quot; but &quot;Markada Nyaya&quot;â€”as the child
                     monkey holds on to the mother, in this process God and human beings cooperate.
                     God uses the Church as the most efficient agent for the deification of His children.
                   </p>
@@ -195,13 +195,13 @@ export default async function DeificationPage({
                     The ultimate goal is nothing but deification or Theosis. Continuously we have to
                     progress in the process of becoming like God. He has given the potentiality for
                     it in our being and the Holy Spirit to proceed in this dynamism. &quot;Save
-                    yourself, and thousands around you will be saved&quot;—St. Seraphim of Sarov.
+                    yourself, and thousands around you will be saved&quot;â€”St. Seraphim of Sarov.
                   </p>
 
                   <div className="bg-syro-red/5 rounded-lg p-6 mt-8 border border-syro-table-border">
                     <p className="font-syro-primary text-syro-dark-gray leading-relaxed text-center mb-4">
                       Theosis is becoming like Christ, the perfect icon of God. He became man that
-                      we might become divine. Deification is humanization—the more humanity becomes
+                      we might become divine. Deification is humanizationâ€”the more humanity becomes
                       like God, the more it becomes itself.
                     </p>
                     <p className="font-syro-primary text-syro-dark-gray leading-relaxed text-center font-semibold">

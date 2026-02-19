@@ -25,7 +25,7 @@ export default async function ChristologyPage({
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 <div className="mb-8 flex justify-center">
@@ -56,7 +56,7 @@ export default async function ChristologyPage({
                     The One Incarnate Nature of God the Word
                   </h2>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                    Jesus Christ is One Incarnate (united) Nature of God the Word—this is the christological formula of the Malankara Church. The Church believes that this one united nature is composed of Godhead and manhood in their perfection. According to the Church, in the one Christ the two natures continued without confusion or mixture on the one hand, and without separation or division on the other. The Church professes: We believe that one of the Persons of the Holy Trinity came down from heaven although He did not cease to dwell in the bosom of the Father; that He dwelt in the womb of the Virgin, and was incarnate of the Holy Ghost and of the Virgin Mary, and was made man, while still continuing to be God, and was united to the flesh of the same substance as ours and endowed with a rational and living soul. There are two natures in our Lord: the divinity and the humanity. The union of His divinity with His humanity is transcendent and ineffable by the Word without admixture, without confusion, without transformation or conversion, without change, and without mixture. Although preserving the distinctiveness of the nature in one Son, one is Christ, one is ousia, one is hypostasis, one is person, one is will, one is Power, and one is operation.
+                    Jesus Christ is One Incarnate (united) Nature of God the Wordâ€”this is the christological formula of the Malankara Church. The Church believes that this one united nature is composed of Godhead and manhood in their perfection. According to the Church, in the one Christ the two natures continued without confusion or mixture on the one hand, and without separation or division on the other. The Church professes: We believe that one of the Persons of the Holy Trinity came down from heaven although He did not cease to dwell in the bosom of the Father; that He dwelt in the womb of the Virgin, and was incarnate of the Holy Ghost and of the Virgin Mary, and was made man, while still continuing to be God, and was united to the flesh of the same substance as ours and endowed with a rational and living soul. There are two natures in our Lord: the divinity and the humanity. The union of His divinity with His humanity is transcendent and ineffable by the Word without admixture, without confusion, without transformation or conversion, without change, and without mixture. Although preserving the distinctiveness of the nature in one Son, one is Christ, one is ousia, one is hypostasis, one is person, one is will, one is Power, and one is operation.
                   </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Ousia here is the one individuated ousia. It is hypostasis and the hypostasis is in its nature. The nature is one incarnate nature or one united nature and it is synonymous with the one composite hypostasis. The one nature or hypostasis of God the Word after the union became one person. The word &apos;nature&apos; (physis), when it is used with reference to Christ means only hypostasis, or a concrete being. For the Church, this meaning is crucial, because physis, if it is taken in the sense of hypostasis, is capable of conserving the idea that Jesus Christ lived a concrete human life on earth.
@@ -140,7 +140,7 @@ export default async function ChristologyPage({
 
                   <div className="bg-syro-red/5 rounded-lg p-6 mt-8 border border-syro-table-border">
                     <p className="font-syro-primary text-syro-dark-gray leading-relaxed text-center">
-                      The Malankara Orthodox Syrian Church confesses our Lord Jesus Christ as the One Incarnate nature of God the Word—perfect God and perfect man, one person, without confusion, without separation.
+                      The Malankara Orthodox Syrian Church confesses our Lord Jesus Christ as the One Incarnate nature of God the Wordâ€”perfect God and perfect man, one person, without confusion, without separation.
                     </p>
                   </div>
                 </div>

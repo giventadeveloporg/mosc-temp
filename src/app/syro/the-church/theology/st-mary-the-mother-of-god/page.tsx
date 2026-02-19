@@ -25,7 +25,7 @@ export default async function StMaryMotherOfGodPage({
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 <div className="mb-8 flex justify-center">
@@ -143,8 +143,8 @@ export default async function StMaryMotherOfGodPage({
                     Second Ecumenical Council held at Ephesus in A.D. 431 declared that St. Mary be
                     addressed as the &quot;Mother of God&quot; (Theotokos). It must be borne in mind
                     that St. Cyril of Alexandria&apos;s opposition to Nestorius&apos; advocacy for
-                    the use of Mother of Christ (Christotokos)—the controversy that constitutes the
-                    background for this ecumenical council—was based not only on this popular piety,
+                    the use of Mother of Christ (Christotokos)â€”the controversy that constitutes the
+                    background for this ecumenical councilâ€”was based not only on this popular piety,
                     but also on the sound theological principle that what was in question was more
                     than a mere use of a term. What was at stake was the very foundation of the
                     belief that God had become man. In pursuing the belief that Christ was fully God

@@ -59,7 +59,7 @@ export function ArticleShareButtons({ url, title }: ArticleShareButtonsProps) {
             href={link.href}
             rel="external nofollow"
             target="_blank"
-            className={`flex h-10 w-10 items-center justify-center rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border ${link.className ?? 'bg-muted text-foreground border-border'}`}
+            className={`flex h-10 w-10 items-center justify-center rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-syro-red focus-visible:ring-offset-2 border ${link.className ?? 'bg-syro-bg-gray text-syro-blue border-syro-table-border'}`}
             title={link.label}
             aria-label={link.label}
           >

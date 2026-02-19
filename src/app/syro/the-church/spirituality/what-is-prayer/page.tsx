@@ -7,7 +7,7 @@ import TheChurchSidebar from '../../TheChurchSidebar';
 export const metadata = {
   title: 'What is Prayer?',
   description:
-    'Prayer is communion with God. Learn what prayer is, why we pray, and how to pray—including posture, focus, gestures, and ejaculatory prayer for Orthodox Christians.',
+    'Prayer is communion with God. Learn what prayer is, why we pray, and how to prayâ€”including posture, focus, gestures, and ejaculatory prayer for Orthodox Christians.',
 };
 
 export default async function WhatIsPrayerPage({
@@ -25,7 +25,7 @@ export default async function WhatIsPrayerPage({
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 <div className="mb-8 flex justify-center">
@@ -50,9 +50,9 @@ export default async function WhatIsPrayerPage({
                     and supplies it with oxygen. If we do not breathe for a few minutes we die.
                     Where there is no prayer, sin accumulates and the proper functioning of the
                     spiritual life becomes obstructed. Prayer is communion or communication with
-                    God—opening ourselves to Him and receiving His love. It is by living consciously
+                    Godâ€”opening ourselves to Him and receiving His love. It is by living consciously
                     in this relationship of love that we can be transformed into the image of God. By
-                    prayer we become more like God—more loving, more wise, more powerful, more kind
+                    prayer we become more like Godâ€”more loving, more wise, more powerful, more kind
                     and good. In prayer we are cleansed of the accumulated impurities of our life and
                     supplied with power to live a good, kind and holy life. Prayer is not merely a
                     matter of asking God for things. The relationship is valuable in itself. It is not
@@ -76,9 +76,9 @@ export default async function WhatIsPrayerPage({
                     transformed into God&apos;s likeness and share in His divine power. God wants us
                     to have a part in the task of shaping this world through prayer and knowledge and
                     work. By prayer we do change reality. God has given us that power. In the
-                    Lord&apos;s Prayer, all the first petitions are focused on God—His name, His
+                    Lord&apos;s Prayer, all the first petitions are focused on Godâ€”His name, His
                     kingdom, His will. We pray that God&apos;s purposes may be established in the
-                    lives of all people. In prayer, we are never alone—especially in group prayer, we
+                    lives of all people. In prayer, we are never aloneâ€”especially in group prayer, we
                     commemorate all those who are members of the Body of Christ.
                   </p>
 
@@ -86,7 +86,7 @@ export default async function WhatIsPrayerPage({
                     3. How to Pray?
                   </h2>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                    Prayer has to be learned. It is like swimming—a spiritual skill to be acquired by
+                    Prayer has to be learned. It is like swimmingâ€”a spiritual skill to be acquired by
                     constant practice. The first rule is not to give up. The second is to &quot;let
                     go,&quot; to relax and trust in God. The third is to keep up the practice, even
                     when we do not feel like it. The fourth rule is to develop the discipline of
@@ -99,10 +99,10 @@ export default async function WhatIsPrayerPage({
                   </h3>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     In our Eastern tradition, the posture for prayer is standing, facing east, with
-                    arms uplifted or folded in adoration. It is good to have a focal point—a cross
+                    arms uplifted or folded in adoration. It is good to have a focal pointâ€”a cross
                     with two candles on each side, icons or pictures of Christ, of the Blessed Virgin
                     Mother and of the Saints. Eastern icons are to be preferred. The body must
-                    pray—not merely the mind. Let your lips and mouth sing the praises of God.
+                    prayâ€”not merely the mind. Let your lips and mouth sing the praises of God.
                     Singing is better than saying your prayers, for in the very music certain human
                     attitudes and aspirations are expressed.
                   </p>
@@ -124,10 +124,10 @@ export default async function WhatIsPrayerPage({
                     Group Prayer and Personal Prayer
                   </h3>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                    It is important to come into the presence of God regularly as a community—as a
+                    It is important to come into the presence of God regularly as a communityâ€”as a
                     family, as a youth group, as a local congregation. But community worship is not
                     enough by itself. In addition to group forms, we should master forms for personal
-                    use. The most effective of these is ejaculatory prayer—one-sentence prayers we
+                    use. The most effective of these is ejaculatory prayerâ€”one-sentence prayers we
                     can repeat wherever or whenever: &quot;Lord Jesus Christ, Son of God, be merciful
                     to me a sinner;&quot; &quot;O God, Thou art my God. I love Thee. I am Thine for
                     ever;&quot; &quot;Lord, have mercy, Lord, have mercy, Lord have mercy upon me.&quot;

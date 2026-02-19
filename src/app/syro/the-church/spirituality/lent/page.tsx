@@ -25,7 +25,7 @@ export default async function LentPage({
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 <div className="mb-8 flex justify-center">
@@ -85,7 +85,7 @@ export default async function LentPage({
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Lent is a training for simple life. During Lents we avoid certain times of meal
                     and certain types of meal. Ancient Christian practice was to have just one time
-                    of meal—a purely vegetarian supper—during the Great Lent. Fasting and
+                    of mealâ€”a purely vegetarian supperâ€”during the Great Lent. Fasting and
                     vegetarianism during Lent are an invitation to overcome the enslaving power of
                     consumerist culture which is based on greed. In the midst of prosperity and
                     over-consumption we are trained to enjoy the beauty of a simple life based on
@@ -112,7 +112,7 @@ export default async function LentPage({
                     force who brought temptations. Till the last breath there will be temptations
                     and spiritual warfare in the lives of all, and those who make use of Lent as a
                     spiritual weapon will be victorious. The prayers of the Great Lent highlight
-                    Moses, Elijah and Jesus as the great champions of fasting—they observed fasting
+                    Moses, Elijah and Jesus as the great champions of fastingâ€”they observed fasting
                     for forty days and it was these three who are seen in unusually bright light on
                     the Transfiguration mount. Through fasting we humble ourselves and surrender
                     fully to God who empowers us to face all challenges and sinful tendencies.
@@ -123,7 +123,7 @@ export default async function LentPage({
                   </h3>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Lent is a time when we cooperate with God for the nourishment of our inner being.
-                    The abstinences during Lent indicate the shift of focus—we give extra care to
+                    The abstinences during Lent indicate the shift of focusâ€”we give extra care to
                     the nourishment of our spirit. During Lent we give more time for Bible reading,
                     meditation and prayer so that our spirit is purified and enriched by God, the
                     life-giving food of our inner life. Then the Holy Spirit who resides in our

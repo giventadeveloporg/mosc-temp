@@ -19,7 +19,7 @@ const HGAlexiosMarEusebiusMetropolitanPage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -53,7 +53,7 @@ const HGAlexiosMarEusebiusMetropolitanPage = () => {
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace graduated from Kerala University with Bachelor’s degree in Science. He then joined Bangalore University for legal studies and secured LL.B. After completing his secular studies, he devoted himself for theological studies and joined the Orthodox Theological seminary, Kottayam. He completed Graduation in Sacred Theology from Orthodox Theological seminary and Bachelor of Divinity from Serampore University, Calcutta. Pursuing his post-graduation, he secured Master’s Degree in Theology from St. Peter’s Pontifical Institute of Theology, Bangalore. He acquired a Diploma in Biblical Geography from Tantur Ecumenical Institute, Jerusalem and conducted his Doctoral Research Study in Old Testament from Friedrich Alexander University, Germany. He also practiced as a Civil Lawyer in the District Court of Kollam in 1994-95.
+                        His Grace graduated from Kerala University with Bachelorâ€™s degree in Science. He then joined Bangalore University for legal studies and secured LL.B. After completing his secular studies, he devoted himself for theological studies and joined the Orthodox Theological seminary, Kottayam. He completed Graduation in Sacred Theology from Orthodox Theological seminary and Bachelor of Divinity from Serampore University, Calcutta. Pursuing his post-graduation, he secured Masterâ€™s Degree in Theology from St. Peterâ€™s Pontifical Institute of Theology, Bangalore. He acquired a Diploma in Biblical Geography from Tantur Ecumenical Institute, Jerusalem and conducted his Doctoral Research Study in Old Testament from Friedrich Alexander University, Germany. He also practiced as a Civil Lawyer in the District Court of Kollam in 1994-95.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
@@ -69,7 +69,7 @@ const HGAlexiosMarEusebiusMetropolitanPage = () => {
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace handled the regular columns in the Malankara Sabha, Sahayatra, Parish Mission Literatures for the Outside Kerala Region. He has authored a book in Malayalam named “Vachanathejas”, a compilation of Sunday Sermons for a complete liturgical year. His Grace has served and represented the Church in Ecumenical Conferences in India as well as abroad.
+                        His Grace handled the regular columns in the Malankara Sabha, Sahayatra, Parish Mission Literatures for the Outside Kerala Region. He has authored a book in Malayalam named â€œVachanathejasâ€, a compilation of Sunday Sermons for a complete liturgical year. His Grace has served and represented the Church in Ecumenical Conferences in India as well as abroad.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
@@ -88,7 +88,7 @@ const HGAlexiosMarEusebiusMetropolitanPage = () => {
                         Contact
                       </h4>
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
-                        <p>St Thomas Ashram, Kailash Nagar, Bhilai, Chhattisgarh – 490 001</p>
+                        <p>St Thomas Ashram, Kailash Nagar, Bhilai, Chhattisgarh â€“ 490 001</p>
                         <p>Telephone: +91 8547058607</p>
                         <p>Email: mareusebius@gmail.com</p>
                       </div>

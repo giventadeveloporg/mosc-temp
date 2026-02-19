@@ -339,10 +339,14 @@ export async function getFlashNewsForNewsPages(): Promise<FlashNewsForPage> {
   }
 }
 
+/** Strapi 5 documentId pattern: lowercase alphanumeric, 15–35 chars (e.g. o42fs0slvzzj9os0g9xtc11d). */
+const DOCUMENT_ID_PATTERN = /^[a-z0-9]{15,35}$/;
+
 /**
  * Fetches a single article by slug or id for the detail page. Returns null if not found or Strapi unavailable.
  * Supports: text slug, numeric id (legacy), or documentId (Strapi 5).
- * Replicates legacy index.html: article links use slug or id in the URL.
+ * When the param matches Strapi 5 documentId pattern (e.g. from admin URL), tries documentId first so
+ * links like /mosc/news/o42fs0slvzzj9os0g9xtc11d work even when slug differs from documentId.
  */
 export async function getArticleBySlug(slugOrId: string): Promise<NewsArticle | null> {
   if (!getStrapiUrl() || !slugOrId?.trim()) return null;
@@ -353,28 +357,65 @@ export async function getArticleBySlug(slugOrId: string): Promise<NewsArticle | 
     return null;
   }
   const base = `filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}&filters[publishedAt][$notNull]=true&${POPULATE}`;
+  const param = slugOrId.trim();
   try {
-    // 1. Try slug (text) — use $eqi for case-insensitive match
-    let path = `/articles?filters[slug][$eqi]=${encodeURIComponent(slugOrId.trim())}&${base}`;
-    let res = await fetchStrapi<unknown[]>(path);
-    let list = Array.isArray(res?.data) ? res.data : [];
-    let first = list[0] as { id?: number; documentId?: string; attributes?: Record<string, unknown> } | undefined;
+    let path: string;
+    let res: { data: unknown } | null;
+    let list: unknown[];
+    let first: { id?: number; documentId?: string; attributes?: Record<string, unknown> } | undefined;
 
-    // 2. If not found and param looks numeric, try by id (Strapi v4 or when id is used)
-    if (!first && /^\d+$/.test(slugOrId.trim())) {
-      const id = parseInt(slugOrId.trim(), 10);
+    // 1. If param looks like Strapi 5 documentId (admin URLs, links), try documentId first
+    if (DOCUMENT_ID_PATTERN.test(param)) {
+      path = `/articles?filters[documentId][$eq]=${encodeURIComponent(param)}&${base}`;
+      res = await fetchStrapi<unknown[]>(path);
+      list = Array.isArray(res?.data) ? res.data : [];
+      first = list[0] as typeof first;
+    }
+
+    // 2. If not found, try slug (text) — use $eqi for case-insensitive match
+    if (!first) {
+      path = `/articles?filters[slug][$eqi]=${encodeURIComponent(param)}&${base}`;
+      res = await fetchStrapi<unknown[]>(path);
+      list = Array.isArray(res?.data) ? res.data : [];
+      first = list[0] as typeof first;
+    }
+
+    // 3. If not found and param looks numeric, try by id (Strapi v4 or when id is used)
+    if (!first && /^\d+$/.test(param)) {
+      const id = parseInt(param, 10);
       path = `/articles?filters[id][$eq]=${id}&${base}`;
       res = await fetchStrapi<unknown[]>(path);
       list = Array.isArray(res?.data) ? res.data : [];
-      first = list[0] as { id?: number; documentId?: string; attributes?: Record<string, unknown> } | undefined;
+      first = list[0] as typeof first;
     }
 
-    // 3. If not found, try documentId (Strapi 5 identifier, typically alphanumeric)
-    if (!first && slugOrId.trim().length > 10) {
-      path = `/articles?filters[documentId][$eq]=${encodeURIComponent(slugOrId.trim())}&${base}`;
+    // 4. Fallback: try documentId for non-numeric params (e.g. long alphanumeric that didn't match pattern)
+    if (!first && param.length > 10 && !DOCUMENT_ID_PATTERN.test(param)) {
+      path = `/articles?filters[documentId][$eq]=${encodeURIComponent(param)}&${base}`;
       res = await fetchStrapi<unknown[]>(path);
       list = Array.isArray(res?.data) ? res.data : [];
-      first = list[0] as { id?: number; documentId?: string; attributes?: Record<string, unknown> } | undefined;
+      first = list[0] as typeof first;
+    }
+
+    // 5. When tenant-scoped queries return 0, retry without tenant filter (article may have no tenant set in Strapi)
+    const baseNoTenant = `filters[publishedAt][$notNull]=true&${POPULATE}`;
+    if (!first && DOCUMENT_ID_PATTERN.test(param)) {
+      path = `/articles?filters[documentId][$eq]=${encodeURIComponent(param)}&${baseNoTenant}`;
+      res = await fetchStrapi<unknown[]>(path);
+      list = Array.isArray(res?.data) ? res.data : [];
+      first = list[0] as typeof first;
+      if (first) {
+        console.warn(`[STRAPI-NEWS] Article ${param} found without tenant filter. Add tenant (${tenantId}) in Strapi for proper scoping.`);
+      }
+    }
+    if (!first) {
+      path = `/articles?filters[slug][$eqi]=${encodeURIComponent(param)}&${baseNoTenant}`;
+      res = await fetchStrapi<unknown[]>(path);
+      list = Array.isArray(res?.data) ? res.data : [];
+      first = list[0] as typeof first;
+      if (first) {
+        console.warn(`[STRAPI-NEWS] Article slug ${param} found without tenant filter. Add tenant (${tenantId}) in Strapi for proper scoping.`);
+      }
     }
 
     if (!first) return null;

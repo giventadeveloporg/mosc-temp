@@ -51,7 +51,7 @@ export default async function NewsArticlePage({ params }: PageProps) {
     });
 
   return (
-    <div className="bg-background">
+    <div className="bg-syro-bg-gray font-syro-primary text-[#0b2848] min-h-screen">
       <NewsPageHeader />
 
       {flashData.flashNewsItems?.length > 0 ? (
@@ -60,15 +60,15 @@ export default async function NewsArticlePage({ params }: PageProps) {
         <FlashBar message={flashData.flash.message} />
       ) : null}
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 overflow-x-hidden">
+      <div className="max-w-[1200px] mx-auto px-[15px] py-syro-xxxl overflow-x-hidden">
         <Link
           href="/syro/news"
-          className="syro-news-link inline-flex items-center gap-2 font-body text-sm hover:underline mb-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="syro-news-link inline-flex items-center gap-2 text-syro-small text-syro-blue hover:text-syro-red transition-colors duration-300 mb-syro-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-syro-red"
         >
           <span aria-hidden="true">←</span> Back to News
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-12 min-w-0">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-syro-xl min-w-0">
           {/* Main content */}
           <article className="lg:col-span-2 min-w-0 overflow-x-hidden max-w-full">
             <header className="mb-6">
@@ -85,7 +85,7 @@ export default async function NewsArticlePage({ params }: PageProps) {
             </header>
 
             {article.coverUrl && (
-              <div className="relative w-full h-auto rounded-xl overflow-hidden bg-muted mb-8">
+              <div className="relative w-full h-auto rounded-xl overflow-hidden bg-syro-bg-gray mb-8">
                 <Image
                   src={article.coverUrl}
                   alt={article.coverAlt || article.title}
@@ -100,12 +100,12 @@ export default async function NewsArticlePage({ params }: PageProps) {
             )}
 
             {article.excerpt && !(Array.isArray(article.description) && article.description.length > 0) && !(typeof article.body === 'string' && article.body.trim()) && (
-              <p className="syro-article-detail-lead mb-6 border-l-4 border-primary/30 pl-4">
+              <p className="syro-article-detail-lead mb-6 border-l-4 border-syro-red/30 pl-4">
                 {article.excerpt}
               </p>
             )}
 
-            <div className="syro-article-detail-body prose prose-lg max-w-full min-w-0 break-words overflow-x-clip prose-headings:font-heading prose-headings:text-foreground prose-headings:font-semibold prose-p:leading-relaxed prose-p:text-base prose-p:break-words prose-a:no-underline prose-pre:overflow-x-hidden prose-pre:max-w-full prose-pre:whitespace-pre-wrap prose-pre:break-words [&>*]:min-w-0 [&>*]:max-w-full [&>*]:break-words [&_p]:break-words [&_li]:break-words">
+            <div className="syro-article-detail-body prose prose-lg max-w-full min-w-0 break-words overflow-x-clip prose-headings:font-heading prose-headings:text-syro-blue prose-headings:font-semibold prose-p:leading-relaxed prose-p:text-base prose-p:break-words prose-a:no-underline prose-pre:overflow-x-hidden prose-pre:max-w-full prose-pre:whitespace-pre-wrap prose-pre:break-words [&>*]:min-w-0 [&>*]:max-w-full [&>*]:break-words [&_p]:break-words [&_li]:break-words">
               <ArticleContent
                 description={article.description}
                 body={article.body}
@@ -114,7 +114,7 @@ export default async function NewsArticlePage({ params }: PageProps) {
               />
             </div>
 
-            <div className="mt-8 pt-6 border-t border-border">
+            <div className="mt-8 pt-6 border-t border-syro-table-border">
               <ArticleShareButtons url={articleUrl} title={article.title} />
             </div>
 
@@ -122,7 +122,7 @@ export default async function NewsArticlePage({ params }: PageProps) {
               <p className="syro-article-detail-meta mt-6">
                 <span className="font-semibold uppercase tracking-wide">Posted in</span>{' '}
                 <span className="inline-flex flex-wrap gap-2 mt-2">
-                  <span className="inline-block px-3 py-1 rounded-full bg-muted text-foreground/80 border border-border">
+                  <span className="inline-block px-3 py-1 rounded-full bg-syro-bg-gray text-syro-blue border border-syro-table-border">
                     {article.categoryName}
                   </span>
                 </span>
@@ -130,10 +130,10 @@ export default async function NewsArticlePage({ params }: PageProps) {
             )}
 
             {previousArticle && (
-              <div className="mt-8 pt-6 border-t border-border">
+              <div className="mt-8 pt-6 border-t border-syro-table-border">
                 <Link
                   href={`/syro/news/${previousArticle.slug}`}
-                  className="syro-news-link inline-flex items-center gap-2 font-body text-sm hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="syro-news-link inline-flex items-center gap-2 font-body text-sm text-syro-blue hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-syro-red"
                 >
                   <span aria-hidden="true">←</span> Previous Post
                 </Link>
@@ -149,8 +149,8 @@ export default async function NewsArticlePage({ params }: PageProps) {
             <FollowUsFacebook />
 
             {/* Recent Posts */}
-            <div className="bg-card rounded-xl border border-border p-6 sacred-shadow">
-              <h3 className="font-heading font-semibold text-lg text-foreground uppercase tracking-wide mb-4">
+            <div className="bg-white rounded-xl border border-syro-table-border p-6 sacred-shadow shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]">
+              <h3 className="font-heading font-semibold text-lg text-syro-blue uppercase tracking-wide mb-4">
                 Recent Posts
               </h3>
               <ul className="space-y-3">
@@ -158,7 +158,7 @@ export default async function NewsArticlePage({ params }: PageProps) {
                   <li key={item.id}>
                     <Link
                       href={`/syro/news/${item.slug}`}
-                      className={`syro-news-link font-body text-sm leading-snug focus:outline-none focus-visible:ring-2 focus-visible:ring-ring block ${
+                      className={`syro-news-link font-body text-sm text-syro-blue leading-snug focus:outline-none focus-visible:ring-2 focus-visible:ring-syro-red block ${
                         item.slug === article.slug ? 'font-medium' : ''
                       }`}
                     >

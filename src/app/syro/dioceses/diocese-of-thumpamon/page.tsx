@@ -17,7 +17,7 @@ const dioceseofthumpamonPage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -40,7 +40,7 @@ const dioceseofthumpamonPage = () => {
                   </h2>
 
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Flipping through the historical pages of Orthodox Christian community in Kerala, Thumpamon was one of the bastions for Christians during the very first century. Thumpamon Diocese was created after the Mulanthuruthy Synod 1876 along with other six dioceses. The historical diocese has been an idealist not just to the Orthodox Christian believers but even to the Kerala society under the bulwarks of Malankara Orthodox Church who have contributed to a great extend for the formation the Indian Orthodox Church and Diocese as a whole. The first torch bearer of the diocese was Metropolitan Geevarghese Mar Yulios of Pampakuda (1876- 1883) followed by St. Gregorios of Parumala (1883-1902), Pulikkottil Joseph Mar Dionysius (1902-1909), Vattasseril Mar Dionysius (1909 – 1913) ,Euyakim Mar Ivanios (1913- 1925), Geevarghese Mar Gregorios (1925-1930) , Geevarghese Mar Philoxenos (1930-1951), Augen Mar Timotheos (19451-1953), Daniel Mar Philoxenos (1953-1990), Philipose Mar Eusebius (1990-2009), H.G. Kuriakose Mar Clemis (2009- 2023),   At present H.G. Dr. Abraham Mar Seraphim 12th  Metropolitan of the Thumpamon diocese.
+                      Flipping through the historical pages of Orthodox Christian community in Kerala, Thumpamon was one of the bastions for Christians during the very first century. Thumpamon Diocese was created after the Mulanthuruthy Synod 1876 along with other six dioceses. The historical diocese has been an idealist not just to the Orthodox Christian believers but even to the Kerala society under the bulwarks of Malankara Orthodox Church who have contributed to a great extend for the formation the Indian Orthodox Church and Diocese as a whole. The first torch bearer of the diocese was Metropolitan Geevarghese Mar Yulios of Pampakuda (1876- 1883) followed by St. Gregorios of Parumala (1883-1902), Pulikkottil Joseph Mar Dionysius (1902-1909), Vattasseril Mar Dionysius (1909 â€“ 1913) ,Euyakim Mar Ivanios (1913- 1925), Geevarghese Mar Gregorios (1925-1930) , Geevarghese Mar Philoxenos (1930-1951), Augen Mar Timotheos (19451-1953), Daniel Mar Philoxenos (1953-1990), Philipose Mar Eusebius (1990-2009), H.G. Kuriakose Mar Clemis (2009- 2023),Â  Â At present H.G. Dr. Abraham Mar Seraphim 12thÂ  Metropolitan of the Thumpamon diocese.
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       The Bishop's house (Aramana) of the diocese was built by Puthencav kochu Thirumeni (Geevarghese Mar Philoxenos) who was also the founder of the then Catholicate High School ,at present known as Catholicate College which became the blessing and guiding path of education for the people of Pathanamtitta. The contribution of Thumpamon diocese was not just centric to church and spirituality but also to the social fabric of Pathanamthitta, where late lamented Daniel Mar Philoxenise was part of the regional committee of the Pathanamthitta district who initiated many schemes and policy for the welfare of the people.
@@ -55,7 +55,7 @@ const dioceseofthumpamonPage = () => {
                       The contributions of the diocese for the social upliftment of the people are wide and extensive, providing shelter for the Homeless, educational scholarship for the financially weak students, training and guiding students who are specially able, free treatment and medicine for helpless and needy are the projects owned and implemented by the Basil Monastery , St Antony Monastry, St Mary's Convent as a lending hand to bring the less facilitated people to the mainstream society.
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Address: Basil Aramana, Pathanamthitta - 689 645
+                      Address:Â Basil Aramana, Pathanamthitta - 689 645
                     </p>
                 </div>
               </div>
@@ -94,13 +94,13 @@ const dioceseofthumpamonPage = () => {
                       href="/syro/dioceses/diocese-of-kottarakara-punalur" 
                       className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Kottarakara – Punalur
+                      Diocese of Kottarakara â€“ Punalur
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-adoor-kadampanadu" 
                       className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Adoor – Kadampanadu
+                      Diocese of Adoor â€“ Kadampanadu
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-thumpamon" 

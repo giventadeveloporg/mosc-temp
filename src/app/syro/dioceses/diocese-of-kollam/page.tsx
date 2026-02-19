@@ -17,7 +17,7 @@ const dioceseofkollamPage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -61,13 +61,13 @@ const dioceseofkollamPage = () => {
                       Mathews Mar Coorilos became the Bishop of Kollam in 1966 and served the diocese till he became the Catholicos of the East . In 1991 when Mathews Mar Coorilos became the Supreme Head of Malankara Sabha, Mathews Mar Epiphanios ,who was the Assistant Bishop of Kollam became the Bishop of Kollam and served the diocese till 2009.
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      In 1979 , the diocese of Kollam was bifurcated to Trivandrum and Kollam Diocese (------?) churches went to Trivandrum diocese. Again in 1985 four churches detached from Kollam diocese and included in Chengannur diocese.   In 2002 , from Kollam diocese twenty seven churches detached and formed the new Mavelikara diocese. In 2010   a rearrangement of churches of Kollam and Trivandrum dioceses resulted in the formation of Adoor- Kadampanad and Kottarakara –Punalur dioceses .
+                      In 1979 , the diocese of Kollam was bifurcated to Trivandrum and Kollam Diocese (------?) churches went to Trivandrum diocese. Again in 1985 four churches detached from Kollam diocese and included in Chengannur diocese.Â Â  In 2002 , from Kollam diocese twenty seven churches detached and formed the new Mavelikara diocese. In 2010Â Â  a rearrangement of churches of Kollam and Trivandrum dioceses resulted in the formation of Adoor- Kadampanad and Kottarakara â€“Punalur dioceses .
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      The first headquarters of   Kollam Diocese was Kottapuram Seminary during the reign of Geevarghese Mar Gregorious of Parumala and Kundara Seminary was the headquarters of Kollam Diocese during the reign of Geevarghese Mar Gregorious who later known as Baselious Geevarghese II .
+                      The first headquarters ofÂ Â  Kollam Diocese was Kottapuram Seminary during the reign of Geevarghese Mar Gregorious of Parumala and Kundara Seminary was the headquarters of Kollam Diocese during the reign of Geevarghese Mar Gregorious who later known as Baselious Geevarghese II .
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Mathews Mar Coorilous later known as Baselious Marthoma Mathews -II ,the Catholicos of the East,  established the present headquarters at Cross Junction, Kollam  .
+                      Mathews Mar Coorilous later known as Baselious Marthoma Mathews -II ,the Catholicos of the East,Â  established the present headquarters at Cross Junction, Kollam Â .
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       From 2009 April 1st , onwards H.G. Zachariah Mar Anthonios became the Metropolitan of Kollam Diocese. At present sixty five churches under the Diocese of Kollam. H.G Zachariah Mar Anthonios renovated and dedicated the Kollam Aramana during 2013-15.The Kollam diocese has two diocesan centers - Mar Epiphnios Centre ,Kottarakara and Sooranad. The diocese also has St. Thomas Boys Home, Sasthamkotta and Mar Baselious Santhi Bhavan, Thalavoor as Charitable institutions.
@@ -109,13 +109,13 @@ const dioceseofkollamPage = () => {
                       href="/syro/dioceses/diocese-of-kottarakara-punalur" 
                       className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Kottarakara – Punalur
+                      Diocese of Kottarakara â€“ Punalur
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-adoor-kadampanadu" 
                       className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Adoor – Kadampanadu
+                      Diocese of Adoor â€“ Kadampanadu
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-thumpamon" 

@@ -17,7 +17,7 @@ const dioceseofchengannurPage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -40,7 +40,7 @@ const dioceseofchengannurPage = () => {
                   </h2>
 
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      The Diocese of Chengannur came into existence of 10th March 1985 vide Kalpana No. 52/85 dtd. 8.3.85 of H.H. Moran Mar Baselios Marthoma Mathews I Catholicose of the    East and Malankara    Metropolitan. This Diocese was established with 50 Churches from Thumpamon, Niranam and Kollam Dioceses. This newly constituted Diocese lies in an area comprising of Pazhakulam in the South, Kallunkal in the North, Kuttemperoor St. Mary's - Budhannoor in the West and Mezhuveli and Maramon in the East.H.G. Thomas Mar Athanasios, the celebrated educationalist and a pioneer priest in organising congregations in western India (Maharastra, Gujarat and Rajastan), became the first Metropolitan of the Diocese on 1st August 1985. His Grace is at present the president of Divyasandesam (Visual Media Department of our Church), Malankara Orthodox Church Publications and Akhila Malankara Gayaka Sangam of our church.  Eventhough he is very busy with various activities, he goes through effectively and punctually every minute details of the activities of the Diocese.The Diocesan Head Quarters is Bethel of which the founder is the late Puthencavu Geevarghese Mar Philoxenos of blessed memory. A multistoried Administative Block and a beautiful Church has come up in Bethel.Now there are 51 Churches, 10 Chapels and 55 Priests. There are 8851 families in the diocese.The Diocese gives maximum importance to spiritual organisations. Moreover the "Daivavili Sangam", a nursery for budding priests and nuns, is a unique activity of the Diocese.The Suvisesha Sangam - a fellowship of all the office bearers of the various spiritual organisations in the Diocese is the missionary wing of the Diocese.The Parish Council is yet another innovative idea of the Diocese. The Vicar, the Kaikaran, the Secretary and the office bearers (Vice-President, Secretary & Trustee) of various spiritual organisations in a Parish consitute the Parish Council. They meet every three months and review the functioning of the spiritual organisations in the Parishes.Assraya Social and Charitable Society,  "Mar Philoxenos Research & Guidence Centre, Vidya Jyothi, Philox School of  Liturgical Music, Baselios Counselling Centre" are four innovative ideas introduced recently.
+                      The Diocese of Chengannur came into existence of 10th March 1985 vide Kalpana No. 52/85 dtd. 8.3.85 of H.H. Moran Mar Baselios Marthoma Mathews I Catholicose of theÂ Â Â  East and MalankaraÂ Â Â  Metropolitan. This Diocese was established with 50 Churches from Thumpamon, Niranam and Kollam Dioceses. This newly constituted Diocese lies in an area comprising of Pazhakulam in the South, Kallunkal in the North, Kuttemperoor St. Mary's - Budhannoor in the West and Mezhuveli and Maramon in the East.H.G. Thomas Mar Athanasios, the celebrated educationalist and a pioneer priest in organising congregations in western India (Maharastra, Gujarat and Rajastan), became the first Metropolitan of the Diocese on 1st August 1985. His Grace is at present the president of Divyasandesam (Visual Media Department of our Church), Malankara Orthodox Church Publications and Akhila Malankara Gayaka Sangam of our church.Â  Eventhough he is very busy with various activities, he goes through effectively and punctually every minute details of the activities of the Diocese.The Diocesan Head Quarters is Bethel of which the founder is the late Puthencavu Geevarghese Mar Philoxenos of blessed memory. A multistoried Administative Block and a beautiful Church has come up in Bethel.Now there are 51 Churches, 10 Chapels and 55 Priests. There are 8851 families in the diocese.The Diocese gives maximum importance to spiritual organisations. Moreover the "Daivavili Sangam", a nursery for budding priests and nuns, is a unique activity of the Diocese.The Suvisesha Sangam - a fellowship of all the office bearers of the various spiritual organisations in the Diocese is the missionary wing of the Diocese.The Parish Council is yet another innovative idea of the Diocese. The Vicar, the Kaikaran, the Secretary and the office bearers (Vice-President, Secretary & Trustee) of various spiritual organisations in a Parish consitute the Parish Council. They meet every three months and review the functioning of the spiritual organisations in the Parishes.Assraya Social and Charitable Society,Â  "Mar Philoxenos Research & Guidence Centre, Vidya Jyothi, Philox School ofÂ  Liturgical Music, Baselios Counselling Centre" are four innovative ideas introduced recently.
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       The official organ of the Diocese is "Bethel Pathrika" a monthly, with an online editionwww.bethelpatrika.org
@@ -108,13 +108,13 @@ CHENGANNUR
                       href="/syro/dioceses/diocese-of-kottarakara-punalur" 
                       className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Kottarakara – Punalur
+                      Diocese of Kottarakara â€“ Punalur
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-adoor-kadampanadu" 
                       className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Adoor – Kadampanadu
+                      Diocese of Adoor â€“ Kadampanadu
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-thumpamon" 

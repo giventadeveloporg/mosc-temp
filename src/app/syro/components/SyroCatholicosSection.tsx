@@ -10,7 +10,7 @@ export default function SyroCatholicosSection() {
   return (
     <section className="cardinal-new syro-cardinal-section" id="syro-cardinal-section">
       <div className="container">
-        <div className="row align-items-center">
+        <div className="row align-items-start">
           {/* Left column: images (main + overlay at bottom-right) */}
           <div className="col-lg-6 order-2 order-lg-1">
             <div className="cardinal-images syro-cardinal-images">

@@ -17,7 +17,7 @@ const dioceseofkottayamPage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -40,16 +40,16 @@ const dioceseofkottayamPage = () => {
                   </h2>
 
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      As per the decisions of the Mulamthuruthy Synod, Kottayam Diocese was formed initially with 20 churches altogether from Kottayam and nearby places. The first diocesan metropolitan was His Grace Kadavil  Paulose Mar Athanasios. After his demise, H.G Paulose Mar Ivanios (First Catholicos), H.G. Geevarghese Mar Philoxenos (Second Catholicos), H.G. Vattasseril Geevarghese mar Dionysios, H.G.Kuriakose Mar Gregorios (Pampadi Thirumeni  1929-1965) and  H.G Paret Mathews Mar Ivanios (1965-1985) held the office  in respective period of time. During the time of H.G Kuriakose Mar Gregorios, the Pampady Dayara became the office of the Diocese.
+                      As per the decisions of the Mulamthuruthy Synod, Kottayam Diocese was formed initially with 20 churches altogether from Kottayam and nearby places. The first diocesan metropolitan was His Grace Kadavil Â Paulose Mar Athanasios. After his demise, H.G Paulose Mar Ivanios (First Catholicos), H.G. Geevarghese Mar Philoxenos (Second Catholicos), H.G. Vattasseril Geevarghese mar Dionysios, H.G.Kuriakose Mar Gregorios (Pampadi ThirumeniÂ  1929-1965) and Â H.G Paret Mathews Mar Ivanios (1965-1985) held the office Â in respective period of time. During the time of H.G Kuriakose Mar Gregorios, the Pampady Dayara became the office of the Diocese.
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       On 1982 April 21, the then Kottayam Diocese was divided into Kottayam, Kottayam Central, and Idukki. H.G Geevarghese Mar Ivanios took charge as the first Diocesan head of the newly re-organised Kottayam Diocese. After 28 years of fruitful administration of Kottayam Diocese, His Grace Geevarghese Mar Ivanios Metropolitan entered into Heavenly Abode on 12th April 2013.
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Diocesan Office :  KMG Centre, P.B.No.686, MD Seminary, Kottayam-1
+                      Diocesan OfficeÂ : Â KMG Centre, P.B.No.686, MD Seminary, Kottayam-1
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Ph:  0481-2564329, 2304376
+                      Ph: Â 0481-2564329, 2304376
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       Email: kmgcentre @gmail.com
@@ -94,13 +94,13 @@ const dioceseofkottayamPage = () => {
                       href="/syro/dioceses/diocese-of-kottarakara-punalur" 
                       className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Kottarakara – Punalur
+                      Diocese of Kottarakara â€“ Punalur
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-adoor-kadampanadu" 
                       className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Adoor – Kadampanadu
+                      Diocese of Adoor â€“ Kadampanadu
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-thumpamon" 

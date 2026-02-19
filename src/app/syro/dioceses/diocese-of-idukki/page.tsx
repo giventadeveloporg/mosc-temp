@@ -17,7 +17,7 @@ const dioceseofidukkiPage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -40,13 +40,13 @@ const dioceseofidukkiPage = () => {
                   </h2>
 
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Until 1982, the present churches of the Idukki diocese were the part of kottayam diocese. In 1982 the churches in the eastern part of kottayam diocese were took and formed the Idukki Diocese. The first metropolitan of idukki diocese was the late lamented His Grace Mathews Mar Barnabas metropolitan. His Grace Mathews mar Barnabas metropolitan took all initiatives and bought land and constructed aramana and also started idukki orthodox medical center hospital  in concern to the social commitment of the diocese to the society.
+                      Until 1982, the present churches of the Idukki diocese were the part of kottayam diocese. In 1982 the churches in the eastern part of kottayam diocese were took and formed the Idukki Diocese. The first metropolitan of idukki diocese was the late lamented His Grace Mathews Mar Barnabas metropolitan. His Grace Mathews mar Barnabas metropolitan took all initiatives and bought land and constructed aramana and also started idukki orthodox medical center hospitalÂ  in concern to the social commitment of the diocese to the society.
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       In 1992 when His Grace Mathews Mar Barnabas took the charge of American diocese the then metropolitans were H.G. Mathews mar severios, late lamented Paulose mar Pachomios, H.G. Abraham mar severios, H.G. Augen mar Dionysius, H.G. paulose mar milithios (H.H. Baselios marthoma paulose II). During the period of late lamented Augen mar Dionysios the Idukki diocese achieved a major stream of growth. Presently there are 30 churches and more than 2000 families in Idukki diocese.
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Address:  Gedseemon Aramana, Chakkupallom, Kumily-686509
+                      Address: Â Gedseemon Aramana, Chakkupallom, Kumily-686509
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       Ph: 04868-282248, 282504
@@ -91,13 +91,13 @@ const dioceseofidukkiPage = () => {
                       href="/syro/dioceses/diocese-of-kottarakara-punalur" 
                       className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Kottarakara – Punalur
+                      Diocese of Kottarakara â€“ Punalur
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-adoor-kadampanadu" 
                       className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Adoor – Kadampanadu
+                      Diocese of Adoor â€“ Kadampanadu
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-thumpamon" 

@@ -19,7 +19,7 @@ const HisGraceGeevargheseMarCooriloseMetropolitanPage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -68,7 +68,7 @@ const HisGraceGeevargheseMarCooriloseMetropolitanPage = () => {
                         Contact
                       </h4>
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
-                        <p>Bombay Orthodox Church Centre, Dr. Mar Theophilus Marg, Sector X-A, Vashi, Juhu Nagar, Navi Mumbai – 400 703</p>
+                        <p>Bombay Orthodox Church Centre, Dr. Mar Theophilus Marg, Sector X-A, Vashi, Juhu Nagar, Navi Mumbai â€“ 400 703</p>
                         <p>Tel.: 022-27669850, 022-27801427 | Mob: 09820333379</p>
                         <p>E-mail: orthodox77@hotmail.com, marcoorilos@yahoo.com</p>
                       </div>

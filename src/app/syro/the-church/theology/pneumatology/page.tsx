@@ -25,7 +25,7 @@ export default async function PneumatologyPage({
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 <div className="mb-8 flex justify-center">
@@ -60,7 +60,7 @@ export default async function PneumatologyPage({
                     tri-personality of the divine nature is not merely economic and temporal but is
                     immanent and eternal. It is not tritheism; for while there are three persons,
                     there is but one essence. Thus the term &apos;Trinity&apos; is not a metaphysical
-                    one—it is only a designation of four facts: (1) The Father is God; (2) the Son
+                    oneâ€”it is only a designation of four facts: (1) The Father is God; (2) the Son
                     is God; (3) the Spirit is God; (4) there is but one God. Our concern here is to
                     describe the Doctrine of the Holy Spirit.
                   </p>
@@ -70,7 +70,7 @@ export default async function PneumatologyPage({
                   </h3>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     &apos;Ruah&apos; is Hebrew and &apos;Pneuma&apos; in Greek signify the same:
-                    &apos;breath&apos; or &apos;wind&apos;—that which is living but immaterial. Spirit
+                    &apos;breath&apos; or &apos;wind&apos;â€”that which is living but immaterial. Spirit
                     is used in three ways in Scripture: (1) The Holy Spirit is one of the three
                     persons of the Trinity (Jn 4:24; 20:22); (2) The angels are called spirit (Ps
                     104:4); (3) The human spirit possesses the intuitive ability to know and

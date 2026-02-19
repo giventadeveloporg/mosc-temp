@@ -20,7 +20,7 @@ const HGDrYuhanonMorMeletiusMetropolitanPage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -50,11 +50,11 @@ const HGDrYuhanonMorMeletiusMetropolitanPage = () => {
 
                     <div className="prose prose-lg max-w-none">
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace was born at Elakkaranadu, a typical village in the Ernakulam District of Kerala, to a social worker Mr Markose and Mrs Saramma, Murimakkil. He had his primary education from the Government School at Maneed. After his schooling, His Grace studied at St Peter’s College, Kolencherry, and passed out with his bachelors in Malayalam.
+                        His Grace was born at Elakkaranadu, a typical village in the Ernakulam District of Kerala, to a social worker Mr Markose and Mrs Saramma, Murimakkil. He had his primary education from the Government School at Maneed. After his schooling, His Grace studied at St Peterâ€™s College, Kolencherry, and passed out with his bachelors in Malayalam.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        Coming to the theological studies, he did his BD and MTh degrees from the United Theological College, Bangalore. Thereupon, he took ThM and PhD qualify (old testament theology) from Lutheran School of Theology, Chicago. His Grace has submitted his PhD paper to Dharmaram Vidyashektram, Bangalore. Meanwhile, he studied syriac at St Aphrem’s Seminary, Damascus.
+                        Coming to the theological studies, he did his BD and MTh degrees from the United Theological College, Bangalore. Thereupon, he took ThM and PhD qualify (old testament theology) from Lutheran School of Theology, Chicago. His Grace has submitted his PhD paper to Dharmaram Vidyashektram, Bangalore. Meanwhile, he studied syriac at St Aphremâ€™s Seminary, Damascus.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
@@ -62,11 +62,11 @@ const HGDrYuhanonMorMeletiusMetropolitanPage = () => {
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        As a priest, he was teaching at MSOT Seminary, Udaigiri. He was also serving as the vicar of St Mary’s Church, Valampur, for about four years. His Grace is also served as the president of Orthodox Christian Youth Movement.
+                        As a priest, he was teaching at MSOT Seminary, Udaigiri. He was also serving as the vicar of St Maryâ€™s Church, Valampur, for about four years. His Grace is also served as the president of Orthodox Christian Youth Movement.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        A scholar, His Grace is a visiting professor to the Orthodox seminaries at Nagpur and Kottayam. An accomplished writer, Mar Meletius has few books—Verukal Thedi, Manavikathayude Kazhchapadukal, Swatantravum Swayam Paryapthathayum—to his credit.
+                        A scholar, His Grace is a visiting professor to the Orthodox seminaries at Nagpur and Kottayam. An accomplished writer, Mar Meletius has few booksâ€”Verukal Thedi, Manavikathayude Kazhchapadukal, Swatantravum Swayam Paryapthathayumâ€”to his credit.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
@@ -80,7 +80,7 @@ const HGDrYuhanonMorMeletiusMetropolitanPage = () => {
                         Contact
                       </h4>
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
-                        <p>Gedseemon Seminary, Mannuthy, Thrissur, Kerala, India – 680651</p>
+                        <p>Gedseemon Seminary, Mannuthy, Thrissur, Kerala, India â€“ 680651</p>
                         <p>Phone: 0487 2371039, 2371748, 9447037174</p>
                         <p>Email: yuhanonmilitos@hotmail.com / mormilitos@gmail.com</p>
                       </div>

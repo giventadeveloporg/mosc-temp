@@ -6,7 +6,7 @@ import SyroPageBanner from '../../components/SyroPageBanner';
 export const metadata = {
   title: 'The Successor of St. Thomas in Europe',
   description:
-    'A grand reception accorded to His Holiness Baselios Marthoma Paulose II by the U. K. Europe Africa Diocese and Lambeth Palace, London — September 2013. Ecumenical relations of the Malankara Orthodox Syrian Church.',
+    'A grand reception accorded to His Holiness Baselios Marthoma Paulose II by the U. K. Europe Africa Diocese and Lambeth Palace, London â€” September 2013. Ecumenical relations of the Malankara Orthodox Syrian Church.',
 };
 
 const SuccessorOfStThomasInEuropePage = () => {
@@ -17,7 +17,7 @@ const SuccessorOfStThomasInEuropePage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 <div className="prose prose-lg max-w-none">

@@ -17,7 +17,7 @@ const dioceseofmavelikaraPage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -43,13 +43,13 @@ const dioceseofmavelikaraPage = () => {
                       Establishment
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      The Diocese of Mavelikara came in to existence on 10th August, 2002 with the decision of the holy Episcopal Synod of Malankara Orthodox Church. Late Lamented H.H.BaseliosMarthoma Mathews II Catholicos formally announced the formation of the Mavelikara diocese of the Malankara Orthodox Churchthrough Kalpana no. 134/2002. His Holiness appointed H.G.Paulose Mar Pachomiosmetropolitan as the first diocesean Metropolitan. The craftsmanship and administrative skills of Mar Pachomios Metropolitan helped the diocese to keep its root fixed for its future growth and development. The priest's and laymen's personal attachment to Pachomios Metropolitan was one of the primary reasons that kept the diocese united in its initial days. Forty-oneparishes and twelve chapels of the dioceses of Kollam, Niranam and Chengannoor, were annexed to the newly formed Mavelikara Diocese. Though the diocese is a newly formed one, it has the rich heritage kept by its ancient churches and communities. The spiritual guidance of H.G. Dr.Geevarghese Mar Osthathios, H.G.Mathews Mar Epiphanios and H.G. Thomas Mar Athanasius to the parishes from their respective dioceses was priceless in formulating the spiritual foundation of the diocese.
+                      The Diocese ofÂ Mavelikara came in to existenceÂ on 10th August, 2002 with the decision of the holy Episcopal Synod of Malankara Orthodox Church. Late Lamented H.H.BaseliosMarthoma Mathews II Catholicos formally announced the formation of the Mavelikara diocese of the Malankara Orthodox Churchthrough Kalpana no. 134/2002. His Holiness appointed H.G.Paulose Mar Pachomiosmetropolitan as the first diocesean Metropolitan. The craftsmanship and administrative skills of Mar Pachomios Metropolitan helped the diocese to keep its root fixed for its future growth and development. The priest's and laymen's personal attachment to Pachomios Metropolitan was one of the primary reasons that kept the diocese united in its initial days. Forty-oneparishes and twelve chapels of the dioceses of Kollam, Niranam and Chengannoor, were annexed to the newly formed Mavelikara Diocese. Though the diocese is a newly formed one, it has the rich heritage kept by its ancient churches and communities. The spiritual guidance of H.G. Dr.Geevarghese Mar Osthathios, H.G.Mathews Mar Epiphanios and H.G. Thomas Mar Athanasius to the parishes from their respective dioceses was priceless in formulating the spiritual foundation of the diocese.
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       Diocesan Center
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      The M.S. Seminary,Thazhakkara, Mavelikara was the temporary diocesan office and bishop's residence.  In view of having a permanent diocesan office and Aramana,1.22acres of land was purchasedin Thazhakkara villagein 2005. It has all the conveniences of a town with the serenity of a village and isstrategically located in proximity to Saint Mary's Orthodox Cathedral, Puthiyakavu, Mavelikara and the M.S. Seminary Thazhakkara.Under the guidance and leadership of the late lamented H.G.Paulose Mar PachomiosMetropolitan, abeautiful Aramana was constructed in 2008. The newly built Diocesan center, named TheobhavanAramana was consecrated by late H.H.Baselios Marthoma Didymus I Catholicos on 17thOctober, 2008.Along with serving as the residence of the metropolitan and the diocesan office, TheobhavanAramana is designed with a vision to serve multiple needs of the diocese. The diocesan centre consists of a chapel for regular worship, office for spiritual organizations, guest rooms, diocesan council room, conference rooms and quarters for staff and other inmates.
+                      The M.S. Seminary,Thazhakkara, Mavelikara was the temporary diocesan office and bishop's residence.Â  In view of having a permanent diocesan office and Aramana,1.22acres of land was purchasedin Thazhakkara villagein 2005. It has all the conveniences of a town with the serenity of a village and isstrategically located in proximity to Saint Mary's Orthodox Cathedral, Puthiyakavu, Mavelikara and the M.S. Seminary Thazhakkara.Under the guidance and leadership of the late lamented H.G.Paulose Mar PachomiosMetropolitan, abeautiful Aramana was constructed in 2008. The newly built Diocesan center, named TheobhavanAramana was consecrated by late H.H.Baselios Marthoma Didymus I Catholicos on 17thOctober, 2008.Along with serving as the residence of the metropolitan and the diocesan office, TheobhavanAramana is designed with a vision to serve multiple needs of the diocese. The diocesan centre consists of a chapel for regular worship, office for spiritual organizations, guest rooms, diocesan council room, conference rooms and quarters for staff and other inmates.
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       In 2018, the diocese purchased a prime land of 57 cents and a building adjacent to the Aramana, for future expansions. The office of the Orthodox Syrian Church Navajothy MOMs charitable society currently functions there.
@@ -70,7 +70,7 @@ const dioceseofmavelikaraPage = () => {
                       Aramana Family
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Rev.Fr.Joykutty Varghese serves as the present Aramana manager. Rev. Fr. Allen S. Mathew serves as the assistant Manager and supervises the agricultural works along with the day to day affairs. The Aramanahas a full-fledgedoffice with Rev.Fr. Dennis Samuel as theManager and principal secretary to the metropolitanand Sri.John Cherianas the accountant. The seminary aspirants reside at the aramana and undergo training with biblical and liturgical orientation under the guidance of the metropolitan. Deacons who completed their theological studies live in the Aramana and serve as secretary to the metropolitan.  Metropolitan's driver, a farmer and cook also reside at the Aramana making the family an extended one.  Life at the Aramana campus is rich and diverse with a cow and a brood of hens which provide for the needs of Aramana kitchen. The organic farming with a variety of vegetables and fruit trees helps to be self-sufficient to a great extent.
+                      Rev.Fr.Joykutty Varghese serves as the present Aramana manager. Rev. Fr. Allen S. Mathew serves as the assistant Manager and supervises the agricultural works along with the day to day affairs. The Aramanahas a full-fledgedoffice with Rev.Fr. Dennis Samuel as theManager and principal secretary to the metropolitanand Sri.John Cherianas the accountant. The seminary aspirants reside at the aramana and undergo training with biblical and liturgical orientation under the guidance of the metropolitan. Deacons who completed their theological studies live in the Aramana and serve as secretary to the metropolitan.Â  Metropolitan's driver, a farmer and cook also reside at the Aramana making the family an extended one.Â  Life at the Aramana campus is rich and diverse with a cow and a brood of hens which provide for the needs of Aramana kitchen. The organic farming with a variety of vegetables and fruit trees helps to be self-sufficient to a great extent.
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       Diocesan Mission
@@ -148,13 +148,13 @@ const dioceseofmavelikaraPage = () => {
                       href="/syro/dioceses/diocese-of-kottarakara-punalur" 
                       className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Kottarakara – Punalur
+                      Diocese of Kottarakara â€“ Punalur
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-adoor-kadampanadu" 
                       className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Adoor – Kadampanadu
+                      Diocese of Adoor â€“ Kadampanadu
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-thumpamon" 

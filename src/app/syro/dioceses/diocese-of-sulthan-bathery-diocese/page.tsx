@@ -17,7 +17,7 @@ const dioceseofsulthanbatherydiocesePage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
@@ -40,19 +40,19 @@ const dioceseofsulthanbatherydiocesePage = () => {
                   </h2>
 
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      In 1986,the diocese of Sultan Bathery is formed by organising all the churches  from the District of Wayanad, some of the churches from the Nilagiri District of Tamilnadu and some other churches in Kannur District which were formerly the part of Malabar Diocese.During its initial days the diocese was directly under the administration of the then catholicos His Holiness Baselius ....Fr.Mathai Nooranal was given the charge as the administrator .
+                      In 1986,the diocese of Sultan Bathery is formed by organising all the churchesÂ  from the District of Wayanad, some of the churches from the Nilagiri District of Tamilnadu and some other churches in Kannur District which were formerly the part of Malabar Diocese.During its initial days the diocese was directly under the administration of the then catholicos His Holiness Baselius ....Fr.Mathai Nooranal was given the charge as the administrator .
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      In 1991 H.G.Kuriakose mar Clemis Metropolitan took its charge as the First metropolitan of Bathery Diocese.The Head Quarters of the dioceses is Situated near Kozhikodu-  Mysore national Highway,300 metres away from Sulthan Bathery Town. Presently, there are 48 churches under the Diocese.
+                      In 1991 H.G.Kuriakose mar Clemis Metropolitan took its charge as the First metropolitan of Bathery Diocese.The Head Quarters of the dioceses is Situated near Kozhikodu-Â  Mysore national Highway,300 metres away from Sulthan Bathery Town.Â Presently, there are 48 churches under the Diocese.
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Address:  Nirmalagiri Aramana, Poomala, S. Bathery P.O, Wayanad- 673592
+                      Address: Â Nirmalagiri Aramana, Poomala, S. Bathery P.O, Wayanad- 673592
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       Ph: 04936 220969
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Email:  nirmalagiribathery@hotmail.com
+                      Email: Â nirmalagiribathery@hotmail.com
                     </p>
                 </div>
               </div>
@@ -91,13 +91,13 @@ const dioceseofsulthanbatherydiocesePage = () => {
                       href="/syro/dioceses/diocese-of-kottarakara-punalur" 
                       className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Kottarakara – Punalur
+                      Diocese of Kottarakara â€“ Punalur
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-adoor-kadampanadu" 
                       className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Adoor – Kadampanadu
+                      Diocese of Adoor â€“ Kadampanadu
                     </Link>
                   <Link 
                       href="/syro/dioceses/diocese-of-thumpamon" 

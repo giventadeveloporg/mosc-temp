@@ -23,7 +23,7 @@ const WelcomeSection = () => {
             preserve our sacred heritage, and serve our community with Christ&apos;s love.
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {features?.map((feature, index) => (
             <div key={index} className="text-center group">
               <div className="w-16 h-16 bg-syro-blue/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-syro-blue/20 transition-all duration-300">

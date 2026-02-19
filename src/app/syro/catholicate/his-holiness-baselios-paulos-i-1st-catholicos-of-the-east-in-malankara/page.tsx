@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import QuickLinks from '@/app/syro/components/QuickLinks';
 import SyroPageBanner from '@/app/syro/components/SyroPageBanner';
-import { SYRO_CATHOLICOS_LINKS } from '@/app/syro/catholicate/catholicosLinks';
+import { SYRO_CATHOLICATE_SIDEBAR_LINKS } from '@/app/syro/catholicate/catholicosLinks';
 
 export const metadata = {
   title: 'His Holiness Baselios Paulos I, The First Catholicos of the East in Malankara (1912–1913)',
@@ -94,11 +94,11 @@ const BaseliosPaulosIPage = () => {
                   <span>Back to The Catholicate</span>
                 </Link>
                 <div className="mt-3 space-y-1.5">
-                  {SYRO_CATHOLICOS_LINKS.map((catholicos) => (
+                  {SYRO_CATHOLICATE_SIDEBAR_LINKS.map((item) => (
                     <Link
-                      key={catholicos.name}
-                      href={catholicos.href}
-                      className={`block p-2 rounded-lg hover:bg-syro-bg-gray/50 transition-colors group leading-tight ${catholicos.href === '/syro/catholicate/his-holiness-baselios-paulos-i-1st-catholicos-of-the-east-in-malankara' ? 'bg-syro-blue/5 border border-syro-blue/20' : ''}`}
+                      key={item.name}
+                      href={item.href}
+                      className={`block p-2 rounded-lg hover:bg-syro-bg-gray/50 transition-colors group leading-tight ${item.href === '/syro/catholicate/his-holiness-baselios-paulos-i-1st-catholicos-of-the-east-in-malankara' ? 'bg-syro-blue/5 border border-syro-blue/20' : ''}`}
                     >
                       <div className="flex items-start space-x-2">
                         <div className="w-6 h-6 bg-syro-blue/10 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-syro-blue/20 transition-colors">
@@ -106,10 +106,10 @@ const BaseliosPaulosIPage = () => {
                         </div>
                         <div className="flex-1 min-w-0">
                           <h4 className="font-syro-display font-medium text-sm text-syro-dark-gray group-hover:text-syro-blue transition-colors leading-tight mt-0 mb-0">
-                            {catholicos.name}
+                            {item.name}
                           </h4>
-                          <p className="font-syro-primary text-xs text-syro-blue font-medium leading-tight mt-0 mb-0">{catholicos.period}</p>
-                          <p className="font-syro-primary text-xs text-[#798daf] leading-tight mt-0 mb-0">{catholicos.description}</p>
+                          {item.period ? <p className="font-syro-primary text-xs text-syro-blue font-medium leading-tight mt-0 mb-0">{item.period}</p> : null}
+                          {item.description ? <p className="font-syro-primary text-xs text-[#798daf] leading-tight mt-0 mb-0">{item.description}</p> : null}
                         </div>
                       </div>
                     </Link>

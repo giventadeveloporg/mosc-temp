@@ -4,17 +4,15 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 
 const QUICK_LINKS = [
-  { name: 'Spiritual Organisations', href: '/syro/spiritual-organizations' },
-  { name: 'Publications', href: '/syro/publications' },
-  { name: 'Institutions', href: '/syro/institutions' },
-  { name: 'Directory', href: '/syro/directory' },
-  { name: 'Training', href: '/syro/training' },
-  { name: 'Theological Seminaries', href: '/syro/theological-seminaries' },
-  { name: 'Lectionary', href: '/syro/lectionary' },
-  { name: 'Downloads', href: '/syro/downloads' },
-  { name: 'Calendar', href: '/syro/calendar' },
-  { name: 'Gallery', href: '/syro/gallery' },
+  { name: 'CATHOLICATE', href: '/syro/catholicate' },
+  { name: 'NEWS', href: '/syro/news' },
+  { name: 'DOWNLOADS', href: '/syro/downloads' },
+  { name: 'E-MAIL', href: '/syro/email' },
+  { name: 'GALLERY', href: '/syro/gallery' },
+  { name: 'CONTACT INFO', href: '/syro/contact-info' },
 ];
+
+const currentYear = () => new Date().getFullYear();
 
 export default function SyroFooter() {
   const [formData, setFormData] = useState({ full_name: '', email_address: '', phone_number: '', feedback: '' });
@@ -152,7 +150,7 @@ export default function SyroFooter() {
                 <Link href="/syro">Disclaimers</Link>
               </li>
               <li className="float-end copy-right">
-                <Link href="/syro">© 2026 The Malankara Orthodox Church. All rights reserved.</Link>
+                <Link href="/syro">© {currentYear()} The Malankara Orthodox Church. All rights reserved.</Link>
               </li>
             </ul>
           </div>
@@ -169,7 +167,7 @@ export default function SyroFooter() {
               </p>
               <p className="text-white text-center mb-2 d-block d-lg-none">Giventa Inc. USA</p>
               <p className="text-white text-center mb-2 d-block d-lg-none">
-                © 2026 The Malankara Orthodox Church. All rights reserved.
+                © {currentYear()} The Malankara Orthodox Church. All rights reserved.
               </p>
             </div>
           </div>

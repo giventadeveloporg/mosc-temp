@@ -121,7 +121,7 @@ export default function DsDemoDashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-syro-xl mb-syro-xxxl">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-syro-xl mb-syro-xxxl">
         {STATS.map((stat) => (
           <div
             key={stat.label}
@@ -299,7 +299,7 @@ export default function DsDemoDashboard() {
       {/* Quick Actions */}
       <div className="bg-syro-red/20 p-syro-xl rounded-[5px] mt-syro-xxxl">
         <h4 className="text-syro-h4 font-semibold text-syro-maroon mb-syro-xl">Quick Actions</h4>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-syro-lg">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-syro-lg">
           {QUICK_ACTIONS.map((action) => (
             <Link
               key={action.label}
