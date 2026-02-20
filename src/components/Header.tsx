@@ -747,7 +747,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                   />
                 </div>
                 <div className="text-left">
-                  <div className="header-logo-primary text-[1.375rem] leading-tight group-hover:text-[var(--header-accent-primary)] transition-colors duration-300">
+                  <div className="header-logo-brand text-[1.375rem] leading-tight inline-block">
                     MALAYALEES.US
                   </div>
                 </div>
@@ -1016,7 +1016,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
         <div className="flex flex-col h-full">
           {/* Mobile Menu Header */}
           <div className="flex items-center justify-between p-5 border-b border-[var(--header-border)]">
-            <Link href="/" className="flex items-center gap-2.5" onClick={closeMobileMenu}>
+            <Link href="/" className="group flex items-center gap-2.5" onClick={closeMobileMenu}>
               <div className="flex items-center justify-center w-[86px] min-w-[86px] h-14 rounded-lg flex-shrink-0 overflow-hidden">
                 <Image
                   src="/images/logos/Malayalees_US/Malayalees_US_Header_Branding.png"
@@ -1027,7 +1027,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                 />
               </div>
               <div className="text-left">
-                <div className="header-logo-primary text-lg leading-tight">
+                <div className="header-logo-brand text-lg leading-tight inline-block">
                   MALAYALEES.US
                 </div>
               </div>

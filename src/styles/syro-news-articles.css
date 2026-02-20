@@ -68,10 +68,10 @@ a:hover .syro-article-card-title {
   flex-shrink: 0;
 }
 
-/* ---- News detail: article title (h1) – design system h1 2.8rem/700 #0b2848 ---- */
+/* ---- News detail: article title (h1) – half of design system h1 (1.4rem) ---- */
 .syro-article-detail-title {
   font-family: 'Poppins', 'Noto Sans Malayalam UI', 'Open Sans', Helvetica, Arial, sans-serif !important;
-  font-size: 2.8rem !important;
+  font-size: 1.4rem !important;
   font-weight: 700 !important;
   color: var(--syro-news-heading) !important;
   line-height: 1.2 !important;

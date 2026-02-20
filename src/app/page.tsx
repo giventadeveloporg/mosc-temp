@@ -261,13 +261,7 @@ function HomePageContent() {
   return (
     <main>
       <HeroSection />
-      {/* Temporary site banner */}
-      <div className="w-full bg-green-700 text-white py-0 md:py-0.5">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <span className="text-2xl md:text-4xl font-bold tracking-wider">MOSC-TEMP</span>
-        </div>
-      </div>
-      <div className="-mt-3 md:-mt-4">
+      <div>
         <ErrorBoundary fallback={<EventsFallback />}>
           <LiveEventsSection />
         </ErrorBoundary>

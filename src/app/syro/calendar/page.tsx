@@ -24,10 +24,10 @@ export default function CalendarPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <a
-              href="http://calendar.mosc.in/"
+              href="/calendar"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center px-8 py-4 bg-syro-red text-syro-red-foreground font-syro-primary font-semibold text-lg rounded-lg hover:bg-syro-red/90 transition-all duration-300 shadow-syro-card hover:shadow-syro-card-hover border-r-4 border-[#be1929]"
+              className="inline-flex items-center px-8 py-4 bg-syro-red text-white font-syro-primary font-semibold text-lg rounded-lg hover:bg-syro-red/90 transition-all duration-300 shadow-syro-card hover:shadow-syro-card-hover border-r-4 border-[#be1929]"
             >
               <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -116,10 +116,10 @@ export default function CalendarPage() {
               The official calendar is maintained on a dedicated platform for easy viewing and regular updates with all liturgical dates, feast days, and special observances. Click below to access the interactive church calendar.
             </p>
             <a
-              href="http://calendar.mosc.in/"
+              href="/calendar"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center px-8 py-4 bg-syro-red text-syro-red-foreground font-syro-primary font-semibold text-lg rounded-lg hover:bg-syro-red/90 transition-all duration-300 shadow-syro-card hover:shadow-syro-card-hover"
+              className="inline-flex items-center px-8 py-4 bg-syro-red text-white font-syro-primary font-semibold text-lg rounded-lg hover:bg-syro-red/90 transition-all duration-300 shadow-syro-card hover:shadow-syro-card-hover"
             >
               <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />

@@ -223,12 +223,12 @@ function BishopCard({ bishop }: { bishop: Bishop }) {
     <li className="h-full bg-white rounded-lg p-4 sacred-shadow-sm hover:sacred-shadow reverent-transition border-l-4 border-syro-red shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]">
       <Link href={`/syro/directory/bishops/${bishop.documentId}`} className="flex gap-4 group h-full">
         {bishop.imageUrl && (
-          <div className="relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-syro-bg-gray">
+          <div className="relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden flex items-center justify-center">
             <Image
               src={bishop.imageUrl}
               alt={bishop.imageAlt ?? bishop.name}
               fill
-              className="object-cover"
+              className="object-contain object-center"
               sizes="80px"
             />
           </div>

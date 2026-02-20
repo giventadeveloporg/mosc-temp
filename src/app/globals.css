@@ -53,6 +53,21 @@
   transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Header brand text (MALAYALEES.US) - always purple, shadow and hover animation */
+.header-logo-brand {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: #7c3aed; /* purple-600 */
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.12));
+  transition: filter 0.3s ease-out, transform 0.3s ease-out;
+  transform-origin: left;
+}
+.group:hover .header-logo-brand {
+  filter: drop-shadow(0 2px 12px rgba(88, 28, 135, 0.4));
+  transform: scale(1.05);
+}
+
 .header-logo-secondary {
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   font-weight: 500;
@@ -471,9 +486,9 @@ nav[role="navigation"] .group {
   }
 }
 
-/* Hero left image: fill container (no empty padding around image) */
+/* Hero left image: full image visible, centered, no crop */
 .hero-left-image img {
-  object-fit: cover !important;
+  object-fit: contain !important;
   object-position: center center !important;
   width: 100% !important;
   height: 100% !important;
@@ -690,22 +705,25 @@ nav[role="navigation"] .group {
    BOTTOM ROW (div[2]) - 20% of hero: Mission + Donate cards
    ======================================== */
 
-/* Bottom row: ~18% of hero (20% total for bottom area including browse link) */
+/* Bottom row: ~18% of hero, two boxes centered in a single line at half width */
 .hero-bottom-row {
   flex: 0 0 18%;
   min-height: 0;
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 1rem;
-  max-width: 1400px;
   margin: 0 auto;
   width: 100%;
 }
 
 @media (min-width: 640px) {
   .hero-bottom-row {
-    grid-template-columns: 1fr 1fr;
+    flex-direction: row;
+    align-items: stretch;
     gap: 1rem;
     padding: 0.75rem 1.5rem;
   }
@@ -718,14 +736,23 @@ nav[role="navigation"] .group {
   }
 }
 
-/* Bottom cards: visibly bigger than minimal strip, still hero fits viewport */
+/* Bottom cards: full width when stacked (mobile), half width when in a row */
 .hero-bottom-card {
   position: relative;
+  width: 100%;
+  max-width: 340px;
   min-height: 88px;
   max-height: 120px;
   border-radius: 1rem;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (min-width: 640px) {
+  .hero-bottom-card {
+    width: 50%;
+    max-width: 340px;
+  }
 }
 
 @media (min-width: 768px) {
