@@ -742,14 +742,14 @@ const HeroSection: React.FC = () => {
       <div className="hero-split-row">
         {/* LEFT PANEL (Section 1): Static Kerala Image - Full visibility, elegant frame */}
         <div className="hero-left-panel">
-          {/* Image container - object-contain for full image visibility */}
-          <div className="hero-left-image">
+          {/* Image container - object-contain for full image visibility, centered */}
+          <div className="hero-left-image flex items-center justify-center">
             <Image
               src="/images/hero_section/wooden-boat-under-coconut-tree-riverside_ver_2.jpeg"
               alt="Malayalees.US - Kerala Backwaters"
               width={600}
               height={800}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain object-center"
               sizes="(max-width: 768px) 100vw, 35vw"
               priority
               style={{

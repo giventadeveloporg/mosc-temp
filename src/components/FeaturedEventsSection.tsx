@@ -58,8 +58,8 @@ const FeaturedEventsSection: React.FC = () => {
     <section className="py-0 md:py-0.5 bg-gradient-to-r from-blue-50 to-indigo-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header - Yellow bar and label only (h2 removed per request) */}
-        <div className="mb-16">
-          <div className="flex items-center space-x-2 mb-6">
+        <div className="mt-4 mb-4">
+          <div className="flex items-center space-x-2 mb-0">
             <div className="w-5 h-2 bg-yellow-400 rounded"></div>
             <p className="text-gray-600">Featured</p>
           </div>

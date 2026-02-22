@@ -84,7 +84,14 @@ export default clerkMiddleware(
       await auth.protect();
     }
 
-    const resolvedAuth = await auth();
+    // PERFORMANCE: Only resolve auth() for non-public routes.
+    // auth() makes a network call to Clerk API (~300-800ms on Lambda cold start).
+    // Public routes (/, /syro, /events, etc.) don't need auth state in middleware,
+    // so skipping this call saves significant latency on the critical render path.
+    let resolvedAuth: { userId?: string | null; sessionId?: string | null } | null = null;
+    if (!isPublicRouteClerk(req)) {
+      resolvedAuth = await auth();
+    }
     debugLog('[MIDDLEWARE] afterAuth called for:', pathname);
     debugLog('[MIDDLEWARE] Auth state:', { userId: resolvedAuth?.userId ?? null, sessionId: resolvedAuth?.sessionId ?? null });
 

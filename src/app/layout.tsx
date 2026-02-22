@@ -98,8 +98,10 @@ export default async function RootLayout({
 
   // Determine tenant-scoped admin flag on the server
   // Perform auth + profile lookup whenever we have a pathname so Header gets correct isTenantAdmin on every page.
-  // Skip auth on /mosc/* and /syro/* (section routes with their own layout).
-  const skipAuthForRoute = pathname.startsWith('/mosc') || pathname.startsWith('/syro');
+  // Skip auth on public landing routes — they don't need isTenantAdmin and the auth + profile
+  // lookup chain (auth() → currentUser() → 1-3 fetch calls) adds 1-3s of blocking latency
+  // on Lambda cold starts. The home page is 'use client' and /syro has its own layout.
+  const skipAuthForRoute = pathname === '/' || pathname.startsWith('/mosc') || pathname.startsWith('/syro');
   if (pathname && !skipAuthForRoute) {
     try {
       // CRITICAL: Call auth() immediately after awaiting headers() to ensure proper async context

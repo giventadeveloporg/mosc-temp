@@ -42,91 +42,81 @@ export default async function BishopDetailPage({ params }: PageProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Link
             href="/syro/directory/bishops"
-            className="font-body text-syro-blue hover:underline mb-4 inline-block"
+            className="font-body text-syro-red hover:underline mb-4 inline-block"
           >
-            ← Bishops
+            ← Back to Bishops
           </Link>
-          <div className="flex flex-col sm:flex-row gap-6 items-start">
-            {bishop.imageUrl && (
-              <div className="relative w-40 h-40 flex-shrink-0 rounded-xl overflow-hidden bg-syro-bg-gray sacred-shadow">
-                <Image
-                  src={bishop.imageUrl}
-                  alt={bishop.imageAlt ?? bishop.name}
-                  fill
-                  className="object-cover"
-                  sizes="160px"
-                  priority
-                />
-              </div>
-            )}
-            <div className="min-w-0 flex-1">
-              <h1 className="font-heading font-semibold text-2xl lg:text-3xl text-syro-blue">
-                {bishop.name}
-              </h1>
-              {bishop.dioceseName && (
-                <p className="font-body text-syro-dark-gray mt-1">
-                  {bishop.dioceseName}
-                </p>
-              )}
-              <p className="font-body text-sm text-syro-dark-gray mt-2 capitalize">
-                {bishop.bishopType.replace(/-/g, ' ')}
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-12 bg-syro-bg-gray">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-lg p-6 sacred-shadow-sm border-l-4 border-syro-red space-y-4 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]">
-            {bishop.address && (
-              <div>
-                <h3 className="font-heading font-medium text-syro-blue mb-1">Address</h3>
-                <p className="font-body text-syro-dark-gray whitespace-pre-line">
-                  {bishop.address
-                    .split(/[,\n]+/)
-                    .map((s) => s.trim())
-                    .filter(Boolean)
-                    .join('\n')}
-                </p>
-              </div>
-            )}
-            {bishop.email && (
-              <div>
-                <h3 className="font-heading font-medium text-syro-blue mb-1">Email</h3>
-                <div className="font-body text-syro-blue space-y-1">
-                  {bishop.email
-                    .split(/[,\n]+/)
-                    .map((s) => s.trim())
-                    .filter(Boolean)
-                    .map((email) => (
-                      <a key={email} href={`mailto:${email}`} className="hover:underline block">
-                        {email}
-                      </a>
-                    ))}
+          <div className="bg-white rounded-lg sacred-shadow-sm border-l-4 border-syro-red shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] overflow-hidden">
+            <div className="flex flex-col sm:flex-row gap-6 p-6 items-stretch">
+              {bishop.imageUrl && (
+                <div className="relative w-full min-h-[12rem] sm:w-[35%] sm:min-h-0 flex-shrink-0 rounded-xl overflow-hidden sacred-shadow self-stretch flex items-center justify-center">
+                  <Image
+                    src={bishop.imageUrl}
+                    alt={bishop.imageAlt ?? bishop.name}
+                    fill
+                    className="object-contain object-center"
+                    sizes="(min-width: 1024px) 560px, (min-width: 640px) 35vw, 100vw"
+                    quality={95}
+                    priority
+                  />
                 </div>
+              )}
+              <div className="min-w-0 flex-1 space-y-4">
+                <div>
+                  <h1 className="font-heading font-semibold text-2xl lg:text-3xl text-syro-blue">
+                    {bishop.name}
+                  </h1>
+                  {bishop.dioceseName && (
+                    <p className="font-body text-syro-dark-gray mt-1">
+                      {bishop.dioceseName}
+                    </p>
+                  )}
+                  <p className="font-body text-sm text-syro-dark-gray mt-2 capitalize">
+                    {bishop.bishopType.replace(/-/g, ' ')}
+                  </p>
+                </div>
+                {bishop.address && (
+                  <div>
+                    <h3 className="font-heading font-medium text-sm text-syro-blue mb-1">Address</h3>
+                    <p className="font-body text-syro-dark-gray whitespace-pre-line">
+                      {bishop.address
+                        .split(/[,\n]+/)
+                        .map((s) => s.trim())
+                        .filter(Boolean)
+                        .join('\n')}
+                    </p>
+                  </div>
+                )}
+                {bishop.email && (
+                  <div>
+                    <h3 className="font-heading font-medium text-sm text-syro-blue mb-1">Email</h3>
+                    <div className="font-body text-syro-blue space-y-1">
+                      {bishop.email
+                        .split(/[,\n]+/)
+                        .map((s) => s.trim())
+                        .filter(Boolean)
+                        .map((email) => (
+                          <a key={email} href={`mailto:${email}`} className="hover:underline block">
+                            {email}
+                          </a>
+                        ))}
+                    </div>
+                  </div>
+                )}
+                {bishop.phones && (
+                  <div>
+                    <h3 className="font-heading font-medium text-sm text-syro-blue mb-1">Phone(s)</h3>
+                    <p className="font-body text-syro-dark-gray whitespace-pre-line">
+                      {bishop.phones
+                        .split(/[,\n]+/)
+                        .map((s) => s.trim())
+                        .filter(Boolean)
+                        .join('\n')}
+                    </p>
+                  </div>
+                )}
               </div>
-            )}
-            {bishop.phones && (
-              <div>
-                <h3 className="font-heading font-medium text-syro-blue mb-1">Phone(s)</h3>
-                <p className="font-body text-syro-dark-gray whitespace-pre-line">
-                  {bishop.phones
-                    .split(/[,\n]+/)
-                    .map((s) => s.trim())
-                    .filter(Boolean)
-                    .join('\n')}
-                </p>
-              </div>
-            )}
-          </div>
-          <div className="mt-8">
-            <Link
-              href="/syro/directory/bishops"
-              className="font-body text-syro-blue font-medium hover:underline inline-flex items-center gap-1"
-            >
-              ← Back to Bishops
-            </Link>
+            </div>
           </div>
         </div>
       </section>
