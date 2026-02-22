@@ -182,6 +182,12 @@ const nextConfig = {
     NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_ID: process.env.NEXT_PUBLIC_GIVEBUTTER_CAMPAIGN_ID,
     NEXT_PUBLIC_GIVEBUTTER_WIDGET_ID: process.env.NEXT_PUBLIC_GIVEBUTTER_WIDGET_ID,
 
+    // Memberstack (member portal; client-side widget uses public key; optional plan/price IDs for signup and checkout)
+    NEXT_PUBLIC_MEMBERSTACK_PUBLIC_KEY: process.env.NEXT_PUBLIC_MEMBERSTACK_PUBLIC_KEY,
+    NEXT_PUBLIC_MEMBERSTACK_PROJECT_ID: process.env.NEXT_PUBLIC_MEMBERSTACK_PROJECT_ID,
+    NEXT_PUBLIC_MEMBERSTACK_FREE_PLAN_ID: process.env.NEXT_PUBLIC_MEMBERSTACK_FREE_PLAN_ID,
+    NEXT_PUBLIC_MEMBERSTACK_BRONZE_PRICE_ID: process.env.NEXT_PUBLIC_MEMBERSTACK_BRONZE_PRICE_ID,
+
     // Additional environment variables required in production
     CLERK_WEBHOOK_SECRET: process.env.CLERK_WEBHOOK_SECRET,
     DATABASE_URL: process.env.DATABASE_URL,

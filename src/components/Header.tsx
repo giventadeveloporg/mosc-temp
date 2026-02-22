@@ -33,6 +33,7 @@ const navItems = [
       { name: 'Polls', href: '/polls' },
       { name: 'Focus Groups', href: '/focus-groups' },
       { name: 'Profile', href: '/profile', requiresAuth: true },
+      { name: 'Members', href: '/member-portal', requiresAuth: true },
       { name: 'Membership', href: '/membership' },
       { name: 'MOSC', href: '/syro' }
     ]
