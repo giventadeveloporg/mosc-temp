@@ -1,27 +1,32 @@
 import React from 'react';
 import Image from 'next/image';
-import SynodMembersSidebar from '@/components/holy-synod/SynodMembersSidebar';
-import QuickLinks from '@/components/holy-synod/QuickLinks';
+import SynodMembersSidebar from '../../components/SynodMembersSidebar';
+import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata = {
   title: 'H.G. Geevarghese Mar Philoxenos Metropolitan',
-  description: 'Biography and information about H.G. Geevarghese Mar Philoxenos Metropolitan.',
+  description: 'His Grace Geevarghese Mar Philoxenos, Metropolitan of Madras diocese. PhD Brisbane College of Theology; ordained Metropolitan 2022.',
 };
 
 const HGGeevargheseMarPhilaxenosMetropolitanPage = () => {
   return (
-    <div className="bg-background">
+    <div className="bg-syro-bg-gray">
+      <SyroPageBanner
+        title="H.G. Geevarghese Mar Philoxenos Metropolitan"
+        breadcrumbFrom="holy-synod"
+      />
       {/* Main Content */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
-              <div className="bg-background rounded-lg sacred-shadow p-8">
+              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 <div className="flex flex-col md:flex-row gap-8">
                   {/* Featured Portrait - Left Side - Large Display */}
                   <div className="flex-shrink-0 flex justify-center md:justify-start">
-                    <div className="relative w-72 h-[28rem] md:w-80 md:h-[32rem] lg:w-96 lg:h-[36rem] rounded-lg overflow-hidden sacred-shadow-lg">
+                    <div className="relative w-72 h-[28rem] md:w-80 md:h-[32rem] lg:w-96 lg:h-[36rem] rounded-lg overflow-hidden shadow-syro-card-hover">
                       <Image
                         src="/images/holy-synod/Geevarghese-Mar-Philaxenos.png"
                         alt="H.G. Geevarghese Mar Philoxenos Metropolitan"
@@ -38,22 +43,22 @@ const HGGeevargheseMarPhilaxenosMetropolitanPage = () => {
 
                   {/* Content - Right Side of Image */}
                   <div className="flex-1">
-                    <h3 className="font-heading font-semibold text-2xl text-foreground mb-6">
+                    <h3 className="font-syro-display font-semibold text-2xl text-syro-blue mb-6">
                       H.G. Geevarghese Mar Philoxenos Metropolitan
                     </h3>
 
                     <div className="prose prose-lg max-w-none">
-                      <p className="font-body text-muted-foreground leading-relaxed mb-4">
-                        H. G. Geevarghese Mar Philoxenos Metropolitan was born in Maleth house, Arattupuzha as the son of Mr. M. G. George and Mrs. Accamma on 30 th May 1972 . His Grace belongs to the parish of St. Mary’s Church, Arattupuzha under Chengannur diocese. His Grace completed his primary education from Metropolitan High School, Puthenkavu (1987), following which he completed Pre-Degree (1989) from Christian College, Chengannur. Completed degree in Economics (1991-94) from Catholicate college, Pathanamthitta, and Postgraduation in Economics (1994-96) from Institute of Economics, Thiruvalla, he joined Old Seminary, Kottayam and completed GST and BD (1996-2000). Later, he took his PhD from Brisbane College of Theology (2011-13). He was ordained sub-deaconship on 1999, by H.G. Dr. Yacob Mar Irenios Metropolitan at St. Mary’s Church, Arattupuzha. He was ordained deaconship (2000),and priesthood (17 th May 2000) at Mount Tabor Dayara, Pathanapuram . He was chosen as a Metropolitan in the Malankara Syrian Christian Association held on 25 th February 2022 at Kolencherry. He received the status of Ramban on 2 nd June 2022 at the Parumala Seminary. He was ordained as a Metropolitan by the name ‘Mar Philoxenos’ by H.H. Baselios Mar Thoma Mathews III Catholicos on 28 th July 2022 at St. Mary’s Cathedral, Pazhanji. H.G. has taken charge of Madras diocese as Metropolitan since 3 rd November 2022.
+                      <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
+                        H. G. Geevarghese Mar Philoxenos Metropolitan was born in Maleth house, Arattupuzha as the son of Mr. M. G. George and Mrs. Accamma on 30 May 1972. His Grace belongs to the parish of St. Maryâ€™s Church, Arattupuzha under Chengannur diocese. His Grace completed his primary education from Metropolitan High School, Puthenkavu (1987), following which he completed Pre-Degree (1989) from Christian College, Chengannur. Completed degree in Economics (1991-94) from Catholicate college, Pathanamthitta, and Postgraduation in Economics (1994-96) from Institute of Economics, Thiruvalla, he joined Old Seminary, Kottayam and completed GST and BD (1996-2000). Later, he took his PhD from Brisbane College of Theology (2011-13). He was ordained sub-deaconship in 1999, by H.G. Dr. Yacob Mar Irenios Metropolitan at St. Maryâ€™s Church, Arattupuzha. He was ordained deaconship (2000), and priesthood on 17 May 2000 at Mount Tabor Dayara, Pathanapuram. He was chosen as a Metropolitan in the Malankara Syrian Christian Association held on 25 February 2022 at Kolencherry. He received the status of Ramban on 2 June 2022 at the Parumala Seminary. He was ordained as a Metropolitan by the name â€˜Mar Philoxenosâ€™ by H.H. Baselios Mar Thoma Mathews III Catholicos on 28 July 2022 at St. Maryâ€™s Cathedral, Pazhanji. H.G. has taken charge of Madras diocese as Metropolitan since 3 November 2022.
                       </p>
 
-                      <div className="mt-6 pt-6 border-t border-border">
-                        <p className="font-body text-muted-foreground leading-relaxed mb-2">
-                          Address: Bishop\'s House 4/51, Rajeswari Street, Mehta Nagar, Chennai - 600029.
-                        </p>
-                        <p className="font-body text-muted-foreground leading-relaxed mb-2">
-                          Mob: +91 7025168747 E-mail: madrasorthodoxdiocese@gmail.com
-                        </p>
+                      <h4 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
+                        Contact
+                      </h4>
+                      <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
+                        <p>Bishop&apos;s House, 4/51 Rajeswari Street, Mehta Nagar, Chennai â€“ 600029</p>
+                        <p>Mobile: +91 7025168747</p>
+                        <p>Email: madrasorthodoxdiocese@gmail.com</p>
                       </div>
                     </div>
                   </div>

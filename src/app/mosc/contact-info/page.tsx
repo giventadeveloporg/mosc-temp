@@ -1,4 +1,7 @@
 import React from 'react';
+import QuickLinks from '../components/QuickLinks';
+import SyroPageHero from '../components/SyroPageHero';
+import SyroSectionTitle from '../components/SyroSectionTitle';
 
 export const metadata = {
   title: 'Contact Info | MOSC',
@@ -35,47 +38,22 @@ const ContactInfoPage = () => {
   };
 
   return (
-    <div className="bg-background">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-background to-muted min-h-[400px] flex items-center">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-primary rounded-lg flex items-center justify-center mx-auto mb-6 sacred-shadow-lg">
-              <svg 
-                className="w-10 h-10 text-primary-foreground" 
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" 
-                />
-              </svg>
-            </div>
-            <h1 className="font-heading font-semibold text-4xl md:text-5xl text-foreground mb-4">
-              Contact Info
-            </h1>
-            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Get in touch with the Malankara Orthodox Syrian Church headquarters. We're here to serve you and answer your questions.
-            </p>
-          </div>
-        </div>
-      </section>
+    <div className="bg-syro-bg-gray">
+      <SyroPageHero
+        title="Contact Info"
+        description="Get in touch with the Malankara Orthodox Syrian Church headquarters. We're here to serve you and answer your questions."
+      />
 
-      {/* Contact Information Section */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <SyroSectionTitle>Contact Information</SyroSectionTitle>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
             {/* Address Card */}
-            <div className="bg-background rounded-lg sacred-shadow p-8">
+            <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
               <div className="flex items-center space-x-3 mb-6">
-                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                <div className="w-12 h-12 bg-syro-red/10 rounded-lg flex items-center justify-center">
                   <svg 
-                    className="w-6 h-6 text-primary" 
+                    className="w-6 h-6 text-syro-red" 
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
@@ -95,15 +73,15 @@ const ContactInfoPage = () => {
                     />
                   </svg>
                 </div>
-                <h2 className="font-heading font-semibold text-2xl text-foreground">
+                <h2 className="font-syro-display font-semibold text-2xl text-syro-blue">
                   Address
                 </h2>
               </div>
               <div className="space-y-2">
-                <p className="font-body font-semibold text-lg text-foreground">
+                <p className="font-syro-primary font-semibold text-lg text-syro-blue">
                   {contactInfo.organization}
                 </p>
-                <div className="font-body text-muted-foreground leading-relaxed">
+                <div className="font-syro-primary text-syro-dark-gray leading-relaxed">
                   <p>{contactInfo.address.building}</p>
                   <p>{contactInfo.address.postOffice}</p>
                   <p>(Via.) {contactInfo.address.via}</p>
@@ -114,11 +92,11 @@ const ContactInfoPage = () => {
             </div>
 
             {/* Phone Card */}
-            <div className="bg-background rounded-lg sacred-shadow p-8">
+            <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
               <div className="flex items-center space-x-3 mb-6">
-                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                <div className="w-12 h-12 bg-syro-red/10 rounded-lg flex items-center justify-center">
                   <svg 
-                    className="w-6 h-6 text-primary" 
+                    className="w-6 h-6 text-syro-red" 
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
@@ -132,7 +110,7 @@ const ContactInfoPage = () => {
                     />
                   </svg>
                 </div>
-                <h2 className="font-heading font-semibold text-2xl text-foreground">
+                <h2 className="font-syro-display font-semibold text-2xl text-syro-blue">
                   Phone
                 </h2>
               </div>
@@ -140,7 +118,7 @@ const ContactInfoPage = () => {
                 <div>
                   <a 
                     href={`tel:+91${contactInfo.phone.primary.replace(/\s/g, '')}`}
-                    className="font-body text-lg text-primary hover:text-accent reverent-transition block"
+                    className="font-syro-primary text-lg text-syro-red hover:text-accent transition-all duration-300 block"
                   >
                     {contactInfo.phone.primary}
                   </a>
@@ -148,7 +126,7 @@ const ContactInfoPage = () => {
                 <div>
                   <a 
                     href={`tel:+91${contactInfo.phone.secondary.replace(/\s/g, '')}`}
-                    className="font-body text-lg text-primary hover:text-accent reverent-transition block"
+                    className="font-syro-primary text-lg text-syro-red hover:text-accent transition-all duration-300 block"
                   >
                     {contactInfo.phone.secondary}
                   </a>
@@ -160,11 +138,11 @@ const ContactInfoPage = () => {
           {/* Email Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto mt-8">
             {/* Catholicos Email */}
-            <div className="bg-background rounded-lg sacred-shadow p-8">
+            <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
               <div className="flex items-center space-x-3 mb-6">
-                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                <div className="w-12 h-12 bg-syro-red/10 rounded-lg flex items-center justify-center">
                   <svg 
-                    className="w-6 h-6 text-primary" 
+                    className="w-6 h-6 text-syro-red" 
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
@@ -178,14 +156,14 @@ const ContactInfoPage = () => {
                     />
                   </svg>
                 </div>
-                <h2 className="font-heading font-semibold text-xl text-foreground">
+                <h2 className="font-syro-display font-semibold text-xl text-syro-blue">
                   {contactInfo.email.catholicos.label}
                 </h2>
               </div>
               <div>
                 <a 
                   href={`mailto:${contactInfo.email.catholicos.address}`}
-                  className="font-body text-lg text-primary hover:text-accent reverent-transition"
+                  className="font-syro-primary text-lg text-syro-red hover:text-accent transition-all duration-300"
                 >
                   {contactInfo.email.catholicos.address}
                 </a>
@@ -193,11 +171,11 @@ const ContactInfoPage = () => {
             </div>
 
             {/* PRO Email */}
-            <div className="bg-background rounded-lg sacred-shadow p-8">
+            <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
               <div className="flex items-center space-x-3 mb-6">
-                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                <div className="w-12 h-12 bg-syro-red/10 rounded-lg flex items-center justify-center">
                   <svg 
-                    className="w-6 h-6 text-primary" 
+                    className="w-6 h-6 text-syro-red" 
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
@@ -211,20 +189,21 @@ const ContactInfoPage = () => {
                     />
                   </svg>
                 </div>
-                <h2 className="font-heading font-semibold text-xl text-foreground">
+                <h2 className="font-syro-display font-semibold text-xl text-syro-blue">
                   {contactInfo.email.pro.label}
                 </h2>
               </div>
               <div>
                 <a 
                   href={`mailto:${contactInfo.email.pro.address}`}
-                  className="font-body text-lg text-primary hover:text-accent reverent-transition"
+                  className="font-syro-primary text-lg text-syro-red hover:text-accent transition-all duration-300"
                 >
                   {contactInfo.email.pro.address}
                 </a>
               </div>
             </div>
           </div>
+          <QuickLinks />
         </div>
       </section>
     </div>

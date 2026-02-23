@@ -6,7 +6,7 @@ import Link from 'next/link';
  */
 export default function DiocesesQuickLinksNav() {
   const linkClass =
-    'block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition';
+    'block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300';
   const links = [
     { href: '/mosc/holy-synod', label: 'Holy Synod' },
     { href: '/mosc/ecumenical', label: 'Ecumenical Relations' },
@@ -21,8 +21,8 @@ export default function DiocesesQuickLinksNav() {
     { href: '/mosc/faqs', label: 'FAQs' },
   ];
   return (
-    <div className="bg-background rounded-lg sacred-shadow p-6">
-      <h3 className="font-heading font-semibold text-lg text-foreground mb-4">Quick Links</h3>
+    <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-6">
+      <h3 className="font-syro-display font-semibold text-lg text-syro-blue mb-4">Quick Links</h3>
       <nav className="space-y-2">
         {links.map(({ href, label }) => (
           <Link key={href} href={href} className={linkClass}>

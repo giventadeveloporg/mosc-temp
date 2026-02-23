@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import DiocesesQuickLinksNav from '../DiocesesQuickLinksNav';
+import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata = {
   title: 'Diocese of Sulthan Bathery',
@@ -10,31 +11,16 @@ export const metadata = {
 
 const dioceseofsulthanbatherydiocesePage = () => {
   return (
-    <div className="bg-background">
-      {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-br from-background to-muted">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-primary rounded-lg flex items-center justify-center mx-auto mb-6 sacred-shadow-lg">
-              <span className="text-primary-foreground text-4xl font-bold" role="img" aria-label="Diocese">⛪</span>
-            </div>
-            <h1 className="font-heading font-semibold text-4xl text-foreground mb-4">
-              Diocese of Sulthan Bathery
-            </h1>
-            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Kerala Diocese of the Malankara Orthodox Syrian Church
-            </p>
-          </div>
-        </div>
-      </section>
+    <div className="bg-syro-bg-gray">
+      <SyroPageBanner title="Diocese of Sulthan Bathery" breadcrumbFrom="dioceses" />
 
       {/* Main Content */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
-              <div className="bg-background rounded-lg sacred-shadow p-8">
+              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 {/* Featured Image */}
                 <div className="mb-8">
                   <Image
@@ -42,31 +28,31 @@ const dioceseofsulthanbatherydiocesePage = () => {
                     alt="Diocese of Sulthan Bathery"
                     width={500}
                     height={300}
-                    className="rounded-lg sacred-shadow w-full h-auto"
+                    className="rounded-lg shadow-syro-card w-full h-auto"
                     priority
                   />
                 </div>
 
                 {/* Content */}
                 <div className="prose prose-lg max-w-none">
-                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-6">
+                  <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-6">
                     Diocese of Sulthan Bathery
                   </h2>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      In 1986,the diocese of Sultan Bathery is formed by organising all the churches  from the District of Wayanad, some of the churches from the Nilagiri District of Tamilnadu and some other churches in Kannur District which were formerly the part of Malabar Diocese.During its initial days the diocese was directly under the administration of the then catholicos His Holiness Baselius ....Fr.Mathai Nooranal was given the charge as the administrator .
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
+                      In 1986,the diocese of Sultan Bathery is formed by organising all the churchesÂ  from the District of Wayanad, some of the churches from the Nilagiri District of Tamilnadu and some other churches in Kannur District which were formerly the part of Malabar Diocese.During its initial days the diocese was directly under the administration of the then catholicos His Holiness Baselius ....Fr.Mathai Nooranal was given the charge as the administrator .
                     </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      In 1991 H.G.Kuriakose mar Clemis Metropolitan took its charge as the First metropolitan of Bathery Diocese.The Head Quarters of the dioceses is Situated near Kozhikodu-  Mysore national Highway,300 metres away from Sulthan Bathery Town. Presently, there are 48 churches under the Diocese.
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
+                      In 1991 H.G.Kuriakose mar Clemis Metropolitan took its charge as the First metropolitan of Bathery Diocese.The Head Quarters of the dioceses is Situated near Kozhikodu-Â  Mysore national Highway,300 metres away from Sulthan Bathery Town.Â Presently, there are 48 churches under the Diocese.
                     </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      Address:  Nirmalagiri Aramana, Poomala, S. Bathery P.O, Wayanad- 673592
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
+                      Address: Â Nirmalagiri Aramana, Poomala, S. Bathery P.O, Wayanad- 673592
                     </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       Ph: 04936 220969
                     </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                      Email:  nirmalagiribathery@hotmail.com
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
+                      Email: Â nirmalagiribathery@hotmail.com
                     </p>
                 </div>
               </div>
@@ -74,144 +60,144 @@ const dioceseofsulthanbatherydiocesePage = () => {
 
             {/* Sidebar */}
             <div className="lg:col-span-1">
-              <div className="bg-background rounded-lg sacred-shadow p-6 mb-6">
-                <h3 className="font-heading font-semibold text-lg text-foreground mb-4">
+              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-6 mb-6">
+                <h3 className="font-syro-display font-semibold text-lg text-syro-blue mb-4">
                   Dioceses
                 </h3>
                 <nav className="space-y-2">
                   <Link 
                     href="/mosc/dioceses" 
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
+                    className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                   >
                     Dioceses Overview
                   </Link>
-                  <div className="border-t border-border my-2"></div>
-                  <div className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                  <div className="border-t border-syro-table-border my-2"></div>
+                  <div className="px-3 py-2 text-xs font-semibold text-syro-dark-gray uppercase tracking-wide">
                     Kerala Dioceses
                   </div>
                   <Link 
                       href="/mosc/dioceses/diocese-of-thiruvananthapuram-diocese" 
-                      className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
+                      className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
                       Diocese of Thiruvananthapuram
                     </Link>
                   <Link 
                       href="/mosc/dioceses/diocese-of-kollam" 
-                      className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
+                      className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
                       Diocese of Kollam
                     </Link>
                   <Link 
                       href="/mosc/dioceses/diocese-of-kottarakara-punalur" 
-                      className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
+                      className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Kottarakara – Punalur
+                      Diocese of Kottarakara â€“ Punalur
                     </Link>
                   <Link 
                       href="/mosc/dioceses/diocese-of-adoor-kadampanadu" 
-                      className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
+                      className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
-                      Diocese of Adoor – Kadampanadu
+                      Diocese of Adoor â€“ Kadampanadu
                     </Link>
                   <Link 
                       href="/mosc/dioceses/diocese-of-thumpamon" 
-                      className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
+                      className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
                       Diocese of Thumpamon
                     </Link>
                   <Link 
                       href="/mosc/dioceses/diocese-of-mavelikara" 
-                      className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
+                      className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
                       Diocese of Mavelikara
                     </Link>
                   <Link 
                       href="/mosc/dioceses/diocese-of-chengannur" 
-                      className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
+                      className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
                       Diocese of Chengannur
                     </Link>
                   <Link 
                       href="/mosc/dioceses/diocese-of-niranam" 
-                      className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
+                      className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
                       Diocese of Niranam
                     </Link>
                   <Link 
                       href="/mosc/dioceses/diocese-of-nilackal" 
-                      className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
+                      className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
                       Diocese of Nilackal
                     </Link>
                   <Link 
                       href="/mosc/dioceses/diocese-of-kottayam" 
-                      className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
+                      className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
                       Diocese of Kottayam
                     </Link>
                   <Link 
                       href="/mosc/dioceses/diocese-of-kottayam-central" 
-                      className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
+                      className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
                       Diocese of Kottayam Central
                     </Link>
                   <Link 
                       href="/mosc/dioceses/diocese-of-idukki" 
-                      className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
+                      className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
                       Diocese of Idukki
                     </Link>
                   <Link 
                       href="/mosc/dioceses/diocese-of-kandanad-east" 
-                      className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
+                      className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
                       Diocese of Kandanad East
                     </Link>
                   <Link 
                       href="/mosc/dioceses/diocese-of-kandanad-west" 
-                      className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
+                      className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
                       Diocese of Kandanad West
                     </Link>
                   <Link 
                       href="/mosc/dioceses/diocese-of-ankamaly" 
-                      className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
+                      className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
                       Diocese of Ankamaly
                     </Link>
                   <Link 
                       href="/mosc/dioceses/diocese-of-kochi" 
-                      className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
+                      className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
                       Diocese of Kochi
                     </Link>
                   <Link 
                       href="/mosc/dioceses/diocese-of-thrissur" 
-                      className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
+                      className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
                       Diocese of Thrissur
                     </Link>
                   <Link 
                       href="/mosc/dioceses/diocese-of-kunnamkulam" 
-                      className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
+                      className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
                       Diocese of Kunnamkulam
                     </Link>
                   <Link 
                       href="/mosc/dioceses/diocese-of-malabar" 
-                      className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
+                      className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
                       Diocese of Malabar
                     </Link>
                   <Link 
                       href="/mosc/dioceses/diocese-of-sulthan-bathery-diocese" 
-                      className="block px-3 py-2 bg-primary text-primary-foreground rounded-md font-body text-sm reverent-transition"
+                      className="block px-3 py-2 bg-syro-red text-white rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
                       Diocese of Sulthan Bathery
                     </Link>
                   <Link 
                       href="/mosc/dioceses/diocese-of-brahamavar" 
-                      className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
+                      className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
                     >
                       Diocese of Brahamavar
                     </Link>

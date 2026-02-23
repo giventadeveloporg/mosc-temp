@@ -2,7 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Metadata } from 'next';
-import QuickLinks from '@/components/holy-synod/QuickLinks';
+import QuickLinks from '../../components/QuickLinks';
 
 export const metadata: Metadata = {
   title: 'Sruti School of Liturgical Music | Training | MOSC',
@@ -24,32 +24,32 @@ export default function SrutiSchoolPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-syro-bg-gray">
       {/* Breadcrumb */}
-      <section className="bg-muted py-4">
+      <section className="bg-syro-bg-gray py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex items-center space-x-2 font-body text-sm text-muted-foreground">
-            <Link href="/mosc" className="hover:text-primary reverent-transition">MOSC</Link>
+          <nav className="flex items-center space-x-2 font-syro-primary text-sm text-syro-dark-gray">
+            <Link href="/mosc-old" className="hover:text-syro-red transition-all duration-300">MOSC</Link>
             <span>/</span>
-            <Link href="/mosc/training" className="hover:text-primary reverent-transition">Training</Link>
+            <Link href="/mosc/training" className="hover:text-syro-red transition-all duration-300">Training</Link>
             <span>/</span>
-            <span className="text-foreground">Sruti School of Liturgical Music</span>
+            <span className="text-syro-blue">Sruti School of Liturgical Music</span>
           </nav>
         </div>
       </section>
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-background to-muted py-12 lg:py-16">
+      <section className="relative bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            <div className="relative w-full h-80 lg:h-96 rounded-lg overflow-hidden sacred-shadow-lg">
+            <div className="relative w-full h-80 lg:h-96 rounded-lg overflow-hidden shadow-syro-card-hover">
               <Image src="/images/training/sruti.jpg" alt="Sruti School of Liturgical Music" fill className="object-cover" priority />
             </div>
             <div>
-              <h1 className="font-heading font-semibold text-4xl lg:text-5xl text-foreground mb-4">
+              <h1 className="font-syro-display font-semibold text-4xl lg:text-5xl text-syro-blue mb-4">
                 Sruti School of Liturgical Music
               </h1>
-              <p className="font-body text-lg text-muted-foreground leading-relaxed">
+              <p className="font-syro-primary text-lg text-syro-dark-gray leading-relaxed">
                 A premier institution for systematic training in Orthodox liturgical music, Karnatic music, Western music, and instrumental music.
               </p>
             </div>
@@ -58,10 +58,10 @@ export default function SrutiSchoolPage() {
       </section>
 
       {/* About Section */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="prose prose-lg max-w-none">
-            <div className="space-y-6 font-body text-lg text-muted-foreground leading-relaxed">
+            <div className="space-y-6 font-syro-primary text-lg text-syro-dark-gray leading-relaxed">
               <p>
                 The Sruti School of Liturgical Music is the realization of a long-cherished desire of the Orthodox Theological Seminary to effect a systematised and organised form to the music and hymnody of the Malankara Orthodox Syrian Church. A prime objective of the institution is to foster the integration of the existing music in the Church with the indigenous music, so as to bring about an authentic Indian worship service in the Church. Since its inception, these objectives have been enlarged in scope to embrace not only the teaching of Eastern Orthodox Church Music, but also Karnatic, Western and Instrumental Music.
               </p>
@@ -77,18 +77,18 @@ export default function SrutiSchoolPage() {
       </section>
 
       {/* Aims & Objectives */}
-      <section className="py-16 bg-muted">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-heading font-semibold text-3xl text-foreground mb-8 pb-4 border-b-2 border-primary">
+          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary">
             Aims & Objectives
           </h2>
           <div className="space-y-4">
             {objectives.map((objective, index) => (
-              <div key={index} className="flex items-start bg-card rounded-lg p-6 sacred-shadow-sm">
-                <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0 mr-4">
-                  <span className="font-heading font-semibold text-primary-foreground">{index + 1}</span>
+              <div key={index} className="flex items-start bg-white rounded-lg p-6 shadow-syro-card-sm">
+                <div className="w-8 h-8 bg-syro-red rounded-full flex items-center justify-center flex-shrink-0 mr-4">
+                  <span className="font-syro-display font-semibold text-syro-red-foreground">{index + 1}</span>
                 </div>
-                <p className="font-body text-muted-foreground leading-relaxed flex-1">
+                <p className="font-syro-primary text-syro-dark-gray leading-relaxed flex-1">
                   {objective}
                 </p>
               </div>
@@ -98,12 +98,12 @@ export default function SrutiSchoolPage() {
       </section>
 
       {/* Syriac Music Section */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-heading font-semibold text-3xl text-foreground mb-6">
+          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-6">
             Syriac Music
           </h2>
-          <div className="space-y-6 font-body text-lg text-muted-foreground leading-relaxed">
+          <div className="space-y-6 font-syro-primary text-lg text-syro-dark-gray leading-relaxed">
             <p>
               Syriac belongs to the family of Semitic language and its development can be traced back to its source the Aramaic language around the second century A.D. At one time it was the vernacular of Syria and its adjacent regions. Today, however, its usage is restricted to the worship and liturgy of the Eastern Churches in these areas. Due to the many contacts between and the influence of these churches on the nascent Malankara church, Syriac became the dominant liturgical language of the Malankara Christians. This accounts for the popular designation "Syrian Christians".
             </p>
@@ -118,29 +118,29 @@ export default function SrutiSchoolPage() {
       </section>
 
       {/* Contact Information */}
-      <section className="py-12 bg-muted">
+      <section className="py-12 bg-syro-bg-gray">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-card rounded-lg sacred-shadow p-8 border-l-4 border-primary">
-            <h3 className="font-heading font-semibold text-2xl text-foreground mb-6">
+          <div className="bg-white rounded-lg shadow-syro-card p-8 border-l-4 border-primary">
+            <h3 className="font-syro-display font-semibold text-2xl text-syro-blue mb-6">
               Contact Information
             </h3>
-            <div className="space-y-3 font-body text-muted-foreground">
-              <p className="font-medium text-foreground text-lg">Sruti Liturgical School of Music</p>
+            <div className="space-y-3 font-syro-primary text-syro-dark-gray">
+              <p className="font-medium text-syro-blue text-lg">Sruti Liturgical School of Music</p>
               <p>Orthodox Seminary</p>
               <p>PB 98, Chungam</p>
               <p>Kottayam-686001</p>
               <p className="pt-3">
-                <span className="font-medium text-foreground">Phone:</span> 0481 2585384
+                <span className="font-medium text-syro-blue">Phone:</span> 0481 2585384
               </p>
               <p>
-                <span className="font-medium text-foreground">Email:</span>{' '}
-                <a href="mailto:srutimusics@gmail.com" className="text-primary hover:underline">
+                <span className="font-medium text-syro-blue">Email:</span>{' '}
+                <a href="mailto:srutimusics@gmail.com" className="text-syro-red hover:underline">
                   srutimusics@gmail.com
                 </a>
               </p>
               <p>
-                <span className="font-medium text-foreground">Website:</span>{' '}
-                <a href="http://www.srutimusic.org/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                <span className="font-medium text-syro-blue">Website:</span>{' '}
+                <a href="http://www.srutimusic.org/" target="_blank" rel="noopener noreferrer" className="text-syro-red hover:underline">
                   www.srutimusic.org
                 </a>
               </p>
@@ -152,10 +152,10 @@ export default function SrutiSchoolPage() {
       <QuickLinks />
 
       {/* Navigation */}
-      <section className="py-12 bg-background">
+      <section className="py-12 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-center">
-            <Link href="/mosc/training" className="inline-flex items-center px-6 py-3 bg-primary text-primary-foreground font-body font-medium rounded-lg hover:bg-primary/90 reverent-transition sacred-shadow">
+            <Link href="/mosc/training" className="inline-flex items-center px-6 py-3 bg-syro-red text-syro-red-foreground font-syro-primary font-medium rounded-lg hover:bg-syro-red/90 transition-all duration-300 shadow-syro-card">
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>

@@ -101,52 +101,52 @@ const QuestionIcon = () => (
 const quickLinks: QuickLink[] = [
   {
     name: 'Kalpana',
-    href: '/mosc/downloads/kalpana',
+    href: '/mosc-old/downloads/kalpana',
     icon: <DocumentIcon />
   },
   {
     name: 'Downloads',
-    href: '/mosc/downloads',
+    href: '/mosc-old/downloads',
     icon: <DownloadIcon />
   },
   {
     name: 'Institutions',
-    href: '/mosc/institutions',
+    href: '/mosc-old/institutions',
     icon: <BuildingIcon />
   },
   {
     name: 'Training',
-    href: '/mosc/training',
+    href: '/mosc-old/training',
     icon: <AcademicIcon />
   },
   {
     name: 'Publications',
-    href: '/mosc/publications',
+    href: '/mosc-old/publications',
     icon: <BookIcon />
   },
   {
     name: 'Directory',
-    href: '/mosc/directory',
+    href: '/mosc-old/directory',
     icon: <DirectoryIcon />
   },
   {
     name: 'Spiritual Organisations',
-    href: '/mosc/spiritual-organizations',
+    href: '/mosc-old/spiritual-organizations',
     icon: <HeartIcon />
   },
   {
     name: 'Theological Seminaries',
-    href: '/mosc/theological-seminaries',
+    href: '/mosc-old/theological-seminaries',
     icon: <ChurchIcon />
   },
   {
     name: 'Calendar',
-    href: '/mosc/calendar',
+    href: '/mosc-old/calendar',
     icon: <CalendarIcon />
   },
   {
     name: 'Lectionary',
-    href: '/mosc/lectionary',
+    href: '/mosc-old/lectionary',
     icon: <BookOpenIcon />
   },
   {
@@ -157,22 +157,22 @@ const quickLinks: QuickLink[] = [
   },
   {
     name: 'Online Resources',
-    href: '/mosc/online-resources',
+    href: '/mosc-old/online-resources',
     icon: <GlobeIcon />
   },
   {
     name: 'Gallery',
-    href: '/mosc/gallery',
+    href: '/mosc-old/gallery',
     icon: <PhotoIcon />
   },
   {
     name: 'Contact Info',
-    href: '/mosc/contact-info',
+    href: '/mosc-old/contact-info',
     icon: <MailIcon />
   },
   {
     name: 'FAQs',
-    href: '/mosc/faqs',
+    href: '/mosc-old/faqs',
     icon: <QuestionIcon />
   }
 ];

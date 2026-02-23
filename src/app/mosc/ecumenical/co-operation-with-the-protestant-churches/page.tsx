@@ -1,6 +1,7 @@
 import React from 'react';
-import Link from 'next/link';
-import QuickLinks from '@/components/holy-synod/QuickLinks';
+import QuickLinks from '../../components/QuickLinks';
+import EcumenicalSidebar from '../../components/EcumenicalSidebar';
+import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata = {
   title: 'Co-operation with the Protestant Churches',
@@ -10,39 +11,17 @@ export const metadata = {
 
 const CoOperationWithProtestantChurchesPage = () => {
   return (
-    <div className="bg-background">
-      {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-br from-background to-muted">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-primary rounded-lg flex items-center justify-center mx-auto mb-6 sacred-shadow-lg">
-              <span
-                className="text-primary-foreground text-4xl font-bold"
-                role="img"
-                aria-label="Protestant Churches"
-              >
-                ✟
-              </span>
-            </div>
-            <h1 className="font-heading font-semibold text-3xl md:text-4xl text-foreground mb-4">
-              Co-operation with the Protestant Churches
-            </h1>
-            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Relations with CSI, Marthoma, and Lutheran Churches — theological education and
-              ecumenical dialogue
-            </p>
-          </div>
-        </div>
-      </section>
+    <div className="bg-syro-bg-gray">
+      <SyroPageBanner title="Co-operation with the Protestant Churches" breadcrumbFrom="ecumenical" />
 
       {/* Main Content */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
-              <div className="bg-background rounded-lg sacred-shadow p-8">
+              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 <div className="prose prose-lg max-w-none">
-                  <div className="font-body text-muted-foreground leading-relaxed space-y-6">
+                  <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-6">
                     <p>
                       It is a fact that there is no healthy and lively talks between the Orthodox
                       and CSI, Marthoma Churches. However, the Malankara Church has strong
@@ -78,110 +57,7 @@ const CoOperationWithProtestantChurchesPage = () => {
 
             {/* Sidebar */}
             <div className="lg:col-span-1">
-              <div className="bg-background rounded-lg sacred-shadow p-6 mb-6">
-                <h3 className="font-heading font-semibold text-lg text-foreground mb-4">
-                  Ecumenical Relations
-                </h3>
-                <nav className="space-y-2">
-                  <Link
-                    href="/mosc/ecumenical"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Ecumenical Overview
-                  </Link>
-                  <Link
-                    href="/mosc/ecumenical/world-council-of-churches"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    World Council of Churches
-                  </Link>
-                  <Link
-                    href="/mosc/ecumenical/orthodox-churches"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Orthodox Churches
-                  </Link>
-                  <Link
-                    href="/mosc/ecumenical/catholic-church"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Catholic Church
-                  </Link>
-                  <Link
-                    href="/mosc/ecumenical/protestant-churches"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Protestant Churches
-                  </Link>
-                  <Link
-                    href="/mosc/ecumenical/oriental-orthodox"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Oriental Orthodox
-                  </Link>
-                  <Link
-                    href="/mosc/ecumenical/in-egypt-with-the-message-of-fraternity"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    In Egypt with the Message of Fraternity
-                  </Link>
-                  <Link
-                    href="/mosc/ecumenical/the-shepherd-of-the-indian-church-in-ethiopia"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    The Shepherd of the Indian Church in Ethiopia
-                  </Link>
-                  <Link
-                    href="/mosc/ecumenical/the-confluence-of-love-in-vatican"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    The Confluence of Love in Vatican
-                  </Link>
-                  <Link
-                    href="/mosc/ecumenical/the-fraternity-at-vienna"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    The Fraternity at Vienna
-                  </Link>
-                  <Link
-                    href="/mosc/ecumenical/catholicos-speech-vatican"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Catholicos Speech at Vatican
-                  </Link>
-                  <Link
-                    href="/mosc/ecumenical/pope-francis-speech-vatican"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Pope Francis Speech at Vatican
-                  </Link>
-                  <Link
-                    href="/mosc/ecumenical/the-successor-of-st-thomas-in-europe"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    The Successor of St. Thomas in Europe
-                  </Link>
-                  <Link
-                    href="/mosc/ecumenical/co-operation-with-the-protestant-churches"
-                    className="block px-3 py-2 bg-primary text-primary-foreground rounded-md font-body text-sm reverent-transition"
-                  >
-                    Co-operation with the Protestant Churches
-                  </Link>
-                  <Link
-                    href="/mosc/ecumenical/ecumenical-ventures-in-modern-times"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Ecumenical ventures in modern times
-                  </Link>
-                  <Link
-                    href="/mosc/ecumenical/interfaith-dialogue"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Interfaith Dialogue
-                  </Link>
-                </nav>
-              </div>
-
+              <EcumenicalSidebar />
             </div>
           </div>
           {/* Quick Links - mobile only: just above footer */}

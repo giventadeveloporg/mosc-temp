@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Metadata } from 'next';
 import { getParishesData } from './getParishesData';
 import type { Parish } from './types';
@@ -38,26 +39,26 @@ export default async function ParishesPage({ searchParams }: PageProps) {
 
   const subtitle = hasSearch
     ? `${pagination.total} paris${pagination.total !== 1 ? 'hes' : 'h'} matching "${searchTerm}".`
-    : `${pagination.total} paris${pagination.total !== 1 ? 'hes' : 'h'}. Data from the directory API.`;
+    : `${pagination.total} paris${pagination.total !== 1 ? 'hes' : 'h'}. Data from the directory Parish API.`;
 
   return (
-    <div className="min-h-screen bg-background">
-      <section className="relative bg-gradient-to-br from-background to-muted py-12 lg:py-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Link href="/mosc/directory" className="font-body text-primary hover:underline mb-4 inline-block">
+    <div className="min-h-screen bg-syro-bg-gray">
+      <section className="relative bg-syro-bg-gray py-12 lg:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Link href="/mosc/directory" className="font-body text-syro-blue hover:underline mb-4 inline-block">
             ← Directory
           </Link>
-          <h1 className="font-heading font-semibold text-3xl lg:text-4xl text-foreground">
+          <h1 className="font-heading font-semibold text-3xl lg:text-4xl text-syro-blue">
             Parishes
           </h1>
-          <p className="font-body text-muted-foreground mt-2">
+          <p className="font-body text-syro-dark-gray mt-2">
             {subtitle}
           </p>
         </div>
       </section>
 
-      <section className="py-12 bg-card">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-12 bg-syro-bg-gray">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-6" role="search" aria-label="Search parishes by name">
             <form method="get" action={BASE_PATH} className="flex flex-wrap gap-2 items-center">
               <label htmlFor="parishes-name-search" className="sr-only">Search by name</label>
@@ -67,13 +68,13 @@ export default async function ParishesPage({ searchParams }: PageProps) {
                 name="q"
                 defaultValue={nameSearch ?? ''}
                 placeholder="Search by name..."
-                className="font-body flex-1 min-w-[200px] px-4 py-2 border border-border rounded-lg bg-input text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                className="font-body flex-1 min-w-[200px] px-4 py-2 border border-syro-table-border rounded-lg bg-white text-syro-blue placeholder:text-syro-dark-gray focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2"
               />
-              <button type="submit" className="font-body font-medium px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 reverent-transition">
+              <button type="submit" className="syro-primary-button inline-flex items-center gap-2 px-4 py-2">
                 Search
               </button>
               {hasSearch && (
-                <Link href={BASE_PATH} className="font-body text-sm text-muted-foreground hover:text-primary hover:underline">
+                <Link href={BASE_PATH} className="font-body text-sm text-syro-dark-gray hover:text-syro-red hover:underline">
                   Clear search
                 </Link>
               )}
@@ -81,26 +82,26 @@ export default async function ParishesPage({ searchParams }: PageProps) {
           </div>
 
           {parishes.length === 0 ? (
-            <div className="bg-muted/20 rounded-lg p-8 text-center">
-              <p className="font-body text-muted-foreground">No parishes listed yet. Data is loaded from the directory API.</p>
-              <Link href="/mosc/directory" className="font-body text-primary font-medium mt-4 inline-block hover:underline">Back to Directory</Link>
+            <div className="bg-white rounded-lg p-8 text-center border-l-4 border-syro-red shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]">
+              <p className="font-body text-syro-dark-gray">No parishes listed yet. Data is loaded from the directory Parish API.</p>
+              <Link href="/mosc/directory" className="font-body text-syro-blue font-medium mt-4 inline-block hover:underline">Back to Directory</Link>
             </div>
           ) : (
             <>
-              <ul className="space-y-6">
+              <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {parishes.map((p) => (
                   <ParishCard key={p.documentId} parish={p} />
                 ))}
               </ul>
               {pagination.pageCount > 1 && (
                 <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
-                  <span className="font-body text-sm text-muted-foreground">Page {pagination.page} of {pagination.pageCount}</span>
+                  <span className="font-body text-sm text-syro-dark-gray">Page {pagination.page} of {pagination.pageCount}</span>
                   <div className="flex gap-3">
                     {pagination.page > 1 && (
-                      <Link href={buildUrl(pagination.page - 1, nameSearch)} className="px-4 py-2 bg-primary/10 text-primary font-body font-medium rounded-lg hover:bg-primary/20 reverent-transition">Previous</Link>
+                      <Link href={buildUrl(pagination.page - 1, nameSearch)} className="px-4 py-2 bg-syro-red/10 text-syro-blue font-body font-medium rounded-lg hover:bg-syro-red/20 reverent-transition">Previous</Link>
                     )}
                     {pagination.page < pagination.pageCount && (
-                      <Link href={buildUrl(pagination.page + 1, nameSearch)} className="px-4 py-2 bg-primary/10 text-primary font-body font-medium rounded-lg hover:bg-primary/20 reverent-transition">Next</Link>
+                      <Link href={buildUrl(pagination.page + 1, nameSearch)} className="px-4 py-2 bg-syro-red/10 text-syro-blue font-body font-medium rounded-lg hover:bg-syro-red/20 reverent-transition">Next</Link>
                     )}
                   </div>
                 </div>
@@ -114,20 +115,40 @@ export default async function ParishesPage({ searchParams }: PageProps) {
 }
 
 function ParishCard({ parish }: { parish: Parish }) {
+  const locationParts = [parish.addressLine1, parish.city, parish.state].filter(Boolean);
+  const locationLine = locationParts.length ? locationParts.join(', ') : parish.address ?? null;
+
   return (
-    <li className="bg-muted/20 rounded-lg p-6 sacred-shadow-sm border-l-4 border-primary hover:sacred-shadow reverent-transition">
-      <Link href={`/mosc/directory/parishes/${parish.documentId}`} className="block group">
-        <h2 className="font-heading font-semibold text-xl text-foreground group-hover:text-primary reverent-transition">{parish.name}</h2>
-        {parish.dioceseName && <p className="font-body text-sm text-muted-foreground mt-1">{parish.dioceseName}</p>}
-        {(parish.city || parish.state) && (
-          <p className="font-body text-sm text-muted-foreground mt-1">{[parish.city, parish.state].filter(Boolean).join(', ')}</p>
-        )}
-        <span className="inline-flex items-center font-body text-primary text-sm font-medium mt-2">
-          View details
-          <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </span>
+    <li className="h-full bg-white rounded-lg overflow-hidden sacred-shadow-sm border-l-4 border-syro-red hover:sacred-shadow reverent-transition shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]">
+      <Link href={`/mosc/directory/parishes/${parish.documentId}`} className="block group h-full flex flex-col">
+        <div className="flex flex-col sm:flex-row gap-4 p-6 flex-1">
+          {parish.imageUrl && (
+            <div className="relative w-full sm:w-32 h-40 sm:h-28 flex-shrink-0 rounded-lg overflow-hidden bg-syro-bg-gray">
+              <Image
+                src={parish.imageUrl}
+                alt={parish.imageAlt ?? parish.name}
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 100vw, 128px"
+              />
+            </div>
+          )}
+          <div className="min-w-0 flex-1">
+            <h2 className="font-heading font-semibold text-xl text-syro-blue group-hover:text-syro-red reverent-transition">{parish.name}</h2>
+            {parish.dioceseName && <p className="font-body text-sm text-syro-dark-gray mt-1">{parish.dioceseName}</p>}
+            {locationLine && (
+              <p className="font-body text-sm text-syro-dark-gray mt-1">
+                {locationLine}
+              </p>
+            )}
+            <span className="syro-primary-button inline-flex items-center gap-2 mt-2 w-fit">
+              View details
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </span>
+          </div>
+        </div>
       </Link>
     </li>
   );

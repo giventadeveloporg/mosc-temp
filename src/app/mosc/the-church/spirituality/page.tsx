@@ -1,56 +1,34 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import QuickLinks from '@/components/holy-synod/QuickLinks';
+import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
 import TheChurchSidebar from '../TheChurchSidebar';
 
 export const metadata = {
   title: 'Spirituality',
   description:
-    'Spirituality may be defined as the life in and with the Holy Spirit—an ascetic and pious struggle through repentance, prayer, fasting, and participation in the sacramental life of the Church.',
+    'Spirituality may be defined as the life in and with the Holy Spiritâ€”an ascetic and pious struggle through repentance, prayer, fasting, and participation in the sacramental life of the Church.',
 };
 
-const SpiritualityPage = () => {
+export default async function SpiritualityPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string }>;
+}) {
+  const params = await searchParams;
+  const breadcrumbFrom = params.from === 'the-church' ? 'the-church' : 'home';
+
   return (
-    <div className="bg-background">
-      {/* Hero Section - MOSC styling */}
-      <section className="py-16 bg-gradient-to-br from-background to-muted">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 sacred-shadow-lg border border-border/50">
-              <svg
-                className="w-10 h-10 text-primary"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                />
-              </svg>
-            </div>
-            <h1 className="font-heading font-semibold text-4xl text-foreground mb-4">
-              Spirituality
-            </h1>
-            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Spirituality may be defined as the life in and with the Holy Spirit. It is an ascetic
-              and pious struggle against sin through repentance, prayer, fasting, and participation
-              in the sacramental life of the Church.
-            </p>
-          </div>
-        </div>
-      </section>
+    <div className="bg-syro-bg-gray">
+      <SyroPageBanner title="Spirituality" breadcrumbFrom={breadcrumbFrom} />
 
       {/* Main Content */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
-              <div className="bg-background rounded-lg sacred-shadow p-8">
+              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 {/* Featured Image - centered, contained */}
                 <div className="mb-8 flex justify-center">
                   <div className="relative w-full max-w-[280px] h-auto">
@@ -65,20 +43,20 @@ const SpiritualityPage = () => {
                 </div>
 
                 <div className="prose prose-lg max-w-none">
-                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-4">
+                  <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4">
                     Introduction
                   </h2>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Spirituality may be defined as the life in and with the Holy Spirit. It is an
                     ascetic and pious struggle against sin through repentance, prayer, fasting and
                     participation in the sacramental life of the Church. St. Paul says:
                     &quot;Walk in the Spirit, and you shall not fulfill the lust of the flesh. For
                     the flesh lusts against the Spirit, and the Spirit against the flesh; and these
-                    are contrary to one another, so that you do not do the things that you wish….
+                    are contrary to one another, so that you do not do the things that you wishâ€¦.
                     Now the works of the flesh are evident, which are adultery, fornication,
                     uncleanness, lewdness, idolatry, sorcery, hatred, contentions, jealousies,
                     outbursts of wrath, selfish ambitions, dissensions, heresies, envy, murders,
-                    drunkenness, revelries, and the like…… But the fruit of the Spirit is love, joy,
+                    drunkenness, revelries, and the likeâ€¦â€¦ But the fruit of the Spirit is love, joy,
                     peace, long suffering, kindness, goodness, faithfulness, gentleness and
                     self-control. And those who are Christ&apos;s have crucified the flesh with its
                     passions and desires. If we live in the Spirit, let us also walk in the
@@ -90,10 +68,10 @@ const SpiritualityPage = () => {
                     Ephesians 3:16-17; Colossians 3:3; John 14:23; 1 John 3:24 etc.
                   </p>
 
-                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-4 mt-8">
+                  <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 mt-8">
                     What is Orthodox Spirituality and what is its Goal?
                   </h2>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Orthodox Spirituality presents the process of a Christian&apos;s progress on the
                     road to perfection in Christ, by the cleansing of passions and the winning of
                     the virtues, a process which takes place in a certain order. Spirituality
@@ -105,7 +83,7 @@ const SpiritualityPage = () => {
                     peak, he/she simultaneously moves toward union with Christ and the knowledge of
                     Him by experience, which also means his/her deification.
                   </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The goal of Orthodox Spirituality is the perfection of the believer by his/her
                     union with God in Christ. But as God is unending, the goal of our union with
                     Him, or our perfection, has no point from which we can no longer progress. So
@@ -117,10 +95,10 @@ const SpiritualityPage = () => {
                     man&apos;s work is replaced by God&apos;s. Man contributes by opening himself up
                     receptively to an ever-greater filling with the life of God.
                   </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     In short, we may narrate the following features of Orthodox Spirituality:
                   </p>
-                  <ol className="list-decimal list-inside font-body text-muted-foreground leading-relaxed mb-6 space-y-2 pl-2">
+                  <ol className="list-decimal list-inside font-syro-primary text-syro-dark-gray leading-relaxed mb-6 space-y-2 pl-2">
                     <li>
                       The culminating state of the spiritual life is a union of the soul with God,
                       lived or experienced.
@@ -139,7 +117,7 @@ const SpiritualityPage = () => {
                       charisma.
                     </li>
                   </ol>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The Orthodox use the word &apos;deification&apos; or participation in the
                     divinity to characterize the union with God. It, however, does not mean that
                     here there is a pantheistic identification of man with God. But it asserts with
@@ -147,10 +125,10 @@ const SpiritualityPage = () => {
                     &apos;vision&apos; of Him, of a &apos;participation&apos; in Him, through grace.
                   </p>
 
-                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-4 mt-8">
+                  <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 mt-8">
                     Orthodox Spirituality and this world
                   </h2>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     It is very important to note that Orthodox Spirituality does not call for an
                     indifference to life, for a withdrawal from its affairs and for a pre-mature
                     eschatology. The Church Fathers have demonstrated the movement of God&apos;s
@@ -163,7 +141,7 @@ const SpiritualityPage = () => {
                     perfection). This movement is intended in general to elevate a person to the
                     level of the highest good and to perfection.
                   </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The road to Christian perfection does not exclude this world and the works in
                     it, but it does require that it contribute to the winning of virtues. No one
                     should imagine that the work he/she does is an end in itself; it has the role
@@ -178,7 +156,7 @@ const SpiritualityPage = () => {
                     and that of our neighbours, by beautifying ourselves with virtues, does not
                     mean a non-participation in the life of the world.
                   </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The one who has reached the peaks of spiritual living is no longer pre-occupied
                     with external activity, but contemplation. Even so, he/she exerts an influence
                     on the development of the world, by an attraction and a power which touch his
@@ -191,23 +169,23 @@ const SpiritualityPage = () => {
                     people.
                   </p>
 
-                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-4 mt-8">
+                  <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 mt-8">
                     Holy Trinity is the basis and Love is the Hallmark of Orthodox Spirituality
                   </h2>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The very basis of Christian life is in the mystery of Holy Trinity and
                     Incarnation. Orthodox spirituality has as a basic conviction on the existence
                     of a personal God, who is incarnated and who is the supreme source of
                     radiating love. God prizes man and does not want to confuse him/her with
                     Himself, but maintains and raises him to an eternal dialogue of love.
                   </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     But the personal God, the supreme source of love, can&apos;t be conceived of as
                     a single person, but as a community of persons in a perfect unity. The God of
                     the New Testament and of the holy Fathers is living and irreducibly three in
                     one the Holy Trinity.
                   </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     We may describe the Trinitarian basis of our spirituality in the following
                     lines: Only a perfect community of supreme persons (the Father, the Son and the
                     Holy Spirit) can nourish, with its unending and perfect love, our thirst for
@@ -234,10 +212,10 @@ const SpiritualityPage = () => {
                     spiritual life.
                   </p>
 
-                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-4 mt-8">
+                  <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 mt-8">
                     The Soul of Orthodox spirituality
                   </h2>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The soul of Orthodox spirituality consists in the practice of virtues and
                     especially in the gift of prayer. There is no spiritual life without prayer
                     and there is no labour greater than praying to God. The Church has got
@@ -260,7 +238,7 @@ const SpiritualityPage = () => {
                     is reserved for the age to come, yet even in the present life, the saints
                     enjoy sure pledge and first fruits of the coming harvest.
                   </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The first stage is called &apos;active life&apos; while the second and third
                     jointly designated the &apos;contemplative life&apos;. It is to be noted that
                     not only the social worker or family member or the missionary who is following
@@ -272,11 +250,11 @@ const SpiritualityPage = () => {
                     a &apos;contemplative&apos;.
                   </p>
 
-                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-4 mt-8">
+                  <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 mt-8">
                     Three Presuppositions
                   </h2>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    <strong className="text-foreground">i)</strong> The Orthodox tradition is
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
+                    <strong className="text-syro-blue">i)</strong> The Orthodox tradition is
                     intensely conscious of the ecclesial character of Christianity. It is of
                     course true that there are many who reject Christ and His Church, or who have
                     never heard of him; whether they will be saved or not cannot be answered
@@ -286,16 +264,16 @@ const SpiritualityPage = () => {
                     and communal. The Christian is the one who has brothers and sisters. He/she
                     belongs to a family and that family is the Church.
                   </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    <strong className="text-foreground">ii)</strong> Spiritual life is not only a
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
+                    <strong className="text-syro-blue">ii)</strong> Spiritual life is not only a
                     life in the Church but also life in the sacraments. It is the sacraments that
                     constitute our life in Christ. Our path is the path of corporate worship,
                     centred around the sacraments and especially the sacrament of Eucharist. That
                     is to say that it is in the communion of the Body and Blood of Christ that the
                     Christian life is based and moved towards perfection.
                   </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    <strong className="text-foreground">iii)</strong> The spiritual life is also
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
+                    <strong className="text-syro-blue">iii)</strong> The spiritual life is also
                     evangelical. At each step upon the path, we turn for guidance to the voice of
                     God speaking to us through the Bible. After being inspired by what is written
                     in the Bible, we lead ourselves to be the real witnesses of our Lord to our
@@ -307,10 +285,10 @@ const SpiritualityPage = () => {
                     Sacramental and ecclesiastical character of Orthodox spirituality.
                   </p>
 
-                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-4 mt-8">
+                  <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 mt-8">
                     Conclusion
                   </h2>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Orthodox spirituality gives enough and equal space for family life and monastic
                     life. That means it gives equal value to those who follow family life and
                     monastic life and no clear marked distinction is given to their goal although
@@ -323,15 +301,15 @@ const SpiritualityPage = () => {
                     Orthodox spirituality. For the Church Fathers, &apos;to flee from the
                     world&apos; means to flee from every thing that divides. Also, the spirituality
                     must ultimately be understood in terms of paschal mystery. It is an
-                    affirmation of the Cross—as the path of resurrection. The ability to bear the
+                    affirmation of the Crossâ€”as the path of resurrection. The ability to bear the
                     cross comes from the joy of being saved. Joy in our Lord is our strength. The
                     aim of the exercise that at times is found painful is a purified love of God,
                     of neighbours, and of the whole creation. But that also means an increase of
                     joy.
                   </p>
 
-                  <div className="bg-muted/30 rounded-lg p-6 mt-8 border border-border/50">
-                    <p className="font-body text-muted-foreground leading-relaxed text-sm italic">
+                  <div className="bg-syro-bg-gray rounded-lg p-6 mt-8 border border-syro-table-border">
+                    <p className="font-syro-primary text-syro-dark-gray leading-relaxed text-sm italic">
                       H.G. Dr. Yuhanon Mar Diascoros Metropolitan
                     </p>
                   </div>
@@ -358,4 +336,3 @@ const SpiritualityPage = () => {
   );
 };
 
-export default SpiritualityPage;

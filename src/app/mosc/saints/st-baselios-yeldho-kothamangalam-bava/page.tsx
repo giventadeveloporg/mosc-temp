@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import SyroPageBanner from '../../components/SyroPageBanner';
 import { SAINTS_SIDEBAR_LINKS } from '../saintsSidebarLinks';
 
 export const metadata = {
@@ -10,41 +11,32 @@ export const metadata = {
 
 const currentSlug = '/mosc/saints/st-baselios-yeldho-kothamangalam-bava';
 
-export default function StBaseliosYeldhoPage() {
+export default async function StBaseliosYeldhoPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string }>;
+}) {
+  const params = await searchParams;
+  const breadcrumbFrom = params.from === 'saints' ? 'saints' : 'home';
   return (
-    <div className="bg-background">
-      <section className="py-16 bg-gradient-to-br from-background to-muted">
+    <div className="bg-syro-bg-gray">
+      <SyroPageBanner title="St. Baselios Yeldho (Kothamangalam Bava)" breadcrumbFrom={breadcrumbFrom} />
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-primary rounded-lg flex items-center justify-center mx-auto mb-6 sacred-shadow-lg">
-              <span className="text-primary-foreground text-4xl font-bold" role="img" aria-label="Saint">👼</span>
-            </div>
-            <h1 className="font-heading font-semibold text-4xl text-foreground mb-4">
-              St. Baselios Yeldho (Kothamangalam Bava)
-            </h1>
-            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Saint and Maphriyana of the Malankara Church
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16 bg-card">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
-              <div className="bg-background rounded-lg sacred-shadow p-8">
+              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 <div className="mb-8">
                   <Image
                     src="/images/saints/st-baselios-yeldho-kothamangalam-bava.jpg"
                     alt="St. Baselios Yeldho (Kothamangalam Bava)"
                     width={500}
                     height={300}
-                    className="rounded-lg sacred-shadow w-full h-auto object-contain"
+                    className="rounded-lg shadow-syro-card w-full h-auto object-contain"
                     priority
                   />
                 </div>
-                <div className="prose prose-lg max-w-none font-body text-muted-foreground leading-relaxed space-y-4">
+                <div className="prose prose-lg max-w-none font-syro-primary text-syro-dark-gray leading-relaxed space-y-4">
                   <p>
                     St Baselios Yeldho was born in a village called kooded (now known as Karakosh) near Mosul in Iraq where Marth Smooni and her 7 children suffered martyrdom. At a very young age he joined the Mar Bahanan Monastery and become a monk. In 1678 he was consecrated Maphriyana by the Patriarch of Antioch Moran Mar Ignatius Abdul Masiha I. In 1685 at the age of 92, the holy father started the difficult mission to India at the request of Mar Thoma II of Malankara who informed the Patriarchate about the unpleasant situation of the Church here.
                   </p>
@@ -64,17 +56,17 @@ export default function StBaseliosYeldhoPage() {
               </div>
             </div>
             <div className="lg:col-span-1">
-              <div className="bg-background rounded-lg sacred-shadow p-6 mb-6">
-                <h3 className="font-heading font-semibold text-lg text-foreground mb-4">Saints Categories</h3>
+              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-6 mb-6">
+                <h3 className="font-syro-display font-semibold text-lg text-syro-blue mb-4">Saints Categories</h3>
                 <nav className="space-y-2">
                   {SAINTS_SIDEBAR_LINKS.map((link) => (
                     <Link
                       key={link.href}
-                      href={link.href}
-                      className={`block px-3 py-2 rounded-md font-body text-sm reverent-transition ${
+                      href={link.href === '/mosc/saints' ? link.href : `${link.href}?from=saints`}
+                      className={`block px-3 py-2 rounded-md font-syro-primary text-sm transition-all duration-300 ${
                         link.href === currentSlug
-                          ? 'bg-primary text-primary-foreground'
-                          : 'text-muted-foreground hover:text-primary hover:bg-muted'
+                          ? 'bg-syro-red text-white'
+                          : 'text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray'
                       }`}
                     >
                       {link.label}
@@ -82,16 +74,16 @@ export default function StBaseliosYeldhoPage() {
                   ))}
                 </nav>
               </div>
-              <div className="bg-background rounded-lg sacred-shadow p-6">
-                <h3 className="font-heading font-semibold text-lg text-foreground mb-4">Quick Links</h3>
+              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-6">
+                <h3 className="font-syro-display font-semibold text-lg text-syro-blue mb-4">Quick Links</h3>
                 <nav className="space-y-2">
-                  <Link href="/mosc/the-church" className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition">The Church</Link>
-                  <Link href="/mosc/holy-synod" className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition">Holy Synod</Link>
-                  <Link href="/mosc/dioceses" className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition">Dioceses</Link>
-                  <Link href="/mosc/ecumenical" className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition">Ecumenical Relations</Link>
-                  <Link href="/mosc/institutions" className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition">Institutions</Link>
-                  <Link href="/mosc/gallery" className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition">Gallery</Link>
-                  <Link href="/mosc/contact-info" className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition">Contact Info</Link>
+                  <Link href="/mosc/the-church" className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300">The Church</Link>
+                  <Link href="/mosc/holy-synod" className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300">Holy Synod</Link>
+                  <Link href="/mosc/dioceses" className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300">Dioceses</Link>
+                  <Link href="/mosc/ecumenical" className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300">Ecumenical Relations</Link>
+                  <Link href="/mosc/institutions" className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300">Institutions</Link>
+                  <Link href="/mosc/gallery" className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300">Gallery</Link>
+                  <Link href="/mosc/contact-info" className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300">Contact Info</Link>
                 </nav>
               </div>
             </div>

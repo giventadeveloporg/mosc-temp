@@ -55,8 +55,8 @@ const isPublicRouteClerk = createRouteMatcher([
   '/membership/qr(.*)',
   '/api/diagnostic(.*)',
   '/api/logs(.*)',
+  '/mosc-old(.*)',
   '/mosc(.*)',
-  '/syro(.*)',
   '/events(.*)',
   '/sponsors(.*)',
   '/team(.*)',
@@ -86,7 +86,7 @@ export default clerkMiddleware(
 
     // PERFORMANCE: Only resolve auth() for non-public routes.
     // auth() makes a network call to Clerk API (~300-800ms on Lambda cold start).
-    // Public routes (/, /syro, /events, etc.) don't need auth state in middleware,
+    // Public routes (/, /mosc-old, /mosc, /events, etc.) don't need auth state in middleware,
     // so skipping this call saves significant latency on the critical render path.
     let resolvedAuth: { userId?: string | null; sessionId?: string | null } | null = null;
     if (!isPublicRouteClerk(req)) {

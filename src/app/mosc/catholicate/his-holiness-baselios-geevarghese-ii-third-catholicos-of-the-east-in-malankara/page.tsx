@@ -1,77 +1,53 @@
 import React from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
-import QuickLinks from '@/components/holy-synod/QuickLinks';
+import Image from 'next/image';
+import QuickLinks from '@/app/mosc/components/QuickLinks';
+import SyroPageBanner from '@/app/mosc/components/SyroPageBanner';
+import { SYRO_CATHOLICATE_SIDEBAR_LINKS } from '@/app/mosc/catholicate/catholicosLinks';
 
 export const metadata = {
-  title: 'H.H. Baselios Geevarghese II, The Third Catholicos of the East in Malankara (1929–1964)',
+  title: 'His Holiness Baselios Geevarghese II, The Third Catholicos of the East in Malankara (1929–1964)',
   description: 'Biography of His Holiness Baselios Geevarghese II, the third Catholicos of the East in Malankara.',
 };
 
-const catholicosLinks = [
-  { name: 'The Catholicate Overview', href: '/mosc/catholicate/catholicate' },
-  { name: 'H.H. Baselios Paulos I', period: '1912–1913', description: 'The First Catholicos of the East in Malankara', href: '/mosc/catholicate/his-holiness-baselios-paulos-i-1st-catholicos-of-the-east-in-malankara' },
-  { name: 'H.H. Baselios Geevarghese I', period: '1925–1928', description: 'The Second Catholicos of the East in Malankara', href: '/mosc/catholicate/his-holiness-baselios-geevarghese-i-second-catholicos-of-the-east-in-malankara' },
-  { name: 'H.H. Baselios Geevarghese II', period: '1929–1964', description: 'The Third Catholicos of the East in Malankara', href: '/mosc/catholicate/his-holiness-baselios-geevarghese-ii-third-catholicos-of-the-east-in-malankara' },
-  { name: 'H.H. Baselios Augen I', period: '1964–1975', description: 'The Fourth Catholicos of the East in Malankara', href: '/mosc/catholicate/his-holiness-baselios-oughen-i-the-fourth-catholicos-of-the-east-in-malankara' },
-  { name: 'H.H. Baselios Marthoma Mathews I', period: '1975–1991', description: 'The Fifth Catholicos of the East in Malankara', href: '/mosc/catholicate/his-holiness-baselios-marthoma-mathews-i-fifth-catholicos-of-the-east-in-malankara' },
-  { name: 'H.H. Baselios Marthoma Mathews II', period: '1991–2005', description: 'The Sixth Catholicos of the East in Malankara', href: '/mosc/catholicate/his-holiness-baselios-marthoma-mathews-ii-sixth-catholicos-of-the-east-in-malankara' },
-  { name: 'H.H. Baselios Marthoma Didymos I', period: '2005-2010', description: 'The Seventh Catholicos of the East in Malankara', href: '/mosc/catholicate/his-holiness-baselios-marthoma-didymos-i-seventh-catholicos-of-the-east-in-malankara' },
-  { name: 'H.H. Baselios Marthoma Paulose II', period: '2010–2021', description: 'The Eighth Catholicos of the East in Malankara', href: '/mosc/catholicate/h-h-baselios-marthoma-paulose-ii' },
-];
-
 const BaseliosGeevargheseIIPage = () => {
   return (
-    <div className="bg-background text-foreground">
-      {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-br from-background to-muted">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-primary rounded-lg flex items-center justify-center mx-auto mb-6 sacred-shadow-lg">
-              <span className="text-primary-foreground text-4xl font-bold" role="img" aria-label="Crown">👑</span>
-            </div>
-            <h1 className="font-heading font-semibold text-4xl text-foreground mb-4">
-              H.H. Baselios Geevarghese II
-            </h1>
-            <p className="font-body text-lg text-primary mb-2 font-medium">
-              The Third Catholicos of the East in Malankara
-            </p>
-            <p className="font-body text-lg text-muted-foreground">
-              1929–1964
-            </p>
-          </div>
-        </div>
-      </section>
+    <div className="bg-syro-bg-gray">
+      <SyroPageBanner title="His Holiness Baselios Geevarghese II" breadcrumbFrom="catholicate" />
 
-      {/* Main Content */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            {/* Main Content */}
             <div className="lg:col-span-2">
-              <div className="bg-background rounded-lg sacred-shadow p-8">
-                <div className="mb-8">
+              <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8 mb-8">
+                <p className="font-syro-display text-xl font-semibold text-syro-blue mb-2">
+                  The Third Catholicos of the East in Malankara
+                </p>
+                <p className="font-syro-primary text-lg text-[#798daf] mb-8">1929–1964</p>
+
+                <div className="mb-8 flex justify-center">
                   <Image
-                    src="/images/catholicate/geevar.jpg"
-                    alt="H.H. Baselios Geevarghese II, The Third Catholicos of the East in Malankara"
+                    src="https://mosc.in/wp-content/uploads/2015/01/geevar.jpg"
+                    alt="His Holiness Baselios Geevarghese II, The Third Catholicos of the East in Malankara"
                     width={500}
                     height={300}
-                    className="rounded-lg sacred-shadow mb-6"
-                    priority
+                    className="w-full max-w-md h-auto object-contain rounded-lg"
+                    unoptimized
+                    sizes="(max-width: 768px) 100vw, 50vw"
                   />
                 </div>
-                <div className="space-y-6 font-body text-muted-foreground leading-relaxed">
-                  <div className="space-y-6">
-                    <h2 className="font-heading font-semibold text-2xl text-primary mb-4">
-                      Biography
-                    </h2>
-                    <p>
-                      His Holiness was born to Ulahannan and Naithi of Kallaserri family in Kurichi, Kottayam on 16 June 1874. On 24 April 1892, Kadavil Paulose Mar Athanasios ordained him as deacon and on 24 November and 27 November 1898 he was ordained as priest and Ramban (Monk) respectively by St.Gregorios. As per the order of St. Gregorios, he resided in Kadambanad church and took charge of the southern dioceses. He also served as Manager and Malpan of Old Seminary. He published books like "Sahodaran- marude Charithram". "Rehasya Prarthanakal". "Parudaisa", and "Mar Yuhanon Mamdana". On 8 September 1912, His Holiness Patriarch Abdhedh Meshiah consecrated him as Metropolitan Geevarghese Mar Gregorios at Parumala Seminary. He was appointed as the Metropolitan of Thumpamon, Kollam and Niranam dioceses. On 15 February 1929. With the Malankara Metropolitan Vattaserril Geevarghese Mar Dionysios as the chief priest, he was installed as the Catholicos of the East. When the Association met on 24 December 1934 at M. D. Seminary, Kottayam, he was chosen as Malankara Metropolitan. It was a period when issues became very complex. Through prayer and fasting he received strength from God to lead his people for long years, courageously, inspiring his people to work for their church and for the glory of God. Following the peace pact of 1958, he had the good fortune to guide the destiny of the unified Malankara Church. Apart from consecrating twelve Meropolitans, and ordaining more than thousand priests and deacons, he founded and consecrated many churches. On 22 April 1932 and on 20 April 1951 he conducted the 'Mooron Koodasha' (Chrism Consecration) at the Old Seminary. On 2 November 1947 he declared Geevarghese Mar Gregorios and Yeldo Mar Baselios as Saints. From his time onwards the offices of Catholicos and Malankara Metropolitan came to repose in one and the same person. The deep spirituality and wisdom of this Catholicos earned him the title "Valiya Bava," or "The Great Catholicos." Shedding luster like a Beacon illuminating the history of the church, he led it from glory to glory. He entered the eternal realms on 3 January 1964 at Develokam Aramana He was laid to rest beside the Devalokam Aramana Chapel. His Anniversary is 3 January.
-                    </p>
-                  </div>
+
+                <div className="space-y-6 font-syro-primary text-syro-dark-gray leading-relaxed">
+                  <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 pl-4 border-l-4 border-syro-red">
+                    Biography
+                  </h2>
+                  <p>
+                    His Holiness was born to Ulahannan and Naithi of Kallaserri family in Kurichi, Kottayam on 16 June 1874. On 24 April 1892, Kadavil Paulose Mar Athanasios ordained him as deacon and on 24 November and 27 November 1898 he was ordained as priest and Ramban (Monk) respectively by St. Gregorios. As per the order of St. Gregorios, he resided in Kadambanad church and took charge of the southern dioceses. He also served as Manager and Malpan of Old Seminary. He published books like &quot;Sahodaran- marude Charithram&quot;, &quot;Rehasya Prarthanakal&quot;, &quot;Parudaisa&quot;, and &quot;Mar Yuhanon Mamdana&quot;. On 8 September 1912, His Holiness Patriarch Abdhedh Meshiah consecrated him as Metropolitan Geevarghese Mar Gregorios at Parumala Seminary. He was appointed as the Metropolitan of Thumpamon, Kollam and Niranam dioceses. On 15 February 1929, with the Malankara Metropolitan Vattaserril Geevarghese Mar Dionysios as the chief priest, he was installed as the Catholicos of the East. When the Association met on 24 December 1934 at M. D. Seminary, Kottayam, he was chosen as Malankara Metropolitan. It was a period when issues became very complex. Through prayer and fasting he received strength from God to lead his people for long years, courageously, inspiring his people to work for their church and for the glory of God. Following the peace pact of 1958, he had the good fortune to guide the destiny of the unified Malankara Church. Apart from consecrating twelve Metropolitans, and ordaining more than thousand priests and deacons, he founded and consecrated many churches. On 22 April 1932 and on 20 April 1951 he conducted the &apos;Mooron Koodasha&apos; (Chrism Consecration) at the Old Seminary. On 2 November 1947 he declared Geevarghese Mar Gregorios and Yeldo Mar Baselios as Saints. From his time onwards the offices of Catholicos and Malankara Metropolitan came to repose in one and the same person. The deep spirituality and wisdom of this Catholicos earned him the title &quot;Valiya Bava,&quot; or &quot;The Great Catholicos.&quot; Shedding luster like a Beacon illuminating the history of the church, he led it from glory to glory. He entered the eternal realms on 3 January 1964 at Devalokam Aramana. He was laid to rest beside the Devalokam Aramana Chapel. His Anniversary is 3 January.
+                  </p>
                 </div>
               </div>
 
-              {/* Quick Links - Horizontal Below Main Content (same as holy-synod) - desktop only in column */}
               <div className="mt-8 hidden lg:block">
                 <QuickLinks />
               </div>
@@ -79,69 +55,73 @@ const BaseliosGeevargheseIIPage = () => {
 
             {/* Sidebar */}
             <div className="space-y-6">
-              <div className="bg-background rounded-lg sacred-shadow p-6">
-                <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
-                  Catholicate History
+              <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-6">
+                <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-4 pl-4 border-l-4 border-syro-red">
+                  Quick Facts
                 </h3>
-                <div className="space-y-3">
-                  {catholicosLinks.map((catholicos, index) => (
+                <div className="space-y-3 font-syro-primary text-syro-dark-gray">
+                  <div>
+                    <span className="font-semibold text-syro-blue">Born:</span>
+                    <p className="text-sm mt-0.5">16 June 1874, Kurichi, Kottayam</p>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-syro-blue">Consecrated as Bishop:</span>
+                    <p className="text-sm mt-0.5">8 September 1912 (Geevarghese Mar Gregorios)</p>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-syro-blue">Reign:</span>
+                    <p className="text-sm mt-0.5">1929–1964</p>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-syro-blue">Passed Away:</span>
+                    <p className="text-sm mt-0.5">3 January 1964 at Devalokam Aramana</p>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-syro-blue">Resting Place:</span>
+                    <p className="text-sm mt-0.5">Beside Devalokam Aramana Chapel</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-6">
+                <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-4 pl-4 border-l-4 border-syro-red">
+                  The Catholicate
+                </h3>
+                <Link
+                  href="/mosc/catholicate"
+                  className="syro-primary-button inline-flex items-center gap-2 w-full justify-center py-1.5 leading-tight"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  <span>Back to The Catholicate</span>
+                </Link>
+                <div className="mt-3 space-y-1.5">
+                  {SYRO_CATHOLICATE_SIDEBAR_LINKS.map((item) => (
                     <Link
-                      key={catholicos.name}
-                      href={catholicos.href}
-                      className={`block p-3 rounded-lg hover:bg-muted/50 reverent-transition group ${index === 3 ? 'bg-primary/5 border border-primary/20' : ''}`}
+                      key={item.name}
+                      href={item.href}
+                      className={`block p-2 rounded-lg hover:bg-syro-bg-gray/50 transition-colors group leading-tight ${item.href === '/mosc/catholicate/his-holiness-baselios-geevarghese-ii-third-catholicos-of-the-east-in-malankara' ? 'bg-syro-blue/5 border border-syro-blue/20' : ''}`}
                     >
-                      <div className="flex items-start space-x-3">
-                        <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 reverent-transition">
-                          <span className="text-sm text-primary" role="img" aria-label="Catholicos">👑</span>
+                      <div className="flex items-start space-x-2">
+                        <div className="w-6 h-6 bg-syro-blue/10 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-syro-blue/20 transition-colors">
+                          <span className="text-xs text-syro-blue" role="img" aria-label="Catholicos">👑</span>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-heading font-medium text-sm text-foreground group-hover:text-primary reverent-transition">
-                            {catholicos.name}
+                          <h4 className="font-syro-display font-medium text-sm text-syro-dark-gray group-hover:text-syro-blue transition-colors leading-tight mt-0 mb-0">
+                            {item.name}
                           </h4>
-                          {catholicos.period && (
-                            <p className="font-body text-xs text-primary font-medium">{catholicos.period}</p>
-                          )}
-                          {catholicos.description && (
-                            <p className="font-body text-xs text-muted-foreground">{catholicos.description}</p>
-                          )}
+                          {item.period ? <p className="font-syro-primary text-xs text-syro-blue font-medium leading-tight mt-0 mb-0">{item.period}</p> : null}
+                          {item.description ? <p className="font-syro-primary text-xs text-[#798daf] leading-tight mt-0 mb-0">{item.description}</p> : null}
                         </div>
                       </div>
                     </Link>
                   ))}
                 </div>
               </div>
-
-              {/* Quick Facts */}
-              <div className="bg-background rounded-lg sacred-shadow p-6">
-                <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
-                  Quick Facts
-                </h3>
-                <div className="space-y-3">
-                  <div>
-                    <span className="font-medium text-foreground">Born:</span>
-                    <p className="text-sm text-muted-foreground">16 June 1874</p>
-                  </div>
-                  <div>
-                    <span className="font-medium text-foreground">Consecrated as Bishop:</span>
-                    <p className="text-sm text-muted-foreground">8 September 1912</p>
-                  </div>
-                  <div>
-                    <span className="font-medium text-foreground">Reign:</span>
-                    <p className="text-sm text-muted-foreground">1929–1964</p>
-                  </div>
-                  <div>
-                    <span className="font-medium text-foreground">Passed Away:</span>
-                    <p className="text-sm text-muted-foreground">3 January 1964</p>
-                  </div>
-                  <div>
-                    <span className="font-medium text-foreground">Resting Place:</span>
-                    <p className="text-sm text-muted-foreground">Beside Devalokam Aramana Chapel</p>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
-          {/* Quick Links - mobile only: just above footer */}
+
           <div className="mt-8 lg:hidden">
             <QuickLinks />
           </div>

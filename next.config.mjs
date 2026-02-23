@@ -45,25 +45,14 @@ const nextConfig = {
     return config;
   },
 
-  // Configure redirects if needed
-  async redirects() {
-    return [];
-  },
+  // No redirects from /mosc; /mosc-old exists on its own (rewrite only)
 
-  // Configure rewrites for Clerk proxy (satellite domain support) and Syro static landing
+  // Rewrites: /mosc = app/mosc (Syro), /mosc-old = app/mosc-old (legacy) via filesystem; no path rewrites needed.
   async rewrites() {
-    // Read Clerk Frontend API URL from environment variable
     const clerkFrontendApi = process.env.NEXT_PUBLIC_CLERK_FRONTEND_API_URL || 'https://clerk.event-site-manager.com';
 
     return [
-      {
-        source: '/__clerk/:path*',
-        destination: `${clerkFrontendApi}/:path*`,
-      },
-      // Syro landing: serve static index.html at /syro and /syro/ (URL stays /syro)
-      // Administration, Catholicate, Holy Synod are Next.js pages (src/app/syro/...) — no rewrite
-      { source: '/syro', destination: '/syro/index.html' },
-      { source: '/syro/', destination: '/syro/index.html' },
+      { source: '/__clerk/:path*', destination: `${clerkFrontendApi}/:path*` },
     ];
   },
 

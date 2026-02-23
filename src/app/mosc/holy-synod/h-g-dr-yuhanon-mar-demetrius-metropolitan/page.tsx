@@ -1,27 +1,32 @@
 import React from 'react';
 import Image from 'next/image';
-import SynodMembersSidebar from '@/components/holy-synod/SynodMembersSidebar';
-import QuickLinks from '@/components/holy-synod/QuickLinks';
+import SynodMembersSidebar from '../../components/SynodMembersSidebar';
+import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata = {
   title: 'H.G. Dr. Youhanon Mar Demetrios Metropolitan',
-  description: 'Biography and information about H.G. Dr. Youhanon Mar Demetrios Metropolitan.',
+  description: 'His Grace Dr. Youhanon Mar Demetrios, Metropolitan of Delhi Diocese. Professor, Orthodox Theological Seminary; General Secretary, Orthodox Vaidika Sangham; Co-Secretary, Orthodoxâ€“Catholic Church Dialogue.',
 };
 
 const HGDrYuhanonMarDemetriusMetropolitanPage = () => {
   return (
-    <div className="bg-background">
+    <div className="bg-syro-bg-gray">
+      <SyroPageBanner
+        title="H.G. Dr. Youhanon Mar Demetrios Metropolitan"
+        breadcrumbFrom="holy-synod"
+      />
       {/* Main Content */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
-              <div className="bg-background rounded-lg sacred-shadow p-8">
+              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 <div className="flex flex-col md:flex-row gap-8">
                   {/* Featured Portrait - Left Side - Large Display */}
                   <div className="flex-shrink-0 flex justify-center md:justify-start">
-                    <div className="relative w-72 h-[28rem] md:w-80 md:h-[32rem] lg:w-96 lg:h-[36rem] rounded-lg overflow-hidden sacred-shadow-lg">
+                    <div className="relative w-72 h-[28rem] md:w-80 md:h-[32rem] lg:w-96 lg:h-[36rem] rounded-lg overflow-hidden shadow-syro-card-hover">
                       <Image
                         src="/images/holy-synod/del.jpg"
                         alt="H.G. Dr. Youhanon Mar Demetrios Metropolitan"
@@ -38,25 +43,22 @@ const HGDrYuhanonMarDemetriusMetropolitanPage = () => {
 
                   {/* Content - Right Side of Image */}
                   <div className="flex-1">
-                    <h3 className="font-heading font-semibold text-2xl text-foreground mb-6">
+                    <h3 className="font-syro-display font-semibold text-2xl text-syro-blue mb-6">
                       H.G. Dr. Youhanon Mar Demetrios Metropolitan
                     </h3>
 
                     <div className="prose prose-lg max-w-none">
-                      <p className="font-body text-muted-foreground leading-relaxed mb-4">
-                        His Grace was Born on 18-12-1952 as the son of Palamoottil Mathews and Mercy. Home parish is St. Thomas Orthodox Cathedral, Kollam Diocese. After completing the formal education, His Grace took his MRE from Gordon-Conwell Theological Seminary in S. Hamilton, Massachusetts, after that received his Ph.D. From Fordham University, and M. R. E from Gorden Conwell Theological Seminary, America. His Grace is well versed in different languages such as Malayalam, Greek and Syriac. His Grace took several key positions of the church as Professor, Orthodox Theological Seminary, Kottayam, Secretary, Ecumenical Relations Committee, General Secretary, Orthodox Vydikasangam, Co-Secretary, Orthodox – Catholic Church Dialogue, Delegate, W. C. C Commission of Educational and Ecumenical Formation, Representative of the Church in many international Conferences, Registrar, F.F.R.R.C, Dean, Doctoral Studies. He is elected as the Metropolitan candidate on 17th February at the Malankara Association held at Sasthamkotta. He is consecrated as Metropolitan on 12th May 2010 at Mar Elia Cathedral, Kottayam.His Grace is serving the Delhi Diocese as its Metropolitan.
+                      <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
+                        His Grace was born on 18 December 1952 as the son of Palamoottil Mathews and Mercy. His home parish is St. Thomas Orthodox Cathedral, Kollam Diocese. After completing formal education, His Grace received his M.R.E. from Gordon-Conwell Theological Seminary in South Hamilton, Massachusetts, and his Ph.D. from Fordham University. He is well versed in Malayalam, Greek, and Syriac. His Grace has held several key positions in the Church: Professor at the Orthodox Theological Seminary, Kottayam; Secretary, Ecumenical Relations Committee; General Secretary, Orthodox Vaidika Sangham; Co-Secretary, Orthodoxâ€“Catholic Church Dialogue; Delegate, W.C.C. Commission on Education and Ecumenical Formation; Representative of the Church at many international conferences; Registrar, F.F.R.R.C.; Dean of Doctoral Studies. He was elected as Metropolitan candidate on 17 February at the Malankara Association held at Sasthamkotta, and was consecrated as Metropolitan on 12 May 2010 at Mar Elia Cathedral, Kottayam. His Grace is serving the Delhi Diocese as its Metropolitan.
                       </p>
 
-                      <div className="mt-6 pt-6 border-t border-border">
-                        <p className="font-body text-muted-foreground leading-relaxed mb-2">
-                          Address: Delhi Orthodox Centre, 2 Institutional Area, Tughlakabad, New Delhi 110 062.
-                        </p>
-                        <p className="font-body text-muted-foreground leading-relaxed mb-2">
-                          Mob: 9810791894.
-                        </p>
-                        <p className="font-body text-muted-foreground leading-relaxed mb-2">
-                          Email:mar.demetrios@gmail.com
-                        </p>
+                      <h4 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
+                        Contact
+                      </h4>
+                      <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
+                        <p>Delhi Orthodox Centre, 2 Institutional Area, Tughlakabad, New Delhi 110 062</p>
+                        <p>Mobile: 9810791894</p>
+                        <p>Email: mar.demetrios@gmail.com</p>
                       </div>
                     </div>
                   </div>

@@ -2,7 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Metadata } from 'next';
-import QuickLinks from '@/components/holy-synod/QuickLinks';
+import QuickLinks from '../../components/QuickLinks';
 
 export const metadata: Metadata = {
   title: 'Major Centres | Institutions | MOSC',
@@ -75,29 +75,29 @@ export default function MajorCentresPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-syro-bg-gray">
       {/* Breadcrumb */}
-      <section className="bg-muted py-4">
+      <section className="bg-syro-bg-gray py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex items-center space-x-2 font-body text-sm text-muted-foreground">
-            <Link href="/mosc" className="hover:text-primary reverent-transition">
+          <nav className="flex items-center space-x-2 font-syro-primary text-sm text-syro-dark-gray">
+            <Link href="/mosc-old" className="hover:text-syro-red transition-all duration-300">
               MOSC
             </Link>
             <span>/</span>
-            <Link href="/mosc/institutions" className="hover:text-primary reverent-transition">
+            <Link href="/mosc/institutions" className="hover:text-syro-red transition-all duration-300">
               Institutions
             </Link>
             <span>/</span>
-            <span className="text-foreground">Major Centres</span>
+            <span className="text-syro-blue">Major Centres</span>
           </nav>
         </div>
       </section>
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-background to-muted py-12 lg:py-16">
+      <section className="relative bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            <div className="relative w-full h-80 lg:h-96 rounded-lg overflow-hidden sacred-shadow-lg">
+            <div className="relative w-full h-80 lg:h-96 rounded-lg overflow-hidden shadow-syro-card-hover">
               <Image
                 src="/images/institutions/ca.jpg"
                 alt="Major Centres"
@@ -107,10 +107,10 @@ export default function MajorCentresPage() {
               />
             </div>
             <div>
-              <h1 className="font-heading font-semibold text-4xl lg:text-5xl text-foreground mb-4">
+              <h1 className="font-syro-display font-semibold text-4xl lg:text-5xl text-syro-blue mb-4">
                 Major Centres
               </h1>
-              <p className="font-body text-lg text-muted-foreground leading-relaxed">
+              <p className="font-syro-primary text-lg text-syro-dark-gray leading-relaxed">
                 The spiritual and administrative centres of the Malankara Orthodox Syrian Church, serving as places of pilgrimage, worship, and church governance.
               </p>
             </div>
@@ -119,23 +119,23 @@ export default function MajorCentresPage() {
       </section>
 
       {/* Centres List Section */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-12">
             {centres.map((centre, index) => (
-              <div key={index} className="bg-card rounded-lg sacred-shadow p-8">
-                <h2 className="font-heading font-semibold text-2xl lg:text-3xl text-primary mb-4">
+              <div key={index} className="bg-white rounded-lg shadow-syro-card p-8">
+                <h2 className="font-syro-display font-semibold text-2xl lg:text-3xl text-syro-red mb-4">
                   {centre.name}
                 </h2>
-                <p className="font-body text-lg text-muted-foreground leading-relaxed mb-6">
+                <p className="font-syro-primary text-lg text-syro-dark-gray leading-relaxed mb-6">
                   {centre.description}
                 </p>
                 {centre.contact && (
-                  <div className="bg-muted/30 rounded-lg p-6 border-l-4 border-primary">
-                    <h3 className="font-heading font-medium text-xl text-foreground mb-4">
+                  <div className="bg-syro-bg-gray rounded-lg p-6 border-l-4 border-primary">
+                    <h3 className="font-syro-display font-medium text-xl text-syro-blue mb-4">
                       Contact Information
                     </h3>
-                    <div className="space-y-2 font-body text-muted-foreground">
+                    <div className="space-y-2 font-syro-primary text-syro-dark-gray">
                       {centre.contact.address && (
                         <div className="mb-4">
                           {centre.contact.address.map((line, i) => (
@@ -145,20 +145,20 @@ export default function MajorCentresPage() {
                       )}
                       {centre.contact.phone && (
                         <p>
-                          <span className="font-medium text-foreground">Phone:</span> {centre.contact.phone}
+                          <span className="font-medium text-syro-blue">Phone:</span> {centre.contact.phone}
                         </p>
                       )}
                       {centre.contact.emails && centre.contact.emails.map((email, i) => (
                         <p key={i}>
-                          <span className="font-medium text-foreground">Email:</span>{' '}
-                          <a href={`mailto:${email.split(' ')[0]}`} className="text-primary hover:underline">
+                          <span className="font-medium text-syro-blue">Email:</span>{' '}
+                          <a href={`mailto:${email.split(' ')[0]}`} className="text-syro-red hover:underline">
                             {email}
                           </a>
                         </p>
                       ))}
                       {centre.contact.website && (
                         <p>
-                          <span className="font-medium text-foreground">Website:</span>{' '}
+                          <span className="font-medium text-syro-blue">Website:</span>{' '}
                           {centre.contact.website.split(', ').map((site, i) => (
                             <React.Fragment key={i}>
                               {i > 0 && ', '}
@@ -166,7 +166,7 @@ export default function MajorCentresPage() {
                                 href={`http://${site}`} 
                                 target="_blank" 
                                 rel="noopener noreferrer"
-                                className="text-primary hover:underline"
+                                className="text-syro-red hover:underline"
                               >
                                 {site}
                               </a>
@@ -186,12 +186,12 @@ export default function MajorCentresPage() {
       <QuickLinks />
 
       {/* Navigation */}
-      <section className="py-12 bg-muted">
+      <section className="py-12 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-center">
             <Link
               href="/mosc/institutions"
-              className="inline-flex items-center px-6 py-3 bg-primary text-white font-body font-medium rounded-lg hover:bg-primary/90 reverent-transition sacred-shadow"
+              className="inline-flex items-center px-6 py-3 bg-syro-red text-white font-syro-primary font-medium rounded-lg hover:bg-syro-red/90 transition-all duration-300 shadow-syro-card"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />

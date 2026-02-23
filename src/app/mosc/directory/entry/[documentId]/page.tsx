@@ -27,15 +27,15 @@ export default async function DirectoryEntryDetailPage({ params }: PageProps) {
   const listPath = `/mosc/directory/${entry.directoryType}`;
 
   return (
-    <div className="min-h-screen bg-background">
-      <section className="relative bg-gradient-to-br from-background to-muted py-12 lg:py-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Link href={listPath} className="font-body text-primary hover:underline mb-4 inline-block">
+    <div className="min-h-screen bg-syro-bg-gray">
+      <section className="relative bg-syro-bg-gray py-12 lg:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Link href={listPath} className="font-body text-syro-blue hover:underline mb-4 inline-block">
             ← {typeLabel}
           </Link>
           <div className="flex flex-col sm:flex-row gap-6 items-start">
             {entry.imageUrl && (
-              <div className="relative w-40 h-40 flex-shrink-0 rounded-xl overflow-hidden bg-muted/40 sacred-shadow">
+              <div className="relative w-40 h-40 flex-shrink-0 rounded-xl overflow-hidden bg-syro-bg-gray sacred-shadow">
                 <Image
                   src={entry.imageUrl}
                   alt={entry.imageAlt ?? entry.name}
@@ -47,48 +47,48 @@ export default async function DirectoryEntryDetailPage({ params }: PageProps) {
               </div>
             )}
             <div className="min-w-0 flex-1">
-              <h1 className="font-heading font-semibold text-2xl lg:text-3xl text-foreground">
+              <h1 className="font-heading font-semibold text-2xl lg:text-3xl text-syro-blue">
                 {entry.name}
               </h1>
               {entry.description && (
-                <p className="font-body text-muted-foreground mt-2">{entry.description}</p>
+                <p className="font-body text-syro-dark-gray mt-2">{entry.description}</p>
               )}
             </div>
           </div>
         </div>
       </section>
 
-      <section className="py-12 bg-card">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-muted/20 rounded-lg p-6 sacred-shadow-sm border-l-4 border-primary space-y-4">
+      <section className="py-12 bg-syro-bg-gray">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-lg p-6 sacred-shadow-sm border-l-4 border-syro-red space-y-4 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]">
             {entry.address && (
               <div>
-                <h3 className="font-heading font-medium text-foreground mb-1">Address</h3>
-                <p className="font-body text-muted-foreground whitespace-pre-line">{entry.address}</p>
+                <h3 className="font-heading font-medium text-syro-blue mb-1">Address</h3>
+                <p className="font-body text-syro-dark-gray whitespace-pre-line">{entry.address}</p>
               </div>
             )}
             {entry.email && (
               <div>
-                <h3 className="font-heading font-medium text-foreground mb-1">Email</h3>
-                <a href={`mailto:${entry.email}`} className="font-body text-primary hover:underline">
+                <h3 className="font-heading font-medium text-syro-blue mb-1">Email</h3>
+                <a href={`mailto:${entry.email}`} className="font-body text-syro-blue hover:underline">
                   {entry.email}
                 </a>
               </div>
             )}
             {entry.phones && (
               <div>
-                <h3 className="font-heading font-medium text-foreground mb-1">Phone(s)</h3>
-                <p className="font-body text-muted-foreground">{entry.phones}</p>
+                <h3 className="font-heading font-medium text-syro-blue mb-1">Phone(s)</h3>
+                <p className="font-body text-syro-dark-gray">{entry.phones}</p>
               </div>
             )}
             {entry.website && (
               <div>
-                <h3 className="font-heading font-medium text-foreground mb-1">Website</h3>
+                <h3 className="font-heading font-medium text-syro-blue mb-1">Website</h3>
                 <a
                   href={entry.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-body text-primary hover:underline"
+                  className="font-body text-syro-blue hover:underline"
                 >
                   {entry.website}
                 </a>
@@ -96,7 +96,7 @@ export default async function DirectoryEntryDetailPage({ params }: PageProps) {
             )}
           </div>
           <div className="mt-8">
-            <Link href={listPath} className="font-body text-primary font-medium hover:underline">
+            <Link href={listPath} className="font-body text-syro-blue font-medium hover:underline">
               ← Back to {typeLabel}
             </Link>
           </div>

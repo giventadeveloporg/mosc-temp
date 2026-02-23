@@ -1,65 +1,57 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import SyroPageBanner from '../../components/SyroPageBanner';
 import { SAINTS_SIDEBAR_LINKS } from '../saintsSidebarLinks';
 
 export const metadata = {
   title: 'Early Church Fathers',
-  description: 'Church Fathers during the 4th and 5th centuries—Pamphilus, Eusebius, Athanasius, Basil, the Gregories, John Chrysostom, Cyril of Jerusalem.',
+  description: 'Church Fathers during the 4th and 5th centuriesâ€”Pamphilus, Eusebius, Athanasius, Basil, the Gregories, John Chrysostom, Cyril of Jerusalem.',
 };
 
 const currentSlug = '/mosc/saints/early-church-father';
 
-export default function EarlyChurchFatherPage() {
+export default async function EarlyChurchFatherPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string }>;
+}) {
+  const params = await searchParams;
+  const breadcrumbFrom = params.from === 'saints' ? 'saints' : 'home';
   return (
-    <div className="bg-background">
-      <section className="py-16 bg-gradient-to-br from-background to-muted">
+    <div className="bg-syro-bg-gray">
+      <SyroPageBanner title="Early Church Fathers" breadcrumbFrom={breadcrumbFrom} />
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-primary rounded-lg flex items-center justify-center mx-auto mb-6 sacred-shadow-lg">
-              <span className="text-primary-foreground text-4xl font-bold" role="img" aria-label="Church Fathers">📜</span>
-            </div>
-            <h1 className="font-heading font-semibold text-4xl text-foreground mb-4">
-              Early Church Fathers
-            </h1>
-            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Church Fathers during the 4th and 5th centuries
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16 bg-card">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
-              <div className="bg-background rounded-lg sacred-shadow p-8">
+              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 <div className="mb-8">
                   <Image
                     src="/images/saints/early-church-father.jpg"
                     alt="Early Church Fathers"
                     width={500}
                     height={300}
-                    className="rounded-lg sacred-shadow w-full h-auto object-contain"
+                    className="rounded-lg shadow-syro-card w-full h-auto object-contain"
                     priority
                   />
                 </div>
-                <div className="prose prose-lg max-w-none font-body text-muted-foreground leading-relaxed space-y-4">
-                  <h2 className="font-heading font-semibold text-xl text-foreground">Church Fathers during 4th and 5th Centuries</h2>
+                <div className="prose prose-lg max-w-none font-syro-primary text-syro-dark-gray leading-relaxed space-y-4">
+                  <h2 className="font-syro-display font-semibold text-xl text-syro-blue">Church Fathers during 4th and 5th Centuries</h2>
                   <p className="text-justify">
                     The fourth and fifth centuries may be regarded as the greatest centuries as far as the defense of faith is concerned. There were many heresies attacked the Church and the Church strongly defended its true faith through her faithful believers. The heroic children of the Church fought against the opponents of the Church through their teachings and literary works. We can say, without any doubt, these significant personalities are really heroes, the champions of Orthodoxy. The Church cherishes them in her heart as sources and models for Spirit inspired life.
                   </p>
 
-                  <h3 className="font-heading font-medium text-lg text-foreground mt-8 mb-2">PAMPHILUS OF CAESAREA (+ ca AD. 309)</h3>
+                  <h3 className="font-syro-display font-medium text-lg text-syro-blue mt-8 mb-2">PAMPHILUS OF CAESAREA (+ ca AD. 309)</h3>
                   <p className="text-justify">
                     Pamphilus was born at Berytus in Phoenicia. After the primary education in his native place, he went to Alexandria for higher studies. He then reached Caesarea and read books on Theology and Philosophy from the library of Origen. He became a priest and votary of Origen. He took copies of many important works and added them to Origen&apos;s collection of books. Maximinus had started his persecutions and had imprisoned many Christians including Pamaphilus. While imprisoned in the persecution of Maximinus, he wrote an Apology for Origen, highlighting the greatness of Origen&apos;s theology. He made many copies of the Greek Bible, which later led to the propagation of the Bible. Pamphilus&apos; Chief contribution was that he shaped Eusabius into a student of history who later became the father of Church history. Pamphilus suffered martyrdom by 309.
                   </p>
 
-                  <h3 className="font-heading font-medium text-lg text-foreground mt-8 mb-2">EUSEBIUS PAMPHILUS OF CAESAREA (ca.AD 263-340)</h3>
+                  <h3 className="font-syro-display font-medium text-lg text-syro-blue mt-8 mb-2">EUSEBIUS PAMPHILUS OF CAESAREA (ca.AD 263-340)</h3>
                   <p className="text-justify">
                     Eusebius, the Father of Ecclesiastical History, was born at Caesarea in Palestine about the year 263 AD. Eusebius grew up as the disciple and spiritual son of Pamphilus and he got good education and training in research. In gratitude to Pamphilus, Eusebius took his name and called himself Eusebius Pamphili implying Eusebius, son of Pamphilus. When Pamphilus died, he fled to Tyre, then to Egypt and at the end, he returned to Caesarea in 313, and there he became a bishop. It was at this time that the disputes about Arius&apos; heresy rocked the whole Church of the Roman Empire. Eusebius also participated in some discussions. He put forward a proposal to solve the problem. Unfortunately, it created three groups in the Church: 1) those who favoured Arius, 2) those who favoured Athanasius and 3) those who favoured Eusebius, the mediator. He enjoyed the Emperor Constantine&apos;s friendship and it was a very influential one. He died around 340 AD.
                   </p>
-                  <h4 className="font-heading font-medium text-base text-foreground mt-6 mb-2">LITERARY CONTRIBUTIONS OF EUSEBIUS OF CAESAREA</h4>
+                  <h4 className="font-syro-display font-medium text-base text-syro-blue mt-6 mb-2">LITERARY CONTRIBUTIONS OF EUSEBIUS OF CAESAREA</h4>
                   <p className="text-justify font-semibold">Historical writings</p>
                   <p className="text-justify">
                     History of the Church (inter.AD 300-325): Eusebius Ecclesiastical history is the principal source for the history of Christianity from the Apostolic Age to his own day. It contains an immense range of material on the Eastern Church, largely in the form extracts taken over bodily from earlier writers. It contains ten books. The first book is a historical analysis about Jesus Christ. The remaining books contain facts connected with the growth of Church. Importance is given to the description about martyrs.
@@ -83,7 +75,7 @@ export default function EarlyChurchFatherPage() {
                     The Life of the Blessed Emperor Constantine is an inspiring work, contains four books. The circumstances of the conversion of the persecuted Church into the royal Church and the transformation of the heathen temples into Christian Churches are especially noteworthy.
                   </p>
 
-                  <h3 className="font-heading font-medium text-lg text-foreground mt-8 mb-2">ATHANASIUS OF ALEXANDRIA</h3>
+                  <h3 className="font-syro-display font-medium text-lg text-syro-blue mt-8 mb-2">ATHANASIUS OF ALEXANDRIA</h3>
                   <p className="text-justify">
                     Athanasius was the great soldier of faith who fought bravely for truth. St. Basil describes him as the Divine doctor given to the Church. St. Gregory of Nazianzus depicts him as the Pillar of the Church. His life was eventful and he became famous as the fighter against Arius&apos; heresy.
                   </p>
@@ -97,7 +89,7 @@ export default function EarlyChurchFatherPage() {
                     Those were the days when Arius&apos; heresies were rocking the Church Athanasius realized that Arius&apos; denial of Christ&apos;s divinity would ruin the basis of Christian faith. Immediately he started using his tongue and pen against Arius. He argued that the basis of Christian faith is that God saved man by incarnation, and that if Jesus Christ is not God, we had not been saved. In the end, Emperor Constantine convened the synod of Nice to resolve the issues including this.
                   </p>
                   <p className="text-justify">
-                    Athanasius attended the synod as the Secretary of Bishop Alexander. The synod lasted for three months and Athanasius&apos; voice reverberated in it. It was very difficult to take decisions against Arius. Athanasius stood firmly for the phrase ὁμοουσιον τω πατρι (of the same substance with the Father) to qualify the Son. He was not ready to accept even the phrase ὁμοιουσιον τω πατρι (of the similar substance with the Father) suggested by moderates like Eusebius of Caesarea. The essential part of the Creed about faith in the Son of God was written in the Nicene Synod under the leadership of Athanasius.
+                    Athanasius attended the synod as the Secretary of Bishop Alexander. The synod lasted for three months and Athanasius&apos; voice reverberated in it. It was very difficult to take decisions against Arius. Athanasius stood firmly for the phrase á½Î¼Î¿Î¿Ï…ÏƒÎ¹Î¿Î½ Ï„Ï‰ Ï€Î±Ï„ÏÎ¹ (of the same substance with the Father) to qualify the Son. He was not ready to accept even the phrase á½Î¼Î¿Î¹Î¿Ï…ÏƒÎ¹Î¿Î½ Ï„Ï‰ Ï€Î±Ï„ÏÎ¹ (of the similar substance with the Father) suggested by moderates like Eusebius of Caesarea. The essential part of the Creed about faith in the Son of God was written in the Nicene Synod under the leadership of Athanasius.
                   </p>
                   <p className="text-justify">
                     In 328 AD, he succeeds Alexander in the see of Alexandria. Then he visited the Churches under his jurisdiction and confirmed the believers in true faith. The problem created by Arius was a headache to him. They influenced the Emperor and brought forward many allegations against Athanasius. At last, the exiled Arius and his companions were called back; Athanasius was accused of theft, adultery and murder. However, they failed to prove their allegations. Later he was accused of treason and false witnesses were presented against him. The allegation was that Athanasius blocked the ship bringing corn from Egypt to Byzantium. Hearing the words of the false witnesses the Emperor ordered Athanasius to be exiled to Tyre in 335 AD.
@@ -111,10 +103,10 @@ export default function EarlyChurchFatherPage() {
                   </p>
                   <p className="text-justify font-semibold">MAIN TEACHINGS OF ATHANASIUS OF ALEXANDRIA</p>
                   <p className="text-justify">
-                    The Father, The Son and The Holy Spirit are of the same substance (ὁμοουσιος). Jesus Christ is perfect God and perfect Man. Athanasius&apos; main teaching on Christ is contained in the phrase ὁμοουσιος (consubstantial) and in this statement: He became man so that we might be made God; and He manifested Himself in the flesh, so that we might grasp the idea of the unseen father; and he endured the insolence of men, so that we might receive the inheritance of immortality (On Incarnation 54:3). The doctrine of salvation would have been in danger, if the heresy of Arius had gained momentum. Athanasius found in the Incarnation and Crucifixion a single act of God in His attempt to redeem humanity. He refused to see them as two different actions. Athanasius taught about the Divinity of the Holy Spirit and His emanation from God.
+                    The Father, The Son and The Holy Spirit are of the same substance (á½Î¼Î¿Î¿Ï…ÏƒÎ¹Î¿Ï‚). Jesus Christ is perfect God and perfect Man. Athanasius&apos; main teaching on Christ is contained in the phrase á½Î¼Î¿Î¿Ï…ÏƒÎ¹Î¿Ï‚ (consubstantial) and in this statement: He became man so that we might be made God; and He manifested Himself in the flesh, so that we might grasp the idea of the unseen father; and he endured the insolence of men, so that we might receive the inheritance of immortality (On Incarnation 54:3). The doctrine of salvation would have been in danger, if the heresy of Arius had gained momentum. Athanasius found in the Incarnation and Crucifixion a single act of God in His attempt to redeem humanity. He refused to see them as two different actions. Athanasius taught about the Divinity of the Holy Spirit and His emanation from God.
                   </p>
 
-                  <h3 className="font-heading font-medium text-lg text-foreground mt-8 mb-2">4. BASIL THE GREAT OF CAESAREA</h3>
+                  <h3 className="font-syro-display font-medium text-lg text-syro-blue mt-8 mb-2">4. BASIL THE GREAT OF CAESAREA</h3>
                   <p className="text-justify">
                     The three great lights who are so often referred to as the Three Cappadocians are Basil the Great of Caesarea, his friend Gregory of Nazianzus, and his own brother, Gregory of Nyssa. Basil the Great is the senior venerable member among them. He was the first ascetic leader of the Eastern (Greek) Church tradition. Also called Second Athanasius, he proved his personality not only in the ascetic movement but also in the realms of Church administration and theology.
                   </p>
@@ -132,7 +124,7 @@ export default function EarlyChurchFatherPage() {
                     Basil&apos;s works may be classified as Books supporting faith (dogmatic works), Works about the Bible, those related to ascetic life and homilies, letters etc. Dogmatic: Against Eunomius; De Spiritu Sancto. Exegetical: homilies on Genesis, Psalms, Isaiah. Ascetical: Moralia, Monastic rules. The Holy Trinity is the main subject of his dogmatic writings. He opposed all those who regarded the Holy Spirit as subordinate to the Son. His teachings insist that the Father, the Son and the Holy Spirit are of the same essence. He used Ousia and Hypostasis to explain the unity and Trinity of God.
                   </p>
 
-                  <h3 className="font-heading font-medium text-lg text-foreground mt-8 mb-2">5. GREGORY OF NAZIANZUS</h3>
+                  <h3 className="font-syro-display font-medium text-lg text-syro-blue mt-8 mb-2">5. GREGORY OF NAZIANZUS</h3>
                   <p className="text-justify">
                     Gregory was born around AD 330 at Arianzuz in Cappadocea. His father was Gregorios who was the Bishop of Nazianzus. His mother, Nonna, was an ideal woman. Gregory says in one of his speeches about the profound influence his mother had on him. &quot;My mother dedicated me to God even before I was born&quot;.
                   </p>
@@ -144,7 +136,7 @@ export default function EarlyChurchFatherPage() {
                     Gregory is one of the great Church Fathers, and one of the greatest orators of Christian antiquity. He alone, among the Fathers is given St.John&apos;s title, The Theologian. Orations (including five theological orations), Discourses on special occasions, Letters (about 243), Poems. Main teachings: The doctrine of Trinity is the heart of true Christian faith. He stressed the complete humanity of our savior along with His complete divinity. The union between the Godhead and perfect humanhood is very necessary for the perfect redemption of humanity.
                   </p>
 
-                  <h3 className="font-heading font-medium text-lg text-foreground mt-8 mb-2">6. GREGORY OF NYSSA</h3>
+                  <h3 className="font-syro-display font-medium text-lg text-syro-blue mt-8 mb-2">6. GREGORY OF NYSSA</h3>
                   <p className="text-justify">
                     Gregory of Nyssa is the younger brother of Basil of Caesarea, born about the year 335 AD., and the third of the Three Cappadocians. He was known as the star of the Nyssa. He was a devotee who became eloquent in silence and a spiritual spark burning in devotional ascents. He was an extraordinary gifted man as mystic, theologian and writer.
                   </p>
@@ -156,7 +148,7 @@ export default function EarlyChurchFatherPage() {
                     Works are classified into: exegetical, dogmatic, ascetical, discourses, letters. Main teachings: Men must be regarded as many because each of them acts independently; the Godhead is one because Father never acts independently of the Son or the Holy Spirit. The Divine action begins from the Father, proceeds through the Son and is completed in the Holy Spirit. About incarnation, Gregory taught that God came to be in human nature, but the manner of the union is as mysterious and inexplicable as the union between body and soul in man.
                   </p>
 
-                  <h3 className="font-heading font-medium text-lg text-foreground mt-8 mb-2">7. JOHN CHRYSOSTOM</h3>
+                  <h3 className="font-syro-display font-medium text-lg text-syro-blue mt-8 mb-2">7. JOHN CHRYSOSTOM</h3>
                   <p className="text-justify">
                     John Chrysostom succeeded Gregory of Nazianzus as the Patriarch of Constantinople. Both had brilliant personality. Nevertheless, both failed to please the envious and those in authority; hence, they had to give up their positions. The life history of John Chrysostom is the history of his unflinching fight against injustice.
                   </p>
@@ -171,7 +163,7 @@ export default function EarlyChurchFatherPage() {
                     No one else among the Greek Fathers has so large a body of extant writings as has John Chrysostom. Exegetical: Homilies on Genesis, on the Gospel of John, on the Gospel of Mathew, on the Epistle to the Romans, on First Corinthians, on Galatians, on Philippians, on Second Timothy, Explanations of the Psalms, on Hebrews, on Thessalonians. Discourses: Homilies on the Incident of the Statues, The Proof that Christ is God, Homilies against the Anomians. Moral and Ascetical Treatises, Letters. Main teachings: The essence of the Father and the Son is same. The Word become flesh without having any change or mixing in their natures, and there is no separation. He applied the term mystery to the sacraments, to Incarnation and Crucifixion. The essence of Holy Eucharist is the uniting of the communicants with Christ. About priesthood, though the service of a priest takes place on earth it should be considered as taking place in heaven.
                   </p>
 
-                  <h3 className="font-heading font-medium text-lg text-foreground mt-8 mb-2">8. CYRIL OF JERUSALEM</h3>
+                  <h3 className="font-syro-display font-medium text-lg text-syro-blue mt-8 mb-2">8. CYRIL OF JERUSALEM</h3>
                   <p className="text-justify">
                     Cyril was born in Palestine around AD 313. He must have completed his education in Jerusalem and Caesarea. In 335, he was ordained deacon and in 345 Maximus II of Jerusalem ordained him priest. He became the bishop of Jerusalem when Maximus died. He did not engaged in any doctrinal controversies but he opposed Arianism in his writings, and thus, the Arians later troubled him. He was a scapegoat of many wrong notions and so he was exiled three times. It was during his time that a great famine occurred in Jerusalem and its suburbs. Cyril had to sell even the things of the Church to support the helpless that came to him. He attended the Synod at Constantinople in 381 and signed the final decision against Arius and Macedonius. He died in 18 March 386.
                   </p>
@@ -187,17 +179,17 @@ export default function EarlyChurchFatherPage() {
               </div>
             </div>
             <div className="lg:col-span-1">
-              <div className="bg-background rounded-lg sacred-shadow p-6 mb-6">
-                <h3 className="font-heading font-semibold text-lg text-foreground mb-4">Saints Categories</h3>
+              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-6 mb-6">
+                <h3 className="font-syro-display font-semibold text-lg text-syro-blue mb-4">Saints Categories</h3>
                 <nav className="space-y-2">
                   {SAINTS_SIDEBAR_LINKS.map((link) => (
                     <Link
                       key={link.href}
-                      href={link.href}
-                      className={`block px-3 py-2 rounded-md font-body text-sm reverent-transition ${
+                      href={link.href === '/mosc/saints' ? link.href : `${link.href}?from=saints`}
+                      className={`block px-3 py-2 rounded-md font-syro-primary text-sm transition-all duration-300 ${
                         link.href === currentSlug
-                          ? 'bg-primary text-primary-foreground'
-                          : 'text-muted-foreground hover:text-primary hover:bg-muted'
+                          ? 'bg-syro-red text-white'
+                          : 'text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray'
                       }`}
                     >
                       {link.label}
@@ -205,16 +197,16 @@ export default function EarlyChurchFatherPage() {
                   ))}
                 </nav>
               </div>
-              <div className="bg-background rounded-lg sacred-shadow p-6">
-                <h3 className="font-heading font-semibold text-lg text-foreground mb-4">Quick Links</h3>
+              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-6">
+                <h3 className="font-syro-display font-semibold text-lg text-syro-blue mb-4">Quick Links</h3>
                 <nav className="space-y-2">
-                  <Link href="/mosc/the-church" className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition">The Church</Link>
-                  <Link href="/mosc/holy-synod" className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition">Holy Synod</Link>
-                  <Link href="/mosc/dioceses" className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition">Dioceses</Link>
-                  <Link href="/mosc/ecumenical" className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition">Ecumenical Relations</Link>
-                  <Link href="/mosc/institutions" className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition">Institutions</Link>
-                  <Link href="/mosc/gallery" className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition">Gallery</Link>
-                  <Link href="/mosc/contact-info" className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition">Contact Info</Link>
+                  <Link href="/mosc/the-church" className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300">The Church</Link>
+                  <Link href="/mosc/holy-synod" className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300">Holy Synod</Link>
+                  <Link href="/mosc/dioceses" className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300">Dioceses</Link>
+                  <Link href="/mosc/ecumenical" className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300">Ecumenical Relations</Link>
+                  <Link href="/mosc/institutions" className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300">Institutions</Link>
+                  <Link href="/mosc/gallery" className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300">Gallery</Link>
+                  <Link href="/mosc/contact-info" className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300">Contact Info</Link>
                 </nav>
               </div>
             </div>

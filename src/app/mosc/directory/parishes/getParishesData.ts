@@ -1,13 +1,14 @@
 /**
  * Server-side data for Directory Parishes (Strapi GET /api/parishes).
- * API reference: documentation/parish_directory_portal/directory_api_reference.md §5
+ * API reference: documentation/parish_directory_portal/api_reference.md and directory_api_reference.md §5
  */
 
 import 'server-only';
-import { getStrapiApiBase, getStrapiHeaders, getStrapiTenantId } from '@/lib/strapi';
+import { getStrapiUrl, getStrapiApiBase, getStrapiHeaders, getStrapiTenantId } from '@/lib/strapi';
+import { getMediaUrl, getMediaAlt } from '../lib/strapiMedia';
 import type { Parish, ParishesListResult, StrapiPagination } from './types';
 
-function parseParish(raw: Record<string, unknown>): Parish {
+function parseParish(raw: Record<string, unknown>, baseUrl: string): Parish {
   const documentId = typeof raw.documentId === 'string' ? raw.documentId : '';
   const name = typeof raw.name === 'string' ? raw.name : '';
   const slug = typeof raw.slug === 'string' ? raw.slug : '';
@@ -24,6 +25,9 @@ function parseParish(raw: Record<string, unknown>): Parish {
   let dioceseName: string | null = null;
   const diocese = raw.diocese as Record<string, unknown> | undefined;
   if (diocese && typeof diocese.name === 'string') dioceseName = diocese.name;
+  const image = raw.image;
+  const imageUrl = image && baseUrl ? getMediaUrl(image, baseUrl) : null;
+  const imageAlt = image ? (getMediaAlt(image) ?? null) : null;
   return {
     documentId,
     name,
@@ -39,6 +43,8 @@ function parseParish(raw: Record<string, unknown>): Parish {
     state,
     postalCode,
     country,
+    imageUrl,
+    imageAlt,
   };
 }
 
@@ -54,9 +60,10 @@ export async function getParishesData(options: {
   page?: number;
   pageSize?: number;
 }): Promise<ParishesListResult> {
+  const baseUrl = getStrapiUrl();
   const base = getStrapiApiBase();
   const tenantId = getStrapiTenantId();
-  if (!base || !tenantId) return { parishes: [], pagination: DEFAULT_PAGINATION };
+  if (!baseUrl || !base || !tenantId) return { parishes: [], pagination: DEFAULT_PAGINATION };
 
   const params = new URLSearchParams();
   params.set('filters[tenant][tenantId][$eq]', tenantId);
@@ -64,6 +71,7 @@ export async function getParishesData(options: {
   if (nameQuery) params.set('filters[name][$containsi]', nameQuery);
   params.set('sort', 'name:asc');
   params.set('populate[0]', 'diocese');
+  params.set('populate[1]', 'image');
   const page = Math.max(1, options.page ?? 1);
   const pageSize = Math.min(100, Math.max(1, options.pageSize ?? 20));
   params.set('pagination[page]', String(page));
@@ -89,7 +97,7 @@ export async function getParishesData(options: {
     };
     const parishes = list
       .filter((item): item is Record<string, unknown> => item != null && typeof item === 'object')
-      .map(parseParish);
+      .map((item) => parseParish(item, baseUrl));
     return { parishes, pagination };
   } catch {
     return { parishes: [], pagination: DEFAULT_PAGINATION };
@@ -97,10 +105,11 @@ export async function getParishesData(options: {
 }
 
 export async function getParishByDocumentId(documentId: string): Promise<Parish | null> {
+  const baseUrl = getStrapiUrl();
   const base = getStrapiApiBase();
-  if (!base || !documentId) return null;
+  if (!baseUrl || !base || !documentId) return null;
   try {
-    const res = await fetch(`${base}/parishes/${documentId}?populate[0]=diocese`, {
+    const res = await fetch(`${base}/parishes/${documentId}?populate[0]=diocese&populate[1]=image`, {
       headers: getStrapiHeaders(),
       cache: 'no-store',
     });
@@ -108,7 +117,7 @@ export async function getParishByDocumentId(documentId: string): Promise<Parish 
     const json = (await res.json()) as { data?: Record<string, unknown> };
     const raw = json?.data;
     if (!raw || typeof raw !== 'object') return null;
-    return parseParish(raw);
+    return parseParish(raw, baseUrl);
   } catch {
     return null;
   }

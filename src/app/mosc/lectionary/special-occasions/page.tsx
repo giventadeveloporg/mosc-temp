@@ -2,7 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Metadata } from 'next';
-import QuickLinks from '@/components/holy-synod/QuickLinks';
+import QuickLinks from '../../components/QuickLinks';
 
 export const metadata: Metadata = {
   title: 'Special Occasions | Lectionary | MOSC',
@@ -158,29 +158,29 @@ export default function SpecialOccasionsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-syro-bg-gray">
       {/* Breadcrumb */}
-      <section className="bg-muted py-4">
+      <section className="bg-syro-bg-gray py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex items-center space-x-2 font-body text-sm text-muted-foreground">
-            <Link href="/mosc" className="hover:text-primary reverent-transition">
+          <nav className="flex items-center space-x-2 font-syro-primary text-sm text-syro-dark-gray">
+            <Link href="/mosc-old" className="hover:text-syro-red transition-all duration-300">
               MOSC
             </Link>
             <span>/</span>
-            <Link href="/mosc/lectionary" className="hover:text-primary reverent-transition">
+            <Link href="/mosc/lectionary" className="hover:text-syro-red transition-all duration-300">
               Lectionary
             </Link>
             <span>/</span>
-            <span className="text-foreground">Special Occasions</span>
+            <span className="text-syro-blue">Special Occasions</span>
           </nav>
         </div>
       </section>
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-background to-muted py-12 lg:py-16">
+      <section className="relative bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            <div className="relative w-full h-80 lg:h-96 rounded-lg overflow-hidden sacred-shadow-lg">
+            <div className="relative w-full h-80 lg:h-96 rounded-lg overflow-hidden shadow-syro-card-hover">
               <Image
                 src="/images/lectionary/sp.jpg"
                 alt="Special Occasions"
@@ -190,13 +190,13 @@ export default function SpecialOccasionsPage() {
               />
             </div>
             <div>
-              <h1 className="font-heading font-semibold text-4xl lg:text-5xl text-foreground mb-4">
+              <h1 className="font-syro-display font-semibold text-4xl lg:text-5xl text-syro-blue mb-4">
                 Special Occasions
               </h1>
-              <p className="font-body text-lg text-muted-foreground leading-relaxed mb-4">
+              <p className="font-syro-primary text-lg text-syro-dark-gray leading-relaxed mb-4">
                 Scripture readings for special feast days, commemorations of saints and martyrs, and the celebration of the holy sacraments of the Church.
               </p>
-              <p className="font-body text-lg text-muted-foreground leading-relaxed">
+              <p className="font-syro-primary text-lg text-syro-dark-gray leading-relaxed">
                 These readings guide us through the sacred occasions that mark important moments in the life of the Church and the spiritual journey of the faithful.
               </p>
             </div>
@@ -205,27 +205,27 @@ export default function SpecialOccasionsPage() {
       </section>
 
       {/* Feast Days Section */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-heading font-semibold text-3xl text-foreground mb-8 pb-4 border-b-2 border-primary">
+          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary">
             Feast Days and Commemorations
           </h2>
           <div className="space-y-12">
             {specialOccasions.map((occasion, index) => (
-              <div key={index} className="bg-muted/30 rounded-lg p-6 sacred-shadow-sm">
-                <h3 className="font-heading font-medium text-2xl text-foreground mb-6">
+              <div key={index} className="bg-syro-bg-gray rounded-lg p-6 shadow-syro-card-sm">
+                <h3 className="font-syro-display font-medium text-2xl text-syro-blue mb-6">
                   {occasion.title}
                 </h3>
                 <div className="space-y-4">
                   {occasion.sections.map((section, sIndex) => (
                     <div key={sIndex} className="border-l-4 border-primary pl-6">
-                      <h4 className="font-heading font-medium text-lg text-primary mb-2">
+                      <h4 className="font-syro-display font-medium text-lg text-syro-red mb-2">
                         {section.time}
                       </h4>
                       <ul className="space-y-1">
                         {section.verses.map((verse, vIndex) => (
-                          <li key={vIndex} className="font-body text-muted-foreground flex items-start">
-                            <span className="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                          <li key={vIndex} className="font-syro-primary text-syro-dark-gray flex items-start">
+                            <span className="w-2 h-2 bg-syro-red rounded-full mt-2 mr-3 flex-shrink-0"></span>
                             <span>{verse}</span>
                           </li>
                         ))}
@@ -240,25 +240,25 @@ export default function SpecialOccasionsPage() {
       </section>
 
       {/* Sacraments Section */}
-      <section className="py-16 bg-muted">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-heading font-semibold text-3xl text-foreground mb-8 pb-4 border-b-2 border-primary">
+          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary">
             Holy Sacraments
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {sacraments.map((sacrament, index) => (
-              <div key={index} className="bg-card rounded-lg p-6 sacred-shadow">
-                <h3 className="font-heading font-medium text-xl text-foreground mb-4">
+              <div key={index} className="bg-white rounded-lg p-6 shadow-syro-card">
+                <h3 className="font-syro-display font-medium text-xl text-syro-blue mb-4">
                   {sacrament.title}
                 </h3>
                 <div className="border-l-4 border-primary pl-6">
-                  <h4 className="font-heading font-medium text-sm text-primary mb-2">
+                  <h4 className="font-syro-display font-medium text-sm text-syro-red mb-2">
                     Readings
                   </h4>
                   <ul className="space-y-1">
                     {sacrament.readings.map((reading, rIndex) => (
-                      <li key={rIndex} className="font-body text-sm text-muted-foreground flex items-start">
-                        <span className="w-1.5 h-1.5 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                      <li key={rIndex} className="font-syro-primary text-sm text-syro-dark-gray flex items-start">
+                        <span className="w-1.5 h-1.5 bg-syro-red rounded-full mt-2 mr-3 flex-shrink-0"></span>
                         <span>{reading}</span>
                       </li>
                     ))}
@@ -271,25 +271,25 @@ export default function SpecialOccasionsPage() {
       </section>
 
       {/* Ordinations Section */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-heading font-semibold text-3xl text-foreground mb-8 pb-4 border-b-2 border-primary">
+          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary">
             Holy Priesthood Ordinations
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {ordinations.map((ordination, index) => (
-              <div key={index} className="bg-muted/30 rounded-lg p-6 sacred-shadow-sm">
-                <h3 className="font-heading font-medium text-lg text-foreground mb-4">
+              <div key={index} className="bg-syro-bg-gray rounded-lg p-6 shadow-syro-card-sm">
+                <h3 className="font-syro-display font-medium text-lg text-syro-blue mb-4">
                   {ordination.title}
                 </h3>
                 <div className="border-l-4 border-primary pl-6">
-                  <h4 className="font-heading font-medium text-sm text-primary mb-2">
+                  <h4 className="font-syro-display font-medium text-sm text-syro-red mb-2">
                     Readings
                   </h4>
                   <ul className="space-y-1">
                     {ordination.readings.map((reading, rIndex) => (
-                      <li key={rIndex} className="font-body text-sm text-muted-foreground flex items-start">
-                        <span className="w-1.5 h-1.5 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                      <li key={rIndex} className="font-syro-primary text-sm text-syro-dark-gray flex items-start">
+                        <span className="w-1.5 h-1.5 bg-syro-red rounded-full mt-2 mr-3 flex-shrink-0"></span>
                         <span>{reading}</span>
                       </li>
                     ))}
@@ -302,16 +302,16 @@ export default function SpecialOccasionsPage() {
       </section>
 
       {/* Info Box */}
-      <section className="py-12 bg-muted">
+      <section className="py-12 bg-syro-bg-gray">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-card rounded-lg sacred-shadow p-8">
-            <h2 className="font-heading font-semibold text-2xl text-foreground mb-4">
+          <div className="bg-white rounded-lg shadow-syro-card p-8">
+            <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4">
               About Special Occasions
             </h2>
-            <p className="font-body text-lg text-muted-foreground leading-relaxed mb-4">
+            <p className="font-syro-primary text-lg text-syro-dark-gray leading-relaxed mb-4">
               The Church celebrates numerous feast days throughout the year, honoring the memory of saints, martyrs, apostles, and the blessed Mother of God. Each of these occasions has its own appointed scripture readings that reflect the life and witness of those being commemorated.
             </p>
-            <p className="font-body text-lg text-muted-foreground leading-relaxed">
+            <p className="font-syro-primary text-lg text-syro-dark-gray leading-relaxed">
               The readings for the sacraments and ordinations highlight the sacred nature of these holy mysteries through which God's grace is bestowed upon the faithful.
             </p>
           </div>
@@ -321,12 +321,12 @@ export default function SpecialOccasionsPage() {
       <QuickLinks />
 
       {/* Navigation */}
-      <section className="py-12 bg-background">
+      <section className="py-12 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <Link
               href="/mosc/lectionary/kyomtho-easter-to-koodosh-edtho"
-              className="inline-flex items-center px-6 py-3 bg-card text-foreground font-body font-medium rounded-lg hover:bg-muted reverent-transition sacred-shadow"
+              className="inline-flex items-center px-6 py-3 bg-white text-syro-blue font-syro-primary font-medium rounded-lg hover:bg-syro-bg-gray transition-all duration-300 shadow-syro-card"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -335,7 +335,7 @@ export default function SpecialOccasionsPage() {
             </Link>
             <Link
               href="/mosc/lectionary"
-              className="inline-flex items-center px-6 py-3 bg-primary text-primary-foreground font-body font-medium rounded-lg hover:bg-primary/90 reverent-transition sacred-shadow"
+              className="inline-flex items-center px-6 py-3 bg-syro-red text-syro-red-foreground font-syro-primary font-medium rounded-lg hover:bg-syro-red/90 transition-all duration-300 shadow-syro-card"
             >
               Back to Lectionary Overview
             </Link>

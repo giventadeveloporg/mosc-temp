@@ -1,56 +1,34 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import QuickLinks from '@/components/holy-synod/QuickLinks';
+import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
 import TheChurchSidebar from '../TheChurchSidebar';
 
 export const metadata = {
   title: 'Oriental and Eastern Orthodox churches',
   description:
-    'How different is the Eastern Orthodox Church? Who are the Orthodox—Protestants or Roman Catholics? What do they believe differently? The Indian Orthodox Church belongs to the Oriental Orthodox family.',
+    'How different is the Eastern Orthodox Church? Who are the Orthodoxâ€”Protestants or Roman Catholics? What do they believe differently? The Indian Orthodox Church belongs to the Oriental Orthodox family.',
 };
 
-const OrientalAndEasternOrthodoxChurchesPage = () => {
+export default async function OrientalAndEasternOrthodoxChurchesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string }>;
+}) {
+  const params = await searchParams;
+  const breadcrumbFrom = params.from === 'the-church' ? 'the-church' : 'home';
+
   return (
-    <div className="bg-background">
-      {/* Hero Section - MOSC styling */}
-      <section className="py-16 bg-gradient-to-br from-background to-muted">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 sacred-shadow-lg border border-border/50">
-              <svg
-                className="w-10 h-10 text-primary"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                />
-              </svg>
-            </div>
-            <h1 className="font-heading font-semibold text-4xl text-foreground mb-4">
-              Oriental and Eastern Orthodox churches
-            </h1>
-            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              How different is the Eastern Orthodox Church? Who are these Orthodox—Protestants or
-              Roman Catholics? What do they believe differently? We belong to the Oriental Orthodox
-              family of churches.
-            </p>
-          </div>
-        </div>
-      </section>
+    <div className="bg-syro-bg-gray">
+      <SyroPageBanner title="Oriental and Eastern Orthodox churches" breadcrumbFrom={breadcrumbFrom} />
 
       {/* Main Content */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
-              <div className="bg-background rounded-lg sacred-shadow p-8">
+              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 {/* Featured Image - centered, contained */}
                 <div className="mb-8 flex justify-center">
                   <div className="relative w-full max-w-[280px] h-auto">
@@ -65,45 +43,45 @@ const OrientalAndEasternOrthodoxChurchesPage = () => {
                 </div>
 
                 <div className="prose prose-lg max-w-none">
-                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-4">
+                  <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4">
                     How Different is The Eastern Orthodox Church?
                   </h2>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Several people have asked this question in several different forms:
                   </p>
-                  <ul className="list-disc list-inside font-body text-muted-foreground leading-relaxed mb-6 space-y-2 pl-2">
-                    <li>Who are these Orthodox—Protestants or Roman Catholics?</li>
+                  <ul className="list-disc list-inside font-syro-primary text-syro-dark-gray leading-relaxed mb-6 space-y-2 pl-2">
+                    <li>Who are these Orthodoxâ€”Protestants or Roman Catholics?</li>
                     <li>What do they believe differently from the others?</li>
                     <li>What is the difference between Orthodox and other Christians?</li>
                   </ul>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Let me try some simple answers to these three questions.
                   </p>
 
-                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-4 mt-8">
+                  <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 mt-8">
                     Who are the Indian Orthodox?
                   </h2>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     First, both Roman Catholics and Protestants are Western Christian groups. The
                     Orthodox Church is not Western Christianity. Eastern in origin, it was from the
                     beginning open to influences from all cultures. In the first century,
                     Christianity was primarily an Asian-African religion. Only by the 4th century
                     did the Roman Empire become increasingly Christian. The strength of Christianity
                     in the early period was in Palestine, Syria, Greece, Asia Minor, Egypt, and
-                    Libya. We can make a list of the earliest Churches—the Churches of the first
+                    Libya. We can make a list of the earliest Churchesâ€”the Churches of the first
                     century.
                   </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    In the West, i.e. Italy: 2 Churches—Rome and Puteoli (today Pozzuoli near
-                    Naples). Western Greece: 5 Churches—Nicopolis, Corinth, Athens, Thessalonica
-                    and Philippi. Eastern Greece (Asia Minor, today Turkey): 15 Churches—Ephesus,
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
+                    In the West, i.e. Italy: 2 Churchesâ€”Rome and Puteoli (today Pozzuoli near
+                    Naples). Western Greece: 5 Churchesâ€”Nicopolis, Corinth, Athens, Thessalonica
+                    and Philippi. Eastern Greece (Asia Minor, today Turkey): 15 Churchesâ€”Ephesus,
                     Smyrna, Pergamum, Thyatira, Sardis, Philadelphia, Laodicea, Troas, Miletus,
                     Colossae, Perga, Pisidian Antioch, Iconium, Lystra, Derbe. Syria and the East:
-                    6 Churches—Antioch, Tarsus, Edessa, Damascus, Tyre, Sidon. Palestine: 4
-                    Churches—Caesarea, Jerusalem, Samaria, Pella. Cyprus: 2 Churches—Paphos and
+                    6 Churchesâ€”Antioch, Tarsus, Edessa, Damascus, Tyre, Sidon. Palestine: 4
+                    Churchesâ€”Caesarea, Jerusalem, Samaria, Pella. Cyprus: 2 Churchesâ€”Paphos and
                     Salamis. Egypt: Alexandria. Pentapolis (North Africa): Cyrene. India: Malabar.
                   </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     As you can see, only 2 out of 37 Apostolic Churches are strictly Western. If
                     Western Greece and Cyprus are also regarded as Europe, then nine Churches are
                     in Europe, while 28 are in Asia and Africa. The Orthodox Church claims to be
@@ -115,15 +93,15 @@ const OrientalAndEasternOrthodoxChurchesPage = () => {
                     astray from the true tradition of the Christian Church. The Protestant Churches
                     broke off much later (in the 16th century and after) from the Roman Catholic.
                   </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    The Orthodox are today in two families—the Oriental Orthodox family, to which
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
+                    The Orthodox are today in two familiesâ€”the Oriental Orthodox family, to which
                     the Indian Orthodox Church belongs, and the Byzantine Orthodox family, which is
-                    four times as large. The Oriental Orthodox family has five Churches—India,
-                    Armenia, Syria, Egypt and Ethiopia—three in Asia and two in Africa. Total
+                    four times as large. The Oriental Orthodox family has five Churchesâ€”India,
+                    Armenia, Syria, Egypt and Ethiopiaâ€”three in Asia and two in Africa. Total
                     membership is over 25 millions.
                   </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    The Byzantine Orthodox family has over 100 million members—in Greece, Russia,
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
+                    The Byzantine Orthodox family has over 100 million membersâ€”in Greece, Russia,
                     Romania, Bulgaria, Yugoslavia, Western Europe, America, Australia and so on.
                     Their members are mostly Slavic, Greek or Roman in origin. But they are also
                     regarded as Eastern, though they are a bit less Asian-African. Thus the Indian
@@ -134,14 +112,14 @@ const OrientalAndEasternOrthodoxChurchesPage = () => {
                     Apostolic Churches of the world.
                   </p>
 
-                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-4 mt-8">
+                  <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 mt-8">
                     What do they believe differently?
                   </h2>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The very question is a Western one. In the West a Church is defined mainly by
                     what it believes, i.e. by its doctrines and teachings. This intellectualist
                     orientation of faith does not belong to the Eastern tradition. The Orthodox
-                    confess the same faith as the ancient Church—the faith as was later formulated
+                    confess the same faith as the ancient Churchâ€”the faith as was later formulated
                     in the fourth century in the councils of Nicea and Constantinople. We object to
                     certain later additions made by the Roman Catholics, for example the addition
                     of the word &apos;filioque&apos; in the Latin creed. They, for example, teach
@@ -158,11 +136,11 @@ const OrientalAndEasternOrthodoxChurchesPage = () => {
                     eternal relation between the Father and the Spirit, and not the relation in
                     time and history.
                   </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     In the eternal dimension we cannot say that the Spirit proceeds from the
                     Father and the Son. Therefore &apos;filioque&apos; is out of place, wrong and
                     misleading. There are other doctrines and dogmas which the Roman Catholic
-                    Church has added to the Niceno-Constantinopolitan Creed—e.g. the dogma of the
+                    Church has added to the Niceno-Constantinopolitan Creedâ€”e.g. the dogma of the
                     Immaculate Conception, the dogma of Papal Infallibility, and the dogma of the
                     bodily assumption of the Blessed Virgin Mary. The first two are wrong and the
                     third is not dogma, for the Orthodox. We do not believe that there is any
@@ -175,15 +153,15 @@ const OrientalAndEasternOrthodoxChurchesPage = () => {
                     disciplining oneself as on the way of thinking and belief.
                   </p>
 
-                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-4 mt-8">
+                  <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 mt-8">
                     What then is the difference between East and West?
                   </h2>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     It is not so easy to pinpoint the difference in words. It seems the difference
                     is more one of ethos, of orientation, of spirit rather than of dogma or belief.
                     Let us state some of the more obvious differences.
                   </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The Roman Catholic Church, for example, believes in a universal organizational
                     structure for the Church with one particular bishop, namely the Bishop of Rome
                     or the Pope, holding a unique position in the whole world. We Easterners do
@@ -196,7 +174,7 @@ const OrientalAndEasternOrthodoxChurchesPage = () => {
                     Episcopal Synod and Patriarch is autocephalous, i.e. it has its own head, and
                     does not look to any other Church to exercise authority over it.
                   </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     This difference in turn is based on a more profound understanding of what we
                     call the Church Catholic. The Church Catholic is not the Roman Catholic Church.
                     It is the whole Church, in all time and space, in its qualitative and
@@ -209,7 +187,7 @@ const OrientalAndEasternOrthodoxChurchesPage = () => {
                     &quot;ecumenical church&quot; by the Constantinople Church, has been virtually
                     rejected by the Orthodox tradition.
                   </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Now the Roman Catholic Church has something called the Universal Church, and
                     the Pope is the head of this Universal Church. So, for them, the fullness of
                     the Church means the Universal Church which is for them, the manifestation of
@@ -220,7 +198,7 @@ const OrientalAndEasternOrthodoxChurchesPage = () => {
                     without the whole. Hence the insistence of the second Vatican Council that
                     &quot;The College or body of bishops has no authority unless it is
                     simultaneously conceived of in terms of its head, the Roman Pontiff,
-                    Peter&apos;s successor…. Together with its head, the Roman Pontiff, and never
+                    Peter&apos;s successorâ€¦. Together with its head, the Roman Pontiff, and never
                     without this head, the Episcopal order is the subject of Supreme and full power
                     over the Universal Church. But this power can be exercised only with the
                     consent of the Roman Pontiff.&quot; (Lumen Gentium: 22) This teaching the
@@ -233,7 +211,7 @@ const OrientalAndEasternOrthodoxChurchesPage = () => {
                     teaching of the Roman Church, we feel, is due to its breaking away from the
                     tradition of the Church Catholic in the 5th century.
                   </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Neither does the Orthodox Church teach that the bishop or college of bishops
                     alone exercise authority in the Church. Every baptised Christian shares in the
                     kingly, priestly and prophetic authority of the Church, though the bishop has
@@ -251,21 +229,21 @@ const OrientalAndEasternOrthodoxChurchesPage = () => {
                     and colonial expansionism of the West, and we would rather not be associated
                     with such an aggressive and institutionalized mission.
                   </p>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The worship of the Church is the centre of the Orthodox ethos, rather than its
                     mission. The mission follows naturally from true worship and feeds into it. It
                     is in the eucharistic worship of the Church that the Orthodox have a foretaste
                     of the Kingdom which is coming. To join with the angels and archangels in the
                     adoration of the one True God and to rejoice in his presence of the Spirit
-                    through the Son—this is the heart of the Orthodox ethos. The Orthodox Churches
+                    through the Sonâ€”this is the heart of the Orthodox ethos. The Orthodox Churches
                     under Muslim or Communist oppression always survived because of this worship
                     orientation. The West separates action from contemplation, thought and prayer.
                     For us it is in and from eucharistic worship that all action, contemplation,
                     thought and prayer derive their significance.
                   </p>
 
-                  <div className="bg-muted/30 rounded-lg p-6 mt-8 border border-border/50">
-                    <p className="font-body text-muted-foreground leading-relaxed text-sm italic">
+                  <div className="bg-syro-bg-gray rounded-lg p-6 mt-8 border border-syro-table-border">
+                    <p className="font-syro-primary text-syro-dark-gray leading-relaxed text-sm italic">
                       Dr. Paulos Mar Gregorios Metropolitan
                     </p>
                   </div>
@@ -292,4 +270,3 @@ const OrientalAndEasternOrthodoxChurchesPage = () => {
   );
 };
 
-export default OrientalAndEasternOrthodoxChurchesPage;

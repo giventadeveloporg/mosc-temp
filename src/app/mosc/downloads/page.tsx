@@ -3,9 +3,10 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import QuickLinks from '@/components/holy-synod/QuickLinks';
+import QuickLinks from '../components/QuickLinks';
+import SyroPageHero from '../components/SyroPageHero';
+import SyroSectionTitle from '../components/SyroSectionTitle';
 
-// All download items from https://mosc.in/downloads/ in display order; image = path under /images/
 const downloadItems: { title: string; link: string; image?: string }[] = [
   { title: 'local body Election winners award ceremony – Photos', link: '#', image: '/images/downloads/local_body_election.png' },
   { title: 'Catholicate Day Book Cover, Brochure', link: '#', image: '/images/downloads/catholictae_day.png' },
@@ -58,131 +59,66 @@ const downloadItems: { title: string; link: string; image?: string }[] = [
 
 export default function DownloadsPage() {
   return (
-    <div className="bg-background">
-      {/* Hero Section - same layout as the-church */}
-      <section className="relative bg-gradient-to-br from-background to-muted min-h-[280px] flex items-center py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 sacred-shadow-lg border border-border/50">
-              <svg
-                className="w-10 h-10 text-primary"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
-                />
-              </svg>
-            </div>
-            <h1 className="font-heading font-semibold text-4xl text-foreground mb-4">
-              Downloads
-            </h1>
-            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Access official church documents, prayer books, forms, and resources of the Malankara
-              Orthodox Syrian Church.
-            </p>
-          </div>
-        </div>
-      </section>
+    <div className="bg-syro-bg-gray">
+      <SyroPageHero
+        title="Downloads"
+        description="Access official church documents, prayer books, forms, and resources of the Malankara Orthodox Syrian Church."
+      />
 
-      {/* Main content - card grid same pattern as the-church */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="font-heading font-semibold text-3xl text-foreground mb-4">
-              Church Resources
-            </h2>
-            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto">
-              Select a resource below to view or download. Liturgical texts, forms, directories, and
-              official documents are available for the faithful and administration.
-            </p>
-          </div>
+          <SyroSectionTitle>Church Resources</SyroSectionTitle>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {downloadItems.map((item, index) => {
               const isPlaceholder = item.link === '#';
               return (
                 <div
                   key={index}
-                  className="bg-background rounded-lg sacred-shadow p-4 hover:sacred-shadow-lg reverent-transition group flex flex-col h-full min-h-0"
+                  className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 p-8 flex flex-col h-full"
                 >
-                  {/* Image container - fixed height, no shrink */}
-                  <div className="relative w-full h-48 min-h-[192px] flex-shrink-0 mb-3 rounded-lg overflow-hidden bg-muted/30 flex items-center justify-center p-3">
+                  <div className="relative w-full h-48 rounded-lg overflow-hidden bg-syro-bg-gray flex items-center justify-center mb-4">
                     {item.image ? (
-                      <div className="relative w-full h-full">
-                        <Image
-                          src={item.image}
-                          alt=""
-                          fill
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                          className="object-contain object-center group-hover:scale-105 reverent-transition"
-                        />
-                      </div>
+                      <Image
+                        src={item.image}
+                        alt=""
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-contain object-center"
+                      />
                     ) : (
-                      <svg
-                        className="w-10 h-10 text-primary"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                        />
+                      <svg className="w-10 h-10 text-syro-red" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
                     )}
                   </div>
-                  {/* Content: title + spacer so Download is always at bottom */}
-                  <div className="flex flex-col flex-1 min-h-0 text-left">
-                    <h3 className="font-heading font-semibold text-base text-foreground mb-1.5 group-hover:text-primary reverent-transition line-clamp-2 flex-shrink-0">
-                      {item.title}
-                    </h3>
-                    <div className="flex-1 min-h-[24px]" aria-hidden="true" />
-                    <Link
-                      href={item.link}
-                      className="inline-flex items-center gap-1.5 font-body text-sm font-medium text-primary hover:gap-2 reverent-transition flex-shrink-0"
-                      onClick={(e) => {
-                        if (isPlaceholder) {
-                          e.preventDefault();
-                          alert(
-                            'This resource will be available for download soon. Please check back later.'
-                          );
-                        }
-                      }}
-                    >
-                      Download
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
-                    </Link>
-                  </div>
+                  <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-2 line-clamp-2">
+                    {item.title}
+                  </h3>
+                  <div className="flex-1 min-h-[24px]" aria-hidden="true" />
+                  <Link
+                    href={item.link}
+                    className="syro-primary-button inline-flex items-center gap-2 w-fit"
+                    onClick={(e) => {
+                      if (isPlaceholder) {
+                        e.preventDefault();
+                        alert('This resource will be available for download soon. Please check back later.');
+                      }
+                    }}
+                  >
+                    Download
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </Link>
                 </div>
               );
             })}
           </div>
+
+          <QuickLinks />
         </div>
       </section>
-
-      <QuickLinks />
     </div>
   );
 }
