@@ -83,10 +83,10 @@ body {
   color: var(--syro-white);
 }
 
-/* Main titles */
+/* Main titles - use same font as Catholicos heading (Poppins) for consistency */
 .main-title h1,
 .main-title h2 {
-  font-family: var(--syro-font-display);
+  font-family: var(--syro-font-primary);
   font-size: var(--syro-h1);
   font-weight: 700;
   color: var(--syro-blue);

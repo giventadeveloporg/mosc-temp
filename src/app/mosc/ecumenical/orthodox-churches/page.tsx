@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import Image from 'next/image';
 import QuickLinks from '../../components/QuickLinks';
 import EcumenicalSidebar from '../../components/EcumenicalSidebar';
@@ -17,9 +17,9 @@ const orthodoxchurchesPage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Main Content */}
-            <div className="lg:col-span-3">
+            <div className="lg:col-span-2">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 {/* Featured Image */}
                 <div className="mb-8">
@@ -28,7 +28,7 @@ const orthodoxchurchesPage = () => {
                     alt="Orthodox Churches"
                     width={500}
                     height={300}
-                    className="rounded-lg shadow-syro-card w-full h-auto"
+                    className="rounded-lg shadow-syro-card w-auto h-auto block mx-auto"
                     priority
                   />
                 </div>
@@ -55,7 +55,7 @@ const orthodoxchurchesPage = () => {
             </div>
 
             {/* Sidebar */}
-            <div className="lg:col-span-1">
+            <div className="space-y-6 lg:col-span-1">
               <EcumenicalSidebar />
             </div>
           </div>

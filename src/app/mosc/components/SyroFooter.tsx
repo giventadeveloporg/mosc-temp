@@ -133,8 +133,10 @@ export default function SyroFooter() {
                     value={formData.full_name}
                     onChange={(e) => setFormData((p) => ({ ...p, full_name: e.target.value }))}
                     disabled={isSubmitting}
+                    required
+                    aria-required="true"
                   />
-                  <label htmlFor="contact-name">Name</label>
+                  <label htmlFor="contact-name">Name <span className="text-red-500" aria-hidden="true">*</span></label>
                 </div>
                 <div className="form-floating mb-2 subscribe-email-container">
                   <input
@@ -147,8 +149,10 @@ export default function SyroFooter() {
                     value={formData.email_address}
                     onChange={(e) => setFormData((p) => ({ ...p, email_address: e.target.value }))}
                     disabled={isSubmitting}
+                    required
+                    aria-required="true"
                   />
-                  <label htmlFor="contact-email">Email</label>
+                  <label htmlFor="contact-email">Email <span className="text-red-500" aria-hidden="true">*</span></label>
                 </div>
                 <div className="form-floating mb-2 subscribe-email-container">
                   <input
@@ -160,8 +164,10 @@ export default function SyroFooter() {
                     value={formData.phone_number}
                     onChange={(e) => setFormData((p) => ({ ...p, phone_number: e.target.value }))}
                     disabled={isSubmitting}
+                    required
+                    aria-required="true"
                   />
-                  <label htmlFor="contact-phone">Phone</label>
+                  <label htmlFor="contact-phone">Phone <span className="text-red-500" aria-hidden="true">*</span></label>
                 </div>
                 <div className="form-floating mb-4 subscribe-email-container">
                   <textarea
@@ -173,8 +179,10 @@ export default function SyroFooter() {
                     value={formData.feedback}
                     onChange={(e) => setFormData((p) => ({ ...p, feedback: e.target.value }))}
                     disabled={isSubmitting}
+                    required
+                    aria-required="true"
                   />
-                  <label htmlFor="contact-message">Message</label>
+                  <label htmlFor="contact-message">Message <span className="text-red-500" aria-hidden="true">*</span></label>
                 </div>
                 <button type="submit" className="primary-button submit-btn" disabled={isSubmitting}>
                   <span>{isSubmitting ? 'Sending...' : 'Submit'}</span>
@@ -282,12 +290,6 @@ export default function SyroFooter() {
         <div className="row footer-bottom-row">
           <div className="col-lg-4 footer-section-11 d-none d-lg-block">
             <ul className="list-unstyled">
-              <li className="float-end">
-                <Link href="/mosc">Terms &amp; Conditions</Link>
-              </li>
-              <li className="float-end">
-                <Link href="/mosc">Disclaimers</Link>
-              </li>
               <li className="float-end copy-right">
                 <Link href="/mosc">© {currentYear()} The Malankara Orthodox Church. All rights reserved.</Link>
               </li>
@@ -300,10 +302,6 @@ export default function SyroFooter() {
               </li>
             </ul>
             <div className="footer-bottom">
-              <p className="d-block d-lg-none w-100">
-                <Link href="/mosc#!" className="text-start">Terms &amp; Conditions</Link>{' '}
-                <Link href="/mosc#!" className="float-end">Disclaimers</Link>
-              </p>
               <p className="text-white text-center mb-2 d-block d-lg-none">Giventa Inc. USA</p>
               <p className="text-white text-center mb-2 d-block d-lg-none">
                 © {currentYear()} The Malankara Orthodox Church. All rights reserved.

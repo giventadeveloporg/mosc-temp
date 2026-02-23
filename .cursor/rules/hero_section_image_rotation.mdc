@@ -38,7 +38,7 @@ const DynamicHeroImage: React.FC = () => {
   const { filteredEvents, isLoading: eventsLoading, error } = useFilteredEvents('hero');
 
   // Default image path
-  const defaultImage = "/images/hero_section/default_hero_section_second_column_poster.webp";
+  const defaultImage = "/images/hero_section/default_hero_section_second_column_poster.jpeg";
 
   // Rotation logic with useEffect
   useEffect(() => {
@@ -1029,7 +1029,7 @@ const DynamicHeroImage: React.FC = () => {
   const [upcomingEvents, setUpcomingEvents] = useState<EventWithMediaExtended[]>([]);
 
   const { filteredEvents, isLoading: eventsLoading, error } = useFilteredEvents('hero');
-  const defaultImage = "/images/hero_section/default_hero_section_second_column_poster.webp";
+  const defaultImage = "/images/hero_section/default_hero_section_second_column_poster.jpeg";
 
   // Initialize images
   useEffect(() => {

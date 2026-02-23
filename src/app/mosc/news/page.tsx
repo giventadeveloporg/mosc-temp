@@ -6,6 +6,7 @@ import { ArticleList } from './components/ArticleList';
 import { SidebarPromo } from './components/SidebarPromo';
 import { FollowUsFacebook } from './components/FollowUsFacebook';
 import { AdSlots } from './components/AdSlots';
+import QuickLinks from '../components/QuickLinks';
 
 export const metadata = {
   title: 'News',
@@ -126,6 +127,9 @@ export default async function NewsPage() {
           </div>
         </div>
       </section>
+
+      {/* Quick Links - same as catholicate / his-holiness-baselios-geevarghese-i page */}
+      <QuickLinks />
     </div>
   );
 }

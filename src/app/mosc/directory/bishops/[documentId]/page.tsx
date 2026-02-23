@@ -42,7 +42,7 @@ export default async function BishopDetailPage({ params }: PageProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Link
             href="/mosc/directory/bishops"
-            className="font-body text-syro-red hover:underline mb-4 inline-block"
+            className="inline-block no-underline font-light text-white bg-[#dc3545] py-2.5 px-5 border-r-[7px] border-r-[#be1929] mb-4 transition-[1s] hover:bg-[#be1929] hover:border-r-[6px] hover:border-r-[#dc3545] hover:text-white"
           >
             ← Back to Bishops
           </Link>

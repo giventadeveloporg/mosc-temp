@@ -78,9 +78,9 @@ export default async function BishopsPage({ searchParams }: PageProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Link
             href="/mosc/directory"
-            className="font-body text-syro-blue hover:underline mb-4 inline-block"
+            className="inline-block no-underline font-light text-white bg-[#dc3545] py-2.5 px-5 border-r-[7px] border-r-[#be1929] mb-4 transition-[1s] hover:bg-[#be1929] hover:border-r-[6px] hover:border-r-[#dc3545] hover:text-white"
           >
-            ← Directory
+            ← Back to Directory
           </Link>
           <h1 className="font-heading font-semibold text-3xl lg:text-4xl text-syro-blue">
             {title}
@@ -173,9 +173,9 @@ export default async function BishopsPage({ searchParams }: PageProps) {
               </p>
               <Link
                 href="/mosc/directory"
-                className="font-body text-syro-blue font-medium mt-4 inline-block hover:underline"
+                className="inline-block no-underline font-light text-white bg-[#dc3545] py-2.5 px-5 border-r-[7px] border-r-[#be1929] mt-4 transition-[1s] hover:bg-[#be1929] hover:border-r-[6px] hover:border-r-[#dc3545] hover:text-white"
               >
-                Back to Directory
+                ← Back to Directory
               </Link>
             </div>
           ) : (

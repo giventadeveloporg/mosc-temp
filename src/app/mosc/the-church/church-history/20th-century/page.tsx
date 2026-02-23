@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import Image from 'next/image';
 import QuickLinks from '../../../components/QuickLinks';
 import SyroPageBanner from '../../../components/SyroPageBanner';
@@ -24,8 +24,8 @@ export default async function TwentiethCenturyPage({
 
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-3">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="lg:col-span-2">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 <div className="mb-8 flex justify-center">
                   <div className="relative w-full max-w-[280px] h-auto">
@@ -34,7 +34,7 @@ export default async function TwentiethCenturyPage({
                       alt="Church History â€“ 20th Century"
                       width={280}
                       height={180}
-                      className="w-full h-auto object-contain rounded-lg"
+                      className="w-auto h-auto object-contain rounded-lg block mx-auto"
                     />
                   </div>
                 </div>
@@ -103,7 +103,7 @@ export default async function TwentiethCenturyPage({
               </div>
             </div>
 
-            <div className="lg:col-span-1">
+            <div className="space-y-6 lg:col-span-1">
               <TheChurchSidebar />
             </div>
           </div>

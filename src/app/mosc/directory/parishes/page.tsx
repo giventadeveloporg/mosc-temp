@@ -45,8 +45,11 @@ export default async function ParishesPage({ searchParams }: PageProps) {
     <div className="min-h-screen bg-syro-bg-gray">
       <section className="relative bg-syro-bg-gray py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Link href="/mosc/directory" className="font-body text-syro-blue hover:underline mb-4 inline-block">
-            ← Directory
+          <Link
+            href="/mosc/directory"
+            className="inline-block no-underline font-light text-white bg-[#dc3545] py-2.5 px-5 border-r-[7px] border-r-[#be1929] mb-4 transition-[1s] hover:bg-[#be1929] hover:border-r-[6px] hover:border-r-[#dc3545] hover:text-white"
+          >
+            ← Back to Directory
           </Link>
           <h1 className="font-heading font-semibold text-3xl lg:text-4xl text-syro-blue">
             Parishes
@@ -84,7 +87,9 @@ export default async function ParishesPage({ searchParams }: PageProps) {
           {parishes.length === 0 ? (
             <div className="bg-white rounded-lg p-8 text-center border-l-4 border-syro-red shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]">
               <p className="font-body text-syro-dark-gray">No parishes listed yet. Data is loaded from the directory Parish API.</p>
-              <Link href="/mosc/directory" className="font-body text-syro-blue font-medium mt-4 inline-block hover:underline">Back to Directory</Link>
+              <Link href="/mosc/directory" className="inline-block no-underline font-light text-white bg-[#dc3545] py-2.5 px-5 border-r-[7px] border-r-[#be1929] mt-4 transition-[1s] hover:bg-[#be1929] hover:border-r-[6px] hover:border-r-[#dc3545] hover:text-white">
+            ← Back to Directory
+          </Link>
             </div>
           ) : (
             <>

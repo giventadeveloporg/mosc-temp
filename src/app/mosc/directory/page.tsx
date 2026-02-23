@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Metadata } from 'next';
 import { getDirectoryHomeData } from './getDirectoryHomeData';
 import type { DirectorySectionCard } from './types';
+import QuickLinks from '../components/QuickLinks';
 
 export const metadata: Metadata = {
   title: 'Directory | Malankara Orthodox Syrian Church',
@@ -157,7 +158,7 @@ export default async function DirectoryPage() {
             <h1 className="font-heading font-semibold text-4xl lg:text-5xl text-syro-blue mb-4">
               Malankara Orthodox Directory
             </h1>
-            <p className="font-body text-lg lg:text-xl text-syro-dark-gray max-w-3xl mx-auto mb-8">
+            <p className="font-body text-lg lg:text-xl text-black max-w-3xl mx-auto mb-8">
               {leadText}
             </p>
             <a
@@ -200,11 +201,11 @@ export default async function DirectoryPage() {
                       )}
                       <div className="p-6 flex flex-col flex-1">
                         <DirectoryCardIcon title={card.title} />
-                        <h2 className="font-heading font-semibold text-2xl text-syro-blue mb-3 group-hover:text-syro-red reverent-transition">
+                        <h2 className="font-heading font-semibold text-2xl text-black mb-3 group-hover:text-syro-red reverent-transition">
                           {card.title}
                         </h2>
                         {card.description && (
-                          <p className="font-body text-syro-dark-gray leading-relaxed flex-1">
+                          <p className="font-body text-black leading-relaxed flex-1">
                             {card.description}
                           </p>
                         )}
@@ -231,11 +232,11 @@ export default async function DirectoryPage() {
                       )}
                       <div className="p-6 flex flex-col flex-1">
                         <DirectoryCardIcon title={card.title} />
-                        <h2 className="font-heading font-semibold text-2xl text-syro-blue mb-3 group-hover:text-syro-red reverent-transition">
+                        <h2 className="font-heading font-semibold text-2xl text-black mb-3 group-hover:text-syro-red reverent-transition">
                           {card.title}
                         </h2>
                         {card.description && (
-                          <p className="font-body text-syro-dark-gray leading-relaxed flex-1">
+                          <p className="font-body text-black leading-relaxed flex-1">
                             {card.description}
                           </p>
                         )}
@@ -263,11 +264,11 @@ export default async function DirectoryPage() {
                     )}
                     <div className="p-6 flex flex-col flex-1">
                       <DirectoryCardIcon title={card.title} />
-                      <h2 className="font-heading font-semibold text-2xl text-syro-blue mb-3">
+                      <h2 className="font-heading font-semibold text-2xl text-black mb-3">
                         {card.title}
                       </h2>
                       {card.description && (
-                        <p className="font-body text-syro-dark-gray leading-relaxed flex-1">
+                        <p className="font-body text-black leading-relaxed flex-1">
                           {card.description}
                         </p>
                       )}
@@ -283,7 +284,7 @@ export default async function DirectoryPage() {
       {/* Update directory info / Login */}
       <section className="py-12 bg-syro-bg-gray">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="font-body text-syro-dark-gray mb-4">
+          <p className="font-body text-black mb-4">
             Need to update your Directory information?
           </p>
           <a
@@ -292,7 +293,7 @@ export default async function DirectoryPage() {
           >
             Email webmanager@mosc.in
           </a>
-          <p className="font-body text-sm text-syro-dark-gray mt-6">
+          <p className="font-body text-sm text-black mt-6">
             Login only for admin
           </p>
         </div>
@@ -335,19 +336,19 @@ export default async function DirectoryPage() {
       {/* Address Info - from directory.mosc.in */}
       <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-heading font-semibold text-2xl text-syro-blue mb-6 text-center">
+          <h2 className="font-heading font-semibold text-2xl text-black mb-6 text-center">
             Address Info
           </h2>
           <div className="bg-white rounded-lg sacred-shadow p-8 border-l-4 border-syro-red shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]">
-            <p className="font-body text-syro-blue font-medium mb-2">
+            <p className="font-body font-medium mb-2 text-black">
               Malankara Orthodox Church
             </p>
-            <p className="font-body text-syro-dark-gray">
+            <p className="font-body text-black">
               Catholicate Palace,<br />
               Devalokam,<br />
               Kottayam - 686 004
             </p>
-            <p className="font-body text-syro-dark-gray mt-4">
+            <p className="font-body text-black mt-4">
               <span className="font-medium text-syro-blue">Phone:</span> 0481 2578500, 0481 2578499
             </p>
           </div>
@@ -357,7 +358,7 @@ export default async function DirectoryPage() {
       {/* Related internal links */}
       <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-heading font-semibold text-3xl text-syro-blue mb-8 text-center">
+          <h2 className="font-heading font-semibold text-3xl text-black mb-8 text-center">
             Related Resources
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -368,7 +369,7 @@ export default async function DirectoryPage() {
               <h3 className="font-heading font-medium text-lg text-syro-blue mb-2 group-hover:text-syro-red reverent-transition">
                 Dioceses
               </h3>
-              <p className="font-body text-sm text-syro-dark-gray">
+              <p className="font-body text-sm text-black">
                 View all dioceses and their information
               </p>
             </Link>
@@ -379,7 +380,7 @@ export default async function DirectoryPage() {
               <h3 className="font-heading font-medium text-lg text-syro-blue mb-2 group-hover:text-syro-red reverent-transition">
                 Institutions
               </h3>
-              <p className="font-body text-sm text-syro-dark-gray">
+              <p className="font-body text-sm text-black">
                 Schools, hospitals, monasteries, and more
               </p>
             </Link>
@@ -390,7 +391,7 @@ export default async function DirectoryPage() {
               <h3 className="font-heading font-medium text-lg text-syro-blue mb-2 group-hover:text-syro-red reverent-transition">
                 Spiritual Organisations
               </h3>
-              <p className="font-body text-sm text-syro-dark-gray">
+              <p className="font-body text-sm text-black">
                 Organisations offering spiritual guidance
               </p>
             </Link>
@@ -398,14 +399,8 @@ export default async function DirectoryPage() {
         </div>
       </section>
 
-      {/* Footer note */}
-      <section className="py-8 bg-syro-bg-gray">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="font-body text-sm text-syro-dark-gray">
-            © {new Date().getFullYear()} Malankara Orthodox Directory. All Rights Reserved. Created by: ipsr solutions ltd.
-          </p>
-        </div>
-      </section>
+      {/* Quick Links - same as catholicate / his-holiness-baselios-geevarghese-i page */}
+      <QuickLinks />
     </div>
   );
 }

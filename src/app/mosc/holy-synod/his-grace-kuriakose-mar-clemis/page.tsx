@@ -19,30 +19,29 @@ const HisGraceKuriakoseMarClemisPage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Main Content */}
-            <div className="lg:col-span-3">
+            <div className="lg:col-span-2">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
-                <div className="flex flex-col md:flex-row gap-8">
-                  {/* Featured Portrait - Left Side - Large Display */}
-                  <div className="flex-shrink-0 flex justify-center md:justify-start">
-                    <div className="relative w-72 h-[28rem] md:w-80 md:h-[32rem] lg:w-96 lg:h-[36rem] rounded-lg overflow-hidden shadow-syro-card-hover">
-                      <Image
-                        src="/images/holy-synod/mar-clemis.jpg"
-                        alt="H.G. Kuriakose Mar Clemis Metropolitan"
-                        fill
-                        sizes="(max-width: 768px) 288px, (max-width: 1024px) 320px, 384px"
-                        className="object-cover object-top"
-                        style={{
-                          objectPosition: 'center 15%'
-                        }}
-                        priority
-                      />
-                    </div>
+                {/* Featured Image - Top */}
+                <div className="mb-8 flex justify-center">
+                  <div className="relative w-full max-w-md h-[280px] rounded-lg overflow-hidden shadow-syro-card">
+                    <Image
+                      src="/images/holy-synod/mar-clemis.jpg"
+                      alt="H.G. Kuriakose Mar Clemis Metropolitan"
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 448px"
+                      className="object-cover object-top"
+                      style={{
+                        objectPosition: 'center 15%'
+                      }}
+                      priority
+                    />
                   </div>
+                </div>
 
-                  {/* Content - Right Side of Image */}
-                  <div className="flex-1">
+                {/* Content - Below Image */}
+                <div>
                     <h3 className="font-syro-display font-semibold text-2xl text-syro-blue mb-6">
                       H.G. Kuriakose Mar Clemis Metropolitan
                     </h3>
@@ -77,7 +76,6 @@ const HisGraceKuriakoseMarClemisPage = () => {
                         <p>Email: hgmarclemis@gmail.com</p>
                       </div>
                     </div>
-                  </div>
                 </div>
               </div>
 
@@ -88,7 +86,7 @@ const HisGraceKuriakoseMarClemisPage = () => {
             </div>
 
             {/* Sidebar */}
-            <div className="lg:col-span-1">
+            <div className="space-y-6 lg:col-span-1">
               <SynodMembersSidebar />
             </div>
           </div>

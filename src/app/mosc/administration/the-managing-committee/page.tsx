@@ -44,8 +44,8 @@ export default function ManagingCommitteePage() {
 
       <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-3">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="lg:col-span-2">
               <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
                 <div className="mb-8 flex justify-center">
                   <Image
@@ -121,7 +121,7 @@ export default function ManagingCommitteePage() {
               </div>
             </div>
 
-            <div className="lg:col-span-1">
+            <div className="space-y-6 lg:col-span-1">
               <AdministrationSidebar currentSlug="the-managing-committee" />
             </div>
           </div>

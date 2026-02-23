@@ -53,7 +53,7 @@ export default function SyroCatholicosSection() {
                 <div className="syro-cardinal-name-bar" id="bishop_name_bar">
                   <span id="bishop_name">{BISHOP_NAME}</span>
                 </div>
-                <p className="syro-cardinal-about mb-0" id="bishop_about">
+                <p className="syro-cardinal-about mb-0 text-black" id="bishop_about">
                   {BISHOP_ABOUT}
                 </p>
                 <Link href="/mosc/holy-synod/his-holiness-baselios-marthoma-mathews-iii" className="primary-button cardinal-new-profile syro-cardinal-profile">

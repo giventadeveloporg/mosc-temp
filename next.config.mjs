@@ -125,7 +125,8 @@ const nextConfig = {
 
   // Enable experimental features if needed
   experimental: {
-    // Add experimental features here
+    // Allow large multipart bodies (e.g. multi-file media upload) so middleware does not truncate at 10MB
+    middlewareClientMaxBodySize: '100mb',
     serverActions: {
       bodySizeLimit: '50mb', // Increase from default 1mb to 50mb for file uploads
     },

@@ -32,7 +32,7 @@ export default function SyroAboutSection() {
                 </h1>
               </div>
               <div className="about-content">
-                <p className="line-9" id="front_description">
+                <p className="line-9 text-black" id="front_description">
                   {ABOUT_DESCRIPTION}
                 </p>
               </div>

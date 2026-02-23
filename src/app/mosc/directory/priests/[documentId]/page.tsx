@@ -26,7 +26,12 @@ export default async function PriestDetailPage({ params }: PageProps) {
     <div className="min-h-screen bg-syro-bg-gray">
       <section className="relative bg-syro-bg-gray py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Link href="/mosc/directory/priests" className="font-body text-syro-blue hover:underline mb-4 inline-block">← Priests</Link>
+          <Link
+            href="/mosc/directory/priests"
+            className="inline-block no-underline font-light text-white bg-[#dc3545] py-2.5 px-5 border-r-[7px] border-r-[#be1929] mb-4 transition-[1s] hover:bg-[#be1929] hover:border-r-[6px] hover:border-r-[#dc3545] hover:text-white"
+          >
+            ← Back to Priests
+          </Link>
           <div className="flex flex-col sm:flex-row gap-6 items-start">
             {priest.imageUrl && (
               <div className="relative w-40 h-40 flex-shrink-0 rounded-xl overflow-hidden bg-syro-bg-gray sacred-shadow">
@@ -67,7 +72,12 @@ export default async function PriestDetailPage({ params }: PageProps) {
             )}
           </div>
           <div className="mt-8">
-            <Link href="/mosc/directory/priests" className="font-body text-syro-blue font-medium hover:underline">← Back to Priests</Link>
+            <Link
+            href="/mosc/directory/priests"
+            className="inline-block no-underline font-light text-white bg-[#dc3545] py-2.5 px-5 border-r-[7px] border-r-[#be1929] mt-4 transition-[1s] hover:bg-[#be1929] hover:border-r-[6px] hover:border-r-[#dc3545] hover:text-white"
+          >
+            ← Back to Priests
+          </Link>
           </div>
         </div>
       </section>

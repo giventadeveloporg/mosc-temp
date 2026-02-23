@@ -29,6 +29,7 @@ const ecumenicalItems: EcumenicalItem[] = [
 
 export default function EcumenicalSidebar() {
   const pathname = usePathname();
+  const isSubpage = pathname !== '/mosc/ecumenical';
 
   return (
     <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-6 mb-6">
@@ -38,6 +39,8 @@ export default function EcumenicalSidebar() {
       <nav className="space-y-1">
         {ecumenicalItems.map((item) => {
           const isActive = pathname === item.href;
+          const isOverviewLink = item.href === '/mosc/ecumenical';
+          const isHidden = isSubpage && isOverviewLink;
           return (
             <Link
               key={item.href}
@@ -46,7 +49,7 @@ export default function EcumenicalSidebar() {
                 isActive
                   ? 'bg-syro-red text-white border-syro-red'
                   : 'text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray border-syro-table-border'
-              }`}
+              } ${isHidden ? 'hidden' : ''}`}
             >
               {item.name}
             </Link>

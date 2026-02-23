@@ -29,7 +29,12 @@ export default async function ParishDetailPage({ params }: PageProps) {
     <div className="min-h-screen bg-syro-bg-gray">
       <section className="relative bg-syro-bg-gray py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Link href="/mosc/directory/parishes" className="font-body text-syro-blue hover:underline mb-4 inline-block">← Parishes</Link>
+          <Link
+            href="/mosc/directory/parishes"
+            className="inline-block no-underline font-light text-white bg-[#dc3545] py-2.5 px-5 border-r-[7px] border-r-[#be1929] mb-4 transition-[1s] hover:bg-[#be1929] hover:border-r-[6px] hover:border-r-[#dc3545] hover:text-white"
+          >
+            ← Back to Parishes
+          </Link>
           <h1 className="font-heading font-semibold text-2xl lg:text-3xl text-syro-blue">{parish.name}</h1>
           {parish.dioceseName && <p className="font-body text-syro-dark-gray mt-1">{parish.dioceseName}</p>}
         </div>
@@ -74,7 +79,12 @@ export default async function ParishDetailPage({ params }: PageProps) {
             )}
           </div>
           <div className="mt-8">
-            <Link href="/mosc/directory/parishes" className="font-body text-syro-blue font-medium hover:underline">← Back to Parishes</Link>
+            <Link
+            href="/mosc/directory/parishes"
+            className="inline-block no-underline font-light text-white bg-[#dc3545] py-2.5 px-5 border-r-[7px] border-r-[#be1929] mt-4 transition-[1s] hover:bg-[#be1929] hover:border-r-[6px] hover:border-r-[#dc3545] hover:text-white"
+          >
+            ← Back to Parishes
+          </Link>
           </div>
         </div>
       </section>

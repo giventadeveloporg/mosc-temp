@@ -107,10 +107,10 @@ const CatholicatePage = () => {
                 />
               </div>
               <div className="lg:col-span-8">
-                <h2 className="font-syro-display text-[2.2rem] font-bold text-syro-blue mb-5">
+                <h2 className="font-syro-display text-[2.2rem] font-bold text-black mb-5">
                   The Catholicate of the Malankara Orthodox Syrian Church
                 </h2>
-                <p className="font-syro-primary text-xl text-syro-dark-gray mb-5 leading-relaxed">
+                <p className="font-syro-primary text-xl text-black mb-5 leading-relaxed">
                   <strong>Introduction</strong> — The word &apos;Catholicos&apos; means &quot;the general head&quot; or &quot;general bishop&quot;. It can be considered as equivalent to &quot;universal Bishop&quot;. This title and rank is much more ancient than the title Patriarch in the church. In the ministry of the early church there were only three ranks: Episcopos (Bishop), Priest and Deacon. By the end of the third century certain bishops of important cities gained pre-eminence and came to be known as Metropolitans. The same rank in the Churches outside the Roman Empire was called Catholicos. There were three ancient Catholicates: the Catholicate of the East (Persia), the Catholicate of Armenia and the Catholicate of Georgia.
                 </p>
                 <Link
@@ -127,7 +127,7 @@ const CatholicatePage = () => {
           </div>
 
           {/* Section title - left red bar (HTML .catholicate-section-title) */}
-          <h3 className="text-2xl font-light text-[#798daf] mb-10 pl-8 border-l-[7px] border-syro-red">
+          <h3 className="text-2xl font-light text-black mb-10 pl-8 border-l-[7px] border-syro-red">
             Catholicos of the East in Malankara
           </h3>
 
@@ -149,10 +149,10 @@ const CatholicatePage = () => {
                   />
                 </div>
                 <div className="p-8 flex flex-col flex-1">
-                  <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 line-clamp-3">
+                  <h3 className="font-syro-display text-xl font-semibold text-black mb-4 line-clamp-3">
                     {card.title}
                   </h3>
-                  <p className="font-syro-primary text-base text-syro-dark-gray flex-1 mb-5 leading-relaxed">
+                  <p className="font-syro-primary text-base text-black flex-1 mb-5 leading-relaxed">
                     {card.excerpt}
                   </p>
                   {card.internal ? (

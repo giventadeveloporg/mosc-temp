@@ -24,7 +24,7 @@ const DynamicHeroImage: React.FC = () => {
   const [hasTicketedEvents, setHasTicketedEvents] = useState(false);
 
   // Default image path
-  const defaultImage = "/images/hero_section/default_hero_section_second_column_poster.webp";
+  const defaultImage = "/images/hero_section/default_hero_section_second_column_poster.jpeg";
 
   // Fetch events with media function
   const fetchEventsWithMedia = async (): Promise<EventWithMedia[]> => {

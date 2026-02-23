@@ -23,8 +23,8 @@ export default async function StBaseliosYeldhoPage({
       <SyroPageBanner title="St. Baselios Yeldho (Kothamangalam Bava)" breadcrumbFrom={breadcrumbFrom} />
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-3">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="lg:col-span-2">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 <div className="mb-8">
                   <Image
@@ -32,7 +32,7 @@ export default async function StBaseliosYeldhoPage({
                     alt="St. Baselios Yeldho (Kothamangalam Bava)"
                     width={500}
                     height={300}
-                    className="rounded-lg shadow-syro-card w-full h-auto object-contain"
+                    className="rounded-lg shadow-syro-card w-auto h-auto object-contain block mx-auto"
                     priority
                   />
                 </div>
@@ -55,7 +55,7 @@ export default async function StBaseliosYeldhoPage({
                 </div>
               </div>
             </div>
-            <div className="lg:col-span-1">
+            <div className="space-y-6 lg:col-span-1">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-6 mb-6">
                 <h3 className="font-syro-display font-semibold text-lg text-syro-blue mb-4">Saints Categories</h3>
                 <nav className="space-y-2">
@@ -64,7 +64,7 @@ export default async function StBaseliosYeldhoPage({
                       key={link.href}
                       href={link.href === '/mosc/saints' ? link.href : `${link.href}?from=saints`}
                       className={`block px-3 py-2 rounded-md font-syro-primary text-sm transition-all duration-300 ${
-                        link.href === currentSlug
+                        link.href === '/mosc/saints' ? 'hidden' : link.href === currentSlug
                           ? 'bg-syro-red text-white'
                           : 'text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray'
                       }`}

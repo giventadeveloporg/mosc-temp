@@ -133,7 +133,7 @@ const DynamicHeroImage: React.FC<{
 
   const { filteredEvents, isLoading: eventsLoading, error } = useFilteredEvents('hero');
 
-  const defaultImage = "/images/hero_section/default_hero_section_second_column_poster.webp";
+  const defaultImage = "/images/hero_section/default_hero_section_second_column_poster.jpeg";
 
   // Store onEventChange in a ref to avoid dependency issues in the rotation effect
   const onEventChangeRef = React.useRef(onEventChange);
@@ -796,7 +796,7 @@ const HeroSection: React.FC = () => {
         <Link href="/#about-us" className="hero-bottom-card hero-bottom-card-mission group">
           <div className="hero-mission-bg">
             <Image
-              src="/images/logos/Malayalees_US/Unite_India_Header_Branding.jpeg"
+              src="/images/logos/Malayalees_US/Unite_India_Header_Branding.png"
               alt="Unite India - A Nonprofit Corporation"
               fill
               className="object-cover object-left transition-transform duration-500 group-hover:scale-[1.02]"
@@ -809,17 +809,19 @@ const HeroSection: React.FC = () => {
           </div>
         </Link>
 
-        {/* Section 4: Donate Button - Made Bigger/More Prominent */}
+        {/* Section 4: Donate Button - Compact horizontal layout */}
         <div className="hero-bottom-card hero-bottom-card-donate">
           <div className="hero-donate-bg" />
           <div className="hero-donate-glow" />
           <div className="hero-donate-content">
-            <p className="hero-donate-heading">Support Our Community</p>
-            <p className="hero-donate-subtext">Help us make a difference</p>
+            <div className="hero-donate-text-group">
+              <p className="hero-donate-heading">Support Our Community</p>
+              <p className="hero-donate-subtext">Help us make a difference</p>
+            </div>
             <GivebutterDonateButton
               className="hero-donate-button"
             >
-              <Heart size={20} className="fill-white" />
+              <Heart size={16} className="fill-white" />
               <span>Donate Now</span>
             </GivebutterDonateButton>
           </div>

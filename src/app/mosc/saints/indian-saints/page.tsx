@@ -21,9 +21,9 @@ export default async function IndianSaintsPage({
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Main Content */}
-            <div className="lg:col-span-3">
+            <div className="lg:col-span-2">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 {/* Featured Image */}
                 <div className="mb-8">
@@ -32,7 +32,7 @@ export default async function IndianSaintsPage({
                     alt="Indian Saints"
                     width={500}
                     height={300}
-                    className="rounded-lg shadow-syro-card w-full h-auto"
+                    className="rounded-lg shadow-syro-card w-auto h-auto block mx-auto"
                     priority
                   />
                 </div>
@@ -90,7 +90,7 @@ Among the many disciples of Mar Gregorios, three deserve special notice:
             </div>
 
             {/* Sidebar */}
-            <div className="lg:col-span-1">
+            <div className="space-y-6 lg:col-span-1">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-6 mb-6">
                 <h3 className="font-syro-display font-semibold text-lg text-syro-blue mb-4">
                   Saints Categories
@@ -98,7 +98,7 @@ Among the many disciples of Mar Gregorios, three deserve special notice:
                 <nav className="space-y-2">
                   <Link 
                     href="/mosc/saints" 
-                    className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
+                    className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300 hidden"
                   >
                     Saints Overview
                   </Link>

@@ -37,36 +37,40 @@ export function ArticleList({ title, articles, baseHref, compact, id }: ArticleL
         {title}
       </h2>
       {articles.length > 0 ? (
-        <ul className={`grid gap-syro-xl p-syro-xxl ${compact ? 'grid-cols-1 max-w-2xl' : 'grid-cols-1 md:grid-cols-2'}`}>
+        <ul className={`grid gap-4 p-syro-xxl ${compact ? 'grid-cols-1 max-w-2xl' : 'grid-cols-1 md:grid-cols-2'}`}>
           {articles.map((article) => (
-            <li key={article.id}>
+            <li key={article.id} className="min-h-0">
               <Link
                 href={`${baseHref}/${article.documentId || article.slug || String(article.id)}`}
-                className="block group rounded-[5px] overflow-hidden border border-syro-table-border hover:shadow-syro-card-hover transition-shadow duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-syro-red focus-visible:ring-offset-2 bg-white"
+                className="flex flex-col h-full group rounded-[5px] overflow-hidden border border-syro-table-border hover:shadow-syro-card-hover transition-shadow duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-syro-red focus-visible:ring-offset-2 bg-white"
               >
-                {/* Image on top - object-contain so header/top is not cropped (image_containment_prevention) */}
-                {article.coverUrl && (
-                  <div className="relative w-full h-auto rounded-t-lg overflow-hidden bg-syro-bg-gray p-3">
+                {/* Image on top - fixed 4:3 aspect; object-contain shows full image centered, no cropping */}
+                <div className="relative w-full aspect-[4/3] shrink-0 overflow-hidden bg-syro-bg-gray flex items-center justify-center">
+                  {article.coverUrl ? (
                     <Image
                       src={article.coverUrl}
                       alt={article.coverAlt || article.title}
-                      width={800}
-                      height={600}
-                      className="w-full h-auto object-contain group-hover:scale-105 transition-transform duration-300"
-                      style={{ borderRadius: '0.5rem 0.5rem 0 0', backgroundColor: 'transparent' }}
+                      fill
+                      className="object-contain object-center group-hover:scale-105 transition-transform duration-300"
                       sizes={compact ? '(max-width: 768px) 100vw, 672px' : '(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 400px'}
                       unoptimized
                     />
-                  </div>
-                )}
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-syro-dark-gray/50" aria-hidden>
+                      <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
                 {/* Title, date, description - design system card padding 20px for inner content */}
-                <div className="p-syro-lg">
+                <div className="flex flex-col flex-1 min-h-0 p-syro-lg">
                   <h3 className="syro-article-card-title line-clamp-2 reverent-transition">
                     {article.title}
                   </h3>
                   {article.publishedAt && (
                     <time
-                      className="syro-article-card-meta mt-2 flex items-center gap-1.5"
+                      className="syro-article-card-meta mt-2 flex items-center gap-1.5 flex-shrink-0"
                       dateTime={article.publishedAt}
                     >
                       <CalendarIcon className="w-4 h-4 flex-shrink-0" />
@@ -76,7 +80,7 @@ export function ArticleList({ title, articles, baseHref, compact, id }: ArticleL
                     </time>
                   )}
                   {!compact && article.excerpt && (
-                    <p className="syro-article-card-desc mt-2 line-clamp-3">
+                    <p className="syro-article-card-desc mt-2 line-clamp-3 flex-1 min-h-0">
                       {article.excerpt}
                     </p>
                   )}

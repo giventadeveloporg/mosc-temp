@@ -30,13 +30,18 @@ interface EventFormHelpTooltipProps {
   fieldName: string;
   /** Optional custom content to display instead of fetching HTML */
   customContent?: React.ReactNode;
+  /** Optional tooltip title (used when customContent is set; default for event form) */
+  title?: string;
 }
 
 /**
  * Help Tooltip Component for Event Form
  * Displays HTML documentation content in a tooltip when hovering over a question mark icon
  */
-export default function EventFormHelpTooltip({ fieldName, customContent }: EventFormHelpTooltipProps) {
+const DEFAULT_TITLE = 'Events Page Filtering and Display Rules';
+
+export default function EventFormHelpTooltip({ fieldName, customContent, title }: EventFormHelpTooltipProps) {
+  const tooltipTitle = title ?? DEFAULT_TITLE;
   const [isOpen, setIsOpen] = useState(false);
   const [htmlContent, setHtmlContent] = useState<string>('');
   const [loading, setLoading] = useState(false);
@@ -48,6 +53,8 @@ export default function EventFormHelpTooltip({ fieldName, customContent }: Event
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isHoveringIconRef = useRef(false);
   const isHoveringTooltipRef = useRef(false);
+  /** When true, tooltip was opened by click — stay open until user closes (no close on mouse leave). */
+  const openedByClickRef = useRef(false);
 
   // Calculate tooltip position
   const calculatePosition = useCallback(() => {
@@ -57,8 +64,10 @@ export default function EventFormHelpTooltip({ fieldName, customContent }: Event
     const tooltipWidth = 800;
     const tooltipHeight = 600;
     const spacing = 12;
+    /* Overlap so there's no dead zone when moving mouse from icon to tooltip */
+    const overlap = 12;
 
-    let top = iconRect.bottom + spacing;
+    let top = iconRect.bottom - overlap;
     let left = iconRect.left;
 
     // Adjust if tooltip would go off right edge
@@ -141,6 +150,7 @@ export default function EventFormHelpTooltip({ fieldName, customContent }: Event
         setIsOpen(false);
         isHoveringIconRef.current = false;
         isHoveringTooltipRef.current = false;
+        openedByClickRef.current = false;
       }
     };
 
@@ -149,6 +159,7 @@ export default function EventFormHelpTooltip({ fieldName, customContent }: Event
         setIsOpen(false);
         isHoveringIconRef.current = false;
         isHoveringTooltipRef.current = false;
+        openedByClickRef.current = false;
       }
     };
 
@@ -182,12 +193,12 @@ export default function EventFormHelpTooltip({ fieldName, customContent }: Event
 
     // Delay opening to prevent shaky behavior
     openTimeoutRef.current = setTimeout(() => {
-      // Double-check we're still hovering before opening
       if (isHoveringIconRef.current || isHoveringTooltipRef.current) {
+        openedByClickRef.current = false; // opened by hover — close on leave after delay
         setIsOpen(true);
       }
       openTimeoutRef.current = null;
-    }, 700); // 700ms delay - longer to prevent flickering
+    }, 700);
   }, [isOpen]);
 
   const handleMouseLeave = useCallback(() => {
@@ -199,17 +210,19 @@ export default function EventFormHelpTooltip({ fieldName, customContent }: Event
       openTimeoutRef.current = null;
     }
 
+    // When opened by click, do not close on mouse leave — user must close explicitly
+    if (openedByClickRef.current) return;
+
     // Delay closing to allow moving mouse to tooltip
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current);
     }
     closeTimeoutRef.current = setTimeout(() => {
-      // Only close if not hovering over icon or tooltip
       if (!isHoveringIconRef.current && !isHoveringTooltipRef.current) {
         setIsOpen(false);
       }
       closeTimeoutRef.current = null;
-    }, 500); // 500ms delay before closing
+    }, 900);
   }, []);
 
   const handleTooltipMouseEnter = useCallback(() => {
@@ -225,25 +238,25 @@ export default function EventFormHelpTooltip({ fieldName, customContent }: Event
   const handleTooltipMouseLeave = useCallback(() => {
     isHoveringTooltipRef.current = false;
 
-    // Clear any pending timeouts
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current);
     }
 
-    // Close after delay
+    // When opened by click, do not close on mouse leave
+    if (openedByClickRef.current) return;
+
     closeTimeoutRef.current = setTimeout(() => {
       if (!isHoveringIconRef.current && !isHoveringTooltipRef.current) {
         setIsOpen(false);
       }
       closeTimeoutRef.current = null;
-    }, 400);
+    }, 900);
   }, []);
 
   const handleClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    // Clear any pending timeouts
     if (openTimeoutRef.current) {
       clearTimeout(openTimeoutRef.current);
       openTimeoutRef.current = null;
@@ -253,14 +266,15 @@ export default function EventFormHelpTooltip({ fieldName, customContent }: Event
       closeTimeoutRef.current = null;
     }
 
-    // Toggle immediately on click
     setIsOpen(prev => {
       const newState = !prev;
       if (newState) {
         isHoveringIconRef.current = true;
+        openedByClickRef.current = true; // stay open until user closes
       } else {
         isHoveringIconRef.current = false;
         isHoveringTooltipRef.current = false;
+        openedByClickRef.current = false;
       }
       return newState;
     });
@@ -270,8 +284,8 @@ export default function EventFormHelpTooltip({ fieldName, customContent }: Event
     setIsOpen(false);
     isHoveringIconRef.current = false;
     isHoveringTooltipRef.current = false;
+    openedByClickRef.current = false;
 
-    // Clear any pending timeouts
     if (openTimeoutRef.current) {
       clearTimeout(openTimeoutRef.current);
       openTimeoutRef.current = null;
@@ -318,7 +332,7 @@ export default function EventFormHelpTooltip({ fieldName, customContent }: Event
           {/* Header */}
           <div className="sticky top-0 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-3 flex items-center justify-between border-b border-blue-700 z-10">
             <h3 className="text-lg font-bold text-yellow-200 drop-shadow-md">
-              Events Page Filtering and Display Rules
+              {tooltipTitle}
             </h3>
             <button
               onClick={handleClose}

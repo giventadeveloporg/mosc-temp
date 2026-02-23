@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import Image from 'next/image';
 import QuickLinks from '../../components/QuickLinks';
 import EcumenicalSidebar from '../../components/EcumenicalSidebar';
@@ -18,9 +18,9 @@ const TheShepherdOfTheIndianChurchInEthiopiaPage = () => {
       {/* Main Content */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Main Content */}
-            <div className="lg:col-span-3">
+            <div className="lg:col-span-2">
               <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 {/* Featured Image */}
                 <div className="mb-8 flex justify-center">
@@ -29,7 +29,7 @@ const TheShepherdOfTheIndianChurchInEthiopiaPage = () => {
                     alt="Ecumenical gathering in Ethiopia"
                     width={600}
                     height={360}
-                    className="rounded-lg w-full h-auto object-contain max-w-full"
+                    className="rounded-lg w-auto h-auto object-contain max-w-full block mx-auto"
                     sizes="(max-width: 1024px) 100vw, 66vw"
                   />
                 </div>
@@ -123,7 +123,7 @@ const TheShepherdOfTheIndianChurchInEthiopiaPage = () => {
             </div>
 
             {/* Sidebar */}
-            <div className="lg:col-span-1">
+            <div className="space-y-6 lg:col-span-1">
               <EcumenicalSidebar />
             </div>
           </div>
