@@ -1,6 +1,6 @@
 import React from 'react';
 import { Metadata } from 'next';
-import '../../mosc/mosc-globals.css';
+import '../../mosc-old/mosc-globals.css';
 
 export const metadata: Metadata = {
   title: {
