@@ -1,7 +1,8 @@
-import React from 'react';
+﻿import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import QuickLinks from '@/components/holy-synod/QuickLinks';
+import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
 import TheChurchSidebar from '../TheChurchSidebar';
 
 export const metadata = {
@@ -10,47 +11,24 @@ export const metadata = {
     'The Orthodox Church of India. The Malankara Orthodox Church is the second largest faction of the ancient church of the St. Thomas Christians in India, tracing its origins to the apostolic mission of St. Thomas.',
 };
 
-const ChurchHistoryPage = () => {
+export default async function ChurchHistoryPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string }>;
+}) {
+  const params = await searchParams;
+  const breadcrumbFrom = params.from === 'the-church' ? 'the-church' : 'home';
+
   return (
-    <div className="bg-background">
-      {/* Hero Section - MOSC styling */}
-      <section className="py-16 bg-gradient-to-br from-background to-muted">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 sacred-shadow-lg border border-border/50">
-              <svg
-                className="w-10 h-10 text-primary"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-            </div>
-            <h1 className="font-heading font-semibold text-4xl text-foreground mb-4">
-              History
-            </h1>
-            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              The Orthodox Church of India. The Malankara Orthodox Church—hereafter referred to as
-              the Orthodox Church of India or the Indian Orthodox Church—is the second largest
-              faction of the ancient church of the St. Thomas Christians in India.
-            </p>
-          </div>
-        </div>
-      </section>
+    <div className="bg-syro-bg-gray">
+      <SyroPageBanner title="History" breadcrumbFrom={breadcrumbFrom} />
 
       {/* Main Content */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <div className="lg:col-span-3">
-              <div className="bg-background rounded-lg sacred-shadow p-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="lg:col-span-2">
+              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 {/* Featured Image - centered, contained */}
                 <div className="mb-8 flex justify-center">
                   <div className="relative w-full max-w-[280px] h-auto">
@@ -59,54 +37,54 @@ const ChurchHistoryPage = () => {
                       alt="MOSC - Malankara Orthodox Syrian Church"
                       width={280}
                       height={180}
-                      className="w-full h-auto object-contain rounded-lg"
+                      className="w-auto h-auto object-contain rounded-lg block mx-auto"
                     />
                   </div>
                 </div>
 
                 <div className="prose prose-lg max-w-none">
-                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-4">
+                  <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4">
                     The Orthodox Church of India
                   </h2>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    The Malankara Orthodox Church—hereafter referred to as the Orthodox Church of
-                    India or the Indian Orthodox Church—is the second largest faction of the ancient
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
+                    The Malankara Orthodox Churchâ€”hereafter referred to as the Orthodox Church of
+                    India or the Indian Orthodox Churchâ€”is the second largest faction of the ancient
                     church of the St. Thomas Christians in India, which stood till 1657 as a single
                     and united Church with an indigenous character of its own. This ancient church
                     of the St. Thomas Christians is an Apostolic Church like all other Apostolic
                     Churches around the world and originated from the evangelical labours of St.
-                    Thomas—the Apostle not only of Malabar and South India but also of India and all
+                    Thomasâ€”the Apostle not only of Malabar and South India but also of India and all
                     of Asia. In that sense this church is one of the oldest churches in the
                     Christian world and also in India, because Roman Catholic Christians came to
                     India only in the 16th century and Protestant Christians in the 18th
-                    century—all following Western colonialism. The Malankara Church is an
+                    centuryâ€”all following Western colonialism. The Malankara Church is an
                     indigenous Church with a distinctive heritage and characteristics of its own,
                     deeply rooted in Indian soil. Moreover it is a church which stood for centuries
                     in close contact with the East Syrian Church which once flourished in the present
                     regions of Iraq and Iran.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Portuguese Contact and Roman Catholic Influence
                   </h3>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     In the 16th century it came in contact with the Roman Catholic Church through
                     Portuguese colonialism, which after a century&apos;s contact and interactions
                     resulted in the enforced domination of Roman Catholicism over the church of the
-                    St. Thomas Christians. The Synod of Udayamperoor—1599 played the decisive role in
+                    St. Thomas Christians. The Synod of Udayamperoorâ€”1599 played the decisive role in
                     this regard. Thus this synod laid the firm foundation for all the problems which
                     arose later on in this church. For about 54 years thereafter the St. Thomas
                     Christians remained under Rome&apos;s occupation and then onwards in a divided
                     state.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     The Great Revolt of 1653
                   </h3>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     In 1653 through an Oath, the St. Thomas Christians&apos; Church as a whole
                     overthrew their enforced subjection to Roman Catholicism and resolved to restore
                     their freedom as a church of India and to revive their Oriental Church heritage
@@ -114,8 +92,8 @@ const ChurchHistoryPage = () => {
                     broken, mainly due to the overwhelming action of the Roman Catholics who had
                     immense support from the Colonial powers; a group of the Thomas Christians were
                     induced to the Roman Catholic side and later on became the champions in the
-                    propagation of Roman Catholicism among the Thomas Christians. Moreover they—i.e.,
-                    those who were taken over to the Roman Catholic side—did not allow their
+                    propagation of Roman Catholicism among the Thomas Christians. Moreover theyâ€”i.e.,
+                    those who were taken over to the Roman Catholic sideâ€”did not allow their
                     opponents, who had discarded Rome, to travel on freely to their destination as a
                     free church. After many years of intense tribulation, struggles and loss of
                     faithful to the Roman Catholics, those who stood against Rome emerged as an
@@ -126,14 +104,14 @@ const ChurchHistoryPage = () => {
                     region.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     The Mar Thoma Period and the Malankara Orthodox Syrian Church
                   </h3>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     This Church of the St. Thomas Christians who had freed themselves from Roman
                     Catholicism were led till 1816 by Indian bishops of their own native origin and
-                    they were known by a common name—Mar Thoma. It is this church, which continued
+                    they were known by a common nameâ€”Mar Thoma. It is this church, which continued
                     thereafter under bishops known as Mar Dionysius; now known by the name the
                     Indian Orthodox Church. During the 17th, 18th and 19th centuries they were also
                     known by some names, which in most cases were appellations imposed upon them by
@@ -148,22 +126,22 @@ const ChurchHistoryPage = () => {
                     Protestant) church traditions.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Self-Governance and Indigenous Character
                   </h3>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The church is fully self-governed by its local leadership and is indigenous. No
                     foreign leadership is allowed to rule over this church now. This element of
                     self-awareness always echoed whenever they were threatened during the periods
                     of contact with Roman Catholicism, Protestantism and the West Syrians.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Tolerance and Harmony
                   </h3>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Moreover, a unique and noble feature of this church, even now, is its broad
                     vision of humanity, non-Christian religions and other ideologies. From time
                     immemorial this Church was at peace, oneness and tranquility with the
@@ -177,11 +155,11 @@ const ChurchHistoryPage = () => {
                     humanity all over the globe.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Present Status
                   </h3>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     This Church now consists of about 3.5 million members, who are spread all over
                     the world, though the majority reside in Kerala state. The Supreme Head of the
                     Church and the present Catholicos is H.H. Baselios Marthoma Mathews III. His
@@ -191,44 +169,44 @@ const ChurchHistoryPage = () => {
                     spiritually.
                   </p>
 
-                  <div className="bg-muted/30 rounded-lg p-6 mt-8 border border-border/50">
-                    <h4 className="font-heading font-semibold text-lg text-foreground mb-4">
+                  <div className="bg-syro-bg-gray rounded-lg p-6 mt-8 border border-syro-table-border">
+                    <h4 className="font-syro-display font-semibold text-lg text-syro-blue mb-4">
                       Key Historical Milestones
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="bg-card rounded-lg p-4 sacred-shadow-sm border border-border/30">
-                        <h5 className="font-heading font-medium text-foreground mb-2">52 AD</h5>
-                        <p className="font-body text-muted-foreground text-sm">
+                      <div className="bg-white rounded-lg p-4 shadow-syro-card-sm border border-syro-table-border/30">
+                        <h5 className="font-syro-display font-medium text-syro-blue mb-2">52 AD</h5>
+                        <p className="font-syro-primary text-syro-dark-gray text-sm">
                           St. Thomas the Apostle arrives in India and establishes Christianity
                         </p>
                       </div>
-                      <div className="bg-card rounded-lg p-4 sacred-shadow-sm border border-border/30">
-                        <h5 className="font-heading font-medium text-foreground mb-2">1599</h5>
-                        <p className="font-body text-muted-foreground text-sm">
-                          Synod of Udayamperoor—Portuguese influence and enforced domination
+                      <div className="bg-white rounded-lg p-4 shadow-syro-card-sm border border-syro-table-border/30">
+                        <h5 className="font-syro-display font-medium text-syro-blue mb-2">1599</h5>
+                        <p className="font-syro-primary text-syro-dark-gray text-sm">
+                          Synod of Udayamperoorâ€”Portuguese influence and enforced domination
                         </p>
                       </div>
-                      <div className="bg-card rounded-lg p-4 sacred-shadow-sm border border-border/30">
-                        <h5 className="font-heading font-medium text-foreground mb-2">1653</h5>
-                        <p className="font-body text-muted-foreground text-sm">
-                          The Great Revolt—Freedom from Roman Catholicism through the Oath
+                      <div className="bg-white rounded-lg p-4 shadow-syro-card-sm border border-syro-table-border/30">
+                        <h5 className="font-syro-display font-medium text-syro-blue mb-2">1653</h5>
+                        <p className="font-syro-primary text-syro-dark-gray text-sm">
+                          The Great Revoltâ€”Freedom from Roman Catholicism through the Oath
                         </p>
                       </div>
-                      <div className="bg-card rounded-lg p-4 sacred-shadow-sm border border-border/30">
-                        <h5 className="font-heading font-medium text-foreground mb-2">1665</h5>
-                        <p className="font-body text-muted-foreground text-sm">
+                      <div className="bg-white rounded-lg p-4 shadow-syro-card-sm border border-syro-table-border/30">
+                        <h5 className="font-syro-display font-medium text-syro-blue mb-2">1665</h5>
+                        <p className="font-syro-primary text-syro-dark-gray text-sm">
                           West Syrian connection established; Dutch replace Portuguese
                         </p>
                       </div>
-                      <div className="bg-card rounded-lg p-4 sacred-shadow-sm border border-border/30">
-                        <h5 className="font-heading font-medium text-foreground mb-2">1934</h5>
-                        <p className="font-body text-muted-foreground text-sm">
-                          Church constitution formed—Malankara Orthodox Syrian Church
+                      <div className="bg-white rounded-lg p-4 shadow-syro-card-sm border border-syro-table-border/30">
+                        <h5 className="font-syro-display font-medium text-syro-blue mb-2">1934</h5>
+                        <p className="font-syro-primary text-syro-dark-gray text-sm">
+                          Church constitution formedâ€”Malankara Orthodox Syrian Church
                         </p>
                       </div>
-                      <div className="bg-card rounded-lg p-4 sacred-shadow-sm border border-border/30">
-                        <h5 className="font-heading font-medium text-foreground mb-2">Present</h5>
-                        <p className="font-body text-muted-foreground text-sm">
+                      <div className="bg-white rounded-lg p-4 shadow-syro-card-sm border border-syro-table-border/30">
+                        <h5 className="font-syro-display font-medium text-syro-blue mb-2">Present</h5>
+                        <p className="font-syro-primary text-syro-dark-gray text-sm">
                           About 3.5 million members worldwide; 30 dioceses; Catholicos at Kottayam
                         </p>
                       </div>
@@ -243,7 +221,7 @@ const ChurchHistoryPage = () => {
             </div>
 
             {/* Sidebar - The Church (all subpages, like mosc.in) */}
-            <div className="lg:col-span-1">
+            <div className="space-y-6 lg:col-span-1">
               <TheChurchSidebar />
             </div>
           </div>
@@ -255,6 +233,4 @@ const ChurchHistoryPage = () => {
       </section>
     </div>
   );
-};
-
-export default ChurchHistoryPage;
+}

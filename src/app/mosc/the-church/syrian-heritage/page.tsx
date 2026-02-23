@@ -1,7 +1,8 @@
-import React from 'react';
+﻿import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import QuickLinks from '@/components/holy-synod/QuickLinks';
+import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
 import TheChurchSidebar from '../TheChurchSidebar';
 
 export const metadata = {
@@ -10,47 +11,24 @@ export const metadata = {
     'Syrian Heritage of the St. Thomas Christians. Syriac is the liturgical language of the St. Thomas Christians from a very early date, even though their identity and culture remained always truly Indian.',
 };
 
-const SyrianHeritagePage = () => {
+export default async function SyrianHeritagePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string }>;
+}) {
+  const params = await searchParams;
+  const breadcrumbFrom = params.from === 'the-church' ? 'the-church' : 'home';
+
   return (
-    <div className="bg-background">
-      {/* Hero Section - MOSC styling */}
-      <section className="py-16 bg-gradient-to-br from-background to-muted">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 sacred-shadow-lg border border-border/50">
-              <svg
-                className="w-10 h-10 text-primary"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.747 5.754 18 7.5 18s3.332.747 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.747 18.247 18 16.5 18c-1.746 0-3.332.747-4.5 1.253"
-                />
-              </svg>
-            </div>
-            <h1 className="font-heading font-semibold text-4xl text-foreground mb-4">
-              Syrian Heritage
-            </h1>
-            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Syrian Heritage of the St. Thomas Christians. Syriac is the liturgical language of
-              the St. Thomas Christians from a very early date, even though their identity and
-              culture remained always truly Indian.
-            </p>
-          </div>
-        </div>
-      </section>
+    <div className="bg-syro-bg-gray">
+      <SyroPageBanner title="Syrian Heritage" breadcrumbFrom={breadcrumbFrom} />
 
       {/* Main Content */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <div className="lg:col-span-3">
-              <div className="bg-background rounded-lg sacred-shadow p-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="lg:col-span-2">
+              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 {/* Featured Image - centered, contained */}
                 <div className="mb-8 flex justify-center">
                   <div className="relative w-full max-w-[280px] h-auto">
@@ -59,16 +37,16 @@ const SyrianHeritagePage = () => {
                       alt="Syrian Heritage of the St. Thomas Christians"
                       width={280}
                       height={180}
-                      className="w-full h-auto object-contain rounded-lg"
+                      className="w-auto h-auto object-contain rounded-lg block mx-auto"
                     />
                   </div>
                 </div>
 
                 <div className="prose prose-lg max-w-none">
-                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-4">
+                  <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4">
                     Syrian Heritage of the St. Thomas Christians
                   </h2>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Syriac is the liturgical language of the St. Thomas Christians from a very
                     early date, even though their identity and culture remained always truly
                     Indian. This language, which belongs to the family of Semitic languages
@@ -83,21 +61,21 @@ const SyrianHeritagePage = () => {
                     also would have been in Aramaic.
                   </p>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Edessa was the cradle of Syriac and it was primarily among the Christians of
                     Edessa that it began to be used as an independent language. Soon it acquired
                     the status of the language of Christian communities of Mesopotamia and Syria.
                     These Christians began to be called as Syrians after the Roman province in
-                    which they lived—Syria—and their language was called Syriac. It did not take
-                    long for this language to reach Persia and from there to India—where it
+                    which they livedâ€”Syriaâ€”and their language was called Syriac. It did not take
+                    long for this language to reach Persia and from there to Indiaâ€”where it
                     remains even today as the basic liturgical language of some Christian
-                    communities—and even up to China.
+                    communitiesâ€”and even up to China.
                   </p>
 
-                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-4 mt-8">
+                  <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 mt-8">
                     Syriac Scripts: Estrangela, Serto, and Eastern (Chaldean)
                   </h2>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Estrangela was the script initially used to write Syriac. Later two different
                     scripts and pronunciations developed, one in the western parts of the Middle
                     East (especially in the Roman empire) known as the western script or
@@ -115,10 +93,10 @@ const SyrianHeritagePage = () => {
                     resembles more to the estrangela, came into regular use even later.
                   </p>
 
-                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-4 mt-8">
+                  <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 mt-8">
                     Syriac Literature and Its History
                   </h2>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Syriac literature covers numerous fields within and outside Christianity such
                     as Biblical interpretations, theology, apologetics, history, monasticism,
                     legends, civil and canon law, philosophy, natural and physical science,
@@ -145,10 +123,10 @@ const SyrianHeritagePage = () => {
                     being conducted in Arabic.
                   </p>
 
-                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-4 mt-8">
+                  <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 mt-8">
                     St. Thomas Christians and the Persian Church
                   </h2>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     As far as historical evidence is available, it is now more or less an
                     established fact that the St. Thomas Christians had very intimate relations
                     with the Persian Church from a very early date. Even though it is difficult to
@@ -166,10 +144,10 @@ const SyrianHeritagePage = () => {
                     qurbana (Eucharist) are examples.
                   </p>
 
-                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-4 mt-8">
+                  <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 mt-8">
                     From East Syrian to West Syrian Liturgy
                   </h2>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The liturgy that was in use in this church when the Portuguese landed in
                     Malabar (end of 15th cent.) was the east Syrian liturgy of Addai and Mari, the
                     same as that of the Persian Church. Other liturgical practices also would have
@@ -196,10 +174,10 @@ const SyrianHeritagePage = () => {
                     a failure.
                   </p>
 
-                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-4 mt-8">
+                  <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 mt-8">
                     Syriac Printing and the Spread of West Syrian Traditions
                   </h2>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The establishment of Syriac printing presses, first in Cochin (St. Thomas
                     press), which was later shifted to Kottayam, and in Pampakuda (Mar Julius
                     press, in 1879) helped the spread of west Syrian liturgical traditions. A
@@ -207,10 +185,10 @@ const SyrianHeritagePage = () => {
                     popularized even patristic texts, side by side with books of worship.
                   </p>
 
-                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-4 mt-8">
+                  <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 mt-8">
                     Twentieth Century: The Era of Translations
                   </h2>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     If the 19th century saw the establishment of west Syrian traditions in Kerala,
                     the 20th century can be distinguished as the era of translations. Especially
                     during the second half of the past century most of the liturgical texts were
@@ -223,10 +201,10 @@ const SyrianHeritagePage = () => {
                     languages and English are under way.
                   </p>
 
-                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-4 mt-8">
+                  <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 mt-8">
                     Syrian Heritage and Indian Culture
                   </h2>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     It has to be borne in mind that the St. Thomas Christians, even while accepting
                     and feeling proud of their Syrian liturgical heritage, have always adopted
                     those traditions in combination with local customs and practices. For example,
@@ -235,17 +213,17 @@ const SyrianHeritagePage = () => {
                     liturgy, their culture is Indian.
                   </p>
 
-                  <div className="bg-muted/30 rounded-lg p-6 mt-8 border border-border/50">
-                    <p className="font-body text-muted-foreground leading-relaxed text-sm font-semibold text-foreground mb-1">
+                  <div className="bg-syro-bg-gray rounded-lg p-6 mt-8 border border-syro-table-border">
+                    <p className="font-syro-primary text-syro-dark-gray leading-relaxed text-sm font-semibold text-syro-blue mb-1">
                       Written By:
                     </p>
-                    <p className="font-body text-muted-foreground leading-relaxed text-sm italic">
+                    <p className="font-syro-primary text-syro-dark-gray leading-relaxed text-sm italic">
                       Rev. Fr. Dr. Johns Abraham Konat
                     </p>
-                    <p className="font-body text-muted-foreground leading-relaxed text-sm italic">
+                    <p className="font-syro-primary text-syro-dark-gray leading-relaxed text-sm italic">
                       Professor
                     </p>
-                    <p className="font-body text-muted-foreground leading-relaxed text-sm italic">
+                    <p className="font-syro-primary text-syro-dark-gray leading-relaxed text-sm italic">
                       Orthodox Theological Seminary, Kottayam
                     </p>
                   </div>
@@ -258,7 +236,7 @@ const SyrianHeritagePage = () => {
             </div>
 
             {/* Sidebar - The Church (all subpages, like mosc.in) */}
-            <div className="lg:col-span-1">
+            <div className="space-y-6 lg:col-span-1">
               <TheChurchSidebar />
             </div>
           </div>
@@ -272,4 +250,3 @@ const SyrianHeritagePage = () => {
   );
 };
 
-export default SyrianHeritagePage;

@@ -13,19 +13,19 @@ interface AdSlotsProps {
 export function AdSlots({ slots }: AdSlotsProps) {
   if (slots.length === 0) {
     return (
-      <div className="rounded-xl bg-card border border-border sacred-shadow-sm overflow-hidden p-4">
-        <h3 className="font-heading font-semibold text-lg text-foreground mb-2">Advertisement</h3>
-        <p className="font-body text-sm text-muted-foreground">No advertisements at the moment.</p>
+      <div className="rounded-[5px] bg-white overflow-hidden p-syro-xxl shadow-syro-card font-syro-primary">
+        <h3 className="text-syro-h3 font-semibold text-syro-blue mb-2">Advertisement</h3>
+        <p className="text-syro-small text-syro-dark-gray">No advertisements at the moment.</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-syro-lg">
       {slots.map((slot) => (
         <div
           key={slot.id}
-          className="rounded-xl bg-card border border-border sacred-shadow-sm overflow-hidden p-4"
+          className="rounded-[5px] bg-white overflow-hidden p-syro-xxl shadow-syro-card font-syro-primary"
         >
           {slot.embedHtml && slot.embedHtml.trim().length > 0 ? (
             <div

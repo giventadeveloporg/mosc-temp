@@ -46,30 +46,30 @@ export default function EngineeringCollegesPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-syro-bg-gray">
       {/* Breadcrumb */}
-      <section className="bg-muted py-4">
+      <section className="bg-syro-bg-gray py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex items-center space-x-2 font-body text-sm text-muted-foreground">
-            <Link href="/mosc" className="hover:text-primary reverent-transition">MOSC</Link>
+          <nav className="flex items-center space-x-2 font-syro-primary text-sm text-syro-dark-gray">
+            <Link href="/mosc-old" className="hover:text-syro-red transition-all duration-300">MOSC</Link>
             <span>/</span>
-            <Link href="/mosc/institutions" className="hover:text-primary reverent-transition">Institutions</Link>
+            <Link href="/mosc/institutions" className="hover:text-syro-red transition-all duration-300">Institutions</Link>
             <span>/</span>
-            <span className="text-foreground">Engineering Colleges</span>
+            <span className="text-syro-blue">Engineering Colleges</span>
           </nav>
         </div>
       </section>
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-background to-muted py-12 lg:py-16">
+      <section className="relative bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            <div className="relative w-full h-80 lg:h-96 rounded-lg overflow-hidden sacred-shadow-lg">
+            <div className="relative w-full h-80 lg:h-96 rounded-lg overflow-hidden shadow-syro-card-hover">
               <Image src="/images/institutions/mbc.jpg" alt="Engineering Colleges" fill className="object-cover" priority />
             </div>
             <div>
-              <h1 className="font-heading font-semibold text-4xl lg:text-5xl text-foreground mb-4">Engineering Colleges</h1>
-              <p className="font-body text-lg text-muted-foreground leading-relaxed">
+              <h1 className="font-syro-display font-semibold text-4xl lg:text-5xl text-syro-blue mb-4">Engineering Colleges</h1>
+              <p className="font-syro-primary text-lg text-syro-dark-gray leading-relaxed">
                 Institutions providing quality technical education, preparing the next generation of engineers with strong ethical foundations.
               </p>
             </div>
@@ -78,33 +78,33 @@ export default function EngineeringCollegesPage() {
       </section>
 
       {/* Colleges Section */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-12">
             {colleges.map((college, index) => (
-              <div key={index} className="bg-card rounded-lg sacred-shadow p-8">
-                <h2 className="font-heading font-semibold text-2xl lg:text-3xl text-primary mb-2">
+              <div key={index} className="bg-white rounded-lg shadow-syro-card p-8">
+                <h2 className="font-syro-display font-semibold text-2xl lg:text-3xl text-syro-red mb-2">
                   {college.name}
                 </h2>
-                <p className="font-body text-lg text-muted-foreground mb-6 italic">
+                <p className="font-syro-primary text-lg text-syro-dark-gray mb-6 italic">
                   {college.location}
                 </p>
-                <p className="font-body text-lg text-foreground leading-relaxed mb-6">
+                <p className="font-syro-primary text-lg text-syro-blue leading-relaxed mb-6">
                   {college.description}
                 </p>
                 {college.mission && (
-                  <div className="bg-muted/30 rounded-lg p-6 mb-6">
-                    <h3 className="font-heading font-medium text-xl text-foreground mb-3">Our Mission</h3>
-                    <p className="font-body text-muted-foreground leading-relaxed">{college.mission}</p>
+                  <div className="bg-syro-bg-gray rounded-lg p-6 mb-6">
+                    <h3 className="font-syro-display font-medium text-xl text-syro-blue mb-3">Our Mission</h3>
+                    <p className="font-syro-primary text-syro-dark-gray leading-relaxed">{college.mission}</p>
                   </div>
                 )}
                 {college.programs && (
                   <div className="mb-6">
-                    <h3 className="font-heading font-medium text-xl text-foreground mb-3">Programs Offered</h3>
+                    <h3 className="font-syro-display font-medium text-xl text-syro-blue mb-3">Programs Offered</h3>
                     <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {college.programs.map((program, i) => (
-                        <li key={i} className="flex items-start font-body text-muted-foreground">
-                          <span className="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                        <li key={i} className="flex items-start font-syro-primary text-syro-dark-gray">
+                          <span className="w-2 h-2 bg-syro-red rounded-full mt-2 mr-3 flex-shrink-0"></span>
                           <span>{program}</span>
                         </li>
                       ))}
@@ -112,36 +112,36 @@ export default function EngineeringCollegesPage() {
                   </div>
                 )}
                 {college.facilities && (
-                  <div className="bg-primary/5 rounded-lg p-6 mb-6">
-                    <h3 className="font-heading font-medium text-xl text-foreground mb-3">Facilities</h3>
-                    <p className="font-body text-muted-foreground leading-relaxed">{college.facilities}</p>
+                  <div className="bg-syro-red/5 rounded-lg p-6 mb-6">
+                    <h3 className="font-syro-display font-medium text-xl text-syro-blue mb-3">Facilities</h3>
+                    <p className="font-syro-primary text-syro-dark-gray leading-relaxed">{college.facilities}</p>
                   </div>
                 )}
                 {college.spiritualNote && (
                   <div className="bg-gradient-to-br from-muted to-background rounded-lg p-6 mb-6">
-                    <h3 className="font-heading font-medium text-xl text-foreground mb-3">Spiritual Heritage</h3>
-                    <p className="font-body text-muted-foreground leading-relaxed">{college.spiritualNote}</p>
+                    <h3 className="font-syro-display font-medium text-xl text-syro-blue mb-3">Spiritual Heritage</h3>
+                    <p className="font-syro-primary text-syro-dark-gray leading-relaxed">{college.spiritualNote}</p>
                   </div>
                 )}
-                <div className="bg-muted/30 rounded-lg p-6 border-l-4 border-primary">
-                  <h3 className="font-heading font-medium text-xl text-foreground mb-4">Contact Information</h3>
-                  <div className="space-y-2 font-body text-muted-foreground">
-                    {college.contact.title && <p className="font-medium text-foreground">{college.contact.title}</p>}
+                <div className="bg-syro-bg-gray rounded-lg p-6 border-l-4 border-primary">
+                  <h3 className="font-syro-display font-medium text-xl text-syro-blue mb-4">Contact Information</h3>
+                  <div className="space-y-2 font-syro-primary text-syro-dark-gray">
+                    {college.contact.title && <p className="font-medium text-syro-blue">{college.contact.title}</p>}
                     {college.contact.address?.map((line, i) => (
                       <p key={i}>{line}</p>
                     ))}
-                    {college.contact.phone && <p><span className="font-medium text-foreground">Phone:</span> {college.contact.phone}</p>}
-                    {college.contact.fax && <p><span className="font-medium text-foreground">Fax:</span> {college.contact.fax}</p>}
+                    {college.contact.phone && <p><span className="font-medium text-syro-blue">Phone:</span> {college.contact.phone}</p>}
+                    {college.contact.fax && <p><span className="font-medium text-syro-blue">Fax:</span> {college.contact.fax}</p>}
                     {college.contact.emails?.map((email, i) => (
                       <p key={i}>
-                        <span className="font-medium text-foreground">Email:</span>{' '}
-                        <a href={`mailto:${email}`} className="text-primary hover:underline">{email}</a>
+                        <span className="font-medium text-syro-blue">Email:</span>{' '}
+                        <a href={`mailto:${email}`} className="text-syro-red hover:underline">{email}</a>
                       </p>
                     ))}
                     {college.contact.website && (
                       <p>
-                        <span className="font-medium text-foreground">Website:</span>{' '}
-                        <a href={`http://${college.contact.website}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{college.contact.website}</a>
+                        <span className="font-medium text-syro-blue">Website:</span>{' '}
+                        <a href={`http://${college.contact.website}`} target="_blank" rel="noopener noreferrer" className="text-syro-red hover:underline">{college.contact.website}</a>
                       </p>
                     )}
                   </div>
@@ -155,10 +155,10 @@ export default function EngineeringCollegesPage() {
       <QuickLinks />
 
       {/* Navigation */}
-      <section className="py-12 bg-muted">
+      <section className="py-12 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-center">
-            <Link href="/mosc/institutions" className="inline-flex items-center px-6 py-3 bg-primary text-white font-body font-medium rounded-lg hover:bg-primary/90 reverent-transition sacred-shadow">
+            <Link href="/mosc/institutions" className="inline-flex items-center px-6 py-3 bg-syro-red text-white font-syro-primary font-medium rounded-lg hover:bg-syro-red/90 transition-all duration-300 shadow-syro-card">
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>

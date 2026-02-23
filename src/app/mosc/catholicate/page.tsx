@@ -1,176 +1,189 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import CatholicateEmblem from './CatholicateEmblem';
-import QuickLinks from '@/components/holy-synod/QuickLinks';
+import QuickLinks from '../components/QuickLinks';
+import SyroPageBanner from '../components/SyroPageBanner';
 
 export const metadata = {
   title: 'The Catholicate',
-  description: 'Learn about the Catholicate of the Malankara Orthodox Syrian Church, its history, and the spiritual leadership of our Catholicos.',
+  description: 'The Catholicate of the Malankara Orthodox Syrian Church — history, spiritual leadership, and the succession of Catholicoi of the East in Malankara.',
 };
 
+interface CatholicosCard {
+  title: string;
+  excerpt: string;
+  image: string;
+  href: string;
+  alt: string;
+  internal?: boolean;
+}
+
+const catholicosCards: CatholicosCard[] = [
+  {
+    title: 'His Holiness Baselios Paulos I, The First Catholicos of the East in Malankara (1912–1913)',
+    excerpt: 'His Holiness was born on 19 January 1836 to Murimattom Kurian and Mariamma in Kolencherry. He received deaconship from Cheppad Mar Dionysius in 1843 and in 1852 he was ordained...',
+    image: 'https://mosc.in/wp-content/uploads/2014/12/Untitled-11.jpg',
+    href: '/mosc/catholicate/his-holiness-baselios-paulos-i-1st-catholicos-of-the-east-in-malankara',
+    alt: 'His Holiness Baselios Paulos I',
+    internal: true,
+  },
+  {
+    title: 'His Holiness Baselios Geevarghese I, The Second Catholicos of the East in Malankara (1925–1928)',
+    excerpt: 'His Holiness was born in 1870 as the second son of Karuchira Paulose. He was ordained as \'Koruya\' on 13 June 1885, as deacon in 1892, on 16 August 1896...',
+    image: 'https://mosc.in/wp-content/uploads/2014/12/Untitled-12.jpg',
+    href: '/mosc/catholicate/his-holiness-baselios-geevarghese-i-second-catholicos-of-the-east-in-malankara',
+    alt: 'His Holiness Baselios Geevarghese I',
+    internal: true,
+  },
+  {
+    title: 'His Holiness Baselios Geevarghese II, The Third Catholicos of the East in Malankara (1929–1964)',
+    excerpt: 'His Holiness was born to Ulahannan and Naithi of Kallaserri family in Kurichi, Kottayam on 16 June 1874. On 24 April 1892, Kadavil Paulose Mar Athanasios ordained him as deacon...',
+    image: 'https://mosc.in/wp-content/uploads/2015/01/geevar.jpg',
+    href: '/mosc/catholicate/his-holiness-baselios-geevarghese-ii-third-catholicos-of-the-east-in-malankara',
+    alt: 'His Holiness Baselios Geevarghese II',
+    internal: true,
+  },
+  {
+    title: 'His Holiness Baselios Augen I, The Fourth Catholicos of the East in Malankara (1964–1975)',
+    excerpt: 'His Holiness was born on 26 June 1884 at Perumbavoor, Vengola, to Abraham Kathanar of Chettakulathukara family. He was ordained as deacon by Kadavil Paulose Mar Athanasios and in...',
+    image: 'https://mosc.in/wp-content/uploads/2015/01/augen.jpg',
+    href: '/mosc/catholicate/his-holiness-baselios-oughen-i-the-fourth-catholicos-of-the-east-in-malankara',
+    alt: 'His Holiness Baselios Augen I',
+    internal: true,
+  },
+  {
+    title: 'His Holiness Baselios Marthoma Mathews I, The Fifth Catholicos of the East in Malankara (1975–1991)',
+    excerpt: 'His Holiness was born on 27th March 1907 as the youngest son of Vattakunnel Kurien Kathanar and Olesha Pulickaparampil Mariamma in Kottayam. He took his B.A, B.D. degrees. Even as...',
+    image: 'https://mosc.in/wp-content/uploads/2015/01/mathews-i.jpg',
+    href: '/mosc/catholicate/his-holiness-baselios-marthoma-mathews-i-fifth-catholicos-of-the-east-in-malankara',
+    alt: 'His Holiness Baselios Marthoma Mathews I',
+    internal: true,
+  },
+  {
+    title: 'His Holiness Baselios Marthoma Mathews II, The Sixth Catholicos of the East in Malankara (1991–2005)',
+    excerpt: 'His Holiness Moran Mar Baselios Marthoma Mathews II, Catholicos of the East, and 89th successor to the Holy Apostolic Throne of St. Thomas was enthroned on 29 April 1991. He...',
+    image: 'https://mosc.in/wp-content/uploads/2015/01/sas.jpg',
+    href: '/mosc/catholicate/his-holiness-baselios-marthoma-mathews-ii-sixth-catholicos-of-the-east-in-malankara',
+    alt: 'His Holiness Baselios Marthoma Mathews II',
+    internal: true,
+  },
+  {
+    title: 'His Holiness Baselios Marthoma Didymos I, The Seventh Catholicos of the East in Malankara (2005–2010)',
+    excerpt: 'His Holiness was consecrated and enthroned at Parumala Seminary as Catholicoi of the East in the Apostolic throne of St. Thomas on 31 October 2005. He is the seventh Catholicos since the...',
+    image: 'https://mosc.in/wp-content/uploads/2015/01/didymus.jpg',
+    href: '/mosc/catholicate/his-holiness-baselios-marthoma-didymos-i-seventh-catholicos-of-the-east-in-malankara',
+    alt: 'His Holiness Baselios Marthoma Didymos I',
+    internal: true,
+  },
+  {
+    title: 'H.H. Baselios Marthoma Paulose II, The Eighth Catholicos of the East in Malankara (2010–2021)',
+    excerpt: 'His Holiness Baselios Marthoma Paulose II was enthroned as the Catholicos of the East & Malankara Metropolitan (the Supreme Head of the Malankara Orthodox Syrian Church of India) on Monday, 1st...',
+    image: 'https://mosc.in/wp-content/uploads/2015/01/bava.jpg',
+    href: '/mosc/catholicate/h-h-baselios-marthoma-paulose-ii',
+    alt: 'H.H. Baselios Marthoma Paulose II',
+    internal: true,
+  },
+];
+
 const CatholicatePage = () => {
-  const catholicosHistory = [
-    {
-      name: 'H.H. Baselios Paulos I',
-      period: '1912–1913',
-      description: 'The First Catholicos of the East in Malankara',
-      fullTitle: 'His Holiness Baselios Paulos I, The First Catholicos of the East in Malankara (1912–1913)',
-      excerpt: 'His Holiness was born on 19 January 1836 to Murimattom Kurian and Mariamma in Kolencherry. He received deaconship from Cheppad Mar Dionysius in 1843 and in 1852 he was ordained as Priest by Metropolitan Yuyakim Mar Kurilos. He served for a long period as Vicar of Kolencherry Church.',
-      href: '/mosc/catholicate/his-holiness-baselios-paulos-i-1st-catholicos-of-the-east-in-malankara',
-      image: '/images/catholicate/Untitled-11.jpg'
-    },
-    {
-      name: 'H.H. Baselios Geevarghese I',
-      period: '1925–1928',
-      description: 'The Second Catholicos of the East in Malankara',
-      fullTitle: 'His Holiness Baselios Geevarghese I, The Second Catholicos of the East in Malankara (1925–1928)',
-      excerpt: 'His Holiness was born in 1870 as the second son of Karuchira Paulose. He was ordained as \'Koruya\' on 13 June 1885, as deacon in 1892, on 16 August 1896 as priest and on 23 August as Ramban(Monk) by Metropolitan Kadavil Paulose Mar Athanasios.',
-      href: '/mosc/catholicate/his-holiness-baselios-geevarghese-i-second-catholicos-of-the-east-in-malankara',
-      image: '/images/catholicate/Untitled-12.jpg'
-    },
-    {
-      name: 'H.H. Baselios Geevarghese II',
-      period: '1929–1964',
-      description: 'The Third Catholicos of the East in Malankara',
-      fullTitle: 'His Holiness Baselios Geevarghese II, The Third Catholicos of the East in Malankara (1929–1964)',
-      excerpt: 'His Holiness was born to Ulahannan and Naithi of Kallaserri family in Kurichi, Kottayam on 16 June 1874. On 24 April 1892, Kadavil Paulose Mar Athanasios ordained him as deacon and on 24 November and 27 November 1898 he was ordained as priest and Ramban (Monk) respectively by St.Gregorios.',
-      href: '/mosc/catholicate/his-holiness-baselios-geevarghese-ii-third-catholicos-of-the-east-in-malankara',
-      image: '/images/catholicate/geevar.jpg'
-    },
-    {
-      name: 'H.H. Baselios Augen I',
-      period: '1964–1975',
-      description: 'The Fourth Catholicos of the East in Malankara',
-      fullTitle: 'His Holiness Baselios Augen I, The Fourth Catholicos of the East in Malankara (1964–1975)',
-      excerpt: 'His Holiness was born on 26 June 1884 at Perumbavoor , Vengola, to Abraham Kathanar of Chettakulathukara family. He was ordained as deacon by Kadavil Paulose Mar Athanasios and in 1908 at Jerusalem he was elevated to the monastic order of Ramban.',
-      href: '/mosc/catholicate/his-holiness-baselios-oughen-i-the-fourth-catholicos-of-the-east-in-malankara',
-      image: '/images/catholicate/augen.jpg'
-    },
-    {
-      name: 'H.H. Baselios Marthoma Mathews I',
-      period: '1975–1991',
-      description: 'The Fifth Catholicos of the East in Malankara',
-      fullTitle: 'His Holiness Baselios Marthoma Mathews I, The Fifth Catholicos of the East in Malankara (1975–1991)',
-      excerpt: 'His Holiness was born on 27th, March 1907 as the youngest son of Vattakunnel Kurien Kathanar and Olesha Pulickaparampil Mariamma in Kottayam. He took his B.A, B.D. degrees. Even as a layman he had achieved the unique distinction in studies and also in the Canonical Laws.',
-      href: '/mosc/catholicate/his-holiness-baselios-marthoma-mathews-i-fifth-catholicos-of-the-east-in-malankara',
-      image: '/images/catholicate/mathews-i.jpg'
-    },
-    {
-      name: 'H.H. Baselios Marthoma Mathews II',
-      period: '1991–2005',
-      description: 'The Sixth Catholicos of the East in Malankara',
-      fullTitle: 'His Holiness Baselios Marthoma Mathews II, The Sixth Catholicos of the East in Malankara (1991–2005)',
-      excerpt: 'His Holiness Moran Mar Baselios Marthoma Mathews II, Catholicos of the East, and 89th successor to the Holy Apostolic Throne of St. Thomas was enthroned on 29 April 1991. He was born on January 30, 1915 at Perinad in Kollam District of Kerala.',
-      href: '/mosc/catholicate/his-holiness-baselios-marthoma-mathews-ii-sixth-catholicos-of-the-east-in-malankara',
-      image: '/images/catholicate/sas.jpg'
-    },
-    {
-      name: 'H.H. Baselios Marthoma Didymos I',
-      period: '2005-2010',
-      description: 'The Seventh Catholicos of the East in Malankara',
-      fullTitle: 'His Holiness Baselios Marthoma Didymos I, The Seventh Catholicos of the East in Malankara (2005-2010)',
-      excerpt: 'His Holiness was consecrated and enthroned at Parumala Seminary as Catholicoi of the East in the Apostolic throne of St. Thomas on 31 October 2005. He is the seventh Catholicos since the Catholicate of the East was relocated to India and 90th in the lineage of Catholicoi of the East.',
-      href: '/mosc/catholicate/his-holiness-baselios-marthoma-didymos-i-seventh-catholicos-of-the-east-in-malankara',
-      image: '/images/catholicate/didymus.jpg'
-    },
-    {
-      name: 'H.H. Baselios Marthoma Paulose II',
-      period: '2010–2021',
-      description: 'The Eighth Catholicos of the East in Malankara',
-      fullTitle: 'H.H. Baselios Marthoma Paulose II, The Eighth Catholicos of the East in Malankara (2010–2021)',
-      excerpt: 'His Holiness Baselios MarthomaPaulose II was enthroned as the Catholicos of the East & Malankara Metropolitan (the Supreme Head of the Malankara Orthodox Syrian Church of India) on Monday, 1st November 2010. His Holiness is the 91st Primate on the Apostolic Throne of St. Thomas.',
-      href: '/mosc/catholicate/h-h-baselios-marthoma-paulose-ii',
-      image: '/images/catholicate/bava.jpg'
-    }
-  ];
-
   return (
-    <div className="bg-background">
-      <section className="py-16 bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="font-heading font-semibold text-4xl md:text-5xl text-foreground text-center mb-12">
-            The Catholicate
-          </h1>
+    <div className="bg-syro-bg-gray">
+      <SyroPageBanner title="The Catholicate" />
 
-          {/* Intro - logo on top, description on bottom (no card background) */}
-          <article className="mb-10">
-            <div className="flex flex-col gap-6 p-6 md:p-8">
-              <div className="flex justify-center">
-                <CatholicateEmblem />
+      {/* Content - matches HTML structure and style */}
+      <section className="py-16 bg-syro-bg-gray">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Intro card - white card, image left, text right (HTML .catholicate-intro-card) */}
+          <div className="bg-white p-10 rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] mb-16">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              <div className="lg:col-span-4 relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-syro-bg-gray">
+                <Image
+                  src="https://mosc.in/wp-content/uploads/2014/12/Untitled-1.jpg"
+                  alt="The Catholicate"
+                  fill
+                  className="object-cover"
+                  unoptimized
+                  sizes="(max-width: 1024px) 100vw, 33vw"
+                />
               </div>
-              <div className="min-w-0">
-                <p className="font-body text-muted-foreground leading-relaxed mb-4">
-                  <span className="font-semibold text-foreground">Introduction</span> The word &apos;Catholicos&apos; means &quot;the general head&quot; or &quot;general bishop&quot;. It can be considered as equivalent to &quot;universal Bishop&quot;. This title and rank is much more ancient than the title Patriarch in the church.
-                </p>
-                <p className="font-body text-muted-foreground leading-relaxed mb-5">
-                  In the ministry of the early church there were only three ranks namely; Episcopos (Bishop), Priest and Deacon. By the end of the third century or by the beginning of the fourth century certain bishops of certain important cities or provincial capitals in the Roman empire gained pre-eminence than other bishops and they came to be known as Metropolitans. The Ecumenical councils of the fourth century recognized the authority of these Metropolitans.
+              <div className="lg:col-span-8">
+                <h2 className="font-syro-display text-[2.2rem] font-bold text-black mb-5">
+                  The Catholicate of the Malankara Orthodox Syrian Church
+                </h2>
+                <p className="font-syro-primary text-xl text-black mb-5 leading-relaxed">
+                  <strong>Introduction</strong> — The word &apos;Catholicos&apos; means &quot;the general head&quot; or &quot;general bishop&quot;. It can be considered as equivalent to &quot;universal Bishop&quot;. This title and rank is much more ancient than the title Patriarch in the church. In the ministry of the early church there were only three ranks: Episcopos (Bishop), Priest and Deacon. By the end of the third century certain bishops of important cities gained pre-eminence and came to be known as Metropolitans. The same rank in the Churches outside the Roman Empire was called Catholicos. There were three ancient Catholicates: the Catholicate of the East (Persia), the Catholicate of Armenia and the Catholicate of Georgia.
                 </p>
                 <Link
-                  href="/mosc/catholicate/catholicate"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary/10 hover:bg-primary/20 text-primary font-medium rounded-lg border border-primary/30 reverent-transition group"
+                  href="/mosc/catholicate-intro"
+                  className="syro-primary-button inline-flex items-center gap-2"
                 >
                   <span>Read More</span>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
                 </Link>
               </div>
             </div>
-          </article>
+          </div>
 
-          {/* Catholicos cards grid - 3 per row like saints page */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {catholicosHistory.map((catholicos) => (
-              <Link
-                key={catholicos.name}
-                href={catholicos.href}
-                className="bg-card rounded-lg sacred-shadow p-0 overflow-hidden hover:sacred-shadow-lg reverent-transition group flex flex-col"
+          {/* Section title - left red bar (HTML .catholicate-section-title) */}
+          <h3 className="text-2xl font-light text-black mb-10 pl-8 border-l-[7px] border-syro-red">
+            Catholicos of the East in Malankara
+          </h3>
+
+          {/* Cards grid - 3 per row (HTML .catholicate-card) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            {catholicosCards.map((card) => (
+              <div
+                key={card.title}
+                className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 overflow-hidden flex flex-col h-full"
               >
-                <div className="relative w-full h-48 bg-muted overflow-hidden flex items-center justify-center">
+                <div className="relative w-full h-60 bg-syro-bg-gray">
                   <Image
-                    src={catholicos.image}
-                    alt={catholicos.name}
+                    src={card.image}
+                    alt={card.alt}
                     fill
-                    className="object-center group-hover:scale-105 transition-transform duration-300"
-                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    className="object-cover object-top"
+                    unoptimized
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
                 </div>
-                <div className="p-6 flex flex-col flex-1">
-                  <h3 className="font-heading font-semibold text-xl text-foreground mb-3 group-hover:text-primary reverent-transition">
-                    {catholicos.fullTitle}
+                <div className="p-8 flex flex-col flex-1">
+                  <h3 className="font-syro-display text-xl font-semibold text-black mb-4 line-clamp-3">
+                    {card.title}
                   </h3>
-                  <p className="font-body text-muted-foreground text-sm leading-relaxed flex-1 line-clamp-4">
-                    {catholicos.excerpt}
+                  <p className="font-syro-primary text-base text-black flex-1 mb-5 leading-relaxed">
+                    {card.excerpt}
                   </p>
-                  <div className="mt-auto pt-4">
-                    <span className="inline-flex items-center gap-1.5 font-body text-sm font-medium text-primary">
-                      Read More
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      aria-hidden="true"
+                  {card.internal ? (
+                    <Link
+                      href={card.href}
+                      className="syro-primary-button inline-flex items-center gap-2 mt-auto w-fit"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </span>
-                  </div>
+                      <span>Read More</span>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
+                    </Link>
+                  ) : (
+                    <a
+                      href={card.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="syro-primary-button inline-flex items-center gap-2 mt-auto w-fit"
+                    >
+                      <span>Read More</span>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
+                    </a>
+                  )}
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
 
-          {/* Quick Links - Horizontal Below Main Content (same as holy-synod) */}
-          <div className="mt-8">
-            <QuickLinks />
-          </div>
+          <QuickLinks />
         </div>
       </section>
     </div>
@@ -178,8 +191,3 @@ const CatholicatePage = () => {
 };
 
 export default CatholicatePage;
-
-
-
-
-

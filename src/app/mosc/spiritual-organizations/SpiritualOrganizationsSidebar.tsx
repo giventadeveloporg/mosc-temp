@@ -12,17 +12,17 @@ interface SpiritualOrganizationsSidebarProps {
  */
 export default function SpiritualOrganizationsSidebar({ currentHref }: SpiritualOrganizationsSidebarProps) {
   return (
-    <div className="bg-background rounded-lg sacred-shadow p-6 sticky top-8">
-      <h3 className="font-heading font-semibold text-lg text-foreground mb-4">
+    <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-6 sticky top-8">
+      <h3 className="font-syro-display font-semibold text-lg text-syro-blue mb-4">
         Spiritual Organizations
       </h3>
       <nav className="space-y-2">
         <Link
           href="/mosc/spiritual-organizations"
-          className={`block px-3 py-2 rounded-md font-body text-sm reverent-transition ${
+          className={`block px-3 py-2 rounded-md font-syro-primary text-sm transition-all duration-300 ${
             currentHref === '/mosc/spiritual-organizations'
-              ? 'bg-primary text-white'
-              : 'text-muted-foreground hover:text-primary hover:bg-muted'
+              ? 'bg-syro-red text-white'
+              : 'text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray'
           }`}
         >
           All Spiritual Organizations
@@ -31,10 +31,10 @@ export default function SpiritualOrganizationsSidebar({ currentHref }: Spiritual
           <Link
             key={org.href}
             href={org.href}
-            className={`block px-3 py-2 rounded-md font-body text-sm reverent-transition ${
+            className={`block px-3 py-2 rounded-md font-syro-primary text-sm transition-all duration-300 ${
               currentHref === org.href
-                ? 'bg-primary text-white'
-                : 'text-muted-foreground hover:text-primary hover:bg-muted'
+                ? 'bg-syro-red text-white'
+                : 'text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray'
             }`}
           >
             {org.title}

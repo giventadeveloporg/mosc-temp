@@ -10,6 +10,8 @@ import { useRouter, useParams } from "next/navigation";
 import { Modal } from "@/components/Modal";
 import { getTenantId } from '@/lib/env';
 import { formatInTimeZone } from 'date-fns-tz';
+import EventFormHelpTooltip from '@/components/EventFormHelpTooltip';
+import MediaImageSpecHelpContent from '@/components/MediaImageSpecHelpContent';
 
 // Helper function for timezone-aware date formatting
 function formatDateInTimezone(dateString: string, timezone: string = 'America/New_York'): string {
@@ -764,6 +766,14 @@ export default function EventMediaListPage() {
       </div>
 
       <EventDetailsTable event={eventDetails} />
+
+      {/* Image spec guidance - same as edit events help tip */}
+      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between">
+        <span className="text-sm font-medium text-gray-700">
+          Image specifications for hero and event media (Section 1–3). Mouse over for details.
+        </span>
+        <EventFormHelpTooltip fieldName="Image specifications" title="Image specifications for hero and event media" customContent={<MediaImageSpecHelpContent />} />
+      </div>
 
       <div className="mb-8 bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-xl font-bold text-gray-800 mb-4">Search Media</h2>

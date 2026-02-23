@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import QuickLinks from '@/components/holy-synod/QuickLinks';
+import QuickLinks from '../../components/QuickLinks';
 import SpiritualOrganizationsSidebar from '../SpiritualOrganizationsSidebar';
 
 export const metadata = {
@@ -11,18 +11,18 @@ export const metadata = {
 
 const OrthodoxSyrianSundaySchoolAssociationOfTheEastPage = () => {
   return (
-    <div className="bg-background">
+    <div className="bg-syro-bg-gray">
       {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-br from-background to-muted">
+      <section className="py-16 bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <div className="w-20 h-20 bg-primary rounded-lg flex items-center justify-center mx-auto mb-6 sacred-shadow-lg">
-              <span className="text-primary-foreground text-4xl font-bold" role="img" aria-label="Orthodox Syrian Sunday School Association of the East (SUNDAY SCHOOL)">📚</span>
+            <div className="w-20 h-20 bg-syro-red rounded-lg flex items-center justify-center mx-auto mb-6 shadow-syro-card-hover">
+              <span className="text-syro-red-foreground text-4xl font-bold" role="img" aria-label="Orthodox Syrian Sunday School Association of the East (SUNDAY SCHOOL)">ðŸ“š</span>
             </div>
-            <h1 className="font-heading font-semibold text-4xl text-foreground mb-4">
+            <h1 className="font-syro-display font-semibold text-4xl text-syro-blue mb-4">
               Orthodox Syrian Sunday School Association of the East (SUNDAY SCHOOL)
             </h1>
-            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            <p className="font-syro-primary text-lg text-syro-dark-gray max-w-3xl mx-auto leading-relaxed">
               Orthodox Syrian Sunday School Association of the East is a spiritual organization functioning in all the parishes of the Malankara Orthodox Church throughout the world. It takes care of the spiritual nurturing of the children, by bringing them up in the knowledge and fellowship of Jesus Christ and His Church.
             </p>
           </div>
@@ -30,13 +30,13 @@ const OrthodoxSyrianSundaySchoolAssociationOfTheEastPage = () => {
       </section>
 
       {/* Content Section */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-3">
-              <div className="bg-background rounded-lg sacred-shadow p-0 overflow-hidden">
+              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-0 overflow-hidden">
                 {/* Featured Image */}
-                <div className="relative w-full h-48 bg-muted overflow-hidden flex items-center justify-center">
+                <div className="relative w-full h-48 bg-syro-bg-gray overflow-hidden flex items-center justify-center">
                   <Image
                     src="/images/spiritual/OSSSAE.png"
                     alt="Orthodox Syrian Sunday School Association of the East"
@@ -47,10 +47,10 @@ const OrthodoxSyrianSundaySchoolAssociationOfTheEastPage = () => {
                   />
                 </div>
                 <div className="p-8">
-                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-6">
+                  <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-6">
                     About O.S.S.A.E.
                   </h2>
-                  <div className="space-y-4 font-body text-muted-foreground leading-relaxed">
+                  <div className="space-y-4 font-syro-primary text-syro-dark-gray leading-relaxed">
                     <p>
                       Orthodox Syrian Sunday School Association of the East is a spiritual organization functioning in all the parishes of the Malankara Orthodox Church throughout the world. It takes care of the spiritual nurturing of the children, by bringing them up in the knowledge and fellowship of Jesus Christ and His Church. The classes are conducted for the children. It has a separate wing for the Outside Kerala Region (OKR).
                     </p>
@@ -61,39 +61,39 @@ const OrthodoxSyrianSundaySchoolAssociationOfTheEastPage = () => {
 
                   {/* Office Bearers */}
                   <div className="mt-10 space-y-6">
-                    <h3 className="font-heading font-semibold text-xl text-foreground border-b border-border pb-2">
+                    <h3 className="font-syro-display font-semibold text-xl text-syro-blue border-b border-syro-table-border pb-2">
                       President
                     </h3>
-                    <ul className="space-y-2 font-body text-muted-foreground">
+                    <ul className="space-y-2 font-syro-primary text-syro-dark-gray">
                       <li>H.G. Dr. Joseph Mar Dionysius Metropolitan</li>
                       <li>H.G. Dr. Youhanon Mar Demetrios Metropolitan (President, Outside Kerala Region)</li>
                     </ul>
 
-                    <h3 className="font-heading font-semibold text-xl text-foreground border-b border-border pb-2 mt-8">
+                    <h3 className="font-syro-display font-semibold text-xl text-syro-blue border-b border-syro-table-border pb-2 mt-8">
                       Director General
                     </h3>
-                    <p className="font-body text-muted-foreground">
+                    <p className="font-syro-primary text-syro-dark-gray">
                       Rev. Fr. Dr. Varghese Varghese, Mob: +91 9947362708
                     </p>
 
-                    <h3 className="font-heading font-semibold text-xl text-foreground border-b border-border pb-2 mt-8">
+                    <h3 className="font-syro-display font-semibold text-xl text-syro-blue border-b border-syro-table-border pb-2 mt-8">
                       Office Administrator
                     </h3>
-                    <p className="font-body text-muted-foreground">
+                    <p className="font-syro-primary text-syro-dark-gray">
                       Rev. Fr. Jobsam Mathew, Mob: +91 9846670920
                     </p>
 
-                    <h3 className="font-heading font-semibold text-xl text-foreground border-b border-border pb-2 mt-8">
+                    <h3 className="font-syro-display font-semibold text-xl text-syro-blue border-b border-syro-table-border pb-2 mt-8">
                       Outside Kerala Region
                     </h3>
-                    <p className="font-body text-muted-foreground">
+                    <p className="font-syro-primary text-syro-dark-gray">
                       Director: Rev. Fr. Dr. Jossi Jacob, Mob: +91 9400352724
                     </p>
 
-                    <h3 className="font-heading font-semibold text-xl text-foreground border-b border-border pb-2 mt-8">
+                    <h3 className="font-syro-display font-semibold text-xl text-syro-blue border-b border-syro-table-border pb-2 mt-8">
                       Address
                     </h3>
-                    <address className="font-body text-muted-foreground not-italic leading-relaxed">
+                    <address className="font-syro-primary text-syro-dark-gray not-italic leading-relaxed">
                       O.S.S.A.E Central Office,<br />
                       Catholicate Aramana,<br />
                       Devalokam P.O, Kottayam,<br />
@@ -101,17 +101,17 @@ const OrthodoxSyrianSundaySchoolAssociationOfTheEastPage = () => {
                       Phone: 0481 2572890
                     </address>
 
-                    <h3 className="font-heading font-semibold text-xl text-foreground border-b border-border pb-2 mt-8">
+                    <h3 className="font-syro-display font-semibold text-xl text-syro-blue border-b border-syro-table-border pb-2 mt-8">
                       Websites
                     </h3>
-                    <ul className="space-y-2 font-body text-muted-foreground">
+                    <ul className="space-y-2 font-syro-primary text-syro-dark-gray">
                       <li>
-                        <a href="http://www.ossae.org/" target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80 underline reverent-transition">
+                        <a href="http://www.ossae.org/" target="_blank" rel="noopener noreferrer" className="text-syro-red hover:text-syro-red/80 underline transition-all duration-300">
                           www.ossae.org
                         </a>
                       </li>
                       <li>
-                        <a href="https://ossaebodhanam.org/" target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80 underline reverent-transition">
+                        <a href="https://ossaebodhanam.org/" target="_blank" rel="noopener noreferrer" className="text-syro-red hover:text-syro-red/80 underline transition-all duration-300">
                           ossaebodhanam.org
                         </a>
                       </li>

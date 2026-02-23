@@ -1,7 +1,8 @@
-import React from 'react';
+﻿import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import QuickLinks from '@/components/holy-synod/QuickLinks';
+import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
 import TheChurchSidebar from '../TheChurchSidebar';
 
 export const metadata = {
@@ -10,46 +11,24 @@ export const metadata = {
     'The main Doctrines of the Church. The Malankara Orthodox Church has pillars of Mystery through which it teaches and demonstrates its basic religious belief, with Biblical foundation.',
 };
 
-const TheologyPage = () => {
+export default async function TheologyPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string }>;
+}) {
+  const params = await searchParams;
+  const breadcrumbFrom = params.from === 'the-church' ? 'the-church' : 'home';
+
   return (
-    <div className="bg-background">
-      {/* Hero Section - MOSC styling */}
-      <section className="py-16 bg-gradient-to-br from-background to-muted">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 sacred-shadow-lg border border-border/50">
-              <svg
-                className="w-10 h-10 text-primary"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                />
-              </svg>
-            </div>
-            <h1 className="font-heading font-semibold text-4xl text-foreground mb-4">
-              Theology
-            </h1>
-            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              The main Doctrines of the Church. The Malankara Orthodox Church has pillars of
-              Mystery through which it teaches and demonstrates its basic religious belief.
-            </p>
-          </div>
-        </div>
-      </section>
+    <div className="bg-syro-bg-gray">
+      <SyroPageBanner title="Theology" breadcrumbFrom={breadcrumbFrom} />
 
       {/* Main Content */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <div className="lg:col-span-3">
-              <div className="bg-background rounded-lg sacred-shadow p-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="lg:col-span-2">
+              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 {/* Featured Image - centered, contained */}
                 <div className="mb-8 flex justify-center">
                   <div className="relative w-full max-w-[280px] h-auto">
@@ -58,28 +37,28 @@ const TheologyPage = () => {
                       alt="Theology - Main Doctrines of the Church"
                       width={280}
                       height={180}
-                      className="w-full h-auto object-contain rounded-lg"
+                      className="w-auto h-auto object-contain rounded-lg block mx-auto"
                     />
                   </div>
                 </div>
 
                 <div className="prose prose-lg max-w-none">
-                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-4">
+                  <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4">
                     The Main Doctrines of the Church
                   </h2>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mb-8">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-8">
                     The Malankara Orthodox Church has pillars of Mystery through which it teaches
                     and demonstrates its basic religious belief. They are called pillars due to the
                     fact that they support and strengthen the faithful in their life as a pillar
                     supports a roof. These pillars have Biblical foundation.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Scripture and Tradition
                   </h3>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Tradition constitutes the Christian faith. It can be denoted as the act by which
                     something is handed down from ancestors to posterity. The Orthodox churches hold
                     the view that apart from the Holy Scripture, other sources of divine revelation
@@ -91,46 +70,46 @@ const TheologyPage = () => {
                     ecclesiologically, the concept has deeper and wide meanings. There could be a
                     fundamental difference between tradition and traditions even. When traditions
                     cover the concepts and practices which were handed down from ancestors,
-                    tradition embodies the integral part of everything—it includes all the
+                    tradition embodies the integral part of everythingâ€”it includes all the
                     socio-economic and religious background in its integrity. When we transfer this
                     aspect into ecclesiology, we reach the point that &quot;the Church itself is
                     in the traditions.&quot;
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     What is Holy Scripture?
                   </h3>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The Holy Scripture is the sacred book that reveals the divine plan of Salvation
                     in Jesus, which God the Father began in the Old Testament times. The Holy
                     Scripture relates the history of salvation revealed to Israel (OT) and the
                     church (NT) for the benefit of the whole humanity.
                   </p>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The OT and NT are Holy Scripture. The OT predicted and expected a Saviour, the
                     Messiah, in the fullness of time. In the incarnation of Jesus, the prediction of
-                    the OT—one part of the Holy Scripture—was fulfilled. This fulfilment was
+                    the OTâ€”one part of the Holy Scriptureâ€”was fulfilled. This fulfilment was
                     recorded and preserved in literary form, which is the NT.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Why the Holy Scripture?
                   </h3>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Thus, since the NT reveals God through Jesus Christ, the Bible is holy scripture.
                     According to the Church, God inspires the Holy Scripture. Therefore, the
                     scripture is true, sacred, infallible and normative. In this sense, the Holy
                     Scripture is a divine book.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Divine Inspiration of the Scripture
                   </h3>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The Holy Scripture has divine origin. The inspired men of God under divine
                     direction speak God&apos;s word or write it (cf. Ezekiel 3:4; Acts 1:16, 4:25;
                     Rev. 2:1, 8, 15). The divine mysteries were revealed by God to persons who were
@@ -140,19 +119,19 @@ const TheologyPage = () => {
                     are written.
                   </p>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The divine inspiration is stated in the Bible as St. Peter, the chief of the
                     apostles, says: &quot;First of all you must understand this, that no prophecy
                     of scripture is a matter of one&apos;s own interpretation, because no prophecy
                     ever came by human will, but men and women moved by the Holy Spirit spoke from
-                    God&quot; (II Pt. 1:20–21).
+                    God&quot; (II Pt. 1:20â€“21).
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     The Formation of OT and NT
                   </h3>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The formation of both OT and NT has a long history. The primitive Church
                     recognised the OT as divinely inspired and the Church needed the same for the
                     expectation of Jesus as the promised Messiah. The preaching in Acts testifies to
@@ -160,7 +139,7 @@ const TheologyPage = () => {
                     OT.
                   </p>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The NT scripture contains a variety of writings: gospels, narration of the
                     apostles&apos; acts, letters, apocalypse, church orders, etc. The Christian
                     community was in essence not a &quot;bookish&quot; one. It was called into
@@ -168,10 +147,10 @@ const TheologyPage = () => {
                     scripture for the benefit of the Christian community. The apostle Paul says,
                     &quot;All scripture is inspired by God and is useful for teaching, for reproof,
                     for correction and for training in righteousness, so that everyone who belongs to
-                    God may be proficient, equipped for every good work&quot; (2 Tim 3:16–17).
+                    God may be proficient, equipped for every good work&quot; (2 Tim 3:16â€“17).
                   </p>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Hence, Holy Scripture is a development within the living community, that is, the
                     Church. The community is the apostolic community. They had used the OT to
                     explain the holy tradition and to explain Jesus. Likewise, we rely on the
@@ -181,49 +160,49 @@ const TheologyPage = () => {
                     the Church itself is the tradition.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Tradition and Traditions
                   </h3>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Tradition is, to be exact, a bond between the present and the past. The Greek
                     word used is <em>parodosis</em>, meaning handing down, or to hand over, to
-                    deliver. Since it is a bond, there is certainly a relation within the Church—a
+                    deliver. Since it is a bond, there is certainly a relation within the Churchâ€”a
                     cyclic one. Apostolic teachings are there which substantiate the concept of
                     tradition and its need in the Church.
                   </p>
 
-                  <div className="bg-muted/30 rounded-lg p-6 mb-6 border border-border/50">
-                    <p className="font-body text-muted-foreground leading-relaxed mb-4">
+                  <div className="bg-syro-bg-gray rounded-lg p-6 mb-6 border border-syro-table-border">
+                    <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
                       <strong>I Cor. 11:2</strong> says: &quot;I commend you because you remember me
                       in everything and maintain the traditions just as I handed them on to you.&quot;
                     </p>
-                    <p className="font-body text-muted-foreground leading-relaxed">
+                    <p className="font-syro-primary text-syro-dark-gray leading-relaxed">
                       <strong>II Thes. 2:15</strong> says: &quot;So then, brothers and sisters, stand
                       firm and hold fast to the traditions that you were taught by us, either by word
                       of mouth or by our letter.&quot;
                     </p>
                   </div>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Hence, tradition includes tradition of mouth also. The advice by words that was
                     observed by posterity may not be found in the Holy Scripture. This does not mean
                     that the Holy Scripture is imperfect. It is perfect in itself, but the Church has
                     the responsibility to observe and hand over the tradition in the Church.
                   </p>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     However, in traditions, all minute observances and ceremonies may arise. There
                     could be certain factors that are set apart. Tradition includes all traditions,
                     but the tradition may not include every tradition in its integrity. What Paul
                     meant in II Thes. 2:15 and in I Cor. 11:2 about &apos;traditions&apos; is its
-                    integral aspect—that is, the Church itself. It is within this
+                    integral aspectâ€”that is, the Church itself. It is within this
                     &apos;tradition&apos;, and all &quot;traditions&quot; in their integral aspect,
                     that the Holy Scripture was formulated, and not the Holy Scripture that formed
                     the Church. Behind every literal work, there lies an oral or written tradition.
                   </p>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The &apos;rabbis&apos; in the NT made a distinction between the written Torah
                     and oral tradition. The NT designates this unwritten tradition as the
                     &quot;tradition of the elders&quot; (Mt. 15:2). Paul&apos;s expression
@@ -232,8 +211,8 @@ const TheologyPage = () => {
                     21:21) and &quot;the law of our fathers&quot; (Acts 23:3) have the same meaning.
                   </p>
 
-                  <div className="bg-primary/5 rounded-lg p-6 mt-8 border border-border/50">
-                    <p className="font-body text-muted-foreground leading-relaxed text-center">
+                  <div className="bg-syro-red/5 rounded-lg p-6 mt-8 border border-syro-table-border">
+                    <p className="font-syro-primary text-syro-dark-gray leading-relaxed text-center">
                       Our Church gives equal importance to both the Holy Scripture and the tradition.
                       The Church believes that it is dangerous and wrong to give too much importance
                       to any one of them while neglecting concern for the other.
@@ -248,7 +227,7 @@ const TheologyPage = () => {
             </div>
 
             {/* Sidebar - The Church (all subpages, like mosc.in) */}
-            <div className="lg:col-span-1">
+            <div className="space-y-6 lg:col-span-1">
               <TheChurchSidebar />
             </div>
           </div>
@@ -262,4 +241,3 @@ const TheologyPage = () => {
   );
 };
 
-export default TheologyPage;

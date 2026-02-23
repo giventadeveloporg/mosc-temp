@@ -8,6 +8,8 @@ import AdminNavigation from '@/components/AdminNavigation';
 import { createPortal } from "react-dom";
 import { Modal } from "@/components/Modal";
 import { formatInTimeZone } from 'date-fns-tz';
+import EventFormHelpTooltip from '@/components/EventFormHelpTooltip';
+import MediaImageSpecHelpContent from '@/components/MediaImageSpecHelpContent';
 
 // Helper function for timezone-aware date formatting
 function formatDateInTimezone(dateString: string, timezone: string = 'America/New_York'): string {
@@ -550,6 +552,7 @@ function UploadMediaModal({
   const [heroDisplayDurationMinutes, setHeroDisplayDurationMinutes] = useState<number | "">("");
   const [heroDisplayDurationSeconds, setHeroDisplayDurationSeconds] = useState<number | "">("");
   const [isDragOver, setIsDragOver] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -635,7 +638,7 @@ function UploadMediaModal({
         return processNext();
       }
       if (entry.isFile) {
-        return new Promise((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
           (entry as FileSystemFileEntry).file((file) => {
             files.push(file);
             resolve();
@@ -692,35 +695,41 @@ function UploadMediaModal({
       return;
     }
     onUploadStart();
-    const formData = new FormData();
-    validFiles.forEach((file) => formData.append("files", file));
-    // Do NOT append eventId - upload creates media with no event (event_id NULL in DB).
-    formData.append("eventFlyer", String(eventFlyer));
-    formData.append("isEventManagementOfficialDocument", String(isEventManagementOfficialDocument));
-    formData.append("isHeroImage", String(isHeroImage));
-    formData.append("isActiveHeroImage", String(isActiveHeroImage));
-    formData.append("isFeaturedEventImage", String(isFeaturedEventImage));
-    formData.append("isLiveEventImage", String(isLiveEventImage));
-    formData.append("isHomePageHeroImage", String(isHomePageHeroImage));
-    formData.append("isPublic", String(isPublic));
-    formData.append("tenantId", tenantId);
-    formData.append("isTeamMemberProfileImage", "false");
-    validFiles.forEach(() => {
-      formData.append("titles", title);
-      formData.append("descriptions", description || "");
-    });
-    if (startDisplayingFromDate) formData.append("startDisplayingFromDate", startDisplayingFromDate);
-    if (isHomePageHeroImage) {
-      const min = typeof heroDisplayDurationMinutes === "number" ? heroDisplayDurationMinutes : 0;
-      const sec = typeof heroDisplayDurationSeconds === "number" ? heroDisplayDurationSeconds : 0;
-      const total = min * 60 + sec;
-      if (total > 0 && total <= 600) formData.append("homePageHeroDisplayDurationSeconds", String(total));
-    }
+    setUploadProgress(null);
+    const total = validFiles.length;
+    const buildOneFileFormData = (file: File) => {
+      const fd = new FormData();
+      fd.append("files", file);
+      fd.append("eventFlyer", String(eventFlyer));
+      fd.append("isEventManagementOfficialDocument", String(isEventManagementOfficialDocument));
+      fd.append("isHeroImage", String(isHeroImage));
+      fd.append("isActiveHeroImage", String(isActiveHeroImage));
+      fd.append("isFeaturedEventImage", String(isFeaturedEventImage));
+      fd.append("isLiveEventImage", String(isLiveEventImage));
+      fd.append("isHomePageHeroImage", String(isHomePageHeroImage));
+      fd.append("isPublic", String(isPublic));
+      fd.append("tenantId", tenantId);
+      fd.append("isTeamMemberProfileImage", "false");
+      fd.append("titles", title);
+      fd.append("descriptions", description || "");
+      if (startDisplayingFromDate) fd.append("startDisplayingFromDate", startDisplayingFromDate);
+      if (isHomePageHeroImage) {
+        const min = typeof heroDisplayDurationMinutes === "number" ? heroDisplayDurationMinutes : 0;
+        const sec = typeof heroDisplayDurationSeconds === "number" ? heroDisplayDurationSeconds : 0;
+        const totalSec = min * 60 + sec;
+        if (totalSec > 0 && totalSec <= 600) fd.append("homePageHeroDisplayDurationSeconds", String(totalSec));
+      }
+      return fd;
+    };
     try {
-      const res = await fetch("/api/proxy/event-medias/upload-multiple", { method: "POST", body: formData });
-      if (!res.ok) {
-        const err = await res.text();
-        throw new Error(err || `Upload failed (${res.status})`);
+      for (let i = 0; i < validFiles.length; i++) {
+        setUploadProgress(`Uploading ${i + 1}/${total}…`);
+        const formData = buildOneFileFormData(validFiles[i]);
+        const res = await fetch("/api/proxy/event-medias/upload-multiple", { method: "POST", body: formData });
+        if (!res.ok) {
+          const err = await res.text();
+          throw new Error(err || `Upload failed for file ${i + 1} (${res.status})`);
+        }
       }
       onSuccess();
       onClose();
@@ -741,13 +750,14 @@ function UploadMediaModal({
     } catch (err: unknown) {
       setExternalMessage(err instanceof Error ? err.message : "Upload failed");
     } finally {
+      setUploadProgress(null);
       onUploadEnd();
     }
   };
 
   if (!isOpen) return null;
   return (
-    <Modal open={true} onClose={onClose} title="Upload New Media (no event)">
+    <Modal open={true} onClose={onClose} title="Upload New Media (no event)" preventBackdropClose>
       <p className="text-sm text-gray-600 mb-4">
         This media will not be linked to an event. You can link it to an event later from the edit page.
       </p>
@@ -949,9 +959,11 @@ function UploadMediaModal({
           <button
             type="submit"
             disabled={externalLoading}
+            title={externalLoading ? (uploadProgress || "Uploading…") : "Upload"}
+            aria-label={externalLoading ? (uploadProgress || "Uploading…") : "Upload"}
             className="flex-1 h-12 rounded-xl bg-green-100 hover:bg-green-200 text-green-700 font-semibold transition-all disabled:opacity-50 flex items-center justify-center gap-2"
           >
-            {externalLoading ? "Uploading…" : "Upload"}
+            {externalLoading ? (uploadProgress || "Uploading…") : "Upload"}
           </button>
         </div>
       </form>
@@ -973,6 +985,7 @@ export default function AdminMediaPage() {
   const [totalCount, setTotalCount] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [eventFlyerOnly, setEventFlyerOnly] = useState(false);
+  const [heroImagesOnly, setHeroImagesOnly] = useState(false);
   const [serialNumberInput, setSerialNumberInput] = useState('');
   const totalPages = Math.ceil(totalCount / pageSize);
   const router = useRouter();
@@ -992,6 +1005,11 @@ export default function AdminMediaPage() {
   const [uploadMessage, setUploadMessage] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
+  // Bulk selection and delete
+  const [selectedMediaIds, setSelectedMediaIds] = useState<Set<number>>(new Set());
+  const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
+  const [bulkDeletePending, setBulkDeletePending] = useState(false);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       async function fetchMedia() {
@@ -1006,6 +1024,10 @@ export default function AdminMediaPage() {
 
           if (eventFlyerOnly) {
             url += `&eventFlyer.equals=true`;
+          }
+
+          if (heroImagesOnly) {
+            url += `&isHeroImage.equals=true`;
           }
 
           const res = await fetch(url);
@@ -1030,7 +1052,7 @@ export default function AdminMediaPage() {
       fetchMedia();
     }, 500); // Debounce search
     return () => clearTimeout(timer);
-  }, [page, pageSize, searchTerm, eventFlyerOnly, refreshKey]);
+  }, [page, pageSize, searchTerm, eventFlyerOnly, heroImagesOnly, refreshKey]);
 
   function handleCellMouseEnter(media: EventMediaDTO, e: React.MouseEvent<HTMLDivElement>, type: 'uploadedMedia', serialNumber: number) {
     // Don't show tooltip if it was recently closed
@@ -1176,6 +1198,37 @@ export default function AdminMediaPage() {
     });
   };
 
+  const toggleSelection = (id: number | undefined) => {
+    if (id == null) return;
+    setSelectedMediaIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const clearSelection = () => setSelectedMediaIds(new Set());
+
+  const confirmBulkDelete = async () => {
+    if (selectedMediaIds.size === 0) return;
+    setBulkDeletePending(true);
+    try {
+      const ids = Array.from(selectedMediaIds);
+      for (const id of ids) {
+        const res = await fetch(`/api/proxy/event-medias/${id}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error(`Failed to delete media ${id}`);
+      }
+      setMediaList(prev => prev.filter(m => m.id == null || !selectedMediaIds.has(m.id)));
+      setSelectedMediaIds(new Set());
+      setBulkDeleteConfirmOpen(false);
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : 'Bulk delete failed');
+    } finally {
+      setBulkDeletePending(false);
+    }
+  };
+
   const handleNextPage = () => {
     if (page < totalPages - 1) {
       setPage(page + 1);
@@ -1191,7 +1244,21 @@ export default function AdminMediaPage() {
   const startItem = page * pageSize + 1;
   const endItem = Math.min((page + 1) * pageSize, totalCount);
 
-  const sortedMedia = mediaList.sort((a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime());
+  const sortedMedia = [...mediaList].sort((a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime());
+  const pageItemIds = sortedMedia.filter((m): m is EventMediaDTO & { id: number } => m.id != null).map(m => m.id);
+  const allOnPageSelected = pageItemIds.length > 0 && pageItemIds.every(id => selectedMediaIds.has(id));
+
+  const toggleSelectAllOnPage = () => {
+    if (allOnPageSelected) {
+      setSelectedMediaIds(prev => {
+        const next = new Set(prev);
+        pageItemIds.forEach(id => next.delete(id));
+        return next;
+      });
+    } else {
+      setSelectedMediaIds(prev => new Set([...prev, ...pageItemIds]));
+    }
+  };
 
   if (error) {
     return <div className="text-red-500 text-center p-8">{error}</div>;
@@ -1237,6 +1304,14 @@ export default function AdminMediaPage() {
             <span className="font-semibold text-blue-700 hidden sm:inline">Upload New Media</span>
           </button>
         </div>
+      </div>
+
+      {/* Image spec guidance - same as edit events help tip */}
+      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between">
+        <span className="text-sm font-medium text-gray-700">
+          Image specifications for hero and event media (Section 1–3). Mouse over for details.
+        </span>
+        <EventFormHelpTooltip fieldName="Image specifications" title="Image specifications for hero and event media" customContent={<MediaImageSpecHelpContent />} />
       </div>
 
       <div className="mb-8 bg-white p-6 rounded-lg shadow-md">
@@ -1287,8 +1362,8 @@ export default function AdminMediaPage() {
             </button>
           </div>
 
-          {/* Event flyers filter */}
-          <div className="flex items-center gap-2">
+          {/* Event flyers and hero images filters */}
+          <div className="flex flex-wrap items-center gap-4">
             <label className="flex items-center gap-2 cursor-pointer">
               <span className="relative flex items-center justify-center">
                 <input
@@ -1307,6 +1382,25 @@ export default function AdminMediaPage() {
                 </span>
               </span>
               <span className="text-sm font-medium text-gray-700 select-none">Event Flyers Only</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <span className="relative flex items-center justify-center">
+                <input
+                  type="checkbox"
+                  className="custom-checkbox"
+                  checked={heroImagesOnly}
+                  onChange={(e) => setHeroImagesOnly(e.target.checked)}
+                  onClick={(e) => e.stopPropagation()}
+                />
+                <span className="custom-checkbox-tick">
+                  {heroImagesOnly && (
+                    <svg className="text-black" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l5 5L19 7" />
+                    </svg>
+                  )}
+                </span>
+              </span>
+              <span className="text-sm font-medium text-gray-700 select-none">Hero Images Only</span>
             </label>
           </div>
         </div>
@@ -1331,11 +1425,64 @@ export default function AdminMediaPage() {
           {/* Medium Dark Radial Gradient Overlay */}
           <div className="absolute inset-0 pointer-events-none opacity-60" style={{ backgroundImage: 'radial-gradient(circle at top left, rgba(255, 255, 255, 0.12), transparent 55%)' }} />
 
+          {/* Bulk action bar: Select all checkbox to the left of Delete selected; button always visible, enabled when at least one selected */}
+          <div className="relative px-6 pt-6 sm:px-10 lg:px-14">
+            <div className="flex flex-wrap items-center gap-3 mb-4">
+              <label className="flex items-center gap-2 cursor-pointer select-none order-first">
+                <span className="relative flex items-center justify-center flex-shrink-0">
+                  <input
+                    type="checkbox"
+                    checked={allOnPageSelected}
+                    onChange={toggleSelectAllOnPage}
+                    className="custom-checkbox"
+                    aria-label="Select all on this page"
+                  />
+                  <span className="custom-checkbox-tick">
+                    {allOnPageSelected && (
+                      <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l5 5L19 7" />
+                      </svg>
+                    )}
+                  </span>
+                </span>
+                <span className="text-sm font-medium text-white">Select all on page</span>
+              </label>
+              <button
+                type="button"
+                onClick={() => selectedMediaIds.size > 0 && setBulkDeleteConfirmOpen(true)}
+                disabled={selectedMediaIds.size === 0}
+                className="flex-shrink-0 h-10 rounded-lg bg-red-500 hover:bg-red-600 text-white font-semibold px-4 flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-red-500"
+                title={selectedMediaIds.size === 0 ? "Select at least one item to delete" : "Delete selected"}
+                aria-label="Delete selected"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Delete selected
+              </button>
+              {selectedMediaIds.size > 0 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={clearSelection}
+                    className="text-sm font-medium text-blue-200 hover:text-white underline"
+                  >
+                    Clear selection
+                  </button>
+                  <span className="text-sm text-white/90">
+                    <span className="font-bold text-white">{selectedMediaIds.size}</span> selected
+                  </span>
+                </>
+              )}
+            </div>
+          </div>
+
           {/* Grid Content */}
           <div className="relative px-6 py-10 sm:px-10 lg:px-14">
             <div ref={mediaGridRef} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {sortedMedia.map((item, index) => {
             const serialNumber = page * pageSize + index + 1;
+            const isSelected = item.id != null && selectedMediaIds.has(item.id);
             return (
               <div
                 key={item.id}
@@ -1370,8 +1517,27 @@ export default function AdminMediaPage() {
                     <p className="text-gray-600 text-sm h-10 overflow-hidden" title={item.description || ''}>{item.description}</p>
                   </div>
                 </div>
-                {/* Action Buttons - Medium Action Icons Pattern (Media Gallery Grid) */}
-                <div className="p-4 pt-0 flex justify-end gap-2">
+                {/* Checkbox (left) + Action Buttons - Medium Action Icons Pattern (Media Gallery Grid) */}
+                <div className="p-4 pt-0 flex items-center gap-2">
+                  {/* Per-item checkbox - left of Edit */}
+                  {item.id != null && (
+                    <label className="flex-shrink-0 cursor-pointer flex items-center justify-center w-14 h-14 rounded-lg border-2 border-gray-300 bg-gray-50 hover:bg-gray-100 flex items-center justify-center transition-all duration-300 hover:scale-110">
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => toggleSelection(item.id)}
+                        className="sr-only"
+                        aria-label={`Select ${item.title || 'media'}`}
+                      />
+                      <span className={`block w-6 h-6 rounded border-2 flex items-center justify-center ${isSelected ? 'bg-blue-600 border-blue-600' : 'border-gray-400 bg-white'}`}>
+                        {isSelected && (
+                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l5 5L19 7" />
+                          </svg>
+                        )}
+                      </span>
+                    </label>
+                  )}
                   {/* Edit Button */}
                   <button
                     onClick={() => handleEditClick(item)}
@@ -1503,6 +1669,48 @@ export default function AdminMediaPage() {
                   </svg>
                 </div>
                 <span className="font-semibold text-red-700">{isPending ? 'Deleting...' : 'Confirm Delete'}</span>
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {bulkDeleteConfirmOpen && (
+        <Modal open={bulkDeleteConfirmOpen} onClose={() => !bulkDeletePending && setBulkDeleteConfirmOpen(false)} title="Confirm bulk deletion">
+          <div className="text-center">
+            <p className="text-lg">
+              Delete <strong>{selectedMediaIds.size}</strong> selected item{selectedMediaIds.size !== 1 ? 's' : ''}? This action cannot be undone.
+            </p>
+            <div className="mt-6 flex justify-center gap-4">
+              <button
+                onClick={() => setBulkDeleteConfirmOpen(false)}
+                disabled={bulkDeletePending}
+                className="flex-shrink-0 h-14 rounded-xl bg-teal-100 hover:bg-teal-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Cancel"
+                aria-label="Cancel"
+                type="button"
+              >
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
+                  <svg className="text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-teal-700">Cancel</span>
+              </button>
+              <button
+                onClick={confirmBulkDelete}
+                disabled={bulkDeletePending}
+                className="flex-shrink-0 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Delete selected"
+                aria-label="Delete selected"
+                type="button"
+              >
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-200 flex items-center justify-center">
+                  <svg className="text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-red-700">{bulkDeletePending ? 'Deleting...' : 'Delete selected'}</span>
               </button>
             </div>
           </div>

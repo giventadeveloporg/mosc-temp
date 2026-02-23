@@ -1,6 +1,5 @@
 import React from 'react';
 import { Metadata } from 'next';
-import '../../mosc/mosc-globals.css';
 
 export const metadata: Metadata = {
   title: {
@@ -16,7 +15,7 @@ interface PilgrimCentresLayoutProps {
 
 export default function PilgrimCentresLayout({ children }: PilgrimCentresLayoutProps) {
   return (
-    <div className="mosc-layout min-h-screen bg-background flex flex-col">
+    <div className="mosc-layout min-h-screen bg-syro-bg-gray flex flex-col">
       <main className="mosc-main flex-1">
         {children}
       </main>

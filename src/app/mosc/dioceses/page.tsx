@@ -1,6 +1,9 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import QuickLinks from '../components/QuickLinks';
+import SyroPageBanner from '../components/SyroPageBanner';
+import SyroSectionTitle from '../components/SyroSectionTitle';
 
 export const metadata = {
   title: 'Dioceses',
@@ -43,46 +46,24 @@ const DiocesesPage = () => {
   ];
 
   return (
-    <div className="bg-background">
-      {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-br from-background to-muted">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-primary rounded-lg flex items-center justify-center mx-auto mb-6 sacred-shadow-lg">
-              <span className="text-primary-foreground text-4xl font-bold" role="img" aria-label="Dioceses">🗺️</span>
-            </div>
-            <h1 className="font-heading font-semibold text-4xl text-foreground mb-4">
-              Dioceses of the Malankara Orthodox Syrian Church
-            </h1>
-            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Our church is organized into dioceses across India and worldwide, each serving local communities
-              while maintaining unity with the global Orthodox family.
-            </p>
-          </div>
-        </div>
-      </section>
+    <div className="bg-syro-bg-gray">
+      <SyroPageBanner title="Dioceses" />
 
-      {/* Dioceses cards - like mosc.in/dioceses (image, title, excerpt, Read More) */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="font-heading font-semibold text-3xl text-foreground mb-4">
-              Dioceses
-            </h2>
-            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto">
-              The Malankara Orthodox Syrian Church is organized into dioceses that serve communities
-              across different regions, ensuring spiritual care and administrative support for all members.
-            </p>
-          </div>
+          <SyroSectionTitle>Dioceses</SyroSectionTitle>
+          <p className="font-syro-primary text-lg text-syro-dark-gray max-w-3xl mb-10">
+            The Malankara Orthodox Syrian Church is organized into dioceses that serve communities across different regions, ensuring spiritual care and administrative support for all members.
+          </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {dioceseCards.map((card) => (
               <Link
                 key={card.href}
                 href={card.href}
-                className="bg-background rounded-lg sacred-shadow p-0 overflow-hidden hover:sacred-shadow-lg reverent-transition group flex flex-col"
+                className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 p-0 overflow-hidden group flex flex-col"
               >
-                <div className="relative w-full h-48 bg-muted overflow-hidden">
+                <div className="relative w-full h-48 bg-syro-bg-gray/30 overflow-hidden">
                   <Image
                     src={card.image}
                     alt={card.name}
@@ -91,48 +72,33 @@ const DiocesesPage = () => {
                     sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                   />
                 </div>
-                <div className="p-6 flex flex-col flex-1">
-                  <h3 className="font-heading font-semibold text-xl text-foreground mb-3 group-hover:text-primary reverent-transition">
+                <div className="p-6 flex flex-col flex-1 bg-white">
+                  <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-3 group-hover:text-syro-red transition-all duration-300">
                     {card.name}
                   </h3>
-                  <p className="font-body text-muted-foreground text-sm leading-relaxed flex-1 line-clamp-4">
+                  <p className="font-syro-primary text-syro-dark-gray text-sm leading-relaxed flex-1 line-clamp-4">
                     {card.excerpt}
                   </p>
                   <div className="mt-auto pt-4">
-                    <span className="inline-flex items-center gap-1.5 font-body text-sm font-medium text-primary">
+                    <span className="syro-read-more-btn font-syro-primary">
                       Read More
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      aria-hidden="true"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </span>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
+                    </span>
                   </div>
                 </div>
               </Link>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* Diocese Information */}
-      <section className="py-16 bg-muted/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          {/* Diocese Information */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-16">
             <div>
-              <h2 className="font-heading font-semibold text-3xl text-foreground mb-6">
+              <h2 className="text-2xl font-light text-[#798daf] pl-8 border-l-[7px] border-syro-red mb-6">
                 About Our Dioceses
               </h2>
-              <div className="space-y-4 font-body text-muted-foreground leading-relaxed">
+              <div className="space-y-4 font-syro-primary text-syro-dark-gray leading-relaxed">
                 <p>
                   Each diocese in the Malankara Orthodox Syrian Church is led by a Metropolitan or Bishop
                   who provides spiritual guidance and administrative oversight to the parishes within their jurisdiction.
@@ -149,34 +115,36 @@ const DiocesesPage = () => {
               </div>
             </div>
 
-            <div className="bg-card rounded-lg sacred-shadow p-6">
-              <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
+            <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-6">
+              <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-4">
                 Diocese Statistics
               </h3>
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="font-body text-muted-foreground">Total Dioceses</span>
-                  <span className="font-heading font-semibold text-foreground">30</span>
+                  <span className="font-syro-primary text-syro-dark-gray">Total Dioceses</span>
+                  <span className="font-syro-display font-semibold text-syro-blue">30</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="font-body text-muted-foreground">Kerala Dioceses</span>
-                  <span className="font-heading font-semibold text-foreground">21</span>
+                  <span className="font-syro-primary text-syro-dark-gray">Kerala Dioceses</span>
+                  <span className="font-syro-display font-semibold text-syro-blue">21</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="font-body text-muted-foreground">Indian Dioceses</span>
-                  <span className="font-heading font-semibold text-foreground">6</span>
+                  <span className="font-syro-primary text-syro-dark-gray">Indian Dioceses</span>
+                  <span className="font-syro-display font-semibold text-syro-blue">6</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="font-body text-muted-foreground">International Dioceses</span>
-                  <span className="font-heading font-semibold text-foreground">3</span>
+                  <span className="font-syro-primary text-syro-dark-gray">International Dioceses</span>
+                  <span className="font-syro-display font-semibold text-syro-blue">3</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="font-body text-muted-foreground">Total Parishes</span>
-                  <span className="font-heading font-semibold text-foreground">2000+</span>
+                  <span className="font-syro-primary text-syro-dark-gray">Total Parishes</span>
+                  <span className="font-syro-display font-semibold text-syro-blue">2000+</span>
                 </div>
               </div>
             </div>
           </div>
+
+          <QuickLinks />
         </div>
       </section>
     </div>

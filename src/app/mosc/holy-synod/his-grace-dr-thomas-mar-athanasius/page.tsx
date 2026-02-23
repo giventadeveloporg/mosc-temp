@@ -1,32 +1,36 @@
-import React from 'react';
+﻿import React from 'react';
 import Image from 'next/image';
-import SynodMembersSidebar from '@/components/holy-synod/SynodMembersSidebar';
-import QuickLinks from '@/components/holy-synod/QuickLinks';
+import SynodMembersSidebar from '../../components/SynodMembersSidebar';
+import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata = {
   title: 'H. G. Dr. Thomas Mar Athanasius Metropolitan',
-  description: 'Biography and information about H. G. Dr. Thomas Mar Athanasius Metropolitan.',
+  description: 'His Grace Dr. Thomas Mar Athanasius Metropolitan, Bishop of Kandanad Diocese. Scholar, social worker, and author.',
 };
 
 const HisGraceDrThomasMarAthanasiusPage = () => {
   return (
-    <div className="bg-background">
+    <div className="bg-syro-bg-gray">
+      <SyroPageBanner
+        title="H. G. Dr. Thomas Mar Athanasius Metropolitan"
+        breadcrumbFrom="holy-synod"
+      />
       {/* Main Content */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Main Content */}
-            <div className="lg:col-span-3">
-              <div className="bg-background rounded-lg sacred-shadow p-8">
-                <div className="flex flex-col md:flex-row gap-8">
-                  {/* Featured Portrait - Left Side - Large Display */}
-                  <div className="flex-shrink-0 flex justify-center md:justify-start">
-                    <div className="relative w-72 h-[28rem] md:w-80 md:h-[32rem] lg:w-96 lg:h-[36rem] rounded-lg overflow-hidden sacred-shadow-lg">
+            <div className="lg:col-span-2">
+              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
+                {/* Featured Image - Top */}
+                <div className="mb-8 flex justify-center">
+                  <div className="relative w-full max-w-md h-[280px] rounded-lg overflow-hidden shadow-syro-card">
                       <Image
                         src="/images/holy-synod/ath.jpg"
                         alt="H. G. Dr. Thomas Mar Athanasius Metropolitan"
                         fill
-                        sizes="(max-width: 768px) 288px, (max-width: 1024px) 320px, 384px"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 448px"
                         className="object-cover object-top"
                         style={{
                           objectPosition: 'center 15%'
@@ -36,43 +40,42 @@ const HisGraceDrThomasMarAthanasiusPage = () => {
                     </div>
                   </div>
 
-                  {/* Content - Right Side of Image */}
-                  <div className="flex-1">
-                    <h3 className="font-heading font-semibold text-2xl text-foreground mb-6">
+                {/* Content - Below Image */}
+                <div>
+                    <h3 className="font-syro-display font-semibold text-2xl text-syro-blue mb-6">
                       H. G. Dr. Thomas Mar Athanasius Metropolitan
                     </h3>
 
                     <div className="prose prose-lg max-w-none">
-                      <p className="font-body text-muted-foreground leading-relaxed mb-4">
-                        His Grace was born on 28 June 1952 at Arikuzha, Thodupuzha, to Rev. Fr Yohannan Puttanil and Mrs Mariam. He did his schooling at Government UPS School Arikuzha and NSS High School, Manakad. Thereupon he joined New Man College, Thodupuzha and passed out his Pre-degree and Degree from there. He did his MA from St John’s College, Agra.
+                      <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
+                        His Grace was born on 28 June 1952 at Arikuzha, Thodupuzha, to Rev. Fr Yohannan Puttanil and Mrs Mariam. He did his schooling at Government UPS School Arikuzha and NSS High School, Manakad. Thereupon he joined New Man College, Thodupuzha and passed out his Pre-degree and Degree from there. He did his MA from St Johnâ€™s College, Agra.
                       </p>
 
-                      <p className="font-body text-muted-foreground leading-relaxed mb-4">
+                      <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
                         In the theological front, he took his BD degree from Serampore College and United Theological College, Bangalore. And went for his DTh from Protestant Faculty, University of Munich.
                       </p>
 
-                      <p className="font-body text-muted-foreground leading-relaxed mb-4">
+                      <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
                         He was ordained a priest in 1990 and the very same year was consecrated as Bishop and was given the charge of Kandanad Diocese. He was a teacher at Syrian Orthodox Theological Seminary at Vettickal during 1990-95. From 1992, His Grace was the President of Kerala Council of Churches till 1998.
                       </p>
 
-                      <p className="font-body text-muted-foreground leading-relaxed mb-4">
+                      <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
                         Dr Athanasius is a known social worker and a philanthropist. He runs Swasraya Rehabilitation & Training Centre at Vettickal, Mulanthuruthy; Trinity Retirement Home, Kolenchery; Samanvaya Study and Dialogue Centre, Pampakuda; Sukhada Retreat Centre, Kolenchery; Santhula Hospital and Deaddiction Centre, Vadakara; and Giliyad, Retreat Centre & Orphanage, Vadkara.
                       </p>
 
-                      <p className="font-body text-muted-foreground leading-relaxed mb-4">
+                      <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
                         His Grace is an author of few well-known books. A Comparative Study of Theological Methodologies of Irenaeus and Sri Sankara (1990); Church and Society (1992); Neethi Samooham; and Anthyokya Malankara Bandham: Oru Punarchintanam are the main titles.
                       </p>
 
-                      <div className="mt-6 pt-6 border-t border-border">
-                        <p className="font-body text-muted-foreground leading-relaxed mb-2">
-                          Address: Bishop’s House, Cathedral Road, Moovattupuzha,Kerala – 686 661 ph : 0485 2833401 Cell: 9447083340
+                      <div className="mt-6 pt-6 border-t border-syro-table-border">
+                        <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-2">
+                          Address: Bishopâ€™s House, Cathedral Road, Moovattupuzha,Kerala â€“ 686 661 ph : 0485 2833401 Cell: 9447083340
                         </p>
-                        <p className="font-body text-muted-foreground leading-relaxed mb-2">
+                        <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-2">
                           Email: thomasmarathanasius@gmail.com
                         </p>
                       </div>
                     </div>
-                  </div>
                 </div>
               </div>
 
@@ -83,7 +86,7 @@ const HisGraceDrThomasMarAthanasiusPage = () => {
             </div>
 
             {/* Sidebar */}
-            <div className="lg:col-span-1">
+            <div className="space-y-6 lg:col-span-1">
               <SynodMembersSidebar />
             </div>
           </div>

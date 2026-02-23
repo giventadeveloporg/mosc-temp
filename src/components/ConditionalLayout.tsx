@@ -12,19 +12,13 @@ interface ConditionalLayoutProps {
 export default function ConditionalLayout({ children, header, footer }: ConditionalLayoutProps) {
   const pathname = usePathname();
 
-  // Check if this is a MOSC route
-  const isMOSCRoute = pathname?.startsWith("/mosc") ?? false;
-  
-  // Check if this is a Syro route
-  const isSyroRoute = pathname?.startsWith("/syro") ?? false;
+  // Legacy MOSC app at /mosc-old (app/mosc-old)
+  const isMoscOldRoute = pathname?.startsWith("/mosc-old") ?? false;
+  // Syro app at /mosc (app/mosc)
+  const isMoscRoute = (pathname?.startsWith("/mosc") && !pathname?.startsWith("/mosc-old")) ?? false;
 
-  // For MOSC routes, just render children without main app header/footer
-  if (isMOSCRoute) {
-    return <>{children}</>;
-  }
-
-  // For Syro routes, just render children without main app header/footer
-  if (isSyroRoute) {
+  // For /mosc-old and /mosc, render children without main app header/footer
+  if (isMoscOldRoute || isMoscRoute) {
     return <>{children}</>;
   }
 

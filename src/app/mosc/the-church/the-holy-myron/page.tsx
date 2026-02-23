@@ -1,55 +1,34 @@
-import React from 'react';
+﻿import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import QuickLinks from '@/components/holy-synod/QuickLinks';
+import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
 import TheChurchSidebar from '../TheChurchSidebar';
 
 export const metadata = {
   title: 'The Holy Myron',
   description:
-    'The divine and life-giving mystery of the Holy Myron. By the divine power, we speak of the mysteries of the cross and the holy anointing—its origin, meaning, and consecration in the Orthodox tradition.',
+    'The divine and life-giving mystery of the Holy Myron. By the divine power, we speak of the mysteries of the cross and the holy anointingâ€”its origin, meaning, and consecration in the Orthodox tradition.',
 };
 
-const TheHolyMyronPage = () => {
+export default async function TheHolyMyronPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string }>;
+}) {
+  const params = await searchParams;
+  const breadcrumbFrom = params.from === 'the-church' ? 'the-church' : 'home';
+
   return (
-    <div className="bg-background">
-      {/* Hero Section - MOSC styling */}
-      <section className="py-16 bg-gradient-to-br from-background to-muted">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 sacred-shadow-lg border border-border/50">
-              <svg
-                className="w-10 h-10 text-primary"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                />
-              </svg>
-            </div>
-            <h1 className="font-heading font-semibold text-4xl text-foreground mb-4">
-              The Holy Myron
-            </h1>
-            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              By the divine power, we have spoken at length on the mysteries of the cross. We next
-              write about the divine and life-giving mystery of the Holy Myron.
-            </p>
-          </div>
-        </div>
-      </section>
+    <div className="bg-syro-bg-gray">
+      <SyroPageBanner title="The Holy Myron" breadcrumbFrom={breadcrumbFrom} />
 
       {/* Main Content */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <div className="lg:col-span-3">
-              <div className="bg-background rounded-lg sacred-shadow p-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="lg:col-span-2">
+              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 {/* Featured Image */}
                 <div className="mb-8 flex justify-center">
                   <div className="relative w-full max-w-[280px] h-auto">
@@ -58,47 +37,47 @@ const TheHolyMyronPage = () => {
                       alt="The Holy Myron - Sacrament of Chrismation"
                       width={280}
                       height={180}
-                      className="w-full h-auto object-contain rounded-lg"
+                      className="w-auto h-auto object-contain rounded-lg block mx-auto"
                     />
                   </div>
                 </div>
 
                 <div className="prose prose-lg max-w-none">
-                  <h2 className="font-heading font-semibold text-2xl text-foreground mb-4">
+                  <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4">
                     On the Divine and Life-Giving Myron
                   </h2>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-8">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-8">
                     Now that discourse on the holy cross has reached a conclusion, the discourse
                     proceeds speedily in order to indicate briefly concerning the holy and divine
                     Myron.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 1
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The word &apos;Myron&apos; is translated in the Syriac language as
-                    &apos;muro&apos;. Etymologically the word muro—with which the dead are
-                    embalmed—signifies mortality. Thus it signifies the mortality of Our Lord for
+                    &apos;muro&apos;. Etymologically the word muroâ€”with which the dead are
+                    embalmedâ€”signifies mortality. Thus it signifies the mortality of Our Lord for
                     our sake. Solomon also called Him &quot;Oil of Myrrh&quot; (Songs 1:2). The
                     Greeks too call it Myron in the Greek language. In two ways it is called Myron:
-                    first, because of the fragrance—every kind of oil composed from many fragrant
+                    first, because of the fragranceâ€”every kind of oil composed from many fragrant
                     plants is called Myron; aromatic herbs are also called Myron.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 2
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The discussion investigates from which oils is Myron made? We say from the oil of
                     Balsam or the balm that comes from Egypt and from the olive oil that is found
                     everywhere.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 3
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     It is necessary to contemplate the Balsam oil. Josephus the historian says:
                     Jericho is one of the places of the Hebrews which was rich in palm trees and
                     other plants; there was also the Balsam plant. When they cut its roots with
@@ -110,25 +89,25 @@ const TheHolyMyronPage = () => {
                     sliced, it gives the gum of Myron.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 4
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     People may ask: From where has the tradition of the Myron come down to us? We
                     say: From the time of Moses. When God took him up to the mountain and taught him
                     the mysteries of the Church, He also commanded him saying, &quot;Take the
                     finest aromatics: the flower of chosen Myron five hundred shekels, Cinnamon,
                     Cassia and Olive oil etc. and make the oil of anointing, and you shall anoint
-                    the tent of the testimony, etc.&quot; (Ex. 30:23–26). And this type was handed
+                    the tent of the testimony, etc.&quot; (Ex. 30:23â€“26). And this type was handed
                     down till Christ and the old anointing of Moses came to an end, when Our Lord
                     handed over the key to Simon on the Mount Tabor. And thus the new anointing
                     originated. These things are enough.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 5
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     People again ask: From where did the apostles learn to consecrate the Myron?
                     Some of the doctors say they learnt it in the Upper Room when they ate the
                     Passover, and He taught them to perform the memory of His death through the
@@ -142,19 +121,19 @@ const TheHolyMyronPage = () => {
                     the Holy Spirit taught the apostles to make the Myron when He descended upon
                     them in the form of the tongues of fire. This is evident from what the Son had
                     said: &quot;From that which is Mine He takes and informs you&quot; (cf. Jn.
-                    16:13–15).
+                    16:13â€“15).
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 6
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The Nestorians who oppose the truth as well as the faith ask: Did the apostles
                     consecrate the Myron or not? We say against them: Show us where is it written
                     that there was the horn of oil for the apostles? You say that it was raised up
                     amongst you. Again, show us where is it written that the apostles consecrated
                     the Myron for baptism, and that they anointed the baptized with it, as your
-                    elders do—for when one wishes to baptize, he consecrates the oil? If you say
+                    elders doâ€”for when one wishes to baptize, he consecrates the oil? If you say
                     that it is not written that the apostles consecrated the Myron, and therefore
                     we do not consecrate it, then show us where is it written to adore the cross,
                     to build the churches in the eastward direction, to celebrate the baptism in the
@@ -174,10 +153,10 @@ const TheHolyMyronPage = () => {
                     apostles. Let these things stop here.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 7
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     People ask: What does the Myron depict? In his letter to John the Roman, Saint
                     Severios said that the Myron signifies the Holy Spirit, the giver of gifts.
                     Others also say that the Myron depicts the Spirit, basing themselves on what
@@ -189,10 +168,10 @@ const TheHolyMyronPage = () => {
                     from its composition and its operations, as we are going to show below.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 8
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Why is Christ called &apos;Myron&apos;? We say that as the Myron possesses
                     fragrance, the Word also has holiness and fragrance naturally. Whenever the
                     Myron is hidden in a vase and not revealed and not known, it does not give out
@@ -202,10 +181,10 @@ const TheHolyMyronPage = () => {
                     incarnate.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 9
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     How many anointings did the incarnate Word receive? We say five. First, when
                     the Word was anointed by the Spirit in the flesh, that is by the Holy Spirit,
                     when He was in the womb of the Virgin. Second, when He anointed His humanity
@@ -215,10 +194,10 @@ const TheHolyMyronPage = () => {
                     Myron, when He was anointed by the women.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 10
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     When Myron is rubbed on the wings of doves, it gives fragrance and it attracts
                     other doves to this dove. When it is rubbed on the nostrils of impure vultures,
                     they die. Similarly, by the true Myron oil, many live and many others die. The
@@ -226,10 +205,10 @@ const TheHolyMyronPage = () => {
                     it die by it.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 11
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Again Christ is called &apos;Myron&apos; because He received it when He was
                     anointed by the women. On the fragrance: When the Balsam oil is squeezed and
                     pressed out, it gives out fragrance. Similarly, Christ was pierced with the
@@ -239,10 +218,10 @@ const TheHolyMyronPage = () => {
                     above.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 12
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Why is the Myron composed from two oils? We say because Christ is known from
                     His divinity and humanity. The high priest pours the Balsam oil over the olive
                     oil, symbolizing that he had poured the divinity over the humanity. The Balsam
@@ -259,14 +238,14 @@ const TheHolyMyronPage = () => {
                     The same one is visible and invisible. Just as the constitution of the Myron is
                     from oils and substances that are separate and different in essence, yet nobody
                     says after the composition of Myron that there are many oils, but a single
-                    Myron—similarly, it is not right to separate Christ, that true Myron, into two
+                    Myronâ€”similarly, it is not right to separate Christ, that true Myron, into two
                     natures after the union with the flesh.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 13
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     We say that the union of the Word with the body took place not in confusion, in
                     the way in which the oil of Myron is mixed, that is the oils with each other.
                     But Christ&apos;s union was like that of fire with iron, and light with heat,
@@ -274,10 +253,10 @@ const TheHolyMyronPage = () => {
                     natures.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 14
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Again through the &apos;fatness&apos; of the olive we see the holy flesh. The
                     olive plant is abundant in blessings and helps, and it is of advantage to all
                     species with which it is mixed. Cold plants when compounded with it become cold;
@@ -290,31 +269,31 @@ const TheHolyMyronPage = () => {
                     These things are sufficient.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 15
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     It has been asked: Why do the bishops alone compose the Myron? We say as an
-                    argument that Christ united to Himself an animated body—and so the bishop alone
-                    compounds it—for one is the Only-Begotten Son who is from the Father. Again, for
+                    argument that Christ united to Himself an animated bodyâ€”and so the bishop alone
+                    compounds itâ€”for one is the Only-Begotten Son who is from the Father. Again, for
                     He alone, and His Holy Spirit, know how He was &apos;compounded&apos; with the
                     flesh.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 16
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     He compounds it secretly in a special place in order to indicate the particular
                     intention of the Father, Son and the Holy Spirit, in which the mystery of the
                     emptying out and the economy of the Word is hidden. Secondly, this place
                     indicates the Virgin Mary, in whom the Word was united with His flesh.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 17
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Again the bishop pours the Balsam oil over the olive oil, indicating thus that
                     the divinity, which is exalted from all things, poured out its essence upon the
                     humanity. The Word empties out Himself into the womb of the Virgin without
@@ -324,10 +303,10 @@ const TheHolyMyronPage = () => {
                     the womb of the Virgin, without His having departed from His Father.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 18
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The bishop is clothed in white, corresponding to the light of his soul and with
                     the purity of his person, as the mystery indicates to him that it should be
                     offered to God in purity. Again, having put on white garments, he consecrates
@@ -342,10 +321,10 @@ const TheHolyMyronPage = () => {
                     light. These are enough.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 19
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The fact that the bishop leaves the Holy of Holies and goes around and comes up
                     to the other end of the church, carrying the Myron, indicates that the divinity
                     of the Only-Begotten Word descended and came to us when He became man. As the
@@ -355,10 +334,10 @@ const TheHolyMyronPage = () => {
                     and came to us, yet when He became man, His dispensation is concealed from us.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 20
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     As the Myron is hidden, so too the divinity of the Word is concealed from the
                     angels and created beings do not comprehend it. Again Myron is veiled, just as
                     the divinity of the Word was veiled in the flesh when He came to the world. And
@@ -367,29 +346,29 @@ const TheHolyMyronPage = () => {
                     6:3).
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 21
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    The Myron leaves and goes around the nave and returns—just as the Word, when
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
+                    The Myron leaves and goes around the nave and returnsâ€”just as the Word, when
                     He became flesh, left heaven (just as the Myron leaves the Holy of Holies), and
                     He went around the world (just as the Myron goes around the nave). He fulfilled
                     the divine economy and returned to heaven, from where He descended.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 22
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     In the middle of the church it is revealed and consecrated, as the Word, when
                     He became flesh, did realize the salvation in the middle of the earth. As David
                     said: &quot;In the midst of the church will I give praise&quot; (Ps 22:22 LXX).
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 23
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     When the Myron leaves the sanctuary, why does the procession move to the north?
                     We say: The eastern region is luminous and the western is dark; the northern is
                     high and elevated; the southern is deep and low. East and the North indicate
@@ -401,10 +380,10 @@ const TheHolyMyronPage = () => {
                     temporal.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 24
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     He leaves the sanctuary, that is from the East, as a bridegroom from the bridal
                     chamber, while the Psalm of David is sung before him: &quot;Like a bridegroom
                     comes out of the chamber&quot; (Ps 19:5). He cries out from the East:
@@ -427,18 +406,18 @@ const TheHolyMyronPage = () => {
                     This is enough regarding the procession of the divine Myron.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 25
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    On the Myron and its mysteries—it is necessary that we may continue with the
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
+                    On the Myron and its mysteriesâ€”it is necessary that we may continue with the
                     same contemplation (spiritual sense) and compare the types to the truth. Thus
                     the twelve deacons who surround the Myron represent the twelve legions of the
                     angels. Others say that the deacons represent the Seraphim who surround the
                     Word. Their fans indicate the six wings of the Seraphim, who covered their faces
                     with two (that is from His divinity), with two they covered their feet (that
-                    is from His humanity)—as someone may say, they do not search out His divinity
-                    and investigate about His humanity—and with the middle wings they fly, seeing
+                    is from His humanity)â€”as someone may say, they do not search out His divinity
+                    and investigate about His humanityâ€”and with the middle wings they fly, seeing
                     that they possess an intermediary knowledge about Him, because &quot;He is the
                     mediator between God and men,&quot; as Paul had said (1 Tim 2:5). Again, the
                     fact that the deacons conceal the Myron is the type of the Seraphim who conceal
@@ -452,41 +431,41 @@ const TheHolyMyronPage = () => {
                     right that the divine mysteries should be revealed to those who are unworthy.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 26
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Again we say that the twelve priests represent the twelve Apostles.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 27
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The twelve censers indicate the preaching of the Gospel. Again the twelve
                     censers filled with incense and going before the Myron indicate for us the
                     twelve apostles through whom the fragrance of the Gospel of Christ was spread.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 28
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Again the sweet incense symbolizes the fragrance of faith that is spread in
                     the four quarters.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 29
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Again sub-deacons represent the prophets.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 30
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The twelve lamps in their hands symbolize the luminous revelations that descend
                     upon them, in accordance with &quot;every good gift and perfect grace&quot;
                     (James 1:17). Again the lamps indicate the light of the divine knowledge that is
@@ -494,46 +473,46 @@ const TheHolyMyronPage = () => {
                     interpreters who were like lamps to the Church with their teachings.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 31
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The deacons stand nearer to the Myron than the priests who are superior in
                     rank, because the deacons represent the Seraphim who are nearer to Christ, and
                     the priests the apostles, and the sub-deacons the prophets.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 32
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The sub-deacons who are inferior go before the priests, because the prophets
                     preceded the Apostles.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 33
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The deacons, priests and the sub-deacons are nearer to the Myron than the
                     people, because the Seraphim, apostles and the prophets are nearer to Christ
                     than the faithful.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 34
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
-                    The number twelve—whether twelve censers, twelve lamps or twelve fans—indicates
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
+                    The number twelveâ€”whether twelve censers, twelve lamps or twelve fansâ€”indicates
                     the twelve tribes. As the tribes were twelve, the stones were twelve, and
                     twelve hours make a day, and there are twelve months in a year, and also man is
                     known in twelve parts.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 35
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Again, the Myron is slowly carried around in the hands of the high priest and
                     proceeds until the procession returns to the sanctuary, and he places the vase
                     on the table. It indicates the course that Christ, followed by His disciples,
@@ -542,10 +521,10 @@ const TheHolyMyronPage = () => {
                     are enough.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 36
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Now it is necessary to open up the true types of Myron, so that the hearer might
                     be filled with the mystical fragrance of the noetic Myron. The hymns with which
                     the Myron is consecrated indicate the hymns of the Seraphim who cry out
@@ -553,26 +532,26 @@ const TheHolyMyronPage = () => {
                     &quot;Blessed is the honor of the Lord from His place&quot; (Ezek 3:12).
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 37
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The high priest places the vase of the Myron on the altar, because it refers to
                     and represents Christ. The altar represents also the wood on which He was
                     crucified.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 38
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     He signs three crosses over it indicating the Trinity who perfects the mystery.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 39
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Why is it consecrated on Thursday? We say: Since &apos;Myron&apos; in the Syriac
                     language indicates death, and on this day Our Lord revealed about His death, as
                     He said: &quot;One of you will betray me to death&quot; (Mt 26:21). Again
@@ -614,95 +593,95 @@ const TheHolyMyronPage = () => {
                     baptized in that noble night and on the feast of resurrection. These are enough.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 40
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     On the mystery of Myron: It is advantageous for us to add on the same subject.
                     People ask us: Why is Myron consecrated by day? We say, because it is a mystery
                     dressed with light.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 41
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     It is consecrated at the third hour, for it indicates Christ, who Himself
                     indicates the Trinity: the Father who anoints, and the Son who is anointed and
                     the Spirit who fulfills the role of oil.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 42
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The bishop alone consecrates it, so that he may have some proper function other
                     than that of the priests. Therefore he consecrates altars, that is tablets, and
                     performs ordinations.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 43
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Again the high priest consecrates it because it is the sanctifying principle of
                     all the ecclesiastical affairs. And therefore the bishop alone consecrates the
                     Myron.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 44
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     After the consecration, he ascends to the Bema as Christ ascended to the Mount
                     of Olives with His twelve apostles and then to His Father.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 45
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     It is not right for him to remain in the same manner of life, but to advance
                     from his first manner of life to another more excellent one.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 46
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Thirdly, just as he is exalted in his being, so he should be exalted in his
                     knowledge and manner of life above the priests, deacons and the whole people.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 47
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Again, in order to show the Myron to the people, just as Our Lord was suspended
-                    on the cross in the sight of all the creation—He was seen.
+                    on the cross in the sight of all the creationâ€”He was seen.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 48
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     By extolling it, he indicates the following: When Emmanuel was raised on the
-                    cross and extended, He received the anointing of the Spirit—not that He had not
+                    cross and extended, He received the anointing of the Spiritâ€”not that He had not
                     yet received the Spirit, for Jesus had not yet been glorified.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 49
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     In the same way as Christ blessed His apostles when He ascended to heaven, the
                     bishop blesses the people when he ascends on the Bema.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 50
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     He extols it towards the four quarters, because Christ had commanded that His
                     Gospel should be transmitted to the four quarters. Also man is composed of four
                     elements. The twelve hours of the day have been divided into four watches, each
@@ -717,10 +696,10 @@ const TheHolyMyronPage = () => {
                     mercy upon us!&quot; These are enough.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 51
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     In the course of contemplation, we proceed and arrive at other things. When the
                     Myron descends from the Bema, it is placed on the altar, indicating that the
                     Word, even after He had ascended to heaven, dwells always on the holy altars. It
@@ -729,15 +708,15 @@ const TheHolyMyronPage = () => {
                     to the Word. The one into which it is poured typifies our flesh, for through
                     baptism we receive it. Again the Myron is hidden in the Holy of Holies and is
                     not left revealed like the crosses and the similar orders in the church, for the
-                    mystery of the economy of the Word—whom it typifies—is hidden. His judgments are
+                    mystery of the economy of the Wordâ€”whom it typifiesâ€”is hidden. His judgments are
                     inscrutable, being a great depth, and therefore it is not lawful to show the
                     mysteries openly.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 52
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     It is given by the order and permission of the bishop, because the bishop
                     occupies the place of Christ. It is not lawful to be given without his
                     permission, for he holds the keys of the kingdom. Again, so that they should
@@ -748,10 +727,10 @@ const TheHolyMyronPage = () => {
                     injured by its proximity.
                   </p>
 
-                  <h3 className="font-heading font-semibold text-lg text-foreground mt-8 mb-3">
+                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                     Chapter 53
                   </h3>
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Again it is consecrated by the bishop and it consecrates the baptismal water,
                     the tablets, the baptized as well as the churches. Thus the Myron represents
                     Christ Himself, who sanctifies and is sanctified. He sanctifies all, as He is
@@ -771,7 +750,7 @@ const TheHolyMyronPage = () => {
                     became flesh: &quot;Your name is the myron poured out&quot; (Songs 1:3).
                     Qurbana and the altar were named during the time of the dispensation and the
                     person of humanity. Moses Bar Kepha, bishop of Mosul, says otherwise: Myron,
-                    Qurbana, altar or bishop—one is not more valuable than the other, because all
+                    Qurbana, altar or bishopâ€”one is not more valuable than the other, because all
                     four indicate Christ and occupy the place of Christ. Christ is the Myron. As
                     Paul had said, &quot;In the end of the world, He offered Himself once for all
                     through His sacrifice&quot; (Heb 9:26). He is the altar, as &quot;an altar not
@@ -783,7 +762,7 @@ const TheHolyMyronPage = () => {
                     mutually, and are sanctified and perfected by others. Myron is consecrated so
                     that things might be anointed with it, and so that churches as well as baptismal
                     water might be consecrated, the baptized might be signed with it and so be
-                    distinguished from the non-baptized—in order to confer adoption as sons and the
+                    distinguished from the non-baptizedâ€”in order to confer adoption as sons and the
                     garment of life to those who wear it, to anoint our spiritual head, to gladden our
                     faces that were blackened with sins, to help the spiritual athletes and to give
                     virtue to those who have entered the world and good company to those who are
@@ -798,7 +777,7 @@ const TheHolyMyronPage = () => {
                     say that we meditate with the eyes of the soul on God the Word, who unites
                     Himself with the bread and wine and the oil. He is the Qurbana; He is the
                     Myron, and the Word of Life to those who are saved, and death to those who
-                    perish. The operations of the Myron precede the Qurbana—for without Myron, the
+                    perish. The operations of the Myron precede the Qurbanaâ€”for without Myron, the
                     church is not consecrated, nor the altar, nor the baptism, the Qurbana nor the
                     priest, and these are the fundamental operations. The operations of the Qurbana
                     are the final and complete, because the church that is consecrated with Myron,
@@ -806,7 +785,7 @@ const TheHolyMyronPage = () => {
                     operate without the others.
                   </p>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mt-8 italic">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mt-8 italic">
                     This discourse may take completion here. End of the discourse on the divine and
                     life-giving Myron.
                   </p>
@@ -819,7 +798,7 @@ const TheHolyMyronPage = () => {
             </div>
 
             {/* Sidebar - The Church (all subpages, like mosc.in) */}
-            <div className="lg:col-span-1">
+            <div className="space-y-6 lg:col-span-1">
               <TheChurchSidebar />
             </div>
           </div>
@@ -833,4 +812,3 @@ const TheHolyMyronPage = () => {
   );
 };
 
-export default TheHolyMyronPage;

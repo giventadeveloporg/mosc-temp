@@ -1,32 +1,36 @@
-import React from 'react';
+﻿import React from 'react';
 import Image from 'next/image';
-import SynodMembersSidebar from '@/components/holy-synod/SynodMembersSidebar';
-import QuickLinks from '@/components/holy-synod/QuickLinks';
+import SynodMembersSidebar from '../../components/SynodMembersSidebar';
+import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata = {
   title: 'H.G. Dr. Zacharias Mar Aprem Metropolitan',
-  description: 'Biography and information about H.G. Dr. Zacharias Mar Aprem Metropolitan.',
+  description: 'His Grace Dr. Zacharias Mar Aprem, Metropolitan of Adoorâ€“Kadampanad Diocese. President, Senate of Serampore University; Chief Editor, Malankara Sabha Magazine; Professor, Orthodox Theological Seminary, Kottayam.',
 };
 
 const HGDrZachariasMarApremMetropolitanPage = () => {
   return (
-    <div className="bg-background">
+    <div className="bg-syro-bg-gray">
+      <SyroPageBanner
+        title="H.G. Dr. Zacharias Mar Aprem Metropolitan"
+        breadcrumbFrom="holy-synod"
+      />
       {/* Main Content */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Main Content */}
-            <div className="lg:col-span-3">
-              <div className="bg-background rounded-lg sacred-shadow p-8">
-                <div className="flex flex-col md:flex-row gap-8">
-                  {/* Featured Portrait - Left Side - Large Display */}
-                  <div className="flex-shrink-0 flex justify-center md:justify-start">
-                    <div className="relative w-72 h-[28rem] md:w-80 md:h-[32rem] lg:w-96 lg:h-[36rem] rounded-lg overflow-hidden sacred-shadow-lg">
+            <div className="lg:col-span-2">
+              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
+                {/* Featured Image - Top */}
+                <div className="mb-8 flex justify-center">
+                  <div className="relative w-full max-w-md h-[280px] rounded-lg overflow-hidden shadow-syro-card">
                       <Image
                         src="/images/holy-synod/mar-aprem.jpg"
                         alt="H.G. Dr. Zacharias Mar Aprem Metropolitan"
                         fill
-                        sizes="(max-width: 768px) 288px, (max-width: 1024px) 320px, 384px"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 448px"
                         className="object-cover object-top"
                         style={{
                           objectPosition: 'center 15%'
@@ -36,38 +40,26 @@ const HGDrZachariasMarApremMetropolitanPage = () => {
                     </div>
                   </div>
 
-                  {/* Content - Right Side of Image */}
-                  <div className="flex-1">
-                    <h3 className="font-heading font-semibold text-2xl text-foreground mb-6">
+                {/* Content - Below Image */}
+                <div>
+                    <h3 className="font-syro-display font-semibold text-2xl text-syro-blue mb-6">
                       H.G. Dr. Zacharias Mar Aprem Metropolitan
                     </h3>
 
                     <div className="prose prose-lg max-w-none">
-                      <p className="font-body text-muted-foreground leading-relaxed mb-4">
-                        He is elected as the Metropolitan candidate on 17th February 2010 at the Malankara Association held at Sasthamkotta. He is consecrated Metropolitan on 12th May 2010 at Mar Elia Cathedral Kottayam by H H Baselios Marthoma Didymus I . His Grace is serving the Adoor - Kadampanad Diocese as its Metropolitan.
+                      <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
+                        His Grace was born as the son of E.K. Kuriakose and Sossama Kuriakose. He is a member of St. George Valiyapally, Chungathara, Malabar Diocese. After taking his Bachelor&apos;s degree in Science from Malabar Christian College, Calicut, he joined the Orthodox Theological Seminary, Kottayam, for theological studies. From the Orthodox Theological Seminary, Kottayam, he received the Graduate Degree in Sacred Theology (GST) and the Bachelor of Divinity (B.D.) from the Senate of Serampore University. He then took his M.Th. from Gurukul Theological College &amp; Research Institute, Chennai (Serampore University), and earned his D.Th. from Sathri, Bangalore, under Serampore University, in Advaita Vedanta. His Grace has held several key positions in the Church: Professor at the Orthodox Theological Seminary, Kottayam; Registrar, Orthodox Seminary; Principal Secretary to H.H. Didymos I, the Catholicos; Chief Editor, Malankara Sabha Magazine; Member, Ecumenical Relations Committee; Member, Seminary Governing Board; Member, Bible Society (Kerala auxiliary). He is now serving as President of the Senate of Serampore University. His Grace&apos;s major area of study is Religion &amp; Philosophy. In addition to the responsibilities of the diocese, His Grace serves as Professor at the Orthodox Theological Seminary. His Grace is a noted singer and writer. He was elected as Metropolitan candidate on 17 February 2010 at the Malankara Association held at Sasthamkotta, and was consecrated as Metropolitan on 12 May 2010 at Mar Elia Cathedral, Kottayam, by H.H. Baselios Marthoma Didymos I. His Grace is serving the Adoorâ€“Kadampanad Diocese as its Metropolitan.
                       </p>
 
-                      <p className="font-body text-muted-foreground leading-relaxed mb-4">
-                        His Grace was born as the son of E.K. Kuriakose and Sossama Kuriakose. His Grace is a member of St. George Valiyapally, Chungathara , Malabar Diocese. After taking his Bachelors Degree in Science from Malabar Christian College, Calicut, he joined the Orthodox Theological Seminary, Kottayam, for theological studies. From the Orthodox Theological Seminary, Kottayam, he took Graduate Degree in Sacred Theology (GST) and the Bachelor of Divinity (BD) degree at the Senate of Serampore University. After taking his M. Th from Gurukul Theological College & Research Institute Chennai ( Serampore University). He earn his D.Th from Sathri, Banglore under Serampore University in Advaita Vedanta.
-                      </p>
-
-                      <p className="font-body text-muted-foreground leading-relaxed mb-4">
-                        His Grace took several key positions of the church as Prof. OTS Ktm , Registrar, Orthodox Seminary, Principal Secretary to H.H Didymos I Catholicos , Cheif Editor Malankara Sabha Magazine, Member Ecumenical Relations Committee, Seminary Governing Board , Bible Society (Kerala auxilary). Now he is serving as the President of Senet of Serampore University, His Grace\'s major area of study is Religion & Philosphy . In addition to the responsibilities of the diocese His grace is working as the professor, Orthodox Theological seminary His Grace is a Good singer and writer.
-                      </p>
-
-                      <div className="mt-6 pt-6 border-t border-border">
-                        <p className="font-body text-muted-foreground leading-relaxed mb-2">
-                          Address: Sreyas Aramana, Mar Epiphanios Centre, Kannamkodu, Adoor P.O Pathanamthitta- 691523
-                        </p>
-                        <p className="font-body text-muted-foreground leading-relaxed mb-2">
-                          Telephone No:9447184303, 04734 227117
-                        </p>
-                        <p className="font-body text-muted-foreground leading-relaxed mb-2">
-                          Email: 2010aprem@gmail.com
-                        </p>
+                      <h4 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
+                        Contact
+                      </h4>
+                      <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
+                        <p>Sreyas Aramana, Mar Epiphanios Centre, Kannamkodu, Adoor P.O., Pathanamthitta â€“ 691 523</p>
+                        <p>Tel: 04734 227117 | Mobile: 9447184303</p>
+                        <p>Email: 2010aprem@gmail.com</p>
                       </div>
                     </div>
-                  </div>
                 </div>
               </div>
 
@@ -78,7 +70,7 @@ const HGDrZachariasMarApremMetropolitanPage = () => {
             </div>
 
             {/* Sidebar */}
-            <div className="lg:col-span-1">
+            <div className="space-y-6 lg:col-span-1">
               <SynodMembersSidebar />
             </div>
           </div>

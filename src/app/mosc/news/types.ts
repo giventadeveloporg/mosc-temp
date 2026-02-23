@@ -31,7 +31,7 @@ export interface FlashNews {
 export interface FlashNewsItemUI {
   id: number;
   content: string;
-  /** Internal path (/mosc/news/slug) or external URL; omit for text-only. */
+  /** Internal path (/syro/news/slug) or external URL; omit for text-only. */
   link?: string | null;
   startDate?: string | null;
   endDate?: string | null;
@@ -66,4 +66,6 @@ export interface NewsHomePageData {
   adSlots: AdSlot[];
   /** Top banner ad slots (position=top) */
   topAdSlots: AdSlot[];
+  /** Between-sections ad slots (position=between_sections) */
+  betweenSectionsAdSlots: AdSlot[];
 }

@@ -1,3 +1,65 @@
 
 Let's use the frontend design skill to improve the design
 Take a look at layout diagram "C:\project_workspace\mosc-temp\public\images\hero_section\hero_section_split_excalidraw.png"  attached screenshot We need to in the home page localhost:3000 we adjust the hero section /html/body/div[3]/main/section[1]  as per this diagram currently we need the we need this image "C:\project_workspace\mosc-temp\public\images\hero_section\wooden-boat-under-coconut-tree-riverside_ver_2.jpeg" to be on the left left hand side in the section one and the section two we should not be changing any logic of the looping the programming for the display and the slider show we should not touch that we will be only dealing with changing the design here none of the functionality of the application should be touched Try to place this on the left hand side and adjust the hero section accordingly on the left hand side section A the image we are going to place should on the right hand side should blend with the right hand side slide show without any stark border separation between the left and the right.   
+
+*********************       section 1 image prompt *******************
+
+
+Resize this image for the Left Panel (Kerala / branding image).
+Target dimensions
+Recommended: 1000 px wide × 1200 px high (1000×1200 px).
+Aspect ratio: 5:6 (portrait). Keep this ratio in the final image.
+Minimum: Do not go below 600×720 px.
+What to preserve
+Text: Keep all text sharp and readable:
+Vertical “MALAYALEES.US” on the left.
+Malayalam script and “malayalees” / “Friends” inside the yellow circular logo.
+Logo: Scale the yellow circular logo (with green palm frond and text) proportionally. Do not crop or distort the circle.
+Composition: Preserve the split between the dark left panel (stars/flag) and the tropical right panel (palms, water, sky). Keep the overall balance of national symbols and Kerala landscape.
+Detail: Maintain clarity of palm fronds, water, and fine details when scaling.
+Method
+Prefer cropping to fit 5:6 if needed, rather than stretching or squashing.
+Avoid generative fill or adding new content; only resize/crop the existing image.
+If 1000×1200 is not possible without losing quality, keep the 5:6 ratio and ensure size is at least 600×720 px.
+
+
+********************     section 2 hero / event image prompt ***********************
+
+
+Resize this image for the Right Panel (slideshow / event images).
+Target dimensions
+Aspect Ratio	5:2 wide landscape (2.5:1)
+Recommended Size	2000 × 800 px
+Also Acceptable	2500 × 1000 px, 1500 × 600 px
+Minimum Size	1200 × 480 px
+Fit Behaviour	object-cover — fills container, slight edge crop
+Safe Zone	Center 60% — keep important content away from edges
+Section 2 Container Ratios by Viewport (Fixed Hero Heights)
+Viewport	Image Area (px)	Container Ratio	Crop with 2.5:1 image
+768px (tablet)	459 × 296	1.55:1	Top/bottom cropped ~24%
+1024px (desktop)	644 × 320	2.01:1	Top/bottom cropped ~11%
+1366px (laptop)	877 × 320	2.74:1	Left/right cropped ~5%
+1536px (laptop)	992 × 352	2.82:1	Left/right cropped ~6%
+1920px (desktop)	1254 × 352	3.56:1	Left/right cropped ~18%
+Safe Zone for Section 2: Keep all important content (text, faces, logos) within the center 60% of the image. The outer 20% on each edge may be cropped depending on viewport width. At the most common laptop size (1366px), a 2.5:1 image has only ~5% edge crop.
+Retain the text in it. Dont change the content or texts. Just change the dimensions as per the prompt.
+
+
+*******************   section 3 image prompt    *******************
+
+Resize this image for the Mission Card (Unite India banner).
+Target dimensions
+Recommended: 1000 px wide × 200 px high (1000×200 px).
+Aspect ratio: 5:1 (wide landscape). Keep this ratio in the final image.
+Minimum: Do not go below 680×140 px.
+Format
+This is a wide horizontal banner (5× wider than tall). Compose or crop so the image reads clearly as a single horizontal strip.
+Preserve the main message, branding, and focal elements (e.g. “Unite India” text, logos, key graphics). Keep them centered or balanced across the width.
+Avoid cropping off important text, symbols, or faces. Prefer cropping from the sides or from top/bottom in a way that keeps the banner’s story intact.
+If the image has a clear horizon or horizontal line, align it with the 5:1 frame so the banner looks stable.
+Method
+Prefer cropping to fit 5:1 rather than stretching or squashing.
+Do not add new content; only resize and/or crop the existing image.
+If 1000×200 is not possible without quality loss, keep the 5:1 ratio and ensure the size is at least 680×140 px.
+
+

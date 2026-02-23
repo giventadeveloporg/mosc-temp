@@ -2,7 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Metadata } from 'next';
-import QuickLinks from '@/components/holy-synod/QuickLinks';
+import QuickLinks from '../../components/QuickLinks';
 
 export const metadata: Metadata = {
   title: 'Great Lent | Lectionary | MOSC',
@@ -302,29 +302,29 @@ export default function GreatLentPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-syro-bg-gray">
       {/* Breadcrumb */}
-      <section className="bg-muted py-4">
+      <section className="bg-syro-bg-gray py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex items-center space-x-2 font-body text-sm text-muted-foreground">
-            <Link href="/mosc" className="hover:text-primary reverent-transition">
+          <nav className="flex items-center space-x-2 font-syro-primary text-sm text-syro-dark-gray">
+            <Link href="/mosc-old" className="hover:text-syro-red transition-all duration-300">
               MOSC
             </Link>
             <span>/</span>
-            <Link href="/mosc/lectionary" className="hover:text-primary reverent-transition">
+            <Link href="/mosc/lectionary" className="hover:text-syro-red transition-all duration-300">
               Lectionary
             </Link>
             <span>/</span>
-            <span className="text-foreground">Great Lent</span>
+            <span className="text-syro-blue">Great Lent</span>
           </nav>
         </div>
       </section>
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-background to-muted py-12 lg:py-16">
+      <section className="relative bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            <div className="relative w-full h-80 lg:h-96 rounded-lg overflow-hidden sacred-shadow-lg">
+            <div className="relative w-full h-80 lg:h-96 rounded-lg overflow-hidden shadow-syro-card-hover">
               <Image
                 src="/images/lectionary/lent.jpg"
                 alt="Great Lent"
@@ -334,13 +334,13 @@ export default function GreatLentPage() {
               />
             </div>
             <div>
-              <h1 className="font-heading font-semibold text-4xl lg:text-5xl text-foreground mb-4">
+              <h1 className="font-syro-display font-semibold text-4xl lg:text-5xl text-syro-blue mb-4">
                 Great Lent
               </h1>
-              <p className="font-body text-lg text-muted-foreground leading-relaxed mb-4">
+              <p className="font-syro-primary text-lg text-syro-dark-gray leading-relaxed mb-4">
                 The Great Lent is a 50-day period of fasting, prayer, and spiritual renewal in preparation for the Resurrection of our Lord. It is a time of intense spiritual discipline and repentance.
               </p>
-              <p className="font-body text-lg text-muted-foreground leading-relaxed">
+              <p className="font-syro-primary text-lg text-syro-dark-gray leading-relaxed">
                 Daily scripture readings guide the faithful through this sacred season, focusing on repentance, renewal, and preparation for the celebration of Easter.
               </p>
             </div>
@@ -349,30 +349,30 @@ export default function GreatLentPage() {
       </section>
 
       {/* Readings Section */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-16">
             {lentWeeks.map((week, weekIndex) => (
               <div key={weekIndex}>
-                <h2 className="font-heading font-semibold text-3xl text-foreground mb-8 pb-4 border-b-2 border-primary">
+                <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary">
                   {week.week}
                 </h2>
                 <div className="space-y-8">
                   {week.days.map((day, dayIndex) => (
-                    <div key={dayIndex} className="bg-muted/30 rounded-lg p-6 sacred-shadow-sm">
-                      <h3 className="font-heading font-medium text-2xl text-foreground mb-4">
+                    <div key={dayIndex} className="bg-syro-bg-gray rounded-lg p-6 shadow-syro-card-sm">
+                      <h3 className="font-syro-display font-medium text-2xl text-syro-blue mb-4">
                         {day.day}
                       </h3>
                       <div className="space-y-4">
                         {Object.entries(day.readings).map(([time, verses], timeIndex) => (
                           <div key={timeIndex} className="border-l-4 border-primary pl-6">
-                            <h4 className="font-heading font-medium text-lg text-primary mb-2">
+                            <h4 className="font-syro-display font-medium text-lg text-syro-red mb-2">
                               {time}
                             </h4>
                             <ul className="space-y-1">
                               {verses.map((verse, verseIndex) => (
-                                <li key={verseIndex} className="font-body text-muted-foreground flex items-start">
-                                  <span className="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                                <li key={verseIndex} className="font-syro-primary text-syro-dark-gray flex items-start">
+                                  <span className="w-2 h-2 bg-syro-red rounded-full mt-2 mr-3 flex-shrink-0"></span>
                                   <span>{verse}</span>
                                 </li>
                               ))}
@@ -392,12 +392,12 @@ export default function GreatLentPage() {
       <QuickLinks />
 
       {/* Navigation */}
-      <section className="py-12 bg-muted">
+      <section className="py-12 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <Link
               href="/mosc/lectionary/koodosh-eetho-to-kothne"
-              className="inline-flex items-center px-6 py-3 bg-card text-foreground font-body font-medium rounded-lg hover:bg-muted reverent-transition sacred-shadow"
+              className="inline-flex items-center px-6 py-3 bg-white text-syro-blue font-syro-primary font-medium rounded-lg hover:bg-syro-bg-gray transition-all duration-300 shadow-syro-card"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -406,7 +406,7 @@ export default function GreatLentPage() {
             </Link>
             <Link
               href="/mosc/lectionary/kyomtho-easter-to-koodosh-edtho"
-              className="inline-flex items-center px-6 py-3 bg-primary text-primary-foreground font-body font-medium rounded-lg hover:bg-primary/90 reverent-transition sacred-shadow"
+              className="inline-flex items-center px-6 py-3 bg-syro-red text-syro-red-foreground font-syro-primary font-medium rounded-lg hover:bg-syro-red/90 transition-all duration-300 shadow-syro-card"
             >
               Next: Kyomtho (Easter)
               <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

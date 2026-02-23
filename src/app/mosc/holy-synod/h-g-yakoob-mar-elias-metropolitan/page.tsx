@@ -1,32 +1,36 @@
-import React from 'react';
+﻿import React from 'react';
 import Image from 'next/image';
-import SynodMembersSidebar from '@/components/holy-synod/SynodMembersSidebar';
-import QuickLinks from '@/components/holy-synod/QuickLinks';
+import SynodMembersSidebar from '../../components/SynodMembersSidebar';
+import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata = {
   title: 'H.G. Yakob Mar Elias Metropolitan',
-  description: 'Biography and information about H.G. Yakob Mar Elias Metropolitan.',
+  description: 'His Grace Yakob Mar Elias, Metropolitan of Brahmavar Diocese. Director, St. Basil Bible School; Vice President, Orthodox Christian Youth Movement; Secretary, Kottayam Diocese.',
 };
 
 const HGYakoobMarEliasMetropolitanPage = () => {
   return (
-    <div className="bg-background">
+    <div className="bg-syro-bg-gray">
+      <SyroPageBanner
+        title="H.G. Yakob Mar Elias Metropolitan"
+        breadcrumbFrom="holy-synod"
+      />
       {/* Main Content */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Main Content */}
-            <div className="lg:col-span-3">
-              <div className="bg-background rounded-lg sacred-shadow p-8">
-                <div className="flex flex-col md:flex-row gap-8">
-                  {/* Featured Portrait - Left Side - Large Display */}
-                  <div className="flex-shrink-0 flex justify-center md:justify-start">
-                    <div className="relative w-72 h-[28rem] md:w-80 md:h-[32rem] lg:w-96 lg:h-[36rem] rounded-lg overflow-hidden sacred-shadow-lg">
+            <div className="lg:col-span-2">
+              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
+                {/* Featured Image - Top */}
+                <div className="mb-8 flex justify-center">
+                  <div className="relative w-full max-w-md h-[280px] rounded-lg overflow-hidden shadow-syro-card">
                       <Image
                         src="/images/holy-synod/mar-eliyas.jpg"
                         alt="H.G. Yakob Mar Elias Metropolitan"
                         fill
-                        sizes="(max-width: 768px) 288px, (max-width: 1024px) 320px, 384px"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 448px"
                         className="object-cover object-top"
                         style={{
                           objectPosition: 'center 15%'
@@ -36,35 +40,26 @@ const HGYakoobMarEliasMetropolitanPage = () => {
                     </div>
                   </div>
 
-                  {/* Content - Right Side of Image */}
-                  <div className="flex-1">
-                    <h3 className="font-heading font-semibold text-2xl text-foreground mb-6">
+                {/* Content - Below Image */}
+                <div>
+                    <h3 className="font-syro-display font-semibold text-2xl text-syro-blue mb-6">
                       H.G. Yakob Mar Elias Metropolitan
                     </h3>
 
                     <div className="prose prose-lg max-w-none">
-                      <p className="font-body text-muted-foreground leading-relaxed mb-4">
-                        He is elected as the Metropolitan candidate on 17th February at the Malankara Association held at Sasthamkotta. He is consecrated as Metropolitan on 12th May 2010 at Mar Elia Cathedral, Kottayam.His Grace is serving the Brahmavar Diocese as its Metropolitan.
+                      <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
+                        His Grace was born on 24 February 1953 as the son of Chackaleth Viruthiyath Kizhakkethil Mathai and Mariamma. He is a member of St. Elias Orthodox Church, Budhanoor, Chengannoor Diocese. After taking his Master&apos;s degree from Kerala University, he joined the Orthodox Theological Seminary, Kottayam, for theological studies. From the Orthodox Theological Seminary, Kottayam, he received the Graduate Degree in Sacred Theology (GST) and the Bachelor of Divinity (B.D.) from the Senate of Serampore University. His Grace has held several key positions in the Church: Manager, Mar Elia Chapel, Sasthamkotta; Director, St. Basil Bible School; Vice President, Orthodox Christian Youth Movement; Secretary, Kottayam Diocese; Member, Ecumenical Relations Committee; Member, Mission Training Centre, Mavelikkara; Member, Orthodox Bible Preparation Committee; Member, Malankara Sabha Editorial Board; Member, Oriental and Anglican Forum. He was elected as Metropolitan candidate on 17 February at the Malankara Association held at Sasthamkotta, and was consecrated as Metropolitan on 12 May 2010 at Mar Elia Cathedral, Kottayam. His Grace is serving the Brahmavar Diocese as its Metropolitan.
                       </p>
 
-                      <p className="font-body text-muted-foreground leading-relaxed mb-4">
-                        His Grace was born on 24-02-1953 as the son of Chackaleth Viruthiyath Kizhakkethil Mathai and Mariamma. His Grace is a member of St. Elias Orthodox Church, Budhanoor, Chengannoor Diocese. After taking his Masters Degree from Kerala University, he joined the Orthodox Theological Seminary, Kottayam, for theological studies. From the Orthodox Theological Seminary, Kottayam, he took Graduate Degree in Sacred Theology (GST) and the Bachelor of Divinity (BD) degree at the Senate of Serampore University.
-                      </p>
-
-                      <p className="font-body text-muted-foreground leading-relaxed mb-4">
-                        His Grace took several key positions of the church Position held – Manager, Mar Elia Chapel, Sasthamkotta, Director, St. Basil Bible School, Vice President, Orthodox Christian Youth Movement, Secretary, Kottayam Diocese, Member, Ecumenical Relations Committee.Member, Mission Tranining Centre, Member, Mavelikkara, Orthodox Bible Preparation Committee, Member, Malankara Sabha Editorial Board, Member, Oriental and Anglican Forum.
-                      </p>
-
-                      <div className="mt-6 pt-6 border-t border-border">
-                        <p className="font-body text-muted-foreground leading-relaxed mb-2">
-                          Address: Mount Horeb Bishop\'s House, Balikashram Road, Kankanady, Mangalore - 575 002, Karnataka, India
-                        </p>
-                        <p className="font-body text-muted-foreground leading-relaxed mb-2">
-                          Email: metropolitanelias@yahoo.com Ph: 0824- 2013157, 09483530018
-                        </p>
+                      <h4 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
+                        Contact
+                      </h4>
+                      <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
+                        <p>Mount Horeb Bishop&apos;s House, Balikashram Road, Kankanady, Mangalore â€“ 575 002, Karnataka, India</p>
+                        <p>Tel: 0824-2013157 | Mobile: 09483530018</p>
+                        <p>Email: metropolitanelias@yahoo.com</p>
                       </div>
                     </div>
-                  </div>
                 </div>
               </div>
 
@@ -75,7 +70,7 @@ const HGYakoobMarEliasMetropolitanPage = () => {
             </div>
 
             {/* Sidebar */}
-            <div className="lg:col-span-1">
+            <div className="space-y-6 lg:col-span-1">
               <SynodMembersSidebar />
             </div>
           </div>

@@ -1,185 +1,223 @@
 import React from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
-import QuickLinks from '@/components/holy-synod/QuickLinks';
+import Link from 'next/link';
+import QuickLinks from '../components/QuickLinks';
+import SyroPageBanner from '../components/SyroPageBanner';
 
 export const metadata = {
   title: 'Administration',
   description:
-    'Learn about the administrative structure and governance of the Malankara Orthodox Syrian Church — Constitution, Canon Law, Holy Episcopal Synod, Malankara Association, and more.',
+    'Administration of the Malankara Orthodox Church — Constitution, Canon Law, Holy Episcopal Synod, Malankara Association, Managing Committee, and parish-level structures.',
 };
-// test
-const administrationSections = [
+
+const adminCards = [
   {
     title: 'The Constitution of the Malankara Orthodox Church',
-    description:
-      'The church had no written constitution until 1934, but was governed by consensus, traditions and precedence. It was the vision of Mor Dionysius, Vattasseril to have a clearly defined uniform constitution for the church.',
+    excerpt:
+      'The church had no written constitution until 1934, but was governed by consensus, traditions and precedence. It was the vision of Mor Dionysius, Vattasseril to have a clearly defined uniform...',
     href: '/mosc/administration/administration',
-    image: '/images/logos/Current_Edits/MOSC-Logo-only.png',
   },
   {
     title: 'The Canon Law of the Malankara Orthodox Church',
-    description:
-      'The Canon Law accepted and followed by the Orthodox church of Malankara was collected and codified by Mar Gregorios Bar Hebraeus, Catholicos of Edessa (AD. 1226-1286) in the thirteenth century. It continues to guide the ecclesiastical discipline and governance of the church.',
+    excerpt:
+      'The Canon Law accepted and followed by the Orthodox church of Malankara was collected and codified by Mar Gregorios Bar Hebraeus, Catholicos of Edessa (AD. 1226-1286) in the thirteenth century....',
     href: '/mosc/administration/he-canon-law-of-the-malankara-orthodox-church',
-    image: '/images/administration/canon-law.jpg',
   },
   {
     title: 'The Holy Episcopal Synod',
-    description:
-      'The Episcopal Synod with the Catholicos as its president is the apex body of all bishops. The authority of the synod is final and binding. It has exclusive rights and responsibilities in matters of faith, order, and spiritual governance.',
+    excerpt:
+      'The Episcopal Synod with the Catholicos as its president is the apex body of all bishops. The authority of the synod is final and binding. It has exclusive rights and...',
     href: '/mosc/administration/the-holy-episcopal-synod',
-    image: '/images/administration/holy-episcopal-synod.jpg',
   },
   {
     title: 'Malankara Association',
-    description:
-      'It was in the Mulamthuruthy synod summoned by the patriarch Peter III in 1876 that resolved to have an elected body called the Malankara Syria Christian Association to manage and administer the affairs of the church. This body remains the supreme legislative assembly.',
+    excerpt:
+      'It was in the Mulamthuruthy synod summoned by the patriarch peter III in 1876 that resolved to have an elected body called the Malankara Syria Christian Association to manage and...',
     href: '/mosc/administration/malankara-association',
-    image: '/images/administration/malankara-association.jpg',
   },
   {
     title: 'The Managing Committee',
-    description:
-      'In the Mulamthuruthy synod which formulated the Malankara Association, provision was laid down for the Managing Committee — a smaller body to look into the financial and other administrative matters of the church.',
+    excerpt:
+      'In the Mulamthuruthy synod which formulated the Malankara association had laid down the provision for the managing committee, a smaller body to look into the financial and other administrative matters....',
     href: '/mosc/administration/the-managing-committee',
-    image: '/images/administration/managing-committee.jpg',
   },
   {
     title: 'The Working Committee',
-    description:
-      'It is a small body of members nominated by the Malankara Metropolitan. This body prepares the agenda for the Managing Committee and helps the Malankara Metropolitan in his administrative functions.',
+    excerpt:
+      'It is a small body of members nominated by the Malankara Metropolitan. This body prepares the agenda for the Managing Committee and helps the Malankara Metropolitan in his administrative functions....',
     href: '/mosc/administration/the-working-committee',
-    image: '/images/administration/working-committee.jpg',
   },
   {
     title: 'The Diocesan General Body',
-    description:
-      'Every diocese will have a Diocesan Assembly. The Diocesan bishop presides over the meetings. All matters related to the Diocese are discussed and decided in the General body assembly, including the election of diocesan office bearers.',
+    excerpt:
+      'Every diocese will have a Diocesan Assembly. The Diocesan bishop presides over the meetings. All matters related to the Diocese is discussed and decided in the General body assembly including...',
     href: '/mosc/administration/the-diocesan-general-body',
-    image: '/images/administration/diocesan-general-body.jpg',
   },
   {
     title: 'The Parish Managing Committee',
-    description:
-      'The members of the Parish Managing Committee, excluding the priests, will be elected by the Parish Assembly and their term of office will be one year. Every Parish Managing Committee functions under the guidance of the parish priest and the diocesan bishop.',
+    excerpt:
+      'The members of the Parish Managing Committee excluding the priests will be elected by the Parish Assembly and their term of office will be one year. Every Parish Managing Committee...',
     href: '/mosc/administration/the-parish-managing-committee',
-    image: '/images/administration/parish-managing-committee.jpg',
   },
   {
     title: 'The Parish General Body',
-    description:
-      'Every parish is within the framework of the church constitution. It is neither outside the umbrella of the constitution nor an independent entity. Each Parish has a general body comprising all members of the parish.',
+    excerpt:
+      'Every parish is within the frame work of the church constitution. It is neither outside the umbrella of the constitution nor an independent entity. Each Parish has a general body....',
     href: '/mosc/administration/the-parish-general-body',
-    image: '/images/administration/parish-general-body.jpg',
   },
 ];
 
 const AdministrationPage = () => {
   return (
-    <div className="bg-background">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-background to-muted min-h-[280px] flex items-center py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 sacred-shadow-lg border border-border/50">
-              <svg
-                className="w-10 h-10 text-primary"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                />
-              </svg>
-            </div>
-            <h1 className="font-heading font-semibold text-4xl text-foreground mb-4">
-              Administration
-            </h1>
-            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              The administrative structure of the Malankara Orthodox Syrian Church — from the
-              Constitution and Canon Law to the Holy Episcopal Synod, Malankara Association, and
-              parish-level bodies.
-            </p>
-          </div>
-        </div>
-      </section>
+    <div className="bg-syro-bg-gray">
+      <SyroPageBanner title="Administration" />
 
-      {/* Administration Sections - 3 cards per row (holy synod style) */}
-      <section className="py-16 bg-card">
+      {/* Content - matches HTML structure and style */}
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="font-heading font-semibold text-3xl text-foreground mb-4">
-              Governance &amp; Administrative Structure
+          {/* Intro card (HTML .admin-intro-card) */}
+          <div className="bg-white p-10 rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] mb-16">
+            <h2 className="font-syro-display text-[2.2rem] font-bold text-syro-blue mb-5">
+              Administration
             </h2>
-            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto">
-              Our church is governed by a clear hierarchy of bodies, from the Holy Episcopal Synod
-              to the parish general body, each with defined roles and responsibilities.
+            <p className="font-syro-primary text-xl text-syro-dark-gray leading-relaxed">
+              The Malankara Orthodox Syrian Church is administered according to its Constitution, Canon Law, and the structures of the Holy Episcopal Synod, Malankara Association, Managing Committee, Working Committee, and bodies at diocesan and parish levels.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {administrationSections.map((item, index) => (
-              <Link
-                key={item.title}
-                href={item.href}
-                className="bg-card rounded-lg sacred-shadow p-0 overflow-hidden hover:sacred-shadow-lg reverent-transition group flex flex-col"
+          {/* Section title - left red bar (HTML .admin-section-title) */}
+          <h3 className="text-2xl font-light text-[#798daf] mb-10 pl-8 border-l-[7px] border-syro-red">
+            Constitution & Structure
+          </h3>
+
+          {/* Cards grid - no images (HTML .admin-card) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            {adminCards.map((card, index) => (
+              <div
+                key={card.title}
+                className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 p-8 flex flex-col h-full"
               >
-                {/* Image area - same as catholicate: full width h-48, centered and fully visible */}
-                <div className="relative w-full h-48 bg-muted overflow-hidden flex items-center justify-center">
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    fill
-                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                    className={index === 0 ? 'object-contain object-center group-hover:scale-105 transition-transform duration-300' : 'object-center group-hover:scale-105 transition-transform duration-300'}
-                    style={{
-                      objectPosition: 'center center',
-                      backgroundColor: 'transparent',
-                    }}
-                  />
-                </div>
-                {/* Content area - same padding and spacing as catholicate */}
-                <div className="p-6 flex flex-col flex-1">
-                  <h3 className="font-heading font-semibold text-xl text-foreground mb-3 group-hover:text-primary reverent-transition">
-                    {item.title}
-                  </h3>
-                  <p className="font-body text-muted-foreground text-sm leading-relaxed flex-1 line-clamp-4">
-                    {item.description}
-                  </p>
-                  <div className="mt-auto pt-4">
-                    <span className="inline-flex items-center gap-1.5 font-body text-sm font-medium text-primary">
-                      Read More
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
-                    </span>
+                {index === 0 && (
+                  <div className="mb-5 flex justify-center">
+                    <Image
+                      src="/images/logos/Current_Edits/MOSC-Logo-only.png"
+                      alt="MOSC Logo"
+                      width={120}
+                      height={120}
+                      className="object-contain"
+                    />
                   </div>
-                </div>
-              </Link>
+                )}
+                {index === 1 && (
+                  <div className="mb-5 flex justify-center">
+                    <Image
+                      src="/images/administration/canon-law.jpg"
+                      alt="The Canon Law of the Malankara Orthodox Church"
+                      width={280}
+                      height={168}
+                      className="w-full max-w-[280px] h-auto object-contain rounded-lg"
+                    />
+                  </div>
+                )}
+                {index === 2 && (
+                  <div className="mb-5 flex justify-center">
+                    <Image
+                      src="/images/administration/holy-episcopal-synod.jpg"
+                      alt="The Holy Episcopal Synod"
+                      width={280}
+                      height={168}
+                      className="w-full max-w-[280px] h-auto object-contain rounded-lg"
+                    />
+                  </div>
+                )}
+                {index === 3 && (
+                  <div className="mb-5 flex justify-center">
+                    <Image
+                      src="/images/administration/malankara-association.jpg"
+                      alt="Malankara Association"
+                      width={280}
+                      height={168}
+                      className="w-full max-w-[280px] h-auto object-contain rounded-lg"
+                    />
+                  </div>
+                )}
+                {index === 4 && (
+                  <div className="mb-5 flex justify-center">
+                    <Image
+                      src="/images/administration/managing-committee.jpg"
+                      alt="The Managing Committee"
+                      width={280}
+                      height={168}
+                      className="w-full max-w-[280px] h-auto object-contain rounded-lg"
+                    />
+                  </div>
+                )}
+                {index === 5 && (
+                  <div className="mb-5 flex justify-center">
+                    <Image
+                      src="/images/administration/working-committee.jpg"
+                      alt="The Working Committee"
+                      width={280}
+                      height={168}
+                      className="w-full max-w-[280px] h-auto object-contain rounded-lg"
+                    />
+                  </div>
+                )}
+                {index === 6 && (
+                  <div className="mb-5 flex justify-center">
+                    <Image
+                      src="/images/administration/diocesan-general-body.jpg"
+                      alt="The Diocesan General Body"
+                      width={280}
+                      height={168}
+                      className="w-full max-w-[280px] h-auto object-contain rounded-lg"
+                    />
+                  </div>
+                )}
+                {index === 7 && (
+                  <div className="mb-5 flex justify-center">
+                    <Image
+                      src="/images/administration/parish-managing-committee.jpg"
+                      alt="The Parish Managing Committee"
+                      width={280}
+                      height={168}
+                      className="w-full max-w-[280px] h-auto object-contain rounded-lg"
+                    />
+                  </div>
+                )}
+                {index === 8 && (
+                  <div className="mb-5 flex justify-center">
+                    <Image
+                      src="/images/administration/parish-general-body.jpg"
+                      alt="The Parish General Body"
+                      width={280}
+                      height={168}
+                      className="w-full max-w-[280px] h-auto object-contain rounded-lg"
+                    />
+                  </div>
+                )}
+                <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug">
+                  {card.title}
+                </h3>
+                <p className="font-syro-primary text-base text-syro-dark-gray flex-1 mb-5 leading-relaxed">
+                  {card.excerpt}
+                </p>
+                <Link
+                  href={card.href}
+                  className="syro-primary-button inline-flex items-center gap-2 mt-auto w-fit"
+                >
+                  <span>Read More</span>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </Link>
+              </div>
             ))}
           </div>
+
+          <QuickLinks />
         </div>
       </section>
-
-      {/* Quick Links - same style as holy synod member pages */}
-      <QuickLinks />
     </div>
   );
 };

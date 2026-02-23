@@ -29,14 +29,15 @@ function FacebookIcon({ className }: { className?: string }) {
   );
 }
 
+/** Design system: card 40px padding, shadow-syro-card, title 1.8rem/600 #0b2848 */
 export function FollowUsFacebook() {
   return (
-    <div className="rounded-xl bg-card border border-border sacred-shadow-sm overflow-hidden">
-      <h3 className="font-heading font-semibold text-lg text-foreground border-b border-border px-4 py-3 bg-muted/30 flex items-center gap-2">
+    <div className="rounded-[5px] bg-white overflow-hidden shadow-syro-card font-syro-primary">
+      <h3 className="text-syro-h3 font-semibold text-syro-blue border-b border-syro-table-border px-syro-lg py-syro-md bg-syro-bg-gray flex items-center gap-2">
         <FacebookIcon className="w-5 h-5 text-[#1877F2]" />
         <span>Follow Us</span>
       </h3>
-      <div className="px-2 pt-2 pb-0 overflow-hidden [&>iframe]:block">
+      <div className="px-syro-sm pt-syro-sm pb-0 overflow-hidden [&>iframe]:block">
         <iframe
           src={IFRAME_SRC}
           width="100%"

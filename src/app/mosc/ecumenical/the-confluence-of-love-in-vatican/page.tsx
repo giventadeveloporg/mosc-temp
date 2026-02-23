@@ -1,7 +1,8 @@
-import React from 'react';
+﻿import React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
-import QuickLinks from '@/components/holy-synod/QuickLinks';
+import QuickLinks from '../../components/QuickLinks';
+import EcumenicalSidebar from '../../components/EcumenicalSidebar';
+import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata = {
   title: 'The Confluence of Love in Vatican',
@@ -11,49 +12,28 @@ export const metadata = {
 
 const TheConfluenceOfLoveInVaticanPage = () => {
   return (
-    <div className="bg-background">
-      {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-br from-background to-muted">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-primary rounded-lg flex items-center justify-center mx-auto mb-6 sacred-shadow-lg">
-              <span
-                className="text-primary-foreground text-4xl font-bold"
-                role="img"
-                aria-label="Vatican"
-              >
-                ✟
-              </span>
-            </div>
-            <h1 className="font-heading font-semibold text-4xl text-foreground mb-4">
-              The Confluence of Love in Vatican
-            </h1>
-            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Meeting of His Holiness Baselios Marthoma Paulose II with His Holiness Pope Francis — 5th September 2013
-            </p>
-          </div>
-        </div>
-      </section>
+    <div className="bg-syro-bg-gray">
+      <SyroPageBanner title="The Confluence of Love in Vatican" breadcrumbFrom="ecumenical" />
 
       {/* Main Content */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <div className="lg:col-span-3">
-              <div className="bg-background rounded-lg sacred-shadow p-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="lg:col-span-2">
+              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
                 <div className="mb-8 flex justify-center">
                   <Image
                     src="/images/mosc/ecumenical/rome.jpg"
                     alt="Ecumenical meeting in Vatican"
                     width={600}
                     height={360}
-                    className="rounded-lg w-full h-auto object-contain max-w-full"
+                    className="rounded-lg w-auto h-auto object-contain max-w-full block mx-auto"
                     sizes="(max-width: 1024px) 100vw, 66vw"
                   />
                 </div>
 
                 <div className="prose prose-lg max-w-none">
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The epoch making meeting between His Holiness Baselios Marthoma Paulose II, the
                     Supreme Head of the Malankara Orthodox Church and His Holiness Pope Francis, the
                     Supreme Head of the Catholic Church on 5th September, 2013 at Vatican is of great
@@ -81,7 +61,7 @@ const TheConfluenceOfLoveInVaticanPage = () => {
                     communion with the Malankara Orthodox Church.
                   </p>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     It is part of this tradition that our Catholicos visited Pope Francis after
                     some months of his enthronement despite the fact that we still do not have
                     communion and unity of faith with the Catholics. The Catholicos and the
@@ -99,7 +79,7 @@ const TheConfluenceOfLoveInVaticanPage = () => {
                     common mess hall.
                   </p>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     On 4th September afternoon the Catholicos and the delegates were taken to the
                     St. Peter Basilica, Vatican Museum and the famous Sistine Chapel. Bishop Brian
                     Farell, the Secretary of the Pontifical Council for Unity at Vatican gave
@@ -122,7 +102,7 @@ const TheConfluenceOfLoveInVaticanPage = () => {
                     evening of 4th September.
                   </p>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     On 5th September, by 8 a.m., the Catholicos and the delegation came for
                     breakfast at the mess hall of St. Martha&apos;s (This house is named after
                     Martha, the sister of Lazarus of Bethania and the host of Jesus). By the time,
@@ -136,7 +116,7 @@ const TheConfluenceOfLoveInVaticanPage = () => {
                     when he was the Bishop and Cardinal in Argentina.
                   </p>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     By 11 a.m., the Catholicos was received at the official Reception Hall of the
                     Papal Palace. A private meeting between the Pope and the Catholicos had been
                     arranged before the mutual greeting and the speech in public. Though the time
@@ -165,7 +145,7 @@ const TheConfluenceOfLoveInVaticanPage = () => {
                     peace.
                   </p>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     After the long private meeting, the two holy fathers together came to the main
                     reception hall. After occupying their designated seats, both read the prepared
                     speech in front of the representatives from both Churches. In His Holiness&apos;
@@ -190,7 +170,7 @@ const TheConfluenceOfLoveInVaticanPage = () => {
                     the special attention of Pope. The Pope accepted all gifts with great joy.
                   </p>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     As the gifts were handed over, this author commented that &quot;We give these
                     gifts to Your Holiness to remember us in your prayers&quot;. The Pope humbly
                     replied, &quot;You may pray for me as well&quot;. The Pope very happily accepted the
@@ -216,7 +196,7 @@ const TheConfluenceOfLoveInVaticanPage = () => {
                     they are assaulted.
                   </p>
 
-                  <p className="font-body text-muted-foreground leading-relaxed mb-6">
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The official visit came to a close when the two fathers bid farewell after the
                     lunch. Both departed after greeting each other. In the afternoon, Rev. Dn. Joji
                     George, Rev. Fr. Vinu Varghese, the research students in Rome and some Malayalee
@@ -231,8 +211,8 @@ const TheConfluenceOfLoveInVaticanPage = () => {
                     who blessed his house! The tenets of all protocol were flung in the air.
                   </p>
 
-                  <p className="font-body text-muted-foreground leading-relaxed pt-4 border-t border-border/30 mt-8">
-                    <span className="font-semibold text-foreground">Fr. Dr. K. M. George</span>, Director,
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed pt-4 border-t border-syro-table-border/30 mt-8">
+                    <span className="font-semibold text-syro-blue">Fr. Dr. K. M. George</span>, Director,
                     Sopana Orthodox Academy, Njaliakuzhy, Kottayam
                   </p>
                 </div>
@@ -245,110 +225,8 @@ const TheConfluenceOfLoveInVaticanPage = () => {
             </div>
 
             {/* Sidebar */}
-            <div className="lg:col-span-1">
-              <div className="bg-background rounded-lg sacred-shadow p-6 mb-6">
-                <h3 className="font-heading font-semibold text-lg text-foreground mb-4">
-                  Ecumenical Relations
-                </h3>
-                <nav className="space-y-2">
-                  <Link
-                    href="/mosc/ecumenical"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Ecumenical Overview
-                  </Link>
-                  <Link
-                    href="/mosc/ecumenical/world-council-of-churches"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    World Council of Churches
-                  </Link>
-                  <Link
-                    href="/mosc/ecumenical/orthodox-churches"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Orthodox Churches
-                  </Link>
-                  <Link
-                    href="/mosc/ecumenical/catholic-church"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Catholic Church
-                  </Link>
-                  <Link
-                    href="/mosc/ecumenical/protestant-churches"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Protestant Churches
-                  </Link>
-                  <Link
-                    href="/mosc/ecumenical/oriental-orthodox"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Oriental Orthodox
-                  </Link>
-                  <Link
-                    href="/mosc/ecumenical/in-egypt-with-the-message-of-fraternity"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    In Egypt with the Message of Fraternity
-                  </Link>
-                  <Link
-                    href="/mosc/ecumenical/the-shepherd-of-the-indian-church-in-ethiopia"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    The Shepherd of the Indian Church in Ethiopia
-                  </Link>
-                  <Link
-                    href="/mosc/ecumenical/the-confluence-of-love-in-vatican"
-                    className="block px-3 py-2 bg-primary text-primary-foreground rounded-md font-body text-sm reverent-transition"
-                  >
-                    The Confluence of Love in Vatican
-                  </Link>
-                  <Link
-                    href="/mosc/ecumenical/the-fraternity-at-vienna"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    The Fraternity at Vienna
-                  </Link>
-                  <Link
-                    href="/mosc/ecumenical/catholicos-speech-vatican"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Catholicos Speech at Vatican
-                  </Link>
-                  <Link
-                    href="/mosc/ecumenical/pope-francis-speech-vatican"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Pope Francis Speech at Vatican
-                  </Link>
-                  <Link
-                    href="/mosc/ecumenical/the-successor-of-st-thomas-in-europe"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    The Successor of St. Thomas in Europe
-                  </Link>
-                  <Link
-                    href="/mosc/ecumenical/co-operation-with-the-protestant-churches"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Co-operation with the Protestant Churches
-                  </Link>
-                  <Link
-                    href="/mosc/ecumenical/ecumenical-ventures-in-modern-times"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Ecumenical ventures in modern times
-                  </Link>
-                  <Link
-                    href="/mosc/ecumenical/interfaith-dialogue"
-                    className="block px-3 py-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-md font-body text-sm reverent-transition"
-                  >
-                    Interfaith Dialogue
-                  </Link>
-                </nav>
-              </div>
+            <div className="space-y-6 lg:col-span-1">
+              <EcumenicalSidebar />
             </div>
           </div>
           {/* Quick Links - mobile only: just above footer */}

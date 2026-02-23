@@ -12,11 +12,11 @@ type SchoolEntry = { name: string; location: string; phone?: string };
 
 function SchoolCard({ school, index }: { school: SchoolEntry; index: number }) {
   return (
-    <div className="bg-muted/20 rounded-lg p-6 sacred-shadow-sm hover:sacred-shadow reverent-transition border-l-4 border-primary">
-      <h3 className="font-heading font-semibold text-lg text-foreground mb-3">{school.name}</h3>
-      <div className="space-y-2 font-body text-sm text-muted-foreground">
+    <div className="bg-syro-bg-gray/20 rounded-lg p-6 shadow-syro-card-sm hover:shadow-syro-card transition-all duration-300 border-l-4 border-primary">
+      <h3 className="font-syro-display font-semibold text-lg text-syro-blue mb-3">{school.name}</h3>
+      <div className="space-y-2 font-syro-primary text-sm text-syro-dark-gray">
         <p>{school.location}</p>
-        {school.phone && <p className="font-medium text-foreground">Ph: {school.phone}</p>}
+        {school.phone && <p className="font-medium text-syro-blue">Ph: {school.phone}</p>}
       </div>
     </div>
   );
@@ -24,10 +24,10 @@ function SchoolCard({ school, index }: { school: SchoolEntry; index: number }) {
 
 function SchoolCardCompact({ school, index }: { school: SchoolEntry; index: number }) {
   return (
-    <div className="bg-card rounded-lg p-4 sacred-shadow-sm hover:sacred-shadow reverent-transition border-l-4 border-primary">
-      <h3 className="font-heading font-semibold text-base text-foreground mb-1">{school.name}</h3>
-      <p className="font-body text-sm text-muted-foreground">{school.location}</p>
-      {school.phone && <p className="font-body text-sm font-medium text-foreground mt-1">Ph: {school.phone}</p>}
+    <div className="bg-white rounded-lg p-4 shadow-syro-card-sm hover:shadow-syro-card transition-all duration-300 border-l-4 border-primary">
+      <h3 className="font-syro-display font-semibold text-base text-syro-blue mb-1">{school.name}</h3>
+      <p className="font-syro-primary text-sm text-syro-dark-gray">{school.location}</p>
+      {school.phone && <p className="font-syro-primary text-sm font-medium text-syro-blue mt-1">Ph: {school.phone}</p>}
     </div>
   );
 }
@@ -141,25 +141,25 @@ export default function SchoolsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-syro-bg-gray">
       {/* Breadcrumb */}
-      <section className="bg-muted py-4">
+      <section className="bg-syro-bg-gray py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex items-center space-x-2 font-body text-sm text-muted-foreground">
-            <Link href="/mosc" className="hover:text-primary reverent-transition">MOSC</Link>
+          <nav className="flex items-center space-x-2 font-syro-primary text-sm text-syro-dark-gray">
+            <Link href="/mosc-old" className="hover:text-syro-red transition-all duration-300">MOSC</Link>
             <span>/</span>
-            <Link href="/mosc/institutions" className="hover:text-primary reverent-transition">Institutions</Link>
+            <Link href="/mosc/institutions" className="hover:text-syro-red transition-all duration-300">Institutions</Link>
             <span>/</span>
-            <span className="text-foreground">Schools</span>
+            <span className="text-syro-blue">Schools</span>
           </nav>
         </div>
       </section>
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-background to-muted py-12 lg:py-16">
+      <section className="relative bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            <div className="relative w-full h-auto rounded-lg overflow-hidden flex items-center justify-center bg-muted/20">
+            <div className="relative w-full h-auto rounded-lg overflow-hidden flex items-center justify-center bg-syro-bg-gray/20">
               <Image
                 src="/images/institutions/raj.jpg"
                 alt="Schools"
@@ -171,14 +171,14 @@ export default function SchoolsPage() {
               />
             </div>
             <div>
-              <h1 className="font-heading font-semibold text-4xl lg:text-5xl text-foreground mb-4">Schools</h1>
-              <div className="bg-primary/10 rounded-lg p-4 mb-4">
-                <h2 className="font-heading font-semibold text-xl text-foreground mb-2">Catholicate and M D Schools</h2>
-                <p className="font-body text-muted-foreground">
-                  <span className="font-medium text-foreground">Manager:</span> H.G. Dr. Gabriel Mar Gregorios Metropolitan
+              <h1 className="font-syro-display font-semibold text-4xl lg:text-5xl text-syro-blue mb-4">Schools</h1>
+              <div className="bg-syro-red/10 rounded-lg p-4 mb-4">
+                <h2 className="font-syro-display font-semibold text-xl text-syro-blue mb-2">Catholicate and M D Schools</h2>
+                <p className="font-syro-primary text-syro-dark-gray">
+                  <span className="font-medium text-syro-blue">Manager:</span> H.G. Dr. Gabriel Mar Gregorios Metropolitan
                 </p>
               </div>
-              <p className="font-body text-lg text-muted-foreground leading-relaxed">
+              <p className="font-syro-primary text-lg text-syro-dark-gray leading-relaxed">
                 A comprehensive network of schools providing quality education rooted in Christian values and academic excellence.
               </p>
             </div>
@@ -187,9 +187,9 @@ export default function SchoolsPage() {
       </section>
 
       {/* Higher Secondary Schools */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-heading font-semibold text-3xl text-foreground mb-8 pb-4 border-b-2 border-primary">
+          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary">
             Higher Secondary Schools
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -201,9 +201,9 @@ export default function SchoolsPage() {
       </section>
 
       {/* High Schools */}
-      <section className="py-16 bg-muted">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-heading font-semibold text-3xl text-foreground mb-8 pb-4 border-b-2 border-primary">
+          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary">
             High Schools
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -215,9 +215,9 @@ export default function SchoolsPage() {
       </section>
 
       {/* Upper Primary Schools */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-heading font-semibold text-3xl text-foreground mb-8 pb-4 border-b-2 border-primary">
+          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary">
             Upper Primary Schools
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -229,9 +229,9 @@ export default function SchoolsPage() {
       </section>
 
       {/* Lower Primary Schools */}
-      <section className="py-16 bg-muted">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-heading font-semibold text-3xl text-foreground mb-8 pb-4 border-b-2 border-primary">
+          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary">
             Lower Primary Schools
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -243,9 +243,9 @@ export default function SchoolsPage() {
       </section>
 
       {/* Un Aided Schools */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-heading font-semibold text-3xl text-foreground mb-8 pb-4 border-b-2 border-primary">
+          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary">
             Un Aided Schools
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -257,9 +257,9 @@ export default function SchoolsPage() {
       </section>
 
       {/* Boarding Homes */}
-      <section className="py-16 bg-muted">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-heading font-semibold text-3xl text-foreground mb-8 pb-4 border-b-2 border-primary">
+          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary">
             Boarding Homes
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -271,9 +271,9 @@ export default function SchoolsPage() {
       </section>
 
       {/* Teacher Training Institutions */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-heading font-semibold text-3xl text-foreground mb-8 pb-4 border-b-2 border-primary">
+          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary">
             Teacher Training Institutions
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -285,12 +285,12 @@ export default function SchoolsPage() {
       </section>
 
       {/* Public Schools */}
-      <section className="py-16 bg-muted">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-primary/10 rounded-lg p-6 mb-8">
-            <h2 className="font-heading font-semibold text-2xl text-foreground mb-2">Public Schools</h2>
-            <p className="font-body text-muted-foreground">
-              <span className="font-medium text-foreground">Manager:</span> H.G. Dr. Geevarghese Mar Barnabas Metropolitan
+          <div className="bg-syro-red/10 rounded-lg p-6 mb-8">
+            <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-2">Public Schools</h2>
+            <p className="font-syro-primary text-syro-dark-gray">
+              <span className="font-medium text-syro-blue">Manager:</span> H.G. Dr. Geevarghese Mar Barnabas Metropolitan
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -302,13 +302,13 @@ export default function SchoolsPage() {
       </section>
 
       {/* Mission Statement */}
-      <section className="py-12 bg-card">
+      <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-br from-muted to-background rounded-lg sacred-shadow p-8 text-center">
-            <h2 className="font-heading font-semibold text-2xl text-foreground mb-4">
+          <div className="bg-gradient-to-br from-muted to-background rounded-lg shadow-syro-card p-8 text-center">
+            <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4">
               Educational Excellence with Spiritual Foundation
             </h2>
-            <p className="font-body text-lg text-muted-foreground leading-relaxed">
+            <p className="font-syro-primary text-lg text-syro-dark-gray leading-relaxed">
               Our schools are dedicated to nurturing young minds with quality education while instilling Christian values, preparing students to become responsible citizens and faithful members of the Church.
             </p>
           </div>
@@ -318,10 +318,10 @@ export default function SchoolsPage() {
       <QuickLinks />
 
       {/* Navigation */}
-      <section className="py-12 bg-muted">
+      <section className="py-12 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-center">
-            <Link href="/mosc/institutions" className="inline-flex items-center px-6 py-3 bg-primary text-white font-body font-medium rounded-lg hover:bg-primary/90 reverent-transition sacred-shadow">
+            <Link href="/mosc/institutions" className="inline-flex items-center px-6 py-3 bg-syro-red text-white font-syro-primary font-medium rounded-lg hover:bg-syro-red/90 transition-all duration-300 shadow-syro-card">
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>

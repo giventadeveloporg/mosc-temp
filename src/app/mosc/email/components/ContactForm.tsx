@@ -157,7 +157,7 @@ export default function ContactForm() {
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Name Field */}
       <div>
-        <label htmlFor="name" className="block font-body font-medium text-foreground mb-2">
+        <label htmlFor="name" className="block font-syro-primary font-medium text-syro-blue mb-2">
           Name <span className="text-destructive">*</span>
         </label>
         <input
@@ -166,14 +166,14 @@ export default function ContactForm() {
           name="name"
           value={formData.name}
           onChange={handleChange}
-          className={`w-full px-4 py-3 bg-input border rounded-lg font-body text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 reverent-transition ${
-            errors.name ? 'border-destructive' : 'border-border'
+          className={`w-full px-4 py-3 bg-input border rounded-lg font-syro-primary text-syro-blue placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-all duration-300 ${
+            errors.name ? 'border-destructive' : 'border-syro-table-border'
           }`}
           placeholder="Enter your full name"
           disabled={isSubmitting}
         />
         {errors.name && (
-          <p className="mt-2 inline-flex items-center gap-2 rounded-md bg-red-50 px-4 py-2 text-sm font-body text-red-700 border border-red-300">
+          <p className="mt-2 inline-flex items-center gap-2 rounded-md bg-red-50 px-4 py-2 text-sm font-syro-primary text-red-700 border border-red-300">
             <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-white text-[11px] font-bold">
               !
             </span>
@@ -184,7 +184,7 @@ export default function ContactForm() {
 
       {/* Email Field */}
       <div>
-        <label htmlFor="email" className="block font-body font-medium text-foreground mb-2">
+        <label htmlFor="email" className="block font-syro-primary font-medium text-syro-blue mb-2">
           Email Address <span className="text-destructive">*</span>
         </label>
         <input
@@ -193,14 +193,14 @@ export default function ContactForm() {
           name="email"
           value={formData.email}
           onChange={handleChange}
-          className={`w-full px-4 py-3 bg-input border rounded-lg font-body text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 reverent-transition ${
-            errors.email ? 'border-destructive' : 'border-border'
+          className={`w-full px-4 py-3 bg-input border rounded-lg font-syro-primary text-syro-blue placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-all duration-300 ${
+            errors.email ? 'border-destructive' : 'border-syro-table-border'
           }`}
           placeholder="Enter your email address"
           disabled={isSubmitting}
         />
         {errors.email && (
-          <p className="mt-2 inline-flex items-center gap-2 rounded-md bg-red-50 px-4 py-2 text-sm font-body text-red-700 border border-red-300">
+          <p className="mt-2 inline-flex items-center gap-2 rounded-md bg-red-50 px-4 py-2 text-sm font-syro-primary text-red-700 border border-red-300">
             <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-white text-[11px] font-bold">
               !
             </span>
@@ -211,7 +211,7 @@ export default function ContactForm() {
 
       {/* Message Field */}
       <div>
-        <label htmlFor="message" className="block font-body font-medium text-foreground mb-2">
+        <label htmlFor="message" className="block font-syro-primary font-medium text-syro-blue mb-2">
           Message <span className="text-destructive">*</span>
         </label>
         <textarea
@@ -220,14 +220,14 @@ export default function ContactForm() {
           value={formData.message}
           onChange={handleChange}
           rows={6}
-          className={`w-full px-4 py-3 bg-input border rounded-lg font-body text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 reverent-transition resize-none ${
-            errors.message ? 'border-destructive' : 'border-border'
+          className={`w-full px-4 py-3 bg-input border rounded-lg font-syro-primary text-syro-blue placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-all duration-300 resize-none ${
+            errors.message ? 'border-destructive' : 'border-syro-table-border'
           }`}
           placeholder="Enter your message"
           disabled={isSubmitting}
         />
         {errors.message && (
-          <p className="mt-2 inline-flex items-center gap-2 rounded-md bg-red-50 px-4 py-2 text-sm font-body text-red-700 border border-red-300">
+          <p className="mt-2 inline-flex items-center gap-2 rounded-md bg-red-50 px-4 py-2 text-sm font-syro-primary text-red-700 border border-red-300">
             <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-white text-[11px] font-bold">
               !
             </span>
@@ -239,14 +239,14 @@ export default function ContactForm() {
       {/* Submit Status Message */}
       {submitStatus !== 'idle' && (
         <div
-          className={`rounded-lg border px-4 py-3 sacred-shadow-sm ${
+          className={`rounded-lg border px-4 py-3 shadow-syro-card-sm ${
             submitStatus === 'success'
               ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
               : 'bg-red-50 border-red-300 text-red-700'
           }`}
         >
           <div className="flex items-start gap-3">
-            <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 sacred-shadow-sm">
+            <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow-syro-card-sm">
               {submitStatus === 'success' ? (
                 <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -258,10 +258,10 @@ export default function ContactForm() {
               )}
             </div>
             <div>
-              <p className="font-heading text-sm font-semibold">
+              <p className="font-syro-display text-sm font-semibold">
                 {submitStatus === 'success' ? 'Message sent successfully' : 'There was a problem sending your message'}
               </p>
-              <p className="mt-1 font-body text-sm text-muted-foreground">{submitMessage}</p>
+              <p className="mt-1 font-syro-primary text-sm text-syro-dark-gray">{submitMessage}</p>
             </div>
           </div>
         </div>
@@ -271,7 +271,7 @@ export default function ContactForm() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full bg-primary text-primary-foreground font-body font-medium px-6 py-3 rounded-lg hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 reverent-transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+        className="w-full bg-syro-red text-syro-red-foreground font-syro-primary font-medium px-6 py-3 rounded-lg hover:bg-syro-red/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
       >
         {isSubmitting ? (
           <>

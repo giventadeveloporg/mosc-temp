@@ -81,6 +81,25 @@ body:has(.syro-layout) {
   text-decoration: none !important;
 }
 
+/* Black text for h2, h3, and paragraphs in main content (all navbar pages) */
+#mainContent h2,
+#mainContent h3,
+#mainContent p {
+  color: #000 !important;
+}
+
+/* Apply same font as Catholicos/main titles (Poppins) to all titles in MOSC subpages */
+.syro-layout .font-syro-display {
+  font-family: var(--syro-font-primary, 'Poppins', Arial, Helvetica, sans-serif) !important;
+}
+/* Ensure all main-content headings use the same title font (Poppins) */
+.syro-layout #mainContent h1,
+.syro-layout #mainContent h2,
+.syro-layout #mainContent h3,
+.syro-layout #mainContent h4 {
+  font-family: var(--syro-font-primary, 'Poppins', Arial, Helvetica, sans-serif) !important;
+}
+
 /* Liturgy (section 6): keep image in flow so section gets height and doesn't collapse */
 .syro-layout section.liturgy {
   overflow: visible;

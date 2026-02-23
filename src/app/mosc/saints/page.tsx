@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import SyroPageBanner from '../components/SyroPageBanner';
 
 export const metadata = {
   title: 'Saints',
@@ -54,33 +55,17 @@ const SAINTS_CARDS = [
 
 const SaintsPage = () => {
   return (
-    <div className="bg-background">
-      {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-br from-background to-muted">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-primary rounded-lg flex items-center justify-center mx-auto mb-6 sacred-shadow-lg">
-              <span className="text-primary-foreground text-4xl font-bold" role="img" aria-label="Saints">👼</span>
-            </div>
-            <h1 className="font-heading font-semibold text-4xl text-foreground mb-4">
-              Saints of the Orthodox Church
-            </h1>
-            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Discover the lives, teachings, and spiritual legacies of the saints who have shaped
-              our Orthodox tradition and continue to inspire our faith journey.
-            </p>
-          </div>
-        </div>
-      </section>
+    <div className="bg-syro-bg-gray">
+      <SyroPageBanner title="Saints" />
 
       {/* Saints Cards Grid - 7 cards with thumbnails (legacy content) */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="font-heading font-semibold text-3xl text-foreground mb-4">
+            <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-4">
               Saints
             </h2>
-            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto">
+            <p className="font-syro-primary text-lg text-syro-dark-gray max-w-3xl mx-auto">
               Learn about the saints and holy figures venerated in the Malankara Orthodox Syrian Church.
             </p>
           </div>
@@ -89,11 +74,11 @@ const SaintsPage = () => {
             {SAINTS_CARDS.map((card) => (
               <Link
                 key={card.href}
-                href={card.href}
-                className="bg-background rounded-lg sacred-shadow p-0 overflow-hidden hover:sacred-shadow-lg reverent-transition group flex flex-col"
+                href={`${card.href}?from=saints`}
+                className="bg-syro-bg-gray rounded-lg shadow-syro-card p-0 overflow-hidden hover:shadow-syro-card-hover transition-all duration-300 group flex flex-col"
               >
                 {/* Image area - padded container, object-contain per image_containment_prevention rule */}
-                <div className="relative w-full h-48 bg-muted overflow-hidden flex items-center justify-center p-4">
+                <div className="relative w-full h-48 bg-syro-bg-gray overflow-hidden flex items-center justify-center p-4">
                   <div className="relative w-full h-full min-h-0">
                     <Image
                       src={card.image}
@@ -109,30 +94,19 @@ const SaintsPage = () => {
                   </div>
                 </div>
                 <div className="p-6 flex flex-col flex-1">
-                  <h3 className="font-heading font-semibold text-xl text-foreground mb-3 group-hover:text-primary reverent-transition">
+                  <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-3 group-hover:text-syro-red transition-all duration-300">
                     {card.title}
                   </h3>
-                  <p className="font-body text-muted-foreground text-sm leading-relaxed flex-1 line-clamp-4">
+                  <p className="font-syro-primary text-syro-dark-gray text-sm leading-relaxed flex-1 line-clamp-4">
                     {card.excerpt}
                   </p>
                   <div className="mt-auto pt-4">
-                    <span className="inline-flex items-center gap-1.5 font-body text-sm font-medium text-primary">
+                    <span className="syro-read-more-btn font-syro-primary">
                       Read More
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      aria-hidden="true"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </span>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
+                    </span>
                   </div>
                 </div>
               </Link>
@@ -142,14 +116,14 @@ const SaintsPage = () => {
       </section>
 
       {/* Understanding Saints - keep brief section */}
-      <section className="py-16 bg-muted/30">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             <div>
-              <h2 className="font-heading font-semibold text-3xl text-foreground mb-6">
+              <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-6">
                 Understanding Saints in Orthodoxy
               </h2>
-              <div className="space-y-4 font-body text-muted-foreground leading-relaxed">
+              <div className="space-y-4 font-syro-primary text-syro-dark-gray leading-relaxed">
                 <p>
                   In the Orthodox tradition, saints are not just historical figures but living
                   examples of holiness who continue to intercede for us before God. They serve
@@ -162,30 +136,30 @@ const SaintsPage = () => {
                 </p>
               </div>
             </div>
-            <div className="bg-card rounded-lg sacred-shadow p-6">
-              <h3 className="font-heading font-semibold text-xl text-foreground mb-4">
+            <div className="bg-white rounded-lg shadow-syro-card p-6">
+              <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-4">
                 How We Honor Saints
               </h3>
               <div className="space-y-4">
                 <div className="flex items-start space-x-3">
-                  <span className="text-primary text-xl" role="img" aria-label="Prayer">🙏</span>
+                  <span className="text-syro-red text-xl" role="img" aria-label="Prayer">🙏</span>
                   <div>
-                    <h4 className="font-heading font-medium text-foreground">Prayer & Intercession</h4>
-                    <p className="font-body text-muted-foreground text-sm">Seeking their prayers and intercession</p>
+                    <h4 className="font-syro-display font-medium text-syro-blue">Prayer & Intercession</h4>
+                    <p className="font-syro-primary text-syro-dark-gray text-sm">Seeking their prayers and intercession</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">
-                  <span className="text-primary text-xl" role="img" aria-label="Feast Days">📅</span>
+                  <span className="text-syro-red text-xl" role="img" aria-label="Feast Days">📅</span>
                   <div>
-                    <h4 className="font-heading font-medium text-foreground">Feast Days</h4>
-                    <p className="font-body text-muted-foreground text-sm">Celebrating their memory on special days</p>
+                    <h4 className="font-syro-display font-medium text-syro-blue">Feast Days</h4>
+                    <p className="font-syro-primary text-syro-dark-gray text-sm">Celebrating their memory on special days</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">
-                  <span className="text-primary text-xl" role="img" aria-label="Icons">🖼️</span>
+                  <span className="text-syro-red text-xl" role="img" aria-label="Icons">🖼️</span>
                   <div>
-                    <h4 className="font-heading font-medium text-foreground">Icons & Images</h4>
-                    <p className="font-body text-muted-foreground text-sm">Using their images for veneration and inspiration</p>
+                    <h4 className="font-syro-display font-medium text-syro-blue">Icons & Images</h4>
+                    <p className="font-syro-primary text-syro-dark-gray text-sm">Using their images for veneration and inspiration</p>
                   </div>
                 </div>
               </div>

@@ -1,32 +1,36 @@
 import React from 'react';
 import Image from 'next/image';
-import SynodMembersSidebar from '@/components/holy-synod/SynodMembersSidebar';
-import QuickLinks from '@/components/holy-synod/QuickLinks';
+import SynodMembersSidebar from '../../components/SynodMembersSidebar';
+import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata = {
   title: 'H.G. Dr. Thomas Mar Ivanios Metropolitan',
-  description: 'Biography and information about H.G. Dr. Thomas Mar Ivanios Metropolitan.',
+  description: 'His Grace Dr. Thomas Mar Ivanios, Metropolitan of the Diocese of South-West America. M.Th. (FFRRC), D.Min.; ordained Metropolitan 2022.',
 };
 
 const HGThomasMarIvaniosMetropolitanPage = () => {
   return (
-    <div className="bg-background">
+    <div className="bg-syro-bg-gray">
+      <SyroPageBanner
+        title="H.G. Dr. Thomas Mar Ivanios Metropolitan"
+        breadcrumbFrom="holy-synod"
+      />
       {/* Main Content */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Main Content */}
-            <div className="lg:col-span-3">
-              <div className="bg-background rounded-lg sacred-shadow p-8">
-                <div className="flex flex-col md:flex-row gap-8">
-                  {/* Featured Portrait - Left Side - Large Display */}
-                  <div className="flex-shrink-0 flex justify-center md:justify-start">
-                    <div className="relative w-72 h-[28rem] md:w-80 md:h-[32rem] lg:w-96 lg:h-[36rem] rounded-lg overflow-hidden sacred-shadow-lg">
+            <div className="lg:col-span-2">
+              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
+                {/* Featured Image - Top */}
+                <div className="mb-8 flex justify-center">
+                  <div className="relative w-full max-w-md h-[280px] rounded-lg overflow-hidden shadow-syro-card">
                       <Image
                         src="/images/holy-synod/Thomas-Mar-Ivanios.png"
                         alt="H.G. Dr. Thomas Mar Ivanios Metropolitan"
                         fill
-                        sizes="(max-width: 768px) 288px, (max-width: 1024px) 320px, 384px"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 448px"
                         className="object-cover object-top"
                         style={{
                           objectPosition: 'center 15%'
@@ -36,33 +40,28 @@ const HGThomasMarIvaniosMetropolitanPage = () => {
                     </div>
                   </div>
 
-                  {/* Content - Right Side of Image */}
-                  <div className="flex-1">
-                    <h3 className="font-heading font-semibold text-2xl text-foreground mb-6">
+                {/* Content - Below Image */}
+                <div>
+                    <h3 className="font-syro-display font-semibold text-2xl text-syro-blue mb-6">
                       H.G. Dr. Thomas Mar Ivanios Metropolitan
                     </h3>
 
                     <div className="prose prose-lg max-w-none">
-                      <p className="font-body text-muted-foreground leading-relaxed mb-4">
-                        Born to of Late Mr. Thomas Chacko and Mrs. Annamma , in Pulluparampil house, Aleppey on 13 th December 1969, His Grace Thomas Mar Ivanios Metropolitan belongs to the parish of St. Thomas Orthodox Church, Chennankari under Kottayam diocese. His Grace completed his school education from St. Joseph High School, Chennankari (1985), following which H.G. completed degree in Malayalam (1986-88) from SD College, Aleppey. He joined Kottayam Old Seminary in 1992 and completed GST (1992-96). Later, he did M.Th (1997- 99) from FFRRC and a degree in Doctor of Ministry (D. Min). He was ordained sub-deaconship, by H.G. Geevarghese Mar Ivanios Metropolitan at Orthodox Theological Seminary, Kottayam on 8 th December 1996 . He was ordained deaconship (1999) at Mar Baselios Dayara, Njaliyakuzhi, and priesthood at St. Thomas Orthodox church, Chennankari on 18 th September 1999. He was chosen as Metropolitan in the Malankara Syrian Christian Association held at Kolencherry on 25 th February 2022 . He received the status of Ramban at the Parumala Seminary on 2 nd June 2022 . He was ordained as a Metropolitan by the name ‘Mar Ivanios’ by H.H. Baselios Mar Thoma Mathews III Catholicos at St. Mary’s Cathedral, Pazhanji on 28 th July 2022 . H.G. has taken charge of the diocese of South-West America since 3 rd November 2022.
+                      <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
+                        Born to Late Mr. Thomas Chacko and Mrs. Annamma, in Pulluparampil house, Aleppey on 13 December 1969, His Grace Thomas Mar Ivanios Metropolitan belongs to the parish of St. Thomas Orthodox Church, Chennankari under Kottayam diocese. His Grace completed his school education from St. Joseph High School, Chennankari (1985), following which H.G. completed degree in Malayalam (1986-88) from SD College, Aleppey. He joined Kottayam Old Seminary in 1992 and completed GST (1992-96). Later, he did M.Th. (1997â€“99) from FFRRC and a degree in Doctor of Ministry (D. Min). He was ordained sub-deaconship, by H.G. Geevarghese Mar Ivanios Metropolitan at Orthodox Theological Seminary, Kottayam on 8 December 1996. He was ordained deaconship (1999) at Mar Baselios Dayara, Njaliyakuzhi, and priesthood at St. Thomas Orthodox church, Chennankari on 18 September 1999. He was chosen as Metropolitan in the Malankara Syrian Christian Association held at Kolencherry on 25 February 2022. He received the status of Ramban at the Parumala Seminary on 2 June 2022. He was ordained as a Metropolitan by the name â€˜Mar Ivaniosâ€™ by H.H. Baselios Mar Thoma Mathews III Catholicos at St. Maryâ€™s Cathedral, Pazhanji on 28 July 2022. H.G. has taken charge of the diocese of South-West America since 3 November 2022.
                       </p>
 
-                      <div className="mt-6 pt-6 border-t border-border">
-                        <p className="font-body text-muted-foreground leading-relaxed mb-2">
-                          Urshlem (Indian Orthodox Church Center)3101 Hopkins Road, Beasley, TX 77417, USA
-                        </p>
-                        <p className="font-body text-muted-foreground leading-relaxed mb-2">
-                          Email: thomasmarivanios@mosc.in, diocesanoffice@ds-wa.org Ph: +7132813871 +919511842199 001-281-403-0670
-                        </p>
-                        <p className="font-body text-muted-foreground leading-relaxed mb-2">
-                          Web: www.ds-wa.org
-                        </p>
-                        <p className="font-body text-muted-foreground leading-relaxed mb-2">
-                          Web: www.ds-wa.org (/mosc/directory)
-                        </p>
+                      <h4 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
+                        Contact
+                      </h4>
+                      <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
+                        <p>Urshlem (Indian Orthodox Church Center)</p>
+                        <p>3101 Hopkins Road, Beasley, TX 77417, USA</p>
+                        <p>Ph: +1 (713) 281-3871, +91 9511842199, 001-281-403-0670</p>
+                        <p>Email: thomasmarivanios@mosc.in, diocesanoffice@ds-wa.org</p>
+                        <p>Web: www.ds-wa.org</p>
                       </div>
                     </div>
-                  </div>
                 </div>
               </div>
 
@@ -73,7 +72,7 @@ const HGThomasMarIvaniosMetropolitanPage = () => {
             </div>
 
             {/* Sidebar */}
-            <div className="lg:col-span-1">
+            <div className="space-y-6 lg:col-span-1">
               <SynodMembersSidebar />
             </div>
           </div>
