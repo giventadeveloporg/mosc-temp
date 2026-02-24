@@ -7,8 +7,8 @@ export interface EventWithFilteredMedia {
   media: EventMediaDTO;
 }
 
-export const useFilteredEvents = (filterType: 'hero' | 'live' | 'featured') => {
-  const { eventsWithMedia, isLoading, error } = useEventsData();
+export const useFilteredEvents = (filterType: 'hero' | 'live' | 'featured', enabled: boolean = true) => {
+  const { eventsWithMedia, isLoading, error } = useEventsData(enabled);
 
   const filteredEvents = useMemo(() => {
     if (isLoading || error) {

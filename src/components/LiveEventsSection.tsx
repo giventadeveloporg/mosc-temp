@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { formatInTimeZone } from 'date-fns-tz';
 import type { EventDetailsDTO, EventMediaDTO } from '@/types';
 import { useFilteredEvents } from '@/hooks/useFilteredEvents';
+import { useDeferredFetch } from '@/hooks/usePageReady';
 
 interface LiveEventWithMedia {
   event: EventDetailsDTO;
@@ -14,7 +15,9 @@ interface LiveEventWithMedia {
 
 const LiveEventsSection: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const { filteredEvents, isLoading, error } = useFilteredEvents('live');
+  // Defer live event data fetching until after initial paint + 500ms
+  const liveFetchEnabled = useDeferredFetch(500);
+  const { filteredEvents, isLoading, error } = useFilteredEvents('live', liveFetchEnabled);
 
   // Helper to generate Google Calendar URL
   function toGoogleCalendarDate(date: string, time: string) {

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { TenantSettingsDTO } from '@/types';
 import { getAppUrl } from '@/lib/env';
+import { usePageReady } from '@/hooks/usePageReady';
 
 interface TenantSettingsContextType {
   settings: TenantSettingsDTO | null;
@@ -30,6 +31,7 @@ export const TenantSettingsProvider: React.FC<TenantSettingsProviderProps> = ({ 
   const [settings, setSettings] = useState<TenantSettingsDTO | null>(null);
   const [loading, setLoading] = useState(true);
   const [retryCount, setRetryCount] = useState(0);
+  const pageReady = usePageReady();
 
   // Cache key for sessionStorage
   const CACHE_KEY = 'homepage_tenant_settings_cache';
@@ -39,7 +41,7 @@ export const TenantSettingsProvider: React.FC<TenantSettingsProviderProps> = ({ 
 
   useEffect(() => {
     async function fetchTenantSettings() {
-      // Check cache first
+      // Check cache first (instant, no deferral needed for cached data)
       try {
         const cachedData = sessionStorage.getItem(CACHE_KEY);
         if (cachedData) {
@@ -54,6 +56,9 @@ export const TenantSettingsProvider: React.FC<TenantSettingsProviderProps> = ({ 
       } catch (error) {
         console.warn('Failed to read tenant settings cache:', error);
       }
+
+      // Defer network request until after initial paint to avoid blocking static content rendering
+      if (!pageReady && retryCount === 0) return;
 
       try {
         const baseUrl = getAppUrl();
@@ -142,7 +147,7 @@ export const TenantSettingsProvider: React.FC<TenantSettingsProviderProps> = ({ 
     }
 
     fetchTenantSettings();
-  }, [CACHE_KEY, CACHE_DURATION, retryCount]);
+  }, [CACHE_KEY, CACHE_DURATION, retryCount, pageReady]);
 
   // Determine section visibility with fallback to true (show by default)
   // This ensures the app continues to work even if tenant settings fail

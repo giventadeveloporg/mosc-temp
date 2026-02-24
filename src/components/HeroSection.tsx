@@ -8,6 +8,7 @@ import { useFilteredEvents } from '@/hooks/useFilteredEvents';
 import { isRecurringEvent, getNextOccurrenceDate } from '@/lib/eventUtils';
 import { getOverlayInfo } from '@/lib/heroOverlay';
 import { getTenantId } from '@/lib/env';
+import { useDeferredFetch } from '@/hooks/usePageReady';
 import { ArrowRight, Heart, Play, Pause, ChevronLeft, ChevronRight } from 'lucide-react';
 import GivebutterDonateButton from '@/components/GivebutterDonateButton';
 
@@ -131,7 +132,9 @@ const DynamicHeroImage: React.FC<{
   // Ref to track the last scheduled image index to prevent duplicate scheduling
   const lastScheduledIndexRef = React.useRef<number | null>(null);
 
-  const { filteredEvents, isLoading: eventsLoading, error } = useFilteredEvents('hero');
+  // Defer hero event data fetching until after initial paint + 500ms
+  const heroFetchEnabled = useDeferredFetch(500);
+  const { filteredEvents, isLoading: eventsLoading, error } = useFilteredEvents('hero', heroFetchEnabled);
 
   const defaultImage = "/images/hero_section/default_hero_section_second_column_poster.jpeg";
 

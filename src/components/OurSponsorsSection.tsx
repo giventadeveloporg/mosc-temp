@@ -4,12 +4,16 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import type { EventSponsorsDTO } from "@/types";
 import { getAppUrl, getTenantId } from '@/lib/env';
+import { useDeferredFetch } from '@/hooks/usePageReady';
 import { SponsorCard } from '@/components/sponsors/SponsorCard';
 
 const OurSponsorsSection: React.FC = () => {
   const [sponsors, setSponsors] = useState<EventSponsorsDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(false);
+
+  // Defer sponsors API call until page ready + 1500ms (bottom of page, lowest priority)
+  const shouldFetch = useDeferredFetch(1500);
 
   // Cache key for sessionStorage
   const CACHE_KEY = 'homepage_sponsors_cache';
@@ -36,7 +40,7 @@ const OurSponsorsSection: React.FC = () => {
 
   useEffect(() => {
     async function fetchSponsors() {
-      // Check cache first
+      // Check cache first (instant, no deferral needed for cached data)
       try {
         const cachedData = sessionStorage.getItem(CACHE_KEY);
         if (cachedData) {
@@ -51,6 +55,9 @@ const OurSponsorsSection: React.FC = () => {
       } catch (error) {
         console.warn('Failed to read sponsors cache:', error);
       }
+
+      // Defer network request until page is ready + delay
+      if (!shouldFetch) return;
 
       setLoading(true);
       setFetchError(false);
@@ -104,7 +111,7 @@ const OurSponsorsSection: React.FC = () => {
     }
 
     fetchSponsors();
-  }, []);
+  }, [shouldFetch]);
 
   // Don't render anything while loading - section will appear only when fully loaded
   if (loading) {

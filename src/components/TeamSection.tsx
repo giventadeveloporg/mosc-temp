@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { ExecutiveCommitteeTeamMemberDTO } from '@/types';
 import { getAppUrl, getTenantId } from '@/lib/env';
+import { useDeferredFetch } from '@/hooks/usePageReady';
 import styles from './TeamSection.module.css';
 
 const TeamSection: React.FC = () => {
@@ -12,14 +13,18 @@ const TeamSection: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showImages, setShowImages] = useState(false);
 
+  // Defer team member API call until page ready + 800ms
+  // This section is further down the page and mounts after TenantSettings loads,
+  // so the effective delay from initial page load is even longer.
+  const shouldFetch = useDeferredFetch(800);
+
   // Cache key for sessionStorage
   const CACHE_KEY = 'homepage_team_cache';
   const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
   useEffect(() => {
-    // Fetch team members when component mounts
     const loadTeamMembers = async () => {
-      // Check cache first
+      // Check cache first (instant, no deferral needed for cached data)
       try {
         const cachedData = sessionStorage.getItem(CACHE_KEY);
         if (cachedData) {
@@ -35,6 +40,9 @@ const TeamSection: React.FC = () => {
       } catch (error) {
         console.warn('Failed to read team cache:', error);
       }
+
+      // Defer network request until page is ready + delay
+      if (!shouldFetch) return;
 
       try {
         const baseUrl = getAppUrl();
@@ -81,7 +89,7 @@ const TeamSection: React.FC = () => {
     };
 
     loadTeamMembers();
-  }, []);
+  }, [shouldFetch]);
 
   // Helper function to get full name
   const getFullName = (member: ExecutiveCommitteeTeamMemberDTO) => {
