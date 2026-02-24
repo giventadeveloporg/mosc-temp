@@ -8,8 +8,8 @@ export interface SyroPageBannerProps {
   title: string;
   /** When true, center the title and breadcrumb text (e.g. on saints subpages) */
   centerText?: boolean;
-  /** Breadcrumb path: 'home' = Home / Title, 'holy-synod' = Holy Synod / Title, 'saints' = Saints / Title, 'the-church' = The Church / Title, 'catholicate' = The Catholicate / Title, 'administration' = Administration / Title, 'ecumenical' = Ecumenical / Title, 'dioceses' = Dioceses / Title */
-  breadcrumbFrom?: 'home' | 'holy-synod' | 'saints' | 'the-church' | 'catholicate' | 'administration' | 'ecumenical' | 'dioceses';
+  /** Breadcrumb path: 'home' = Home / Title, 'holy-synod' = Holy Synod / Title, 'saints' = Saints / Title, 'the-church' = The Church / Title, 'catholicate' = The Catholicate / Title, 'administration' = Administration / Title, 'ecumenical' = Ecumenical / Title, 'dioceses' = Dioceses / Title, 'spiritual-organizations' = Spiritual Organizations / Title */
+  breadcrumbFrom?: 'home' | 'holy-synod' | 'saints' | 'the-church' | 'catholicate' | 'administration' | 'ecumenical' | 'dioceses' | 'spiritual-organizations';
 }
 
 /**
@@ -28,6 +28,7 @@ const BREADCRUMB_CONFIG = {
   administration: { href: '/mosc/administration', label: 'Administration' },
   ecumenical: { href: '/mosc/ecumenical', label: 'Ecumenical' },
   dioceses: { href: '/mosc/dioceses', label: 'Dioceses' },
+  'spiritual-organizations': { href: '/mosc/spiritual-organizations', label: 'Spiritual Organizations' },
 } as const;
 
 export type SyroBreadcrumbFrom = keyof typeof BREADCRUMB_CONFIG;

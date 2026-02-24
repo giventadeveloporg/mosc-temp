@@ -138,7 +138,7 @@ const CatholicatePage = () => {
                 key={card.title}
                 className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 overflow-hidden flex flex-col h-full"
               >
-                <div className="relative w-full h-60 bg-syro-bg-gray">
+                <div className="relative w-full h-64 bg-syro-bg-gray">
                   <Image
                     src={card.image}
                     alt={card.alt}
@@ -148,8 +148,8 @@ const CatholicatePage = () => {
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
                 </div>
-                <div className="p-8 flex flex-col flex-1">
-                  <h3 className="font-syro-display text-xl font-semibold text-black mb-4 line-clamp-3">
+                <div className="p-6 flex flex-col flex-1 min-h-0">
+                  <h3 className="font-syro-display text-lg font-semibold text-black mb-3 leading-snug">
                     {card.title}
                   </h3>
                   <p className="font-syro-primary text-base text-black flex-1 mb-5 leading-relaxed">

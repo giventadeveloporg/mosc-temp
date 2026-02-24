@@ -97,26 +97,22 @@ const BaseliosGeevargheseIPage = () => {
                   <span>Back to The Catholicate</span>
                 </Link>
                 <div className="mt-3 space-y-1.5">
-                  {SYRO_CATHOLICATE_SIDEBAR_LINKS.map((item) => (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className={`block p-2 rounded-lg hover:bg-syro-bg-gray/50 transition-colors group leading-tight ${item.href === '/mosc/catholicate/his-holiness-baselios-geevarghese-i-second-catholicos-of-the-east-in-malankara' ? 'bg-syro-blue/5 border border-syro-blue/20' : ''}`}
-                    >
-                      <div className="flex items-start space-x-2">
-                        <div className="w-6 h-6 bg-syro-blue/10 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-syro-blue/20 transition-colors">
-                          <span className="text-xs text-syro-blue" role="img" aria-label="Catholicos">👑</span>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-syro-display font-medium text-sm text-syro-dark-gray group-hover:text-syro-blue transition-colors leading-tight mt-0 mb-0">
-                            {item.name}
-                          </h4>
-                          {item.period ? <p className="font-syro-primary text-xs text-syro-blue font-medium leading-tight mt-0 mb-0">{item.period}</p> : null}
-                          {item.description ? <p className="font-syro-primary text-xs text-[#798daf] leading-tight mt-0 mb-0">{item.description}</p> : null}
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
+                  {SYRO_CATHOLICATE_SIDEBAR_LINKS.map((item) => {
+                    const isActive = item.href === '/mosc/catholicate/his-holiness-baselios-geevarghese-i-second-catholicos-of-the-east-in-malankara';
+                    return (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        className={`block px-3 py-2 rounded-lg font-syro-primary text-sm leading-tight outline-none focus:outline-none transition-colors ${
+                          isActive ? 'bg-syro-red text-white' : 'text-syro-dark-gray hover:text-syro-blue hover:bg-syro-bg-gray/50'
+                        }`}
+                      >
+                        <span className={`font-syro-display font-medium ${isActive ? 'text-white' : ''}`}>{item.name}</span>
+                        {item.period ? <p className={`font-syro-primary text-xs font-medium mt-0 mb-0 ${isActive ? '!text-white' : 'text-syro-blue'}`}>{item.period}</p> : null}
+                        {item.description ? <p className={`font-syro-primary text-xs leading-tight mt-0 mb-0 ${isActive ? '!text-white' : 'text-[#798daf]'}`}>{item.description}</p> : null}
+                      </Link>
+                    );
+                  })}
                 </div>
               </div>
             </div>

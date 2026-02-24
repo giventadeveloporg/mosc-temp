@@ -1,6 +1,6 @@
 import React from 'react';
-import QuickLinks from '../../components/QuickLinks';
-import SpiritualOrganizationsSidebar from '../SpiritualOrganizationsSidebar';
+import Image from 'next/image';
+import SpiritualOrgSubpageLayout from '../SpiritualOrgSubpageLayout';
 
 export const metadata = {
   title: 'Akhila Malankara Orthodox Shusrushaka Sangham (AMOSS) | MOSC',
@@ -9,85 +9,72 @@ export const metadata = {
 
 const AkhilaMalankaraOrthodoxShusrushakaSanghamAmossPage = () => {
   return (
-    <div className="bg-syro-bg-gray">
-      <section className="py-16 bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-syro-red rounded-lg flex items-center justify-center mx-auto mb-6 shadow-syro-card-hover">
-              <span className="text-syro-red-foreground text-4xl font-bold" role="img" aria-label="AMOSS">⛪</span>
-            </div>
-            <h1 className="font-syro-display font-semibold text-4xl text-syro-blue mb-4">
-              Akhila Malankara Orthodox Shusrushaka Sangham (AMOSS)
-            </h1>
-            <p className="font-syro-primary text-lg text-syro-dark-gray max-w-3xl mx-auto leading-relaxed">
-              AMOSS is a movement working to give instructions to the altar boys of all parishes in the Malankara Church for uniformity in worship and to serve systematically.
-            </p>
-          </div>
+    <SpiritualOrgSubpageLayout
+      title="Akhila Malankara Orthodox Shusrushaka Sangham (AMOSS)"
+      currentHref="/mosc/spiritual-organizations/akhila-malankara-orthodox-shusrushaka-sangham-amoss"
+    >
+      <div className="space-y-6 font-syro-primary text-syro-dark-gray leading-relaxed">
+        <div className="relative w-full h-48 bg-syro-bg-gray rounded-lg overflow-hidden flex items-center justify-center mb-6">
+          <Image
+            src="/images/logos/Current_Edits/MOSC-Logo-only.png"
+            alt="Akhila Malankara Orthodox Shusrushaka Sangham (AMOSS)"
+            fill
+            className="object-contain object-center"
+            style={{ objectPosition: 'center center', backgroundColor: 'transparent' }}
+            sizes="(min-width: 1024px) 66vw, 100vw"
+          />
         </div>
-      </section>
+        <p>
+          AMOSS is a movement working on the following objectives:
+        </p>
 
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            <div className="lg:col-span-2">
-              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
-                <div className="space-y-6 font-syro-primary text-syro-dark-gray leading-relaxed">
-                  <p>
-                    AMOSS objectives: (1) To give instructions to the altar boys of all parishes in the Malankara Church to make uniformity in the worship of the church and to serve systematically. (2) To mould people who have God&apos;s grace, dedication, who follow spiritual & sacramental life, and who have worldly experience to reside as servants in the sacramental service of the holy church. (3) To train attendants to practice the holy church&apos;s tradition and ritual service without any alteration and to perform it timely with all its meaning and value and to ordain and make them members of the church&apos;s serving community. The training to these altar boys is given under the supervision of &quot;SRUTI&quot; in the Kottayam Theological Seminary.
-                  </p>
-                  <p>
-                    The activities under AMOSS are: Periodical training programmes at the diocese and zonal levels. Annual conferences aiming in the upliftment and encouragement of youngsters as the altar boys. AMOSS have units in almost all parishes.
-                  </p>
-                </div>
+        <ol className="list-decimal list-inside space-y-3 pl-2">
+          <li>
+            To give instructions to the altar boys of all parishes in the Malankara Church to make uniformity in the worship of the church and to serve systematically.
+          </li>
+          <li>
+            To mould people who have God&apos;s grace, dedication, who follow spiritual &amp; sacramental life, and who have worldly experience to reside as servants in the sacramental service of the holy church.
+          </li>
+          <li>
+            To train attendants to practice the holy church&apos;s tradition and ritual service without any alteration and to perform it timely with all its meaning and value and to ordain and make them members of the church&apos;s serving community. The training to these altar boys is given under the supervision of &quot;SRUTI&quot; in the Kottayam Theological Seminary.
+          </li>
+        </ol>
 
-                <div className="mt-10 space-y-6">
-                  <h3 className="font-syro-display font-semibold text-xl text-syro-blue border-b border-syro-table-border pb-2">
-                    President
-                  </h3>
-                  <p className="font-syro-primary text-syro-dark-gray">
-                    H. G. Dr. Yuhanon Mar Thevodoros Metropolitan
-                  </p>
+        <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 pl-4 border-l-4 border-syro-red mt-10">
+          Activities
+        </h2>
+        <p>The activities under AMOSS are:</p>
+        <ol className="list-decimal list-inside space-y-2 pl-2">
+          <li>Periodical training programmes at the diocese and zonal levels.</li>
+          <li>Annual conferences aiming in the upliftment and encouragement of youngsters as the altar boys.</li>
+        </ol>
+        <p>AMOSS have units in almost all parishes.</p>
 
-                  <h3 className="font-syro-display font-semibold text-xl text-syro-blue border-b border-syro-table-border pb-2 mt-8">
-                    Vice President
-                  </h3>
-                  <p className="font-syro-primary text-syro-dark-gray">
-                    Fr. Jose Thomas Poovathumkal
-                  </p>
-                  <p className="font-syro-primary text-syro-dark-gray">
-                    Ph: 9447231131
-                  </p>
+        <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 pl-4 border-l-4 border-syro-red mt-10">
+          Office Bearers
+        </h2>
 
-                  <h3 className="font-syro-display font-semibold text-xl text-syro-blue border-b border-syro-table-border pb-2 mt-8">
-                    General Secretary
-                  </h3>
-                  <p className="font-syro-primary text-syro-dark-gray">
-                    Biju V. Panthaplave
-                  </p>
-                  <p className="font-syro-primary text-syro-dark-gray">
-                    Ph: 9447558620
-                  </p>
+        <h3 className="font-syro-display font-semibold text-xl text-syro-blue border-b border-syro-table-border pb-2">
+          President
+        </h3>
+        <p>H. G. Dr. Yuhanon Mar Thevodoros Metropolitan</p>
 
-                  <h3 className="font-syro-display font-semibold text-xl text-syro-blue border-b border-syro-table-border pb-2 mt-8">
-                    Treasurer
-                  </h3>
-                  <p className="font-syro-primary text-syro-dark-gray">
-                    Roy M. Muthoottu
-                  </p>
-                  <p className="font-syro-primary text-syro-dark-gray">
-                    Ph: 9847032251
-                  </p>
-                </div>
-              </div>
-            </div>
+        <h3 className="font-syro-display font-semibold text-xl text-syro-blue border-b border-syro-table-border pb-2 mt-8">
+          Vice President
+        </h3>
+        <p>Fr. Jose Thomas Poovathumkal, Ph: 9447231131</p>
 
-            <SpiritualOrganizationsSidebar currentHref="/mosc/spiritual-organizations/akhila-malankara-orthodox-shusrushaka-sangham-amoss" />
-          </div>
-        </div>
-      </section>
+        <h3 className="font-syro-display font-semibold text-xl text-syro-blue border-b border-syro-table-border pb-2 mt-8">
+          General Secretary
+        </h3>
+        <p>Biju V. Panthaplave, Ph: 9447558620</p>
 
-      <QuickLinks />
-    </div>
+        <h3 className="font-syro-display font-semibold text-xl text-syro-blue border-b border-syro-table-border pb-2 mt-8">
+          Treasurer
+        </h3>
+        <p>Roy M. Muthoottu, Ph: 9847032251</p>
+      </div>
+    </SpiritualOrgSubpageLayout>
   );
 };
 
