@@ -28,6 +28,7 @@ const TeamSection: React.FC = () => {
   // Cache key for sessionStorage
   const CACHE_KEY = 'homepage_team_cache';
   const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+    // Cache key for sessionStorage end
 
   useEffect(() => {
     const loadTeamMembers = async () => {
