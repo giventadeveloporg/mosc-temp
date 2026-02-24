@@ -7,6 +7,7 @@ import { formatInTimeZone } from 'date-fns-tz';
 import type { EventDetailsDTO, EventMediaDTO } from '@/types';
 import { useFilteredEvents } from '@/hooks/useFilteredEvents';
 import { getOverlayInfo } from '@/lib/heroOverlay';
+import { useDeferredFetch } from '@/hooks/usePageReady';
 
 interface FeaturedEventWithMedia {
   event: EventDetailsDTO;
@@ -17,7 +18,9 @@ const MAX_FEATURED_EVENTS = 3;
 
 const FeaturedEventsSection: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const { filteredEvents, isLoading, error } = useFilteredEvents('featured');
+  // Defer featured event data fetching until after initial paint + 500ms
+  const featuredFetchEnabled = useDeferredFetch(500);
+  const { filteredEvents, isLoading, error } = useFilteredEvents('featured', featuredFetchEnabled);
   const displayedEvents = filteredEvents.slice(0, MAX_FEATURED_EVENTS);
 
   // Helper to generate Google Calendar URL

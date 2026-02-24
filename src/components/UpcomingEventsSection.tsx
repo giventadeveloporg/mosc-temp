@@ -9,6 +9,7 @@ import { isRecurringEvent, getNextOccurrenceDate } from '@/lib/eventUtils';
 import { isDonationBasedEvent, isTicketedFundraiserEvent } from '@/lib/donation/utils';
 import { isTicketedEventCube } from '@/lib/eventcube/utils';
 import { getTenantId } from '@/lib/env';
+import { useDeferredFetch } from '@/hooks/usePageReady';
 
 // Component to handle event image loading errors and hide container when image fails
 function EventImageWithErrorHandling({
@@ -73,6 +74,10 @@ const UpcomingEventsSection: React.FC = () => {
   const [fetchError, setFetchError] = useState(false);
   const [isUpcomingEvents, setIsUpcomingEvents] = useState(true);
 
+  // Defer upcoming events API call until page ready + 300ms
+  // This section mounts after TenantSettings loads, adding natural delay on top
+  const shouldFetch = useDeferredFetch(300);
+
   // Cache key for sessionStorage
   const CACHE_KEY = 'homepage_events_cache';
   const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
@@ -98,7 +103,7 @@ const UpcomingEventsSection: React.FC = () => {
 
   useEffect(() => {
     async function fetchEvents() {
-      // Check cache first
+      // Check cache first (instant, no deferral needed for cached data)
       try {
         const cachedData = sessionStorage.getItem(CACHE_KEY);
         if (cachedData) {
@@ -114,6 +119,9 @@ const UpcomingEventsSection: React.FC = () => {
       } catch (error) {
         console.warn('Failed to read events cache:', error);
       }
+
+      // Defer network request until page is ready + delay
+      if (!shouldFetch) return;
 
       setLoading(true);
       setFetchError(false);
@@ -392,7 +400,7 @@ const UpcomingEventsSection: React.FC = () => {
       }
     }
     fetchEvents();
-  }, []);
+  }, [shouldFetch]);
 
   // Helper to format time with AM/PM
   function formatTime(time: string): string {

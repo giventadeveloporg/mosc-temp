@@ -15,7 +15,7 @@ export interface EventsData {
   error: string | null;
 }
 
-export const useEventsData = () => {
+export const useEventsData = (enabled: boolean = true) => {
   const [data, setData] = useState<EventsData>({
     events: [],
     eventsWithMedia: [],
@@ -44,6 +44,9 @@ export const useEventsData = () => {
   };
 
   useEffect(() => {
+    // Defer API calls until enabled (after page ready + delay)
+    if (!enabled) return;
+
     const fetchEventsData = async () => {
       try {
         setData(prev => ({ ...prev, isLoading: true, error: null }));
@@ -167,7 +170,7 @@ export const useEventsData = () => {
     };
 
     fetchEventsData();
-  }, []);
+  }, [enabled]);
 
   return data;
 };
