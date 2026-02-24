@@ -88,6 +88,12 @@ body:has(.syro-layout) {
   color: #000 !important;
 }
 
+/* Selected sidebar item: all text (including p) must be white on red background */
+#mainContent a.bg-syro-red p,
+#mainContent a.bg-syro-red span {
+  color: #fff !important;
+}
+
 /* Apply same font as Catholicos/main titles (Poppins) to all titles in MOSC subpages */
 .syro-layout .font-syro-display {
   font-family: var(--syro-font-primary, 'Poppins', Arial, Helvetica, sans-serif) !important;

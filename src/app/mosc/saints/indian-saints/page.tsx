@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import SyroPageBanner from '../../components/SyroPageBanner';
+import QuickLinks from '../../components/QuickLinks';
 
 export const metadata = {
   title: 'Indian Saints',
@@ -87,6 +88,10 @@ Among the many disciples of Mar Gregorios, three deserve special notice:
                     </p>
                 </div>
               </div>
+
+              <div className="mt-8 hidden lg:block">
+                <QuickLinks />
+              </div>
             </div>
 
             {/* Sidebar */}
@@ -127,93 +132,6 @@ Among the many disciples of Mar Gregorios, three deserve special notice:
                     >
                       Indian Saints
                     </Link>
-                </nav>
-              </div>
-
-              {/* Quick Links */}
-              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-6">
-                <h3 className="font-syro-display font-semibold text-lg text-syro-blue mb-4">
-                  Quick Links
-                </h3>
-                <nav className="space-y-2">
-                  <Link 
-                    href="/mosc/the-church" 
-                    className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
-                  >
-                    The Church
-                  </Link>
-                  <Link 
-                    href="/mosc/holy-synod" 
-                    className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
-                  >
-                    Holy Synod
-                  </Link>
-                  <Link 
-                    href="/mosc/dioceses" 
-                    className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
-                  >
-                    Dioceses
-                  </Link>
-                  <Link 
-                    href="/mosc/ecumenical" 
-                    className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
-                  >
-                    Ecumenical Relations
-                  </Link>
-                  <Link 
-                    href="/mosc/institutions" 
-                    className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
-                  >
-                    Institutions
-                  </Link>
-                  <Link 
-                    href="/mosc/training" 
-                    className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
-                  >
-                    Training
-                  </Link>
-                  <Link 
-                    href="/mosc/publications" 
-                    className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
-                  >
-                    Publications
-                  </Link>
-                  <Link 
-                    href="/mosc/spiritual" 
-                    className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
-                  >
-                    Spiritual Organisations
-                  </Link>
-                  <Link 
-                    href="/mosc/theological" 
-                    className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
-                  >
-                    Theological Seminaries
-                  </Link>
-                  <Link 
-                    href="/mosc/lectionary" 
-                    className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
-                  >
-                    Lectionary
-                  </Link>
-                  <Link 
-                    href="/mosc/gallery" 
-                    className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
-                  >
-                    Gallery
-                  </Link>
-                  <Link 
-                    href="/mosc/contact-info" 
-                    className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
-                  >
-                    Contact Info
-                  </Link>
-                  <Link 
-                    href="/mosc/faqs" 
-                    className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
-                  >
-                    FAQs
-                  </Link>
                 </nav>
               </div>
             </div>

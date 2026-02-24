@@ -1,6 +1,6 @@
 import React from 'react';
-import QuickLinks from '../../components/QuickLinks';
-import SpiritualOrganizationsSidebar from '../SpiritualOrganizationsSidebar';
+import Image from 'next/image';
+import SpiritualOrgSubpageLayout from '../SpiritualOrgSubpageLayout';
 
 export const metadata = {
   title: "Marth Mariam Vanitha Samajam (Women's Wing of Orthodox Church of India) | MOSC",
@@ -9,85 +9,126 @@ export const metadata = {
 
 const MarthMariamVanithaSamajamPage = () => {
   return (
-    <div className="bg-syro-bg-gray">
-      <section className="py-16 bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-syro-red rounded-lg flex items-center justify-center mx-auto mb-6 shadow-syro-card-hover">
-              <span className="text-syro-red-foreground text-4xl font-bold" role="img" aria-label="Marth Mariam Vanitha Samajam">👩</span>
-            </div>
-            <h1 className="font-syro-display font-semibold text-4xl text-syro-blue mb-4">
-              Marth Mariam Vanitha Samajam (Women&apos;s Wing of Orthodox Church of India)
-            </h1>
-            <p className="font-syro-primary text-lg text-syro-dark-gray max-w-3xl mx-auto leading-relaxed">
-              Marth Mariam Vanitha Samajam is the Women&apos;s wing of the Malankara Orthodox Church of India. It is one of the major spiritual organizations of the church combining all the female members, spread throughout the world in all the 30 Dioceses. The organization was founded in 1928 aimed at the spiritual progress of women.
-            </p>
-          </div>
+    <SpiritualOrgSubpageLayout
+      title="Marth Mariam Vanitha Samajam (Women's Wing of Orthodox Church of India)"
+      currentHref="/mosc/spiritual-organizations/marth-mariam-vanitha-samajam-womens-wing-of-orthodox-church-of-india"
+    >
+      <div className="space-y-6 font-syro-primary text-syro-dark-gray leading-relaxed">
+        <div className="relative w-full h-48 bg-syro-bg-gray rounded-lg overflow-hidden flex items-center justify-center mb-6">
+          <Image
+            src="/images/spiritual/MMVS.png"
+            alt="Marth Mariam Vanitha Samajam (Women's Wing of Orthodox Church of India)"
+            fill
+            className="object-contain object-center"
+            style={{ objectPosition: 'center center', backgroundColor: 'transparent' }}
+            sizes="(min-width: 1024px) 66vw, 100vw"
+          />
         </div>
-      </section>
+        <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 pl-4 border-l-4 border-syro-red">
+          A Brief History
+        </h2>
+        <p>
+          Marth Mariam Vanitha Samajam is the Women&apos;s wing of the Malankara Orthodox Church of India. It is one of the major spiritual organization of the church combining all the female members. It is spread throughout the world in all the 30 Dioceses and functioning in all parishes of the church.
+        </p>
+        <p>
+          The organization was founded in 1928 aimed at the spiritual progress of women. The founders named it &quot;Marth Mariam Samajam&quot; after the Blessed Virgin Mary whom they accepted as their interceding saint. It was started under the patronage of the Late Very Rev. M.C. Kuriakose Ramban and with the leadership of K.M. Annamma and co-workers.
+        </p>
 
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            <div className="lg:col-span-2">
-              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
-                <div className="space-y-6 font-syro-primary text-syro-dark-gray leading-relaxed">
-                  <p>
-                    The founders named it &quot;Marth Mariam Samajam&quot; after the Blessed Virgin Mary whom they accepted as their interceding saint. It was started under the patronage of the Late Very Rev. M.C. Kuriakose Ramban and with the leadership of K.M. Annamma and co-workers. <strong className="text-syro-blue">Motto:</strong> Prarthikkuka, Pravarthikkuka, Prakasikkuka.
-                  </p>
-                  <p>
-                    There is a central committee with all the 30 Dioceses of the church. The Diocesan Metropolitan is the President of diocesan committee. Retreats, Bible Classes, Competitions etc are held on Parish, Group, Diocese & Akhila Malankara levels. There is a Leadership Training Camp held annually. The Samajam conducts theological training (Divyabodhanam), social awareness, and various welfare projects including &quot;Snehasparsam&quot; (marriage aid, sick aid, education aid, housing for widows), and publishes the trimagazine &quot;Vanitha Deepthi&quot;. Marth Mariam Vanitha Samajam Kendra Mandiram is at Kanjikuzhy Kottayam.
-                  </p>
-                </div>
+        <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 pl-4 border-l-4 border-syro-red mt-10">
+          Motto
+        </h2>
+        <p>Prarthikkuka, Pravarthikkuka, Prakasikkuka.</p>
 
-                <div className="mt-10 space-y-6">
-                  <h3 className="font-syro-display font-semibold text-xl text-syro-blue border-b border-syro-table-border pb-2">
-                    Office Bearers
-                  </h3>
-                  <p className="font-syro-primary text-syro-dark-gray">
-                    <strong className="text-syro-blue">President:</strong> H. G. Dr. Yuhanon Mar Diascoros Metropolitan
-                  </p>
-                  <p className="font-syro-primary text-syro-dark-gray">
-                    <strong className="text-syro-blue">Vice President:</strong> Fr. Philip Tharakan Thevalakara – 9633519075, 9447061819
-                  </p>
-                  <p className="font-syro-primary text-syro-dark-gray">
-                    <strong className="text-syro-blue">General Secretary:</strong> Prof. Mary Mathew – 9447145064
-                  </p>
-                  <p className="font-syro-primary text-syro-dark-gray">
-                    <strong className="text-syro-blue">Treasurer:</strong> Alice Koshy +91 8369582238
-                  </p>
-                  <p className="font-syro-primary text-syro-dark-gray">
-                    <strong className="text-syro-blue">Office Secretary:</strong> Molly Varghese – 9961742164
-                  </p>
+        <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 pl-4 border-l-4 border-syro-red mt-10">
+          Administration
+        </h2>
+        <p>
+          There is a central committee with all the 30 Dioceses of the church. H.H. is the Patron. According to the constitution President, Vice President, General Secretary, Joint Secretary and Treasurer, the Secretaries from 30 Dioceses & Diocese Representatives consist of the Central Committee. Central Committee is the deciding body of Marth Mariam Vanitha Samajam. The Diocesan Metropolitan is the President of diocesan committee, Vice President is a priest from that Diocese and the vicars that of the branches. Each Diocesan Samajam has a secretary, elected from the committee members who in their turn represents the group or districts into which each diocese is subdivided. The Group secretaries encourage the branch samajams and make members ever more loyal to the faith and practices of the church. The diocesan and the organizing secretaries are expected to visit the branches at times. Retreats, Bible Classes, Competitions etc are held on Parish, Group, Diocese & Akhila Malankara levels.
+        </p>
+        <p>
+          There is a Leadership Training Camp held annually for 2 days. Annual examinations are conducted based on prescribed text books of church faith, Bible portions and liturgical hymns. Examination is conducted inside & outside India in October.
+        </p>
 
-                  <h3 className="font-syro-display font-semibold text-xl text-syro-blue border-b border-syro-table-border pb-2 mt-8">
-                    Head Quarters
-                  </h3>
-                  <p className="font-syro-primary text-syro-dark-gray">
-                    Marth Mariam Vanitha Samajam Central Office<br />
-                    Muttambalam P.O. Kanjikuzhy, Kottayam 4<br />
-                    Kerala State, India
-                  </p>
-                  <p className="font-syro-primary text-syro-dark-gray">
-                    Phone: 0481-2571840
-                  </p>
-                  <p className="font-syro-primary text-syro-dark-gray">
-                    Email:{' '}
-                    <a href="mailto:momsglobal@yahoo.in" className="text-syro-red hover:underline">
-                      momsglobal@yahoo.in
-                    </a>
-                  </p>
-                </div>
-              </div>
-            </div>
+        <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 pl-4 border-l-4 border-syro-red mt-10">
+          Present Concerns and Future Prospects
+        </h2>
+        <ol className="list-decimal list-inside space-y-2 pl-2">
+          <li>Preparing women to have theological training. Hundreds of women are now undergoing the Divyabodhanam course of the Orthodox Seminary, Kottayam.</li>
+          <li>Training women to have social awareness, participation in political activities, decision-making at every level.</li>
+          <li>Conscientization program for women who are generally denied basic human hood in the family.</li>
+          <li>Attempts to find out women&apos;s potentials to a greater extent.</li>
+          <li>Training women to conduct Women&apos;s prayer groups, to lead prayer, Bible classes, fellowship meetings and to preach the gospel.</li>
+          <li>Preparing cell to solve the problems of working women.</li>
+          <li>Seek solidarity with women&apos;s action groups on local and national level. Encouraging more participation in ecumenical gatherings.</li>
+          <li>To enhance spiritual practices observing lent, and other religious practices, bringing up children etc.</li>
+          <li>Attempts to find out more Sunday school teachers with a commitment to Christ.</li>
+          <li>We are continuing the struggle against dowry system and other social evils and to persuade the authorities that woman should be provided with equal opportunities and recognition.</li>
+          <li>Also efforts are done to get participation for women in the administration of the church various aspects of Managing committee, Working Committee, Advisory committee etc.</li>
+        </ol>
 
-            <SpiritualOrganizationsSidebar currentHref="/mosc/spiritual-organizations/marth-mariam-vanitha-samajam-womens-wing-of-orthodox-church-of-india" />
-          </div>
-        </div>
-      </section>
+        <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 pl-4 border-l-4 border-syro-red mt-10">
+          &apos;Snehasparsam&apos; Project
+        </h2>
+        <p>
+          This is the helping hand for the needy. Samajam is providing marriage aid, sick aid, education aid & providing for construction of houses for widows.
+        </p>
 
-      <QuickLinks />
-    </div>
+        <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 pl-4 border-l-4 border-syro-red mt-10">
+          &apos;Vanitha Deepthi&apos;
+        </h2>
+        <p>This is the trimagazine released by Marth Mariam Vanitha Samajam from 2012.</p>
+
+        <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 pl-4 border-l-4 border-syro-red mt-10">
+          Navajyoti MOMS Charitable Society & Chaithanya Samskarika Koottayma
+        </h2>
+        <p>These are two projects under Marth Mariam Vanitha Samajam for the upliftment of women.</p>
+
+        <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 pl-4 border-l-4 border-syro-red mt-10">
+          Marth Mariam Vanitha Samajam Kendra Mandiram
+        </h2>
+        <p>
+          In Kanjikuzhy Kottayam Marth Mariam Vanitha Samajam had a building with office constructed in 1987. It is renovated & the first floor of the building is completed in 2014. The Koodasa of the new construction was on 26th August 2014. Every 2nd Wednesday there is Holy Qurbana & Bible Class in the Chapel of Kendra Mandiram.
+        </p>
+
+        <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 pl-4 border-l-4 border-syro-red mt-10">
+          Achievements
+        </h2>
+        <p>
+          The Samajam was in the fore-front of the struggle to achieve equal ancestral property right for Christian women of Kerala.
+        </p>
+        <p>
+          Besides the central administrative office at Kottayam, almost all the Dioceses have their own headquarters and conference centers. There are vocational guidance centers, Nursery schools and self-employment projects, school for specially abled, Balika Bhavan.
+        </p>
+        <p>
+          Recently many changes occurred in the life of the Church with the humble persuasion of this Samajam. During Baptism, the Girls are also permitted to enter the sanctuary and kiss the altar. The tradition that only boys are baptized just after the feast of Epiphany is now changed. Females are allowed to read the Bible during liturgy. Nuns are allowed to serve at the altar during the worship services and Holy Liturgy in the convents. Women are now elected as members and office-bearers in the administration in Parishes. Marth Mariam Vanitha Samajam activities are conducted in Gulf, America, U.K.-Europe.
+        </p>
+
+        <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 pl-4 border-l-4 border-syro-red mt-10">
+          Office Bearers
+        </h2>
+        <p><strong className="text-syro-blue">President:</strong> H. G. Dr. Yuhanon Mar Diascoros Metropolitan</p>
+        <p><strong className="text-syro-blue">Vice President:</strong> Fr. Philip Tharakan Thevalakara – 9633519075, 9447061819</p>
+        <p><strong className="text-syro-blue">General Secretary:</strong> Prof. Mary Mathew – 9447145064</p>
+        <p><strong className="text-syro-blue">Treasurer:</strong> Alice Koshy, Ph: +91 8369582238</p>
+        <p><strong className="text-syro-blue">Office Secretary:</strong> Molly Varghese – 9961742164</p>
+
+        <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 pl-4 border-l-4 border-syro-red mt-10">
+          Head Quarters
+        </h2>
+        <p>
+          Marth Mariam Vanitha Samajam Central Office<br />
+          Muttambalam P.O. Kanjikuzhy, Kottayam 4<br />
+          Kerala State, India
+        </p>
+        <p>Phone: 0481-2571840</p>
+        <p>
+          Email:{' '}
+          <a href="mailto:momsglobal@yahoo.in" className="text-syro-red hover:underline">
+            momsglobal@yahoo.in
+          </a>
+        </p>
+      </div>
+    </SpiritualOrgSubpageLayout>
   );
 };
 

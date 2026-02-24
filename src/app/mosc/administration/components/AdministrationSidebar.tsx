@@ -25,7 +25,7 @@ export default function AdministrationSidebar({ currentSlug }: { currentSlug: st
             <Link
               key={slug}
               href={`/mosc/administration/${slug}`}
-              className={`block px-3 py-2 rounded-md font-syro-primary text-sm transition-colors ${
+              className={`block px-3 py-2 rounded-md font-syro-primary text-sm transition-colors outline-none focus:outline-none ${
                 isActive
                   ? 'bg-syro-red text-white'
                   : 'text-syro-dark-gray hover:text-syro-blue hover:bg-syro-bg-gray'

@@ -39,12 +39,12 @@
   }
 }
 
-/* Team member card - consistent height and width with centering */
+/* Team member card - consistent height and width with centering (height allows "Read more" to be visible) */
 .teamCard {
   width: 300px;
   max-width: 300px;
-  height: 700px;
-  /* Fixed height for consistency */
+  height: 820px;
+  /* Fixed height so content + "Read more" button fit without clipping */
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -87,9 +87,10 @@
   background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
 }
 
-/* Card content with proper flex distribution */
+/* Card content: takes remaining space, min-height 0 so inner scroll works */
 .teamCard .cardContent {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   background: white;
@@ -100,13 +101,18 @@
   z-index: 2;
 }
 
+/* First child (photo section) must never shrink - keeps image height equal across cards */
+.teamCard > div:first-child {
+  flex-shrink: 0;
+}
+
 /* Mobile-specific adjustments */
 @media (max-width: 599px) {
   .teamCard {
     width: 100%;
     max-width: 320px;
-    height: 650px;
-    /* Slightly shorter for mobile */
+    height: 780px;
+    /* Enough height for "Read more" to be visible */
   }
 }
 

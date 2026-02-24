@@ -184,37 +184,19 @@ const CatholicateIntroPage = () => {
                 <div className="mt-3 space-y-1.5">
                   <Link
                     href="/mosc/catholicate-intro"
-                    className="block p-2 rounded-lg bg-syro-blue/5 border border-syro-blue/20 transition-colors group leading-tight"
+                    className="block px-3 py-2 rounded-lg bg-syro-red text-white font-syro-primary text-sm leading-tight outline-none focus:outline-none transition-colors"
                   >
-                    <div className="flex items-start space-x-2">
-                      <div className="w-6 h-6 bg-syro-blue/10 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-syro-blue/20 transition-colors">
-                        <span className="text-xs text-syro-blue" role="img" aria-label="Introduction">👑</span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-syro-display font-medium text-sm text-syro-dark-gray group-hover:text-syro-blue transition-colors leading-tight mt-0 mb-0">
-                          The Catholicate — Introduction
-                        </h4>
-                      </div>
-                    </div>
+                    The Catholicate — Introduction
                   </Link>
                   {SYRO_CATHOLICOS_LINKS.map((catholicos) => (
                     <Link
                       key={catholicos.name}
                       href={catholicos.href}
-                      className="block p-2 rounded-lg hover:bg-syro-bg-gray/50 transition-colors group leading-tight"
+                      className="block px-3 py-2 rounded-lg text-syro-dark-gray hover:text-syro-blue hover:bg-syro-bg-gray/50 font-syro-primary text-sm leading-tight outline-none focus:outline-none transition-colors"
                     >
-                      <div className="flex items-start space-x-2">
-                        <div className="w-6 h-6 bg-syro-blue/10 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-syro-blue/20 transition-colors">
-                          <span className="text-xs text-syro-blue" role="img" aria-label="Catholicos">👑</span>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-syro-display font-medium text-sm text-syro-dark-gray group-hover:text-syro-blue transition-colors leading-tight mt-0 mb-0">
-                            {catholicos.name}
-                          </h4>
-                          <p className="font-syro-primary text-xs text-syro-blue font-medium leading-tight mt-0 mb-0">{catholicos.period}</p>
-                          <p className="font-syro-primary text-xs text-[#798daf] leading-tight mt-0 mb-0">{catholicos.description}</p>
-                        </div>
-                      </div>
+                      <span className="font-syro-display font-medium">{catholicos.name}</span>
+                      {catholicos.period ? <p className="font-syro-primary text-xs text-syro-blue font-medium mt-0 mb-0">{catholicos.period}</p> : null}
+                      {catholicos.description ? <p className="font-syro-primary text-xs text-[#798daf] leading-tight mt-0 mb-0">{catholicos.description}</p> : null}
                     </Link>
                   ))}
                 </div>
