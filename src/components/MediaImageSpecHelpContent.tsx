@@ -44,6 +44,19 @@ export default function MediaImageSpecHelpContent() {
           <li>Wide horizontal banner; keep main message and branding centered</li>
         </ul>
       </section>
+
+      {/* Featured event image (isFeaturedEventImage) */}
+      <section>
+        <h5 className="font-semibold text-blue-700 mb-2">Featured event image</h5>
+        <p className="mb-2 text-gray-600">Used for events marked as Featured: banner below hero and/or Featured Events cards.</p>
+        <ul className="list-disc pl-5 space-y-1">
+          <li><strong>Recommended:</strong> 1920 × 1080 px (16:9 aspect ratio)</li>
+          <li><strong>Mobile:</strong> 800 × 450 px (16:9)</li>
+          <li><strong>Format:</strong> WebP preferred, JPEG acceptable; quality 85–90%</li>
+          <li><strong>File size:</strong> Under 500 KB</li>
+          <li>16:9 fills the container without padding on all screen sizes</li>
+        </ul>
+      </section>
     </div>
   );
 }
