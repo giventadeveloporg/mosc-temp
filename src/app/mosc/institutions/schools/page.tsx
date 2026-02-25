@@ -2,6 +2,9 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Metadata } from 'next';
+import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
+import InstitutionsSidebar from '../components/InstitutionsSidebar';
 
 export const metadata: Metadata = {
   title: 'Schools | Institutions | MOSC',
@@ -142,53 +145,38 @@ export default function SchoolsPage() {
 
   return (
     <div className="min-h-screen bg-syro-bg-gray">
-      {/* Breadcrumb */}
-      <section className="bg-syro-bg-gray py-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex items-center space-x-2 font-syro-primary text-sm text-syro-dark-gray">
-            <Link href="/mosc-old" className="hover:text-syro-red transition-all duration-300">MOSC</Link>
-            <span>/</span>
-            <Link href="/mosc/institutions" className="hover:text-syro-red transition-all duration-300">Institutions</Link>
-            <span>/</span>
-            <span className="text-syro-blue">Schools</span>
-          </nav>
-        </div>
-      </section>
+      <SyroPageBanner title="Schools" breadcrumbFrom="institutions" />
 
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray py-12 lg:py-16">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            <div className="relative w-full h-auto rounded-lg overflow-hidden flex items-center justify-center bg-syro-bg-gray/20">
-              <Image
-                src="/images/institutions/raj.jpg"
-                alt="Schools"
-                width={800}
-                height={600}
-                className="w-full h-auto object-contain group-hover:scale-105 transition-transform duration-300"
-                style={{ backgroundColor: 'transparent', borderRadius: '0.5rem' }}
-                priority
-              />
-            </div>
-            <div>
-              <h1 className="font-syro-display font-semibold text-4xl lg:text-5xl text-syro-blue mb-4">Schools</h1>
-              <div className="bg-syro-red/10 rounded-lg p-4 mb-4">
-                <h2 className="font-syro-display font-semibold text-xl text-syro-blue mb-2">Catholicate and M D Schools</h2>
-                <p className="font-syro-primary text-syro-dark-gray">
-                  <span className="font-medium text-syro-blue">Manager:</span> H.G. Dr. Gabriel Mar Gregorios Metropolitan
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="lg:col-span-2">
+              <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
+                <div className="mb-8 flex justify-center">
+                  <div className="relative w-full h-auto rounded-lg overflow-hidden flex items-center justify-center bg-syro-bg-gray/20">
+                    <Image
+                      src="/images/institutions/raj.jpg"
+                      alt="Schools"
+                      width={800}
+                      height={600}
+                      className="w-full h-auto object-contain"
+                      style={{ backgroundColor: 'transparent', borderRadius: '0.5rem' }}
+                      priority
+                    />
+                  </div>
+                </div>
+                <div className="bg-syro-red/10 rounded-lg p-4 mb-4">
+                  <h2 className="font-syro-display font-semibold text-xl text-syro-blue mb-2">Catholicate and M D Schools</h2>
+                  <p className="font-syro-primary text-syro-dark-gray">
+                    <span className="font-medium text-syro-blue">Manager:</span> H.G. Dr. Gabriel Mar Gregorios Metropolitan
+                  </p>
+                </div>
+                <p className="font-syro-primary text-lg text-syro-dark-gray leading-relaxed">
+                  A comprehensive network of schools providing quality education rooted in Christian values and academic excellence.
                 </p>
               </div>
-              <p className="font-syro-primary text-lg text-syro-dark-gray leading-relaxed">
-                A comprehensive network of schools providing quality education rooted in Christian values and academic excellence.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Higher Secondary Schools */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="mt-8">
           <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary">
             Higher Secondary Schools
           </h2>
@@ -197,13 +185,8 @@ export default function SchoolsPage() {
               <SchoolCard key={index} school={school} index={index} />
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* High Schools */}
-      <section className="py-16 bg-syro-bg-gray">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary">
+          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary mt-12">
             High Schools
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -211,13 +194,8 @@ export default function SchoolsPage() {
               <SchoolCard key={index} school={school} index={index} />
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* Upper Primary Schools */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary">
+          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary mt-12">
             Upper Primary Schools
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -225,13 +203,8 @@ export default function SchoolsPage() {
               <SchoolCard key={index} school={school} index={index} />
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* Lower Primary Schools */}
-      <section className="py-16 bg-syro-bg-gray">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary">
+          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary mt-12">
             Lower Primary Schools
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -239,13 +212,8 @@ export default function SchoolsPage() {
               <SchoolCardCompact key={index} school={school} index={index} />
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* Un Aided Schools */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary">
+          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary mt-12">
             Un Aided Schools
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -253,13 +221,8 @@ export default function SchoolsPage() {
               <SchoolCard key={index} school={school} index={index} />
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* Boarding Homes */}
-      <section className="py-16 bg-syro-bg-gray">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary">
+          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary mt-12">
             Boarding Homes
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -267,26 +230,17 @@ export default function SchoolsPage() {
               <SchoolCard key={index} school={school} index={index} />
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* Teacher Training Institutions */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary">
+          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary mt-12">
             Teacher Training Institutions
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {teacherTraining.map((school, index) => (
               <SchoolCard key={index} school={school} index={index} />
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* Public Schools */}
-      <section className="py-16 bg-syro-bg-gray">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary mt-12">Public Schools</h2>
           <div className="bg-syro-red/10 rounded-lg p-6 mb-8">
             <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-2">Public Schools</h2>
             <p className="font-syro-primary text-syro-dark-gray">
@@ -298,13 +252,8 @@ export default function SchoolsPage() {
               <SchoolCard key={index} school={school} index={index} />
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* Mission Statement */}
-      <section className="py-12 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-br from-muted to-background rounded-lg shadow-syro-card p-8 text-center">
+          <div className="mt-12 bg-gradient-to-br from-muted to-background rounded-lg shadow-syro-card p-8 text-center">
             <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4">
               Educational Excellence with Spiritual Foundation
             </h2>
@@ -312,21 +261,26 @@ export default function SchoolsPage() {
               Our schools are dedicated to nurturing young minds with quality education while instilling Christian values, preparing students to become responsible citizens and faithful members of the Church.
             </p>
           </div>
-        </div>
-      </section>
+              </div>
 
-      <QuickLinks />
-
-      {/* Navigation */}
-      <section className="py-12 bg-syro-bg-gray">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-center">
-            <Link href="/mosc/institutions" className="inline-flex items-center px-6 py-3 bg-syro-red text-white font-syro-primary font-medium rounded-lg hover:bg-syro-red/90 transition-all duration-300 shadow-syro-card">
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              Back to All Institutions
-            </Link>
+              <div className="mt-8 hidden lg:block">
+                <QuickLinks />
+              </div>
+              <div className="mt-8 flex justify-center">
+                <Link href="/mosc/institutions" className="inline-flex items-center px-6 py-3 bg-syro-red text-white font-syro-primary font-medium rounded-lg hover:bg-syro-red/90 transition-all duration-300 shadow-syro-card">
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  Back to All Institutions
+                </Link>
+              </div>
+            </div>
+            <div className="space-y-6 lg:col-span-1">
+              <InstitutionsSidebar currentSlug="schools" />
+            </div>
+          </div>
+          <div className="mt-8 lg:hidden">
+            <QuickLinks />
           </div>
         </div>
       </section>

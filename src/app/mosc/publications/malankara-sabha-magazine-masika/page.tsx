@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata: Metadata = {
   title: 'Malankara Sabha Magazine (Masika) | Publications | MOSC',
@@ -12,22 +13,7 @@ export const metadata: Metadata = {
 export default function MalankaraSabhaMagazinePage() {
   return (
     <div className="min-h-screen bg-syro-bg-gray">
-      {/* Breadcrumb */}
-      <section className="bg-syro-bg-gray py-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex items-center space-x-2 font-syro-primary text-sm text-syro-dark-gray">
-            <Link href="/mosc-old" className="hover:text-syro-red transition-all duration-300">
-              MOSC
-            </Link>
-            <span>/</span>
-            <Link href="/mosc/publications" className="hover:text-syro-red transition-all duration-300">
-              Publications
-            </Link>
-            <span>/</span>
-            <span className="text-syro-blue">Malankara Sabha Magazine (Masika)</span>
-          </nav>
-        </div>
-      </section>
+      <SyroPageBanner title="Malankara Sabha Magazine (Masika)" breadcrumbFrom="publications" />
 
       {/* Hero Section with Image */}
       <section className="relative bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray py-12 lg:py-16">

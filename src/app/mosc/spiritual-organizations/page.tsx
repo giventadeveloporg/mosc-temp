@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import QuickLinks from '../components/QuickLinks';
+import SyroPageBanner from '../components/SyroPageBanner';
 
 export const metadata = {
   title: 'Spiritual Organizations | MOSC',
@@ -133,23 +134,7 @@ const SpiritualOrganizationsPage = () => {
 
   return (
     <div className="bg-syro-bg-gray">
-      {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-syro-red rounded-lg flex items-center justify-center mx-auto mb-6 shadow-syro-card-hover">
-              <span className="text-syro-red-foreground text-4xl font-bold" role="img" aria-label="Spiritual Organizations">⛪</span>
-            </div>
-            <h1 className="font-syro-display font-semibold text-4xl text-syro-blue mb-4">
-              Spiritual Organizations
-            </h1>
-            <p className="font-syro-primary text-lg text-syro-dark-gray max-w-3xl mx-auto leading-relaxed">
-              Discover the various spiritual organizations, ministries, and associations that serve the 
-              Malankara Orthodox Syrian Church and contribute to the spiritual growth of our community.
-            </p>
-          </div>
-        </div>
-      </section>
+      <SyroPageBanner title="Spiritual Organizations" breadcrumbFrom="home" />
 
       {/* Organizations Grid */}
       <section className="py-16 bg-white">
