@@ -73,7 +73,7 @@ const DiocesesPage = () => {
                   />
                 </div>
                 <div className="p-6 flex flex-col flex-1 bg-white">
-                  <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-3 group-hover:text-syro-red transition-all duration-300">
+                  <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug">
                     {card.name}
                   </h3>
                   <p className="font-syro-primary text-syro-dark-gray text-sm leading-relaxed flex-1 line-clamp-4">

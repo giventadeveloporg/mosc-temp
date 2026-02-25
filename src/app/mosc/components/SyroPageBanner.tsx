@@ -8,8 +8,8 @@ export interface SyroPageBannerProps {
   title: string;
   /** When true, center the title and breadcrumb text (e.g. on saints subpages) */
   centerText?: boolean;
-  /** Breadcrumb path: 'home' = Home / Title, 'holy-synod' = Holy Synod / Title, 'saints' = Saints / Title, 'the-church' = The Church / Title, 'catholicate' = The Catholicate / Title, 'administration' = Administration / Title, 'ecumenical' = Ecumenical / Title, 'dioceses' = Dioceses / Title, 'spiritual-organizations' = Spiritual Organizations / Title, 'publications' = Publications / Title, 'institutions' = Institutions / Title */
-  breadcrumbFrom?: 'home' | 'holy-synod' | 'saints' | 'the-church' | 'catholicate' | 'administration' | 'ecumenical' | 'dioceses' | 'spiritual-organizations' | 'publications' | 'institutions';
+  /** Breadcrumb path: 'home' = Home / Title, 'gallery' = Gallery / Title, 'downloads' = Downloads / Title, 'calendar' = Calendar / Title, plus holy-synod, saints, etc. */
+  breadcrumbFrom?: 'home' | 'gallery' | 'downloads' | 'calendar' | 'holy-synod' | 'saints' | 'the-church' | 'catholicate' | 'administration' | 'ecumenical' | 'dioceses' | 'spiritual-organizations' | 'publications' | 'institutions' | 'training' | 'theological-seminaries' | 'lectionary';
 }
 
 /**
@@ -21,6 +21,9 @@ const SHEPHERD_IMAGE_SRC = 'https://www.syromalabarchurch.in/assets/images/backg
 
 const BREADCRUMB_CONFIG = {
   home: { href: '/mosc', label: 'Home' },
+  gallery: { href: '/mosc/gallery', label: 'Gallery' },
+  downloads: { href: '/mosc/downloads', label: 'Downloads' },
+  calendar: { href: '/mosc/calendar', label: 'Calendar' },
   'holy-synod': { href: '/mosc/holy-synod', label: 'Holy Synod' },
   saints: { href: '/mosc/saints', label: 'Saints' },
   'the-church': { href: '/mosc/the-church', label: 'The Church' },
@@ -31,6 +34,9 @@ const BREADCRUMB_CONFIG = {
   'spiritual-organizations': { href: '/mosc/spiritual-organizations', label: 'Spiritual Organizations' },
   publications: { href: '/mosc/publications', label: 'Publications' },
   institutions: { href: '/mosc/institutions', label: 'Institutions' },
+  training: { href: '/mosc/training', label: 'Training' },
+  'theological-seminaries': { href: '/mosc/theological-seminaries', label: 'Theological Seminaries' },
+  lectionary: { href: '/mosc/lectionary', label: 'Lectionary' },
 } as const;
 
 export type SyroBreadcrumbFrom = keyof typeof BREADCRUMB_CONFIG;

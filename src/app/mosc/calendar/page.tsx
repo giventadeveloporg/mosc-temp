@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import QuickLinks from '../components/QuickLinks';
-import SyroPageHero from '../components/SyroPageHero';
+import SyroPageBanner from '../components/SyroPageBanner';
 import SyroSectionTitle from '../components/SyroSectionTitle';
 
 export const metadata: Metadata = {
@@ -14,10 +14,7 @@ export const metadata: Metadata = {
 export default function CalendarPage() {
   return (
     <div className="bg-syro-bg-gray">
-      <SyroPageHero
-        title="Liturgical Calendar"
-        description="Access the complete liturgical calendar of the Malankara Orthodox Syrian Church with feast days, fasting periods, and important church observances."
-      />
+      <SyroPageBanner title="Liturgical Calendar" breadcrumbFrom="home" />
 
       {/* CTA + What's in the Calendar */}
       <section className="py-16 bg-syro-bg-gray">

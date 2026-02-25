@@ -36,7 +36,7 @@ const EcumenicalPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SyroIntroCard>
             <div className="text-center">
-              <h2 className="font-syro-display text-[2.2rem] font-bold text-syro-blue mb-5">
+              <h2 className="font-syro-display text-[2.2rem] font-bold text-black mb-5">
                 Department of Ecumenical Relations
               </h2>
               <p className="font-syro-primary text-xl text-syro-dark-gray leading-relaxed">
@@ -66,7 +66,7 @@ const EcumenicalPage = () => {
                   )}
                 </div>
                 <div className="p-8 flex-1 flex flex-col">
-                  <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-3 group-hover:text-syro-red transition-colors line-clamp-3">
+                  <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug line-clamp-3">
                     {article.title}
                   </h3>
                   <p className="font-syro-primary text-base text-syro-dark-gray flex-1 line-clamp-3 leading-relaxed">

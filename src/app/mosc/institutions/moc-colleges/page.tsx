@@ -54,7 +54,7 @@ export default function MOCCollegesPage() {
               <div className="mt-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {colleges.map((college, index) => (
-              <div key={index} className="bg-syro-bg-gray/20 rounded-lg p-6 shadow-syro-card-sm border-l-4 border-primary hover:shadow-syro-card transition-all duration-300 min-w-0">
+              <div key={index} className="bg-syro-bg-gray/20 rounded-lg p-6 shadow-syro-card-sm border-l-4 border-syro-red hover:shadow-syro-card transition-all duration-300 min-w-0">
                 <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-3">{college.name}</h3>
                 <div className="space-y-2 font-syro-primary text-syro-dark-gray">
                   <p className="flex items-start">
@@ -76,7 +76,7 @@ export default function MOCCollegesPage() {
               </div>
             ))}
             {/* Corporate Office */}
-            <div className="bg-syro-red/5 rounded-lg p-6 shadow-syro-card-sm border-l-4 border-primary hover:shadow-syro-card transition-all duration-300 min-w-0">
+            <div className="bg-syro-red/5 rounded-lg p-6 shadow-syro-card-sm border-l-4 border-syro-red hover:shadow-syro-card transition-all duration-300 min-w-0">
               <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-3">
                 MOC Colleges Corporate Management Office
               </h3>

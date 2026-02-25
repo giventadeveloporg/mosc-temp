@@ -15,7 +15,7 @@ type SchoolEntry = { name: string; location: string; phone?: string };
 
 function SchoolCard({ school, index }: { school: SchoolEntry; index: number }) {
   return (
-    <div className="bg-syro-bg-gray/20 rounded-lg p-6 shadow-syro-card-sm hover:shadow-syro-card transition-all duration-300 border-l-4 border-primary">
+    <div className="bg-syro-bg-gray/20 rounded-lg p-6 shadow-syro-card-sm hover:shadow-syro-card transition-all duration-300 border-l-4 border-syro-red">
       <h3 className="font-syro-display font-semibold text-lg text-syro-blue mb-3">{school.name}</h3>
       <div className="space-y-2 font-syro-primary text-sm text-syro-dark-gray">
         <p>{school.location}</p>
@@ -27,7 +27,7 @@ function SchoolCard({ school, index }: { school: SchoolEntry; index: number }) {
 
 function SchoolCardCompact({ school, index }: { school: SchoolEntry; index: number }) {
   return (
-    <div className="bg-white rounded-lg p-4 shadow-syro-card-sm hover:shadow-syro-card transition-all duration-300 border-l-4 border-primary">
+    <div className="bg-white rounded-lg p-4 shadow-syro-card-sm hover:shadow-syro-card transition-all duration-300 border-l-4 border-syro-red">
       <h3 className="font-syro-display font-semibold text-base text-syro-blue mb-1">{school.name}</h3>
       <p className="font-syro-primary text-sm text-syro-dark-gray">{school.location}</p>
       {school.phone && <p className="font-syro-primary text-sm font-medium text-syro-blue mt-1">Ph: {school.phone}</p>}
@@ -177,7 +177,7 @@ export default function SchoolsPage() {
               </div>
 
               <div className="mt-8">
-          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary">
+          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-syro-red">
             Higher Secondary Schools
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -186,7 +186,7 @@ export default function SchoolsPage() {
             ))}
           </div>
 
-          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary mt-12">
+          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-syro-red mt-12">
             High Schools
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -195,7 +195,7 @@ export default function SchoolsPage() {
             ))}
           </div>
 
-          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary mt-12">
+          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-syro-red mt-12">
             Upper Primary Schools
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -204,7 +204,7 @@ export default function SchoolsPage() {
             ))}
           </div>
 
-          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary mt-12">
+          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-syro-red mt-12">
             Lower Primary Schools
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -213,7 +213,7 @@ export default function SchoolsPage() {
             ))}
           </div>
 
-          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary mt-12">
+          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-syro-red mt-12">
             Un Aided Schools
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -222,7 +222,7 @@ export default function SchoolsPage() {
             ))}
           </div>
 
-          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary mt-12">
+          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-syro-red mt-12">
             Boarding Homes
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -231,7 +231,7 @@ export default function SchoolsPage() {
             ))}
           </div>
 
-          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary mt-12">
+          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-syro-red mt-12">
             Teacher Training Institutions
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -240,7 +240,7 @@ export default function SchoolsPage() {
             ))}
           </div>
 
-          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-primary mt-12">Public Schools</h2>
+          <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-8 pb-4 border-b-2 border-syro-red mt-12">Public Schools</h2>
           <div className="bg-syro-red/10 rounded-lg p-6 mb-8">
             <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-2">Public Schools</h2>
             <p className="font-syro-primary text-syro-dark-gray">

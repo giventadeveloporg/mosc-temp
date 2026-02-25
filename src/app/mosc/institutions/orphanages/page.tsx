@@ -91,7 +91,7 @@ export default function OrphanagesPage() {
               <div className="mt-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {orphanages.map((orphanage, index) => (
-              <div key={index} className="bg-syro-bg-gray/20 rounded-lg p-6 shadow-syro-card-sm border-l-4 border-primary hover:shadow-syro-card transition-all duration-300">
+              <div key={index} className="bg-syro-bg-gray/20 rounded-lg p-6 shadow-syro-card-sm border-l-4 border-syro-red hover:shadow-syro-card transition-all duration-300">
                 <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-3">{orphanage.name}</h3>
                 <div className="space-y-2 font-syro-primary text-syro-dark-gray">
                   <p className="flex items-start">

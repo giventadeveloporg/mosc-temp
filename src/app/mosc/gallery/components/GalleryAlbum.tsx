@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import SyroPageBanner from '../../components/SyroPageBanner';
 
 interface Photo {
   src: string;
@@ -48,33 +49,27 @@ export default function GalleryAlbum({ title, date, category, photos }: GalleryA
 
   return (
     <>
+      <SyroPageBanner title={title} breadcrumbFrom="gallery" />
       {/* Header Section */}
-      <section className="relative bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray py-12">
+      <section className="relative bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-6">
-            <Link
-              href="/mosc/gallery"
-              className="inline-flex items-center font-syro-primary text-syro-red hover:text-syro-red/80 transition-all duration-300"
-            >
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-              Back to Gallery
+          <div className="flex items-center justify-between mb-4">
+            <Link href="/mosc/gallery" className="inline-flex items-center">
+              <span className="syro-read-more-btn font-syro-primary inline-flex items-center gap-2">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Back to Gallery
+              </span>
             </Link>
             <span className="inline-block px-3 py-1 bg-syro-red/10 text-syro-red text-xs font-syro-primary font-medium rounded-full">
               {category}
             </span>
           </div>
-
-          <div className="text-center">
-            <h1 className="font-syro-display font-semibold text-3xl lg:text-4xl text-syro-blue mb-3">
-              {title}
-            </h1>
-            <div className="flex items-center justify-center space-x-4 font-syro-primary text-syro-dark-gray">
-              <span>{date}</span>
-              <span>•</span>
-              <span>{photos.length} Photos</span>
-            </div>
+          <div className="flex items-center justify-center space-x-4 font-syro-primary text-syro-dark-gray text-sm">
+            <span>{date}</span>
+            <span>•</span>
+            <span>{photos.length} Photos</span>
           </div>
         </div>
       </section>

@@ -155,7 +155,7 @@ export default async function DirectoryPage() {
                 </svg>
               </div>
             </div>
-            <h1 className="font-heading font-semibold text-4xl lg:text-5xl text-syro-blue mb-4">
+            <h1 className="font-syro-display text-[2.2rem] font-bold text-black mb-5">
               Malankara Orthodox Directory
             </h1>
             <p className="font-body text-lg lg:text-xl text-black max-w-3xl mx-auto mb-8">
@@ -201,7 +201,7 @@ export default async function DirectoryPage() {
                       )}
                       <div className="p-6 flex flex-col flex-1">
                         <DirectoryCardIcon title={card.title} />
-                        <h2 className="font-heading font-semibold text-2xl text-black mb-3 group-hover:text-syro-red reverent-transition">
+                        <h2 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug">
                           {card.title}
                         </h2>
                         {card.description && (
@@ -232,7 +232,7 @@ export default async function DirectoryPage() {
                       )}
                       <div className="p-6 flex flex-col flex-1">
                         <DirectoryCardIcon title={card.title} />
-                        <h2 className="font-heading font-semibold text-2xl text-black mb-3 group-hover:text-syro-red reverent-transition">
+                        <h2 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug">
                           {card.title}
                         </h2>
                         {card.description && (
@@ -264,7 +264,7 @@ export default async function DirectoryPage() {
                     )}
                     <div className="p-6 flex flex-col flex-1">
                       <DirectoryCardIcon title={card.title} />
-                      <h2 className="font-heading font-semibold text-2xl text-black mb-3">
+                      <h2 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug">
                         {card.title}
                       </h2>
                       {card.description && (

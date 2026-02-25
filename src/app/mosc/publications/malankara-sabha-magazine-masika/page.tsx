@@ -100,7 +100,7 @@ export default function MalankaraSabhaMagazinePage() {
           <p className="font-syro-primary text-lg text-syro-dark-gray leading-relaxed mb-6">
             The magazine is published on the 10th of every month. In order to subscribe for the magazine and for other information, contact:
           </p>
-          <div className="bg-white rounded-lg shadow-syro-card p-8 border-l-4 border-primary">
+          <div className="bg-white rounded-lg shadow-syro-card p-8 border-l-4 border-syro-red">
             <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-4">
               The Managing Editor
             </h3>

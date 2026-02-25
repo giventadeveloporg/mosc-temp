@@ -110,7 +110,7 @@ export default function EngineeringCollegesPage() {
                     <p className="font-syro-primary text-syro-dark-gray leading-relaxed">{college.spiritualNote}</p>
                   </div>
                 )}
-                <div className="bg-syro-bg-gray rounded-lg p-6 border-l-4 border-primary">
+                <div className="bg-syro-bg-gray rounded-lg p-6 border-l-4 border-syro-red">
                   <h3 className="font-syro-display font-medium text-xl text-syro-blue mb-4">Contact Information</h3>
                   <div className="space-y-2 font-syro-primary text-syro-dark-gray">
                     {college.contact.title && <p className="font-medium text-syro-blue">{college.contact.title}</p>}

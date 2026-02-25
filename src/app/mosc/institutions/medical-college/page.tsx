@@ -39,7 +39,7 @@ export default function MedicalCollegePage() {
               Kolencherry – 682 311
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-syro-bg-gray rounded-lg p-6 border-l-4 border-primary">
+              <div className="bg-syro-bg-gray rounded-lg p-6 border-l-4 border-syro-red">
                 <h3 className="font-syro-display font-medium text-xl text-syro-blue mb-4">
                   Main Departments
                 </h3>
@@ -62,7 +62,7 @@ export default function MedicalCollegePage() {
                   </p>
                 </div>
               </div>
-              <div className="bg-syro-bg-gray rounded-lg p-6 border-l-4 border-primary">
+              <div className="bg-syro-bg-gray rounded-lg p-6 border-l-4 border-syro-red">
                 <h3 className="font-syro-display font-medium text-xl text-syro-blue mb-4">
                   Educational Programs
                 </h3>
@@ -81,7 +81,7 @@ export default function MedicalCollegePage() {
                   </p>
                 </div>
               </div>
-              <div className="bg-syro-bg-gray rounded-lg p-6 border-l-4 border-primary">
+              <div className="bg-syro-bg-gray rounded-lg p-6 border-l-4 border-syro-red">
                 <h3 className="font-syro-display font-medium text-xl text-syro-blue mb-4">
                   Additional Services
                 </h3>
@@ -100,7 +100,7 @@ export default function MedicalCollegePage() {
                   </p>
                 </div>
               </div>
-              <div className="bg-syro-red/5 rounded-lg p-6 border-l-4 border-primary flex flex-col justify-center">
+              <div className="bg-syro-red/5 rounded-lg p-6 border-l-4 border-syro-red flex flex-col justify-center">
                 <h3 className="font-syro-display font-medium text-xl text-syro-blue mb-4">
                   Website
                 </h3>

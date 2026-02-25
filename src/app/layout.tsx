@@ -11,7 +11,7 @@ import MobileDebugConsole from "../components/MobileDebugConsole";
 import { TenantSettingsProvider } from "../components/TenantSettingsProvider";
 import { headers } from "next/headers";
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { getAppUrl, getTenantId } from "@/lib/env";
+import { getAppUrl, getTenantId, getApiBaseUrl } from "@/lib/env";
 import { fetchWithJwtRetry } from "@/lib/proxyHandler";
 
 const DEBUG_LAYOUT = process.env.NEXT_PUBLIC_DEBUG_LAYOUT === 'true';
@@ -187,11 +187,7 @@ export default async function RootLayout({
                     });
 
                     // Use direct backend call with JWT (not proxy) for PATCH operations
-// Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
-function getApiBase() {
-  return getApiBaseUrl();
-}
-
+                    const apiBaseUrl = getApiBaseUrl();
                     // CRITICAL: Build update payload that ONLY updates userId/clerkUserId
                     // Preserve ALL existing fields - do NOT include fields that might overwrite existing data
                     const updatePayload: any = {
@@ -234,7 +230,7 @@ function getApiBase() {
 
                     debugLog('[Layout] Sending PATCH request with payload:', JSON.stringify(updatePayload, null, 2));
 
-                    const updateRes = await fetchWithJwtRetry(`${getApiBase()}/api/user-profiles/${existingProfile.id}`, {
+                    const updateRes = await fetchWithJwtRetry(`${apiBaseUrl}/api/user-profiles/${existingProfile.id}`, {
                       method: 'PATCH',
                       headers: { 'Content-Type': 'application/merge-patch+json' },
                       body: JSON.stringify(updatePayload),

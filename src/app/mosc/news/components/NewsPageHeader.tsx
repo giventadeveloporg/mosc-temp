@@ -32,7 +32,7 @@ export function NewsPageHeader() {
             <a
               key={href}
               href={href}
-              className="text-syro-small font-medium text-syro-blue hover:text-syro-red transition-colors duration-300 px-syro-md py-syro-sm rounded-[5px] bg-syro-light-gray/80 hover:bg-syro-light-gray"
+              className="syro-primary-button inline-flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-syro-red focus-visible:ring-offset-2"
             >
               {label}
             </a>
@@ -43,7 +43,7 @@ export function NewsPageHeader() {
               href={href}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-syro-small font-medium text-syro-blue hover:text-syro-red transition-colors duration-300 px-syro-md py-syro-sm rounded-[5px] bg-syro-light-gray/80 hover:bg-syro-light-gray"
+              className="syro-primary-button inline-flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-syro-red focus-visible:ring-offset-2"
             >
               {label}
             </a>

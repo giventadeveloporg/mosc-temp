@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Metadata } from 'next';
 import QuickLinks from '../components/QuickLinks';
-import SyroPageHero from '../components/SyroPageHero';
+import SyroPageBanner from '../components/SyroPageBanner';
 import SyroSectionTitle from '../components/SyroSectionTitle';
 
 export const metadata: Metadata = {
@@ -251,11 +251,8 @@ export default function GalleryPage() {
   const categories = ['All', 'Major Events', 'Ecumenical Visits', 'Special Events', 'Private Audiences', 'Receptions', 'Liturgical Events', 'Church Visits', 'Conferences'];
 
   return (
-    <div className="bg-syro-bg-gray" data-testid="mosc-gallery-page">
-      <SyroPageHero
-        title="Photo Gallery"
-        description="Commemorating significant moments in the life of our church through ecumenical visits, major ceremonies, and special events."
-      />
+    <div className="bg-syro-bg-gray" data-testid="mosc-gallery-page" id="mainContent">
+      <SyroPageBanner title="Photo Gallery" breadcrumbFrom="home" />
 
       <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -309,7 +306,7 @@ export default function GalleryPage() {
                       </svg>
                     </div>
                   )}
-                  <div className="absolute top-3 right-3 bg-syro-red text-syro-red-foreground px-3 py-1 rounded-full text-xs font-syro-primary font-medium shadow-md">
+                  <div className="absolute top-3 right-3 bg-syro-red px-3 py-1 rounded-full text-xs font-syro-primary font-medium shadow-md text-white">
                     {album.photoCount} photos
                   </div>
                 </div>
@@ -325,11 +322,13 @@ export default function GalleryPage() {
                   <p className="font-syro-primary text-sm text-syro-dark-gray mb-4">
                     {album.date}
                   </p>
-                  <div className="flex items-center font-syro-primary text-syro-red text-sm font-medium">
-                    <span>View Album</span>
-                    <svg className="w-4 h-4 ml-1 group-hover:ml-2 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                  <div className="flex items-center mt-auto">
+                    <span className="syro-read-more-btn font-syro-primary inline-flex items-center gap-2">
+                      View Album
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </span>
                   </div>
                 </div>
               </Link>
