@@ -4,7 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import QuickLinks from '../components/QuickLinks';
-import SyroPageHero from '../components/SyroPageHero';
+import SyroPageBanner from '../components/SyroPageBanner';
 import SyroSectionTitle from '../components/SyroSectionTitle';
 
 const downloadItems: { title: string; link: string; image?: string }[] = [
@@ -60,10 +60,7 @@ const downloadItems: { title: string; link: string; image?: string }[] = [
 export default function DownloadsPage() {
   return (
     <div className="bg-syro-bg-gray">
-      <SyroPageHero
-        title="Downloads"
-        description="Access official church documents, prayer books, forms, and resources of the Malankara Orthodox Syrian Church."
-      />
+      <SyroPageBanner title="Downloads" breadcrumbFrom="home" />
 
       <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

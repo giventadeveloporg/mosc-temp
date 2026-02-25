@@ -34,7 +34,7 @@ export default async function NewsPage() {
       {/* Hero / Page title - design system mainTitle: h1 2.8rem/700, p 20px/#506276 */}
       <section className="py-syro-xxxl bg-syro-bg-gray border-b border-syro-table-border">
         <div className="max-w-[1200px] mx-auto px-[15px]">
-          <h1 className="font-syro-display font-bold text-syro-h1 text-syro-blue mb-2.5">
+          <h1 className="font-syro-display text-[2.2rem] font-bold text-black mb-5">
             News
           </h1>
           <p className="text-syro-body text-syro-dark-gray mb-syro-xxl">

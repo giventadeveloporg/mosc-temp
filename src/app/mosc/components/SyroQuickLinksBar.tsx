@@ -8,7 +8,6 @@ const QUICK_LINKS = [
   { name: 'Spiritual Organisations', href: '/mosc/spiritual-organizations' },
   { name: 'Publications', href: '/mosc/publications' },
   { name: 'Institutions', href: '/mosc/institutions' },
-  { name: 'Directory', href: '/mosc/directory' },
   { name: 'Training', href: '/mosc/training' },
   { name: 'Theological Seminaries', href: '/mosc/theological-seminaries' },
   { name: 'Lectionary', href: '/mosc/lectionary' },

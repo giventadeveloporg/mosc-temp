@@ -5,8 +5,7 @@ import Link from 'next/link';
 import { useTenantSettings } from '@/components/TenantSettingsProvider';
 
 const QUICK_LINKS = [
-  { name: 'CATHOLICATE', href: '/mosc/catholicate' },
-  { name: 'NEWS', href: '/mosc/news' },
+  { name: 'CATHOLICATE NEWS', href: '/mosc/news' },
   { name: 'DOWNLOADS', href: '/mosc/downloads' },
   { name: 'E-MAIL', href: '/mosc/email' },
   { name: 'GALLERY', href: '/mosc/gallery' },
@@ -129,7 +128,6 @@ export default function SyroFooter() {
                     className="form-control subscribe-email"
                     name="full_name"
                     id="contact-name"
-                    placeholder="Enter Your Name"
                     value={formData.full_name}
                     onChange={(e) => setFormData((p) => ({ ...p, full_name: e.target.value }))}
                     disabled={isSubmitting}
@@ -144,7 +142,6 @@ export default function SyroFooter() {
                     className="form-control subscribe-email"
                     name="email_address"
                     id="contact-email"
-                    placeholder="name@example.com"
                     pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
                     value={formData.email_address}
                     onChange={(e) => setFormData((p) => ({ ...p, email_address: e.target.value }))}
@@ -160,7 +157,6 @@ export default function SyroFooter() {
                     className="form-control subscribe-email"
                     name="phone_number"
                     id="contact-phone"
-                    placeholder="Phone"
                     value={formData.phone_number}
                     onChange={(e) => setFormData((p) => ({ ...p, phone_number: e.target.value }))}
                     disabled={isSubmitting}
@@ -174,7 +170,6 @@ export default function SyroFooter() {
                     className="form-control subscribe-email"
                     cols={3}
                     name="feedback"
-                    placeholder="Message"
                     id="contact-message"
                     value={formData.feedback}
                     onChange={(e) => setFormData((p) => ({ ...p, feedback: e.target.value }))}
@@ -184,15 +179,15 @@ export default function SyroFooter() {
                   />
                   <label htmlFor="contact-message">Message <span className="text-red-500" aria-hidden="true">*</span></label>
                 </div>
+                {submitStatus !== 'idle' && (
+                  <p className="mb-3 text-white small" role="status" aria-live="polite">
+                    {submitMessage}
+                  </p>
+                )}
                 <button type="submit" className="primary-button submit-btn" disabled={isSubmitting}>
                   <span>{isSubmitting ? 'Sending...' : 'Submit'}</span>
                   <i className="fa-solid fa-arrow-right-long ms-3" />
                 </button>
-                {submitStatus !== 'idle' && (
-                  <p className="mt-2 mb-0 text-white-50 small">
-                    {submitMessage}
-                  </p>
-                )}
               </div>
             </form>
           </div>

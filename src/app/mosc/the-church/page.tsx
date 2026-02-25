@@ -99,7 +99,7 @@ const TheChurchPage = () => {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-4">
+            <h2 className="font-syro-display text-[2.2rem] font-bold text-black mb-5">
               The Malankara Orthodox Syrian Church
             </h2>
             <p className="font-syro-primary text-lg text-syro-dark-gray max-w-3xl mx-auto">
@@ -129,7 +129,7 @@ const TheChurchPage = () => {
                 </div>
 
                 <div className="flex flex-col flex-1 text-left">
-                  <h3 className="font-syro-display font-semibold text-base text-syro-blue mb-1.5 group-hover:text-syro-red transition-all duration-300">
+                  <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug">
                     {item.title}
                   </h3>
                   <p className="font-syro-primary text-sm text-syro-dark-gray leading-relaxed line-clamp-3 mb-3">

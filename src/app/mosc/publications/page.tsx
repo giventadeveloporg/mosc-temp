@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Metadata } from 'next';
+import SyroPageBanner from '../components/SyroPageBanner';
 
 export const metadata: Metadata = {
   title: 'Publications | Malankara Orthodox Syrian Church',
@@ -21,19 +22,7 @@ export default function PublicationsPage() {
 
   return (
     <div className="min-h-screen bg-syro-bg-gray">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray py-16 lg:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="font-syro-display font-semibold text-4xl lg:text-5xl text-syro-blue mb-4">
-              Publications
-            </h1>
-            <p className="font-syro-primary text-lg lg:text-xl text-syro-dark-gray max-w-3xl mx-auto">
-              Official publications of the Malankara Orthodox Syrian Church, sharing the faith, tradition, and teachings of our ancient church.
-            </p>
-          </div>
-        </div>
-      </section>
+      <SyroPageBanner title="Publications" breadcrumbFrom="home" />
 
       {/* Publications Grid Section */}
       <section className="py-16 bg-white">

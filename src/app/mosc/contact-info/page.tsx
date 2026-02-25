@@ -1,6 +1,6 @@
 import React from 'react';
 import QuickLinks from '../components/QuickLinks';
-import SyroPageHero from '../components/SyroPageHero';
+import SyroPageBanner from '../components/SyroPageBanner';
 import SyroSectionTitle from '../components/SyroSectionTitle';
 
 export const metadata = {
@@ -39,10 +39,7 @@ const ContactInfoPage = () => {
 
   return (
     <div className="bg-syro-bg-gray">
-      <SyroPageHero
-        title="Contact Info"
-        description="Get in touch with the Malankara Orthodox Syrian Church headquarters. We're here to serve you and answer your questions."
-      />
+      <SyroPageBanner title="Contact Info" breadcrumbFrom="home" />
 
       <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

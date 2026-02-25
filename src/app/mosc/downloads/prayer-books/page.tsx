@@ -3,6 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import SyroPageBanner from '../../components/SyroPageBanner';
 
 export default function PrayerBooksPage() {
   const prayerBooks = [
@@ -17,18 +18,7 @@ export default function PrayerBooksPage() {
 
   return (
     <div className="min-h-screen bg-syro-bg-gray">
-      {/* Breadcrumb */}
-      <section className="bg-syro-bg-gray py-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex items-center space-x-2 font-syro-primary text-sm text-syro-dark-gray">
-            <Link href="/mosc-old" className="hover:text-syro-red transition-all duration-300">MOSC</Link>
-            <span>/</span>
-            <Link href="/mosc/downloads" className="hover:text-syro-red transition-all duration-300">Downloads</Link>
-            <span>/</span>
-            <span className="text-syro-blue">Prayer Books</span>
-          </nav>
-        </div>
-      </section>
+      <SyroPageBanner title="Prayer Books" breadcrumbFrom="downloads" />
 
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray py-12 lg:py-16">
@@ -41,9 +31,6 @@ export default function PrayerBooksPage() {
                 </svg>
               </div>
             </div>
-            <h1 className="font-syro-display font-semibold text-4xl lg:text-5xl text-syro-blue mb-4">
-              Prayer Books
-            </h1>
             <p className="font-syro-primary text-lg lg:text-xl text-syro-dark-gray max-w-3xl mx-auto">
               Orthodox prayer books and liturgical texts for personal devotion and participation in the life of the Church.
             </p>

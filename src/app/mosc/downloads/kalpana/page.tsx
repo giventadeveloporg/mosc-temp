@@ -4,6 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
 
 export default function KalpanaPage() {
   // Editions from mosc.in/downloads/kalpana/ (2026 down to 2015); label format matches mosc.in for 2021 and 2019
@@ -24,22 +25,7 @@ export default function KalpanaPage() {
 
   return (
     <div className="min-h-screen bg-syro-bg-gray">
-      {/* Breadcrumb */}
-      <section className="bg-syro-bg-gray py-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex items-center space-x-2 font-syro-primary text-sm text-syro-dark-gray">
-            <Link href="/mosc-old" className="hover:text-syro-red transition-all duration-300">
-              MOSC
-            </Link>
-            <span>/</span>
-            <Link href="/mosc/downloads" className="hover:text-syro-red transition-all duration-300">
-              Downloads
-            </Link>
-            <span>/</span>
-            <span className="text-syro-blue">Kalpana</span>
-          </nav>
-        </div>
-      </section>
+      <SyroPageBanner title="Kalpana" breadcrumbFrom="downloads" />
 
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray py-12 lg:py-16">
@@ -60,9 +46,6 @@ export default function KalpanaPage() {
               />
             </div>
             <div>
-              <h1 className="font-syro-display font-semibold text-4xl lg:text-5xl text-syro-blue mb-4">
-                Kalpana
-              </h1>
               <p className="font-syro-primary text-lg text-syro-dark-gray leading-relaxed mb-4">
                 The official annual calendar and directory of the Malankara Orthodox Syrian Church.
               </p>
@@ -111,9 +94,9 @@ export default function KalpanaPage() {
                   {edition.title}
                 </h3>
                 {edition.available && (
-                  <span className="inline-flex items-center font-syro-primary text-sm font-medium text-syro-red">
+                  <span className="syro-read-more-btn font-syro-primary inline-flex items-center gap-2">
                     View
-                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </span>

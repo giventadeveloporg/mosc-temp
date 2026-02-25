@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import QuickLinks from '../components/QuickLinks';
-import SyroPageHero from '../components/SyroPageHero';
+import SyroPageBanner from '../components/SyroPageBanner';
 import SyroSectionTitle from '../components/SyroSectionTitle';
 
 export const metadata: Metadata = {
@@ -81,10 +81,7 @@ export default function InstitutionsPage() {
 
   return (
     <div className="bg-syro-bg-gray">
-      <SyroPageHero
-        title="Institutions"
-        description="The Malankara Orthodox Syrian Church operates a wide network of educational, medical, and spiritual institutions serving communities across India and around the world."
-      />
+      <SyroPageBanner title="Institutions" breadcrumbFrom="home" />
 
       <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

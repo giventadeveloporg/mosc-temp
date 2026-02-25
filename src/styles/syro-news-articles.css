@@ -27,20 +27,24 @@
   letter-spacing: 0.02em !important;
 }
 
-/* ---- News list: article card title (h3) – black text, hover accent #dc3545 ---- */
+/* ---- News list: article card title (h3) – blue like catholicatenews.in, theme red on hover ---- */
+/* Use #mainContent so we override #mainContent h3 { color: #000 } from syro-malabar.css */
+#mainContent .syro-news-article-section .syro-article-card-title,
 .syro-news-article-section .syro-article-card-title,
 .syro-article-card-title {
   font-family: 'Poppins', 'Noto Sans Malayalam UI', 'Open Sans', Helvetica, Arial, sans-serif !important;
   font-size: 18px !important;
-  font-weight: 600 !important;
+  font-weight: 700 !important;
   line-height: 1.35 !important;
-  color: #000 !important;
+  color: var(--syro-news-heading) !important; /* #0b2848 blue - match catholicatenews.in */
   margin: 0 0 5px !important;
   padding: 0 !important;
+  transition: color 0.3s ease !important;
 }
+#mainContent .syro-news-article-section a:hover .syro-article-card-title,
 .syro-news-article-section a:hover .syro-article-card-title,
 a:hover .syro-article-card-title {
-  color: var(--syro-news-link) !important;
+  color: var(--syro-news-link) !important; /* theme red #dc3545 on hover */
 }
 
 /* ---- News list: article card description – paragraph text black (titles/buttons unchanged) ---- */

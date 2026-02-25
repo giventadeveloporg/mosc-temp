@@ -766,3 +766,64 @@ body:has(.syro-layout) {
 #footer-quicklinks a {
   text-transform: uppercase;
 }
+
+/* Footer contact form: remove white/light autofill and selection background */
+#contact-form input.subscribe-email,
+#contact-form textarea.subscribe-email {
+  -webkit-text-fill-color: #fff;
+  background-color: transparent !important;
+}
+
+#contact-form input.subscribe-email:disabled,
+#contact-form textarea.subscribe-email:disabled {
+  background-color: transparent !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.9) !important;
+  color: rgba(255, 255, 255, 0.9);
+  opacity: 1;
+}
+
+#contact-form input.subscribe-email::-webkit-input-placeholder,
+#contact-form textarea.subscribe-email::-webkit-input-placeholder {
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.7);
+}
+
+#contact-form input.subscribe-email::selection,
+#contact-form textarea.subscribe-email::selection {
+  background: rgba(11, 40, 72, 0.7);
+  color: #fff;
+}
+
+#contact-form input.subscribe-email::-moz-selection,
+#contact-form textarea.subscribe-email::-moz-selection {
+  background: rgba(11, 40, 72, 0.7);
+  color: #fff;
+}
+
+/* Override Chrome autofill and any white/light gray background (all states) */
+#contact-form input.subscribe-email:-webkit-autofill,
+#contact-form input.subscribe-email:-webkit-autofill:hover,
+#contact-form input.subscribe-email:-webkit-autofill:focus,
+#contact-form input.subscribe-email:-webkit-autofill:active,
+#contact-form input.subscribe-email:focus,
+#contact-form textarea.subscribe-email:focus {
+  -webkit-box-shadow: 0 0 0 30px rgba(190, 25, 41, 0.85) inset !important;
+  box-shadow: 0 0 0 30px rgba(190, 25, 41, 0.85) inset !important;
+  -webkit-text-fill-color: #fff !important;
+  background-color: transparent !important;
+}
+
+#contact-form input.subscribe-email:-webkit-autofill,
+#contact-form input.subscribe-email:-webkit-autofill:hover,
+#contact-form input.subscribe-email:-webkit-autofill:focus,
+#contact-form input.subscribe-email:-webkit-autofill:active {
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Disabled state during submit: keep dark background, no white/gray */
+#contact-form input.subscribe-email:disabled:-webkit-autofill,
+#contact-form input.subscribe-email:disabled,
+#contact-form textarea.subscribe-email:disabled {
+  -webkit-box-shadow: 0 0 0 30px rgba(190, 25, 41, 0.85) inset !important;
+  box-shadow: 0 0 0 30px rgba(190, 25, 41, 0.85) inset !important;
+  background-color: transparent !important;
+}

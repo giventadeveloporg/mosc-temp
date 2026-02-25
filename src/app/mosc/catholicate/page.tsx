@@ -149,7 +149,7 @@ const CatholicatePage = () => {
                   />
                 </div>
                 <div className="p-6 flex flex-col flex-1 min-h-0">
-                  <h3 className="font-syro-display text-lg font-semibold text-black mb-3 leading-snug">
+                  <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug">
                     {card.title}
                   </h3>
                   <p className="font-syro-primary text-base text-black flex-1 mb-5 leading-relaxed">

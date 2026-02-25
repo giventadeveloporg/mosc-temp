@@ -240,7 +240,7 @@ const HolySynodPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Intro card - centered (HTML .holy-synod-intro) */}
           <div className="bg-white p-10 rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] mb-16 text-center">
-            <h2 className="font-syro-display text-[2.8rem] font-bold text-syro-blue mb-5">
+            <h2 className="font-syro-display text-[2.2rem] font-bold text-black mb-5">
               Holy Synod
             </h2>
             <p className="font-syro-primary text-xl text-syro-dark-gray leading-relaxed">

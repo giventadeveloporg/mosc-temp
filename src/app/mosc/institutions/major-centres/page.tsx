@@ -3,6 +3,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
+import InstitutionsSidebar from '../components/InstitutionsSidebar';
 
 export const metadata: Metadata = {
   title: 'Major Centres | Institutions | MOSC',
@@ -76,52 +78,30 @@ export default function MajorCentresPage() {
 
   return (
     <div className="min-h-screen bg-syro-bg-gray">
-      {/* Breadcrumb */}
-      <section className="bg-syro-bg-gray py-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex items-center space-x-2 font-syro-primary text-sm text-syro-dark-gray">
-            <Link href="/mosc-old" className="hover:text-syro-red transition-all duration-300">
-              MOSC
-            </Link>
-            <span>/</span>
-            <Link href="/mosc/institutions" className="hover:text-syro-red transition-all duration-300">
-              Institutions
-            </Link>
-            <span>/</span>
-            <span className="text-syro-blue">Major Centres</span>
-          </nav>
-        </div>
-      </section>
+      <SyroPageBanner title="Major Centres" breadcrumbFrom="institutions" />
 
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray py-12 lg:py-16">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            <div className="relative w-full h-80 lg:h-96 rounded-lg overflow-hidden shadow-syro-card-hover">
-              <Image
-                src="/images/institutions/ca.jpg"
-                alt="Major Centres"
-                fill
-                className="object-cover"
-                priority
-              />
-            </div>
-            <div>
-              <h1 className="font-syro-display font-semibold text-4xl lg:text-5xl text-syro-blue mb-4">
-                Major Centres
-              </h1>
-              <p className="font-syro-primary text-lg text-syro-dark-gray leading-relaxed">
-                The spiritual and administrative centres of the Malankara Orthodox Syrian Church, serving as places of pilgrimage, worship, and church governance.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="lg:col-span-2">
+              <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
+                <div className="mb-8 flex justify-center">
+                  <div className="relative w-full h-80 rounded-lg overflow-hidden shadow-syro-card-hover">
+                    <Image
+                      src="/images/institutions/ca.jpg"
+                      alt="Major Centres"
+                      fill
+                      className="object-cover"
+                      priority
+                    />
+                  </div>
+                </div>
+                <p className="font-syro-primary text-lg text-syro-dark-gray leading-relaxed mb-8">
+                  The spiritual and administrative centres of the Malankara Orthodox Syrian Church, serving as places of pilgrimage, worship, and church governance.
+                </p>
+              </div>
 
-      {/* Centres List Section */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="space-y-12">
+              <div className="space-y-12 mt-8">
             {centres.map((centre, index) => (
               <div key={index} className="bg-white rounded-lg shadow-syro-card p-8">
                 <h2 className="font-syro-display font-semibold text-2xl lg:text-3xl text-syro-red mb-4">
@@ -131,7 +111,7 @@ export default function MajorCentresPage() {
                   {centre.description}
                 </p>
                 {centre.contact && (
-                  <div className="bg-syro-bg-gray rounded-lg p-6 border-l-4 border-primary">
+                  <div className="bg-syro-bg-gray rounded-lg p-6 border-l-4 border-syro-red">
                     <h3 className="font-syro-display font-medium text-xl text-syro-blue mb-4">
                       Contact Information
                     </h3>
@@ -179,25 +159,29 @@ export default function MajorCentresPage() {
                 )}
               </div>
             ))}
+              </div>
+
+              <div className="mt-8 hidden lg:block">
+                <QuickLinks />
+              </div>
+              <div className="mt-8 flex justify-center">
+                <Link
+                  href="/mosc/institutions"
+                  className="inline-flex items-center px-6 py-3 bg-syro-red text-white font-syro-primary font-medium rounded-lg hover:bg-syro-red/90 transition-all duration-300 shadow-syro-card"
+                >
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  Back to All Institutions
+                </Link>
+              </div>
+            </div>
+            <div className="space-y-6 lg:col-span-1">
+              <InstitutionsSidebar currentSlug="major-centres" />
+            </div>
           </div>
-        </div>
-      </section>
-
-      <QuickLinks />
-
-      {/* Navigation */}
-      <section className="py-12 bg-syro-bg-gray">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-center">
-            <Link
-              href="/mosc/institutions"
-              className="inline-flex items-center px-6 py-3 bg-syro-red text-white font-syro-primary font-medium rounded-lg hover:bg-syro-red/90 transition-all duration-300 shadow-syro-card"
-            >
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              Back to All Institutions
-            </Link>
+          <div className="mt-8 lg:hidden">
+            <QuickLinks />
           </div>
         </div>
       </section>

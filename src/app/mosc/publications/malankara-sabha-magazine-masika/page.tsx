@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import QuickLinks from '../../components/QuickLinks';
+import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata: Metadata = {
   title: 'Malankara Sabha Magazine (Masika) | Publications | MOSC',
@@ -12,22 +13,7 @@ export const metadata: Metadata = {
 export default function MalankaraSabhaMagazinePage() {
   return (
     <div className="min-h-screen bg-syro-bg-gray">
-      {/* Breadcrumb */}
-      <section className="bg-syro-bg-gray py-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex items-center space-x-2 font-syro-primary text-sm text-syro-dark-gray">
-            <Link href="/mosc-old" className="hover:text-syro-red transition-all duration-300">
-              MOSC
-            </Link>
-            <span>/</span>
-            <Link href="/mosc/publications" className="hover:text-syro-red transition-all duration-300">
-              Publications
-            </Link>
-            <span>/</span>
-            <span className="text-syro-blue">Malankara Sabha Magazine (Masika)</span>
-          </nav>
-        </div>
-      </section>
+      <SyroPageBanner title="Malankara Sabha Magazine (Masika)" breadcrumbFrom="publications" />
 
       {/* Hero Section with Image */}
       <section className="relative bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray py-12 lg:py-16">
@@ -114,7 +100,7 @@ export default function MalankaraSabhaMagazinePage() {
           <p className="font-syro-primary text-lg text-syro-dark-gray leading-relaxed mb-6">
             The magazine is published on the 10th of every month. In order to subscribe for the magazine and for other information, contact:
           </p>
-          <div className="bg-white rounded-lg shadow-syro-card p-8 border-l-4 border-primary">
+          <div className="bg-white rounded-lg shadow-syro-card p-8 border-l-4 border-syro-red">
             <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-4">
               The Managing Editor
             </h3>

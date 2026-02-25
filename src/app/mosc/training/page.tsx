@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import QuickLinks from '../components/QuickLinks';
+import SyroPageBanner from '../components/SyroPageBanner';
 
 export const metadata: Metadata = {
   title: 'Training | Malankara Orthodox Syrian Church',
@@ -37,6 +38,8 @@ export default function TrainingPage() {
 
   return (
     <div className="min-h-screen bg-syro-bg-gray">
+      <SyroPageBanner title="Training" breadcrumbFrom="home" />
+
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray py-16 lg:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -66,7 +69,7 @@ export default function TrainingPage() {
               <Link
                 key={program.id}
                 href={program.link}
-                className="group bg-white rounded-lg shadow-syro-card hover:shadow-syro-card-hover transition-all duration-300 overflow-hidden flex flex-col h-full min-h-0"
+                className="group bg-white rounded-lg shadow-syro-card hover:shadow-syro-card-hover transition-all duration-300 overflow-hidden flex flex-col h-full min-h-0 border border-syro-red"
               >
                 <div className="relative w-full h-64 flex-shrink-0">
                   <Image

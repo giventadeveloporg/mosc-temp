@@ -60,19 +60,21 @@ export default async function NewsArticlePage({ params }: PageProps) {
         <FlashBar message={flashData.flash.message} />
       ) : null}
 
-      <div className="max-w-[1200px] mx-auto px-[15px] py-syro-xxxl overflow-x-hidden">
-        <Link
-          href="/mosc/news"
-          className="syro-news-link inline-flex items-center gap-2 text-syro-small text-syro-blue hover:text-syro-red transition-colors duration-300 mb-syro-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-syro-red"
-        >
-          <span aria-hidden="true">←</span> Back to News
-        </Link>
+      <section className="py-16 bg-syro-bg-gray">
+        <div className="max-w-[1200px] mx-auto px-[15px] overflow-x-hidden">
+          <Link
+            href="/mosc/news"
+            className="syro-primary-button inline-flex items-center gap-2 mb-8 w-fit focus:outline-none focus-visible:ring-2 focus-visible:ring-syro-red focus-visible:ring-offset-2"
+          >
+            <span aria-hidden="true">←</span>
+            <span>Back to News</span>
+          </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-syro-xl min-w-0">
-          {/* Main content */}
-          <article className="lg:col-span-2 min-w-0 overflow-x-hidden max-w-full">
-            <header className="mb-6">
-              <h1 className="syro-article-detail-title">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-syro-xl min-w-0">
+            {/* Main content - white card like other MOSC content pages */}
+            <article className="lg:col-span-2 min-w-0 overflow-x-hidden max-w-full bg-white rounded-xl shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
+              <header className="mb-6">
+              <h1 className="font-syro-display text-[2.2rem] font-bold text-black leading-tight">
                 {article.title}
               </h1>
               <p className="syro-article-detail-meta mt-3 tracking-wide">
@@ -82,9 +84,9 @@ export default async function NewsArticlePage({ params }: PageProps) {
                 {postedDate && !article.authorName && <>Posted on {postedDate}</>}
                 {!postedDate && article.authorName && <>By {article.authorName}</>}
               </p>
-            </header>
+              </header>
 
-            {article.coverUrl && (
+              {article.coverUrl && (
               <div className="relative w-full h-auto rounded-xl overflow-hidden bg-syro-bg-gray mb-8">
                 <Image
                   src={article.coverUrl}
@@ -97,28 +99,28 @@ export default async function NewsArticlePage({ params }: PageProps) {
                   unoptimized
                 />
               </div>
-            )}
+              )}
 
-            {article.excerpt && !(Array.isArray(article.description) && article.description.length > 0) && !(typeof article.body === 'string' && article.body.trim()) && (
+              {article.excerpt && !(Array.isArray(article.description) && article.description.length > 0) && !(typeof article.body === 'string' && article.body.trim()) && (
               <p className="syro-article-detail-lead mb-6 border-l-4 border-syro-red/30 pl-4">
                 {article.excerpt}
               </p>
-            )}
+              )}
 
-            <div className="syro-article-detail-body prose prose-lg max-w-full min-w-0 break-words overflow-x-clip prose-headings:font-heading prose-headings:text-syro-blue prose-headings:font-semibold prose-p:leading-relaxed prose-p:text-base prose-p:break-words prose-a:no-underline prose-pre:overflow-x-hidden prose-pre:max-w-full prose-pre:whitespace-pre-wrap prose-pre:break-words [&>*]:min-w-0 [&>*]:max-w-full [&>*]:break-words [&_p]:break-words [&_li]:break-words">
+              <div className="syro-article-detail-body prose prose-lg max-w-full min-w-0 break-words overflow-x-clip prose-headings:font-heading prose-headings:text-syro-blue prose-headings:font-semibold prose-p:leading-relaxed prose-p:text-base prose-p:break-words prose-a:no-underline prose-pre:overflow-x-hidden prose-pre:max-w-full prose-pre:whitespace-pre-wrap prose-pre:break-words [&>*]:min-w-0 [&>*]:max-w-full [&>*]:break-words [&_p]:break-words [&_li]:break-words">
               <ArticleContent
                 description={article.description}
                 body={article.body}
                 excerpt={article.excerpt}
                 emptyMessage="No additional content for this article."
               />
-            </div>
+              </div>
 
-            <div className="mt-8 pt-6 border-t border-syro-table-border">
+              <div className="mt-8 pt-6 border-t border-syro-table-border">
               <ArticleShareButtons url={articleUrl} title={article.title} />
-            </div>
+              </div>
 
-            {article.categoryName && (
+              {article.categoryName && (
               <p className="syro-article-detail-meta mt-6">
                 <span className="font-semibold uppercase tracking-wide">Posted in</span>{' '}
                 <span className="inline-flex flex-wrap gap-2 mt-2">
@@ -127,50 +129,52 @@ export default async function NewsArticlePage({ params }: PageProps) {
                   </span>
                 </span>
               </p>
-            )}
+              )}
 
-            {previousArticle && (
+              {previousArticle && (
               <div className="mt-8 pt-6 border-t border-syro-table-border">
                 <Link
                   href={`/mosc/news/${previousArticle.slug}`}
-                  className="syro-news-link inline-flex items-center gap-2 font-body text-sm text-syro-blue hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-syro-red"
+                  className="syro-primary-button inline-flex items-center gap-2 w-fit focus:outline-none focus-visible:ring-2 focus-visible:ring-syro-red focus-visible:ring-offset-2"
                 >
-                  <span aria-hidden="true">←</span> Previous Post
+                  <span aria-hidden="true">←</span>
+                  <span>Previous Post</span>
                 </Link>
-                <p className="syro-article-detail-body font-body text-base mt-1 line-clamp-2">
+                <p className="syro-article-detail-body font-body text-base mt-3 line-clamp-2 text-syro-dark-gray">
                   {previousArticle.title}
                 </p>
               </div>
-            )}
-          </article>
+              )}
+            </article>
 
-          {/* Sidebar - same Facebook Follow Us widget as news list page */}
-          <aside className="lg:col-span-1 space-y-8">
-            <FollowUsFacebook />
+            {/* Sidebar - same Facebook Follow Us widget as news list page */}
+            <aside className="lg:col-span-1 space-y-8">
+              <FollowUsFacebook />
 
-            {/* Recent Posts */}
-            <div className="bg-white rounded-xl border border-syro-table-border p-6 sacred-shadow shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]">
-              <h3 className="font-heading font-semibold text-lg text-syro-blue uppercase tracking-wide mb-4">
-                Recent Posts
-              </h3>
-              <ul className="space-y-3">
-                {recentArticles.map((item) => (
-                  <li key={item.id}>
-                    <Link
-                      href={`/mosc/news/${item.slug}`}
-                      className={`syro-news-link font-body text-sm text-syro-blue leading-snug focus:outline-none focus-visible:ring-2 focus-visible:ring-syro-red block ${
-                        item.slug === article.slug ? 'font-medium' : ''
-                      }`}
-                    >
-                      <span className="line-clamp-2">{item.title}</span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </aside>
+              {/* Recent Posts */}
+              <div className="bg-white rounded-xl border border-syro-table-border p-6 sacred-shadow shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]">
+                <h3 className="font-syro-display font-semibold text-lg text-black border-l-[7px] border-l-syro-red pl-4 mb-4">
+                  Recent Posts
+                </h3>
+                <ul className="space-y-3">
+                  {recentArticles.map((item) => (
+                    <li key={item.id}>
+                      <Link
+                        href={`/mosc/news/${item.slug}`}
+                        className={`font-body text-sm leading-snug focus:outline-none focus-visible:ring-2 focus-visible:ring-syro-red block text-syro-blue hover:text-syro-red transition-colors duration-300 ${
+                          item.slug === article.slug ? 'font-semibold' : ''
+                        }`}
+                      >
+                        <span className="line-clamp-2">{item.title}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </aside>
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }
