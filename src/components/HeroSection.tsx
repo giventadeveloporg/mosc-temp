@@ -748,7 +748,7 @@ const HeroSection: React.FC = () => {
           {/* Image container - object-contain for full image visibility, centered */}
           <div className="hero-left-image flex items-center justify-center">
             <Image
-              src="/images/hero_section/wooden-boat-under-coconut-tree-riverside_ver_2.jpeg"
+              src="/images/hero_section/wooden-boat-under-coconut-tree-riverside_ver_2.jpg"
               alt="Malayalees.US - Kerala Backwaters"
               width={600}
               height={800}
