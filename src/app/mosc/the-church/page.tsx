@@ -99,7 +99,7 @@ const TheChurchPage = () => {
       <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Intro card (matches administration .admin-intro-card) */}
-          <div className="bg-white p-10 rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] mb-16">
+          <div className="bg-white p-10 rounded-lg shadow-lg mb-16" style={{ boxShadow: 'rgba(50,50,93,0.25) 0px 6px 12px -2px, rgba(0,0,0,0.3) 0px 3px 7px -3px' }}>
             <h2 className="font-syro-display text-[2.2rem] font-bold text-black mb-5">
               The Church
             </h2>
@@ -119,7 +119,10 @@ const TheChurchPage = () => {
             {churchSections.map((item) => (
               <div
                 key={item.title}
-                className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 p-8 flex flex-col h-full"
+                className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 p-8 flex flex-col h-full"
+                style={{
+                  boxShadow: 'rgba(50,50,93,0.25) 0px 6px 12px -2px, rgba(0,0,0,0.3) 0px 3px 7px -3px',
+                }}
               >
                 <div className="mb-5 flex justify-center">
                   <div className="relative w-full max-w-[280px] h-[168px]">
