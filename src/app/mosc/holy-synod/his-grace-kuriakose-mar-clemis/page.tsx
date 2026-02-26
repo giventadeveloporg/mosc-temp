@@ -17,27 +17,15 @@ const HisGraceKuriakoseMarClemisPage = () => {
         breadcrumbFrom="holy-synod"
       />
       {/* Main Content */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Main Content */}
             <div className="lg:col-span-2">
-              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
+              <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
                 {/* Featured Image - Top */}
                 <div className="mb-8 flex justify-center">
-                  <div className="relative w-full max-w-md h-[280px] rounded-lg overflow-hidden shadow-syro-card">
-                    <Image
-                      src="/images/holy-synod/mar-clemis.jpg"
-                      alt="H.G. Kuriakose Mar Clemis Metropolitan"
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 448px"
-                      className="object-cover object-top"
-                      style={{
-                        objectPosition: 'center 15%'
-                      }}
-                      priority
-                    />
-                  </div>
+                  <Image src="/images/holy-synod/mar-clemis.jpg" alt="H.G. Kuriakose Mar Clemis Metropolitan" width={175} height={175} className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }} priority />
                 </div>
 
                 {/* Content - Below Image */}

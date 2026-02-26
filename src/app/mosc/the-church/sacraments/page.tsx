@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import SyroPageBanner from '../../components/SyroPageBanner';
@@ -21,37 +21,37 @@ export default async function SacramentsPage({
     {
       name: 'Baptism',
       description: 'The sacrament of initiation into the Christian faith, washing away original sin and incorporating the person into the Body of Christ.',
-      icon: 'ðŸ’§'
+      icon: '💧'
     },
     {
       name: 'Chrismation',
       description: 'The sacrament of confirmation, sealing the baptized with the gift of the Holy Spirit and completing their initiation.',
-      icon: 'ðŸ•Šï¸'
+      icon: '🕊️'
     },
     {
       name: 'Holy Eucharist',
       description: 'The central sacrament of the Church, where we receive the Body and Blood of Christ for our spiritual nourishment.',
-      icon: 'ðŸž'
+      icon: '🍞'
     },
     {
       name: 'Confession',
       description: 'The sacrament of repentance and forgiveness, where we confess our sins and receive absolution from the priest.',
-      icon: 'ðŸ™'
+      icon: '🙏'
     },
     {
       name: 'Holy Unction',
       description: 'The sacrament of healing for the sick, both physically and spiritually, through anointing with holy oil.',
-      icon: 'ðŸ©¹'
+      icon: '🩹'
     },
     {
       name: 'Holy Matrimony',
       description: 'The sacrament of marriage, uniting a man and woman in holy matrimony before God and the Church.',
-      icon: 'ðŸ’’'
+      icon: '💒'
     },
     {
       name: 'Holy Orders',
       description: 'The sacrament of ordination, conferring the grace and authority to serve as deacon, priest, or bishop.',
-      icon: 'ðŸ‘¨â€ðŸ’¼'
+      icon: '👨‍💼'
     }
   ];
 
@@ -60,20 +60,21 @@ export default async function SacramentsPage({
       <SyroPageBanner title="Sacraments" breadcrumbFrom={breadcrumbFrom} />
 
       {/* Main Content */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Main Content */}
             <div className="lg:col-span-2">
-              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
+              <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
                 {/* Featured Image */}
-                <div className="mb-8">
+                <div className="mb-8 flex justify-center">
                   <Image
                     src="/images/church/sacraments.jpg"
                     alt="Sacraments"
-                    width={500}
-                    height={300}
-                    className="rounded-lg shadow-syro-card w-auto h-auto block mx-auto"
+                    width={175}
+                    height={175}
+                    className="rounded-lg object-contain"
+                    style={{ width: '175px', height: '175px' }}
                     priority
                   />
                 </div>

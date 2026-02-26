@@ -14,14 +14,13 @@ const MarthMariamVanithaSamajamPage = () => {
       currentHref="/mosc/spiritual-organizations/marth-mariam-vanitha-samajam-womens-wing-of-orthodox-church-of-india"
     >
       <div className="space-y-6 font-syro-primary text-syro-dark-gray leading-relaxed">
-        <div className="relative w-full h-48 bg-syro-bg-gray rounded-lg overflow-hidden flex items-center justify-center mb-6">
+        <div className="mb-8 flex justify-center">
           <Image
             src="/images/spiritual/MMVS.png"
             alt="Marth Mariam Vanitha Samajam (Women's Wing of Orthodox Church of India)"
-            fill
-            className="object-contain object-center"
-            style={{ objectPosition: 'center center', backgroundColor: 'transparent' }}
-            sizes="(min-width: 1024px) 66vw, 100vw"
+            width={175}
+            height={175}
+            className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }}
           />
         </div>
         <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 pl-4 border-l-4 border-syro-red">

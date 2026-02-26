@@ -95,61 +95,64 @@ const TheChurchPage = () => {
     <div className="bg-syro-bg-gray">
       <SyroPageBanner title="The Church" />
 
-      {/* Main content - 11 sections in card grid (same pattern as administration) */}
-      <section className="py-16 bg-white">
+      {/* Content - same layout and style as administration */}
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
+          {/* Intro card (matches administration .admin-intro-card) */}
+          <div className="bg-white p-10 rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] mb-16">
             <h2 className="font-syro-display text-[2.2rem] font-bold text-black mb-5">
-              The Malankara Orthodox Syrian Church
+              The Church
             </h2>
-            <p className="font-syro-primary text-lg text-syro-dark-gray max-w-3xl mx-auto">
+            <p className="font-syro-primary text-xl text-syro-dark-gray leading-relaxed">
               Explore our faith, heritage, and tradition—from the Throne of St. Thomas to the Creed,
               theology, spirituality, Syrian heritage, history, the Holy Myron, and liturgy.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Section title - left red bar (matches administration .admin-section-title) */}
+          <h3 className="text-2xl font-light text-[#798daf] mb-10 pl-8 border-l-[7px] border-syro-red">
+            The Malankara Orthodox Syrian Church
+          </h3>
+
+          {/* Cards grid - same style as administration (.admin-card) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {churchSections.map((item) => (
-              <Link
+              <div
                 key={item.title}
-                href={`${item.href}?from=the-church`}
-                className="bg-syro-bg-gray rounded-lg shadow-syro-card p-4 hover:shadow-syro-card-hover transition-all duration-300 group flex flex-col h-full"
+                className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 p-8 flex flex-col h-full"
               >
-                {/* Image container - centered, contained, no overflow (image_containment_prevention) */}
-                <div className="relative w-full h-48 min-h-[192px] mb-3 rounded-lg overflow-hidden bg-syro-bg-gray flex items-center justify-center p-3">
-                  <div className="relative w-full h-full">
+                <div className="mb-5 flex justify-center">
+                  <div className="relative w-full max-w-[280px] h-[168px]">
                     <Image
                       src={item.image}
                       alt={item.title}
                       fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      className="object-contain object-center group-hover:scale-105 transition-all duration-300"
+                      sizes="(max-width: 640px) 100vw, 280px"
+                      className="object-contain"
                     />
-                  </div>
                 </div>
-
-                <div className="flex flex-col flex-1 text-left">
-                  <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug">
-                    {item.title}
-                  </h3>
-                  <p className="font-syro-primary text-sm text-syro-dark-gray leading-relaxed line-clamp-3 mb-3">
-                    {item.description}
-                  </p>
-                  <span className="syro-read-more-btn font-syro-primary mt-auto">
-                    Read More
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
-                  </span>
-                </div>
-              </Link>
+                <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug">
+                  {item.title}
+                </h3>
+                <p className="font-syro-primary text-base text-syro-dark-gray flex-1 mb-5 leading-relaxed">
+                  {item.description}
+                </p>
+                <Link
+                  href={`${item.href}?from=the-church`}
+                  className="syro-primary-button inline-flex items-center gap-2 mt-auto w-fit"
+                >
+                  <span>Read More</span>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </Link>
+              </div>
             ))}
           </div>
+
+          <QuickLinks />
         </div>
       </section>
-
-      {/* Quick Links - same style as holy synod / administration */}
-      <QuickLinks />
     </div>
   );
 };

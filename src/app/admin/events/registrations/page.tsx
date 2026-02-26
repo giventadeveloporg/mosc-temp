@@ -1,19 +1,20 @@
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import { auth } from '@clerk/nextjs/server';
-import { getAppUrl } from '@/lib/env';
+import { safeAuth } from '@/lib/safe-auth';
 import type { EventAttendeeDTO, EventAttendeeGuestDTO, EventDetailsDTO } from '@/types';
 import RegistrationManagementClient from './RegistrationManagementClient';
 import { fetchRegistrationManagementData } from './ApiServerActions';
 
+type SearchParamsShape = {
+  eventId?: string;
+  search?: string;
+  searchType?: string;
+  status?: string;
+  page?: string;
+};
+
 interface RegistrationPageProps {
-  searchParams: {
-    eventId?: string;
-    search?: string;
-    searchType?: string;
-    status?: string;
-    page?: string;
-  };
+  searchParams: SearchParamsShape | Promise<SearchParamsShape>;
 }
 
 function LoadingSkeleton() {
@@ -35,17 +36,19 @@ function LoadingSkeleton() {
 }
 
 export default async function RegistrationManagementPage({ searchParams }: RegistrationPageProps) {
+  const params = typeof searchParams?.then === 'function' ? await searchParams : searchParams;
+
   const { userId } = await safeAuth();
 
   if (!userId) {
     notFound();
   }
 
-  const eventId = searchParams.eventId ? parseInt(searchParams.eventId) : null;
-  const search = searchParams.search || '';
-  const searchType = searchParams.searchType || 'name';
-  const status = searchParams.status || '';
-  const page = parseInt(searchParams.page || '1');
+  const eventId = params.eventId ? parseInt(params.eventId) : null;
+  const search = params.search || '';
+  const searchType = params.searchType || 'name';
+  const status = params.status || '';
+  const page = parseInt(params.page || '1');
 
   return (
     <Suspense fallback={<LoadingSkeleton />}>

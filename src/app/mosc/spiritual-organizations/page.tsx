@@ -136,54 +136,52 @@ const SpiritualOrganizationsPage = () => {
     <div className="bg-syro-bg-gray">
       <SyroPageBanner title="Spiritual Organizations" breadcrumbFrom="home" />
 
-      {/* Organizations Grid */}
-      <section className="py-16 bg-white">
+      {/* Content - same layout and style as administration */}
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-4">
+          {/* Intro card (matches administration .admin-intro-card) */}
+          <div className="bg-white p-10 rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] mb-16">
+            <h2 className="font-syro-display text-[2.2rem] font-bold text-black mb-5">
               Our Spiritual Organizations
             </h2>
-            <p className="font-syro-primary text-lg text-syro-dark-gray max-w-3xl mx-auto">
-              Each organization plays a vital role in nurturing faith, providing education, 
+            <p className="font-syro-primary text-xl text-syro-dark-gray leading-relaxed">
+              Each organization plays a vital role in nurturing faith, providing education,
               and serving the community through various ministries and programs.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* Section title - left red bar (matches administration .admin-section-title) */}
+          <h3 className="text-2xl font-light text-[#798daf] mb-10 pl-8 border-l-[7px] border-syro-red">
+            Spiritual Organizations &amp; Ministries
+          </h3>
+
+          {/* Cards grid (matches administration .admin-card) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {organizations.map((org, index) => (
-              <Link
+              <div
                 key={index}
-                href={org.href}
-                className="bg-syro-bg-gray rounded-lg shadow-syro-card p-0 overflow-hidden hover:shadow-syro-card-hover transition-all duration-300 group flex flex-col"
+                className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 overflow-hidden flex flex-col h-full"
               >
-                {/* Image/icon area - padded container, object-contain per image_containment_prevention rule */}
-                <div className="relative w-full h-48 bg-syro-bg-gray overflow-hidden flex items-center justify-center p-4">
+                <div className="relative w-full h-48 bg-syro-bg-gray shrink-0 flex items-center justify-center p-4">
                   {index === 0 ? (
                     <div className="relative w-full h-full min-h-0">
                       <Image
                         src="/images/spiritual/OSSSAE.png"
                         alt={org.title}
                         fill
-                        className="object-contain object-center group-hover:scale-105 transition-transform duration-300"
-                        style={{
-                          objectPosition: 'center center',
-                          backgroundColor: 'transparent',
-                        }}
+                        className="object-contain object-center"
+                        style={{ backgroundColor: 'transparent' }}
                         sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                       />
                     </div>
                   ) : index >= 8 && index <= 11 ? (
-                    /* Cards a[9]-a[12]: smaller centered logo */
                     <div className="relative w-28 h-28 flex-shrink-0">
                       <Image
                         src={org.image!}
                         alt={org.title}
                         fill
-                        className="object-contain object-center group-hover:scale-105 transition-transform duration-300"
-                        style={{
-                          objectPosition: 'center center',
-                          backgroundColor: 'transparent',
-                        }}
+                        className="object-contain object-center"
+                        style={{ backgroundColor: 'transparent' }}
                         sizes="112px"
                       />
                     </div>
@@ -193,72 +191,65 @@ const SpiritualOrganizationsPage = () => {
                         src={org.image}
                         alt={org.title}
                         fill
-                        className="object-contain object-center group-hover:scale-105 transition-transform duration-300"
-                        style={{
-                          objectPosition: 'center center',
-                          backgroundColor: 'transparent',
-                        }}
+                        className="object-contain object-center"
+                        style={{ backgroundColor: 'transparent' }}
                         sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                       />
                     </div>
                   ) : (
-                    <div className="w-16 h-16 bg-syro-red/10 rounded-full flex items-center justify-center group-hover:bg-syro-red/20 transition-all duration-300">
+                    <div className="w-16 h-16 bg-syro-red/10 rounded-full flex items-center justify-center">
                       <span className="text-3xl" role="img" aria-label={org.title}>{org.icon}</span>
                     </div>
                   )}
                 </div>
-                {/* Content area - same as administration */}
-                <div className="p-6 flex flex-col flex-1">
-                  <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-3 group-hover:text-syro-red transition-all duration-300">
+                <div className="p-8 flex flex-col flex-1">
+                  <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug">
                     {org.title}
                   </h3>
-                  <p className="font-syro-primary text-syro-dark-gray text-sm leading-relaxed flex-1 line-clamp-4">
+                  <p className="font-syro-primary text-base text-syro-dark-gray flex-1 mb-5 leading-relaxed line-clamp-4">
                     {org.description}
                   </p>
-                  <div className="mt-auto pt-4">
-                    <span className="syro-read-more-btn font-syro-primary">
-                      Read More
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                      </svg>
-                    </span>
-                  </div>
+                  <Link
+                    href={org.href}
+                    className="syro-primary-button inline-flex items-center gap-2 mt-auto w-fit"
+                  >
+                    <span>Read More</span>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </Link>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* About Spiritual Organizations */}
-      <section className="py-16 bg-syro-bg-gray">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          {/* About Spiritual Organizations - extra content kept */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
             <div>
               <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-6">
                 The Role of Spiritual Organizations
               </h2>
               <div className="space-y-4 font-syro-primary text-syro-dark-gray leading-relaxed">
                 <p>
-                  Spiritual organizations within the Malankara Orthodox Syrian Church serve as vital 
-                  instruments of faith, education, and community service. Each organization is dedicated 
+                  Spiritual organizations within the Malankara Orthodox Syrian Church serve as vital
+                  instruments of faith, education, and community service. Each organization is dedicated
                   to specific aspects of spiritual growth and social welfare.
                 </p>
                 <p>
-                  These organizations provide structured programs for different age groups and interests, 
-                  from children's ministries to adult education, from charitable work to theological 
-                  training. They help maintain the rich traditions of our Orthodox faith while adapting 
+                  These organizations provide structured programs for different age groups and interests,
+                  from children's ministries to adult education, from charitable work to theological
+                  training. They help maintain the rich traditions of our Orthodox faith while adapting
                   to contemporary needs.
                 </p>
                 <p>
-                  Through their various activities, these organizations strengthen the bonds within 
-                  our community and extend the love of Christ to those in need, both within and 
+                  Through their various activities, these organizations strengthen the bonds within
+                  our community and extend the love of Christ to those in need, both within and
                   outside our church family.
                 </p>
               </div>
             </div>
 
-            <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-6">
+            <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-6">
               <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-4">
                 Key Areas of Ministry
               </h3>
@@ -301,12 +292,7 @@ const SpiritualOrganizationsPage = () => {
               </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Quick Links - same as other MOSC subpages */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <QuickLinks />
         </div>
       </section>

@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import Image from 'next/image';
 import SynodMembersSidebar from '../../components/SynodMembersSidebar';
 import QuickLinks from '../../components/QuickLinks';
@@ -17,27 +17,15 @@ const HGYouhanonMarPolycarpusMetropolitanPage = () => {
         breadcrumbFrom="holy-synod"
       />
       {/* Main Content */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Main Content */}
             <div className="lg:col-span-2">
-              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
+              <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
                 {/* Featured Image - Top */}
                 <div className="mb-8 flex justify-center">
-                  <div className="relative w-full max-w-md h-[280px] rounded-lg overflow-hidden shadow-syro-card">
-                      <Image
-                        src="/images/holy-synod/poly.jpg"
-                        alt="H.G. Yuhanon Mar Policarpos Metropolitan"
-                        fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 448px"
-                        className="object-cover object-top"
-                        style={{
-                          objectPosition: 'center 15%'
-                        }}
-                        priority
-                      />
-                    </div>
+                  <Image src="/images/holy-synod/poly.jpg" alt="H.G. Yuhanon Mar Policarpos Metropolitan" width={175} height={175} className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }} priority />
                   </div>
 
                 {/* Content - Below Image */}
@@ -48,18 +36,18 @@ const HGYouhanonMarPolycarpusMetropolitanPage = () => {
 
                     <div className="prose prose-lg max-w-none">
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace was born on 30th March 1955 as the son of Mr P.V. Zachariah and Mrs Annamma Zachariah of Panniyankara Parakunnil family in Vadakkanchery, Palakkad. His Grace is a member of Mar Gregorios Church, Thenidukku. His Grace had his schooling in Abhayakkad Chami Iyer High School, and graduated from S.N. College Alathoor. His Grace took his Masters degree in Sociology from the University of Kerala. His Grace learned Syriac from Very Rev. Thomas Ramban during the period 1973â€“1974. His Grace passed G.S.T in 1978 and B.D. in 1979 from the Orthodox Theological Seminary. His Grace was ordained sub-deacon on 25th March 1977, deacon on 8th December and priest on 7th January 1980. His Grace was ordained as Ramban by His Holiness Baselios Marthoma Didymos I Catholicos. His Grace received a diploma in 1990 from Geneva.
+                        His Grace was born on 30th March 1955 as the son of Mr P.V. Zachariah and Mrs Annamma Zachariah of Panniyankara Parakunnil family in Vadakkanchery, Palakkad. His Grace is a member of Mar Gregorios Church, Thenidukku. His Grace had his schooling in Abhayakkad Chami Iyer High School, and graduated from S.N. College Alathoor. His Grace took his Masters degree in Sociology from the University of Kerala. His Grace learned Syriac from Very Rev. Thomas Ramban during the period 1973–1974. His Grace passed G.S.T in 1978 and B.D. in 1979 from the Orthodox Theological Seminary. His Grace was ordained sub-deacon on 25th March 1977, deacon on 8th December and priest on 7th January 1980. His Grace was ordained as Ramban by His Holiness Baselios Marthoma Didymos I Catholicos. His Grace received a diploma in 1990 from Geneva.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace served the church in several capacities â€“ Sunday School Director, Cochin Diocese; Koratty Sion Seminary Manager, Parumala Seminary Manager, C.M.I Kerala Region Chaplain, Vettikal Health Centre Director, Thalakkod St Maryâ€™s Boyâ€™s Home Director & Board Member, Kolenchery Medical College Chaplain and Governing Body Member, Founder and Principal of Baselius Vidya Nikethan till 2006. He is serving the Ankamaly Diocese as its Metropolitan.
+                        His Grace served the church in several capacities – Sunday School Director, Cochin Diocese; Koratty Sion Seminary Manager, Parumala Seminary Manager, C.M.I Kerala Region Chaplain, Vettikal Health Centre Director, Thalakkod St Mary’s Boy’s Home Director & Board Member, Kolenchery Medical College Chaplain and Governing Body Member, Founder and Principal of Baselius Vidya Nikethan till 2006. He is serving the Ankamaly Diocese as its Metropolitan.
                       </p>
 
                       <h4 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                         Contact
                       </h4>
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
-                        <p>Thrikkunnathu Seminary PB No. 61, Aluva â€“ 683 101</p>
+                        <p>Thrikkunnathu Seminary PB No. 61, Aluva – 683 101</p>
                         <p>Ph: 0484 2622339 | Mob: 94474 75544</p>
                         <p>Email: marpolicarpos@yahoo.com</p>
                       </div>

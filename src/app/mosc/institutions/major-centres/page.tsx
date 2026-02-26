@@ -86,15 +86,7 @@ export default function MajorCentresPage() {
             <div className="lg:col-span-2">
               <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
                 <div className="mb-8 flex justify-center">
-                  <div className="relative w-full h-80 rounded-lg overflow-hidden shadow-syro-card-hover">
-                    <Image
-                      src="/images/institutions/ca.jpg"
-                      alt="Major Centres"
-                      fill
-                      className="object-cover"
-                      priority
-                    />
-                  </div>
+                  <Image src="/images/institutions/ca.jpg" alt="Major Centres" width={175} height={175} className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }} priority />
                 </div>
                 <p className="font-syro-primary text-lg text-syro-dark-gray leading-relaxed mb-8">
                   The spiritual and administrative centres of the Malankara Orthodox Syrian Church, serving as places of pilgrimage, worship, and church governance.

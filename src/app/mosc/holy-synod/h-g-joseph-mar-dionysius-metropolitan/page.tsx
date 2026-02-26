@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import Image from 'next/image';
 import SynodMembersSidebar from '../../components/SynodMembersSidebar';
 import QuickLinks from '../../components/QuickLinks';
@@ -17,27 +17,15 @@ const HGJosephMarDionysiusMetropolitanPage = () => {
         breadcrumbFrom="holy-synod"
       />
       {/* Main Content */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Main Content */}
             <div className="lg:col-span-2">
-              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
+              <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
                 {/* Featured Image - Top */}
                 <div className="mb-8 flex justify-center">
-                  <div className="relative w-full max-w-md h-[280px] rounded-lg overflow-hidden shadow-syro-card">
-                      <Image
-                        src="/images/holy-synod/cul.jpg"
-                        alt="H.G. Dr. Joseph Mar Dionysius Metropolitan"
-                        fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 448px"
-                        className="object-cover object-top"
-                        style={{
-                          objectPosition: 'center 15%'
-                        }}
-                        priority
-                      />
-                    </div>
+                  <Image src="/images/holy-synod/cul.jpg" alt="H.G. Dr. Joseph Mar Dionysius Metropolitan" width={175} height={175} className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }} priority />
                   </div>
 
                 {/* Content - Below Image */}
@@ -48,14 +36,14 @@ const HGJosephMarDionysiusMetropolitanPage = () => {
 
                     <div className="prose prose-lg max-w-none">
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace was born on 15th June 1956 as the son of Mr. T. V. Mathai and Mrs. Aleyamma Mathai of Thekkil Kandathil family in Valanjavattom, Thiruvalla and a member of St Maryâ€™s Orthodox Church, Valanjavattom in Niranam Diocese. Mar Dionysius became a member of Mount Tabor Ashram on 15th July 1971. He stood first in the Masterâ€™s Degree Exam of Madras University and won the â€œChithanass" award and the gold medal in 1981. His Grace took the M. Phil, Ph. D. Degrees from the University of Kerala and his B.D. degree from the University of Serampore. His Grace was ordained deacon in July 1980. He was ordained as a priest on 4th December 1985. He got Certificate in Advanced Christian Leadership Studies from the Haggai International Institute, Singapore in 2006, Honorary D-Lit Conferred by University of South America in 2017. His Grace took his M.Th. in Missiology from Faith Theological Seminary, recognized by Higher Education Department Govt. of Nagaland in 2019. His Grace served as the Metropolitan of Calcutta Diocese from 2009 to 2022, and also served as the Director of St. Thomas Mission Bilai. His Grace also served as the Asst. Metropolitan of Delhi Diocese from 2009 â€“ 2010. His Grace had been teaching in the Dept. of Zoology at St Stephenâ€™s College Pathanapuram. From 2000, His Grace had been the director of the research department of Zoology. His Grace won the â€œMan of the year" award from American Biographical Institute in 2003 and St Berchmanâ€™s award for the Best University Teacher in 2008. His Grace is ever active as a guide and mentor in meditation, preacher, researcher and ecological theologian. H.G. is the visiting faculty of St. Thomas Orthodox Theological Seminary Nagpur. H.G. currently serves as the President of Orthodox Syrian Sunday School Association of the East, President of Akhila Malankara Balasamajam and President of Ecological Commission.
+                        His Grace was born on 15th June 1956 as the son of Mr. T. V. Mathai and Mrs. Aleyamma Mathai of Thekkil Kandathil family in Valanjavattom, Thiruvalla and a member of St Mary’s Orthodox Church, Valanjavattom in Niranam Diocese. Mar Dionysius became a member of Mount Tabor Ashram on 15th July 1971. He stood first in the Master’s Degree Exam of Madras University and won the “Chithanass" award and the gold medal in 1981. His Grace took the M. Phil, Ph. D. Degrees from the University of Kerala and his B.D. degree from the University of Serampore. His Grace was ordained deacon in July 1980. He was ordained as a priest on 4th December 1985. He got Certificate in Advanced Christian Leadership Studies from the Haggai International Institute, Singapore in 2006, Honorary D-Lit Conferred by University of South America in 2017. His Grace took his M.Th. in Missiology from Faith Theological Seminary, recognized by Higher Education Department Govt. of Nagaland in 2019. His Grace served as the Metropolitan of Calcutta Diocese from 2009 to 2022, and also served as the Director of St. Thomas Mission Bilai. His Grace also served as the Asst. Metropolitan of Delhi Diocese from 2009 – 2010. His Grace had been teaching in the Dept. of Zoology at St Stephen’s College Pathanapuram. From 2000, His Grace had been the director of the research department of Zoology. His Grace won the “Man of the year" award from American Biographical Institute in 2003 and St Berchman’s award for the Best University Teacher in 2008. His Grace is ever active as a guide and mentor in meditation, preacher, researcher and ecological theologian. H.G. is the visiting faculty of St. Thomas Orthodox Theological Seminary Nagpur. H.G. currently serves as the President of Orthodox Syrian Sunday School Association of the East, President of Akhila Malankara Balasamajam and President of Ecological Commission.
                       </p>
 
                       <h4 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                         Contact
                       </h4>
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
-                        <p>Bishops House, Cross Junction, Kollam â€“ 691 001</p>
+                        <p>Bishops House, Cross Junction, Kollam – 691 001</p>
                         <p>Mob: 9425553147, 9446181314</p>
                         <p>Email: josephdionysius@gmail.com</p>
                       </div>

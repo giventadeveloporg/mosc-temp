@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import Image from 'next/image';
 import SynodMembersSidebar from '../../components/SynodMembersSidebar';
 import QuickLinks from '../../components/QuickLinks';
@@ -17,27 +17,15 @@ const HisGraceDrYoohanonMarChrysostamusPage = () => {
         breadcrumbFrom="holy-synod"
       />
       {/* Main Content */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Main Content */}
             <div className="lg:col-span-2">
-              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
+              <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
                 {/* Featured Image - Top */}
                 <div className="mb-8 flex justify-center">
-                  <div className="relative w-full max-w-md h-[280px] rounded-lg overflow-hidden shadow-syro-card">
-                      <Image
-                        src="/images/holy-synod/chris.jpg"
-                        alt="H.G. Dr. Yuhanon Mar Chrisostomos Metropolitan"
-                        fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 448px"
-                        className="object-cover object-top"
-                        style={{
-                          objectPosition: 'center 15%'
-                        }}
-                        priority
-                      />
-                    </div>
+                  <Image src="/images/holy-synod/chris.jpg" alt="H.G. Dr. Yuhanon Mar Chrisostomos Metropolitan" width={175} height={175} className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }} priority />
                   </div>
 
                 {/* Content - Below Image */}
@@ -52,7 +40,7 @@ const HisGraceDrYoohanonMarChrysostamusPage = () => {
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        Metropolitan Geevarghese Mar Osthathios ordained Varghese John a deacon on 19 April 1982, and he received his priesthood from HH Baselios Marthoma Mathews II on 5 June 1982. On 28 January 1998, H.H. Baselios Marthoma Mathews II made him a Ramban at Parumala Seminary. Ramban Yoohanon was the Secretary of the Karunagiri MGD Ashram and Balabhavan. He has held the post of Principal, St Paulâ€™s Mission Training Center, Mavelikkara, visiting faculty of St Thomas Orthodox Theological Seminary, Nagpur, coordinator of Malankara Orthodox Mission Board, St Thomas Karunya Guidance Center, Ulloor, Trivandrum, Karunya Vishranthi Bhavan Kattela, Trivandrum, Marriage Assistance Foundation (MAF), Sick Aid Foundation (SAF), Member of Malankara Association Managing Committee, Council Member of Parumala Seminary, Member of Catholic-Orthodox Dialogue Commission and many other posts of distinction. Besides being a scholar, exceptionally good organizer, and preacher at conventions, he has participated in and given leadership to many meetings and conferences.
+                        Metropolitan Geevarghese Mar Osthathios ordained Varghese John a deacon on 19 April 1982, and he received his priesthood from HH Baselios Marthoma Mathews II on 5 June 1982. On 28 January 1998, H.H. Baselios Marthoma Mathews II made him a Ramban at Parumala Seminary. Ramban Yoohanon was the Secretary of the Karunagiri MGD Ashram and Balabhavan. He has held the post of Principal, St Paul’s Mission Training Center, Mavelikkara, visiting faculty of St Thomas Orthodox Theological Seminary, Nagpur, coordinator of Malankara Orthodox Mission Board, St Thomas Karunya Guidance Center, Ulloor, Trivandrum, Karunya Vishranthi Bhavan Kattela, Trivandrum, Marriage Assistance Foundation (MAF), Sick Aid Foundation (SAF), Member of Malankara Association Managing Committee, Council Member of Parumala Seminary, Member of Catholic-Orthodox Dialogue Commission and many other posts of distinction. Besides being a scholar, exceptionally good organizer, and preacher at conventions, he has participated in and given leadership to many meetings and conferences.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
@@ -63,7 +51,7 @@ const HisGraceDrYoohanonMarChrysostamusPage = () => {
                         Contact
                       </h4>
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
-                        <p>Bethany Aramana, Thiruvalla, Kerala â€“ 689 101</p>
+                        <p>Bethany Aramana, Thiruvalla, Kerala – 689 101</p>
                         <p>Tel.: 0469-2701357 / 2603357 | Fax: 0469-2342709 | Mob: 9447045543</p>
                         <p>Email: yuhanonmarchrysostomos@gmail.com</p>
                       </div>

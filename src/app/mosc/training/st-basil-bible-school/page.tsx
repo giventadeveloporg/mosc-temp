@@ -28,7 +28,7 @@ export default function StBasilBibleSchoolPage() {
             alt="St. Basil Bible School and Orientation Center"
             width={800}
             height={500}
-            className="w-full max-w-md h-auto object-contain rounded-lg"
+            className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }}
             priority
             sizes="(max-width: 768px) 100vw, 28rem"
           />

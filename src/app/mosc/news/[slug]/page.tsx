@@ -8,7 +8,7 @@ import {
   getRecentArticles,
   getPreviousArticle,
 } from '../getNewsHomePageData';
-import { NewsPageHeader } from '../components/NewsPageHeader';
+import SyroPageBanner from '../../components/SyroPageBanner';
 import { FlashNewsCarousel } from '../components/FlashNewsCarousel';
 import { FlashBar } from '../components/FlashBar';
 import { ArticleShareButtons } from '../components/ArticleShareButtons';
@@ -52,7 +52,7 @@ export default async function NewsArticlePage({ params }: PageProps) {
 
   return (
     <div className="bg-syro-bg-gray font-syro-primary text-[#0b2848] min-h-screen">
-      <NewsPageHeader />
+      <SyroPageBanner title={article.title} breadcrumbFrom="news" />
 
       {flashData.flashNewsItems?.length > 0 ? (
         <FlashNewsCarousel items={flashData.flashNewsItems} />

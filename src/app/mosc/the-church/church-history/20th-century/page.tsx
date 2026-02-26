@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import Image from 'next/image';
 import QuickLinks from '../../../components/QuickLinks';
 import SyroPageBanner from '../../../components/SyroPageBanner';
@@ -22,21 +22,18 @@ export default async function TwentiethCenturyPage({
     <div className="bg-syro-bg-gray">
       <SyroPageBanner title="20th Century" breadcrumbFrom={breadcrumbFrom} />
 
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             <div className="lg:col-span-2">
-              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
+              <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
                 <div className="mb-8 flex justify-center">
-                  <div className="relative w-full max-w-[280px] h-auto">
-                    <Image
+                  <Image
                       src="/images/logos/Current_Edits/MOSC-Logo-only.png"
-                      alt="Church History â€“ 20th Century"
-                      width={280}
-                      height={180}
-                      className="w-auto h-auto object-contain rounded-lg block mx-auto"
+                      alt="Church History – 20th Century"
+                      width={175} height={175}
+                      className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }}
                     />
-                  </div>
                 </div>
 
                 <div className="prose prose-lg max-w-none">
@@ -57,7 +54,7 @@ export default async function TwentiethCenturyPage({
                     with that of the Catholicos. Litigations from 1913 to 1958 ended in favour of
                     the Orthodox; a truce was reached in 1958. From 1972 the patriarchal side
                     resumed conflict; Supreme Court verdicts from 1995 onward have not produced a
-                    full amicable solution, and the two sections continueâ€”one under the Patriarch
+                    full amicable solution, and the two sections continue—one under the Patriarch
                     and one under the Catholicos.
                   </p>
 
@@ -74,7 +71,7 @@ export default async function TwentiethCenturyPage({
                     Catholicate to defend the independence of the Indian Church. Abdul Messiah, the
                     predecessor of Abdulla II, was invited; he came to Kerala and established the
                     Catholicate in September 1912. The Orthodox division declared their freedom.
-                    The first Catholicos was Moran Mar Baselios Paulose I (1912â€“14); subsequent
+                    The first Catholicos was Moran Mar Baselios Paulose I (1912–14); subsequent
                     Catholicoses were elevated by the Synod of the Indian Orthodox bishops,
                     showing the autocephalous and autonomous status of the Indian Church. The
                     Catholicate now represents the supreme head of the Malankara Orthodox Syrian
@@ -85,14 +82,14 @@ export default async function TwentiethCenturyPage({
                     The Catholicoses and Recent History
                   </h3>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                    Catholicos Geevarghese II (1929â€“64) served for 35 years. During his time the
+                    Catholicos Geevarghese II (1929–64) served for 35 years. During his time the
                     Church introduced a constitution, won the final legal victory in 1958, and
                     associated with the World Council of Churches. In 1962 the headquarters of the
-                    Catholicos was shifted to Devalokam, Kottayam. Catholicos Augen I (1964â€“75)
+                    Catholicos was shifted to Devalokam, Kottayam. Catholicos Augen I (1964–75)
                     was a great Malayalam and Syriac scholar. From August 1974 all relation with
-                    the Patriarch broke down again over the Patriarchâ€™s denial of the Throne of St.
+                    the Patriarch broke down again over the Patriarch’s denial of the Throne of St.
                     Thomas and the autonomy of the Church under the Catholicos. The Orthodox section
-                    of the Church continues as the Malankara Orthodox Syrian Churchâ€”independent and
+                    of the Church continues as the Malankara Orthodox Syrian Church—independent and
                     autonomous under the Catholicos.
                   </p>
                 </div>

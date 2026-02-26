@@ -238,8 +238,8 @@ const HolySynodPage = () => {
       {/* Content - matches HTML structure and style */}
       <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Intro card - centered (HTML .holy-synod-intro) */}
-          <div className="bg-white p-10 rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] mb-16 text-center">
+          {/* Intro card (matches administration .admin-intro-card) */}
+          <div className="bg-white p-10 rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] mb-16">
             <h2 className="font-syro-display text-[2.2rem] font-bold text-black mb-5">
               Holy Synod
             </h2>

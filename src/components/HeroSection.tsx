@@ -799,7 +799,7 @@ const HeroSection: React.FC = () => {
         <Link href="/#about-us" className="hero-bottom-card hero-bottom-card-mission group">
           <div className="hero-mission-bg">
             <Image
-              src="/images/logos/Malayalees_US/Unite_India_Header_Branding.png"
+              src="/images/logos/Malayalees_US/image.png"
               alt="Unite India - A Nonprofit Corporation"
               fill
               className="object-cover object-left transition-transform duration-500 group-hover:scale-[1.02]"

@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import Image from 'next/image';
 import QuickLinks from '../../../components/QuickLinks';
 import SyroPageBanner from '../../../components/SyroPageBanner';
@@ -22,21 +22,18 @@ export default async function Before1653Page({
     <div className="bg-syro-bg-gray">
       <SyroPageBanner title="Before 1653" breadcrumbFrom={breadcrumbFrom} />
 
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             <div className="lg:col-span-2">
-              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
+              <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
                 <div className="mb-8 flex justify-center">
-                  <div className="relative w-full max-w-[280px] h-auto">
-                    <Image
+                  <Image
                       src="/images/logos/Current_Edits/MOSC-Logo-only.png"
-                      alt="Church History â€“ Before 1653"
-                      width={280}
-                      height={180}
-                      className="w-auto h-auto object-contain rounded-lg block mx-auto"
+                      alt="Church History – Before 1653"
+                      width={175} height={175}
+                      className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }}
                     />
-                  </div>
                 </div>
 
                 <div className="prose prose-lg max-w-none">
@@ -148,7 +145,7 @@ export default async function Before1653Page({
                     Thoma by the laying on of hands of twelve leading priests at Allangad on May 22,
                     1653, with the unanimous consent of the whole Church. Despite efforts by Rome and
                     the Portuguese to regain control, about half of the people did not yield and
-                    maintained their Eastern character and ecclesiastical freedomâ€”the tradition that
+                    maintained their Eastern character and ecclesiastical freedom—the tradition that
                     continues today in the Malankara Orthodox Syrian Church.
                   </p>
                 </div>

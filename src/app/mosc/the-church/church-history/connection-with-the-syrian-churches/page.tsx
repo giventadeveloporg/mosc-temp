@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import Image from 'next/image';
 import QuickLinks from '../../../components/QuickLinks';
 import SyroPageBanner from '../../../components/SyroPageBanner';
@@ -7,7 +7,7 @@ import TheChurchSidebar from '../../TheChurchSidebar';
 export const metadata = {
   title: 'Connection with the Syrian Churches',
   description:
-    'West Syrianization of the Orthodox Thomas Christians, the Patriarchâ€™s jurisdictional claims, and the end of East Syrian connection.',
+    'West Syrianization of the Orthodox Thomas Christians, the Patriarch’s jurisdictional claims, and the end of East Syrian connection.',
 };
 
 export default async function ConnectionWithSyrianChurchesPage({
@@ -25,21 +25,18 @@ export default async function ConnectionWithSyrianChurchesPage({
         breadcrumbFrom={breadcrumbFrom}
       />
 
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             <div className="lg:col-span-2">
-              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
+              <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
                 <div className="mb-8 flex justify-center">
-                  <div className="relative w-full max-w-[280px] h-auto">
-                    <Image
+                  <Image
                       src="/images/logos/Current_Edits/MOSC-Logo-only.png"
                       alt="Connection with the Syrian Churches"
-                      width={280}
-                      height={180}
-                      className="w-auto h-auto object-contain rounded-lg block mx-auto"
+                      width={175} height={175}
+                      className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }}
                     />
-                  </div>
                 </div>
 
                 <div className="prose prose-lg max-w-none">
@@ -64,11 +61,11 @@ export default async function ConnectionWithSyrianChurchesPage({
                     When accepting the services of Mar Gregorios, the Orthodox of Malabar did not
                     place themselves under the jurisdictional setup of the Antiochene Syrian Church.
                     The West Syrian Patriarch, however, from the beginning desired that the Indian
-                    church formally accept him as Supreme Headâ€”similar to the Portuguese extracting
+                    church formally accept him as Supreme Head—similar to the Portuguese extracting
                     submission to Rome in 1599. Mar Thoma V and VI foiled attempts to realize this
                     claim; a party favourable to the Patriarch had formed by the middle of the 18th
                     century and troubled the Mar Thoma bishops. This party was very active during the
-                    CMS collaboration (1816â€“1836) and was a major factor in its collapse.
+                    CMS collaboration (1816–1836) and was a major factor in its collapse.
                   </p>
 
                   <h3 className="font-syro-display font-semibold text-xl text-syro-blue mt-8 mb-3">
@@ -86,7 +83,7 @@ export default async function ConnectionWithSyrianChurchesPage({
                     V clashed with Mar Gabriel both theologically and administratively; Mar Gabriel
                     died without a successor, and with this event the connection of the Indian church
                     with the East Syrian church came to an end. The Portuguese condemnation of the
-                    East Syrian Church as Nestorian, and the West Syrian contactâ€™s denunciation of
+                    East Syrian Church as Nestorian, and the West Syrian contact’s denunciation of
                     East Syrian Christianity as heretical, gradually led the Indian Orthodox to quit
                     their East Syrian identity and embrace West Syrian identity.
                   </p>

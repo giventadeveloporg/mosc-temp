@@ -1,12 +1,11 @@
-﻿import React from 'react';
+import React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import QuickLinks from '../../components/QuickLinks';
 import SyroPageBanner from '../../components/SyroPageBanner';
 import TheChurchSidebar from '../TheChurchSidebar';
 
 export const metadata = {
-  title: 'Syrian Heritage',
+  title: 'Syrian Heritage | The Church | MOSC',
   description:
     'Syrian Heritage of the St. Thomas Christians. Syriac is the liturgical language of the St. Thomas Christians from a very early date, even though their identity and culture remained always truly Indian.',
 };
@@ -24,22 +23,19 @@ export default async function SyrianHeritagePage({
       <SyroPageBanner title="Syrian Heritage" breadcrumbFrom={breadcrumbFrom} />
 
       {/* Main Content */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             <div className="lg:col-span-2">
-              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
+              <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
                 {/* Featured Image - centered, contained */}
                 <div className="mb-8 flex justify-center">
-                  <div className="relative w-full max-w-[280px] h-auto">
-                    <Image
+                  <Image
                       src="/images/church/syrian_heritage.jpg"
                       alt="Syrian Heritage of the St. Thomas Christians"
-                      width={280}
-                      height={180}
-                      className="w-auto h-auto object-contain rounded-lg block mx-auto"
+                      width={175} height={175}
+                      className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }}
                     />
-                  </div>
                 </div>
 
                 <div className="prose prose-lg max-w-none">
@@ -66,31 +62,31 @@ export default async function SyrianHeritagePage({
                     Edessa that it began to be used as an independent language. Soon it acquired
                     the status of the language of Christian communities of Mesopotamia and Syria.
                     These Christians began to be called as Syrians after the Roman province in
-                    which they livedâ€”Syriaâ€”and their language was called Syriac. It did not take
-                    long for this language to reach Persia and from there to Indiaâ€”where it
+                    which they lived – Syria – and their language was called Syriac. It did not take
+                    long for this language to reach Persia and from there to India – where it
                     remains even today as the basic liturgical language of some Christian
-                    communitiesâ€”and even up to China.
+                    communities – and even up to China.
                   </p>
 
                   <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 mt-8">
                     Syriac Scripts: Estrangela, Serto, and Eastern (Chaldean)
                   </h2>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                    Estrangela was the script initially used to write Syriac. Later two different
+                    <em>Estrangela</em> was the script initially used to write Syriac. Later two different
                     scripts and pronunciations developed, one in the western parts of the Middle
                     East (especially in the Roman empire) known as the western script or
-                    <em> serto</em> and another one in the eastern parts (especially in Persia)
-                    known as the eastern script or Chaldean script. The serto is being used by the
+                    <em>serto</em> and another one in the eastern parts (especially in Persia)
+                    known as the eastern script or <em>chaldean</em> script. The serto is being used by the
                     Syrian Orthodox, the Maronite and Syrian Catholic denominations whereas the
                     Assyrian and Chaldean churches use the eastern script. Although remaining a
                     single language, the two employ distinctive variations in pronunciation and
                     writing system. The exact periods in which each of these forms developed is
-                    still a disputed question. It was after the 8th century that the estrangela
-                    script was steadily replaced in the west Syrian circles by the serto. However,
+                    still a disputed question. It was after the 8th century that the <em>estrangela</em>
+                    script was steadily replaced in the west Syrian circles by the <em>serto</em>. However,
                     recent discoveries show that serto scripts were in use much earlier; but as
                     they were used more in business or administrative texts, ecclesiastical
                     institutions and libraries rarely preserved them. The eastern script, which
-                    resembles more to the estrangela, came into regular use even later.
+                    resembles more to the <em>estrangela</em>, came into regular use even later.
                   </p>
 
                   <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 mt-8">
@@ -129,8 +125,7 @@ export default async function SyrianHeritagePage({
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     As far as historical evidence is available, it is now more or less an
                     established fact that the St. Thomas Christians had very intimate relations
-                    with the Persian Church from a very early date. Even though it is difficult to
-                    precise dates due to scarcity of documents, most of the modern historians agree
+                    with the Persian Church from a very early date. Even though it is difficult to precise dates due to scarcity of documents, most of the modern historians agree
                     that the Church of Malabar was under the Metropolitan of Riwadisher, belonging
                     to the Persian Church and they had adopted the east Syrian (Persian) liturgical
                     traditions at least from the 4th century. We do not know how far the ordinary
@@ -149,7 +144,7 @@ export default async function SyrianHeritagePage({
                   </h2>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     The liturgy that was in use in this church when the Portuguese landed in
-                    Malabar (end of 15th cent.) was the east Syrian liturgy of Addai and Mari, the
+                    Malabar (end of 15th cent.) was the east Syrian liturgy of Adai and Mari, the
                     same as that of the Persian Church. Other liturgical practices also would have
                     been in line with that of the east Syrian tradition. Later when the church had
                     to face the threat of latinization under the Portuguese Archbishop Menezes,
@@ -159,12 +154,11 @@ export default async function SyrianHeritagePage({
                     St. Thomas Christians who resisted latinisation entered into an intimate
                     relation with the west Syrian Church of Antioch. During the succeeding
                     centuries (18th and 19th) the Church slowly accepted west Syrian liturgical
-                    traditions. Thus the liturgy of St. James replaced that of Addai and Mari.
+                    traditions. Thus the liturgy of St. James replaced that of Adai and Mari.
                     Other liturgical books such as order of sacraments of marriage, baptism, house
                     blessing, funeral rites etc. were brought to Malabar by visiting bishops and
                     Patriarchs of the Antiochian Church. Books of prayer such as shimo (prayer for
-                    ordinary days), prayers for the holy week, prayers for lent, the
-                    <em> penqitho</em> (prayers for feasts and special days) etc. followed suit.
+                    ordinary days), prayers for the holy week, prayers for lent, the <em>penquito</em> (prayers for feasts and special days) etc. followed suit.
                     Detailed rubrics conforming to Antiochian practices were slowly established
                     through bulls of Patriarchs and direct instructions given by visiting prelates.
                     Patriarch Peter III, who visited the Malankara Church during the last quarter
@@ -181,7 +175,7 @@ export default async function SyrianHeritagePage({
                     The establishment of Syriac printing presses, first in Cochin (St. Thomas
                     press), which was later shifted to Kottayam, and in Pampakuda (Mar Julius
                     press, in 1879) helped the spread of west Syrian liturgical traditions. A
-                    Syriac periodical by name Simath Haye, published from the Mar Julius Press
+                    Syriac periodical by name simath haye, published from the Mar Julius Press
                     popularized even patristic texts, side by side with books of worship.
                   </p>
 

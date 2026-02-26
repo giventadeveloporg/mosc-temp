@@ -4,7 +4,6 @@ import Image from 'next/image';
 import { Metadata } from 'next';
 import QuickLinks from '../components/QuickLinks';
 import SyroPageBanner from '../components/SyroPageBanner';
-import SyroSectionTitle from '../components/SyroSectionTitle';
 
 export const metadata: Metadata = {
   title: 'Photo Gallery | Malankara Orthodox Syrian Church',
@@ -256,7 +255,20 @@ export default function GalleryPage() {
 
       <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <SyroSectionTitle>Browse Albums</SyroSectionTitle>
+          {/* Intro card (matches administration .admin-intro-card) */}
+          <div className="bg-white p-10 rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] mb-16">
+            <h2 className="font-syro-display text-[2.2rem] font-bold text-black mb-5">
+              Photo Gallery
+            </h2>
+            <p className="font-syro-primary text-xl text-syro-dark-gray leading-relaxed">
+              Photo gallery of significant events, ecumenical visits, and ceremonies of the Malankara Orthodox Syrian Church.
+            </p>
+          </div>
+
+          {/* Section title - left red bar (matches administration .admin-section-title) */}
+          <h3 className="text-2xl font-light text-[#798daf] mb-10 pl-8 border-l-[7px] border-syro-red">
+            Browse Albums
+          </h3>
 
           {/* Grid */}
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-syro-bg-gray via-white to-syro-bg-gray border border-syro-table-border/30 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] mb-12">
@@ -280,7 +292,7 @@ export default function GalleryPage() {
               <Link
                 key={album.id}
                 href={`/mosc/gallery/${album.id}`}
-                className="group bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 overflow-hidden block"
+                className="group bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 overflow-hidden flex flex-col h-full"
               >
                 <div className="relative w-full h-48 overflow-hidden">
                   {/* Album Image */}
@@ -310,7 +322,7 @@ export default function GalleryPage() {
                     {album.photoCount} photos
                   </div>
                 </div>
-                <div className="p-6">
+                <div className="p-8 flex flex-col flex-1">
                   <div className="mb-3">
                     <span className="inline-block px-3 py-1 bg-syro-red/10 text-syro-red text-xs font-syro-primary font-medium rounded-full">
                       {album.category}
@@ -323,7 +335,7 @@ export default function GalleryPage() {
                     {album.date}
                   </p>
                   <div className="flex items-center mt-auto">
-                    <span className="syro-read-more-btn font-syro-primary inline-flex items-center gap-2">
+                    <span className="syro-primary-button inline-flex items-center gap-2">
                       View Album
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

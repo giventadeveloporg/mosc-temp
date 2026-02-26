@@ -3,8 +3,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import QuickLinks from '../components/QuickLinks';
 import SyroPageBanner from '../components/SyroPageBanner';
-import SyroIntroCard from '../components/SyroIntroCard';
-import SyroSectionTitle from '../components/SyroSectionTitle';
 
 export const metadata = {
   title: 'Ecumenical',
@@ -34,52 +32,57 @@ const EcumenicalPage = () => {
 
       <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <SyroIntroCard>
-            <div className="text-center">
-              <h2 className="font-syro-display text-[2.2rem] font-bold text-black mb-5">
-                Department of Ecumenical Relations
-              </h2>
-              <p className="font-syro-primary text-xl text-syro-dark-gray leading-relaxed">
-                The Department of Ecumenical Relations caters to the fraternal relations of the Church.
-                The Church, being a founding member of the World Council of Churches, extends its warmth
-                and cooperation to Christian communities worldwide.
-              </p>
-            </div>
-          </SyroIntroCard>
+          {/* Intro card (matches administration .admin-intro-card) */}
+          <div className="bg-white p-10 rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] mb-16">
+            <h2 className="font-syro-display text-[2.2rem] font-bold text-black mb-5">
+              Department of Ecumenical Relations
+            </h2>
+            <p className="font-syro-primary text-xl text-syro-dark-gray leading-relaxed">
+              The Department of Ecumenical Relations caters to the fraternal relations of the Church.
+              The Church, being a founding member of the World Council of Churches, extends its warmth
+              and cooperation to Christian communities worldwide.
+            </p>
+          </div>
 
-          <SyroSectionTitle>Ecumenical Relations &amp; Dialogue</SyroSectionTitle>
+          {/* Section title - left red bar (matches administration .admin-section-title) */}
+          <h3 className="text-2xl font-light text-[#798daf] mb-10 pl-8 border-l-[7px] border-syro-red">
+            Ecumenical Relations &amp; Dialogue
+          </h3>
 
+          {/* Cards grid (matches administration .admin-card) */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {ECUMENICAL_ARTICLES.map((article, index) => (
-              <Link
+              <div
                 key={index}
-                href={article.href}
-                className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 p-0 overflow-hidden flex flex-col h-full group"
+                className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 overflow-hidden flex flex-col h-full"
               >
-                <div className="relative w-full h-48 bg-syro-bg-gray/50">
+                <div className="relative w-full h-48 bg-syro-bg-gray/50 shrink-0">
                   {article.image ? (
-                    <Image src={article.image} alt="" fill className="object-contain object-center group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+                    <Image src={article.image} alt="" fill className="object-contain object-center" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center bg-syro-red/10">
                       <span className="text-4xl text-syro-red/40" role="img" aria-hidden>⛪</span>
                     </div>
                   )}
                 </div>
-                <div className="p-8 flex-1 flex flex-col">
+                <div className="p-8 flex flex-col flex-1">
                   <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug line-clamp-3">
                     {article.title}
                   </h3>
-                  <p className="font-syro-primary text-base text-syro-dark-gray flex-1 line-clamp-3 leading-relaxed">
+                  <p className="font-syro-primary text-base text-syro-dark-gray flex-1 mb-5 leading-relaxed line-clamp-3">
                     {article.excerpt}
                   </p>
-                  <span className="syro-read-more-btn font-syro-primary mt-4">
-                    Read More
+                  <Link
+                    href={article.href}
+                    className="syro-primary-button inline-flex items-center gap-2 mt-auto w-fit"
+                  >
+                    <span>Read More</span>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
-                  </span>
+                  </Link>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
 

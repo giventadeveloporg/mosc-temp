@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import Image from 'next/image';
 import QuickLinks from '../../../components/QuickLinks';
 import SyroPageBanner from '../../../components/SyroPageBanner';
@@ -22,21 +22,18 @@ export default async function ApostolicOriginPage({
     <div className="bg-syro-bg-gray">
       <SyroPageBanner title="Apostolic Origin" breadcrumbFrom={breadcrumbFrom} />
 
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             <div className="lg:col-span-2">
-              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
+              <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
                 <div className="mb-8 flex justify-center">
-                  <div className="relative w-full max-w-[280px] h-auto">
-                    <Image
+                  <Image
                       src="/images/logos/Current_Edits/MOSC-Logo-only.png"
-                      alt="Apostolic Origin â€“ St. Thomas Christians"
-                      width={280}
-                      height={180}
-                      className="w-auto h-auto object-contain rounded-lg block mx-auto"
+                      alt="Apostolic Origin – St. Thomas Christians"
+                      width={175} height={175}
+                      className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }}
                     />
-                  </div>
                 </div>
 
                 <div className="prose prose-lg max-w-none">
@@ -50,8 +47,8 @@ export default async function ApostolicOriginPage({
                     traditions current among the St. Thomas Christians hold that St. Thomas, one
                     among the twelve apostles, after visiting Socotra came to Muzris (Kodungallore)
                     in about AD 52. He preached to the Jewish colony and made converts, established
-                    Christian communities at seven placesâ€”Maliankara, Palayur, Paravur, Gokamangalam,
-                    Niranam, Chayal, and Kollamâ€”and appointed leaders from the leading families
+                    Christian communities at seven places—Maliankara, Palayur, Paravur, Gokamangalam,
+                    Niranam, Chayal, and Kollam—and appointed leaders from the leading families
                     Kalli, Kaliankal, Shankarapuri and Pakalomattam. From Kerala he proceeded to the
                     eastern parts of South India and then to Malacca and China. Returning to India,
                     he was martyred and buried at Mylapur (St. Thomas Mount) in AD 72.
@@ -103,8 +100,8 @@ export default async function ApostolicOriginPage({
                     Conclusion
                   </h3>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                    The age-old consciousness of the church of St. Thomas Christiansâ€”that their
-                    origin as Christians is from the mission of St. Thomas the Apostle in Indiaâ€”stands
+                    The age-old consciousness of the church of St. Thomas Christians—that their
+                    origin as Christians is from the mission of St. Thomas the Apostle in India—stands
                     sufficiently justified by the living community and its traditions, the tomb at
                     Mylapur, the witness of the East Syrian and universal Church, and the judgment
                     of historians.

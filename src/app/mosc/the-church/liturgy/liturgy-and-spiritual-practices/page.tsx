@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import Image from 'next/image';
 import QuickLinks from '../../../components/QuickLinks';
 import SyroPageBanner from '../../../components/SyroPageBanner';
@@ -25,21 +25,18 @@ export default async function LiturgyAndSpiritualPracticesPage({
         breadcrumbFrom={breadcrumbFrom}
       />
 
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             <div className="lg:col-span-2">
-              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
+              <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
                 <div className="mb-8 flex justify-center">
-                  <div className="relative w-full max-w-[280px] h-auto">
-                    <Image
+                  <Image
                       src="/images/church/liturgy-worship.jpg"
                       alt="Liturgy and Spiritual Practices"
-                      width={280}
-                      height={180}
-                      className="w-auto h-auto object-contain rounded-lg block mx-auto"
+                      width={175} height={175}
+                      className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }}
                     />
-                  </div>
                 </div>
 
                 <div className="prose prose-lg max-w-none">
@@ -59,7 +56,7 @@ export default async function LiturgyAndSpiritualPracticesPage({
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Christian life is described in the Book of Acts as continuing &quot;steadfastly
                     in the apostle&apos;s doctrine and fellowship, in the breaking of bread, and in
-                    the prayers.&quot; The liturgy is the common work of the people of Godâ€”the
+                    the prayers.&quot; The liturgy is the common work of the people of God—the
                     offering of praise, thanksgiving, and the Eucharist in which we participate in
                     the Body and Blood of Christ. In the Malankara Orthodox Syrian Church, the
                     liturgy and spiritual practices are rooted in the West Syrian (Antiochene)
@@ -69,7 +66,7 @@ export default async function LiturgyAndSpiritualPracticesPage({
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Through the liturgy we encounter the limitless God in time and space; we offer
                     moments and places purified for worship. The aim of the liturgical year and
-                    spiritual practices is that our entire life be filled with God&apos;s presenceâ€”
+                    spiritual practices is that our entire life be filled with God&apos;s presence—
                     through humility, submission, service, lent, fasting, and participation in the
                     liturgical services with ever-increasing preparation and devotion.
                   </p>

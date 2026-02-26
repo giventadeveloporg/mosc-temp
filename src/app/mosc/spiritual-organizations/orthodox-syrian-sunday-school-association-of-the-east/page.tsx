@@ -14,14 +14,13 @@ const OrthodoxSyrianSundaySchoolAssociationOfTheEastPage = () => {
       currentHref="/mosc/spiritual-organizations/orthodox-syrian-sunday-school-association-of-the-east"
     >
       <div className="space-y-6 font-syro-primary text-syro-dark-gray leading-relaxed">
-        <div className="relative w-full h-48 bg-syro-bg-gray rounded-lg overflow-hidden flex items-center justify-center mb-6">
+        <div className="mb-8 flex justify-center">
           <Image
             src="/images/spiritual/OSSSAE.png"
             alt="Orthodox Syrian Sunday School Association of the East"
-            fill
-            className="object-contain object-center"
-            style={{ objectPosition: 'center center', backgroundColor: 'transparent' }}
-            sizes="(min-width: 1024px) 66vw, 100vw"
+            width={175}
+            height={175}
+            className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }}
           />
         </div>
 

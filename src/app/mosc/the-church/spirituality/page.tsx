@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import QuickLinks from '../../components/QuickLinks';
@@ -8,7 +8,7 @@ import TheChurchSidebar from '../TheChurchSidebar';
 export const metadata = {
   title: 'Spirituality',
   description:
-    'Spirituality may be defined as the life in and with the Holy Spiritâ€”an ascetic and pious struggle through repentance, prayer, fasting, and participation in the sacramental life of the Church.',
+    'Spirituality may be defined as the life in and with the Holy Spirit—an ascetic and pious struggle through repentance, prayer, fasting, and participation in the sacramental life of the Church.',
 };
 
 export default async function SpiritualityPage({
@@ -24,22 +24,19 @@ export default async function SpiritualityPage({
       <SyroPageBanner title="Spirituality" breadcrumbFrom={breadcrumbFrom} />
 
       {/* Main Content */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             <div className="lg:col-span-2">
-              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
+              <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
                 {/* Featured Image - centered, contained */}
                 <div className="mb-8 flex justify-center">
-                  <div className="relative w-full max-w-[280px] h-auto">
-                    <Image
+                  <Image
                       src="/images/church/spirituality.jpg"
                       alt="Spirituality - Life in the Holy Spirit"
-                      width={280}
-                      height={180}
-                      className="w-auto h-auto object-contain rounded-lg block mx-auto"
+                      width={175} height={175}
+                      className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }}
                     />
-                  </div>
                 </div>
 
                 <div className="prose prose-lg max-w-none">
@@ -52,11 +49,11 @@ export default async function SpiritualityPage({
                     participation in the sacramental life of the Church. St. Paul says:
                     &quot;Walk in the Spirit, and you shall not fulfill the lust of the flesh. For
                     the flesh lusts against the Spirit, and the Spirit against the flesh; and these
-                    are contrary to one another, so that you do not do the things that you wishâ€¦.
+                    are contrary to one another, so that you do not do the things that you wish….
                     Now the works of the flesh are evident, which are adultery, fornication,
                     uncleanness, lewdness, idolatry, sorcery, hatred, contentions, jealousies,
                     outbursts of wrath, selfish ambitions, dissensions, heresies, envy, murders,
-                    drunkenness, revelries, and the likeâ€¦â€¦ But the fruit of the Spirit is love, joy,
+                    drunkenness, revelries, and the like…… But the fruit of the Spirit is love, joy,
                     peace, long suffering, kindness, goodness, faithfulness, gentleness and
                     self-control. And those who are Christ&apos;s have crucified the flesh with its
                     passions and desires. If we live in the Spirit, let us also walk in the
@@ -301,7 +298,7 @@ export default async function SpiritualityPage({
                     Orthodox spirituality. For the Church Fathers, &apos;to flee from the
                     world&apos; means to flee from every thing that divides. Also, the spirituality
                     must ultimately be understood in terms of paschal mystery. It is an
-                    affirmation of the Crossâ€”as the path of resurrection. The ability to bear the
+                    affirmation of the Cross—as the path of resurrection. The ability to bear the
                     cross comes from the joy of being saved. Joy in our Lord is our strength. The
                     aim of the exercise that at times is found painful is a purified love of God,
                     of neighbours, and of the whole creation. But that also means an increase of

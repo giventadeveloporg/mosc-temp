@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { getDirectoryEntriesData } from './getDirectoryEntriesData';
 import type { DirectoryEntry, DirectoryEntryType } from './types';
 import { DIRECTORY_ENTRY_TYPE_LABELS } from './types';
+import SyroPageBanner from '../../components/SyroPageBanner';
 
 const PAGE_SIZE = 20;
 
@@ -42,17 +43,9 @@ export default async function EntriesListPage({ directoryType, searchParams }: P
 
   return (
     <div className="min-h-screen bg-syro-bg-gray">
-      <section className="relative bg-syro-bg-gray py-12 lg:py-16">
+      <SyroPageBanner title={title} breadcrumbFrom="directory" />
+      <section className="relative bg-syro-bg-gray py-8 lg:py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Link
-            href="/mosc/directory"
-            className="inline-block no-underline font-light text-white bg-[#dc3545] py-2.5 px-5 border-r-[7px] border-r-[#be1929] mb-4 transition-[1s] hover:bg-[#be1929] hover:border-r-[6px] hover:border-r-[#dc3545] hover:text-white"
-          >
-            ← Back to Directory
-          </Link>
-          <h1 className="font-heading font-semibold text-3xl lg:text-4xl text-syro-blue">
-            {title}
-          </h1>
           <p className="font-body text-syro-dark-gray mt-2">
             {subtitle}
           </p>

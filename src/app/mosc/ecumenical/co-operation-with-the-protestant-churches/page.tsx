@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import QuickLinks from '../../components/QuickLinks';
 import EcumenicalSidebar from '../../components/EcumenicalSidebar';
 import SyroPageBanner from '../../components/SyroPageBanner';
@@ -15,11 +15,11 @@ const CoOperationWithProtestantChurchesPage = () => {
       <SyroPageBanner title="Co-operation with the Protestant Churches" breadcrumbFrom="ecumenical" />
 
       {/* Main Content */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             <div className="lg:col-span-2">
-              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
+              <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
                 <div className="prose prose-lg max-w-none">
                   <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-6">
                     <p>
