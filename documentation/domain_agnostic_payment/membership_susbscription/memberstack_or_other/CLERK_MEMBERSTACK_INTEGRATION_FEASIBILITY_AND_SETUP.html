@@ -412,6 +412,14 @@
                 <p>If you never see fields for <strong>Discovery URL</strong>, <strong>Client ID</strong>, or <strong>Client Secret</strong>, you may be in Test Mode (where they are often hidden), or the form may be for a different flow (e.g. Memberstack as IdP). Configure Clerk when in Live Mode, or look in <strong>Settings</strong> / <strong>Dev Tools</strong> for “External Identity Provider,” “OIDC Provider,” or “Custom OIDC.”</p>
             </div>
 
+            <h3 id="memberstack-edit-sso-auto-generated">Memberstack Edit SSO App (production) and auto-generated credentials</h3>
+            <p>When you edit a Custom SSO integration in Memberstack (e.g. “Edit SSO App” for <code>event_site_manager_clerk_integration</code>), the modal shows <strong>Integration Name</strong>, <strong>Redirect URIs</strong>, <strong>Client ID</strong>, and <strong>Secret Key</strong>. After you create the integration, add Redirect URIs, and save, Memberstack <strong>auto-generates</strong> the <strong>Client ID</strong> and <strong>Secret Key</strong> and displays them in this screen (with copy and show/hide).</p>
+            <p><strong>Important finding:</strong> There is <strong>no field in the Memberstack dashboard</strong> to enter or paste Clerk’s Client ID, Client Secret, or Discovery URL. The Edit SSO App screen only shows Memberstack’s own generated Client ID and Secret Key (and Redirect URIs you added). So Clerk’s Application credentials and Discovery URL from the Clerk Configure tab cannot be “integrated” into Memberstack in the obvious way. The connection between Clerk and Memberstack may work by Memberstack providing its <em>own</em> Client ID and Secret (and Redirect URIs) to Clerk—i.e. you would add Memberstack’s Redirect URI in Clerk’s OAuth application, and possibly register Memberstack as a client in Clerk using Memberstack’s generated Client ID/Secret if Clerk supports that flow—or Memberstack may use a different SSO/OIDC flow. If SSO is not working, confirm with Memberstack support where (if anywhere) Clerk’s Discovery URL, Client ID, and Client Secret should be entered, or whether the integration is entirely driven by Memberstack’s credentials in Clerk.</p>
+            <figure class="doc-fig">
+                <img src="memberstack-edit-sso-app.png" alt="Memberstack Edit SSO App modal: Integration Name, Redirect URIs, Client ID, Secret Key (auto-generated), Delete Integration, Save" width="900" height="auto">
+                <figcaption><strong>Figure.</strong> Memberstack Edit SSO App (production) — Integration Name, Redirect URIs, and <strong>auto-generated</strong> Client ID and Secret Key. There is no field here to enter Clerk’s Client ID or Client Secret.</figcaption>
+            </figure>
+
             <h3>Values to get from Clerk and enter in Memberstack</h3>
             <p>Have these ready from the <strong>Clerk Dashboard</strong> so you can paste them into Memberstack when you find the right fields.</p>
             <table>
@@ -444,6 +452,29 @@
 
             <h3>Test Mode vs Live Mode</h3>
             <p>In <strong>Test Mode</strong>, use the App ID and API Keys from Dev Tools (Test Mode Application ID, Test Mode API Keys) in your app as <code>MEMBERSTACK_PROJECT_ID</code>, <code>NEXT_PUBLIC_MEMBERSTACK_PUBLIC_KEY</code>, and <code>MEMBERSTACK_SECRET_KEY</code>. The dashboard reminder applies: <em>“You will need to update API Keys and SSO Integrations when you switch to Live Mode.”</em> Custom SSO (Clerk) setup—entering Discovery URL, Client ID, and Client Secret—is not required in Test Mode if the UI doesn’t show those fields. When you switch to <strong>Live Mode</strong>, create or edit the Custom SSO Integration and enter Clerk’s OIDC details there; also update API keys and any redirect URIs for production.</p>
+            <h4>Production mode: pricing plan and API keys</h4>
+            <p>To use <strong>production (Live) mode</strong> in Memberstack, you must first choose and activate a <strong>paid pricing plan</strong>. Memberstack is free to test; you only pay when you go live. In the dashboard, go to <strong>Settings</strong> → <strong>Billing</strong>. There you will see plans such as Basic ($25/mo billed yearly), Professional ($39/mo), and Business ($79/mo). Click <strong>Activate Basic</strong>, <strong>Activate Professional</strong>, or <strong>Activate Business</strong> (or another plan) to start paying for hosting your membership application. Only after a plan is activated do the <strong>public key</strong> and <strong>secret key</strong> for production mode become available in <strong>Dev Tools</strong>. Until then, Dev Tools shows Test Mode keys only.</p>
+            <figure class="doc-fig">
+                <img src="memberstack-settings-billing-plans.png" alt="Memberstack Settings → Billing: pricing plans (Basic, Professional, Business) and Activate buttons; 100% free to test - only pay when you go live" width="900" height="auto">
+                <figcaption><strong>Figure.</strong> Memberstack Settings → Billing — Choose and activate a pricing plan to go live; only then can you access production API keys.</figcaption>
+            </figure>
+            <figure class="doc-fig">
+                <img src="memberstack-dev-tools-test-mode-api-keys.png" alt="Memberstack Dev Tools: Test Mode toggle and API Keys section (Public Key, Secret Key)" width="900" height="auto">
+                <figcaption><strong>Figure.</strong> Memberstack Dev Tools — Test Mode toggle and API Keys. After activating a plan, switch to Live Mode here to obtain production public and secret keys.</figcaption>
+            </figure>
+
+            <h4 id="memberstack-plan-price-ids">Obtaining Plan ID and Price ID for .env</h4>
+            <p>To integrate plan and price IDs into your app (e.g. <code>NEXT_PUBLIC_MEMBERSTACK_FREE_PLAN_ID</code>, <code>NEXT_PUBLIC_MEMBERSTACK_BRONZE_PRICE_ID</code>), obtain them from the Memberstack dashboard <strong>Plans</strong> page.</p>
+            <p><strong>Plan ID</strong> (for free and paid plans): In the dashboard, go to <strong>Plans</strong>. For each plan (e.g. Free Member, Bronze), click the <strong>three-dot menu</strong> (⋮) next to the plan name, then choose <strong>Copy Plan ID</strong>. Paste the value into your <code>.env.local</code> (e.g. <code>NEXT_PUBLIC_MEMBERSTACK_FREE_PLAN_ID=pln_...</code> for the free plan).</p>
+            <p><strong>Price ID</strong> (for each price on a plan): In the same <strong>Plans</strong> page, select a plan in the left column (e.g. Bronze). The right-hand panel shows <strong>Prices</strong> for that plan. For each price (e.g. “$2 USD / month – Pro Monthly”), click the <strong>three-dot button</strong> next to that price and use the <strong>copy</strong> button next to the Price ID (e.g. <code>prc_...</code>) to copy it. Use this value in <code>.env.local</code> (e.g. <code>NEXT_PUBLIC_MEMBERSTACK_BRONZE_PRICE_ID=prc_...</code>). Repeat for any other paid plans you need.</p>
+            <figure class="doc-fig">
+                <img src="memberstack-plans-copy-plan-id.png" alt="Memberstack Plans: three-dot menu with Copy Plan ID for a plan (e.g. Free Member)" width="900" height="auto">
+                <figcaption><strong>Figure.</strong> Memberstack Plans — For each plan, open the three-dot menu and use <strong>Copy Plan ID</strong> to copy the Plan ID for your .env file.</figcaption>
+            </figure>
+            <figure class="doc-fig">
+                <img src="memberstack-prices-copy-price-id.png" alt="Memberstack Prices panel: Price ID and copy button for a price (e.g. Bronze Pro Monthly)" width="900" height="auto">
+                <figcaption><strong>Figure.</strong> Memberstack Prices (right panel) — For each price, use the three-dot menu and the copy button next to the Price ID to copy it for your .env file.</figcaption>
+            </figure>
         </section>
 
         <section id="clerk-three-steps">
@@ -475,6 +506,18 @@
             </figure>
             <p>You now have <strong>Client ID</strong> and <strong>Client Secret</strong> to enter in Memberstack wherever it asks for the OIDC provider’s Client ID and Client Secret.</p>
 
+            <h3>Where to find Application credentials and Discovery URL in Clerk (production)</h3>
+            <p>In the Clerk Dashboard, open your <strong>Memberstack</strong> OAuth application and go to the <strong>Configure</strong> tab. There you will find:</p>
+            <ul>
+                <li><strong>Application credentials</strong> — <strong>Client ID</strong> (read-only, with copy icon) and <strong>Client Secret</strong> (masked, with Regenerate and copy). These are the OAuth 2.0 credentials that an external app (e.g. Memberstack) uses to identify itself to Clerk.</li>
+                <li><strong>Application configuration URLs</strong> — <strong>Discovery URL</strong> (e.g. <code>https://clerk.adwiise.com/.well-known/openid-configuration</code>) and <strong>Authorize URL</strong> (e.g. <code>https://clerk.adwiise.com/oauth/authorize</code>). The Discovery URL is what you would enter as the “Discovery URL” or “Issuer URL” in an external IdP configuration. Use the copy icons to copy these values.</li>
+                <li><strong>Basic info</strong> — Name (e.g. Memberstack). <strong>Scopes</strong> — e.g. <code>email</code>, <code>offline_access</code>, <code>openid</code>, <code>profile</code>, <code>public_metadata</code>, <code>private_metadata</code>. <strong>Public</strong> toggle — if enabled, Authorization Code with PKCE can be used. <strong>Redirect URIs</strong> — must include the exact callback URL(s) from Memberstack (e.g. your production callback).</li>
+            </ul>
+            <figure class="doc-fig">
+                <img src="clerk-production-oauth-configure.png" alt="Clerk Configure tab for Memberstack OAuth app: Application credentials (Client ID, Client Secret), Application configuration URLs (Discovery URL, Authorize URL), Scopes, Public toggle, Redirect URIs" width="900" height="auto">
+                <figcaption><strong>Figure.</strong> Clerk (production) — Configure tab for the Memberstack OAuth application: Application credentials (Client ID, Client Secret) and Application configuration URLs (Discovery URL, Authorize URL). Copy these for use in the external IdP configuration.</figcaption>
+            </figure>
+
             <h3>Step 2: Get the Discovery URL (Issuer URL)</h3>
             <ol>
                 <li>In the Clerk Dashboard, go to <strong>API keys</strong>: <a href="https://dashboard.clerk.com/~/api-keys" target="_blank" rel="noopener">dashboard.clerk.com → API keys</a> (often under Configure or Developers).</li>
@@ -485,8 +528,8 @@
             </ol>
             <p>Enter this Discovery URL in Memberstack wherever it asks for the “Discovery URL,” “Issuer URL,” or “OpenID Connect discovery endpoint” of the external IdP.</p>
 
-            <h3>Step 3: Enter all three in Memberstack</h3>
-            <p>In Memberstack’s Custom SSO Integration (the place where you can configure the external IdP – often after creating the integration or in Edit):</p>
+            <h3>Step 3: Enter all three in Memberstack (when fields are available)</h3>
+            <p>If Memberstack’s Custom SSO Integration provides fields for the external IdP, enter Discovery URL, Client ID, and Client Secret from Clerk there. In practice, the <strong>Edit SSO App</strong> screen in Memberstack shows only <strong>auto-generated</strong> Client ID and Secret Key (see <a href="#memberstack-edit-sso-auto-generated">§5a Memberstack Edit SSO App and auto-generated credentials</a>). There is no visible field in the Memberstack dashboard to paste Clerk’s Client ID or Client Secret. If your Memberstack project does show fields for Discovery URL / Client ID / Client Secret, use the table below; otherwise the connection may rely on Memberstack’s credentials being registered in Clerk.</p>
             <table>
                 <thead>
                     <tr>
@@ -510,7 +553,7 @@
                 </tbody>
             </table>
             <div class="success-box">
-                <p><strong>Summary:</strong> (1) Create an OAuth application in Clerk with Redirect URIs from Memberstack and scopes <code>openid</code>, <code>profile</code>, <code>email</code> → get Client ID and Client Secret. (2) Get Discovery URL from Clerk API keys (Frontend API URL + <code>/.well-known/openid-configuration</code>). (3) Enter Discovery URL, Client ID, and Client Secret in Memberstack’s SSO integration.</p>
+                <p><strong>Summary:</strong> (1) Create an OAuth application in Clerk with Redirect URIs from Memberstack and scopes <code>openid</code>, <code>profile</code>, <code>email</code> → get Client ID and Client Secret from the <strong>Configure</strong> tab (Application credentials). (2) Get Discovery URL from the same Configure tab (Application configuration URLs) or from Clerk API keys (Frontend API URL + <code>/.well-known/openid-configuration</code>). (3) If Memberstack exposes fields for the IdP, enter Discovery URL, Client ID, and Client Secret there; otherwise note that Memberstack’s Edit SSO App <strong>auto-generates</strong> its own Client ID and Secret and does not provide a place to enter Clerk’s credentials—see §5a for details and how the two may connect.</p>
             </div>
         </section>
 
@@ -612,6 +655,31 @@ NEXT_PUBLIC_MEMBERSTACK_FREE_PLAN_ID=...   # e.g. pln_free-member-lwm70ejm — s
 NEXT_PUBLIC_MEMBERSTACK_BRONZE_PRICE_ID=... # e.g. prc_pro-monthly-0gqt0es4 — for "Upgrade to Bronze" checkout</pre>
             </div>
 
+            <h3 id="production-env-verification">Production .env verification (.env.production)</h3>
+            <p>To run Memberstack in production and access the member portal from your application, the app only <strong>reads</strong> the following (verified in <code>MemberPortalClient.tsx</code> and <code>next.config.mjs</code>):</p>
+            <ul>
+                <li><strong>Required:</strong> <code>NEXT_PUBLIC_MEMBERSTACK_PUBLIC_KEY</code> — from Memberstack <strong>Dev Tools → Live Mode</strong> (production API Keys). Without this, the member portal shows “Memberstack is not configured.”</li>
+                <li><strong>Optional but recommended:</strong> <code>NEXT_PUBLIC_MEMBERSTACK_FREE_PLAN_ID</code> (Plan ID from Memberstack Plans → Copy Plan ID for your free plan), <code>NEXT_PUBLIC_MEMBERSTACK_BRONZE_PRICE_ID</code> (Price ID from Memberstack Plans → Prices panel for Bronze). These enable “Sign up (Free)” and “Upgrade to Bronze” in the portal.</li>
+                <li><strong>Optional:</strong> <code>MEMBERSTACK_PROJECT_ID</code>, <code>NEXT_PUBLIC_MEMBERSTACK_PROJECT_ID</code>, <code>MEMBERSTACK_SECRET_KEY</code> — exposed in config but not used by the current member-portal client; useful for server-side API or reference.</li>
+            </ul>
+            <p><strong>Valid .env.production example (Memberstack production):</strong></p>
+            <div class="code-block">
+<pre>##### Memberstack (production — from Memberstack Dev Tools, Live Mode) #####
+MEMBERSTACK_PROJECT_ID=app_xxxxx
+NEXT_PUBLIC_MEMBERSTACK_PROJECT_ID=app_xxxxx
+NEXT_PUBLIC_MEMBERSTACK_PUBLIC_KEY=pk_live_xxxxx    # required for member portal
+MEMBERSTACK_SECRET_KEY=sk_live_xxxxx                 # server-only, optional for current app
+
+NEXT_PUBLIC_MEMBERSTACK_FREE_PLAN_ID=pln_xxxxx       # from Plans → Copy Plan ID (free plan)
+NEXT_PUBLIC_MEMBERSTACK_BRONZE_PRICE_ID=prc_xxxxx    # from Plans → Prices → copy Price ID</pre>
+            </div>
+            <p><strong>Notes on Clerk / SSO credentials and naming:</strong></p>
+            <ul>
+                <li><strong>Integration Name and Redirect URIs</strong> are not environment variables. They are set in the <strong>Memberstack dashboard</strong> (Edit SSO App: Integration Name e.g. <code>event_site_manager_clerk_integration</code>, Redirect URIs e.g. <code>https://mosc-temp.com/member-portal/callback</code>) and in the <strong>Clerk dashboard</strong> (OAuth application → Redirect URIs). The callback URL must match in both.</li>
+                <li>If you keep Clerk or Memberstack SSO values in .env for reference or future server-side use, use <strong>valid variable names</strong> (no spaces): e.g. <code>MEMBERSTACK_CLERK_CLIENT_ID</code> and <code>MEMBERSTACK_CLERK_SECRET_KEY</code> for Clerk’s OAuth app credentials; <code>MEMBERSTACK_SSO_CLIENT_ID</code> and <code>MEMBERSTACK_SSO_SECRET_KEY</code> for Memberstack’s auto-generated SSO credentials from Edit SSO App. The <strong>current app does not read these</strong>; SSO is configured between Clerk and Memberstack in their dashboards.</li>
+            </ul>
+            <p>With <code>NEXT_PUBLIC_MEMBERSTACK_PUBLIC_KEY</code> set to your <strong>Live Mode</strong> public key (and optionally the plan/price IDs), the app can run Memberstack in production and users can access the member portal from your deployed application.</p>
+
             <h3>Where it is implemented</h3>
             <ul>
                 <li><strong>Header:</strong> <code>src/components/Header.tsx</code> — Features dropdown includes <code>Members</code> with <code>href: '/member-portal'</code> and <code>requiresAuth: true</code>.</li>
@@ -630,8 +698,8 @@ NEXT_PUBLIC_MEMBERSTACK_BRONZE_PRICE_ID=... # e.g. prc_pro-monthly-0gqt0es4 — 
             <h3>How to show plan choice and the Plans tab</h3>
             <p>Follow these steps so members can pick a plan and the Plans tab appears in the profile modal.</p>
             <ol>
-                <li><strong>Create plans in Memberstack dashboard:</strong> In Memberstack → Plans, create e.g. a free plan (“Free Member”) and a paid plan (“Bronze”, with a price). Note the <strong>Plan ID</strong> for the free plan (e.g. <code>pln_free-member-lwm70ejm</code>) and the <strong>Price ID</strong> for the paid plan (e.g. <code>prc_pro-monthly-0gqt0es4</code>).</li>
-                <li><strong>Set env vars:</strong> In <code>.env.local</code> add <code>NEXT_PUBLIC_MEMBERSTACK_FREE_PLAN_ID=pln_free-member-lwm70ejm</code> (your free plan ID) and <code>NEXT_PUBLIC_MEMBERSTACK_BRONZE_PRICE_ID=prc_pro-monthly-0gqt0es4</code> (your Bronze price ID). Restart the dev server.</li>
+                <li><strong>Obtain Plan ID and Price ID from Memberstack:</strong> In the Memberstack dashboard, go to <strong>Plans</strong>. For each plan, use the three-dot menu → <strong>Copy Plan ID</strong> to get the Plan ID. For each price, open the plan’s <strong>Prices</strong> panel (right side), then use the three-dot button and the copy button next to the Price ID. See <a href="#memberstack-plan-price-ids">§5a Obtaining Plan ID and Price ID for .env</a> for step-by-step instructions and screenshots.</li>
+                <li><strong>Set env vars:</strong> In <code>.env.local</code> add <code>NEXT_PUBLIC_MEMBERSTACK_FREE_PLAN_ID=pln_...</code> (your free plan ID from Copy Plan ID) and <code>NEXT_PUBLIC_MEMBERSTACK_BRONZE_PRICE_ID=prc_...</code> (your Bronze price ID from the Prices panel). Restart the dev server.</li>
                 <li><strong>Signup with free plan:</strong> The member portal “Sign up” becomes “Sign up (Free)” when the free plan ID is set. It opens the signup modal with <code>signup: { plans: [freePlanId] }</code>, so new members get the free plan and the <strong>Plans</strong> tab appears.</li>
                 <li><strong>View plans / Upgrade:</strong> The <code>@memberstack/dom</code> package does <strong>not</strong> support a dedicated “PLANS” modal (calling <code>openModal('PLANS')</code> would gray the screen with no content). Use <strong>Member profile</strong> to see and manage plans. “Upgrade to Bronze” is shown only when the member is signed in, the Bronze price ID is set, and the member does <strong>not</strong> already have that plan (we check <code>getCurrentMember().data.planConnections</code> for a matching <code>payment.priceId</code>). It calls <code>purchasePlansWithCheckout({ priceId })</code> for checkout.</li>
             </ol>
