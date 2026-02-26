@@ -26,9 +26,8 @@ export default function KoodoshEethoToKothnePage() {
                   <Image
                     src="/images/lectionary/lent2.jpg"
                     alt="Koodosh Eetho to Kothne"
-                    width={600}
-                    height={360}
-                    className="rounded-lg w-full max-w-md h-auto object-contain"
+                    width={175} height={175}
+                    className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }}
                     sizes="(min-width: 1024px) 37.5vw, 50vw"
                   />
                 </div>

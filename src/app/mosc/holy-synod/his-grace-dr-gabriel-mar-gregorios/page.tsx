@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import Image from 'next/image';
 import SynodMembersSidebar from '../../components/SynodMembersSidebar';
 import QuickLinks from '../../components/QuickLinks';
@@ -17,27 +17,15 @@ const HisGraceDrGabrielMarGregoriosPage = () => {
         breadcrumbFrom="holy-synod"
       />
       {/* Main Content */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Main Content */}
             <div className="lg:col-span-2">
-              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
+              <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
                 {/* Featured Image - Top */}
                 <div className="mb-8 flex justify-center">
-                  <div className="relative w-full max-w-md h-[280px] rounded-lg overflow-hidden shadow-syro-card">
-                      <Image
-                        src="/images/holy-synod/mar-gregorios.jpg"
-                        alt="H.G. Dr. Gabriel Mar Gregorios Metropolitan"
-                        fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 448px"
-                        className="object-cover object-top"
-                        style={{
-                          objectPosition: 'center 15%'
-                        }}
-                        priority
-                      />
-                    </div>
+                  <Image src="/images/holy-synod/mar-gregorios.jpg" alt="H.G. Dr. Gabriel Mar Gregorios Metropolitan" width={175} height={175} className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }} priority />
                   </div>
 
                 {/* Content - Below Image */}
@@ -48,14 +36,14 @@ const HisGraceDrGabrielMarGregoriosPage = () => {
 
                     <div className="prose prose-lg max-w-none">
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace was born on 10 February 1948 to Mr CM John and Mrs Aleyamma John, Vadakethazhethil, Kanjickal. He did schooling at St Stephenâ€™s High School, Pathanapuram. He pursued his BA from Kerala University in English Literature. Subsequent to that, he joined the Serampore University and took his BD degree in 1974. He did his MTh from the Catholic University, Paris. His Grace pursued successfully a three-year Diploma Course in Biblical Hebrew, a two-year certificate course in Aramaic and advanced course in Biblical Greek at the Catholic University, Paris. His Grace also did Doctoral Research at the Lutheran School of Theology at Chicago on the topic â€œThe Glory of God in St Paulâ€ and took his PhD in New Testament from the Serampore University. He further did his Doctoral Research at the University of Cambridge. His Grace was ordained a deacon on 4 November 1969 by HH Mar Baselios Augen I. HH Baselios Mathews I ordained Dn Gabriel as priest on 8 January 1974. He distinctly served as vicar of many parishes such as Chenganachery, Jaipur, Dehuroad, Kuzhimattom, Mundakayam, Kanakappalam, Odanavattom Nellikunnam, and Pooyapally. He was a Professor at Orthodox Seminary, Kottayam. He was professed as a Monk on 7 August 2004 by HH Baselios Mathews II. The Malankara Syrian Christian Association met on 10 June 2004 at the Parumala Seminary, elected Fr Gabriel as a candidate to be ordained to the Episcopal Order and was ordained on 5 March 2005 by HH Baselios Mathews II. At present, His Grace is looking after the Trivandrum Diocese, which is very critical to the church in many ways.
+                        His Grace was born on 10 February 1948 to Mr CM John and Mrs Aleyamma John, Vadakethazhethil, Kanjickal. He did schooling at St Stephen’s High School, Pathanapuram. He pursued his BA from Kerala University in English Literature. Subsequent to that, he joined the Serampore University and took his BD degree in 1974. He did his MTh from the Catholic University, Paris. His Grace pursued successfully a three-year Diploma Course in Biblical Hebrew, a two-year certificate course in Aramaic and advanced course in Biblical Greek at the Catholic University, Paris. His Grace also did Doctoral Research at the Lutheran School of Theology at Chicago on the topic “The Glory of God in St Paul” and took his PhD in New Testament from the Serampore University. He further did his Doctoral Research at the University of Cambridge. His Grace was ordained a deacon on 4 November 1969 by HH Mar Baselios Augen I. HH Baselios Mathews I ordained Dn Gabriel as priest on 8 January 1974. He distinctly served as vicar of many parishes such as Chenganachery, Jaipur, Dehuroad, Kuzhimattom, Mundakayam, Kanakappalam, Odanavattom Nellikunnam, and Pooyapally. He was a Professor at Orthodox Seminary, Kottayam. He was professed as a Monk on 7 August 2004 by HH Baselios Mathews II. The Malankara Syrian Christian Association met on 10 June 2004 at the Parumala Seminary, elected Fr Gabriel as a candidate to be ordained to the Episcopal Order and was ordained on 5 March 2005 by HH Baselios Mathews II. At present, His Grace is looking after the Trivandrum Diocese, which is very critical to the church in many ways.
                       </p>
 
                       <h4 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
                         Contact
                       </h4>
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
-                        <p>Orthodox Church Centre, Ulloor, Trivandrum, Kerala â€“ 695 011</p>
+                        <p>Orthodox Church Centre, Ulloor, Trivandrum, Kerala – 695 011</p>
                         <p>Tel.: 0471-2442509 / 2552509 | Fax: 0471-2442509 | Cell: 9447166857</p>
                         <p>E-mail: gabrielmargregorios@gmail.com</p>
                       </div>

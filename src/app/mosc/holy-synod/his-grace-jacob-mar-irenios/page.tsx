@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import Image from 'next/image';
 import SynodMembersSidebar from '../../components/SynodMembersSidebar';
 import QuickLinks from '../../components/QuickLinks';
@@ -17,27 +17,15 @@ const HisGraceJacobMarIreniosPage = () => {
         breadcrumbFrom="holy-synod"
       />
       {/* Main Content */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Main Content */}
             <div className="lg:col-span-2">
-              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
+              <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
                 {/* Featured Image - Top */}
                 <div className="mb-8 flex justify-center">
-                  <div className="relative w-full max-w-md h-[280px] rounded-lg overflow-hidden shadow-syro-card">
-                      <Image
-                        src="/images/holy-synod/irne.jpg"
-                        alt="H.G. Dr. Yakoob Mar Irenaios Metropolitan"
-                        fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 448px"
-                        className="object-cover object-top"
-                        style={{
-                          objectPosition: 'center 15%'
-                        }}
-                        priority
-                      />
-                    </div>
+                  <Image src="/images/holy-synod/irne.jpg" alt="H.G. Dr. Yakoob Mar Irenaios Metropolitan" width={175} height={175} className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }} priority />
                   </div>
 
                 {/* Content - Below Image */}
@@ -48,7 +36,7 @@ const HisGraceJacobMarIreniosPage = () => {
 
                     <div className="prose prose-lg max-w-none">
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace was born on 15 August 1949 to Mr T. O Cherian and Mrs Kunjelyamma Cherian of Aruvidan Pallikal Family, Kallupara. He did his high-schooling at MGD High School, Puthussery and pre-degree course at Chengannur Christian College. He had his bachelors and masters in English literature from Madras University. Thereupon, he did his BEd and MEd from Kerala University. He took an additional MA in philosophy from Kerala University and then did his PhD. Coming to the theological front, His Grace did his BD degree from Serampore University and D Th from St Peterâ€™s Pontifical Institute Bangalore, MTh from the US. He was ordained a deacon in 1970 by late His Grace Thoma Mar Dionysius and a priest in 1975 by H.H. Baselios Marthoma Didymos I. He became a Ramban on 19 December 1992. On 16 August 1993, HH Baselios Mar Thoma Mathews II consecrated him as Episcopa and named as Jacob Mar Irenios. In August 1995, he was given charge of the Malabar Diocese as the Assistant Metropolitan. When Zacharia Mar Dionysius departed for the eternal life, His Grace was given the charge of Madras Diocese. His Grace has served the church in different capacities as President, Orthodox Youth Movement, President Orthodox Sunday School Association, President Orthodox Bala Samajam, President MOC publications, President Divya Bodhanam, Manager MOC Colleges. His Grace is presently given the charge of Kochi Diocese.
+                        His Grace was born on 15 August 1949 to Mr T. O Cherian and Mrs Kunjelyamma Cherian of Aruvidan Pallikal Family, Kallupara. He did his high-schooling at MGD High School, Puthussery and pre-degree course at Chengannur Christian College. He had his bachelors and masters in English literature from Madras University. Thereupon, he did his BEd and MEd from Kerala University. He took an additional MA in philosophy from Kerala University and then did his PhD. Coming to the theological front, His Grace did his BD degree from Serampore University and D Th from St Peter’s Pontifical Institute Bangalore, MTh from the US. He was ordained a deacon in 1970 by late His Grace Thoma Mar Dionysius and a priest in 1975 by H.H. Baselios Marthoma Didymos I. He became a Ramban on 19 December 1992. On 16 August 1993, HH Baselios Mar Thoma Mathews II consecrated him as Episcopa and named as Jacob Mar Irenios. In August 1995, he was given charge of the Malabar Diocese as the Assistant Metropolitan. When Zacharia Mar Dionysius departed for the eternal life, His Grace was given the charge of Madras Diocese. His Grace has served the church in different capacities as President, Orthodox Youth Movement, President Orthodox Sunday School Association, President Orthodox Bala Samajam, President MOC publications, President Divya Bodhanam, Manager MOC Colleges. His Grace is presently given the charge of Kochi Diocese.
                       </p>
 
                       <h4 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">

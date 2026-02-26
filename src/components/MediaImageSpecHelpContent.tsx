@@ -13,14 +13,18 @@ export default function MediaImageSpecHelpContent() {
         Image specifications for hero and event media
       </h4>
 
-      {/* Section 1 - Left panel */}
+      {/* Section 1 - Left panel (home page hero left; see docs/hero-section-1-image-resize-prompt.md) */}
       <section>
-        <h5 className="font-semibold text-blue-700 mb-2">Section 1 — Left panel (Kerala / branding)</h5>
+        <h5 className="font-semibold text-blue-700 mb-2">Section 1 — Left panel (Kerala / MALAYALEES.US banner)</h5>
+        <p className="text-xs text-gray-600 mb-2">
+          Full resize prompt: <code className="bg-gray-100 px-1 rounded">docs/hero-section-1-image-resize-prompt.md</code>. Example file: <code className="bg-gray-100 px-1 rounded">public/images/hero_section/wooden-boat-under-coconut-tree-riverside_ver_2.jpg</code>
+        </p>
         <ul className="list-disc pl-5 space-y-1">
-          <li><strong>Recommended:</strong> 1000 × 1200 px (aspect ratio 5:6 portrait)</li>
-          <li><strong>Minimum:</strong> 600 × 720 px (keep 5:6)</li>
-          <li>Keep text sharp (MALAYALEES.US, Malayalam script, circular logo)</li>
-          <li>Preserve split between dark left panel and tropical right; crop to fit 5:6 if needed</li>
+          <li><strong>Output:</strong> 1000 × 1200 px or 1200 × 1440 px (aspect ratio 5:6 portrait)</li>
+          <li><strong>Method:</strong> Reduce height of the visual content and add padding to top and bottom inside the image (soft gradient or solid tone) so the banner fits the frame without being cropped.</li>
+          <li><strong>Preserve:</strong> Full vertical &quot;MALAYALEES.US&quot; text, yellow circular logo (palm frond + &quot;malayalees Friends&quot;), US flag elements, palm trees, water, tropical scene — all visible and legible; scale down, never crop.</li>
+          <li><strong>Padding:</strong> Equal padding above and below; center content vertically. Use dark blue/purple gradient or solid, or gentle sky/water extension.</li>
+          <li>High quality (e.g. 90%+); same format as source (PNG or JPEG).</li>
         </ul>
       </section>
 

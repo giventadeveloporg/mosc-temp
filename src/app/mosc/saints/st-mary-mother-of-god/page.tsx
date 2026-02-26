@@ -23,20 +23,21 @@ export default async function StMaryMotherOfGodPage({
     <div className="bg-syro-bg-gray">
       <SyroPageBanner title="St. Mary Mother of God" breadcrumbFrom={breadcrumbFrom} />
       {/* Main Content */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Main Content */}
             <div className="lg:col-span-2">
-              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
+              <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
                 {/* Featured Image */}
-                <div className="mb-8">
+                <div className="mb-8 flex justify-center">
                   <Image
                     src="/images/saints/st-mary-mother-of-god.jpg"
                     alt="St. Mary Mother of God"
-                    width={500}
-                    height={300}
-                    className="rounded-lg shadow-syro-card w-auto h-auto block mx-auto"
+                    width={175}
+                    height={175}
+                    className="rounded-lg object-contain"
+                    style={{ width: '175px', height: '175px' }}
                     priority
                   />
                 </div>

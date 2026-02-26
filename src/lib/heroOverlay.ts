@@ -9,9 +9,9 @@ export interface HeroOverlayInfo {
 }
 
 /**
- * Returns overlay info for "Buy Tickets" / "Fundraiser ticket click here" CTA
+ * Returns overlay info for "Buy Tickets" / "Fundraiser" / "Register Here" CTA
  * shown at bottom-right of hero or featured event image.
- * Only returns a value for upcoming (today or future) events that are ticketed or ticketed fundraiser.
+ * Only returns a value for upcoming (today or future) events: ticketed, ticketed fundraiser, or registration-required.
  */
 export function getOverlayInfo(event: EventDetailsDTO | null): HeroOverlayInfo | null {
   if (!event || !event.id) return null;
@@ -57,6 +57,14 @@ export function getOverlayInfo(event: EventDetailsDTO | null): HeroOverlayInfo |
       image: '/images/buy_tickets_click_here_red.webp',
       href: checkoutRoute,
       alt: 'Buy Tickets',
+    };
+  }
+
+  if (event.isRegistrationRequired === true) {
+    return {
+      image: '/images/register_here_button.jpg',
+      href: `/events/${event.id}/register`,
+      alt: 'Register Here',
     };
   }
 

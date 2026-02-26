@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getBishopByDocumentId } from '../getBishopsData';
+import SyroPageBanner from '../../../components/SyroPageBanner';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,7 +39,8 @@ export default async function BishopDetailPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-syro-bg-gray">
-      <section className="relative bg-syro-bg-gray py-12 lg:py-16">
+      <SyroPageBanner title={bishop.name} breadcrumbFrom="directory" />
+      <section className="relative bg-syro-bg-gray py-8 lg:py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Link
             href="/mosc/directory/bishops"

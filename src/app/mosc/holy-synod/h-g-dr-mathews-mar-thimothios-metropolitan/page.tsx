@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import Image from 'next/image';
 import SynodMembersSidebar from '../../components/SynodMembersSidebar';
 import QuickLinks from '../../components/QuickLinks';
@@ -17,27 +17,15 @@ const HGDrMathewsMarThimothiosMetropolitanPage = () => {
         breadcrumbFrom="holy-synod"
       />
       {/* Main Content */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Main Content */}
             <div className="lg:col-span-2">
-              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
+              <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
                 {/* Featured Image - Top */}
                 <div className="mb-8 flex justify-center">
-                  <div className="relative w-full max-w-md h-[280px] rounded-lg overflow-hidden shadow-syro-card">
-                      <Image
-                        src="/images/holy-synod/thimothios.jpg"
-                        alt="H. G. Dr. Mathews Mar Thimothios Metropolitan"
-                        fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 448px"
-                        className="object-cover object-top"
-                        style={{
-                          objectPosition: 'center 15%'
-                        }}
-                        priority
-                      />
-                    </div>
+                  <Image src="/images/holy-synod/thimothios.jpg" alt="H. G. Dr. Mathews Mar Thimothios Metropolitan" width={175} height={175} className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }} priority />
                   </div>
 
                 {/* Content - Below Image */}
@@ -48,7 +36,7 @@ const HGDrMathewsMarThimothiosMetropolitanPage = () => {
 
                     <div className="prose prose-lg max-w-none">
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace was born on 3rd May 1963 as the eldest son of Mr P.J. Baby and Mrs Thankamma Baby of Painuvilla Puthenveettil family. His Grace is a member of St Maryâ€™s Cathedral Puthiakavu, Mavelikkara.
+                        His Grace was born on 3rd May 1963 as the eldest son of Mr P.J. Baby and Mrs Thankamma Baby of Painuvilla Puthenveettil family. His Grace is a member of St Mary’s Cathedral Puthiakavu, Mavelikkara.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
@@ -56,11 +44,11 @@ const HGDrMathewsMarThimothiosMetropolitanPage = () => {
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace is a scholar in Italian, French, German, Aramaic and Hebrew apart from English and Malayalam. His Grace has served as Joint Secretary of St Thomas Orthodox Vaidika Sanghom, Publisher of â€œPurohithanâ€ Magazine, Executive Committee Member of the Priest Fellowship in Rome, Secretary of Vattasseril Mar Divanyasios Charitable Fund, Dean of Postgraduate Studies and Registrar of Orthodox Theological Seminary.
+                        His Grace is a scholar in Italian, French, German, Aramaic and Hebrew apart from English and Malayalam. His Grace has served as Joint Secretary of St Thomas Orthodox Vaidika Sanghom, Publisher of “Purohithan” Magazine, Executive Committee Member of the Priest Fellowship in Rome, Secretary of Vattasseril Mar Divanyasios Charitable Fund, Dean of Postgraduate Studies and Registrar of Orthodox Theological Seminary.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
-                        His Grace has served as assistant vicar and vicar in eight parishes in Kollam and Mavelikkara Dioceses. His Grace has prepared O.V.B.S. textbooks, teacherâ€™s guide and a study based on the 24th Psalm.
+                        His Grace has served as assistant vicar and vicar in eight parishes in Kollam and Mavelikkara Dioceses. His Grace has prepared O.V.B.S. textbooks, teacher’s guide and a study based on the 24th Psalm.
                       </p>
 
                       <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
@@ -71,7 +59,7 @@ const HGDrMathewsMarThimothiosMetropolitanPage = () => {
                         Contact
                       </h4>
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
-                        <p>Bethel Mar Gregorios Aramana, Chengannur P.O. â€“ 689 121</p>
+                        <p>Bethel Mar Gregorios Aramana, Chengannur P.O. – 689 121</p>
                         <p>Mob: 9447718511</p>
                         <p>Email: thimothiosmathews@gmail.com</p>
                       </div>

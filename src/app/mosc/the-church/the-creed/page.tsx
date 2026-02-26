@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import QuickLinks from '../../components/QuickLinks';
@@ -24,22 +24,19 @@ export default async function TheCreedPage({
       <SyroPageBanner title="The Creed" breadcrumbFrom={breadcrumbFrom} />
 
       {/* Main Content */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             <div className="lg:col-span-2">
-              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
+              <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
                 {/* Featured Image - centered, contained */}
                 <div className="mb-8 flex justify-center">
-                  <div className="relative w-full max-w-[280px] h-auto">
-                    <Image
+                  <Image
                       src="/images/church/creed.jpg"
                       alt="The Creed - Ecumenical Council of Nicea"
-                      width={280}
-                      height={180}
-                      className="w-auto h-auto object-contain rounded-lg block mx-auto"
+                      width={175} height={175}
+                      className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }}
                     />
-                  </div>
                 </div>
 
                 <div className="prose prose-lg max-w-none">
@@ -133,10 +130,10 @@ export default async function TheCreedPage({
                   </h2>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Council of Nicea issued 20 canons on issues that matter to the discipline of
-                    the Church. Ecclesiastical structures are dealt with in canons 4â€“7, 15 and 16.
-                    Dignity of ordained people is mentioned in canons 1â€“3, 9, 10 and 17. The
+                    the Church. Ecclesiastical structures are dealt with in canons 4–7, 15 and 16.
+                    Dignity of ordained people is mentioned in canons 1–3, 9, 10 and 17. The
                     problem of open confession of sins during a liturgical action is the theme in
-                    canons 11â€“14. The question how to reinstate the lapsed, schismatic and
+                    canons 11–14. The question how to reinstate the lapsed, schismatic and
                     heretics etc. into the Church is dealt with in canons 8 and 19. Liturgical
                     admonitions are given in canons 18 and 20. From the above narration, it is
                     clear that there is no systematic treatment of problems in the order of
@@ -163,7 +160,7 @@ export default async function TheCreedPage({
                     The third Ecumenical Council, Ephesus in 431, reaffirmed the 381 version, and
                     decreed that &quot;it is unlawful for any man to bring forward, or to write, or
                     to compose a different Faith as a rival to that established by the holy
-                    Fathers assembled with the Holy Ghost in NicÃ¦a.&quot;
+                    Fathers assembled with the Holy Ghost in Nicæa.&quot;
                   </p>
 
                   <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4 mt-8">

@@ -748,7 +748,7 @@ const HeroSection: React.FC = () => {
           {/* Image container - object-contain for full image visibility, centered */}
           <div className="hero-left-image flex items-center justify-center">
             <Image
-              src="/images/hero_section/wooden-boat-under-coconut-tree-riverside_ver_2.jpeg"
+              src="/images/hero_section/wooden-boat-under-coconut-tree-riverside_ver_2.jpg"
               alt="Malayalees.US - Kerala Backwaters"
               width={600}
               height={800}
@@ -799,7 +799,7 @@ const HeroSection: React.FC = () => {
         <Link href="/#about-us" className="hero-bottom-card hero-bottom-card-mission group">
           <div className="hero-mission-bg">
             <Image
-              src="/images/logos/Malayalees_US/Unite_India_Header_Branding.png"
+              src="/images/logos/Malayalees_US/image.png"
               alt="Unite India - A Nonprofit Corporation"
               fill
               className="object-cover object-left transition-transform duration-500 group-hover:scale-[1.02]"

@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import Image from 'next/image';
 import QuickLinks from '../../components/QuickLinks';
 import SyroPageBanner from '../../components/SyroPageBanner';
@@ -23,23 +23,22 @@ export default async function MalankaraOrthodoxSyrianChurchPage({
       <SyroPageBanner title="The Malankara Orthodox Syrian Church" breadcrumbFrom={breadcrumbFrom} />
 
       {/* Main Content */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Main Content */}
             <div className="lg:col-span-2">
-              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
+              <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
                 {/* Featured Image - centered, contained */}
                 <div className="mb-8 flex justify-center">
-                  <div className="relative w-full max-w-[250px] h-auto">
-                    <Image
-                      src="/images/logos/Current_Edits/MOSC-Logo-only.png"
-                      alt="Malankara Orthodox Syrian Church"
-                      width={250}
-                      height={150}
-                      className="w-auto h-auto object-contain rounded-lg block mx-auto"
-                    />
-                  </div>
+                  <Image
+                    src="/images/logos/Current_Edits/MOSC-Logo-only.png"
+                    alt="Malankara Orthodox Syrian Church"
+                    width={175}
+                    height={175}
+                    className="rounded-lg object-contain"
+                    style={{ width: '175px', height: '175px' }}
+                  />
                 </div>
 
                 <div className="prose prose-lg max-w-none">

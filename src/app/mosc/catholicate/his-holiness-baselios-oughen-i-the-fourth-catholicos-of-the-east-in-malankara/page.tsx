@@ -30,9 +30,8 @@ const BaseliosAugenIPage = () => {
                   <Image
                     src="https://mosc.in/wp-content/uploads/2015/01/augen.jpg"
                     alt="His Holiness Baselios Augen I, The Fourth Catholicos of the East in Malankara"
-                    width={500}
-                    height={300}
-                    className="w-full max-w-md h-auto object-contain rounded-lg"
+                    width={175} height={175}
+                    className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }}
                     unoptimized
                     sizes="(max-width: 768px) 100vw, 50vw"
                   />

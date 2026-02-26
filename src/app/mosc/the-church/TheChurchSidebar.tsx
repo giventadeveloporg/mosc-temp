@@ -38,7 +38,7 @@ const THE_CHURCH_LINKS: SidebarItem[] = [
       { href: '/mosc/the-church/spirituality/deification', label: 'Deification' },
       { href: '/mosc/the-church/spirituality/fasting-and-abstinence', label: 'Fasting and abstinence' },
       { href: '/mosc/the-church/spirituality/lent', label: 'Lent' },
-      { href: '/mosc/the-church/spirituality#the-great-lent', label: 'The Great Lent' },
+      { href: '/mosc/the-church/spirituality/the-great-lent', label: 'The Great Lent' },
       { href: '/mosc/the-church/spirituality/what-is-prayer', label: 'What is Prayer?' },
       { href: '/mosc/the-church/spirituality/shubqono-let-us-be-reconciled-with-one-another', label: 'Shubqono' },
     ],

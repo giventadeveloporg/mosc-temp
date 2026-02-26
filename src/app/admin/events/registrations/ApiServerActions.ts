@@ -54,7 +54,12 @@ export async function fetchRegistrationManagementData(
     let events: EventDetailsDTO[] = [];
     if (eventsResponse.ok) {
       const eventsData = await eventsResponse.json();
-      events = Array.isArray(eventsData) ? eventsData : [];
+      // Handle paged response (Spring Data REST: { content: [...], totalElements })
+      if (eventsData && typeof eventsData === 'object' && 'content' in eventsData && Array.isArray(eventsData.content)) {
+        events = eventsData.content;
+      } else {
+        events = Array.isArray(eventsData) ? eventsData : [];
+      }
     }
 
     // Only fetch attendees if eventId is provided
@@ -111,29 +116,41 @@ export async function fetchRegistrationManagementData(
       throw new Error(`Failed to fetch attendees: ${attendeesResponse.status}`);
     }
 
-    const attendees = await attendeesResponse.json();
-    const attendeesArray = Array.isArray(attendees) ? attendees : [];
+    const attendeesData = await attendeesResponse.json();
+    // Handle paged response (Spring Data REST: { content: [...], totalElements })
+    let attendeesArray: EventAttendeeDTO[];
+    let totalCountFromAttendees: number | undefined;
+    if (attendeesData && typeof attendeesData === 'object' && 'content' in attendeesData && Array.isArray(attendeesData.content)) {
+      attendeesArray = attendeesData.content;
+      totalCountFromAttendees = typeof attendeesData.totalElements === 'number' ? attendeesData.totalElements : undefined;
+    } else {
+      attendeesArray = Array.isArray(attendeesData) ? attendeesData : [];
+    }
 
-    // Get total count for pagination
-    const countParams = new URLSearchParams(params);
-    countParams.delete('size');
-    countParams.delete('page');
-    countParams.append('size', '1');
+    // Get total count for pagination (use paged response totalElements when available, else fallback to count request)
+    let totalCount = totalCountFromAttendees ?? 0;
+    if (totalCount === 0) {
+      const countParams = new URLSearchParams(params);
+      countParams.delete('size');
+      countParams.delete('page');
+      countParams.append('size', '1');
 
-    const countResponse = await fetchWithJwtRetry(
-      `${getApiBase()}/api/event-attendees?${countParams.toString()}`,
-      {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        cache: 'no-store',
-      },
-      'fetchAttendeesCount'
-    );
+      const countResponse = await fetchWithJwtRetry(
+        `${getApiBase()}/api/event-attendees?${countParams.toString()}`,
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+        },
+        'fetchAttendeesCount'
+      );
 
-    let totalCount = 0;
-    if (countResponse.ok) {
-      const countData = await countResponse.json();
-      totalCount = countData.totalElements || attendeesArray.length;
+      if (countResponse.ok) {
+        const countData = await countResponse.json();
+        totalCount = countData.totalElements ?? attendeesArray.length;
+      } else {
+        totalCount = attendeesArray.length;
+      }
     }
 
     // Fetch selected event details if eventId is provided

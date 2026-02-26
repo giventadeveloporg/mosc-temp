@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import QuickLinks from '../../components/QuickLinks';
@@ -8,7 +8,7 @@ import TheChurchSidebar from '../TheChurchSidebar';
 export const metadata = {
   title: 'The Throne of St. Thomas',
   description:
-    "The concept of the Throne of St. Thomas is based on the words of our Lordâ€”the twelve thrones promised to the apostles and the authority shared by all bishops in the Church.",
+    "The concept of the Throne of St. Thomas is based on the words of our Lord—the twelve thrones promised to the apostles and the authority shared by all bishops in the Church.",
 };
 
 export default async function ThroneOfStThomasPage({
@@ -24,22 +24,19 @@ export default async function ThroneOfStThomasPage({
       <SyroPageBanner title="The Throne of St. Thomas" breadcrumbFrom={breadcrumbFrom} />
 
       {/* Main Content */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             <div className="lg:col-span-2">
-              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
+              <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
                 {/* Featured Image - centered, contained */}
                 <div className="mb-8 flex justify-center">
-                  <div className="relative w-full max-w-[280px] h-auto">
-                    <Image
+                  <Image
                       src="/images/church/throne_of_st_thomas.jpg"
                       alt="The Throne of St. Thomas"
-                      width={280}
-                      height={180}
-                      className="w-auto h-auto object-contain rounded-lg block mx-auto"
+                      width={175} height={175}
+                      className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }}
                     />
-                  </div>
                 </div>
 
                 <div className="prose prose-lg max-w-none">
@@ -71,7 +68,7 @@ export default async function ThroneOfStThomasPage({
                     and the Syriac equivalent is &apos;kursyo&apos;. In Hebrew it is
                     &apos;kisse&apos;. The word primarily means the seat of authority of a king or a
                     prince or a judge. Both in Old Testament and in New Testament the word throne is
-                    referred to the seat of authority (cf. 1 Kings 22:19; Isaiah 6:1; 1 Sam 4:1â€“13
+                    referred to the seat of authority (cf. 1 Kings 22:19; Isaiah 6:1; 1 Sam 4:1–13
                     etc.). In Revelation 4:2 we see a throne in heaven which is the seat of God and
                     in 4:4 we see twenty-four other thrones set around the throne of God. Twenty-four
                     elders were seated on the twenty-four thrones (4:4), clad in white garments and
@@ -111,7 +108,7 @@ export default async function ThroneOfStThomasPage({
                   </h2>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     During the course of time, the word &apos;throne&apos; gradually gave place to
-                    another Greek word for the seat of authorityâ€”&apos;kathedra&apos;. It is used in
+                    another Greek word for the seat of authority—&apos;kathedra&apos;. It is used in
                     Matthew 23:2 for the seat of Moses or the place of the teaching authority of the
                     Mosaic Law. The word &apos;Cathedral&apos; comes from &apos;kathedra&apos; which
                     in Christian use means a bishop&apos;s chair. A cathedral is not simply a large

@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Metadata } from 'next';
+import QuickLinks from '../components/QuickLinks';
 import SyroPageBanner from '../components/SyroPageBanner';
 
 export const metadata: Metadata = {
@@ -24,49 +25,63 @@ export default function PublicationsPage() {
     <div className="min-h-screen bg-syro-bg-gray">
       <SyroPageBanner title="Publications" breadcrumbFrom="home" />
 
-      {/* Publications Grid Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* Intro card (matches administration .admin-intro-card) */}
+          <div className="bg-white p-10 rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] mb-16">
+            <h2 className="font-syro-display text-[2.2rem] font-bold text-black mb-5">
+              Publications
+            </h2>
+            <p className="font-syro-primary text-xl text-syro-dark-gray leading-relaxed">
+              Official publications of the Malankara Orthodox Syrian Church, including the Malankara Sabha Magazine (Masika) and other church literature.
+            </p>
+          </div>
+
+          {/* Section title - left red bar (matches administration .admin-section-title) */}
+          <h3 className="text-2xl font-light text-[#798daf] mb-10 pl-8 border-l-[7px] border-syro-red">
+            Church Publications
+          </h3>
+
+          {/* Cards grid (matches administration .admin-card) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {publications.map((publication) => (
-              <Link
+              <div
                 key={publication.id}
-                href={publication.link}
-                className="group bg-white rounded-lg shadow-syro-card hover:shadow-syro-card-hover transition-all duration-300 overflow-hidden"
+                className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 overflow-hidden flex flex-col h-full"
               >
-                <div className="relative w-full h-64 flex items-center justify-center overflow-hidden bg-syro-bg-gray/20">
+                <div className="relative w-full h-48 bg-syro-bg-gray/20 shrink-0 flex items-center justify-center">
                   <Image
                     src={publication.image}
                     alt={publication.title}
                     fill
-                    className="object-contain group-hover:scale-105 transition-all duration-300"
+                    className="object-contain"
                     style={{ objectPosition: 'center center' }}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
                 </div>
-                <div className="p-6">
-                  <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-3 group-hover:text-syro-red transition-all duration-300">
+                <div className="p-8 flex flex-col flex-1">
+                  <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug">
                     {publication.title}
-                  </h2>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4 line-clamp-3">
+                  </h3>
+                  <p className="font-syro-primary text-base text-syro-dark-gray flex-1 mb-5 leading-relaxed line-clamp-3">
                     {publication.description}
                   </p>
-                  <span className="syro-read-more-btn font-syro-primary">
-                    Read More
+                  <Link
+                    href={publication.link}
+                    className="syro-primary-button inline-flex items-center gap-2 mt-auto w-fit"
+                  >
+                    <span>Read More</span>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
-                  </span>
+                  </Link>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* Additional Information Section */}
-      <section className="py-16 bg-syro-bg-gray">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center">
+          {/* Additional Information Section - kept as requested */}
+          <div className="max-w-3xl mx-auto text-center mb-12">
             <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-6">
               Our Publishing Mission
             </h2>
@@ -77,6 +92,8 @@ export default function PublicationsPage() {
               Each publication reflects our commitment to sharing the timeless teachings of the Orthodox faith in a manner that is both accessible and meaningful to all generations.
             </p>
           </div>
+
+          <QuickLinks />
         </div>
       </section>
     </div>

@@ -385,15 +385,15 @@ nav[role="navigation"] .group {
    Image Containment: Full visibility, no cropping
    ======================================== */
 
-/* Split Hero Container - FIXED standard size, never grows/shrinks with viewport */
+/* Split Hero Container - FIXED standard size; height allows taller bottom cards + padding */
 .hero-container-split {
   position: relative;
   background: var(--hero-bg-gradient);
   padding-top: 5rem;
   width: 100%;
-  /* Fixed height: hero is a standard-size banner, not elastic */
-  height: 30rem; /* 480px - mobile */
-  max-height: 30rem;
+  /* Height accommodates bottom row cards + ~20px so image/content stay fully visible */
+  height: 31.25rem; /* 500px - mobile */
+  max-height: 31.25rem;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -402,22 +402,22 @@ nav[role="navigation"] .group {
 @media (min-width: 768px) {
   .hero-container-split {
     padding-top: 5.5rem;
-    height: 34rem; /* 544px - tablet */
-    max-height: 34rem;
+    height: 35.25rem; /* 564px - tablet */
+    max-height: 35.25rem;
   }
 }
 
 @media (min-width: 1024px) {
   .hero-container-split {
-    height: 36rem; /* 576px - desktop */
-    max-height: 36rem;
+    height: 37.25rem; /* 596px - desktop */
+    max-height: 37.25rem;
   }
 }
 
 @media (min-width: 1440px) {
   .hero-container-split {
-    height: 38rem; /* 608px - large desktop */
-    max-height: 38rem;
+    height: 39.25rem; /* 628px - large desktop */
+    max-height: 39.25rem;
   }
 }
 
@@ -456,8 +456,8 @@ nav[role="navigation"] .group {
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Mobile: generous horizontal padding so image doesn't bleed to edges */
-  padding: 0.5rem 1.25rem;
+  /* No horizontal padding: image fills left/right so no empty purple strip */
+  padding: 0.25rem 0;
   background: transparent;
 }
 
@@ -465,33 +465,31 @@ nav[role="navigation"] .group {
   .hero-left-panel {
     width: 35%;
     flex: none;
-    padding: 1rem 0.5rem 1rem 1rem;
+    padding: 0.5rem 0;
   }
 }
 
 @media (min-width: 1024px) {
   .hero-left-panel {
     width: 32%;
-    padding: 1.25rem 0.75rem 1.25rem 1.5rem;
+    padding: 0.5rem 0;
   }
 }
 
-/* Image container - aspect-ratio locked so frame hugs the image tightly.
-   Image is 944×1136 ≈ 5:6. The frame sizes to match, eliminating empty space. */
+/* Image container - full width of panel so no empty space on left/right.
+   Image uses object-cover so it fills the area edge-to-edge (center kept in view). */
 .hero-left-image {
   position: relative;
-  /* Let aspect-ratio control width; height fills the panel */
-  width: auto;
-  max-width: 100%;
+  width: 100%;
   height: 100%;
+  max-width: 100%;
   max-height: 100%;
-  aspect-ratio: 5 / 6;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.25rem;
+  padding: 0;
   /* Elegant frame effect */
-  border-radius: 1.25rem;
+  border-radius: 0.75rem;
   overflow: hidden;
   /* Subtle ambient glow */
   box-shadow:
@@ -504,17 +502,10 @@ nav[role="navigation"] .group {
   background: linear-gradient(145deg, rgba(45, 27, 78, 0.5), rgba(26, 10, 46, 0.7));
 }
 
-@media (min-width: 768px) {
-  .hero-left-image {
-    padding: 0.375rem;
-  }
-}
-
-/* Hero left image: FULLY VISIBLE — no cutoff on any side, ever.
-   object-contain keeps the entire image within the frame.
-   The container's purple gradient fills any letterbox space. */
+/* Hero left image: fill container edge-to-edge (no empty left/right).
+   object-cover fills the area; image should have built-in top/bottom padding to avoid crop. */
 .hero-left-image img {
-  object-fit: contain !important;
+  object-fit: cover !important;
   object-position: center center !important;
   width: 100% !important;
   height: 100% !important;
@@ -539,20 +530,19 @@ nav[role="navigation"] .group {
   );
 }
 
-/* Right-edge blend: left panel fades into slideshow (no stark border) */
+/* Right-edge blend: very narrow, subtle so no dark band; image fills container */
 .hero-left-image::after {
   content: '';
   position: absolute;
   top: 0;
   right: 0;
-  width: 20%;
+  width: 6%;
   height: 100%;
   pointer-events: none;
   z-index: 2;
   background: linear-gradient(to right,
     transparent 0%,
-    rgba(26, 10, 46, 0.4) 60%,
-    rgba(26, 10, 46, 0.85) 100%
+    rgba(26, 10, 46, 0.25) 100%
   );
   border-radius: 0 0.75rem 0.75rem 0;
 }
@@ -771,13 +761,13 @@ nav[role="navigation"] .group {
   }
 }
 
-/* Bottom cards: slim height, full width stacked (mobile), half in row */
+/* Bottom cards: increased height (+20px) for visibility, full width stacked (mobile), half in row */
 .hero-bottom-card {
   position: relative;
   width: 100%;
   max-width: 340px;
-  min-height: 48px;
-  max-height: 64px;
+  min-height: 68px;
+  max-height: 84px;
   border-radius: 0.75rem;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -792,8 +782,8 @@ nav[role="navigation"] .group {
 
 @media (min-width: 768px) {
   .hero-bottom-card {
-    min-height: 52px;
-    max-height: 72px;
+    min-height: 72px;
+    max-height: 92px;
     border-radius: 0.875rem;
   }
 }
@@ -817,30 +807,31 @@ nav[role="navigation"] .group {
   z-index: 0;
 }
 
+/* Lighter overlay: no dark bar at bottom, keeps section bright while preserving text readability */
 .hero-mission-overlay {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.1) 70%, transparent 100%);
+  background: linear-gradient(to top, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.06) 50%, transparent 100%);
   pointer-events: none;
 }
 
 .hero-mission-content {
   position: relative;
   z-index: 2;
-  padding: 0.125rem 0.5rem;
+  padding: 0.375rem 0.75rem;
   margin-top: auto;
 }
 
 @media (min-width: 768px) {
   .hero-mission-content {
-    padding: 0.1875rem 0.75rem;
+    padding: 0.5rem 1rem;
   }
 }
 
 @media (min-width: 1024px) {
   .hero-mission-content {
-    padding: 0.25rem 1rem;
+    padding: 0.5rem 1.25rem;
   }
 }
 
@@ -875,7 +866,7 @@ nav[role="navigation"] .group {
   justify-content: center;
   gap: 0.75rem;
   text-align: left;
-  padding: 0.125rem 0.75rem;
+  padding: 0.375rem 0.75rem;
   width: 100%;
 }
 
@@ -956,6 +947,113 @@ nav[role="navigation"] .group {
   margin: 0 auto;
   padding: 0.125rem 1rem;
   width: 100%;
+}
+
+/* ========================================
+   HERO MOBILE / SMALL SCREENS: Full-bleed layout
+   Sections 1–4 bleed to screen edges; desktop unchanged (768px+).
+   ======================================== */
+@media (max-width: 767px) {
+  .hero-container-split {
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 5rem;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .hero-split-row {
+    flex-direction: column;
+    gap: 0;
+    padding: 0;
+    margin: 0;
+    min-height: 0;
+  }
+
+  /* Section 1: Left panel (Kerala image) – full bleed */
+  .hero-left-panel {
+    width: 100%;
+    flex: 0 0 auto;
+    min-height: 32vh;
+    padding: 0;
+    margin: 0;
+  }
+
+  .hero-left-image {
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    min-height: 32vh;
+    aspect-ratio: auto;
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+    background: transparent;
+  }
+
+  .hero-left-image::before,
+  .hero-left-image::after {
+    display: none;
+  }
+
+  .hero-left-image img {
+    border-radius: 0 !important;
+  }
+
+  /* Section 2: Right panel (slideshow) – full bleed */
+  .hero-right-panel {
+    width: 100%;
+    flex: 0 0 auto;
+    min-height: 38vh;
+    padding: 0;
+    margin: 0;
+  }
+
+  .hero-slideshow-wrapper {
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+    background: transparent;
+  }
+
+  .hero-slideshow-wrapper::before {
+    display: none;
+  }
+
+  .hero-slideshow-wrapper img {
+    border-radius: 0 !important;
+  }
+
+  .hero-ticket-overlay {
+    bottom: 1rem;
+    right: 1rem;
+  }
+
+  /* Section 3 & 4: Bottom row – full bleed, stacked; increased height for visibility */
+  .hero-bottom-row {
+    flex-direction: column;
+    gap: 0;
+    padding: 0.25rem 0.5rem;
+    margin: 0;
+    width: 100%;
+  }
+
+  .hero-bottom-card {
+    width: 100%;
+    max-width: none;
+    min-height: 76px;
+    max-height: none;
+    border-radius: 0;
+  }
+
+  .hero-browse-container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
 }
 
 /* ========================================

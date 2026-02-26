@@ -27,9 +27,8 @@ export default function KyomthoEasterPage() {
                   <Image
                     src="/images/lectionary/lent1.jpg"
                     alt="Kyomtho (Easter) to Koodosh Edtho"
-                    width={600}
-                    height={360}
-                    className="rounded-lg w-full max-w-md h-auto object-contain"
+                    width={175} height={175}
+                    className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }}
                     sizes="(min-width: 1024px) 37.5vw, 50vw"
                   />
                 </div>

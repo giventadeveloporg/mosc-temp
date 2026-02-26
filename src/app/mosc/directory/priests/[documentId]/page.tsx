@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getPriestByDocumentId } from '../getPriestsData';
+import SyroPageBanner from '../../../components/SyroPageBanner';
 
 type PageProps = { params: Promise<{ documentId: string }> };
 
@@ -22,9 +23,11 @@ export default async function PriestDetailPage({ params }: PageProps) {
   const priest = await getPriestByDocumentId(documentId);
   if (!priest) notFound();
 
+  const displayName = priest.title ? `${priest.title} ${priest.name}` : priest.name;
   return (
     <div className="min-h-screen bg-syro-bg-gray">
-      <section className="relative bg-syro-bg-gray py-12 lg:py-16">
+      <SyroPageBanner title={displayName} breadcrumbFrom="directory" />
+      <section className="relative bg-syro-bg-gray py-8 lg:py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Link
             href="/mosc/directory/priests"

@@ -7,6 +7,7 @@ import { SidebarPromo } from './components/SidebarPromo';
 import { FollowUsFacebook } from './components/FollowUsFacebook';
 import { AdSlots } from './components/AdSlots';
 import QuickLinks from '../components/QuickLinks';
+import SyroPageBanner from '../components/SyroPageBanner';
 
 export const metadata = {
   title: 'News',
@@ -31,16 +32,11 @@ export default async function NewsPage() {
 
   return (
     <div className="bg-syro-bg-gray font-syro-primary text-[#0b2848] min-h-screen">
-      {/* Hero / Page title - design system mainTitle: h1 2.8rem/700, p 20px/#506276 */}
-      <section className="py-syro-xxxl bg-syro-bg-gray border-b border-syro-table-border">
+      <SyroPageBanner title="News" breadcrumbFrom="home" />
+
+      {/* Section nav */}
+      <section className="mt-8 py-syro-lg bg-syro-bg-gray border-b border-syro-table-border">
         <div className="max-w-[1200px] mx-auto px-[15px]">
-          <h1 className="font-syro-display text-[2.2rem] font-bold text-black mb-5">
-            News
-          </h1>
-          <p className="text-syro-body text-syro-dark-gray mb-syro-xxl">
-            Latest news, featured stories, and press releases from the Church.
-          </p>
-          {/* Navigation - same style as Syro home "Know More" button (primary-button) */}
           <nav className="flex flex-wrap gap-syro-xl" aria-label="News sections">
             {SECTION_LINKS.map(({ label, href }) => (
               <a key={href} href={href} className="primary-button">

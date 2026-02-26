@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import TheChurchSidebar from '../TheChurchSidebar';
@@ -22,20 +22,21 @@ export default async function OrthodoxFaithPage({
       <SyroPageBanner title="Orthodox Faith" breadcrumbFrom={breadcrumbFrom} />
 
       {/* Main Content */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Main Content */}
             <div className="lg:col-span-2">
-              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-8">
+              <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
                 {/* Featured Image */}
-                <div className="mb-8">
+                <div className="mb-8 flex justify-center">
                   <Image
                     src="/images/church/orthodox-faith.jpg"
                     alt="Orthodox Faith"
-                    width={500}
-                    height={300}
-                    className="rounded-lg shadow-syro-card w-auto h-auto block mx-auto"
+                    width={175}
+                    height={175}
+                    className="rounded-lg object-contain"
+                    style={{ width: '175px', height: '175px' }}
                     priority
                   />
                 </div>
@@ -158,7 +159,7 @@ export default async function OrthodoxFaithPage({
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     Tradition is, to be exact, a bond between the present and the past. The Greek word used 
                     is "parodosis" means to handing down, or to hand over, deliver. Since it is a bond, 
-                    there could be certainly a relation within the church â€“ a cyclic one. Apostolic teachings 
+                    there could be certainly a relation within the church – a cyclic one. Apostolic teachings 
                     are there which substantiate the concept of tradition and its need in the church.
                   </p>
 

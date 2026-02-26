@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getParishByDocumentId } from '../getParishesData';
+import SyroPageBanner from '../../../components/SyroPageBanner';
 
 type PageProps = { params: Promise<{ documentId: string }> };
 
@@ -27,7 +28,8 @@ export default async function ParishDetailPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-syro-bg-gray">
-      <section className="relative bg-syro-bg-gray py-12 lg:py-16">
+      <SyroPageBanner title={parish.name} breadcrumbFrom="directory" />
+      <section className="relative bg-syro-bg-gray py-8 lg:py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Link
             href="/mosc/directory/parishes"
@@ -35,7 +37,6 @@ export default async function ParishDetailPage({ params }: PageProps) {
           >
             ← Back to Parishes
           </Link>
-          <h1 className="font-heading font-semibold text-2xl lg:text-3xl text-syro-blue">{parish.name}</h1>
           {parish.dioceseName && <p className="font-body text-syro-dark-gray mt-1">{parish.dioceseName}</p>}
         </div>
       </section>

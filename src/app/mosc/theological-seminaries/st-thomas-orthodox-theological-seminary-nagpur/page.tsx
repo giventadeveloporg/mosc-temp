@@ -1,5 +1,4 @@
 import React from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
 import QuickLinks from '../../components/QuickLinks';
 import SyroPageBanner from '../../components/SyroPageBanner';
@@ -27,7 +26,7 @@ const StThomasOrthodoxTheologicalSeminaryNagpurPage = () => {
                     alt="St. Thomas Orthodox Theological Seminary, Nagpur (STOTS)"
                     width={300}
                     height={176}
-                    className="w-full max-w-md h-auto object-contain rounded-lg"
+                    className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }}
                     sizes="(max-width: 768px) 100vw, 28rem"
                   />
                 </div>
@@ -73,17 +72,6 @@ const StThomasOrthodoxTheologicalSeminaryNagpurPage = () => {
 
               <div className="hidden" aria-hidden="true">
                 <QuickLinks />
-              </div>
-              <div className="mt-8 flex justify-center">
-                <Link
-                  href="/mosc/theological-seminaries"
-                  className="inline-flex items-center px-6 py-3 bg-syro-red text-white font-syro-primary font-medium rounded-lg hover:bg-syro-red/90 transition-all duration-300 shadow-syro-card"
-                >
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                  Back to All Theological Seminaries
-                </Link>
               </div>
             </div>
             <div className="space-y-6 lg:col-span-1">

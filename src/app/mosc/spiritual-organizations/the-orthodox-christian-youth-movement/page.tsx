@@ -14,14 +14,13 @@ const TheOrthodoxChristianYouthMovementPage = () => {
       currentHref="/mosc/spiritual-organizations/the-orthodox-christian-youth-movement"
     >
       <div className="space-y-6 font-syro-primary text-syro-dark-gray leading-relaxed">
-        <div className="relative w-full h-48 bg-syro-bg-gray rounded-lg overflow-hidden flex items-center justify-center mb-6">
+        <div className="mb-8 flex justify-center">
           <Image
             src="/images/spiritual/OCYM-ahmedabad.png"
             alt="The Orthodox Christian Youth Movement"
-            fill
-            className="object-contain object-center"
-            style={{ objectPosition: 'center center', backgroundColor: 'transparent' }}
-            sizes="(min-width: 1024px) 66vw, 100vw"
+            width={175}
+            height={175}
+            className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }}
           />
         </div>
         <p>

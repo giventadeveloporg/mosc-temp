@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import QuickLinks from '../components/QuickLinks';
 import SyroPageBanner from '../components/SyroPageBanner';
-import SyroSectionTitle from '../components/SyroSectionTitle';
 
 export const metadata: Metadata = {
   title: 'Calendar | Malankara Orthodox Syrian Church',
@@ -19,6 +18,16 @@ export default function CalendarPage() {
       {/* CTA + What's in the Calendar */}
       <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Intro card (matches administration .admin-intro-card) */}
+          <div className="bg-white p-10 rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] mb-16">
+            <h2 className="font-syro-display text-[2.2rem] font-bold text-black mb-5">
+              Liturgical Calendar
+            </h2>
+            <p className="font-syro-primary text-xl text-syro-dark-gray leading-relaxed">
+              Access the liturgical calendar of the Malankara Orthodox Syrian Church with feast days, fasts, and important church dates.
+            </p>
+          </div>
+
           <div className="text-center mb-12">
             <a
               href="/calendar"
@@ -36,7 +45,10 @@ export default function CalendarPage() {
             </a>
           </div>
 
-          <SyroSectionTitle>What&apos;s in the Calendar</SyroSectionTitle>
+          {/* Section title - left red bar (matches administration .admin-section-title) */}
+          <h3 className="text-2xl font-light text-[#798daf] mb-10 pl-8 border-l-[7px] border-syro-red">
+            What&apos;s in the Calendar
+          </h3>
           <p className="font-syro-primary text-lg text-syro-dark-gray max-w-3xl mx-auto mb-10">
             The liturgical calendar guides our worship throughout the year
           </p>
@@ -136,7 +148,9 @@ export default function CalendarPage() {
       {/* Liturgical Seasons */}
       <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <SyroSectionTitle>The Liturgical Year</SyroSectionTitle>
+          <h3 className="text-2xl font-light text-[#798daf] mb-10 pl-8 border-l-[7px] border-syro-red">
+            The Liturgical Year
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="bg-white rounded-lg p-6 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] border-l-4 border-syro-red">
               <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-3">
@@ -193,7 +207,9 @@ export default function CalendarPage() {
       {/* Related Resources */}
       <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <SyroSectionTitle>Related Resources</SyroSectionTitle>
+          <h3 className="text-2xl font-light text-[#798daf] mb-10 pl-8 border-l-[7px] border-syro-red">
+            Related Resources
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Link
               href="/mosc/lectionary"

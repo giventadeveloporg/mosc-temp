@@ -62,6 +62,14 @@ export default function AdminNavigation({ currentPage, showHome = true }: AdminN
       key: 'event-registrations'
     },
     {
+      href: '/admin/communication',
+      icon: 'envelope',
+      label: 'Communication Center',
+      color: 'amber',
+      active: currentPage === 'communication',
+      key: 'communication'
+    },
+    {
       href: '/admin/bulk-email',
       icon: 'envelope',
       label: 'Bulk Email',

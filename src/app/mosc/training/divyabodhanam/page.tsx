@@ -28,7 +28,7 @@ export default function DivyabodhanamPage() {
             alt="Divyabodhanam - Theological Education Programme for the Laity"
             width={800}
             height={500}
-            className="w-full max-w-md h-auto object-contain rounded-lg"
+            className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }}
             priority
             sizes="(max-width: 768px) 100vw, 28rem"
           />

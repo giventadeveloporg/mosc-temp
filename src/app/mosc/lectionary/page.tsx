@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Metadata } from 'next';
+import QuickLinks from '../components/QuickLinks';
 import SyroPageBanner from '../components/SyroPageBanner';
 
 export const metadata: Metadata = {
@@ -46,43 +47,61 @@ export default function LectionaryPage() {
     <div className="min-h-screen bg-syro-bg-gray">
       <SyroPageBanner title="Lectionary" breadcrumbFrom="home" />
 
-      {/* Lectionary Periods Grid Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Intro card (matches administration .admin-intro-card) */}
+          <div className="bg-white p-10 rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] mb-16">
+            <h2 className="font-syro-display text-[2.2rem] font-bold text-black mb-5">
+              Lectionary
+            </h2>
+            <p className="font-syro-primary text-xl text-syro-dark-gray leading-relaxed">
+              The liturgical lectionary of the Malankara Orthodox Syrian Church, including scripture readings for the church year from Koodosh Eetho to Special Occasions.
+            </p>
+          </div>
+
+          {/* Section title - left red bar (matches administration .admin-section-title) */}
+          <h3 className="text-2xl font-light text-[#798daf] mb-10 pl-8 border-l-[7px] border-syro-red">
+            Lectionary Periods
+          </h3>
+
+          {/* Cards grid (matches administration .admin-card) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {lectionaryPeriods.map((period) => (
-              <Link
+              <div
                 key={period.id}
-                href={period.link}
-                className="group bg-white rounded-lg shadow-syro-card hover:shadow-syro-card-hover transition-all duration-300 overflow-hidden"
+                className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 overflow-hidden flex flex-col h-full"
               >
-                <div className="relative w-full h-64">
+                <div className="relative w-full h-48 shrink-0">
                   <Image
                     src={period.image}
                     alt={period.title}
                     fill
-                    className="object-cover group-hover:scale-105 transition-all duration-300"
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
                 </div>
-                <div className="p-6">
-                  <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-3 group-hover:text-syro-red transition-all duration-300">
+                <div className="p-8 flex flex-col flex-1">
+                  <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug">
                     {period.title}
-                  </h2>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4 line-clamp-3">
+                  </h3>
+                  <p className="font-syro-primary text-base text-syro-dark-gray flex-1 mb-5 leading-relaxed line-clamp-3">
                     {period.description}
                   </p>
-                  <div className="mt-6">
-                    <span className="syro-read-more-btn font-syro-primary">
-                      Read More
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                      </svg>
-                    </span>
-                  </div>
+                  <Link
+                    href={period.link}
+                    className="syro-primary-button inline-flex items-center gap-2 mt-auto w-fit"
+                  >
+                    <span>Read More</span>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </Link>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
+
+          <QuickLinks />
         </div>
       </section>
     </div>

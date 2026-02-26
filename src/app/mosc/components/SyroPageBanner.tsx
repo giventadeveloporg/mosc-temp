@@ -8,8 +8,8 @@ export interface SyroPageBannerProps {
   title: string;
   /** When true, center the title and breadcrumb text (e.g. on saints subpages) */
   centerText?: boolean;
-  /** Breadcrumb path: 'home' = Home / Title, 'gallery' = Gallery / Title, 'downloads' = Downloads / Title, 'calendar' = Calendar / Title, plus holy-synod, saints, etc. */
-  breadcrumbFrom?: 'home' | 'gallery' | 'downloads' | 'calendar' | 'holy-synod' | 'saints' | 'the-church' | 'catholicate' | 'administration' | 'ecumenical' | 'dioceses' | 'spiritual-organizations' | 'publications' | 'institutions' | 'training' | 'theological-seminaries' | 'lectionary';
+  /** Breadcrumb path: 'home' = Home / Title, 'gallery' = Gallery / Title, 'news' = News / Title, 'directory' = Directory / Title, etc. */
+  breadcrumbFrom?: 'home' | 'gallery' | 'downloads' | 'calendar' | 'holy-synod' | 'saints' | 'the-church' | 'catholicate' | 'administration' | 'ecumenical' | 'dioceses' | 'spiritual-organizations' | 'publications' | 'institutions' | 'training' | 'theological-seminaries' | 'lectionary' | 'news' | 'directory';
 }
 
 /**
@@ -37,6 +37,8 @@ const BREADCRUMB_CONFIG = {
   training: { href: '/mosc/training', label: 'Training' },
   'theological-seminaries': { href: '/mosc/theological-seminaries', label: 'Theological Seminaries' },
   lectionary: { href: '/mosc/lectionary', label: 'Lectionary' },
+  news: { href: '/mosc/news', label: 'News' },
+  directory: { href: '/mosc/directory', label: 'Directory' },
 } as const;
 
 export type SyroBreadcrumbFrom = keyof typeof BREADCRUMB_CONFIG;

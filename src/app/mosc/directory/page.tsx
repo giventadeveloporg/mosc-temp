@@ -5,6 +5,7 @@ import { Metadata } from 'next';
 import { getDirectoryHomeData } from './getDirectoryHomeData';
 import type { DirectorySectionCard } from './types';
 import QuickLinks from '../components/QuickLinks';
+import SyroPageBanner from '../components/SyroPageBanner';
 
 export const metadata: Metadata = {
   title: 'Directory | Malankara Orthodox Syrian Church',
@@ -144,8 +145,10 @@ export default async function DirectoryPage() {
 
   return (
     <div className="min-h-screen bg-syro-bg-gray">
+      <SyroPageBanner title="Directory" breadcrumbFrom="home" />
+
       {/* Hero Section */}
-      <section className="relative bg-syro-bg-gray py-16 lg:py-20">
+      <section className="relative bg-syro-bg-gray py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="flex items-center justify-center space-x-3 mb-6">
