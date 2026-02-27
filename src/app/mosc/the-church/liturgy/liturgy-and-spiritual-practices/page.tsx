@@ -34,8 +34,8 @@ export default async function LiturgyAndSpiritualPracticesPage({
                   <Image
                       src="/images/church/liturgy-worship.jpg"
                       alt="Liturgy and Spiritual Practices"
-                      width={175} height={175}
-                      className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }}
+                      width={125} height={125}
+                      className="rounded-lg w-full max-w-[125px] max-h-[125px] object-contain" priority
                     />
                 </div>
 

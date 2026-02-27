@@ -90,27 +90,28 @@ const CatholicatePage = () => {
     <div className="bg-syro-bg-gray">
       <SyroPageBanner title="The Catholicate" />
 
-      {/* Content - matches HTML structure and style */}
+      {/* Content - same layout and design as /mosc/administration */}
       <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Intro card - white card, image left, text right (HTML .catholicate-intro-card) */}
+          {/* Intro card - same structure as administration: single white card (image + text kept) */}
           <div className="bg-white p-10 rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] mb-16">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-              <div className="lg:col-span-4 relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-syro-bg-gray">
-                <Image
-                  src="https://mosc.in/wp-content/uploads/2014/12/Untitled-1.jpg"
-                  alt="The Catholicate"
-                  fill
-                  className="object-cover"
-                  unoptimized
-                  sizes="(max-width: 1024px) 100vw, 33vw"
-                />
+              <div className="lg:col-span-4 flex justify-center">
+                <div className="relative w-full max-w-[200px] aspect-square rounded-lg overflow-hidden">
+                  <Image
+                    src="/images/logos/Current_Edits/MOSC-Logo-only.png"
+                    alt="The Catholicate"
+                    fill
+                    className="object-contain"
+                    sizes="200px"
+                  />
+                </div>
               </div>
               <div className="lg:col-span-8">
                 <h2 className="font-syro-display text-[2.2rem] font-bold text-black mb-5">
                   The Catholicate of the Malankara Orthodox Syrian Church
                 </h2>
-                <p className="font-syro-primary text-xl text-black mb-5 leading-relaxed">
+                <p className="font-syro-primary text-xl text-syro-dark-gray leading-relaxed mb-5">
                   <strong>Introduction</strong> — The word &apos;Catholicos&apos; means &quot;the general head&quot; or &quot;general bishop&quot;. It can be considered as equivalent to &quot;universal Bishop&quot;. This title and rank is much more ancient than the title Patriarch in the church. In the ministry of the early church there were only three ranks: Episcopos (Bishop), Priest and Deacon. By the end of the third century certain bishops of important cities gained pre-eminence and came to be known as Metropolitans. The same rank in the Churches outside the Roman Empire was called Catholicos. There were three ancient Catholicates: the Catholicate of the East (Persia), the Catholicate of Armenia and the Catholicate of Georgia.
                 </p>
                 <Link
@@ -126,59 +127,58 @@ const CatholicatePage = () => {
             </div>
           </div>
 
-          {/* Section title - left red bar (HTML .catholicate-section-title) */}
-          <h3 className="text-2xl font-light text-black mb-10 pl-8 border-l-[7px] border-syro-red">
+          {/* Section title - left red bar (same as administration) */}
+          <h3 className="text-2xl font-light text-[#798daf] mb-10 pl-8 border-l-[7px] border-syro-red">
             Catholicos of the East in Malankara
           </h3>
 
-          {/* Cards grid - 3 per row (HTML .catholicate-card) */}
+          {/* Cards grid - same styling as administration cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {catholicosCards.map((card) => (
               <div
                 key={card.title}
-                className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 overflow-hidden flex flex-col h-full"
+                className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 p-8 flex flex-col h-full overflow-hidden"
               >
-                <div className="relative w-full h-64 bg-syro-bg-gray">
+                <div className="mb-5 flex justify-center">
                   <Image
                     src={card.image}
                     alt={card.alt}
-                    fill
-                    className="object-cover object-top"
+                    width={280}
+                    height={168}
+                    className="w-full max-w-[280px] h-auto object-contain rounded-lg"
                     unoptimized
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 280px"
                   />
                 </div>
-                <div className="p-6 flex flex-col flex-1 min-h-0">
-                  <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug">
-                    {card.title}
-                  </h3>
-                  <p className="font-syro-primary text-base text-black flex-1 mb-5 leading-relaxed">
-                    {card.excerpt}
-                  </p>
-                  {card.internal ? (
-                    <Link
-                      href={card.href}
-                      className="syro-primary-button inline-flex items-center gap-2 mt-auto w-fit"
-                    >
-                      <span>Read More</span>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                      </svg>
-                    </Link>
-                  ) : (
-                    <a
-                      href={card.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="syro-primary-button inline-flex items-center gap-2 mt-auto w-fit"
-                    >
-                      <span>Read More</span>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                      </svg>
-                    </a>
-                  )}
-                </div>
+                <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug">
+                  {card.title}
+                </h3>
+                <p className="font-syro-primary text-base text-syro-dark-gray flex-1 mb-5 leading-relaxed">
+                  {card.excerpt}
+                </p>
+                {card.internal ? (
+                  <Link
+                    href={card.href}
+                    className="syro-primary-button inline-flex items-center gap-2 mt-auto w-fit"
+                  >
+                    <span>Read More</span>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </Link>
+                ) : (
+                  <a
+                    href={card.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="syro-primary-button inline-flex items-center gap-2 mt-auto w-fit"
+                  >
+                    <span>Read More</span>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </a>
+                )}
               </div>
             ))}
           </div>

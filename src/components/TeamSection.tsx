@@ -301,32 +301,32 @@ const TeamSection: React.FC = () => {
 
                 {/* Card Content - flex column with scrollable body so image never gets cut off */}
                 <div className={`${styles.cardContent} flex flex-col min-h-0`}>
-                  {/* Name and Title - never shrink */}
-                  <div className="flex-shrink-0 mb-4">
-                    <h3 className="text-xl lg:text-2xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-300">
+                  {/* Name and Title - reduced spacing */}
+                  <div className="flex-shrink-0 mb-2">
+                    <h3 className="text-xl lg:text-2xl font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors duration-300">
                       {getFullName(member)}
                     </h3>
                     <p className="text-base font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-full inline-block">
                       {member.title}
                     </p>
                     {member.designation && (
-                      <p className="text-sm text-gray-500 mt-2">{member.designation}</p>
+                      <p className="text-sm text-gray-500 mt-1">{member.designation}</p>
                     )}
                   </div>
 
-                  {/* Bio Description - clamped to 3 lines so "Read more" stays visible; show button when bio is long */}
+                  {/* Bio Description - text clamped; "Read more" outside clamp so it stays visible, inline after text */}
                   {member.bio && (
-                    <div className="flex-shrink-0 mb-4">
-                      <p className="text-gray-600 leading-relaxed text-sm lg:text-base line-clamp-3">
+                    <div className="flex-shrink-0 mb-2 flex flex-wrap items-baseline gap-x-1">
+                      <span className="min-w-0 text-gray-600 leading-snug text-sm lg:text-base line-clamp-2">
                         {member.bio.length <= BIO_TRUNCATE_LENGTH
                           ? member.bio
                           : `${member.bio.slice(0, BIO_TRUNCATE_LENGTH).trim()}…`}
-                      </p>
+                      </span>
                       {member.bio.length > BIO_READ_MORE_THRESHOLD && (
                         <button
                           type="button"
                           onClick={() => setProfileModalMember(member)}
-                          className="mt-4 mb-1 py-2 px-3 text-sm font-semibold text-blue-600 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded transition-colors"
+                          className="flex-shrink-0 text-sm font-semibold text-blue-600 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded transition-colors whitespace-nowrap"
                           aria-label={`Read full profile of ${getFullName(member)}`}
                         >
                           Read more
@@ -335,27 +335,20 @@ const TeamSection: React.FC = () => {
                     </div>
                   )}
 
-                  {/* Expertise Tags */}
+                  {/* Expertise: colon after title, list content inline - larger text for readability */}
                   {member.expertise && parseExpertise(member.expertise).length > 0 && (
-                    <div className="flex-shrink-0 mb-4">
-                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
-                        Expertise
+                    <div className="flex-shrink-0 mb-2">
+                      <p className="text-sm font-semibold text-gray-500 uppercase tracking-wide leading-snug">
+                        Expertise:{' '}
+                        <span className="font-normal normal-case text-gray-700 text-sm">
+                          {parseExpertise(member.expertise).join(', ')}
+                        </span>
                       </p>
-                      <div className="flex flex-wrap gap-2">
-                        {parseExpertise(member.expertise).map((skill, skillIndex) => (
-                          <span
-                            key={skillIndex}
-                            className="text-xs bg-gray-100 text-gray-700 px-3 py-1 rounded-full font-medium hover:bg-gray-200 transition-colors duration-200"
-                          >
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
                     </div>
                   )}
 
-                  {/* Contact Info - pushed to bottom, never shrink */}
-                  <div className="flex-shrink-0 pt-4 border-t border-gray-100 mt-auto">
+                  {/* Contact Info - reduced top padding */}
+                  <div className="flex-shrink-0 pt-2 border-t border-gray-100 mt-auto">
                     {member.email && (
                       <a
                         href={`mailto:${member.email}`}
@@ -369,7 +362,7 @@ const TeamSection: React.FC = () => {
                     )}
 
                     {/* Social Links */}
-                    <div className="flex space-x-3 mt-3">
+                    <div className="flex space-x-3 mt-2">
                       {member.linkedinUrl && (
                         <a
                           href={member.linkedinUrl}

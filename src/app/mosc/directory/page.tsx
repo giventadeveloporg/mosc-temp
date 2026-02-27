@@ -35,6 +35,21 @@ const FALLBACK_SECTIONS: DirectorySection[] = [
   { title: 'Seminaries', description: 'There are mainly two seminaries under Malankara Orthodox Church.', href: '/mosc/directory/seminaries' },
 ];
 
+/** Static images for directory section cards, in same order as FALLBACK_SECTIONS (and displayCards). */
+const DIRECTORY_CARD_IMAGES: string[] = [
+  '/images/directory/bishop.jpg',
+  '/images/directory/diocese.jpg',
+  '/images/directory/parish.jpg',
+  '/images/directory/priest.jpg',
+  '/images/directory/institution.jpg',
+  '/images/directory/institution.jpg',
+  '/images/directory/institution.jpg',
+  '/images/directory/managing_commitee.jpg',
+  '/images/directory/institution.jpg',
+  '/images/directory/pilgrim_centers.jpg',
+  '/images/directory/seminaries.jpg',
+];
+
 /** One card to render: either from API or from fallback (no image) */
 type DisplayCard = {
   title: string;
@@ -144,150 +159,112 @@ export default async function DirectoryPage() {
     'The comprehensive directory of the Malankara Orthodox Syrian Church — bishops, dioceses, parishes, priests, institutions, and church administration.';
 
   return (
-    <div className="min-h-screen bg-syro-bg-gray">
+    <div className="bg-syro-bg-gray">
       <SyroPageBanner title="Directory" breadcrumbFrom="home" />
 
-      {/* Hero Section */}
-      <section className="relative bg-syro-bg-gray py-12 lg:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="flex items-center justify-center space-x-3 mb-6">
-              <div className="w-12 h-12 bg-syro-red rounded-full flex items-center justify-center sacred-shadow">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                </svg>
-              </div>
-            </div>
-            <h1 className="font-syro-display text-[2.2rem] font-bold text-black mb-5">
-              Malankara Orthodox Directory
-            </h1>
-            <p className="font-body text-lg lg:text-xl text-black max-w-3xl mx-auto mb-8">
-              {leadText}
-            </p>
-            <a
-              href="https://directory.mosc.in/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="syro-primary-button inline-flex items-center px-8 py-4 font-body font-semibold text-lg"
-            >
-              <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-              Access Directory at directory.mosc.in
-              <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Directory Sections - from Strapi or static fallback (3 cards per row like administration) */}
+      {/* Content - same layout and design as /mosc/administration */}
       <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {displayCards.map((card, index) => (
-              <div key={index} className="bg-white rounded-lg overflow-hidden sacred-shadow-sm border-l-4 border-syro-red hover:sacred-shadow reverent-transition shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] flex flex-col h-full hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300">
+          {/* Intro card - same structure as administration (title + content, no icon) */}
+          <div className="bg-white p-10 rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] mb-16">
+            <h2 className="font-syro-display text-[2.2rem] font-bold text-black mb-5">
+              Malankara Orthodox Directory
+            </h2>
+            <p className="font-syro-primary text-xl text-syro-dark-gray leading-relaxed mb-8">
+              {leadText}
+            </p>
+            <div className="flex justify-center">
+              <a
+                href="https://directory.mosc.in/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="syro-primary-button inline-flex items-center gap-2 px-8 py-4 font-body font-semibold text-lg"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+                <span>Access Directory at directory.mosc.in</span>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          {/* Section title - left red bar (same as administration) */}
+          <h3 className="text-2xl font-light text-[#798daf] mb-10 pl-8 border-l-[7px] border-syro-red">
+            Directory Sections
+          </h3>
+
+          {/* Cards grid - same styling as administration cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            {displayCards.map((card, index) => {
+              const imageUrl = card.imageUrl ?? DIRECTORY_CARD_IMAGES[index] ?? null;
+              return (
+              <div
+                key={index}
+                className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 p-8 flex flex-col h-full overflow-hidden"
+              >
+                {imageUrl ? (
+                  <div className="mb-5 flex justify-center">
+                    <Image
+                      src={imageUrl}
+                      alt={card.imageAlt ?? card.title}
+                      width={280}
+                      height={168}
+                      className="w-full max-w-[280px] h-auto object-contain rounded-lg"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 280px"
+                    />
+                  </div>
+                ) : (
+                  <DirectoryCardIcon title={card.title} />
+                )}
+                <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug">
+                  {card.title}
+                </h3>
+                {card.description && (
+                  <p className="font-syro-primary text-base text-syro-dark-gray flex-1 mb-5 leading-relaxed">
+                    {card.description}
+                  </p>
+                )}
                 {card.linkUrl ? (
                   card.isExternal ? (
-                    <a href={card.linkUrl} target="_blank" rel="noopener noreferrer" className="flex flex-col flex-1 group">
-                      {card.imageUrl && (
-                        <div className="relative w-full h-48 bg-syro-bg-gray flex-shrink-0">
-                          <Image
-                            src={card.imageUrl}
-                            alt={card.imageAlt ?? card.title}
-                            fill
-                            className="object-cover"
-                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                          />
-                        </div>
-                      )}
-                      <div className="p-6 flex flex-col flex-1">
-                        <DirectoryCardIcon title={card.title} />
-                        <h2 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug">
-                          {card.title}
-                        </h2>
-                        {card.description && (
-                          <p className="font-body text-black leading-relaxed flex-1">
-                            {card.description}
-                          </p>
-                        )}
-                        <span className="syro-primary-button inline-flex items-center gap-2 mt-auto w-fit">
-                          View more
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                          </svg>
-                        </span>
-                      </div>
+                    <a
+                      href={card.linkUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="syro-primary-button inline-flex items-center gap-2 mt-auto w-fit"
+                    >
+                      <span>Read More</span>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
                     </a>
                   ) : (
-                    <Link href={card.linkUrl} className="flex flex-col flex-1 group">
-                      {card.imageUrl && (
-                        <div className="relative w-full h-48 bg-syro-bg-gray flex-shrink-0">
-                          <Image
-                            src={card.imageUrl}
-                            alt={card.imageAlt ?? card.title}
-                            fill
-                            className="object-cover"
-                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                          />
-                        </div>
-                      )}
-                      <div className="p-6 flex flex-col flex-1">
-                        <DirectoryCardIcon title={card.title} />
-                        <h2 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug">
-                          {card.title}
-                        </h2>
-                        {card.description && (
-                          <p className="font-body text-black leading-relaxed flex-1">
-                            {card.description}
-                          </p>
-                        )}
-                        <span className="syro-primary-button inline-flex items-center gap-2 mt-auto w-fit">
-                          View more
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                          </svg>
-                        </span>
-                      </div>
+                    <Link
+                      href={card.linkUrl}
+                      className="syro-primary-button inline-flex items-center gap-2 mt-auto w-fit"
+                    >
+                      <span>Read More</span>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
                     </Link>
                   )
-                ) : (
-                  <div className="flex flex-col flex-1">
-                    {card.imageUrl && (
-                      <div className="relative w-full h-48 bg-syro-bg-gray flex-shrink-0">
-                        <Image
-                          src={card.imageUrl}
-                          alt={card.imageAlt ?? card.title}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        />
-                      </div>
-                    )}
-                    <div className="p-6 flex flex-col flex-1">
-                      <DirectoryCardIcon title={card.title} />
-                      <h2 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug">
-                        {card.title}
-                      </h2>
-                      {card.description && (
-                        <p className="font-body text-black leading-relaxed flex-1">
-                          {card.description}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                )}
+                ) : null}
               </div>
-            ))}
+            );
+            })}
           </div>
+
+          <QuickLinks />
         </div>
       </section>
 
       {/* Update directory info / Login */}
       <section className="py-12 bg-syro-bg-gray">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="font-body text-black mb-4">
+          <p className="font-body text-syro-dark-gray mb-4">
             Need to update your Directory information?
           </p>
           <a
@@ -296,7 +273,7 @@ export default async function DirectoryPage() {
           >
             Email webmanager@mosc.in
           </a>
-          <p className="font-body text-sm text-black mt-6">
+          <p className="font-body text-sm text-syro-dark-gray mt-6">
             Login only for admin
           </p>
         </div>
@@ -310,9 +287,9 @@ export default async function DirectoryPage() {
               href="https://mosc.in"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-white rounded-lg p-6 sacred-shadow-sm border-l-4 border-syro-red hover:sacred-shadow reverent-transition text-center group shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]"
+              className="bg-white rounded-lg p-6 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 border-l-[7px] border-syro-red"
             >
-              <span className="font-heading font-semibold text-lg text-syro-blue group-hover:text-syro-red reverent-transition block">
+              <span className="font-heading font-semibold text-lg text-syro-blue block">
                 mosc.in
               </span>
               <span className="font-body text-sm text-syro-dark-gray block mt-1">
@@ -323,9 +300,9 @@ export default async function DirectoryPage() {
               href="https://catholicatenews.in"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-white rounded-lg p-6 sacred-shadow-sm border-l-4 border-syro-red hover:sacred-shadow reverent-transition text-center group shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]"
+              className="bg-white rounded-lg p-6 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 border-l-[7px] border-syro-red"
             >
-              <span className="font-heading font-semibold text-lg text-syro-blue group-hover:text-syro-red reverent-transition block">
+              <span className="font-heading font-semibold text-lg text-syro-blue block">
                 catholicatenews.in
               </span>
               <span className="font-body text-sm text-syro-dark-gray block mt-1">
@@ -342,16 +319,16 @@ export default async function DirectoryPage() {
           <h2 className="font-heading font-semibold text-2xl text-black mb-6 text-center">
             Address Info
           </h2>
-          <div className="bg-white rounded-lg sacred-shadow p-8 border-l-4 border-syro-red shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]">
+          <div className="bg-white rounded-lg p-8 border-l-[7px] border-syro-red shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]">
             <p className="font-body font-medium mb-2 text-black">
               Malankara Orthodox Church
             </p>
-            <p className="font-body text-black">
+            <p className="font-body text-syro-dark-gray">
               Catholicate Palace,<br />
               Devalokam,<br />
               Kottayam - 686 004
             </p>
-            <p className="font-body text-black mt-4">
+            <p className="font-body text-syro-dark-gray mt-4">
               <span className="font-medium text-syro-blue">Phone:</span> 0481 2578500, 0481 2578499
             </p>
           </div>
@@ -367,43 +344,40 @@ export default async function DirectoryPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Link
               href="/mosc/dioceses"
-              className="bg-white rounded-lg p-6 sacred-shadow-sm hover:sacred-shadow reverent-transition text-center group border-l-4 border-syro-red shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]"
+              className="bg-white rounded-lg p-6 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 text-center group border-l-[7px] border-syro-red"
             >
-              <h3 className="font-heading font-medium text-lg text-syro-blue mb-2 group-hover:text-syro-red reverent-transition">
+              <h3 className="font-heading font-medium text-lg text-syro-blue mb-2 group-hover:text-syro-red transition-colors">
                 Dioceses
               </h3>
-              <p className="font-body text-sm text-black">
+              <p className="font-body text-sm text-syro-dark-gray">
                 View all dioceses and their information
               </p>
             </Link>
             <Link
               href="/mosc/institutions"
-              className="bg-white rounded-lg p-6 sacred-shadow-sm hover:sacred-shadow reverent-transition text-center group border-l-4 border-syro-red shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]"
+              className="bg-white rounded-lg p-6 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 text-center group border-l-[7px] border-syro-red"
             >
-              <h3 className="font-heading font-medium text-lg text-syro-blue mb-2 group-hover:text-syro-red reverent-transition">
+              <h3 className="font-heading font-medium text-lg text-syro-blue mb-2 group-hover:text-syro-red transition-colors">
                 Institutions
               </h3>
-              <p className="font-body text-sm text-black">
+              <p className="font-body text-sm text-syro-dark-gray">
                 Schools, hospitals, monasteries, and more
               </p>
             </Link>
             <Link
               href="/mosc/spiritual-organizations"
-              className="bg-white rounded-lg p-6 sacred-shadow-sm hover:sacred-shadow reverent-transition text-center group border-l-4 border-syro-red shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]"
+              className="bg-white rounded-lg p-6 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 text-center group border-l-[7px] border-syro-red"
             >
-              <h3 className="font-heading font-medium text-lg text-syro-blue mb-2 group-hover:text-syro-red reverent-transition">
+              <h3 className="font-heading font-medium text-lg text-syro-blue mb-2 group-hover:text-syro-red transition-colors">
                 Spiritual Organisations
               </h3>
-              <p className="font-body text-sm text-black">
+              <p className="font-body text-sm text-syro-dark-gray">
                 Organisations offering spiritual guidance
               </p>
             </Link>
           </div>
         </div>
       </section>
-
-      {/* Quick Links - same as catholicate / his-holiness-baselios-geevarghese-i page */}
-      <QuickLinks />
     </div>
   );
 }

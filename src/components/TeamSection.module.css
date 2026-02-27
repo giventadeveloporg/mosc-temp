@@ -87,7 +87,7 @@
   background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
 }
 
-/* Card content: takes remaining space, min-height 0 so inner scroll works */
+/* Card content: reduced padding/margin to prevent overflow and save space */
 .teamCard .cardContent {
   flex: 1 1 auto;
   min-height: 0;
@@ -96,7 +96,7 @@
   background: white;
   margin: 4px;
   border-radius: calc(2rem - 4px);
-  padding: 2rem;
+  padding: 1rem 1.25rem;
   position: relative;
   z-index: 2;
 }

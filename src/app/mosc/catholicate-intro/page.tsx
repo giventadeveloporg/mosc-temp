@@ -23,13 +23,12 @@ const CatholicateIntroPage = () => {
               <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8 mb-8">
                 <div className="mb-8 flex justify-center">
                   <Image
-                    src="https://mosc.in/wp-content/uploads/2014/12/Untitled-1.jpg"
+                    src="/images/logos/Current_Edits/MOSC-Logo-only.png"
                     alt="The Catholicate of the Malankara Orthodox Syrian Church"
-                    width={500}
-                    height={300}
-                    className="w-full max-w-md h-auto object-contain rounded-lg"
-                    unoptimized
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    width={125}
+                    height={75}
+                    className="rounded-lg w-full max-w-[125px] h-auto object-contain"
+                    priority
                   />
                 </div>
 

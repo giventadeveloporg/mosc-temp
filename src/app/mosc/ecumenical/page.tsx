@@ -56,16 +56,23 @@ const EcumenicalPage = () => {
                 key={index}
                 className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 overflow-hidden flex flex-col h-full"
               >
-                <div className="relative w-full h-48 bg-syro-bg-gray/50 shrink-0">
+                <div className="mb-5 flex justify-center pt-8">
                   {article.image ? (
-                    <Image src={article.image} alt="" fill className="object-contain object-center" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+                    <Image
+                      src={article.image}
+                      alt=""
+                      width={280}
+                      height={168}
+                      className="w-full max-w-[280px] h-auto object-contain rounded-lg"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    />
                   ) : (
-                    <div className="absolute inset-0 flex items-center justify-center bg-syro-red/10">
+                    <div className="w-full max-w-[280px] h-[168px] rounded-lg bg-syro-red/10 flex items-center justify-center">
                       <span className="text-4xl text-syro-red/40" role="img" aria-hidden>⛪</span>
                     </div>
                   )}
                 </div>
-                <div className="p-8 flex flex-col flex-1">
+                <div className="p-8 pt-0 flex flex-col flex-1">
                   <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug line-clamp-3">
                     {article.title}
                   </h3>
