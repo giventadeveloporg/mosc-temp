@@ -9,14 +9,14 @@ import '@/styles/syro-news-articles.css';
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | Syro-Malabar Church',
-    default: 'Syro-Malabar Church',
+    template: '%s | Malankara Orthodox Syrian Church',
+    default: 'Malankara Orthodox Syrian Church',
   },
-  description: 'Official website of the Syro-Malabar Church - Saint Thomas Christian Community',
-  keywords: ['Syro-Malabar Church', 'Catholic Christianity', 'Saint Thomas', 'Indian Catholic Church'],
+  description: 'Official website of the Malankara Orthodox Syrian Church - Saint Thomas Christian Community',
+  keywords: ['Malankara Orthodox Syrian Church', 'Catholic Christianity', 'Saint Thomas', 'Indian Catholic Church'],
   openGraph: {
-    title: 'Syro-Malabar Church',
-    description: 'Official website of the Syro-Malabar Church - Saint Thomas Christian Community',
+    title: 'Malankara Orthodox Syrian Church',
+    description: 'Official website of the Malankara Orthodox Syrian Church - Saint Thomas Christian Community',
     type: 'website',
   },
 };
