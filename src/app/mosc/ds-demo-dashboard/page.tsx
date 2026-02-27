@@ -3,7 +3,7 @@ import DsDemoDashboard from '../components/DsDemoDashboard';
 
 export const metadata = {
   title: 'Dashboard',
-  description: 'Syro-Malabar Church dashboard - analytics, recent activity, and quick actions.',
+  description: 'Malankara Orthodox Syrian Church dashboard - analytics, recent activity, and quick actions.',
 };
 
 export default function SyroDsDemoDashboardPage() {

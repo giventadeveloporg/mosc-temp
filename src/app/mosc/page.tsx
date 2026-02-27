@@ -10,7 +10,7 @@ import SyroLocationsSection from './components/SyroLocationsSection';
 export const metadata = {
   title: 'Home',
   description:
-    'Syro-Malabar Church - Saint Thomas Christian Community. Explore our heritage, spiritual resources, and community.',
+    'Malankara Orthodox Syrian Church - Saint Thomas Christian Community. Explore our heritage, spiritual resources, and community.',
 };
 
 /**
