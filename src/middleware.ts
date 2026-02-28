@@ -48,6 +48,7 @@ const isPublicRouteClerk = createRouteMatcher([
   '/api/webhooks(.*)',
   '/api/public(.*)',
   '/api/proxy(.*)',
+  '/api/liturgy(.*)',
   '/api/event/success(.*)',
   '/api/membership/success(.*)',
   '/api/events/donation/success(.*)',

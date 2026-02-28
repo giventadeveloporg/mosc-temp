@@ -3,8 +3,8 @@
 import { useState, useTransition, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { RegistrationManagementData } from './ApiServerActions';
-import { searchEvents } from './ApiServerActions';
-import type { EventDetailsDTO } from '@/types';
+import { fetchAttendeeAttachments, searchEvents } from './ApiServerActions';
+import type { EventAttendeeAttachmentDTO, EventDetailsDTO } from '@/types';
 import {
   FaSearch,
   FaFilter,
@@ -44,6 +44,9 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [editForm, setEditForm] = useState<any>({});
+  const [attendeeAttachments, setAttendeeAttachments] = useState<EventAttendeeAttachmentDTO[]>([]);
+  const [isAttachmentsLoading, setIsAttachmentsLoading] = useState(false);
+  const [attachmentsError, setAttachmentsError] = useState<string | null>(null);
 
   const {
     attendees,
@@ -65,12 +68,42 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
   const [eventEndDate, setEventEndDate] = useState('');
   const [searchResults, setSearchResults] = useState<EventDetailsDTO[]>([]);
   const [isSearchingEvents, setIsSearchingEvents] = useState(false);
+  const [eventTypeaheadQuery, setEventTypeaheadQuery] = useState('');
+  const [eventTypeaheadResults, setEventTypeaheadResults] = useState<EventDetailsDTO[]>([]);
+  const [isTypeaheadLoading, setIsTypeaheadLoading] = useState(false);
 
   const [searchType, setSearchType] = useState<'name' | 'email' | 'eventId'>(dataSearchType as 'name' | 'email' | 'eventId' || 'name');
   const [searchValue, setSearchValue] = useState(searchTerm);
 
   // Only show registrants if an event is selected
   const hasSelectedEvent = !!selectedEvent;
+
+  useEffect(() => {
+    if (!hasSelectedEvent) return;
+    const q = eventTypeaheadQuery.trim();
+    if (q.length < 2) {
+      setEventTypeaheadResults([]);
+      setIsTypeaheadLoading(false);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setIsTypeaheadLoading(true);
+      try {
+        const idSearch = /^\d+$/.test(q) ? q : undefined;
+        const nameSearch = /^\d+$/.test(q) ? undefined : q;
+        const results = await searchEvents(nameSearch, idSearch);
+        setEventTypeaheadResults((results || []).slice(0, 12));
+      } catch (error) {
+        console.error('Error searching events (typeahead):', error);
+        setEventTypeaheadResults([]);
+      } finally {
+        setIsTypeaheadLoading(false);
+      }
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [eventTypeaheadQuery, hasSelectedEvent]);
 
   // Event search handler
   const handleEventSearch = async () => {
@@ -239,8 +272,71 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
     }
   };
 
+  const getEditStatusConfig = (status: string) => {
+    switch (status) {
+      case 'REGISTERED':
+        return {
+          label: 'Registered',
+          cardClass: 'bg-emerald-100 border-emerald-300 text-emerald-800',
+          iconClass: 'text-emerald-600',
+          icon: (
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+            </svg>
+          ),
+        };
+      case 'PENDING':
+        return {
+          label: 'Pending',
+          cardClass: 'bg-amber-100 border-amber-300 text-amber-800',
+          iconClass: 'text-amber-600',
+          icon: (
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          ),
+        };
+      case 'CANCELLED':
+        return {
+          label: 'Cancelled',
+          cardClass: 'bg-red-100 border-red-300 text-red-800',
+          iconClass: 'text-red-600',
+          icon: (
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          ),
+        };
+      case 'WAITLISTED':
+        return {
+          label: 'Waitlisted',
+          cardClass: 'bg-blue-100 border-blue-300 text-blue-800',
+          iconClass: 'text-blue-600',
+          icon: (
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          ),
+        };
+      default:
+        return {
+          label: status || 'Unknown',
+          cardClass: 'bg-indigo-100 border-indigo-300 text-indigo-800',
+          iconClass: 'text-indigo-600',
+          icon: (
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          ),
+        };
+    }
+  };
+
+  const statusOptions = ['REGISTERED', 'PENDING', 'WAITLISTED', 'CANCELLED'] as const;
+
   const handleViewAttendee = (attendee: any) => {
     setViewingAttendee(attendee);
+    void loadAttendeeAttachments(attendee.id);
   };
 
   const handleEditAttendee = (attendee: any) => {
@@ -261,6 +357,7 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
       numberOfGuestsCheckedIn: attendee.numberOfGuestsCheckedIn || 0,
       notes: attendee.notes || ''
     });
+    void loadAttendeeAttachments(attendee.id);
   };
 
   const handleDeleteAttendee = (attendee: any) => {
@@ -292,6 +389,8 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
 
   const closeViewModal = () => {
     setViewingAttendee(null);
+    setAttendeeAttachments([]);
+    setAttachmentsError(null);
   };
 
   const closeDeleteModal = () => {
@@ -332,6 +431,49 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
   const closeEditModal = () => {
     setEditingAttendee(null);
     setEditForm({});
+    setAttendeeAttachments([]);
+    setAttachmentsError(null);
+  };
+
+  const loadAttendeeAttachments = async (attendeeId?: number) => {
+    if (!attendeeId) {
+      setAttendeeAttachments([]);
+      return;
+    }
+
+    setIsAttachmentsLoading(true);
+    setAttachmentsError(null);
+    try {
+      const attachments = await fetchAttendeeAttachments(attendeeId);
+      setAttendeeAttachments(attachments);
+    } catch (error) {
+      console.error('Error loading attendee attachments:', error);
+      setAttachmentsError('Unable to load attachments right now.');
+      setAttendeeAttachments([]);
+    } finally {
+      setIsAttachmentsLoading(false);
+    }
+  };
+
+  const formatAttachmentSize = (bytes?: number) => {
+    if (!bytes || bytes <= 0) return 'Unknown size';
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  };
+
+  const handleDownloadAttachment = (attachment: EventAttendeeAttachmentDTO) => {
+    if (!attachment.fileUrl) return;
+    const anchor = document.createElement('a');
+    anchor.href = attachment.fileUrl;
+    anchor.target = '_blank';
+    anchor.rel = 'noopener noreferrer';
+    if (attachment.originalFilename) {
+      anchor.download = attachment.originalFilename;
+    }
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
   };
 
   // Calculate pagination display values
@@ -376,16 +518,16 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
         <div className="flex items-center gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6">
           <Link
             href="/admin"
-            className="flex-shrink-0 h-10 sm:h-12 md:h-14 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 flex items-center justify-center gap-1.5 sm:gap-2 md:gap-3 transition-all duration-300 hover:scale-105 px-2 sm:px-3 md:px-6"
+            className="flex-shrink-0 h-10 sm:h-12 md:h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 dark:bg-indigo-900/50 dark:hover:bg-indigo-900/70 flex items-center justify-center gap-1.5 sm:gap-2 md:gap-3 transition-all duration-300 hover:scale-105 px-2 sm:px-3 md:px-6"
             title="Back to Admin"
             aria-label="Back to Admin"
           >
-            <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-              <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-lg bg-indigo-200 dark:bg-indigo-800 flex items-center justify-center">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-indigo-700 dark:text-indigo-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
             </div>
-            <span className="font-semibold text-gray-700 dark:text-gray-300 text-[10px] sm:text-xs md:text-sm lg:text-base hidden sm:inline">Back to Admin</span>
+            <span className="font-semibold text-indigo-700 dark:text-indigo-200 text-[10px] sm:text-xs md:text-sm lg:text-base hidden sm:inline">Back to Admin</span>
           </Link>
           <div className="flex-1 min-w-0">
             <h1 className="text-sm sm:text-base md:text-xl lg:text-2xl xl:text-3xl font-bold text-gray-900 dark:text-white truncate">Registration Management</h1>
@@ -636,7 +778,7 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
       {hasSelectedEvent && (
         <div className="mb-6">
           <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2 sm:gap-3 lg:gap-4 mb-4 min-w-fit">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2 sm:gap-3 lg:gap-4 mb-4 min-w-fit">
           {/* Search Type Dropdown */}
           <div className="relative">
             <FaFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -664,15 +806,29 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
                     : 'Enter Event ID...'
               }
               value={searchValue}
-              onChange={(e) => {
-                const value = e.target.value;
-                setSearchValue(value);
-                const timeoutId = setTimeout(() => handleSearch(value), 500);
-                return () => clearTimeout(timeoutId);
+              onChange={(e) => setSearchValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleSearch(searchValue);
+                }
               }}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
+
+          {/* Search Trigger Button */}
+          <button
+            onClick={() => handleSearch(searchValue)}
+            className="flex items-center justify-center gap-3 px-4 py-2.5 rounded-xl bg-blue-100 hover:bg-blue-200 transition-all duration-300 hover:scale-105 touch-manipulation"
+            title="Search Registrations"
+            aria-label="Search Registrations"
+            type="button"
+          >
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+              <FaSearch className="w-6 h-6 text-blue-600" />
+            </div>
+            <span className="font-semibold text-blue-700 text-sm sm:text-base">Search</span>
+          </button>
 
             {/* Event Filter - Change Event */}
           <div className="relative">
@@ -716,6 +872,62 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
             </div>
             <span className="font-semibold text-green-700 text-sm sm:text-base">Export CSV</span>
           </button>
+        </div>
+
+        {/* Re-search Event (Type-Ahead for Large Event Lists) */}
+        <div className="mt-2 mb-4 p-4 rounded-xl border border-indigo-200 bg-indigo-50">
+          <div className="flex flex-col lg:flex-row gap-3 lg:items-end">
+            <div className="flex-1">
+              <label className="block text-sm font-semibold text-indigo-800 mb-2">
+                Re-search Event by Name or ID
+              </label>
+              <input
+                type="text"
+                value={eventTypeaheadQuery}
+                onChange={(e) => setEventTypeaheadQuery(e.target.value)}
+                placeholder="Type at least 2 characters (e.g. 8321 or event name)"
+                className="w-full px-4 py-2 border border-indigo-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setEventTypeaheadQuery('');
+                setEventTypeaheadResults([]);
+              }}
+              className="h-12 px-4 rounded-xl bg-purple-100 hover:bg-purple-200 text-purple-800 font-semibold transition-all duration-300 hover:scale-105"
+              title="Clear event search"
+              aria-label="Clear event search"
+            >
+              Clear
+            </button>
+          </div>
+          <p className="text-xs text-indigo-700 mt-2">
+            Note: the dropdown loads recent 50 events for speed; this search helps find older events without loading everything.
+          </p>
+          {isTypeaheadLoading && (
+            <p className="text-sm text-indigo-700 mt-3">Searching events...</p>
+          )}
+          {!isTypeaheadLoading && eventTypeaheadQuery.trim().length >= 2 && eventTypeaheadResults.length === 0 && (
+            <p className="text-sm text-indigo-700 mt-3">No matching events found.</p>
+          )}
+          {eventTypeaheadResults.length > 0 && (
+            <div className="mt-3 max-h-64 overflow-y-auto space-y-2">
+              {eventTypeaheadResults.map((event) => (
+                <button
+                  key={event.id}
+                  type="button"
+                  onClick={() => handleEventFilter(String(event.id || ''))}
+                  className="w-full text-left p-3 rounded-lg border border-indigo-200 bg-white hover:bg-indigo-100 transition-colors"
+                  title={`Switch to event ${event.title}`}
+                  aria-label={`Switch to event ${event.title}`}
+                >
+                  <p className="text-sm font-semibold text-indigo-900">{event.title}</p>
+                  <p className="text-xs text-indigo-700">Event ID: {event.id}</p>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Results Summary */}
@@ -806,12 +1018,23 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
                   <thead className="bg-gray-50 dark:bg-gray-700">
                     <tr>
                       <th className="px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-left border border-gray-300 dark:border-gray-600">
-                        <input
-                          type="checkbox"
-                          checked={selectedAttendees.length === attendees.length && attendees.length > 0}
-                          onChange={handleSelectAll}
-                          className="w-4 h-4 sm:w-5 sm:h-5 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:bg-gray-800 dark:text-blue-400 touch-manipulation"
-                        />
+                        <label className="inline-flex items-center justify-center">
+                          <span className="relative flex items-center justify-center">
+                            <input
+                              type="checkbox"
+                              checked={selectedAttendees.length === attendees.length && attendees.length > 0}
+                              onChange={handleSelectAll}
+                              className="custom-checkbox"
+                            />
+                            <span className="custom-checkbox-tick">
+                              {selectedAttendees.length === attendees.length && attendees.length > 0 && (
+                                <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l5 5L19 7" />
+                                </svg>
+                              )}
+                            </span>
+                          </span>
+                        </label>
                       </th>
                       <th className="px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider border border-gray-300 dark:border-gray-600">
                         Attendee
@@ -832,38 +1055,56 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
                       attendees.map((attendee, index) => (
                         <tr key={attendee.id} className={`hover:bg-gray-50 dark:hover:bg-gray-700 ${index % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-blue-50 dark:bg-gray-700'}`}>
                           <td className="px-2 sm:px-4 lg:px-6 py-2 sm:py-4 whitespace-nowrap border border-gray-300 dark:border-gray-600">
-                            <input
-                              type="checkbox"
-                              checked={selectedAttendees.includes(attendee.id!)}
-                              onChange={() => handleSelectAttendee(attendee.id!)}
-                              className="w-4 h-4 sm:w-5 sm:h-5 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:bg-gray-800 dark:text-blue-400 touch-manipulation"
-                            />
+                            <label className="inline-flex items-center justify-center">
+                              <span className="relative flex items-center justify-center">
+                                <input
+                                  type="checkbox"
+                                  checked={selectedAttendees.includes(attendee.id!)}
+                                  onChange={() => handleSelectAttendee(attendee.id!)}
+                                  className="custom-checkbox"
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                                <span className="custom-checkbox-tick">
+                                  {selectedAttendees.includes(attendee.id!) && (
+                                    <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l5 5L19 7" />
+                                    </svg>
+                                  )}
+                                </span>
+                              </span>
+                            </label>
                           </td>
                           <td className="px-2 sm:px-4 lg:px-6 py-2 sm:py-4 whitespace-nowrap border border-gray-300 dark:border-gray-600">
                             <div className="flex items-center">
                               <div className="flex-shrink-0 h-8 w-8 sm:h-10 sm:w-10">
-                                <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
-                                  <FaUserFriends className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600 dark:text-gray-300" />
+                                <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
+                                  <svg className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600 dark:text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-1a4 4 0 00-5-3.87M9 20H4v-1a4 4 0 015-3.87m8-6.13a4 4 0 11-8 0 4 4 0 018 0zM5 8a4 4 0 118 0 4 4 0 01-8 0z" />
+                                  </svg>
                                 </div>
                               </div>
                               <div className="ml-2 sm:ml-4 min-w-0">
-                                <div className="text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                                <div className="text-xs sm:text-sm font-semibold text-indigo-700 dark:text-indigo-300 truncate">
                                   {attendee.firstName} {attendee.lastName}
                                 </div>
-                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                <div className="text-xs text-purple-600 dark:text-purple-400 font-medium">
                                   ID: {attendee.id}
                                 </div>
                               </div>
                             </div>
                           </td>
                           <td className="px-2 sm:px-4 lg:px-6 py-2 sm:py-4 whitespace-nowrap border border-gray-300 dark:border-gray-600">
-                            <div className="text-xs sm:text-sm text-gray-900 dark:text-gray-100 flex items-center">
-                              <FaEnvelope className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 dark:text-gray-500 mr-2 flex-shrink-0" />
+                            <div className="text-xs sm:text-sm text-blue-700 dark:text-blue-300 font-medium flex items-center">
+                              <svg className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 dark:text-blue-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                              </svg>
                               <span className="break-all">{attendee.email}</span>
                             </div>
                             {attendee.phone && (
-                              <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 flex items-center mt-1">
-                                <FaPhone className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 dark:text-gray-500 mr-2 flex-shrink-0" />
+                              <div className="text-xs sm:text-sm text-teal-700 dark:text-teal-300 font-medium flex items-center mt-1">
+                                <svg className="h-4 w-4 sm:h-5 sm:w-5 text-teal-500 dark:text-teal-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a2 2 0 011.95 1.56l.57 2.57a2 2 0 01-.58 1.92l-1.27 1.27a16 16 0 006.59 6.59l1.27-1.27a2 2 0 011.92-.58l2.57.57A2 2 0 0121 15.72V19a2 2 0 01-2 2h-1C9.16 21 3 14.84 3 7V5z" />
+                                </svg>
                                 <span>{attendee.phone}</span>
                               </div>
                             )}
@@ -1020,17 +1261,20 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
 
       {/* View Attendee Modal */}
       {viewingAttendee && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-6 border-b">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Attendee Details
-              </h3>
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl border border-blue-100 shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between px-6 py-5 border-b border-blue-100 bg-blue-50 rounded-t-2xl">
+              <h3 className="text-lg font-semibold text-blue-900">Attendee Details</h3>
               <button
                 onClick={closeViewModal}
-                className="text-gray-400 hover:text-gray-600"
+                className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                title="Close details"
+                aria-label="Close details"
+                type="button"
               >
-                <FaTimes className="h-6 w-6" />
+                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
             <div className="p-6 space-y-6">
@@ -1123,6 +1367,88 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
                 </div>
               )}
 
+              {viewingAttendee.notes && (
+                <div>
+                  <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
+                    <FaStickyNote className="mr-2 text-yellow-600" />
+                    Additional Notes
+                  </h4>
+                  <div className="rounded-xl border border-yellow-200 bg-yellow-50 px-4 py-3 text-sm text-gray-800 whitespace-pre-wrap">
+                    {viewingAttendee.notes}
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
+                  <svg className="w-5 h-5 text-indigo-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828L18 9.828A4 4 0 0012.343 4.17L5.757 10.757a6 6 0 108.486 8.486L20 13" />
+                  </svg>
+                  Attachments
+                </h4>
+
+                {isAttachmentsLoading ? (
+                  <div className="rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-sm text-indigo-700">
+                    Loading attachments...
+                  </div>
+                ) : attachmentsError ? (
+                  <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                    {attachmentsError}
+                  </div>
+                ) : attendeeAttachments.length === 0 ? (
+                  <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
+                    No attachments uploaded for this attendee.
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {attendeeAttachments.map((attachment) => (
+                      <div key={attachment.id} className="rounded-xl border border-indigo-100 bg-indigo-50/50 p-3">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold text-gray-900 truncate">
+                              {attachment.originalFilename || attachment.title || 'Attachment'}
+                            </p>
+                            <p className="text-xs text-gray-600 mt-1">
+                              {attachment.contentType || 'Unknown type'} - {formatAttachmentSize(attachment.fileSize)}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {attachment.fileUrl && (
+                              <>
+                                <a
+                                  href={attachment.fileUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                                  title="View attachment"
+                                  aria-label="View attachment"
+                                >
+                                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                  </svg>
+                                </a>
+                                <button
+                                  onClick={() => handleDownloadAttachment(attachment)}
+                                  className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 hover:bg-green-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                                  title="Download attachment"
+                                  aria-label="Download attachment"
+                                  type="button"
+                                >
+                                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M7 10l5 5m0 0l5-5m-5 5V3" />
+                                  </svg>
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               {/* Emergency Contact */}
               {(viewingAttendee.emergencyContactName || viewingAttendee.emergencyContactPhone) && (
                 <div>
@@ -1144,12 +1470,20 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
                 </div>
               )}
             </div>
-            <div className="flex justify-end p-6 border-t">
+            <div className="flex justify-end p-6 border-t border-blue-100">
               <button
                 onClick={closeViewModal}
-                className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
+                className="flex-1 sm:flex-none sm:min-w-[200px] h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105"
+                title="Close attendee details"
+                aria-label="Close attendee details"
+                type="button"
               >
-                Close
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-200 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-red-700">Close</span>
               </button>
             </div>
           </div>
@@ -1158,24 +1492,29 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
 
       {/* Edit Attendee Modal */}
       {editingAttendee && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-6 border-b">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Edit Attendee Registration
-              </h3>
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl border border-green-100 shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-6 border-b border-green-100 bg-green-50 rounded-t-2xl">
+              <h3 className="text-lg font-semibold text-green-900">Edit Attendee Registration</h3>
               <button
                 onClick={closeEditModal}
-                className="text-gray-400 hover:text-gray-600"
+                className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                title="Close edit dialog"
+                aria-label="Close edit dialog"
+                type="button"
               >
-                <FaTimes className="h-6 w-6" />
+                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
             <div className="p-6 space-y-6">
               {/* Personal Information */}
               <div>
                 <h4 className="text-md font-semibold text-gray-900 mb-4 flex items-center">
-                  <FaUser className="mr-2 text-blue-600" />
+                  <span className="mr-2 w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                    <FaUser className="w-6 h-6 text-blue-600" />
+                  </span>
                   Personal Information
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1224,22 +1563,46 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
               {/* Registration Status */}
               <div>
                 <h4 className="text-md font-semibold text-gray-900 mb-4 flex items-center">
-                  <FaCalendarAlt className="mr-2 text-green-600" />
+                  <span className="mr-2 w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                    <FaCalendarAlt className="w-6 h-6 text-green-600" />
+                  </span>
                   Registration Status
                 </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                    <select
-                      value={editForm.registrationStatus || 'REGISTERED'}
-                      onChange={(e) => handleFormChange('registrationStatus', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="REGISTERED">Registered</option>
-                      <option value="PENDING">Pending</option>
-                      <option value="CANCELLED">Cancelled</option>
-                      <option value="WAITLISTED">Waitlisted</option>
-                    </select>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Current Status</label>
+                    <div className={`inline-flex items-center gap-3 px-4 py-2.5 rounded-xl border-2 ${getEditStatusConfig(editForm.registrationStatus || 'REGISTERED').cardClass}`}>
+                      <span className={`w-10 h-10 rounded-lg bg-white/70 flex items-center justify-center ${getEditStatusConfig(editForm.registrationStatus || 'REGISTERED').iconClass}`}>
+                        {getEditStatusConfig(editForm.registrationStatus || 'REGISTERED').icon}
+                      </span>
+                      <span className="font-semibold text-base">
+                        {getEditStatusConfig(editForm.registrationStatus || 'REGISTERED').label}
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Select New Status</label>
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                      {statusOptions.map((statusValue) => {
+                        const cfg = getEditStatusConfig(statusValue);
+                        const isActive = (editForm.registrationStatus || 'REGISTERED') === statusValue;
+                        return (
+                          <button
+                            key={statusValue}
+                            type="button"
+                            onClick={() => handleFormChange('registrationStatus', statusValue)}
+                            className={`h-16 rounded-xl border-2 flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 ${cfg.cardClass} ${isActive ? 'ring-2 ring-offset-1 ring-indigo-500 shadow-md' : 'opacity-90 hover:opacity-100'}`}
+                            title={`Set status to ${cfg.label}`}
+                            aria-label={`Set status to ${cfg.label}`}
+                          >
+                            <span className={`w-9 h-9 rounded-lg bg-white/70 flex items-center justify-center ${cfg.iconClass}`}>
+                              {cfg.icon}
+                            </span>
+                            <span className="font-semibold text-sm">{cfg.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1247,7 +1610,9 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
               {/* Guest Management */}
               <div>
                 <h4 className="text-md font-semibold text-gray-900 mb-4 flex items-center">
-                  <FaUsers className="mr-2 text-purple-600" />
+                  <span className="mr-2 w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+                    <FaUsers className="w-6 h-6 text-purple-600" />
+                  </span>
                   Guest Management
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1277,7 +1642,9 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
               {/* Special Requirements */}
               <div>
                 <h4 className="text-md font-semibold text-gray-900 mb-4 flex items-center">
-                  <FaExclamationTriangle className="mr-2 text-orange-600" />
+                  <span className="mr-2 w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
+                    <FaExclamationTriangle className="w-6 h-6 text-orange-600" />
+                  </span>
                   Special Requirements
                 </h4>
                 <div className="space-y-4">
@@ -1317,7 +1684,9 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
               {/* Notes */}
               <div>
                 <h4 className="text-md font-semibold text-gray-900 mb-4 flex items-center">
-                  <FaStickyNote className="mr-2 text-yellow-600" />
+                  <span className="mr-2 w-10 h-10 rounded-lg bg-yellow-100 flex items-center justify-center">
+                    <FaStickyNote className="w-6 h-6 text-yellow-600" />
+                  </span>
                   Additional Notes
                 </h4>
                 <div>
@@ -1332,10 +1701,82 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
                 </div>
               </div>
 
+              {/* Attachments */}
+              <div>
+                <h4 className="text-md font-semibold text-gray-900 mb-4 flex items-center">
+                  <svg className="w-5 h-5 text-indigo-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828L18 9.828A4 4 0 0012.343 4.17L5.757 10.757a6 6 0 108.486 8.486L20 13" />
+                  </svg>
+                  Attachments
+                </h4>
+                {isAttachmentsLoading ? (
+                  <div className="rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-sm text-indigo-700">
+                    Loading attachments...
+                  </div>
+                ) : attachmentsError ? (
+                  <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                    {attachmentsError}
+                  </div>
+                ) : attendeeAttachments.length === 0 ? (
+                  <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
+                    No attachments uploaded for this attendee.
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {attendeeAttachments.map((attachment) => (
+                      <div key={attachment.id} className="rounded-xl border border-indigo-100 bg-indigo-50/50 p-3">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold text-gray-900 truncate">
+                              {attachment.originalFilename || attachment.title || 'Attachment'}
+                            </p>
+                            <p className="text-xs text-gray-600 mt-1">
+                              {attachment.contentType || 'Unknown type'} - {formatAttachmentSize(attachment.fileSize)}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {attachment.fileUrl && (
+                              <>
+                                <a
+                                  href={attachment.fileUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                                  title="View attachment"
+                                  aria-label="View attachment"
+                                >
+                                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                  </svg>
+                                </a>
+                                <button
+                                  onClick={() => handleDownloadAttachment(attachment)}
+                                  className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 hover:bg-green-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                                  title="Download attachment"
+                                  aria-label="Download attachment"
+                                  type="button"
+                                >
+                                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M7 10l5 5m0 0l5-5m-5 5V3" />
+                                  </svg>
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               {/* Emergency Contact */}
               <div>
                 <h4 className="text-md font-semibold text-gray-900 mb-4 flex items-center">
-                  <FaPhone className="mr-2 text-red-600" />
+                  <span className="mr-2 w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
+                    <FaPhone className="w-6 h-6 text-red-600" />
+                  </span>
                   Emergency Contact
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -1370,31 +1811,43 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
                 </div>
               </div>
             </div>
-            <div className="flex justify-end space-x-3 p-6 border-t">
+            <div className="flex flex-row gap-2 sm:gap-3 p-6 border-t">
               <button
                 onClick={closeEditModal}
                 disabled={isSaving}
-                className="px-4 py-2 bg-teal-100 hover:bg-teal-200 text-teal-800 rounded-md flex items-center gap-2 transition-colors disabled:opacity-50"
+                className="flex-1 sm:flex-1 flex-shrink-0 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center gap-0 sm:gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Cancel edit"
+                aria-label="Cancel edit"
+                type="button"
               >
-                <FaTimes />
-                Cancel
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-200 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-red-700 hidden sm:inline">Cancel</span>
               </button>
               <button
                 onClick={handleSaveAttendee}
                 disabled={isSaving}
-                className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md flex items-center gap-2 transition-colors disabled:opacity-50"
+                className="flex-1 sm:flex-1 flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-0 sm:gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Save attendee changes"
+                aria-label="Save attendee changes"
+                type="button"
               >
-                {isSaving ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <FaEdit />
-                    Save Changes
-                  </>
-                )}
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+                  {isSaving ? (
+                    <svg className="animate-spin w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  ) : (
+                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </div>
+                <span className="font-semibold text-green-700 hidden sm:inline">{isSaving ? 'Saving...' : 'Save Changes'}</span>
               </button>
             </div>
           </div>
@@ -1403,8 +1856,8 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
 
       {/* Delete Confirmation Modal */}
       {deletingAttendee && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl border border-red-100 shadow-2xl max-w-md w-full">
             <div className="p-6">
               <div className="flex items-center mb-4">
                 <div className="flex-shrink-0">
@@ -1427,27 +1880,39 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
                   This action cannot be undone and will permanently remove the registration data.
                 </p>
               </div>
-              <div className="flex justify-end space-x-3">
+              <div className="flex flex-row gap-2 sm:gap-3">
                 <button
                   onClick={closeDeleteModal}
                   disabled={isDeleting}
-                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors disabled:opacity-50"
+                  className="flex-1 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                  type="button"
                 >
-                  Cancel
+                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                    <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </div>
+                  <span className="font-semibold text-blue-700 hidden sm:inline">Cancel</span>
                 </button>
                 <button
                   onClick={confirmDeleteAttendee}
                   disabled={isDeleting}
-                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center"
+                  className="flex-1 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                  type="button"
                 >
-                  {isDeleting ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Deleting...
-                    </>
-                  ) : (
-                    'Delete Registration'
-                  )}
+                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-200 flex items-center justify-center">
+                    {isDeleting ? (
+                      <svg className="animate-spin w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                    ) : (
+                      <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    )}
+                  </div>
+                  <span className="font-semibold text-red-700 hidden sm:inline">{isDeleting ? 'Deleting...' : 'Delete Registration'}</span>
                 </button>
               </div>
             </div>

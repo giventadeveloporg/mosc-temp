@@ -31,8 +31,8 @@ export default async function TwentiethCenturyPage({
                   <Image
                       src="/images/logos/Current_Edits/MOSC-Logo-only.png"
                       alt="Church History – 20th Century"
-                      width={175} height={175}
-                      className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }}
+                      width={125} height={125}
+                      className="rounded-lg w-full max-w-[125px] max-h-[125px] object-contain" priority
                     />
                 </div>
 

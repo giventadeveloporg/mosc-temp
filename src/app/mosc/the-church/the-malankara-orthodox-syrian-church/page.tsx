@@ -29,15 +29,15 @@ export default async function MalankaraOrthodoxSyrianChurchPage({
             {/* Main Content */}
             <div className="lg:col-span-2">
               <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
-                {/* Featured Image - centered, contained */}
+                {/* Featured Image - same style as administration/administration */}
                 <div className="mb-8 flex justify-center">
                   <Image
                     src="/images/logos/Current_Edits/MOSC-Logo-only.png"
                     alt="Malankara Orthodox Syrian Church"
-                    width={175}
-                    height={175}
-                    className="rounded-lg object-contain"
-                    style={{ width: '175px', height: '175px' }}
+                    width={125}
+                    height={125}
+                    className="rounded-lg w-full max-w-[125px] max-h-[125px] object-contain"
+                    priority
                   />
                 </div>
 

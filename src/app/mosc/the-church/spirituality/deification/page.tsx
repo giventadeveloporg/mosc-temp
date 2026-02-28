@@ -31,8 +31,8 @@ export default async function DeificationPage({
                   <Image
                       src="/images/church/spirituality.jpg"
                       alt="Deification - Malankara Orthodox Church"
-                      width={175} height={175}
-                      className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }}
+                      width={125} height={125}
+                      className="rounded-lg w-full max-w-[125px] max-h-[125px] object-contain" priority
                     />
                 </div>
 

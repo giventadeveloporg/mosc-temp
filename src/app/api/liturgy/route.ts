@@ -1,0 +1,245 @@
+import { NextRequest, NextResponse } from 'next/server';
+
+// ---------------------------------------------------------------------------
+// Shared types – consumed by SyroLiturgySection via /api/liturgy response
+// ---------------------------------------------------------------------------
+
+export interface LiturgyReading {
+  liturgy_day_heading?: string;
+  season_name?: string;
+  liturgy_heading: string;
+  content_place: string;
+}
+
+export interface LiturgyApiResponse {
+  message: LiturgyReading[];
+}
+
+// ---------------------------------------------------------------------------
+// Strapi response types (internal – used only by the mapping layer)
+// ---------------------------------------------------------------------------
+
+interface StrapiLiturgyReading {
+  id: number;
+  liturgyHeadingEn: string;
+  liturgyHeadingMalylm: string;
+  contentPlaceEn: string;
+  contentPlaceMalylm: string;
+}
+
+interface StrapiLiturgyDay {
+  id: number;
+  documentId: string;
+  date: string;
+  dayHeadingEn: string;
+  dayHeadingMalylm: string;
+  seasonNameEn: string;
+  seasonNameMalylm: string;
+  order: number;
+  readings: StrapiLiturgyReading[];
+}
+
+interface StrapiResponse {
+  data: StrapiLiturgyDay[];
+  meta: {
+    pagination: { page: number; pageSize: number; pageCount: number; total: number };
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Environment
+// ---------------------------------------------------------------------------
+
+const LITURGY_DATA_SOURCE = process.env.LITURGY_DATA_SOURCE || 'external';
+const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || process.env.STRAPI_URL || 'http://localhost:1337';
+const TENANT_ID = process.env.NEXT_PUBLIC_TENANT_ID || '';
+const LITURGY_API_BASE = 'https://www.apiwebser.smcimprojects.com/api';
+
+// ---------------------------------------------------------------------------
+// GET /api/liturgy?lng=en|ml
+// ---------------------------------------------------------------------------
+
+export async function GET(request: NextRequest) {
+  const lng = request.nextUrl.searchParams.get('lng') ?? 'en';
+  if (lng !== 'en' && lng !== 'ml') {
+    return NextResponse.json(
+      { error: 'Invalid language. Use lng=en or lng=ml' },
+      { status: 400 }
+    );
+  }
+
+  if (LITURGY_DATA_SOURCE === 'strapi') {
+    return fetchFromStrapi(lng);
+  }
+  return fetchFromExternalApi(lng);
+}
+
+// ---------------------------------------------------------------------------
+// Strapi backend
+// ---------------------------------------------------------------------------
+
+async function fetchFromStrapi(lng: string): Promise<NextResponse> {
+  try {
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+
+    const baseParams = new URLSearchParams({
+      'filters[date][$eq]': today,
+      'filters[publishedAt][$notNull]': 'true',
+      'populate[0]': 'readings',
+      'sort': 'order:asc',
+    });
+
+    const reqHeaders: Record<string, string> = { Accept: 'application/json' };
+    const strapiToken = process.env.STRAPI_API_TOKEN || process.env.AMPLIFY_STRAPI_API_TOKEN;
+    if (strapiToken) {
+      reqHeaders['Authorization'] = `Bearer ${strapiToken}`;
+    }
+
+    // Build candidate URLs: try with tenant first (if configured), then without.
+    // The liturgy-day content type may or may not have a tenant relation;
+    // when the relation is absent Strapi can return 200 with empty data or 400.
+    // In either case, fall back to querying without the tenant filter.
+    const urls: string[] = [];
+    if (TENANT_ID) {
+      const withTenant = new URLSearchParams(baseParams);
+      withTenant.set('filters[tenant][tenantId][$eq]', TENANT_ID);
+      urls.push(`${STRAPI_URL}/api/liturgy-days?${withTenant.toString()}`);
+    }
+    urls.push(`${STRAPI_URL}/api/liturgy-days?${baseParams.toString()}`);
+
+    let json: StrapiResponse | null = null;
+    for (const url of urls) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[Liturgy API] Strapi request:', url.replace(TENANT_ID || '__NONE__', '***'));
+      }
+      const res = await fetch(url, { method: 'GET', headers: reqHeaders, next: { revalidate: 3600 } });
+
+      if (!res.ok) {
+        if (process.env.NODE_ENV === 'development') {
+          const errBody = await res.text();
+          console.log('[Liturgy API] Strapi returned', res.status, '-- trying next URL. Body:', errBody.slice(0, 500));
+        }
+        continue;
+      }
+
+      const body: StrapiResponse = await res.json();
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[Liturgy API] Strapi raw response (' + (body.data?.length ?? 0) + ' items):', JSON.stringify(body, null, 2).slice(0, 2000));
+      }
+
+      if (body.data && body.data.length > 0) {
+        json = body;
+        break;
+      }
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[Liturgy API] 0 results -- trying next URL');
+      }
+    }
+
+    if (!json) {
+      console.error('[Liturgy API] Strapi: no data found for', today);
+      return NextResponse.json({ error: 'Liturgy service unavailable' }, { status: 502 });
+    }
+
+    const strapiDay: StrapiLiturgyDay = json.data[0];
+    const message = mapStrapiToLegacy(strapiDay, lng);
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Liturgy API] Mapped', message.length, 'readings for', lng);
+    }
+
+    return NextResponse.json({ message });
+  } catch (err) {
+    console.error('[Liturgy API] Strapi fetch error:', err);
+    return NextResponse.json(
+      { error: 'Failed to fetch liturgy readings' },
+      { status: 500 }
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Strapi → LiturgyReading[] mapping
+// ---------------------------------------------------------------------------
+
+function mapStrapiToLegacy(day: StrapiLiturgyDay, lang: string): LiturgyReading[] {
+  const isEn = lang === 'en';
+  const dayHeading = isEn ? day.dayHeadingEn : day.dayHeadingMalylm;
+  const seasonName = isEn ? day.seasonNameEn : day.seasonNameMalylm;
+
+  const readings: LiturgyReading[] = (day.readings || []).map((r) => ({
+    liturgy_day_heading: dayHeading || '',
+    season_name: seasonName || '',
+    liturgy_heading: (isEn ? r.liturgyHeadingEn : r.liturgyHeadingMalylm) || '',
+    content_place: (isEn ? r.contentPlaceEn : r.contentPlaceMalylm) || '',
+  }));
+
+  if (readings.length === 0) {
+    readings.push({
+      liturgy_day_heading: dayHeading || '',
+      season_name: seasonName || '',
+      liturgy_heading: '',
+      content_place: '',
+    });
+  }
+
+  return readings;
+}
+
+// ---------------------------------------------------------------------------
+// Legacy external SMCIM API backend
+// ---------------------------------------------------------------------------
+
+async function fetchFromExternalApi(lng: string): Promise<NextResponse> {
+  try {
+    const token =
+      process.env.LITURGY_API_TOKEN ??
+      process.env.AMPLIFY_LITURGY_API_TOKEN ??
+      (process.env.NODE_ENV === 'development'
+        ? 'dmdlMXBVWkNqcS95MkFDVmlEWExZQT09'
+        : '');
+    if (!token) {
+      console.error('[Liturgy API] LITURGY_API_TOKEN (or AMPLIFY_LITURGY_API_TOKEN) is not set');
+      return NextResponse.json(
+        { error: 'Liturgy API is not configured' },
+        { status: 503 }
+      );
+    }
+
+    const params = new URLSearchParams({ __: token, lng });
+    const url = `${LITURGY_API_BASE}/liturgy?${params.toString()}`;
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Liturgy API] External request (token redacted):', `${LITURGY_API_BASE}/liturgy?__=***&lng=${lng}`);
+    }
+
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        Referer: 'https://www.syromalabarchurch.in/',
+      },
+      next: { revalidate: 3600 },
+    });
+
+    if (!res.ok) {
+      const body = await res.text();
+      console.error('[Liturgy API] Upstream error:', res.status, body);
+      const message =
+        res.status === 404 && body.includes('Access Denied')
+          ? 'Liturgy API returned Access Denied. Check that LITURGY_API_TOKEN in .env.local matches the token from documentation (or request a new token from SMCIM).'
+          : 'Liturgy service unavailable';
+      return NextResponse.json({ error: message }, { status: 502 });
+    }
+
+    const data: LiturgyApiResponse = await res.json();
+    return NextResponse.json(data);
+  } catch (err) {
+    console.error('[Liturgy API] External fetch error:', err);
+    return NextResponse.json(
+      { error: 'Failed to fetch liturgy readings' },
+      { status: 500 }
+    );
+  }
+}

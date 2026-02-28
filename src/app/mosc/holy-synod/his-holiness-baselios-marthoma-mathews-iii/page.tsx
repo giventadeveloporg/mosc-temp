@@ -25,7 +25,7 @@ const HisHolinessBaseliosMarthomaMathewsIiiPage = () => {
               <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
                 {/* Featured Image - centered, contained (administration style) */}
                 <div className="mb-8 flex justify-center">
-                  <Image src="/images/holy-synod/hh-scaled.jpg" alt="H.H. Baselios Marthoma Mathews III, The Ninth Catholicos of the East in Malankara" width={175} height={175} className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }} priority />
+                  <Image src="/images/holy-synod/hh-scaled.jpg" alt="H.H. Baselios Marthoma Mathews III, The Ninth Catholicos of the East in Malankara" width={125} height={75} className="rounded-lg w-full max-w-[125px] h-auto object-contain" priority />
                 </div>
 
                 {/* Content - Below Image */}

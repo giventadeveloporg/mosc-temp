@@ -194,6 +194,14 @@ const nextConfig = {
     AMPLIFY_NEXT_PUBLIC_STRAPI_URL: process.env.AMPLIFY_NEXT_PUBLIC_STRAPI_URL,
     STRAPI_API_TOKEN: process.env.AMPLIFY_STRAPI_API_TOKEN || process.env.STRAPI_API_TOKEN,
     AMPLIFY_STRAPI_API_TOKEN: process.env.AMPLIFY_STRAPI_API_TOKEN,
+
+    // Liturgical Calendar API (Syro-Malabar / SMCIM) – server-only token for /api/liturgy
+    LITURGY_API_TOKEN: process.env.AMPLIFY_LITURGY_API_TOKEN || process.env.LITURGY_API_TOKEN,
+    AMPLIFY_LITURGY_API_TOKEN: process.env.AMPLIFY_LITURGY_API_TOKEN,
+
+    // Liturgical Calendar data source (strapi | external)
+    LITURGY_DATA_SOURCE: process.env.LITURGY_DATA_SOURCE || process.env.AMPLIFY_LITURGY_DATA_SOURCE || 'external',
+    AMPLIFY_LITURGY_DATA_SOURCE: process.env.AMPLIFY_LITURGY_DATA_SOURCE,
   },
 };
 

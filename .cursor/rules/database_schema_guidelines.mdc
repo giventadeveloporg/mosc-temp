@@ -38,6 +38,25 @@ This rule defines the standard patterns for adding or modifying PostgreSQL table
 - **CREATE order:** Create parent tables before tables that reference them (e.g. `news_category` and `user_profile` exist before `news_article`; then `news_article_category` after `news_article` and `news_category`).
 - **Sequence initialization:** For any new table that uses `sequence_generator` for `id`, add that table to the `setval('public.sequence_generator', GREATEST(..., COALESCE((SELECT MAX(id) FROM public.<new_table>), 0), ...))` block at the end of the file so the sequence stays ahead of existing data.
 
+## **Shared Sequence Generator Rules (Mandatory)**
+
+- **Never leave a hardcoded shared sequence value** for `public.sequence_generator` when schema evolves (for example `setval(..., 4000, true)` only).
+- Use `GREATEST(...)` with `COALESCE(MAX(id), 0)` for all tables using `DEFAULT nextval('public.sequence_generator'::regclass)`.
+- When introducing a new table that uses `sequence_generator`, add its `MAX(id)` entry immediately in the consolidated sequence block.
+- **Required pattern:**
+  ```sql
+  SELECT pg_catalog.setval(
+                 'public.sequence_generator',
+                 GREATEST(
+                     COALESCE((SELECT MAX(id) FROM public.user_profile), 0),
+                     COALESCE((SELECT MAX(id) FROM public.<new_table>), 0),
+                     1
+                 ),
+                 true
+         );
+  ```
+- **Why this is required:** it prevents duplicate key errors in mixed environments where data may be preloaded from multiple tables.
+
 ## **Foreign Keys**
 
 - **Naming:** `CONSTRAINT fk_<short_name> FOREIGN KEY (column_id) REFERENCES public.<parent_table>(id) ON DELETE SET NULL` (or `ON DELETE CASCADE` where appropriate).
@@ -62,4 +81,5 @@ This rule defines the standard patterns for adding or modifying PostgreSQL table
 - [ ] DROP TABLE added at top in reverse dependency order
 - [ ] CREATE TABLE added in dependency order (parents before children)
 - [ ] Table added to `sequence_generator` setval GREATEST list
+- [ ] No stale hardcoded `sequence_generator` value left without `MAX(id)` protection for newly-added tables
 - [ ] No ALTER used; only CREATE TABLE for new tables

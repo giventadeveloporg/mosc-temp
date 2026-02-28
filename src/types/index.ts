@@ -338,7 +338,7 @@ export type EventAttendeeDTO = {
   checkInTime?: string;
   totalNumberOfGuests?: number;
   numberOfGuestsCheckedIn?: number;
-  notes?: string;
+  notes?: string; // Supports up to 1500 chars
   qrCodeData?: string;
   qrCodeGenerated?: boolean;
   qrCodeGeneratedAt?: string;
@@ -354,6 +354,28 @@ export type EventAttendeeDTO = {
   createdAt: string;
   updatedAt: string;
   event?: EventDetailsDTO;
+};
+
+/**
+ * DTO for attendee registration file attachments.
+ */
+export type EventAttendeeAttachmentDTO = {
+  id?: number;
+  tenantId?: string;
+  attendeeId: number;
+  eventId: number;
+  title?: string;
+  description?: string;
+  fileUrl?: string;
+  contentType?: string;
+  fileSize?: number;
+  originalFilename?: string;
+  storageType?: string;
+  eventMediaType?: string;
+  isPublic?: boolean;
+  uploadedById?: number;
+  createdAt: string;
+  updatedAt: string;
 };
 
 /**

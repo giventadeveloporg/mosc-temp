@@ -1,6 +1,6 @@
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import { getAppUrl, getApiBaseUrl } from '@/lib/env';
-import type { EventAttendeeDTO, EventAttendeeGuestDTO, EventDetailsDTO } from '@/types';
+import type { EventAttendeeAttachmentDTO, EventAttendeeDTO, EventAttendeeGuestDTO, EventDetailsDTO } from '@/types';
 
 // Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
 function getApiBase() {
@@ -339,6 +339,36 @@ export async function exportRegistrationsToCSV(
   } catch (error) {
     console.error('Error exporting registrations to CSV:', error);
     return null;
+  }
+}
+
+/**
+ * Fetch attendee attachments for view/edit dialogs.
+ */
+export async function fetchAttendeeAttachments(attendeeId: number): Promise<EventAttendeeAttachmentDTO[]> {
+  try {
+    const baseUrl = getAppUrl();
+    const params = new URLSearchParams();
+    params.append('attendeeId.equals', attendeeId.toString());
+    params.append('sort', 'createdAt,desc');
+
+    const response = await fetch(`${baseUrl}/api/proxy/event-attendee-attachments?${params.toString()}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      cache: 'no-store',
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch attendee attachments: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (Array.isArray(data)) return data;
+    if (data && typeof data === 'object' && Array.isArray(data.content)) return data.content;
+    return [];
+  } catch (error) {
+    console.error('Error fetching attendee attachments:', error);
+    return [];
   }
 }
 

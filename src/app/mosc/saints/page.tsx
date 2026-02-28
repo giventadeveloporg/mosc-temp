@@ -84,19 +84,17 @@ const SaintsPage = () => {
                 key={card.href}
                 className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 overflow-hidden flex flex-col h-full"
               >
-                <div className="relative w-full h-48 bg-syro-bg-gray shrink-0 flex items-center justify-center p-4">
-                  <div className="relative w-full h-full min-h-0">
-                    <Image
-                      src={card.image}
-                      alt={card.title}
-                      fill
-                      className="object-contain object-center"
-                      style={{ backgroundColor: 'transparent' }}
-                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                    />
-                  </div>
+                <div className="mb-5 flex justify-center pt-8">
+                  <Image
+                    src={card.image}
+                    alt={card.title}
+                    width={280}
+                    height={168}
+                    className="w-full max-w-[280px] h-auto object-contain rounded-lg"
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                  />
                 </div>
-                <div className="p-8 flex flex-col flex-1">
+                <div className="p-8 pt-0 flex flex-col flex-1">
                   <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug">
                     {card.title}
                   </h3>
