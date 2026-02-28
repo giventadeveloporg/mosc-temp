@@ -146,6 +146,7 @@ DROP TABLE IF EXISTS public.bulk_operation_log CASCADE;
 DROP TABLE IF EXISTS public.qr_code_usage CASCADE;
 
 DROP TABLE IF EXISTS public.event_attendee_guest CASCADE;
+DROP TABLE IF EXISTS public.event_attendee_attachment CASCADE;
 DROP TABLE IF EXISTS public.event_guest_pricing CASCADE;
 DROP TABLE IF EXISTS public.event_attendee CASCADE;
 DROP TABLE IF EXISTS public.event_admin_audit_log CASCADE;
@@ -1432,6 +1433,31 @@ CREATE TABLE public.event_attendee_guest (
                                              CONSTRAINT fk_event_attendee_guest__approved_by_id FOREIGN KEY (approved_by_id) REFERENCES public.user_profile(id) ON DELETE SET NULL,
                                              CONSTRAINT fk_event_attendee_guest__primary_attendee_id FOREIGN KEY (primary_attendee_id) REFERENCES public.event_attendee(id) ON DELETE CASCADE
 );
+
+CREATE TABLE public.event_attendee_attachment (
+                                                  id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                                  tenant_id character varying(255),
+                                                  attendee_id bigint NOT NULL,
+                                                  event_id bigint NOT NULL,
+                                                  title character varying(255),
+                                                  description character varying(2048),
+                                                  file_url character varying(2048) NOT NULL,
+                                                  content_type character varying(255),
+                                                  file_size integer,
+                                                  original_filename character varying(255),
+                                                  storage_type character varying(255) NOT NULL,
+                                                  is_public boolean DEFAULT false NOT NULL,
+                                                  event_media_type character varying(255) DEFAULT 'ATTENDEE_ATTACHMENT'::character varying NOT NULL,
+                                                  uploaded_by_id bigint,
+                                                  created_at timestamp without time zone DEFAULT now() NOT NULL,
+                                                  updated_at timestamp without time zone DEFAULT now() NOT NULL,
+                                                  CONSTRAINT event_attendee_attachment_pkey PRIMARY KEY (id),
+                                                  CONSTRAINT fk_event_attendee_attachment__attendee_id FOREIGN KEY (attendee_id) REFERENCES public.event_attendee(id) ON DELETE CASCADE,
+                                                  CONSTRAINT fk_event_attendee_attachment__event_id FOREIGN KEY (event_id) REFERENCES public.event_details(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_event_attendee_attachment_attendee_created
+    ON public.event_attendee_attachment(attendee_id, created_at);
 
 
 
@@ -5081,6 +5107,7 @@ SELECT pg_catalog.setval(
                    COALESCE((SELECT MAX(id) FROM public.event_admin_audit_log), 0),
                    COALESCE((SELECT MAX(id) FROM public.event_attendee), 0),
                    COALESCE((SELECT MAX(id) FROM public.event_attendee_guest), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_attendee_attachment), 0),
                    COALESCE((SELECT MAX(id) FROM public.event_calendar_entry), 0),
                    COALESCE((SELECT MAX(id) FROM public.event_sponsors), 0),
                    COALESCE((SELECT MAX(id) FROM public.event_sponsors_join), 0),

@@ -171,14 +171,36 @@ if (pathname?.startsWith('/admin')) {
 
 **Reference**: [`src/app/layout.tsx`](mdc:src/app/layout.tsx) - Lines 102-107 ("Run admin check on ALL routes (including public) so the Header shows the Admin menu when a logged-in admin visits any page (e.g. homepage).")
 
+### **Skip-Auth Logic in Root Layout (`skipAuthForRoute`)**
+
+The root layout uses a `skipAuthForRoute` flag to skip the auth + profile lookup block on routes that do not render the main Header (e.g. Syro/MOSC routes with their own layout). **The homepage (`/`) must NOT be skipped** so the Admin menu appears when an admin lands on `/`.
+
+**Implemented pattern in `src/app/layout.tsx`**:
+
+- **`skipAuthForRoute`**
+  - **Before (incorrect)**: `pathname === '/' || pathname.startsWith('/mosc-old') || pathname.startsWith('/mosc')` — caused the admin check to be skipped on the homepage, so `isTenantAdmin` stayed `false` and the Admin menu did not appear in production when users landed on `/`.
+  - **After (correct)**: `pathname.startsWith('/mosc-old') || pathname.startsWith('/mosc')` — only skip routes where the main app Header is not rendered (ConditionalLayout renders children only for `/mosc-old` and `/mosc`).
+
+- **Comment** (keep in layout):
+  - "Run auth + profile lookup on all routes that show the main Header (including /) so Admin menu appears for admins (per clerk_auth rule)."
+  - "Only skip /mosc-old and /mosc — ConditionalLayout does not render the main Header there."
+
+**Result**:
+- **`/`**: Admin check **runs** → profile lookup by `userId` + `tenantId` → `isTenantAdmin` from `user_profile.user_role === 'ADMIN'` → Header can show Admin menu for admins.
+- **`/mosc-old`, `/mosc`**: Admin check **skipped** (no main Header; ConditionalLayout renders children only). No change.
+- **All other routes** (e.g. `/events`, `/pricing`, `/admin`): Admin check already runs; no change.
+
+No changes are required to middleware or ConditionalLayout for this behavior. After deploy, if the Admin menu still does not show for a user, confirm in **production** that there is a `user_profile` row for that Clerk user and the correct tenant (e.g. mosc-temp) with `user_role = 'ADMIN'` (via `/admin/manage-usage` → Edit user → Role = ADMIN, or direct DB update). The user may need to sign out and sign back in after a role change.
+
 ### **Key Requirements**:
 1. ✅ **Await `headers()` first** - Required for Next.js 15+
 2. ✅ **Call `auth()` after headers()** - Ensures proper async context
 3. ✅ **Run admin check on ALL routes** - Use `if (pathname)` (or equivalent); do not gate by `pathname?.startsWith('/admin')` so the Admin menu shows on public pages too
-4. ✅ **Check `userId` exists** - Only fetch profile if user is authenticated
-5. ✅ **Query by `userId + tenantId`** - Multi-tenant scoping
-6. ✅ **Check `userRole === 'ADMIN'`** - Admin status check
-7. ✅ **Pass `isTenantAdmin` to Header** - Client component receives server-verified flag
+4. ✅ **Do not skip auth on homepage** - `skipAuthForRoute` must NOT include `pathname === '/'`; only skip `/mosc-old` and `/mosc` where the main Header is not rendered
+5. ✅ **Check `userId` exists** - Only fetch profile if user is authenticated
+6. ✅ **Query by `userId + tenantId`** - Multi-tenant scoping
+7. ✅ **Check `userRole === 'ADMIN'`** - Admin status check
+8. ✅ **Pass `isTenantAdmin` to Header** - Client component receives server-verified flag
 
 ### **CRITICAL: Admin Role Must Be Set in Database**
 
@@ -846,11 +868,12 @@ Does the route call auth() or currentUser() in server components?
 **Checklist**:
 1. ✅ Is route in `publicRoutes` (not `ignoredRoutes`)?
 2. ✅ Is `auth()` being called after `headers()` is awaited?
-3. ✅ Is `userId` not null (user is logged in)?
-4. ✅ Is `tenantId` matching the database record?
-5. ✅ **Is `user_role = 'ADMIN'` in the `user_profile` table?** (CRITICAL - must be set manually)
-6. ✅ Is `isTenantAdmin` prop being passed to Header?
-7. ✅ Has the user logged out and logged back in after role change?
+3. ✅ **Is the homepage (`/`) NOT skipped?** — In `src/app/layout.tsx`, `skipAuthForRoute` must NOT include `pathname === '/'`; it should only skip `pathname.startsWith('/mosc-old')` and `pathname.startsWith('/mosc')`. If `/` is skipped, the admin check never runs when users land on the homepage and the Admin menu will not appear in production.
+4. ✅ Is `userId` not null (user is logged in)?
+5. ✅ Is `tenantId` matching the database record?
+6. ✅ **Is `user_role = 'ADMIN'` in the `user_profile` table?** (CRITICAL - must be set manually; confirm in **production** DB for production domain, e.g. mosc-temp.com)
+7. ✅ Is `isTenantAdmin` prop being passed to Header?
+8. ✅ Has the user logged out and logged back in after role change?
 
 **Common Cause**: `user_role` is not set to `'ADMIN'` in the database. This must be changed manually:
 - **Via Dashboard**: `/admin/manage-usage` → Edit user → Change Role to `ADMIN` → Save
@@ -896,9 +919,10 @@ Does the route call auth() or currentUser() in server components?
 1. Await `headers()` first
 2. Call `auth()` to get `userId`
 3. **Run admin check on ALL routes** (whenever `pathname` is present)—do not limit to `/admin` so the Admin menu shows on public pages (homepage, events, gallery, etc.)
-4. Query user profile with `userId + tenantId`
-5. Check `userRole === 'ADMIN'` (must be set in database)
-6. Pass `isTenantAdmin` to Header component
+4. **Do not skip auth on homepage** — In layout, `skipAuthForRoute` must NOT include `pathname === '/'`; only skip `pathname.startsWith('/mosc-old')` and `pathname.startsWith('/mosc')` (routes where ConditionalLayout does not render the main Header).
+5. Query user profile with `userId + tenantId`
+6. Check `userRole === 'ADMIN'` (must be set in database)
+7. Pass `isTenantAdmin` to Header component
 
 **User Profile Avatar Pattern**:
 1. Use Clerk's `useUser()` hook to get `user.imageUrl`, `user.firstName`, `user.emailAddresses`
