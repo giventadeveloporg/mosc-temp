@@ -7,6 +7,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import ConditionalLayout from "../components/ConditionalLayout";
 import ClerkSyncUrlCleanup from "../components/ClerkSyncUrlCleanup";
+import ClerkSatelliteSyncGate from "../components/ClerkSatelliteSyncGate";
 import MobileDebugConsole from "../components/MobileDebugConsole";
 import TenantIdInjector from "../components/TenantIdInjector";
 import { TenantSettingsProvider } from "../components/TenantSettingsProvider";
@@ -100,8 +101,17 @@ export default async function RootLayout({
   // Determine tenant-scoped admin flag on the server
   // Run auth + profile lookup on all routes that show the main Header (including /) so Admin menu appears for admins (per clerk_auth rule).
   // Only skip /mosc-old and /mosc — ConditionalLayout does not render the main Header there.
+  // CRITICAL: Also skip during Clerk satellite sync (?__clerk_synced=true). On the first
+  // load after redirect from primary, the session cookie is being established for SUBSEQUENT
+  // requests. Calling auth() now would either hang (blocking the entire server response for
+  // seconds on Lambda cold start) or return null. Skip auth on this request so the server
+  // responds fast; the client-side ClerkProvider will process the sync and establish the session.
   const skipAuthForRoute = pathname.startsWith('/mosc-old') || pathname.startsWith('/mosc');
-  if (pathname && !skipAuthForRoute) {
+  const isClerkSyncing = headersList.get('x-clerk-syncing') === 'true';
+  if (isClerkSyncing) {
+    debugLog('[Layout] ⏳ Skipping auth/profile work during Clerk satellite sync — session not yet established on this request');
+  }
+  if (pathname && !skipAuthForRoute && !isClerkSyncing) {
     try {
       // CRITICAL: Call auth() immediately after awaiting headers() to ensure proper async context
       // Do not call any other async functions before auth() completes
@@ -348,6 +358,7 @@ export default async function RootLayout({
         </head>
         <body className={inter.className + " flex flex-col min-h-screen"} suppressHydrationWarning>
           <ClerkSyncUrlCleanup />
+          <ClerkSatelliteSyncGate />
           <TenantIdInjector />
           <TrpcProvider>
             <TenantSettingsProvider>
