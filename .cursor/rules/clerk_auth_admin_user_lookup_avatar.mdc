@@ -1,6 +1,6 @@
 ---
 description: Clerk authentication middleware configuration, admin role lookup, and satellite/primary sign-in and sign-out patterns for Next.js App Router
-globs: src/middleware.ts, src/app/layout.tsx, src/app/**/layout.tsx, src/app/(auth)/sign-in/[[...sign-in]]/page.tsx, src/app/auth/signout-redirect/page.tsx, src/components/Header.tsx
+globs: src/middleware.ts, src/app/layout.tsx, src/app/**/layout.tsx, src/app/(auth)/sign-in/[[...sign-in]]/page.tsx, src/app/auth/signout-redirect/page.tsx, src/components/Header.tsx, src/components/ClerkSyncUrlCleanup.tsx
 alwaysApply: true
 ---
 
@@ -649,6 +649,22 @@ if (hostname.includes(satelliteDomain.replace('www.', ''))) {
 ```
 
 **Fix**: Detect primary first via `NEXT_PUBLIC_PRIMARY_DOMAIN`; only then treat as satellite when `hostname.includes('mosc-temp.com')` (or another explicit satellite host).
+
+---
+
+## **Clerk URL Sync Parameter Cleanup (`?__clerk_synced=true`)**
+
+After redirect from primary to satellite, Clerk appends `?__clerk_synced=true`. It must be stripped **after** Clerk has processed it, or Clerk re-initiates sync and the param reappears (especially on first load after deploy).
+
+### **Required: ClerkSyncUrlCleanup in Root Layout**
+- **Component**: `src/components/ClerkSyncUrlCleanup.tsx` — client component that uses `useAuth().isLoaded`, then removes `__clerk_*` query params via `history.replaceState`.
+- **Placement**: Must render **inside** `ClerkProvider` (so `useAuth()` works). In `src/app/layout.tsx`, `ClerkSyncUrlCleanup` is inside the same tree as `layoutContent`, which is wrapped by `ClerkProvider` when `CLERK_KEY` is set — do not move it outside.
+- **Timing**: Cleanup runs only when `isLoaded === true`, then after a short delay (600ms) to allow Clerk to persist sync state. A safety-net cleanup runs once after 2s to catch cases where Clerk re-appends the param on first load after deploy (avoids requiring a manual reload).
+- **Do not** remove or reorder `ClerkSyncUrlCleanup` when changing layout/cache (e.g. TenantIdInjector, TenantSettingsProvider). Keep it as one of the first children of `<body>` inside the layout content passed to `ClerkProvider`.
+
+### **Reference**
+- **Implementation**: [`src/components/ClerkSyncUrlCleanup.tsx`](mdc:src/components/ClerkSyncUrlCleanup.tsx)
+- **Layout usage**: [`src/app/layout.tsx`](mdc:src/app/layout.tsx) — `<ClerkSyncUrlCleanup />` inside body, within `layoutContent` wrapped by `ClerkProvider`.
 
 ---
 
