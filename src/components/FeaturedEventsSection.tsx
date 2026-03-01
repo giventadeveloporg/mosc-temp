@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { formatInTimeZone } from 'date-fns-tz';
@@ -8,6 +8,7 @@ import type { EventDetailsDTO, EventMediaDTO } from '@/types';
 import { useFilteredEvents } from '@/hooks/useFilteredEvents';
 import { getOverlayInfo } from '@/lib/heroOverlay';
 import { useDeferredFetch } from '@/hooks/usePageReady';
+import { getHomepageCacheKey } from '@/lib/homepageCacheKeys';
 
 interface FeaturedEventWithMedia {
   event: EventDetailsDTO;
@@ -15,13 +16,49 @@ interface FeaturedEventWithMedia {
 }
 
 const MAX_FEATURED_EVENTS = 3;
+const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes (same as UpcomingEventsSection)
 
 const FeaturedEventsSection: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
-  // Defer featured event data fetching until after initial paint + 500ms
+  // Displayed list: from cache (instant) or from useFilteredEvents (after load)
+  const [displayedEvents, setDisplayedEvents] = useState<FeaturedEventWithMedia[]>([]);
   const featuredFetchEnabled = useDeferredFetch(500);
   const { filteredEvents, isLoading, error } = useFilteredEvents('featured', featuredFetchEnabled);
-  const displayedEvents = filteredEvents.slice(0, MAX_FEATURED_EVENTS);
+
+  const CACHE_KEY = getHomepageCacheKey('homepage_featured_events_cache');
+
+  // Run cache read before paint so cached data shows immediately (no delay on refresh)
+  useLayoutEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(CACHE_KEY);
+      if (!raw) return;
+      const { data, timestamp } = JSON.parse(raw);
+      if (Date.now() - timestamp < CACHE_DURATION_MS && Array.isArray(data) && data.length > 0) {
+        setDisplayedEvents(data.slice(0, MAX_FEATURED_EVENTS));
+        setIsVisible(true);
+      }
+    } catch (_) {
+      /* ignore */
+    }
+  }, [CACHE_KEY]);
+
+  // When useFilteredEvents has data: update displayed list, write cache, show after short delay if not already visible
+  useEffect(() => {
+    if (isLoading || filteredEvents.length === 0) return;
+
+    const next = filteredEvents.slice(0, MAX_FEATURED_EVENTS);
+    setDisplayedEvents(next);
+    try {
+      sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data: next, timestamp: Date.now() }));
+    } catch (_) {
+      /* ignore */
+    }
+
+    if (!isVisible) {
+      const t = setTimeout(() => setIsVisible(true), 300);
+      return () => clearTimeout(t);
+    }
+  }, [isLoading, filteredEvents, CACHE_KEY, isVisible]);
 
   // Helper to generate Google Calendar URL
   function toGoogleCalendarDate(date: string, time: string) {
@@ -38,17 +75,8 @@ const FeaturedEventsSection: React.FC = () => {
     return `${year}${month}${day}T${String(h).padStart(2, '0')}${minute || '00'}00`;
   }
 
-  // Show section after hero section is loaded (same timing as HeroSection)
-  useEffect(() => {
-    if (!isLoading && filteredEvents.length > 0) {
-      setTimeout(() => {
-        setIsVisible(true);
-      }, 2000);
-    }
-  }, [isLoading, filteredEvents.length]);
-
-  // Don't render anything if loading or no featured events
-  if (isLoading || filteredEvents.length === 0) {
+  // Don't render if no featured events to show (and not from cache)
+  if (displayedEvents.length === 0) {
     return null;
   }
 

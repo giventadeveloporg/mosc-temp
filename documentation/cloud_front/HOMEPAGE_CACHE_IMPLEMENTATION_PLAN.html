@@ -294,9 +294,9 @@
         <p><strong>Fix:</strong></p>
         <ul>
             <li><strong>TenantSettingsProvider</strong> – Added a <code class="code-highlight">useLayoutEffect</code> that runs before paint and performs a synchronous read of the tenant-settings cache. When the cache is warm, it sets <code class="code-highlight">settings</code> and <code class="code-highlight">loading = false</code> in that layout effect, so the loading image is never shown.</li>
-            <li><strong>TeamSection, UpcomingEventsSection, OurSponsorsSection</strong> – Added a <code class="code-highlight">useLayoutEffect</code> in each that runs before paint and performs a synchronous read of their sessionStorage cache. When cache is warm, each sets its data and <code class="code-highlight">loading = false</code> in that layout effect, so sections render immediately without waiting for the deferred delays.</li>
+            <li><strong>TeamSection, UpcomingEventsSection, OurSponsorsSection, FeaturedEventsSection</strong> – Added a <code class="code-highlight">useLayoutEffect</code> in each that runs before paint and performs a synchronous read of their sessionStorage cache. When cache is warm, each sets its data and <code class="code-highlight">loading = false</code> (or <code class="code-highlight">isVisible = true</code> for Featured) in that layout effect, so sections render immediately without waiting for the deferred delays.</li>
         </ul>
-        <p><strong>Result:</strong> On refresh or repeat visit (cache warm), the loading image does not appear and Events, Team, and Sponsors sections show content immediately. Cold first load is unchanged (deferred fetch and optional loading UI).</p>
+        <p><strong>Result:</strong> On refresh or repeat visit (cache warm), the loading image does not appear and Events, Featured Events, Team, and Sponsors sections show content immediately. Cold first load is unchanged (deferred fetch and optional loading UI).</p>
 
         <h3>2. NEXT_PUBLIC_APP_ENV values</h3>
         <p><strong>Question:</strong> Does <code class="code-highlight">NEXT_PUBLIC_APP_ENV</code> have to be exactly <code class="code-highlight">local</code> | <code class="code-highlight">development</code> | <code class="code-highlight">staging</code> | <code class="code-highlight">production</code>?</p>
