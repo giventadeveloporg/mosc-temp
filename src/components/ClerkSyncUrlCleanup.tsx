@@ -18,13 +18,18 @@ import { useAuth } from '@clerk/nextjs';
  *  4. Only THEN do we clean the URL via replaceState (no reload, no redirect)
  *  5. sessionStorage guard prevents any edge-case re-trigger within the same tab session
  *
- * First load after deploy: Use a longer initial delay (600ms) so Clerk has time to
- * persist sync state on cold start. A second safety-net cleanup runs once after 2s
- * so if Clerk re-appends the param we strip it again without requiring a manual reload.
+ * Timing (production-tuned for Lambda cold starts + slow Clerk SDK init on satellite):
+ *  - Primary cleanup: 1000ms after isLoaded (up from 600ms — gives Clerk more time to
+ *    persist sync state cookies on cold starts)
+ *  - Single safety net: 5s after isLoaded (up from 2s — catches re-appended params on slow init)
+ *  - Periodic watchdog: every 2.5s for 15s total — catches any lingering __clerk_* params
+ *    that Clerk might re-append during late sync completion or edge-case retry flows
  */
 const SYNC_STORAGE_KEY = 'clerk_satellite_synced';
-const INITIAL_DELAY_MS = 600;
-const SAFETY_NET_DELAY_MS = 2000;
+const INITIAL_DELAY_MS = 1000;
+const SAFETY_NET_DELAY_MS = 5000;
+const WATCHDOG_INTERVAL_MS = 2500;
+const WATCHDOG_MAX_CHECKS = 6; // 6 × 2.5s = 15s total
 
 function stripClerkParamsFromUrl(): boolean {
   if (typeof window === 'undefined') return false;
@@ -47,6 +52,7 @@ export default function ClerkSyncUrlCleanup() {
   const { isLoaded } = useAuth();
   const cleaned = useRef(false);
   const safetyNetScheduled = useRef(false);
+  const watchdogStarted = useRef(false);
 
   // Primary cleanup: after Clerk is loaded, wait then strip __clerk_* params
   useEffect(() => {
@@ -85,6 +91,26 @@ export default function ClerkSyncUrlCleanup() {
     }, SAFETY_NET_DELAY_MS);
 
     return () => clearTimeout(timer);
+  }, [isLoaded]);
+
+  // Periodic watchdog: after Clerk loads, check every WATCHDOG_INTERVAL_MS and strip any
+  // __clerk_* params that Clerk may re-append during late sync or retry flows.
+  // This is the final defense against the param persisting in the URL bar.
+  useEffect(() => {
+    if (!isLoaded || watchdogStarted.current || typeof window === 'undefined') return;
+
+    watchdogStarted.current = true;
+    let checks = 0;
+    const intervalId = setInterval(() => {
+      checks++;
+      if (checks >= WATCHDOG_MAX_CHECKS) {
+        clearInterval(intervalId);
+        return;
+      }
+      stripClerkParamsFromUrl();
+    }, WATCHDOG_INTERVAL_MS);
+
+    return () => clearInterval(intervalId);
   }, [isLoaded]);
 
   return null;

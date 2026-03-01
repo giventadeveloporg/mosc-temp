@@ -127,6 +127,15 @@ export default clerkMiddleware(
     const requestHeaders = new Headers(req.headers);
     requestHeaders.set('x-pathname', pathname);
 
+    // Signal layout to skip heavy auth/profile work during Clerk satellite sync.
+    // On the first load with ?__clerk_synced=true, the session cookie is being
+    // established for SUBSEQUENT requests — auth() on the current request would
+    // either hang or return null, causing unnecessary server delay.
+    if (req.nextUrl.searchParams.has('__clerk_synced')) {
+      requestHeaders.set('x-clerk-syncing', 'true');
+      debugLog('[MIDDLEWARE] Clerk satellite sync detected (__clerk_synced=true), setting x-clerk-syncing header');
+    }
+
     const response = NextResponse.next({ request: { headers: requestHeaders } });
     response.headers.set('x-pathname', pathname);
     return response;

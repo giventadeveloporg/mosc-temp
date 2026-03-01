@@ -1,6 +1,6 @@
 ---
 description: Clerk authentication middleware configuration, admin role lookup, and satellite/primary sign-in and sign-out patterns for Next.js App Router
-globs: src/middleware.ts, src/app/layout.tsx, src/app/**/layout.tsx, src/app/(auth)/sign-in/[[...sign-in]]/page.tsx, src/app/auth/signout-redirect/page.tsx, src/components/Header.tsx, src/components/ClerkSyncUrlCleanup.tsx
+globs: src/middleware.ts, src/app/layout.tsx, src/app/**/layout.tsx, src/app/(auth)/sign-in/[[...sign-in]]/page.tsx, src/app/auth/signout-redirect/page.tsx, src/components/Header.tsx, src/components/ClerkSyncUrlCleanup.tsx, src/components/ClerkSatelliteSyncGate.tsx
 alwaysApply: true
 ---
 
@@ -652,19 +652,54 @@ if (hostname.includes(satelliteDomain.replace('www.', ''))) {
 
 ---
 
-## **Clerk URL Sync Parameter Cleanup (`?__clerk_synced=true`)**
+## **Clerk Satellite Sync: First-Load Fix (`?__clerk_synced=true`)**
 
-After redirect from primary to satellite, Clerk appends `?__clerk_synced=true`. It must be stripped **after** Clerk has processed it, or Clerk re-initiates sync and the param reappears (especially on first load after deploy).
+After redirect from primary to satellite, Clerk appends `?__clerk_synced=true`. On this **first request**, the session cookie has not yet been established — `auth()` on the server would either hang or return null. The client-side ClerkProvider also takes time to process the sync param. This causes a blank/broken page on the first load.
 
-### **Required: ClerkSyncUrlCleanup in Root Layout**
-- **Component**: `src/components/ClerkSyncUrlCleanup.tsx` — client component that uses `useAuth().isLoaded`, then removes `__clerk_*` query params via `history.replaceState`.
-- **Placement**: Must render **inside** `ClerkProvider` (so `useAuth()` works). In `src/app/layout.tsx`, `ClerkSyncUrlCleanup` is inside the same tree as `layoutContent`, which is wrapped by `ClerkProvider` when `CLERK_KEY` is set — do not move it outside.
-- **Timing**: Cleanup runs only when `isLoaded === true`, then after a short delay (600ms) to allow Clerk to persist sync state. A safety-net cleanup runs once after 2s to catch cases where Clerk re-appends the param on first load after deploy (avoids requiring a manual reload).
-- **Do not** remove or reorder `ClerkSyncUrlCleanup` when changing layout/cache (e.g. TenantIdInjector, TenantSettingsProvider). Keep it as one of the first children of `<body>` inside the layout content passed to `ClerkProvider`.
+### **Three-Layer Fix (implemented March 2026)**
+
+#### **Layer 1: Middleware — Skip Server Auth During Sync** (`src/middleware.ts`)
+When `__clerk_synced` is in the URL, middleware sets an `x-clerk-syncing: true` request header. The root layout reads this header and **skips the entire auth/profile lookup block** (auth(), user profile fetch, admin check) for that request — the session will be available on the *next* request after cookies are set.
+
+```typescript
+// In middleware.ts — inside clerkMiddleware callback
+if (req.nextUrl.searchParams.has('__clerk_synced')) {
+  requestHeaders.set('x-clerk-syncing', 'true');
+}
+
+// In layout.tsx — skip expensive auth work during sync
+const isClerkSyncing = headersList.get('x-clerk-syncing') === 'true';
+if (pathname && !skipAuthForRoute && !isClerkSyncing) {
+  // existing auth + profile logic
+}
+```
+
+**Why**: `auth()` during sync makes a network call to Clerk API (~300–800ms on Lambda cold start) that returns null anyway. Skipping it saves server latency and prevents blank/error states.
+
+#### **Layer 2: Loading Overlay — ClerkSatelliteSyncGate** (`src/components/ClerkSatelliteSyncGate.tsx`)
+A client component that detects `__clerk_synced` in the URL on mount and shows a full-screen loading overlay (`position: fixed; z-index: 9998`). Once `useAuth().isLoaded` flips to `true`, it waits a 400ms stabilization period then fades out (500ms CSS transition). A 10s max timeout prevents infinite loading.
+
+- **Placement**: Inside `ClerkProvider` in `src/app/layout.tsx`, alongside `ClerkSyncUrlCleanup`.
+- **z-index**: 9998 (below navigation-loading-indicator at 9999).
+
+#### **Layer 3: URL Cleanup — ClerkSyncUrlCleanup** (`src/components/ClerkSyncUrlCleanup.tsx`)
+Client component that strips `__clerk_*` query params via `history.replaceState` — **only after** `useAuth().isLoaded === true`. Three-tier cleanup with production-tuned timing:
+
+| Tier | Delay after `isLoaded` | Purpose |
+|------|----------------------|---------|
+| Primary cleanup | 1000ms | Main param removal — gives Clerk time to persist sync state cookies on Lambda cold starts |
+| Safety net | 5000ms | Catches re-appended params on slow Clerk SDK init |
+| Periodic watchdog | Every 2500ms for 15s (6 checks) | Final defense against params Clerk re-appends during late sync/retry flows |
+
+- **CRITICAL**: Must wait for `isLoaded === true` before stripping `__clerk_synced`. Removing it early causes Clerk to think sync hasn't happened → infinite redirect loop.
+- **sessionStorage guard**: `clerk_satellite_synced` key prevents edge-case re-trigger within the same tab session.
+- **Placement**: Must render **inside** `ClerkProvider` (so `useAuth()` works). Do not move outside or reorder relative to other layout children.
 
 ### **Reference**
-- **Implementation**: [`src/components/ClerkSyncUrlCleanup.tsx`](mdc:src/components/ClerkSyncUrlCleanup.tsx)
-- **Layout usage**: [`src/app/layout.tsx`](mdc:src/app/layout.tsx) — `<ClerkSyncUrlCleanup />` inside body, within `layoutContent` wrapped by `ClerkProvider`.
+- **Middleware**: [`src/middleware.ts`](mdc:src/middleware.ts) — `x-clerk-syncing` header injection
+- **Layout**: [`src/app/layout.tsx`](mdc:src/app/layout.tsx) — `isClerkSyncing` check, `<ClerkSatelliteSyncGate />` and `<ClerkSyncUrlCleanup />` in body
+- **Sync Gate**: [`src/components/ClerkSatelliteSyncGate.tsx`](mdc:src/components/ClerkSatelliteSyncGate.tsx) — loading overlay during sync
+- **URL Cleanup**: [`src/components/ClerkSyncUrlCleanup.tsx`](mdc:src/components/ClerkSyncUrlCleanup.tsx) — three-tier param removal
 
 ---
 

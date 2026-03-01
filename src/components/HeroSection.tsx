@@ -660,7 +660,7 @@ const DynamicHeroImage: React.FC<{
         alt="Featured Event"
         width={1200}
         height={800}
-        className={`w-full h-full object-cover hero-image-transition ${isTransitioning ? 'transitioning' : ''}`}
+        className={`w-full h-full object-contain hero-image-transition ${isTransitioning ? 'transitioning' : ''}`}
         sizes="(max-width: 768px) 100vw, 65vw"
         priority
         style={{
