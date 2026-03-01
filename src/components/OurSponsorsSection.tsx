@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useLayoutEffect } from 'react';
 import Link from 'next/link';
 import type { EventSponsorsDTO } from "@/types";
 import { getAppUrl, getTenantId } from '@/lib/env';
 import { useDeferredFetch } from '@/hooks/usePageReady';
 import { SponsorCard } from '@/components/sponsors/SponsorCard';
+import { getHomepageCacheKey } from '@/lib/homepageCacheKeys';
 
 const OurSponsorsSection: React.FC = () => {
   const [sponsors, setSponsors] = useState<EventSponsorsDTO[]>([]);
@@ -15,9 +16,23 @@ const OurSponsorsSection: React.FC = () => {
   // Defer sponsors API call until page ready + 1500ms (bottom of page, lowest priority)
   const shouldFetch = useDeferredFetch(1500);
 
-  // Cache key for sessionStorage
-  const CACHE_KEY = 'homepage_sponsors_cache';
+  // Cache key for sessionStorage (env-prefixed so local/dev/prod are separate)
+  const CACHE_KEY = getHomepageCacheKey('homepage_sponsors_cache');
   const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+  // Run cache read before paint so cached data shows immediately (no delay on refresh)
+  useLayoutEffect(() => {
+    try {
+      const cachedData = sessionStorage.getItem(CACHE_KEY);
+      if (cachedData) {
+        const { data, timestamp } = JSON.parse(cachedData);
+        if (Date.now() - timestamp < CACHE_DURATION) {
+          setSponsors(data ?? []);
+          setLoading(false);
+        }
+      }
+    } catch (_) { /* ignore */ }
+  }, [CACHE_KEY, CACHE_DURATION]);
 
   // Array of modern background colors (same as events page)
   const cardBackgrounds = [

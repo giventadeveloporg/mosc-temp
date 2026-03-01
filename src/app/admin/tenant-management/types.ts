@@ -62,6 +62,8 @@ export interface TenantSettingsDTO {
   emailFooterHtmlUrl?: string; // S3 URL for email footer HTML file
   emailHeaderImageUrl?: string; // S3 URL for email header image
   logoImageUrl?: string; // S3 URL for tenant logo image
+  // Homepage edge cache version (cache-busting; bump to refresh CDN cache)
+  homepageCacheVersion?: number;
   // Contact and Address Fields
   addressLine1?: string;
   addressLine2?: string;

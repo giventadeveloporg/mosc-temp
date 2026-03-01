@@ -7,6 +7,7 @@ import type { ExecutiveCommitteeTeamMemberDTO } from '@/types';
 import { getAppUrl } from '@/lib/env';
 import Modal from '@/components/ui/Modal';
 import styles from '@/components/TeamSection.module.css';
+import { getHomepageCacheKey } from '@/lib/homepageCacheKeys';
 
 /** Max characters to show in card before "Read more". Longer bios open in popup. */
 const BIO_TRUNCATE_LENGTH = 120;
@@ -21,8 +22,8 @@ export default function TeamPage() {
   const [profileModalMember, setProfileModalMember] = useState<ExecutiveCommitteeTeamMemberDTO | null>(null);
   const pageSize = 9; // Display 9 team members per page
 
-  // Cache key for sessionStorage
-  const CACHE_KEY = 'team_page_cache';
+  // Cache key for sessionStorage (env-prefixed so local/dev/prod are separate)
+  const CACHE_KEY = getHomepageCacheKey('team_page_cache');
   const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
   useEffect(() => {

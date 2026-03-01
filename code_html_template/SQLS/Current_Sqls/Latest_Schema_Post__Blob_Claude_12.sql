@@ -2212,6 +2212,7 @@ CREATE TABLE public.tenant_settings (
                                         whatsapp_webhook_url character varying(1048),
                                         whatsapp_webhook_token character varying(1048),
                                         enable_email_marketing boolean DEFAULT false,
+                                        homepage_cache_version bigint DEFAULT 0 NOT NULL,
                                         email_provider_config character varying(2048),
                                         custom_css character varying(8192),
                                         custom_js character varying(16384),

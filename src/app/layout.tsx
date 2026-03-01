@@ -8,6 +8,7 @@ import Footer from "../components/Footer";
 import ConditionalLayout from "../components/ConditionalLayout";
 import ClerkSyncUrlCleanup from "../components/ClerkSyncUrlCleanup";
 import MobileDebugConsole from "../components/MobileDebugConsole";
+import TenantIdInjector from "../components/TenantIdInjector";
 import { TenantSettingsProvider } from "../components/TenantSettingsProvider";
 import { headers } from "next/headers";
 import { auth, currentUser } from "@clerk/nextjs/server";
@@ -347,6 +348,7 @@ export default async function RootLayout({
         </head>
         <body className={inter.className + " flex flex-col min-h-screen"} suppressHydrationWarning>
           <ClerkSyncUrlCleanup />
+          <TenantIdInjector />
           <TrpcProvider>
             <TenantSettingsProvider>
               <ConditionalLayout

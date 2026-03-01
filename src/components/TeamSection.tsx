@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { ExecutiveCommitteeTeamMemberDTO } from '@/types';
 import { getAppUrl, getTenantId } from '@/lib/env';
 import { useDeferredFetch } from '@/hooks/usePageReady';
+import { getHomepageCacheKey } from '@/lib/homepageCacheKeys';
 import Modal from '@/components/ui/Modal';
 import styles from './TeamSection.module.css';
 
@@ -25,10 +26,24 @@ const TeamSection: React.FC = () => {
   // so the effective delay from initial page load is even longer.
   const shouldFetch = useDeferredFetch(800);
 
-  // Cache key for sessionStorage
-  const CACHE_KEY = 'homepage_team_cache';
+  // Cache key for sessionStorage (env-prefixed so local/dev/prod are separate)
+  const CACHE_KEY = getHomepageCacheKey('homepage_team_cache');
   const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-    // Cache key for sessionStorage end
+
+  // Run cache read before paint so cached data shows immediately (no delay on refresh)
+  useLayoutEffect(() => {
+    try {
+      const cachedData = sessionStorage.getItem(CACHE_KEY);
+      if (cachedData) {
+        const { data, timestamp } = JSON.parse(cachedData);
+        if (Date.now() - timestamp < CACHE_DURATION) {
+          setTeamMembers(data);
+          setLoading(false);
+          setShowImages(true);
+        }
+      }
+    } catch (_) { /* ignore */ }
+  }, [CACHE_KEY, CACHE_DURATION]);
 
   useEffect(() => {
     const loadTeamMembers = async () => {
