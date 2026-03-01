@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useLayoutEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { EventWithMedia, EventDetailsDTO } from "@/types";
@@ -10,6 +10,7 @@ import { isDonationBasedEvent, isTicketedFundraiserEvent } from '@/lib/donation/
 import { isTicketedEventCube } from '@/lib/eventcube/utils';
 import { getTenantId } from '@/lib/env';
 import { useDeferredFetch } from '@/hooks/usePageReady';
+import { getHomepageCacheKey } from '@/lib/homepageCacheKeys';
 
 // Component to handle event image loading errors and hide container when image fails
 function EventImageWithErrorHandling({
@@ -78,9 +79,24 @@ const UpcomingEventsSection: React.FC = () => {
   // This section mounts after TenantSettings loads, adding natural delay on top
   const shouldFetch = useDeferredFetch(300);
 
-  // Cache key for sessionStorage
-  const CACHE_KEY = 'homepage_events_cache';
+  // Cache key for sessionStorage (env-prefixed so local/dev/prod are separate)
+  const CACHE_KEY = getHomepageCacheKey('homepage_events_cache');
   const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+  // Run cache read before paint so cached data shows immediately (no delay on refresh)
+  useLayoutEffect(() => {
+    try {
+      const cachedData = sessionStorage.getItem(CACHE_KEY);
+      if (cachedData) {
+        const { data, timestamp, isUpcoming } = JSON.parse(cachedData);
+        if (Date.now() - timestamp < CACHE_DURATION) {
+          setEvents(data ?? []);
+          setIsUpcomingEvents(isUpcoming !== false);
+          setLoading(false);
+        }
+      }
+    } catch (_) { /* ignore */ }
+  }, [CACHE_KEY, CACHE_DURATION]);
 
   // Array of modern background colors (same as events page)
   const cardBackgrounds = [

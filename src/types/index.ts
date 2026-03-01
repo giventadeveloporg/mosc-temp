@@ -628,6 +628,7 @@ export interface TenantSettingsDTO {
   showTeamMembersSectionInHomePage?: boolean;
   showSponsorsSectionInHomePage?: boolean;
   isMembershipSubscriptionEnabled?: boolean;
+  homepageCacheVersion?: number;
   // Contact and Address Fields
   addressLine1?: string;
   addressLine2?: string;
