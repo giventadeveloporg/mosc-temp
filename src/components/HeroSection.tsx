@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { EventWithMedia, EventMediaDTO } from '@/types';
@@ -9,6 +9,7 @@ import { isRecurringEvent, getNextOccurrenceDate } from '@/lib/eventUtils';
 import { getOverlayInfo } from '@/lib/heroOverlay';
 import { getTenantId } from '@/lib/env';
 import { useDeferredFetch } from '@/hooks/usePageReady';
+import { getHomepageCacheKey } from '@/lib/homepageCacheKeys';
 import { ArrowRight, Heart, Play, Pause, ChevronLeft, ChevronRight } from 'lucide-react';
 import GivebutterDonateButton from '@/components/GivebutterDonateButton';
 
@@ -137,6 +138,36 @@ const DynamicHeroImage: React.FC<{
   const { filteredEvents, isLoading: eventsLoading, error } = useFilteredEvents('hero', heroFetchEnabled);
 
   const defaultImage = "/images/hero_section/default_hero_section_second_column_poster.jpeg";
+
+  const CACHE_KEY = getHomepageCacheKey('homepage_hero_section_cache');
+  const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes (same as other homepage sections)
+
+  // Run cache read before paint so hero images and rotation show immediately on refresh (per HOMEPAGE_CACHE_IMPLEMENTATION_PLAN)
+  useLayoutEffect(() => {
+    try {
+      const raw = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem(CACHE_KEY) : null;
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as { dynamicImages?: string[]; upcomingEvents?: EventWithMediaExtended[]; imageDurations?: number[]; timestamp?: number };
+      if (
+        parsed.timestamp != null &&
+        Date.now() - parsed.timestamp < CACHE_DURATION_MS &&
+        Array.isArray(parsed.dynamicImages) &&
+        parsed.dynamicImages.length > 0 &&
+        Array.isArray(parsed.imageDurations) &&
+        parsed.imageDurations.length === parsed.dynamicImages.length
+      ) {
+        setDynamicImages(parsed.dynamicImages);
+        setUpcomingEvents(Array.isArray(parsed.upcomingEvents) ? parsed.upcomingEvents : []);
+        setImageDurations(parsed.imageDurations);
+        dynamicImagesRef.current = parsed.dynamicImages;
+        upcomingEventsRef.current = Array.isArray(parsed.upcomingEvents) ? parsed.upcomingEvents : [];
+        imageDurationsRef.current = parsed.imageDurations;
+        setIsInitialized(true);
+      }
+    } catch (_) {
+      /* ignore */
+    }
+  }, [CACHE_KEY]);
 
   // Store onEventChange in a ref to avoid dependency issues in the rotation effect
   const onEventChangeRef = React.useRef(onEventChange);
@@ -347,6 +378,20 @@ const DynamicHeroImage: React.FC<{
           onEventChangeRef.current(processedEvents[0]);
         } else if (onEventChangeRef.current) {
           onEventChangeRef.current(null);
+        }
+
+        try {
+          sessionStorage.setItem(
+            CACHE_KEY,
+            JSON.stringify({
+              dynamicImages: imageUrls,
+              upcomingEvents: processedEvents,
+              imageDurations: durations,
+              timestamp: Date.now(),
+            })
+          );
+        } catch (_) {
+          /* ignore */
         }
       } catch (error) {
         console.error('Failed to initialize hero images:', error);

@@ -465,14 +465,14 @@ nav[role="navigation"] .group {
   .hero-left-panel {
     width: 35%;
     flex: none;
-    padding: 0.25rem 0;
+    padding: 0;
   }
 }
 
 @media (min-width: 1024px) {
   .hero-left-panel {
     width: 32%;
-    padding: 0.25rem 0;
+    padding: 0;
   }
 }
 
@@ -514,6 +514,22 @@ nav[role="navigation"] .group {
   height: 100% !important;
   max-height: 100% !important;
   border-radius: 0.75rem;
+}
+
+/* Desktop: lock the image container to 5:6 (matching the Section 1 image ratio) so the image
+   fills without ANY top/bottom crop. On wide screens the container is narrower than the panel
+   and centers horizontally; the dark hero background shows through as an elegant frame. */
+@media (min-width: 768px) {
+  .hero-left-image {
+    width: auto;
+    height: 100%;
+    aspect-ratio: 5 / 6;
+    max-width: 100%;
+  }
+
+  .hero-left-image img {
+    object-fit: cover !important;
+  }
 }
 
 /* Decorative corner accents - subtle highlight on top edge */
@@ -584,14 +600,14 @@ nav[role="navigation"] .group {
   .hero-right-panel {
     width: 65%;
     flex: 1;
-    padding: 0.375rem;
+    padding: 0;
   }
 }
 
 @media (min-width: 1024px) {
   .hero-right-panel {
     width: 68%;
-    padding: 0.5rem;
+    padding: 0;
   }
 }
 
@@ -647,7 +663,7 @@ nav[role="navigation"] .group {
 /* Desktop: elegant frame with moderate padding all around (reduced to avoid excessive whitespace) */
 @media (min-width: 768px) {
   .hero-slideshow-wrapper {
-    padding: 0.25rem;
+    padding: 0;
     border-radius: 1.25rem;
     box-shadow:
       0 0 60px rgba(245, 158, 11, 0.06),
@@ -661,7 +677,7 @@ nav[role="navigation"] .group {
 
 @media (min-width: 1024px) {
   .hero-slideshow-wrapper {
-    padding: 0.375rem;
+    padding: 0;
   }
 }
 
@@ -702,8 +718,11 @@ nav[role="navigation"] .group {
   border-radius: 0.5rem;
 }
 
+/* Desktop: switch to object-cover so slideshow images fill the panel edge-to-edge.
+   Section 2 images are 5:2 landscape; the center 60% is the safe zone per spec. */
 @media (min-width: 768px) {
   .hero-slideshow-wrapper img {
+    object-fit: cover !important;
     border-radius: 0.75rem;
   }
 }
@@ -990,7 +1009,8 @@ nav[role="navigation"] .group {
     border-radius: 0;
     box-shadow: none;
     border: none;
-    background: transparent;
+    /* Match hero dark purple so contain side-bars blend seamlessly */
+    background: #1a0a2e;
   }
 
   .hero-left-image::before,
@@ -1000,27 +1020,35 @@ nav[role="navigation"] .group {
 
   .hero-left-image img {
     border-radius: 0 !important;
-    object-fit: cover !important;
+    object-fit: contain !important;
+    object-position: center center !important;
     width: 100% !important;
-    height: 30vh !important;
-    max-height: none !important;
+    height: auto !important;
+    max-height: 22vh !important;
+    display: block !important;
   }
 
-  /* Section 2: Right panel (slideshow) – object-cover fills container, ticket overlay sits on image */
+  /* Section 2: Right panel (slideshow) – full-bleed, content-driven height, tight against Section 1 */
   .hero-right-panel {
     width: 100%;
     flex: 0 0 auto;
-    min-height: 32vh;
-    padding: 0.375rem;
-    margin: 0;
+    min-height: 0;
+    padding: 0;
+    margin-top: 0.125rem;
+    align-items: stretch;
+    justify-content: stretch;
   }
 
   .hero-slideshow-wrapper {
-    padding: 0.25rem;
-    border-radius: 0.5rem;
+    padding: 0;
+    border-radius: 0;
     box-shadow: none;
     border: none;
-    background: transparent;
+    background: #1a0a2e;
+    /* Match image 5:2 aspect ratio so contain fills with zero gaps */
+    aspect-ratio: 5 / 2;
+    width: 100%;
+    height: auto;
   }
 
   .hero-slideshow-wrapper::before {
@@ -1028,22 +1056,28 @@ nav[role="navigation"] .group {
   }
 
   .hero-slideshow-wrapper img {
-    border-radius: 0.375rem !important;
-    object-fit: cover !important;
+    border-radius: 0 !important;
+    object-fit: contain !important;
+    width: 100% !important;
+    height: 100% !important;
   }
 
+  /* Ticket/Register overlay: pinned to bottom-right corner ON TOP of the slideshow image */
   .hero-ticket-overlay {
     bottom: 0.75rem;
     right: 0.75rem;
+    z-index: 30;
   }
 
-  /* Section 3 & 4: Bottom row – taller cards, more gap between them, padded so images aren't cut off */
+  /* Section 3 & 4: Bottom row – taller cards, tight against Section 2, minimal top padding */
   .hero-bottom-row {
     flex-direction: column;
     gap: 0.75rem;
-    padding: 0.75rem 1rem;
+    padding: 0.125rem 1rem 0.75rem;
     margin: 0;
     width: 100%;
+    align-items: flex-start;
+    justify-content: flex-start;
   }
 
   .hero-bottom-card {
@@ -1055,24 +1089,30 @@ nav[role="navigation"] .group {
   }
 
   .hero-bottom-card-mission {
-    min-height: 150px;
+    min-height: 0;
     overflow: hidden;
     position: relative;
+    border-radius: 0.75rem;
+    aspect-ratio: 5 / 1;
+    width: 100%;
+    height: auto;
+    background: #1a0a2e;
   }
 
   /* Stronger bottom gradient on mobile so text is readable over the image */
   .hero-bottom-card-mission .hero-mission-overlay {
-    background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.2) 40%, transparent 100%);
+    background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.3) 50%, transparent 100%);
   }
 
-  /* Mission card: text overlays the image — positioned from the bottom, sitting on top of the bg */
+  /* Mission card: text overlays the image — positioned inside the card, above the bottom edge */
   .hero-bottom-card-mission .hero-mission-content {
     margin-top: 0;
     position: absolute;
-    bottom: 0.5rem;
+    bottom: 0.75rem;
     left: 0;
     right: 0;
     padding: 0.25rem 0.75rem;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.7);
   }
 
   /* Tighter text sizing so "About" + "Our Mission" fits within the card on small screens */
@@ -1085,10 +1125,16 @@ nav[role="navigation"] .group {
     font-size: 0.8125rem;
   }
 
-  /* Mission card bg image: contain so Unite India logo is fully visible (not cropped on right) */
+  /* Mission card bg image: contain inside 5:1 aspect-ratio card — same technique as Section 2 */
+  .hero-bottom-card-mission .hero-mission-bg {
+    position: absolute;
+    inset: 0;
+  }
   .hero-bottom-card-mission .hero-mission-bg img {
     object-fit: contain !important;
     object-position: center center !important;
+    width: 100% !important;
+    height: 100% !important;
   }
 
   .hero-browse-container {

@@ -214,100 +214,30 @@ See [`src/components/OurSponsorsSection.tsx`](mdc:src/components/OurSponsorsSect
 - Add `flex items-center justify-center` to container if needed
 - Use `object-position: center` in style if required
 
-## **Hero Section Mobile Layout — Special Cases (March 2026)**
+## **Hero Section Mobile Layout — Aspect-Ratio Containment (March 2026)**
 
-The homepage hero section (`src/components/HeroSection.tsx`) uses a 4-section split layout. On mobile (`@media (max-width: 767px)`), different sections require different image strategies. All mobile overrides live in `src/app/globals.css` inside the `@media (max-width: 767px)` block.
+The homepage hero section uses a 4-section split layout with images of **varying aspect ratios** (5:6 portrait, 5:2 landscape, 5:1 ultra-wide). On mobile, each requires a different containment strategy. The full technique is documented in the dedicated rule:
 
-### **Section 1 (Kerala Image) — Full-Bleed `object-cover`**
+**See [Hero Mobile Image Containment](mdc:.cursor/rules/hero_mobile_image_containment_aspect_ratio.mdc)** for:
+- The **aspect-ratio matching technique** (container ratio = image ratio + `object-contain` = zero crop, zero gaps)
+- Section-by-section CSS with rationale for each approach
+- Decision tree: when to use `aspect-ratio` vs `max-height` cap vs `object-cover`
+- Common pitfalls and lessons learned from iterative fixes
+- Desktop (768px+) strategy differences
 
-**Exception to the general `object-contain` rule**: Section 1 uses `object-cover` on mobile so the image bleeds edge-to-edge with no gaps. A portrait image with `object-contain` on a full-width mobile viewport leaves purple/background gaps on both sides because the image is narrower than the screen.
+### **Quick Summary**
 
-```css
-/* Mobile: full-width bleed, fixed viewport height, cover fills width */
-@media (max-width: 767px) {
-  .hero-left-panel {
-    width: 100%; padding: 0; margin: 0; min-height: 0;
-  }
-  .hero-left-image {
-    width: 100%; height: auto; padding: 0;
-    border-radius: 0; box-shadow: none; border: none;
-    background: transparent;
-  }
-  .hero-left-image img {
-    border-radius: 0 !important;
-    object-fit: cover !important;   /* fills full width — no side gaps */
-    width: 100% !important;
-    height: 30vh !important;        /* viewport-relative height; tune to show more/less */
-    max-height: none !important;
-  }
-}
-```
-
-**Key decisions**:
-- `object-fit: cover` — fills viewport width; slight top/bottom crop is acceptable for this decorative landscape image.
-- `height: 30vh` — shows a generous portion of the image. Increase to show more vertically (more crop on sides); decrease to show less.
-- Container has `padding: 0`, `border-radius: 0`, `border: none` to ensure true edge-to-edge bleed.
-- Desktop (768px+) still uses `object-contain` with `height: 100%` so the full image is visible in the fixed-height panel.
-
-### **Section 3 (Our Mission Card) — Text Overlay on Image**
-
-The mission card has a background image (Unite India logo) with "About" / "Our Mission" text that must sit **on top of** the image, not overflow below it.
-
-```css
-@media (max-width: 767px) {
-  .hero-bottom-card-mission {
-    min-height: 150px;
-    overflow: hidden;
-    position: relative;
-  }
-
-  /* Stronger gradient so white text is readable over the image */
-  .hero-bottom-card-mission .hero-mission-overlay {
-    background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.2) 40%, transparent 100%);
-  }
-
-  /* Absolute positioning keeps text inside the card, overlaying the image */
-  .hero-bottom-card-mission .hero-mission-content {
-    margin-top: 0;
-    position: absolute;
-    bottom: 0.5rem;
-    left: 0; right: 0;
-    padding: 0.25rem 0.75rem;
-  }
-
-  /* Smaller text to fit within the card on small screens */
-  .hero-bottom-card-mission .hero-card-label {
-    font-size: 0.625rem;
-    margin-bottom: 0.125rem;
-  }
-  .hero-bottom-card-mission .hero-card-title {
-    font-size: 0.8125rem;
-  }
-
-  /* Contain the Unite India logo so it's fully visible (not cropped on right) */
-  .hero-bottom-card-mission .hero-mission-bg img {
-    object-fit: contain !important;
-    object-position: center center !important;
-  }
-}
-```
-
-**Key decisions**:
-- `position: absolute; bottom: 0.5rem` on `.hero-mission-content` — anchors text to bottom of card, overlaying the image.
-- `min-height: 150px` — enough room for image + text overlay.
-- Stronger gradient overlay (`rgba(0,0,0,0.55)`) at the bottom ensures white text readability.
-- Smaller font sizes (label: 0.625rem, title: 0.8125rem) prevent text overflow on narrow screens.
-- Mission bg image uses `object-contain` (unlike Section 1) because the Unite India logo must be fully visible.
-
-### **Reference**
-- **CSS overrides**: [`src/app/globals.css`](mdc:src/app/globals.css) — `@media (max-width: 767px)` hero section block
-- **Component**: [`src/components/HeroSection.tsx`](mdc:src/components/HeroSection.tsx) — 4-section split layout
-- **Layout diagram**: `public/images/hero_section/hero_section_split_excalidraw.png`
+| Section | Image Ratio | Mobile Technique | Container Key CSS |
+|---------|-------------|-----------------|-------------------|
+| 1 (Kerala) | 5:6 portrait | `object-contain` + `max-height: 22vh` + dark bg | `background: #1a0a2e` blends side bars |
+| 2 (Slideshow) | 5:2 landscape | `aspect-ratio: 5/2` + `object-contain` | Zero crop, zero gaps |
+| 3 (Mission) | 5:1 ultra-wide | `aspect-ratio: 5/1` + `object-contain` + text overlay | `position: absolute` text + gradient |
 
 ---
 
 ## **Related Patterns**
 
+- See [Hero Mobile Image Containment](mdc:.cursor/rules/hero_mobile_image_containment_aspect_ratio.mdc) for the complete mobile technique
 - See [MOSC Styling Standards](mdc:.cursor/rules/mosc_styling_standards.mdc) for overall design system
 - See [`src/app/events/page.tsx`](mdc:src/app/events/page.tsx) for reference implementation
 - See [`src/components/OurSponsorsSection.tsx`](mdc:src/components/OurSponsorsSection.tsx) for sponsor image pattern
@@ -323,7 +253,8 @@ Before submitting images that must not be cropped:
 - [ ] Image has matching `borderRadius` in style
 - [ ] Placeholder div matches image container styling
 
-**Hero section mobile exceptions**:
-- [ ] Section 1: Uses `object-cover` (not `object-contain`) for full-bleed edge-to-edge
-- [ ] Section 3 mission card: Text uses `position: absolute; bottom: 0.5rem` to overlay on image
-- [ ] Section 3 bg image: Uses `object-contain` so Unite India logo is fully visible
+**Hero section mobile** (see [dedicated rule](mdc:.cursor/rules/hero_mobile_image_containment_aspect_ratio.mdc)):
+- [ ] Section 1: `object-contain` + `max-height: 22vh` + `background: #1a0a2e` (portrait → side gaps blend with dark bg)
+- [ ] Section 2: `aspect-ratio: 5/2` + `object-contain` (landscape → ratio match = zero crop)
+- [ ] Section 3: `aspect-ratio: 5/1` + `object-contain` + `position: absolute` text overlay (ultra-wide → ratio match + gradient text)
+- [ ] All sections: `background: #1a0a2e` on containers, no `min-height`, no decorative styles

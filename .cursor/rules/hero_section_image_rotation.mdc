@@ -11,6 +11,7 @@ This rule defines the standard pattern for hero section image rotation on the ho
 - **Recurring Event Handling**: Shows only the next occurrence for recurring events
 - **Default Image Display**: Shows default image for first 2 seconds before rotation begins
 - **User Experience**: Smooth transitions between event images with proper navigation links and manual control
+- **Homepage cache**: Hero section images and data are cached in sessionStorage under `homepage_hero_section_cache` (see `src/lib/homepageCacheKeys.ts` and `documentation/cloud_front_amplify_cache/HOMEPAGE_CACHE_IMPLEMENTATION_PLAN.html`). On refresh or repeat visit, a `useLayoutEffect` reads the cache before paint so the hero shows immediately without waiting for `useFilteredEvents('hero')` or standalone media fetch.
 
 ## **Hero Image Display Dimensions (Upload Spec)**
 

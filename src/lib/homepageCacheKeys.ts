@@ -25,6 +25,7 @@ export const HOMEPAGE_CACHE_KEY_SUFFIXES = [
   'homepage_sponsors_cache',
   'homepage_events_cache',
   'homepage_featured_events_cache',
+  'homepage_hero_section_cache',
   'team_page_cache',
 ] as const;
 
