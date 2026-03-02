@@ -49,7 +49,15 @@ const HGYouhanonMarPolycarpusMetropolitanPage = () => {
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
                         <p>Thrikkunnathu Seminary PB No. 61, Aluva – 683 101</p>
                         <p>Ph: 0484 2622339 | Mob: 94474 75544</p>
-                        <p>Email: marpolicarpos@yahoo.com</p>
+                        <p>
+                        Email:{' '}
+                        <a
+                          href="mailto:marpolicarpos@yahoo.com"
+                          className="text-syro-blue hover:underline focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 rounded"
+                        >
+                          marpolicarpos@yahoo.com
+                        </a>
+                      </p>
                       </div>
                     </div>
                 </div>

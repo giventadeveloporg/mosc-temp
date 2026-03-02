@@ -45,7 +45,15 @@ const HGDrYuhanonMarDemetriusMetropolitanPage = () => {
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
                         <p>Delhi Orthodox Centre, 2 Institutional Area, Tughlakabad, New Delhi 110 062</p>
                         <p>Mobile: 9810791894</p>
-                        <p>Email: mar.demetrios@gmail.com</p>
+                        <p>
+                        Email:{' '}
+                        <a
+                          href="mailto:mar.demetrios@gmail.com"
+                          className="text-syro-blue hover:underline focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 rounded"
+                        >
+                          mar.demetrios@gmail.com
+                        </a>
+                      </p>
                       </div>
                     </div>
                 </div>

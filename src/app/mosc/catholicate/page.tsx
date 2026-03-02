@@ -139,16 +139,17 @@ const CatholicatePage = () => {
                 key={card.title}
                 className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 p-8 flex flex-col h-full overflow-hidden"
               >
-                <div className="mb-5 flex justify-center">
-                  <Image
-                    src={card.image}
-                    alt={card.alt}
-                    width={280}
-                    height={168}
-                    className="w-full max-w-[280px] h-auto object-contain rounded-lg"
-                    unoptimized
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 280px"
-                  />
+                <div className="mb-5 flex justify-center pt-8">
+                  <div className="relative w-full max-w-[280px] aspect-[280/168] rounded-lg overflow-hidden flex items-center justify-center">
+                    <Image
+                      src={card.image}
+                      alt={card.alt}
+                      fill
+                      className="object-contain rounded-lg"
+                      unoptimized
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 280px"
+                    />
+                  </div>
                 </div>
                 <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug">
                   {card.title}

@@ -64,7 +64,15 @@ const HGZachariahMarNicholovosMetropolitanPage = () => {
                             www.neamericandiocese.org
                           </Link>
                         </p>
-                        <p>Email: Metropolitan@neamericandiocese.org</p>
+                        <p>
+                          Email:{' '}
+                          <a
+                            href="mailto:Metropolitan@neamericandiocese.org"
+                            className="text-syro-blue hover:underline focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 rounded"
+                          >
+                            Metropolitan@neamericandiocese.org
+                          </a>
+                        </p>
                         <p>
                           Facebook:{' '}
                           <Link href="https://www.facebook.com/Nicholovos" target="_blank" rel="noopener noreferrer" className="text-syro-blue hover:underline">

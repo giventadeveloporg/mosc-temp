@@ -126,7 +126,7 @@ const TheChurchPage = () => {
                   style={{ boxShadow: cardShadow }}
                 >
                   <div className="mb-5 flex justify-center">
-                    <div className="relative w-full max-w-[280px] aspect-[280/168] rounded-lg overflow-hidden bg-syro-light-gray/30">
+                    <div className="relative w-full max-w-[280px] aspect-[280/168] rounded-lg overflow-hidden flex items-center justify-center">
                       <Image
                         src={item.image}
                         alt={item.title}

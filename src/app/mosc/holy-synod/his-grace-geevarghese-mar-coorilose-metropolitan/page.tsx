@@ -57,7 +57,22 @@ const HisGraceGeevargheseMarCooriloseMetropolitanPage = () => {
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
                         <p>Bombay Orthodox Church Centre, Dr. Mar Theophilus Marg, Sector X-A, Vashi, Juhu Nagar, Navi Mumbai – 400 703</p>
                         <p>Tel.: 022-27669850, 022-27801427 | Mob: 09820333379</p>
-                        <p>E-mail: orthodox77@hotmail.com, marcoorilos@yahoo.com</p>
+                        <p>
+                        E-mail:{' '}
+                        <a
+                          href="mailto:orthodox77@hotmail.com"
+                          className="text-syro-blue hover:underline focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 rounded"
+                        >
+                          orthodox77@hotmail.com
+                        </a>
+                        {', '}
+                        <a
+                          href="mailto:marcoorilos@yahoo.com"
+                          className="text-syro-blue hover:underline focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 rounded"
+                        >
+                          marcoorilos@yahoo.com
+                        </a>
+                      </p>
                       </div>
                     </div>
                 </div>

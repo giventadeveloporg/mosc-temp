@@ -45,7 +45,15 @@ const HGJosephMarDionysiusMetropolitanPage = () => {
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
                         <p>Bishops House, Cross Junction, Kollam – 691 001</p>
                         <p>Mob: 9425553147, 9446181314</p>
-                        <p>Email: josephdionysius@gmail.com</p>
+                        <p>
+                        Email:{' '}
+                        <a
+                          href="mailto:josephdionysius@gmail.com"
+                          className="text-syro-blue hover:underline focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 rounded"
+                        >
+                          josephdionysius@gmail.com
+                        </a>
+                      </p>
                       </div>
                     </div>
                 </div>

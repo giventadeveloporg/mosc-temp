@@ -45,7 +45,22 @@ const HGDrAbrahamMarSeraphimMetropolitanPage = () => {
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
                         <p>Basil Aramana, Makkamkunnu, Pathanamthitta P.O.</p>
                         <p>Mobile: 9447963528</p>
-                        <p>Email: marseraphim@gmail.com, thumpamon2023@gmail.com</p>
+                        <p>
+                        Email:{' '}
+                        <a
+                          href="mailto:marseraphim@gmail.com"
+                          className="text-syro-blue hover:underline focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 rounded"
+                        >
+                          marseraphim@gmail.com
+                        </a>
+                        {', '}
+                        <a
+                          href="mailto:thumpamon2023@gmail.com"
+                          className="text-syro-blue hover:underline focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 rounded"
+                        >
+                          thumpamon2023@gmail.com
+                        </a>
+                      </p>
                       </div>
                     </div>
                 </div>

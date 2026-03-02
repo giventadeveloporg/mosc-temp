@@ -45,7 +45,15 @@ const HGDrZachariasMarApremMetropolitanPage = () => {
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
                         <p>Sreyas Aramana, Mar Epiphanios Centre, Kannamkodu, Adoor P.O., Pathanamthitta – 691 523</p>
                         <p>Tel: 04734 227117 | Mobile: 9447184303</p>
-                        <p>Email: 2010aprem@gmail.com</p>
+                        <p>
+                        Email:{' '}
+                        <a
+                          href="mailto:2010aprem@gmail.com"
+                          className="text-syro-blue hover:underline focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 rounded"
+                        >
+                          2010aprem@gmail.com
+                        </a>
+                      </p>
                       </div>
                     </div>
                 </div>

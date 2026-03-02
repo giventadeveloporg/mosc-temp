@@ -109,91 +109,99 @@ const AdministrationPage = () => {
                   </div>
                 )}
                 {index === 1 && (
-                  <div className="mb-5 flex justify-center">
-                    <Image
-                      src="/images/administration/canon-law.jpg"
-                      alt="The Canon Law of the Malankara Orthodox Church"
-                      width={280}
-                      height={168}
-                      className="w-full max-w-[280px] h-auto object-contain rounded-lg"
-                    />
+                  <div className="mb-5 flex justify-center pt-8">
+                    <div className="relative w-full max-w-[280px] aspect-[280/168] rounded-lg overflow-hidden flex items-center justify-center">
+                      <Image
+                        src="/images/administration/canon-law.jpg"
+                        alt="The Canon Law of the Malankara Orthodox Church"
+                        fill
+                        className="object-contain rounded-lg"
+                      />
+                    </div>
                   </div>
                 )}
                 {index === 2 && (
-                  <div className="mb-5 flex justify-center">
-                    <Image
-                      src="/images/administration/holy-episcopal-synod.jpg"
-                      alt="The Holy Episcopal Synod"
-                      width={280}
-                      height={168}
-                      className="w-full max-w-[280px] h-auto object-contain rounded-lg"
-                    />
+                  <div className="mb-5 flex justify-center pt-8">
+                    <div className="relative w-full max-w-[280px] aspect-[280/168] rounded-lg overflow-hidden flex items-center justify-center">
+                      <Image
+                        src="/images/administration/holy-episcopal-synod.jpg"
+                        alt="The Holy Episcopal Synod"
+                        fill
+                        className="object-contain rounded-lg"
+                      />
+                    </div>
                   </div>
                 )}
                 {index === 3 && (
-                  <div className="mb-5 flex justify-center">
-                    <Image
-                      src="/images/administration/malankara-association.jpg"
-                      alt="Malankara Association"
-                      width={280}
-                      height={168}
-                      className="w-full max-w-[280px] h-auto object-contain rounded-lg"
-                    />
+                  <div className="mb-5 flex justify-center pt-8">
+                    <div className="relative w-full max-w-[280px] aspect-[280/168] rounded-lg overflow-hidden flex items-center justify-center">
+                      <Image
+                        src="/images/administration/malankara-association.jpg"
+                        alt="Malankara Association"
+                        fill
+                        className="object-contain rounded-lg"
+                      />
+                    </div>
                   </div>
                 )}
                 {index === 4 && (
-                  <div className="mb-5 flex justify-center">
-                    <Image
-                      src="/images/administration/managing-committee.jpg"
-                      alt="The Managing Committee"
-                      width={280}
-                      height={168}
-                      className="w-full max-w-[280px] h-auto object-contain rounded-lg"
-                    />
+                  <div className="mb-5 flex justify-center pt-8">
+                    <div className="relative w-full max-w-[280px] aspect-[280/168] rounded-lg overflow-hidden flex items-center justify-center">
+                      <Image
+                        src="/images/administration/managing-committee.jpg"
+                        alt="The Managing Committee"
+                        fill
+                        className="object-contain rounded-lg"
+                      />
+                    </div>
                   </div>
                 )}
                 {index === 5 && (
-                  <div className="mb-5 flex justify-center">
-                    <Image
-                      src="/images/administration/working-committee.jpg"
-                      alt="The Working Committee"
-                      width={280}
-                      height={168}
-                      className="w-full max-w-[280px] h-auto object-contain rounded-lg"
-                    />
+                  <div className="mb-5 flex justify-center pt-8">
+                    <div className="relative w-full max-w-[280px] aspect-[280/168] rounded-lg overflow-hidden flex items-center justify-center">
+                      <Image
+                        src="/images/administration/working-committee.jpg"
+                        alt="The Working Committee"
+                        fill
+                        className="object-contain rounded-lg"
+                      />
+                    </div>
                   </div>
                 )}
                 {index === 6 && (
-                  <div className="mb-5 flex justify-center">
-                    <Image
-                      src="/images/administration/diocesan-general-body.jpg"
-                      alt="The Diocesan General Body"
-                      width={280}
-                      height={168}
-                      className="w-full max-w-[280px] h-auto object-contain rounded-lg"
-                    />
+                  <div className="mb-5 flex justify-center pt-8">
+                    <div className="relative w-full max-w-[280px] aspect-[280/168] rounded-lg overflow-hidden flex items-center justify-center">
+                      <Image
+                        src="/images/administration/diocesan-general-body.jpg"
+                        alt="The Diocesan General Body"
+                        fill
+                        className="object-contain rounded-lg"
+                      />
+                    </div>
                   </div>
                 )}
                 {index === 7 && (
-                  <div className="mb-5 flex justify-center">
-                    <Image
-                      src="/images/administration/parish-managing-committee.jpg"
-                      alt="The Parish Managing Committee"
-                      width={280}
-                      height={168}
-                      className="w-full max-w-[280px] h-auto object-contain rounded-lg"
-                    />
+                  <div className="mb-5 flex justify-center pt-8">
+                    <div className="relative w-full max-w-[280px] aspect-[280/168] rounded-lg overflow-hidden flex items-center justify-center">
+                      <Image
+                        src="/images/administration/parish-managing-committee.jpg"
+                        alt="The Parish Managing Committee"
+                        fill
+                        className="object-contain rounded-lg"
+                      />
+                    </div>
                   </div>
                 )}
                 {index === 8 && (
-                  <div className="mb-5 flex justify-center">
-                    <Image
-                      src="/images/administration/parish-general-body.jpg"
-                      alt="The Parish General Body"
-                      width={280}
-                      height={168}
-                      className="w-full max-w-[280px] h-auto object-contain rounded-lg"
-                    />
+                  <div className="mb-5 flex justify-center pt-8">
+                    <div className="relative w-full max-w-[280px] aspect-[280/168] rounded-lg overflow-hidden flex items-center justify-center">
+                      <Image
+                        src="/images/administration/parish-general-body.jpg"
+                        alt="The Parish General Body"
+                        fill
+                        className="object-contain rounded-lg"
+                      />
+                    </div>
                   </div>
                 )}
                 <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug">

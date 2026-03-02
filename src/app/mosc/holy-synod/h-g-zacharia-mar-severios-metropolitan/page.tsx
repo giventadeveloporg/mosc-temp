@@ -45,7 +45,15 @@ const HGZachariaMarSeveriosMetropolitanPage = () => {
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
                         <p>Gedseemon Aramana, Chakkupallom, Kumily – 686 509</p>
                         <p>Mobile: +91 9495962966</p>
-                        <p>Email: idukkidiocese82@gmail.com</p>
+                        <p>
+                        Email:{' '}
+                        <a
+                          href="mailto:idukkidiocese82@gmail.com"
+                          className="text-syro-blue hover:underline focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 rounded"
+                        >
+                          idukkidiocese82@gmail.com
+                        </a>
+                      </p>
                       </div>
                     </div>
                 </div>

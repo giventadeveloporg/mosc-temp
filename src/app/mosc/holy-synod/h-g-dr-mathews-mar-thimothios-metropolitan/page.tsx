@@ -61,7 +61,15 @@ const HGDrMathewsMarThimothiosMetropolitanPage = () => {
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
                         <p>Bethel Mar Gregorios Aramana, Chengannur P.O. – 689 121</p>
                         <p>Mob: 9447718511</p>
-                        <p>Email: thimothiosmathews@gmail.com</p>
+                        <p>
+                        Email:{' '}
+                        <a
+                          href="mailto:thimothiosmathews@gmail.com"
+                          className="text-syro-blue hover:underline focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 rounded"
+                        >
+                          thimothiosmathews@gmail.com
+                        </a>
+                      </p>
                       </div>
                     </div>
                 </div>

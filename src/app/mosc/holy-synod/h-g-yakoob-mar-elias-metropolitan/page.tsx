@@ -45,7 +45,15 @@ const HGYakoobMarEliasMetropolitanPage = () => {
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
                         <p>Mount Horeb Bishop&apos;s House, Balikashram Road, Kankanady, Mangalore – 575 002, Karnataka, India</p>
                         <p>Tel: 0824-2013157 | Mobile: 09483530018</p>
-                        <p>Email: metropolitanelias@yahoo.com</p>
+                        <p>
+                        Email:{' '}
+                        <a
+                          href="mailto:metropolitanelias@yahoo.com"
+                          className="text-syro-blue hover:underline focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 rounded"
+                        >
+                          metropolitanelias@yahoo.com
+                        </a>
+                      </p>
                       </div>
                     </div>
                 </div>

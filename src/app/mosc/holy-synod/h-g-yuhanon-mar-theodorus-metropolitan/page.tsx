@@ -45,7 +45,15 @@ const HGYuhanonMarTheodorusMetropolitanPage = () => {
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
                         <p>Kottapuram Seminary, Pulamon P.O., Kottarakara</p>
                         <p>Mobile: 9447471408</p>
-                        <p>Email: stpaulsmtc@yahoo.com</p>
+                        <p>
+                        Email:{' '}
+                        <a
+                          href="mailto:stpaulsmtc@yahoo.com"
+                          className="text-syro-blue hover:underline focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 rounded"
+                        >
+                          stpaulsmtc@yahoo.com
+                        </a>
+                      </p>
                       </div>
                     </div>
                 </div>

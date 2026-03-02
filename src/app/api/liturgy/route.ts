@@ -13,6 +13,8 @@ export interface LiturgyReading {
 
 export interface LiturgyApiResponse {
   message: LiturgyReading[];
+  /** Date of the liturgy day (YYYY-MM-DD), when from Strapi; use for badge instead of "today" */
+  liturgyDate?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -82,11 +84,14 @@ async function fetchFromStrapi(lng: string): Promise<NextResponse> {
   try {
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 
+    // Next available liturgy day: date >= today, sort by date asc, take single record
     const baseParams = new URLSearchParams({
-      'filters[date][$eq]': today,
+      'filters[date][$gte]': today,
       'filters[publishedAt][$notNull]': 'true',
       'populate[0]': 'readings',
-      'sort': 'order:asc',
+      'sort': 'date:asc',
+      'pagination[pageSize]': '1',
+      'pagination[page]': '1',
     });
 
     const reqHeaders: Record<string, string> = { Accept: 'application/json' };
@@ -137,18 +142,20 @@ async function fetchFromStrapi(lng: string): Promise<NextResponse> {
     }
 
     if (!json) {
-      console.error('[Liturgy API] Strapi: no data found for', today);
-      return NextResponse.json({ error: 'Liturgy service unavailable' }, { status: 502 });
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[Liturgy API] Strapi: no liturgy day found for date >=', today, '-- returning empty message');
+      }
+      return NextResponse.json({ message: [] }, { status: 200 });
     }
 
     const strapiDay: StrapiLiturgyDay = json.data[0];
     const message = mapStrapiToLegacy(strapiDay, lng);
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('[Liturgy API] Mapped', message.length, 'readings for', lng);
+      console.log('[Liturgy API] Mapped', message.length, 'readings for', lng, 'date', strapiDay.date);
     }
 
-    return NextResponse.json({ message });
+    return NextResponse.json({ message, liturgyDate: strapiDay.date });
   } catch (err) {
     console.error('[Liturgy API] Strapi fetch error:', err);
     return NextResponse.json(

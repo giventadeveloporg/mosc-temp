@@ -55,7 +55,15 @@ const HGMathewsMarTheodosiusPage = () => {
                         Contact
                       </h4>
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
-                        <p>Email: mathewsmartheodosius@gmail.com</p>
+                        <p>
+                        Email:{' '}
+                        <a
+                          href="mailto:mathewsmartheodosius@gmail.com"
+                          className="text-syro-blue hover:underline focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 rounded"
+                        >
+                          mathewsmartheodosius@gmail.com
+                        </a>
+                      </p>
                       </div>
                     </div>
                 </div>
