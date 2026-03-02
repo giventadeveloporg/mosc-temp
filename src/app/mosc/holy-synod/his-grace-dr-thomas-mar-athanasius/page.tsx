@@ -60,7 +60,13 @@ const HisGraceDrThomasMarAthanasiusPage = () => {
                           Address: Bishop’s House, Cathedral Road, Moovattupuzha,Kerala – 686 661 ph : 0485 2833401 Cell: 9447083340
                         </p>
                         <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-2">
-                          Email: thomasmarathanasius@gmail.com
+                          Email:{' '}
+                          <a
+                            href="mailto:thomasmarathanasius@gmail.com"
+                            className="text-syro-blue hover:underline focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 rounded"
+                          >
+                            thomasmarathanasius@gmail.com
+                          </a>
                         </p>
                       </div>
                     </div>

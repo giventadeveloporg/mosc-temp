@@ -45,7 +45,15 @@ const HGAbrahamMarStephanosMetropolitanPage = () => {
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
                         <p>Malankara House, 35 Hennman Close, Swindon, SN25 4ZW, UK</p>
                         <p>Mobile: 9846767680</p>
-                        <p>Email: abrahamstephanos@mosc.in</p>
+                        <p>
+                        Email:{' '}
+                        <a
+                          href="mailto:abrahamstephanos@mosc.in"
+                          className="text-syro-blue hover:underline focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 rounded"
+                        >
+                          abrahamstephanos@mosc.in
+                        </a>
+                      </p>
                       </div>
                     </div>
                 </div>

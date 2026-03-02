@@ -318,11 +318,26 @@ export default function ExecutiveCommitteeForm({
         </div>
 
         <div>
-          <label className="block font-medium">Priority Order</label>
+          <div className="flex items-center gap-2 mb-1">
+            <label className="block font-medium">Priority Order</label>
+            <span
+              className="text-blue-600 cursor-help"
+              title="Lower number = higher rank (0 first, 10 later). Row 1 on the homepage shows only the single highest-priority member (rank 1); row 2+ show 3 per row."
+              aria-label="Priority order help"
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              </svg>
+            </span>
+          </div>
+          <div className="mb-2 rounded-md bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-800">
+            <strong>Tip:</strong> Lower number = higher rank (0 is first, 10 is later). List and homepage are sorted by this value ascending. <strong>Homepage layout:</strong> Row 1 shows only the single highest-priority member (rank 1); row 2 and below show 3 members per row.
+          </div>
           <input
             type="number"
             {...register('priorityOrder', { valueAsNumber: true })}
             className="w-full border border-gray-300 rounded p-2 focus:border-blue-500 focus:ring-blue-500"
+            title="Lower number = higher rank (0 first, 10 later). Row 1 on homepage = one member only (rank 1)."
           />
         </div>
 

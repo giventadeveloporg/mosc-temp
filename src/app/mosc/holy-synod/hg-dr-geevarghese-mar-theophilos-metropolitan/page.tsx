@@ -45,7 +45,15 @@ const HgDrGeevargheseMarTheophilosMetropolitanPage = () => {
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
                         <p>St. Mary&apos;s Higher Secondary School Campus, Naroda, Ahmedabad, Gujarat</p>
                         <p>Mobile: +91 9496591151</p>
-                        <p>Email: geevarghesetheophilos@gmail.com</p>
+                        <p>
+                        Email:{' '}
+                        <a
+                          href="mailto:geevarghesetheophilos@gmail.com"
+                          className="text-syro-blue hover:underline focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 rounded"
+                        >
+                          geevarghesetheophilos@gmail.com
+                        </a>
+                      </p>
                       </div>
                     </div>
                 </div>

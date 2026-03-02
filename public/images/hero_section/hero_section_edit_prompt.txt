@@ -62,4 +62,57 @@ Prefer cropping to fit 5:1 rather than stretching or squashing.
 Do not add new content; only resize and/or crop the existing image.
 If 1000×200 is not possible without quality loss, keep the 5:1 ratio and ensure the size is at least 680×140 px.
 
+*******************    additional prompt for resize for section 3  *******
+
+
+Resize to exact pixel dimensions for Mission Card (Unite India banner)
+Required output size (non-negotiable):
+Width: exactly 1000 pixels
+Height: exactly 200 pixels
+Total: 1000 × 200 px. The final image must be exactly this size—no other dimensions.
+Aspect ratio: 5:1 (width ÷ height = 5). The result must match this ratio and the exact pixel dimensions above.
+What to do:
+Crop the image to a 5:1 horizontal strip. Remove the empty space above and below the branding so only the central band with the purple logo and “Unite India” / “A NONPROFIT CORPORATION” text remains. Center that content in the frame.
+Resize the cropped result to exactly 1000 pixels wide and 200 pixels high. Do not output 1000×199, 998×200, or any other size—only 1000 × 200.
+Preserve: the dark purple rounded-square logo (hands and figures), the “Unite India” text, and the “A NONPROFIT CORPORATION” line. Keep them sharp and fully visible. Do not stretch, squash, or add new content.
+If the tool has a “dimensions” or “output size” field: enter 1000 for width and 200 for height there, and in the text prompt ask to “crop to 5:1 then resize to exactly 1000×200 px.”
+If the tool keeps giving the wrong size: add this line to your prompt: “The exported/saved image file must be exactly 1000 pixels wide and 200 pixels high when checked in an image viewer or properties
+
+------------------------
+
+mobile response view
+
+In the home page Take a look at layout diagram "C:\project_workspace\mosc-temp\public\images\hero_section\hero_section_split_excalidraw.png". In the mobile view and other small screens we need the hero sections to be bleeding to the edges of the screen instead of applying the styling same as in the desktop do not change anything for the desktop layout and view but for the mobile response view we want to take off all the styling and containers and divisions and stuff and we want all the images from section one Section 2 So the Section 3 and 4 all bleeding to the edges to the sides we need a totally different layout but we need to keep the mobile responsive styling step from the desktop view is that possible?
+
+
+
+
+
+
+
+Let's use the frontend design skill to improve the design
+Take a look at layout diagram "C:\project_workspace\mosc-temp\public\images\hero_section\hero_section_split_excalidraw.png"  
+
+Below is the image specification and image sizes used in different sections 1 , 2 and three Right now we need to focus on sections one and two for the desktop view with these image sizes we need to fill the container the sections no matter whether we resize the browser or not right now there is some padding around it for smaller screen sizes it is containing but there padding around the fitting the sections focus just on the sections one and two in the desktop view for screens , when maximizing the browser window creates lot of padding around the image within the container we need to fill the container by these images no matter which browser size it is Whether it is reduce in size or enlarged or expanded we need the image to be fully containing the container without trungating or cutting off on all four ed Is that possible or do we need provide a different image size Please specify or do the  fix…
+
+
+
+Section 1 — Left panel (Kerala / MALAYALEES.US banner)
+Full resize prompt: docs/hero-section-1-image-resize-prompt.md. Example file: public/images/hero_section/wooden-boat-under-coconut-tree-riverside_ver_2.jpg
+
+Output: 1000 × 1200 px or 1200 × 1440 px (aspect ratio 5:6 portrait)
+Method: Reduce height of the visual content and add padding to top and bottom inside the image (soft gradient or solid tone) so the banner fits the frame without being cropped.
+Preserve: Full vertical "MALAYALEES.US" text, yellow circular logo (palm frond + "malayalees Friends"), US flag elements, palm trees, water, tropical scene — all visible and legible; scale down, never crop.
+Padding: Equal padding above and below; center content vertically. Use dark blue/purple gradient or solid, or gentle sky/water extension.
+High quality (e.g. 90%+); same format as source (PNG or JPEG).
+Section 2 — Right panel (slideshow / event images)
+Aspect ratio: 5:2 wide landscape (2.5:1)
+Recommended: 2000 × 800 px (also 2500×1000 or 1500×600)
+Minimum: 1200 × 480 px
+Fit: object-cover — center 60% is the safe zone; edges may be cropped by viewport
+Section 3 — Mission card (Unite India banner)
+Recommended: 1000 × 200 px (aspect ratio 5:1 wide)
+Minimum: 680 × 140 px (keep 5:1)
+Wide horizontal banner; keep main message and branding centered
+
 

@@ -46,7 +46,22 @@ const HGThomasMarIvaniosMetropolitanPage = () => {
                         <p>Urshlem (Indian Orthodox Church Center)</p>
                         <p>3101 Hopkins Road, Beasley, TX 77417, USA</p>
                         <p>Ph: +1 (713) 281-3871, +91 9511842199, 001-281-403-0670</p>
-                        <p>Email: thomasmarivanios@mosc.in, diocesanoffice@ds-wa.org</p>
+                        <p>
+                        Email:{' '}
+                        <a
+                          href="mailto:thomasmarivanios@mosc.in"
+                          className="text-syro-blue hover:underline focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 rounded"
+                        >
+                          thomasmarivanios@mosc.in
+                        </a>
+                        {', '}
+                        <a
+                          href="mailto:diocesanoffice@ds-wa.org"
+                          className="text-syro-blue hover:underline focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 rounded"
+                        >
+                          diocesanoffice@ds-wa.org
+                        </a>
+                      </p>
                         <p>Web: www.ds-wa.org</p>
                       </div>
                     </div>

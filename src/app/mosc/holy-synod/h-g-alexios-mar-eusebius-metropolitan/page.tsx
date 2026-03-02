@@ -77,7 +77,15 @@ const HGAlexiosMarEusebiusMetropolitanPage = () => {
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
                         <p>St Thomas Ashram, Kailash Nagar, Bhilai, Chhattisgarh – 490 001</p>
                         <p>Telephone: +91 8547058607</p>
-                        <p>Email: mareusebius@gmail.com</p>
+                        <p>
+                        Email:{' '}
+                        <a
+                          href="mailto:mareusebius@gmail.com"
+                          className="text-syro-blue hover:underline focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 rounded"
+                        >
+                          mareusebius@gmail.com
+                        </a>
+                      </p>
                       </div>
                     </div>
                 </div>

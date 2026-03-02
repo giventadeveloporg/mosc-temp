@@ -261,14 +261,15 @@ const HolySynodPage = () => {
                 className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 overflow-hidden flex flex-col h-full"
               >
                 <div className="mb-5 flex justify-center pt-8">
-                  <Image
-                    src={member.image}
-                    alt={member.title}
-                    width={280}
-                    height={168}
-                    className="w-full max-w-[280px] h-auto object-contain rounded-lg"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  />
+                  <div className="relative w-full max-w-[280px] aspect-[280/168] rounded-lg overflow-hidden flex items-center justify-center">
+                    <Image
+                      src={member.image}
+                      alt={member.title}
+                      fill
+                      className="object-contain rounded-lg"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 280px"
+                    />
+                  </div>
                 </div>
                 <div className="p-8 pt-0 flex flex-col flex-1">
                   <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug">

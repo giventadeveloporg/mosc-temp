@@ -49,7 +49,15 @@ const HGAbrahamMarEpiphaniosPage = () => {
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
                         <p>Theobhavan Aramana, Thazhakara – Post, Mavelikara, Kerala – 690 102</p>
                         <p>Mob: 9447908814</p>
-                        <p>Email: marepiphanios@gmail.com</p>
+                        <p>
+                        Email:{' '}
+                        <a
+                          href="mailto:marepiphanios@gmail.com"
+                          className="text-syro-blue hover:underline focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 rounded"
+                        >
+                          marepiphanios@gmail.com
+                        </a>
+                      </p>
                       </div>
                     </div>
                 </div>

@@ -58,16 +58,17 @@ const EcumenicalPage = () => {
               >
                 <div className="mb-5 flex justify-center pt-8">
                   {article.image ? (
-                    <Image
-                      src={article.image}
-                      alt=""
-                      width={280}
-                      height={168}
-                      className="w-full max-w-[280px] h-auto object-contain rounded-lg"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    />
+                    <div className="relative w-full max-w-[280px] aspect-[280/168] rounded-lg overflow-hidden flex items-center justify-center">
+                      <Image
+                        src={article.image}
+                        alt=""
+                        fill
+                        className="object-contain rounded-lg"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 280px"
+                      />
+                    </div>
                   ) : (
-                    <div className="w-full max-w-[280px] h-[168px] rounded-lg bg-syro-red/10 flex items-center justify-center">
+                    <div className="w-full max-w-[280px] aspect-[280/168] rounded-lg flex items-center justify-center">
                       <span className="text-4xl text-syro-red/40" role="img" aria-hidden>⛪</span>
                     </div>
                   )}

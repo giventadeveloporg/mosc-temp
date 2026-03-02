@@ -309,7 +309,8 @@ export async function exportRegistrationsToCSV(
       'Accessibility Needs',
       'Emergency Contact Name',
       'Emergency Contact Phone',
-      'Emergency Contact Relationship'
+      'Emergency Contact Relationship',
+      'Admin Notes'
     ];
 
     const csvRows = attendeesArray.map(attendee => [
@@ -328,7 +329,8 @@ export async function exportRegistrationsToCSV(
       attendee.accessibilityNeeds || '',
       attendee.emergencyContactName || '',
       attendee.emergencyContactPhone || '',
-      attendee.emergencyContactRelationship || ''
+      attendee.emergencyContactRelationship || '',
+      attendee.adminNotes ?? attendee.admin_notes ?? ''
     ]);
 
     const csvContent = [csvHeaders, ...csvRows]

@@ -593,6 +593,7 @@ alwaysApply: true
       }, []);
     }
     ```
+  - **Executive committee priority order:** The list is sorted by `priorityOrder` ascending (`sort=priorityOrder,asc`). **Lower number = higher rank** (0 appears first, 10 later). Show this tip in the admin form (tooltip or info above the Priority Order field).
   - **DON'T:**
     ```typescript
     // ❌ DON'T: Call server actions from client components on public pages

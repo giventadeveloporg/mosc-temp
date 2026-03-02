@@ -45,7 +45,22 @@ const HGGeevargheseMarPachomiosMetropolitanPage = () => {
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
                         <p>Mount Hermon Aramana, Chathamangalam, N.I.T. Campus P.O., Kozhikode – 673 601</p>
                         <p>Mobile: +91 9961932356</p>
-                        <p>Email: geevarghesemarpachomios@gmail.com, hermonaramana@gmail.com</p>
+                        <p>
+                        Email:{' '}
+                        <a
+                          href="mailto:geevarghesemarpachomios@gmail.com"
+                          className="text-syro-blue hover:underline focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 rounded"
+                        >
+                          geevarghesemarpachomios@gmail.com
+                        </a>
+                        {', '}
+                        <a
+                          href="mailto:hermonaramana@gmail.com"
+                          className="text-syro-blue hover:underline focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 rounded"
+                        >
+                          hermonaramana@gmail.com
+                        </a>
+                      </p>
                       </div>
                     </div>
                 </div>

@@ -45,7 +45,15 @@ const HGGeevargheseMarPhilaxenosMetropolitanPage = () => {
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
                         <p>Bishop&apos;s House, 4/51 Rajeswari Street, Mehta Nagar, Chennai – 600029</p>
                         <p>Mobile: +91 7025168747</p>
-                        <p>Email: madrasorthodoxdiocese@gmail.com</p>
+                        <p>
+                        Email:{' '}
+                        <a
+                          href="mailto:madrasorthodoxdiocese@gmail.com"
+                          className="text-syro-blue hover:underline focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 rounded"
+                        >
+                          madrasorthodoxdiocese@gmail.com
+                        </a>
+                      </p>
                       </div>
                     </div>
                 </div>

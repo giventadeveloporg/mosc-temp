@@ -56,7 +56,8 @@ export default function AdminNavigation({ currentPage, showHome = true }: AdminN
     {
       href: '/admin/events/registrations',
       icon: 'users',
-      label: 'Registrations',
+      label: 'Event Attendee',
+      sublabel: 'Registrations',
       color: 'indigo',
       active: currentPage === 'event-registrations',
       key: 'event-registrations'
@@ -88,7 +89,8 @@ export default function AdminNavigation({ currentPage, showHome = true }: AdminN
     {
       href: '/admin/executive-committee',
       icon: 'userTie',
-      label: 'Exec Team Members',
+      label: 'Executive Committee',
+      sublabel: 'Team Members',
       color: 'orange',
       active: currentPage === 'executive-committee',
       key: 'executive-committee'
@@ -287,16 +289,17 @@ export default function AdminNavigation({ currentPage, showHome = true }: AdminN
                 key={button.key}
                 href={button.href}
                 className={`flex flex-col items-center justify-center rounded-lg border-2 p-1.5 sm:p-2 md:p-2.5 lg:p-3 xl:p-4 transition-all duration-300 hover:scale-105 hover:shadow-md group box-border w-full min-w-0 ${colorClasses}`}
-                title={button.label}
-                aria-label={button.label}
+                title={'sublabel' in button && button.sublabel ? `${button.label} [${button.sublabel}]` : button.label}
+                aria-label={'sublabel' in button && button.sublabel ? `${button.label} [${button.sublabel}]` : button.label}
                 style={{ width: '100%', maxWidth: '100%', flexShrink: 0 }}
               >
                 <div className={`flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 xl:w-11 xl:h-11 rounded-xl ${iconBgColor} flex items-center justify-center mb-1 sm:mb-1.5 md:mb-2 group-hover:scale-110 transition-transform duration-300`}>
                   {renderIcon(button.icon, `w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:h-7 xl:w-8 xl:h-8 ${iconTextColor}`)}
                 </div>
-                <span className="font-semibold text-center text-[9px] sm:text-[10px] md:text-xs lg:text-sm xl:text-base leading-tight px-0.5 sm:px-1 break-words hyphens-auto">
-                  {button.label}
-                </span>
+                <span className="font-semibold text-center text-[9px] sm:text-[10px] md:text-xs lg:text-sm xl:text-base leading-tight px-0.5 sm:px-1 break-words hyphens-auto">{button.label}</span>
+                {'sublabel' in button && button.sublabel && (
+                  <span className="text-center text-[8px] sm:text-[9px] md:text-[10px] lg:text-xs xl:text-sm leading-tight mt-0.5 opacity-90 px-0.5 sm:px-1 break-words">[{button.sublabel}]</span>
+                )}
               </Link>
             );
           })}

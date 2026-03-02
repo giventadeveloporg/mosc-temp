@@ -4,7 +4,7 @@ import React, { useState, useEffect, useLayoutEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { ExecutiveCommitteeTeamMemberDTO } from '@/types';
-import { getAppUrl, getTenantId } from '@/lib/env';
+import { getAppUrl } from '@/lib/env';
 import { useDeferredFetch } from '@/hooks/usePageReady';
 import { getHomepageCacheKey } from '@/lib/homepageCacheKeys';
 import Modal from '@/components/ui/Modal';
@@ -69,9 +69,9 @@ const TeamSection: React.FC = () => {
 
       try {
         const baseUrl = getAppUrl();
-        const tenantId = getTenantId();
+        // Proxy injects tenantId.equals per nextjs_api_routes.mdc; only pass filter/sort here
         const response = await fetch(
-          `${baseUrl}/api/proxy/executive-committee-team-members?tenantId.equals=${encodeURIComponent(tenantId)}&isActive.equals=true&sort=priorityOrder,asc`,
+          `${baseUrl}/api/proxy/executive-committee-team-members?isActive.equals=true&sort=priorityOrder,asc`,
           {
             method: 'GET',
             headers: {
@@ -145,10 +145,26 @@ const TeamSection: React.FC = () => {
     return '/images/user_profile_loading.webp';
   };
 
-  // No longer needed with flexbox layout
-  const getLastRowClasses = (index: number, totalMembers: number) => {
-    return '';
-  };
+  /**
+   * Chunk team members by priority for layout:
+   * - Row 1: only the first (priority 0 / rank 1) - single card, one item
+   * - Row 2+: 3 per row (2nd, 3rd, 4th then 5th, 6th, 7th, etc.)
+   * Homepage shows first 6 members in this layout.
+   */
+  const displayedRows = ((): ExecutiveCommitteeTeamMemberDTO[][] => {
+    const sorted = [...teamMembers].sort((a, b) => (a.priorityOrder ?? 0) - (b.priorityOrder ?? 0));
+    const take = Math.min(6, sorted.length);
+    if (take === 0) return [];
+    const list = sorted.slice(0, take);
+    const rows: ExecutiveCommitteeTeamMemberDTO[][] = [];
+    rows.push(list.slice(0, 1));   // Row 1: only rank 1 (single card)
+    let i = 1;
+    while (i < list.length) {
+      rows.push(list.slice(i, i + 3)); // Row 2+: 3 per row
+      i += 3;
+    }
+    return rows;
+  })();
 
   // Don't render anything while loading - section will appear only when fully loaded
   if (loading) {
@@ -272,16 +288,25 @@ const TeamSection: React.FC = () => {
           </div>
         </div>
 
-        {/* Dynamic Team Grid with Perfect Equal Distribution */}
+        {/* Dynamic Team Grid by priority: row 1 = rank 1 only (1 card), row 2+ = 3 cards per row */}
         {teamMembers.length > 0 ? (
           <>
-            <div className={`${styles.teamGrid} gap-8 lg:gap-10`}>
-              {teamMembers.slice(0, 6).map((member, index) => (
+            {displayedRows.map((row, rowIndex) => {
+              const globalStart = displayedRows.slice(0, rowIndex).reduce((sum, r) => sum + r.length, 0);
+              return (
+                <div
+                  key={rowIndex}
+                  className={`${styles.teamGrid} gap-8 lg:gap-10`}
+                  style={rowIndex < displayedRows.length - 1 ? { marginBottom: '2.5rem' } : undefined}
+                >
+                  {row.map((member, cardIndex) => {
+                    const globalIndex = globalStart + cardIndex;
+                    return (
               <div
                 key={member.id}
-                className={`${styles.teamCard} group relative rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 ease-out hover:-translate-y-3 ${getLastRowClasses(index, teamMembers.length)}`}
+                className={`${styles.teamCard} group relative rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 ease-out hover:-translate-y-3`}
                 style={{
-                  animationDelay: `${index * 150}ms`,
+                  animationDelay: `${globalIndex * 150}ms`,
                 }}
               >
                 {/* Large Photo Section - flex-shrink-0 so long text never shrinks or overlaps image */}
@@ -415,11 +440,14 @@ const TeamSection: React.FC = () => {
                         </a>
                       )}
                     </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-            </div>
+                    );
+                  })}
+                </div>
+              );
+            })}
 
             {/* Show More Button - Only show if there are more than 6 team members */}
             {teamMembers.length > 6 && (

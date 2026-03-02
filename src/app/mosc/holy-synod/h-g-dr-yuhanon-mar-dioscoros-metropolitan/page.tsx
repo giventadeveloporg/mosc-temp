@@ -45,7 +45,15 @@ const HGDrYuhanonMarDioscorosMetropolitanPage = () => {
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
                         <p>Mar Kuriakose Dayara, Pothenpuram P.O., Pampady, Kottayam Dist., Kerala, India – 686 502</p>
                         <p>Tel: 0481 2505431 | Mobile: 09791020730</p>
-                        <p>Email: mardiascoros@yahoo.com</p>
+                        <p>
+                        Email:{' '}
+                        <a
+                          href="mailto:mardiascoros@yahoo.com"
+                          className="text-syro-blue hover:underline focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 rounded"
+                        >
+                          mardiascoros@yahoo.com
+                        </a>
+                      </p>
                       </div>
                     </div>
                 </div>

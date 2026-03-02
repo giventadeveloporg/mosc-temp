@@ -68,6 +68,7 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
   const [eventEndDate, setEventEndDate] = useState('');
   const [searchResults, setSearchResults] = useState<EventDetailsDTO[]>([]);
   const [isSearchingEvents, setIsSearchingEvents] = useState(false);
+  const [eventSearchReturnedEmpty, setEventSearchReturnedEmpty] = useState(false);
   const [eventTypeaheadQuery, setEventTypeaheadQuery] = useState('');
   const [eventTypeaheadResults, setEventTypeaheadResults] = useState<EventDetailsDTO[]>([]);
   const [isTypeaheadLoading, setIsTypeaheadLoading] = useState(false);
@@ -108,6 +109,7 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
   // Event search handler
   const handleEventSearch = async () => {
     setIsSearchingEvents(true);
+    setEventSearchReturnedEmpty(false);
     try {
       const results = await searchEvents(
         eventSearchType === 'name' ? eventSearchName : undefined,
@@ -115,10 +117,14 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
         eventSearchType === 'dateRange' ? eventStartDate : undefined,
         eventSearchType === 'dateRange' ? eventEndDate : undefined
       );
-      setSearchResults(results);
+      setSearchResults(results ?? []);
+      if (!results || results.length === 0) {
+        setEventSearchReturnedEmpty(true);
+      }
     } catch (error) {
       console.error('Error searching events:', error);
       setSearchResults([]);
+      setEventSearchReturnedEmpty(true);
     } finally {
       setIsSearchingEvents(false);
     }
@@ -355,7 +361,8 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
       emergencyContactRelationship: attendee.emergencyContactRelationship || '',
       totalNumberOfGuests: attendee.totalNumberOfGuests || 0,
       numberOfGuestsCheckedIn: attendee.numberOfGuestsCheckedIn || 0,
-      notes: attendee.notes || ''
+      notes: attendee.notes || '',
+      adminNotes: attendee.adminNotes ?? (attendee as any).admin_notes ?? ''
     });
     void loadAttendeeAttachments(attendee.id);
   };
@@ -611,140 +618,181 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
               Please search for an event by Event ID, Event Name, or Date Range to view its registrations.
             </p>
 
-          {/* Event Search Type */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Search By
-            </label>
-            <select
-              value={eventSearchType}
-              onChange={(e) => setEventSearchType(e.target.value as 'id' | 'name' | 'dateRange')}
-              className="w-full md:w-64 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="id">Event ID</option>
-              <option value="name">Event Name</option>
-              <option value="dateRange">Date Range</option>
-            </select>
-          </div>
+          {/* Event Search: Search By dropdown and search field(s) on one row */}
+          <div className="flex flex-wrap items-end gap-3 sm:gap-4 mb-4">
+            <div className="w-full sm:w-auto min-w-0 sm:min-w-[140px]">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Search By</label>
+              <select
+                value={eventSearchType}
+                onChange={(e) => {
+                  setEventSearchType(e.target.value as 'id' | 'name' | 'dateRange');
+                  setEventSearchReturnedEmpty(false);
+                }}
+                className="w-full sm:w-40 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="id">Event ID</option>
+                <option value="name">Event Name</option>
+                <option value="dateRange">Date Range</option>
+              </select>
+            </div>
 
-          {/* Event Search Inputs */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             {eventSearchType === 'id' && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Event ID
-                </label>
-                <input
-                  type="number"
-                  value={eventSearchId}
-                  onChange={(e) => setEventSearchId(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && eventSearchId && eventSearchId.trim() !== '') {
-                      handleEventSearch();
-                    }
-                  }}
-                  placeholder="Enter Event ID"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
+              <>
+                <div className="flex-1 min-w-0 sm:min-w-[160px]">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Event ID</label>
+                  <input
+                    type="number"
+                    value={eventSearchId}
+                    onChange={(e) => {
+                      setEventSearchId(e.target.value);
+                      setEventSearchReturnedEmpty(false);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && eventSearchId && eventSearchId.trim() !== '') {
+                        handleEventSearch();
+                      }
+                    }}
+                    placeholder="Enter Event ID"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <button
+                  onClick={handleEventSearch}
+                  disabled={isSearchingEvents || !eventSearchId || eventSearchId.trim() === ''}
+                  className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-blue-100 hover:bg-blue-200 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                  title="Search Events"
+                  aria-label="Search Events"
+                >
+                  <FaSearch className="w-5 h-5 text-blue-600" />
+                  <span className="font-semibold text-blue-700 text-sm">{isSearchingEvents ? 'Searching...' : 'Search Events'}</span>
+                </button>
+              </>
             )}
 
             {eventSearchType === 'name' && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Event Name
-                </label>
-                <input
-                  type="text"
-                  value={eventSearchName}
-                  onChange={(e) => setEventSearchName(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && eventSearchName && eventSearchName.trim() !== '') {
-                      handleEventSearch();
-                    }
-                  }}
-                  placeholder="Enter Event Name"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
+              <>
+                <div className="flex-1 min-w-0 sm:min-w-[200px]">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Event Name</label>
+                  <input
+                    type="text"
+                    value={eventSearchName}
+                    onChange={(e) => {
+                      setEventSearchName(e.target.value);
+                      setEventSearchReturnedEmpty(false);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && eventSearchName && eventSearchName.trim() !== '') {
+                        handleEventSearch();
+                      }
+                    }}
+                    placeholder="Enter Event Name"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <button
+                  onClick={handleEventSearch}
+                  disabled={isSearchingEvents || !eventSearchName || eventSearchName.trim() === ''}
+                  className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-blue-100 hover:bg-blue-200 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                  title="Search Events"
+                  aria-label="Search Events"
+                >
+                  <FaSearch className="w-5 h-5 text-blue-600" />
+                  <span className="font-semibold text-blue-700 text-sm">{isSearchingEvents ? 'Searching...' : 'Search Events'}</span>
+                </button>
+              </>
             )}
 
             {eventSearchType === 'dateRange' && (
               <>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Start Date
-                  </label>
+                <div className="min-w-0">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
                   <input
                     type="date"
                     value={eventStartDate}
-                    onChange={(e) => setEventStartDate(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    onChange={(e) => {
+                      setEventStartDate(e.target.value);
+                      setEventSearchReturnedEmpty(false);
+                    }}
+                    className="w-full min-w-[140px] px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    End Date
-                  </label>
+                <div className="min-w-0">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">End Date</label>
                   <input
                     type="date"
                     value={eventEndDate}
-                    onChange={(e) => setEventEndDate(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    onChange={(e) => {
+                      setEventEndDate(e.target.value);
+                      setEventSearchReturnedEmpty(false);
+                    }}
+                    className="w-full min-w-[140px] px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
+                <button
+                  onClick={handleEventSearch}
+                  disabled={isSearchingEvents || !eventStartDate || !eventEndDate}
+                  className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-blue-100 hover:bg-blue-200 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                  title="Search Events"
+                  aria-label="Search Events"
+                >
+                  <FaSearch className="w-5 h-5 text-blue-600" />
+                  <span className="font-semibold text-blue-700 text-sm">{isSearchingEvents ? 'Searching...' : 'Search Events'}</span>
+                </button>
               </>
             )}
           </div>
 
-          {/* Search Button */}
-          <button
-            onClick={handleEventSearch}
-            disabled={
-              isSearchingEvents ||
-              (eventSearchType === 'id' && (!eventSearchId || eventSearchId.trim() === '')) ||
-              (eventSearchType === 'name' && (!eventSearchName || eventSearchName.trim() === '')) ||
-              (eventSearchType === 'dateRange' && (!eventStartDate || !eventEndDate))
-            }
-            className="flex items-center justify-center gap-3 px-6 py-3 rounded-xl bg-blue-100 hover:bg-blue-200 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-            title="Search Events"
-            aria-label="Search Events"
-          >
-            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
-              <FaSearch className="w-6 h-6 text-blue-600" />
+          {/* No results alert */}
+          {eventSearchReturnedEmpty && (
+            <div className="mb-4 p-4 rounded-lg bg-amber-50 border border-amber-200 flex items-start gap-3" role="alert">
+              <FaExclamationTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-medium text-amber-800">No events found</p>
+                <p className="text-sm text-amber-700 mt-1">
+                  No events match your search. Try a different Event ID, event name, or date range.
+                </p>
+              </div>
             </div>
-            <span className="font-semibold text-blue-700">{isSearchingEvents ? 'Searching...' : 'Search Events'}</span>
-          </button>
+          )}
 
-          {/* Search Results */}
+          {/* Search Results - colorful, prominent section */}
           {searchResults.length > 0 && (
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Search Results ({searchResults.length} events found)
-              </h3>
-              <div className="space-y-2 max-h-96 overflow-y-auto">
+            <div className="mt-6 rounded-xl border-2 border-emerald-300 bg-emerald-50/80 shadow-md overflow-hidden">
+              <div className="px-5 py-4 border-b border-emerald-200 bg-emerald-100/80">
+                <h3 className="text-lg font-bold text-emerald-900 flex items-center gap-2">
+                  <FaCheckCircle className="w-5 h-5 text-emerald-600" />
+                  Search Results ({searchResults.length} event{searchResults.length !== 1 ? 's' : ''} found)
+                </h3>
+              </div>
+              <div className="p-4 space-y-3 max-h-96 overflow-y-auto">
                 {searchResults.map((event) => (
                   <div
                     key={event.id}
-                    className="p-4 border border-gray-200 rounded-md hover:bg-gray-50 cursor-pointer flex items-center justify-between"
+                    className="p-4 border-2 border-emerald-200 rounded-lg bg-white hover:bg-emerald-50/50 cursor-pointer flex flex-wrap items-center justify-between gap-3 transition-colors"
                     onClick={() => handleSelectEventFromSearch(event.id!)}
                   >
-                    <div>
-                      <div className="font-medium text-gray-900">
+                    <div className="min-w-0 flex-1">
+                      <div className="font-semibold text-gray-900">
                         {event.title}
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-emerald-700 mt-1">
                         Event ID: {event.id} | {event.startDate ? new Date(event.startDate).toLocaleDateString() : 'N/A'}
                       </div>
                     </div>
                     <button
+                      type="button"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleSelectEventFromSearch(event.id!);
                       }}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+                      className="flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 px-5 transition-all duration-300 hover:scale-105"
+                      title="View Registrations"
+                      aria-label="View Registrations"
                     >
-                      View Registrations
+                      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+                        <FaUsers className="w-6 h-6 text-green-600" />
+                      </div>
+                      <span className="font-semibold text-green-700">View Registrations</span>
                     </button>
                   </div>
                 ))}
@@ -752,15 +800,15 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
             </div>
           )}
 
-          {/* Quick Event Selection from Dropdown (limited to 50) */}
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          {/* Quick Event Selection from Dropdown (recent events only, max 50) */}
+          <div className="mt-6 pt-6 border-t border-teal-200">
+            <label className="block text-sm font-semibold text-teal-800 mb-2">
               Or select from recent events (max 50)
             </label>
             <select
               value={data.selectedEvent && data.selectedEvent.id ? data.selectedEvent.id.toString() : ''}
               onChange={(e) => handleEventFilter(e.target.value)}
-              className="w-full md:w-96 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full md:w-96 px-4 py-2 border-2 border-teal-300 rounded-lg bg-teal-50/50 text-teal-900 focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
             >
               <option value="">Select an event...</option>
               {events.slice(0, 50).map(event => (
@@ -1278,106 +1326,242 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
               </button>
             </div>
             <div className="p-6 space-y-6">
-              {/* Personal Information */}
+              {/* Identity & Personal Information */}
               <div>
                 <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
                   <FaUser className="mr-2" />
-                  Personal Information
+                  Identity & Personal Information
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
+                    <label className="block text-sm font-medium text-gray-500">Registration ID</label>
+                    <p className="text-sm text-gray-900">{viewingAttendee.id ?? '—'}</p>
+                  </div>
+                  <div>
                     <label className="block text-sm font-medium text-gray-500">First Name</label>
-                    <p className="text-sm text-gray-900">{viewingAttendee.firstName}</p>
+                    <p className="text-sm text-gray-900">{viewingAttendee.firstName ?? '—'}</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-500">Last Name</label>
-                    <p className="text-sm text-gray-900">{viewingAttendee.lastName}</p>
+                    <p className="text-sm text-gray-900">{viewingAttendee.lastName ?? '—'}</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-500">Email</label>
-                    <p className="text-sm text-gray-900">{viewingAttendee.email}</p>
+                    <p className="text-sm text-gray-900">{viewingAttendee.email ?? '—'}</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-500">Phone</label>
-                    <p className="text-sm text-gray-900">{viewingAttendee.phone || 'N/A'}</p>
+                    <p className="text-sm text-gray-900">{viewingAttendee.phone ?? '—'}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">Member</label>
+                    <p className="text-sm text-gray-900">{viewingAttendee.isMember != null ? (viewingAttendee.isMember ? 'Yes' : 'No') : '—'}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">Attendee Type</label>
+                    <p className="text-sm text-gray-900">{viewingAttendee.attendeeType ?? '—'}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">Registration Source</label>
+                    <p className="text-sm text-gray-900">{viewingAttendee.registrationSource ?? '—'}</p>
                   </div>
                 </div>
               </div>
 
-              {/* Event Information */}
+              {/* Event & Registration Information */}
               <div>
                 <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
                   <FaCalendarAlt className="mr-2" />
-                  Event Information
+                  Event & Registration
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-500">Event ID</label>
-                    <p className="text-sm text-gray-900">{viewingAttendee.eventId}</p>
+                    <p className="text-sm text-gray-900">{viewingAttendee.eventId ?? '—'}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">Event Title</label>
+                    <p className="text-sm text-gray-900">{(viewingAttendee as any).event?.title ?? '—'}</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-500">Registration Date</label>
                     <p className="text-sm text-gray-900">
                       {viewingAttendee.registrationDate
-                        ? new Date(viewingAttendee.registrationDate).toLocaleDateString()
-                        : 'N/A'
-                      }
+                        ? new Date(viewingAttendee.registrationDate).toLocaleString()
+                        : '—'}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">Confirmation Date</label>
+                    <p className="text-sm text-gray-900">
+                      {viewingAttendee.confirmationDate
+                        ? new Date(viewingAttendee.confirmationDate).toLocaleString()
+                        : '—'}
                     </p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-500">Status</label>
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(viewingAttendee.registrationStatus || '')}`}>
-                      {viewingAttendee.registrationStatus || 'Unknown'}
+                      {viewingAttendee.registrationStatus || '—'}
                     </span>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-500">Total Guests</label>
-                    <p className="text-sm text-gray-900">{viewingAttendee.totalNumberOfGuests || 0}</p>
+                    <p className="text-sm text-gray-900">{viewingAttendee.totalNumberOfGuests ?? '—'}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">Guests Checked In</label>
+                    <p className="text-sm text-gray-900">{viewingAttendee.numberOfGuestsCheckedIn ?? '—'}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">Cancellation Date</label>
+                    <p className="text-sm text-gray-900">
+                      {viewingAttendee.cancellationDate
+                        ? new Date(viewingAttendee.cancellationDate).toLocaleString()
+                        : '—'}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">Cancellation Reason</label>
+                    <p className="text-sm text-gray-900">{viewingAttendee.cancellationReason ?? '—'}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">Wait List Position</label>
+                    <p className="text-sm text-gray-900">{viewingAttendee.waitListPosition ?? '—'}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">Priority Score</label>
+                    <p className="text-sm text-gray-900">{viewingAttendee.priorityScore ?? '—'}</p>
                   </div>
                 </div>
               </div>
 
-              {/* Special Requirements */}
-              {(viewingAttendee.specialRequirements || viewingAttendee.dietaryRestrictions || viewingAttendee.accessibilityNeeds) && (
-                <div>
-                  <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
-                    <FaExclamationTriangle className="mr-2" />
-                    Special Requirements
-                  </h4>
-                  <div className="space-y-3">
-                    {viewingAttendee.specialRequirements && (
-                      <div>
-                        <label className="block text-sm font-medium text-gray-500">Special Requirements</label>
-                        <p className="text-sm text-gray-900">{viewingAttendee.specialRequirements}</p>
-                      </div>
-                    )}
-                    {viewingAttendee.dietaryRestrictions && (
-                      <div>
-                        <label className="block text-sm font-medium text-gray-500">Dietary Restrictions</label>
-                        <p className="text-sm text-gray-900">{viewingAttendee.dietaryRestrictions}</p>
-                      </div>
-                    )}
-                    {viewingAttendee.accessibilityNeeds && (
-                      <div>
-                        <label className="block text-sm font-medium text-gray-500">Accessibility Needs</label>
-                        <p className="text-sm text-gray-900">{viewingAttendee.accessibilityNeeds}</p>
-                      </div>
-                    )}
+              {/* Check-in / QR */}
+              <div>
+                <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
+                  <FaCheckCircle className="mr-2" />
+                  Check-in & QR
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">Check-in Status</label>
+                    <p className="text-sm text-gray-900">{viewingAttendee.checkInStatus ?? '—'}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">Check-in Time</label>
+                    <p className="text-sm text-gray-900">
+                      {viewingAttendee.checkInTime
+                        ? new Date(viewingAttendee.checkInTime).toLocaleString()
+                        : '—'}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">Check-out Time</label>
+                    <p className="text-sm text-gray-900">
+                      {viewingAttendee.checkOutTime
+                        ? new Date(viewingAttendee.checkOutTime).toLocaleString()
+                        : '—'}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">QR Generated</label>
+                    <p className="text-sm text-gray-900">{viewingAttendee.qrCodeGenerated != null ? (viewingAttendee.qrCodeGenerated ? 'Yes' : 'No') : '—'}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">QR Generated At</label>
+                    <p className="text-sm text-gray-900">
+                      {viewingAttendee.qrCodeGeneratedAt
+                        ? new Date(viewingAttendee.qrCodeGeneratedAt).toLocaleString()
+                        : '—'}
+                    </p>
                   </div>
                 </div>
-              )}
+              </div>
 
-              {viewingAttendee.notes && (
-                <div>
-                  <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
-                    <FaStickyNote className="mr-2 text-yellow-600" />
-                    Additional Notes
-                  </h4>
-                  <div className="rounded-xl border border-yellow-200 bg-yellow-50 px-4 py-3 text-sm text-gray-800 whitespace-pre-wrap">
-                    {viewingAttendee.notes}
+              {/* Special Requirements (always show section, use — when empty) */}
+              <div>
+                <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
+                  <FaExclamationTriangle className="mr-2" />
+                  Special Requirements
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">Special Requirements</label>
+                    <p className="text-sm text-gray-900">{viewingAttendee.specialRequirements ?? '—'}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">Dietary Restrictions</label>
+                    <p className="text-sm text-gray-900">{viewingAttendee.dietaryRestrictions ?? '—'}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">Accessibility Needs</label>
+                    <p className="text-sm text-gray-900">{viewingAttendee.accessibilityNeeds ?? '—'}</p>
                   </div>
                 </div>
-              )}
+              </div>
+
+              {/* Notes (always show) */}
+              <div>
+                <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
+                  <FaStickyNote className="mr-2 text-yellow-600" />
+                  Additional Notes
+                </h4>
+                <div className="rounded-xl border border-yellow-200 bg-yellow-50 px-4 py-3 text-sm text-gray-800 whitespace-pre-wrap">
+                  {viewingAttendee.notes ?? '—'}
+                </div>
+              </div>
+
+              {/* Admin notes (always show) */}
+              <div>
+                <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
+                  <FaInfoCircle className="mr-2 text-indigo-600" />
+                  Admin Notes
+                </h4>
+                <div className="rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-sm text-gray-800 whitespace-pre-wrap">
+                  {viewingAttendee.adminNotes ?? (viewingAttendee as any).admin_notes ?? '—'}
+                </div>
+              </div>
+
+              {/* Feedback & rating */}
+              <div>
+                <h4 className="text-md font-semibold text-gray-900 mb-3">Feedback & Rating</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">Attendance Rating</label>
+                    <p className="text-sm text-gray-900">{viewingAttendee.attendanceRating ?? '—'}</p>
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-500">Feedback</label>
+                    <p className="text-sm text-gray-900 whitespace-pre-wrap">{viewingAttendee.feedback ?? '—'}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Timestamps */}
+              <div>
+                <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
+                  <FaClock className="mr-2" />
+                  Record Timestamps
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">Created At</label>
+                    <p className="text-sm text-gray-900">
+                      {(viewingAttendee as any).createdAt
+                        ? new Date((viewingAttendee as any).createdAt).toLocaleString()
+                        : '—'}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">Updated At</label>
+                    <p className="text-sm text-gray-900">
+                      {(viewingAttendee as any).updatedAt
+                        ? new Date((viewingAttendee as any).updatedAt).toLocaleString()
+                        : '—'}
+                    </p>
+                  </div>
+                </div>
+              </div>
 
               <div>
                 <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center">
@@ -1449,26 +1633,24 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
                 )}
               </div>
 
-              {/* Emergency Contact */}
-              {(viewingAttendee.emergencyContactName || viewingAttendee.emergencyContactPhone) && (
-                <div>
-                  <h4 className="text-md font-semibold text-gray-900 mb-3">Emergency Contact</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-500">Contact Name</label>
-                      <p className="text-sm text-gray-900">{viewingAttendee.emergencyContactName || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-500">Contact Phone</label>
-                      <p className="text-sm text-gray-900">{viewingAttendee.emergencyContactPhone || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-500">Relationship</label>
-                      <p className="text-sm text-gray-900">{viewingAttendee.emergencyContactRelationship || 'N/A'}</p>
-                    </div>
+              {/* Emergency Contact (all fields shown) */}
+              <div>
+                <h4 className="text-md font-semibold text-gray-900 mb-3">Emergency Contact</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">Contact Name</label>
+                    <p className="text-sm text-gray-900">{viewingAttendee.emergencyContactName ?? '—'}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">Contact Phone</label>
+                    <p className="text-sm text-gray-900">{viewingAttendee.emergencyContactPhone ?? '—'}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">Relationship</label>
+                    <p className="text-sm text-gray-900">{viewingAttendee.emergencyContactRelationship ?? '—'}</p>
                   </div>
                 </div>
-              )}
+              </div>
             </div>
             <div className="flex justify-end p-6 border-t border-blue-100">
               <button
@@ -1697,6 +1879,26 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Any additional notes or comments about this attendee..."
+                  />
+                </div>
+              </div>
+
+              {/* Admin notes (internal use only; not visible to attendee) */}
+              <div>
+                <h4 className="text-md font-semibold text-gray-900 mb-4 flex items-center">
+                  <span className="mr-2 w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
+                    <FaInfoCircle className="w-6 h-6 text-indigo-600" />
+                  </span>
+                  Admin Notes
+                </h4>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Admin notes (internal use only)</label>
+                  <textarea
+                    value={editForm.adminNotes || ''}
+                    onChange={(e) => handleFormChange('adminNotes', e.target.value)}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Internal notes about this registration (not visible to the attendee)..."
                   />
                 </div>
               </div>

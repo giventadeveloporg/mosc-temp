@@ -53,7 +53,15 @@ const HisGraceDrYoohanonMarChrysostamusPage = () => {
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
                         <p>Bethany Aramana, Thiruvalla, Kerala – 689 101</p>
                         <p>Tel.: 0469-2701357 / 2603357 | Fax: 0469-2342709 | Mob: 9447045543</p>
-                        <p>Email: yuhanonmarchrysostomos@gmail.com</p>
+                        <p>
+                        Email:{' '}
+                        <a
+                          href="mailto:yuhanonmarchrysostomos@gmail.com"
+                          className="text-syro-blue hover:underline focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 rounded"
+                        >
+                          yuhanonmarchrysostomos@gmail.com
+                        </a>
+                      </p>
                       </div>
                     </div>
                 </div>

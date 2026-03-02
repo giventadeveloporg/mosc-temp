@@ -45,7 +45,22 @@ const HGDrGeevargheseMarJuliusMetropolitanPage = () => {
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
                         <p>Bishop&apos;s House, Arthat, Kunnamkulam – 680 521</p>
                         <p>Mobile: 9447383931</p>
-                        <p>Email: hgyulios@gmail.com, mockkmdiocese@yahoo.in</p>
+                        <p>
+                        Email:{' '}
+                        <a
+                          href="mailto:hgyulios@gmail.com"
+                          className="text-syro-blue hover:underline focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 rounded"
+                        >
+                          hgyulios@gmail.com
+                        </a>
+                        {', '}
+                        <a
+                          href="mailto:mockkmdiocese@yahoo.in"
+                          className="text-syro-blue hover:underline focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 rounded"
+                        >
+                          mockkmdiocese@yahoo.in
+                        </a>
+                      </p>
                       </div>
                     </div>
                 </div>

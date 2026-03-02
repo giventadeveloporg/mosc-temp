@@ -45,7 +45,22 @@ const HisGraceJacobMarIreniosPage = () => {
                       <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-1">
                         <p>Zion Seminary, Koratty East P.O. 680 308, Chalakkudy</p>
                         <p>Tel.: 0480-2734818 | Mob: 9495703344</p>
-                        <p>Email: marirenaios@yahoo.co.in / drmarirenaios@gmail.com</p>
+                        <p>
+                        Email:{' '}
+                        <a
+                          href="mailto:marirenaios@yahoo.co.in"
+                          className="text-syro-blue hover:underline focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 rounded"
+                        >
+                          marirenaios@yahoo.co.in
+                        </a>
+                        {' / '}
+                        <a
+                          href="mailto:drmarirenaios@gmail.com"
+                          className="text-syro-blue hover:underline focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 rounded"
+                        >
+                          drmarirenaios@gmail.com
+                        </a>
+                      </p>
                       </div>
                     </div>
                 </div>

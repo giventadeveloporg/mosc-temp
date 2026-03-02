@@ -1339,6 +1339,7 @@ CREATE TABLE public.event_attendee (
                                        attendance_rating integer,
                                        feedback text,
                                        notes text,
+                                       admin_notes text,
                                        qr_code_data character varying(1000),
                                        qr_code_generated boolean DEFAULT false,
                                        qr_code_generated_at timestamp without time zone,
@@ -2422,6 +2423,7 @@ CREATE TABLE public.user_task (
 -- Create the executive_committee_team_members table
 CREATE TABLE public.executive_committee_team_members (
                                                          id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+                                                         tenant_id character varying(255) NOT NULL,
                                                          first_name VARCHAR(255) NOT NULL,
                                                          last_name VARCHAR(255) NOT NULL,
                                                          title VARCHAR(255) NOT NULL,
@@ -2441,10 +2443,12 @@ CREATE TABLE public.executive_committee_team_members (
                                                          website_url VARCHAR(500),
                                                          created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
                                                          updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-                                                         CONSTRAINT executive_committee_team_members_pkey PRIMARY KEY (id)
+                                                         CONSTRAINT executive_committee_team_members_pkey PRIMARY KEY (id),
+                                                         CONSTRAINT fk_executive_committee_team_members__tenant_id FOREIGN KEY (tenant_id) REFERENCES public.tenant_organization(tenant_id) ON DELETE CASCADE
 );
 
 -- Create indexes for better performance
+CREATE INDEX idx_exec_team_members_tenant_id ON public.executive_committee_team_members(tenant_id);
 CREATE INDEX idx_exec_team_members_name ON public.executive_committee_team_members(first_name);
 CREATE INDEX idx_exec_team_members_department ON public.executive_committee_team_members(department);
 CREATE INDEX idx_exec_team_members_is_active ON public.executive_committee_team_members(is_active);
@@ -2452,6 +2456,7 @@ CREATE INDEX idx_exec_team_members_join_date ON public.executive_committee_team_
 
 -- Add comments for documentation
 COMMENT ON TABLE public.executive_committee_team_members IS 'Stores information about executive committee team members';
+COMMENT ON COLUMN public.executive_committee_team_members.tenant_id IS 'Foreign key reference to tenant_organization.tenant_id for multi-tenant isolation';
 COMMENT ON COLUMN public.executive_committee_team_members.expertise IS 'JSON array of skills and expertise areas';
 COMMENT ON COLUMN public.executive_committee_team_members.is_active IS 'Whether the team member is currently active';
 
@@ -5091,10 +5096,13 @@ SELECT pg_catalog.setval(
 -- Main shared sequence_generator (for all tables using BIGINT with sequence_generator)
 -- =====================================================
 -- Ensure sequence_generator sequence is always ahead of existing data from all tables that use it
--- This prevents duplicate key errors by ensuring the sequence is at least as high as the maximum ID in any table
+-- This prevents duplicate key errors (e.g. event_attendee_pkey: Key (id)=(4) already exists) by
+-- ensuring the sequence is at least as high as the maximum ID in any table and never lower than
+-- its current last_value (so we never decrease the sequence).
 SELECT pg_catalog.setval(
                'public.sequence_generator',
                GREATEST(
+                   COALESCE((SELECT last_value FROM public.sequence_generator), 0),
                    COALESCE((SELECT MAX(id) FROM public.user_profile), 0),
                    COALESCE((SELECT MAX(id) FROM public.bulk_operation_log), 0),
                    COALESCE((SELECT MAX(id) FROM public.event_type_details), 0),
@@ -5164,6 +5172,14 @@ SELECT pg_catalog.setval(
                true
        );
 
-
+-- Verify sequence_generator is ahead of event_attendee (prevents event_attendee_pkey duplicate key)
+SELECT
+    (SELECT last_value FROM public.sequence_generator) AS sequence_last_value,
+    (SELECT MAX(id) FROM public.event_attendee) AS event_attendee_max_id,
+    CASE
+        WHEN (SELECT last_value FROM public.sequence_generator) >= (SELECT COALESCE(MAX(id), 0) FROM public.event_attendee)
+        THEN 'OK: sequence >= max(id)'
+        ELSE 'WARNING: run full sync_sequence_after_inserts.sql'
+    END AS status;
 
 

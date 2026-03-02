@@ -20,6 +20,7 @@ function formatDate(date: Date): string {
 export default function SyroLiturgySection() {
   const [lng, setLng] = useState<'en' | 'ml'>('en');
   const [readings, setReadings] = useState<LiturgyReading[] | null>(null);
+  const [liturgyDate, setLiturgyDate] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,13 +36,15 @@ export default function SyroLiturgySection() {
         }
         return res.json();
       })
-      .then((data: { message?: LiturgyReading[] }) => {
+      .then((data: { message?: LiturgyReading[]; liturgyDate?: string }) => {
         const list = Array.isArray(data?.message) ? data.message : [];
         setReadings(list);
+        setLiturgyDate(data?.liturgyDate ?? null);
       })
       .catch((err) => {
         setError(err instanceof Error ? err.message : 'Failed to load liturgy readings');
         setReadings(null);
+        setLiturgyDate(null);
       })
       .finally(() => {
         setLoading(false);
@@ -56,7 +59,10 @@ export default function SyroLiturgySection() {
     setLng(language);
   };
 
-  const today = formatDate(new Date());
+  // Show the liturgy day date from API when available (e.g. 8 March 2026); otherwise today
+  const displayDate = liturgyDate
+    ? formatDate(new Date(liturgyDate + 'T12:00:00'))
+    : formatDate(new Date());
 
   return (
     <section className="liturgy" aria-label="Liturgical Calendar">
@@ -96,7 +102,7 @@ export default function SyroLiturgySection() {
               <span>
                 <i className="fa-solid fa-calendar-day me-3" />
               </span>
-              <span>{today}</span>
+              <span>{displayDate}</span>
             </div>
 
             {/* Content area */}

@@ -339,6 +339,8 @@ export type EventAttendeeDTO = {
   totalNumberOfGuests?: number;
   numberOfGuestsCheckedIn?: number;
   notes?: string; // Supports up to 1500 chars
+  /** Admin-only notes; not shown to attendee on registration. */
+  adminNotes?: string;
   qrCodeData?: string;
   qrCodeGenerated?: boolean;
   qrCodeGeneratedAt?: string;
