@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { Search, ChevronDown, X, LogOut, User } from 'lucide-react';
 import { useAuth, useClerk, useUser } from '@clerk/nextjs';
 import { useTenantSettings } from '@/components/TenantSettingsProvider';
+import { isAdminRole } from '@/lib/utils';
 import Image from 'next/image';
 
 const navItems = [
@@ -455,6 +456,8 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
   // Prefer server-verified tenant admin flag when provided; re-check admin status when user logs in
   // CRITICAL: When user logs in client-side, isTenantAdmin prop may be stale (from initial SSR)
   // We need to re-check admin status from the database when userId changes
+  // On satellite domains, the server-side check is skipped during __clerk_synced, so
+  // the client-side check here is the primary mechanism for showing the admin menu.
   useEffect(() => {
     // If user is not loaded yet, use server-verified flag (from SSR)
     if (!isLoaded) {
@@ -468,27 +471,24 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
       return;
     }
 
-    // CRITICAL: When user logs in (userId changes from null to value), re-check admin status
-    // This ensures admin menu appears immediately after login without requiring page refresh
-    // We use the proxy API endpoint which is public and doesn't require authentication
-    const checkAdminStatus = async () => {
+    let cancelled = false;
+
+    // Fetch profile and check admin role, with optional retry for satellite domain timing
+    const checkAdminStatus = async (attempt = 1): Promise<void> => {
       try {
         const tenantId = process.env.NEXT_PUBLIC_TENANT_ID;
         if (!tenantId) {
           console.warn('[Header] NEXT_PUBLIC_TENANT_ID not set, cannot check admin status');
-          // Fallback to server-verified flag or Clerk metadata
-          if (typeof isTenantAdmin === 'boolean') {
-            setIsAdmin(isTenantAdmin);
-          } else {
-            setIsAdmin(false);
+          if (!cancelled) {
+            setIsAdmin(typeof isTenantAdmin === 'boolean' ? isTenantAdmin : false);
           }
           return;
         }
 
-        // Use proxy API endpoint to check admin status (public route, no auth required)
         const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
         const url = `${baseUrl}/api/proxy/user-profiles?userId.equals=${encodeURIComponent(userId)}&tenantId.equals=${encodeURIComponent(tenantId)}&size=1`;
 
+        console.log(`[Header] Checking admin status (attempt ${attempt})...`);
         const resp = await fetch(url, {
           cache: 'no-store',
           headers: { 'Content-Type': 'application/json' }
@@ -497,57 +497,80 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
         if (resp.ok) {
           const data = await resp.json();
           const profile = Array.isArray(data) ? data[0] : data;
-          console.log('[Header] 🔍 Profile data from API:', {
-            id: profile?.id,
+          console.log('[Header] Profile data from API:', {
             userId: profile?.userId,
-            email: profile?.email,
             userRole: profile?.userRole,
-            userStatus: profile?.userStatus,
-            tenantId: profile?.tenantId,
-            rawProfile: JSON.stringify(profile, null, 2)
+            attempt,
           });
-          const isAdminUser = profile?.userRole === 'ADMIN';
-          console.log('[Header] ✅ Admin status check result:', {
+          const adminResult = isAdminRole(profile?.userRole);
+          console.log('[Header] Admin status check result:', {
             userId,
-            isAdminUser,
+            isAdmin: adminResult,
             userRole: profile?.userRole,
-            roleMatch: profile?.userRole === 'ADMIN',
-            roleType: typeof profile?.userRole,
-            roleValue: JSON.stringify(profile?.userRole),
-            isTenantAdminProp: isTenantAdmin
+            isTenantAdminProp: isTenantAdmin,
           });
-          setIsAdmin(isAdminUser);
+          if (!cancelled) setIsAdmin(adminResult);
         } else {
-          console.warn('[Header] Failed to check admin status:', resp.status);
-          // Fallback to server-verified flag or Clerk metadata
-          if (typeof isTenantAdmin === 'boolean') {
-            setIsAdmin(isTenantAdmin);
-          } else {
-            // Fallback to Clerk metadata
-            const publicRole = user.publicMetadata?.role as string;
-            const orgRole = user.organizationMemberships?.[0]?.role;
-            const isAdminUser =
-              publicRole === 'admin' ||
-              publicRole === 'administrator' ||
-              orgRole === 'admin' ||
-              orgRole === 'org:admin';
-            setIsAdmin(isAdminUser);
+          console.warn(`[Header] Admin status check failed (attempt ${attempt}):`, resp.status);
+
+          // On satellite domains, the first API call after sync may fail if session
+          // is not yet established. Retry once after a short delay.
+          if (attempt < 2) {
+            console.log('[Header] Retrying admin status check in 2s...');
+            await new Promise(r => setTimeout(r, 2000));
+            if (!cancelled) return checkAdminStatus(attempt + 1);
+          }
+
+          // Final fallback
+          if (!cancelled) {
+            if (typeof isTenantAdmin === 'boolean') {
+              setIsAdmin(isTenantAdmin);
+            } else {
+              const publicRole = user.publicMetadata?.role as string;
+              const orgRole = user.organizationMemberships?.[0]?.role;
+              const isAdminUser =
+                publicRole === 'admin' ||
+                publicRole === 'administrator' ||
+                orgRole === 'admin' ||
+                orgRole === 'org:admin';
+              setIsAdmin(isAdminUser);
+            }
           }
         }
       } catch (error) {
-        console.error('[Header] Error checking admin status:', error);
-        // Fallback to server-verified flag or Clerk metadata
-        if (typeof isTenantAdmin === 'boolean') {
-          setIsAdmin(isTenantAdmin);
-        } else {
-          setIsAdmin(false);
+        console.error(`[Header] Error checking admin status (attempt ${attempt}):`, error);
+
+        // Retry once on error (covers network hiccups after satellite sync)
+        if (attempt < 2) {
+          console.log('[Header] Retrying admin status check in 2s...');
+          await new Promise(r => setTimeout(r, 2000));
+          if (!cancelled) return checkAdminStatus(attempt + 1);
+        }
+
+        if (!cancelled) {
+          setIsAdmin(typeof isTenantAdmin === 'boolean' ? isTenantAdmin : false);
         }
       }
     };
 
-    // Only check admin status if user is logged in
-    // This prevents unnecessary API calls when user is not logged in
     checkAdminStatus();
+
+    // Post-satellite-sync re-check: After Clerk satellite sync completes, the session
+    // may not be fully ready when checkAdminStatus first runs. Detect if we just came
+    // through a sync (ClerkSyncUrlCleanup sets this flag) and re-check after Clerk stabilizes.
+    const wasSynced = typeof window !== 'undefined' && sessionStorage.getItem('clerk_satellite_synced');
+    if (wasSynced) {
+      sessionStorage.removeItem('clerk_satellite_synced');
+      const syncTimer = setTimeout(() => {
+        if (!cancelled) {
+          console.log('[Header] Post-satellite-sync re-check of admin status');
+          checkAdminStatus();
+        }
+      }, 1500);
+      return () => { cancelled = true; clearTimeout(syncTimer); };
+    }
+
+    return () => { cancelled = true; };
   }, [isLoaded, userId, user, isTenantAdmin]);
 
   const toggleMobileMenu = () => {

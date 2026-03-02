@@ -3,6 +3,7 @@ import { headers } from 'next/headers';
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { fetchAdminProfileServer } from './manage-usage/ApiServerActions';
 import { bootstrapUserProfile } from '@/components/ProfileBootstrapperApiServerActions';
+import { isAdminRole } from '@/lib/utils';
 
 const CLERK_KEY = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ?? process.env.AMPLIFY_NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ?? '';
 
@@ -74,12 +75,12 @@ export default async function AdminLayout({
       return <>{children}</>;
     }
 
-    // Check if user has ADMIN role
-    const isAdmin = userProfile?.userRole === 'ADMIN';
+    // Check if user has ADMIN or SUPER_ADMIN role
+    const isAdmin = isAdminRole(userProfile?.userRole);
 
     if (!isAdmin) {
       console.warn(
-        `[AdminLayout] User ${userId} does not have ADMIN role. ` +
+        `[AdminLayout] User ${userId} does not have ADMIN/SUPER_ADMIN role. ` +
         `Role: ${userProfile?.userRole || 'NONE'}, Status: ${userProfile?.userStatus || 'NONE'}`
       );
       redirect('/');
