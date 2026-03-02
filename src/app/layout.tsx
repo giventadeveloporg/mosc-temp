@@ -15,6 +15,7 @@ import { headers } from "next/headers";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { getAppUrl, getTenantId, getApiBaseUrl } from "@/lib/env";
 import { fetchWithJwtRetry } from "@/lib/proxyHandler";
+import { isAdminRole } from "@/lib/utils";
 
 const DEBUG_LAYOUT = process.env.NEXT_PUBLIC_DEBUG_LAYOUT === 'true';
 const debugLog = (...args: unknown[]) => { if (DEBUG_LAYOUT) console.log(...args); };
@@ -256,11 +257,11 @@ export default async function RootLayout({
                         tenantId: updated?.tenantId,
                         rawProfile: JSON.stringify(updated, null, 2)
                       });
-                      isTenantAdmin = updated?.userRole === 'ADMIN';
+                      isTenantAdmin = isAdminRole(updated?.userRole);
                       debugLog('[Layout] ✅ Successfully updated userId. Admin status:', {
                         isTenantAdmin,
                         userRole: updated?.userRole,
-                        roleMatch: updated?.userRole === 'ADMIN',
+                        roleMatch: isAdminRole(updated?.userRole),
                         roleType: typeof updated?.userRole,
                         roleValue: JSON.stringify(updated?.userRole)
                       });
@@ -317,11 +318,11 @@ export default async function RootLayout({
               tenantId: p?.tenantId,
               rawProfile: JSON.stringify(p, null, 2)
             });
-            isTenantAdmin = p?.userRole === 'ADMIN';
+            isTenantAdmin = isAdminRole(p?.userRole);
             debugLog('[Layout] ✅ Found existing profile. Admin status:', {
               isTenantAdmin,
               userRole: p?.userRole,
-              roleMatch: p?.userRole === 'ADMIN',
+              roleMatch: isAdminRole(p?.userRole),
               roleType: typeof p?.userRole,
               roleValue: JSON.stringify(p?.userRole)
             });
