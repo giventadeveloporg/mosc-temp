@@ -342,50 +342,51 @@ export default function EventRegisterPage({ params }: { params: Promise<{ id: st
             <p className="md:col-span-2 text-sm text-gray-500 -mt-4">
               Complete your details and optionally upload up to two supporting files.
             </p>
-            {error && <div className="md:col-span-2 text-red-700 bg-red-50 border border-red-200 rounded-lg px-4 py-3">{error}</div>}
+            {error && <div className="md:col-span-2 text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm font-medium">{error}</div>}
 
             <input type="hidden" name="tenantId" value={attendee.tenantId} />
             <input type="hidden" name="eventId" value={attendee.eventId} />
 
             <div>
-              <label className="block font-medium text-gray-700 mb-1">First Name</label>
-              <input name="firstName" value={attendee.firstName || ""} onChange={handleAttendeeChange} className="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400" required />
+              <label htmlFor="attendee-firstName" className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+              <input id="attendee-firstName" name="firstName" value={attendee.firstName || ""} onChange={handleAttendeeChange} className="w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base" required />
             </div>
             <div>
-              <label className="block font-medium text-gray-700 mb-1">Last Name</label>
-              <input name="lastName" value={attendee.lastName || ""} onChange={handleAttendeeChange} className="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400" required />
+              <label htmlFor="attendee-lastName" className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+              <input id="attendee-lastName" name="lastName" value={attendee.lastName || ""} onChange={handleAttendeeChange} className="w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base" required />
             </div>
             <div>
-              <label className="block font-medium text-gray-700 mb-1">Email</label>
-              <input name="email" type="email" value={attendee.email || ""} onChange={handleAttendeeChange} className="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400" required />
+              <label htmlFor="attendee-email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <input id="attendee-email" name="email" type="email" value={attendee.email || ""} onChange={handleAttendeeChange} className="w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base" required />
             </div>
             <div>
-              <label className="block font-medium text-gray-700 mb-1">Phone</label>
-              <input name="phone" value={attendee.phone || ""} onChange={handleAttendeeChange} className="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+              <label htmlFor="attendee-phone" className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+              <input id="attendee-phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" value={attendee.phone || ""} onChange={handleAttendeeChange} placeholder="e.g. (555) 123-4567" className="w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base" />
             </div>
 
             <div className="md:col-span-2">
               <div className="flex items-center justify-between mb-1">
-                <label className="block font-medium text-gray-700">Notes</label>
+                <label htmlFor="attendee-notes" className="block text-sm font-medium text-gray-700">Notes</label>
                 <span className={`text-xs ${((attendee.notes?.length || 0) > NOTES_MAX_LENGTH - 100) ? "text-amber-600" : "text-gray-500"}`}>
                   {(attendee.notes?.length || 0)}/{NOTES_MAX_LENGTH}
                 </span>
               </div>
               <textarea
+                id="attendee-notes"
                 name="notes"
                 value={attendee.notes || ""}
                 onChange={handleAttendeeChange}
                 maxLength={NOTES_MAX_LENGTH}
                 rows={5}
                 placeholder="Optional notes for the registration team"
-                className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base"
               />
             </div>
 
             <div className="md:col-span-2">
-              <label className="block font-medium text-gray-700 mb-2">Attachments (optional)</label>
-              <label className="flex flex-col items-center justify-center w-full rounded-xl border-2 border-dashed border-blue-200 bg-blue-50/50 px-4 py-6 text-center cursor-pointer hover:bg-blue-50 transition-colors">
-                <FaUpload className="text-blue-500 mb-2" />
+              <label className="block text-sm font-medium text-gray-700 mb-2">Attachments (optional)</label>
+              <label className="flex flex-col items-center justify-center w-full rounded-xl border-2 border-dashed border-blue-300 bg-blue-50/80 px-4 py-6 text-center cursor-pointer hover:bg-blue-50 transition-all duration-300">
+                <FaUpload className="w-8 h-8 text-blue-500 mb-2" />
                 <span className="text-sm font-medium text-blue-700">
                   Upload up to {MAX_ATTACHMENTS} files
                 </span>
@@ -406,9 +407,9 @@ export default function EventRegisterPage({ params }: { params: Promise<{ id: st
               {attachments.length > 0 && (
                 <div className="mt-3 space-y-2">
                   {attachments.map((file, idx) => (
-                    <div key={`${file.name}-${file.size}-${idx}`} className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
+                    <div key={`${file.name}-${file.size}-${idx}`} className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
                       <div className="flex items-center gap-2 min-w-0">
-                        <FaPaperclip className="text-gray-500 flex-shrink-0" />
+                        <FaPaperclip className="text-gray-500 flex-shrink-0 w-5 h-5" />
                         <span className="text-sm text-gray-700 truncate">{file.name}</span>
                         <span className="text-xs text-gray-500 flex-shrink-0">
                           ({(file.size / (1024 * 1024)).toFixed(2)} MB)
@@ -417,10 +418,11 @@ export default function EventRegisterPage({ params }: { params: Promise<{ id: st
                       <button
                         type="button"
                         onClick={() => removeAttachment(idx)}
-                        className="text-red-500 hover:text-red-700 transition-colors"
+                        className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                        title={`Remove ${file.name}`}
                         aria-label={`Remove ${file.name}`}
                       >
-                        <FaTimes />
+                        <FaTimes className="w-5 h-5 text-red-600" />
                       </button>
                     </div>
                   ))}
@@ -430,28 +432,37 @@ export default function EventRegisterPage({ params }: { params: Promise<{ id: st
 
             {/* Guests section */}
             <div className="md:col-span-2 mt-2">
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
                 <span className="font-semibold text-gray-800">
                   Guests
                   <span className="text-blue-600 font-bold ml-2">[optional]</span>
                 </span>
-                <button type="button" onClick={addGuest} className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 font-semibold flex items-center min-w-[160px] transition-colors">
-                  <FaPlus className="mr-2" /> Add Guest
+                <button
+                  type="button"
+                  onClick={addGuest}
+                  className="h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 px-5 transition-all duration-300 hover:scale-105"
+                  title="Add Guest"
+                  aria-label="Add Guest"
+                >
+                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                    <FaPlus className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <span className="font-semibold text-blue-700">Add Guest</span>
                 </button>
               </div>
               {guests.map((guest, idx) => (
-                <div key={idx} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                <div key={idx} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3 p-4 border border-gray-200 rounded-xl bg-gray-50">
                   <div>
-                    <label className="block font-medium text-gray-700 mb-1">First Name</label>
-                    <input name="firstName" value={guest.firstName || ""} onChange={e => handleGuestChange(idx, e)} className="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400" required />
+                    <label htmlFor={`guest-${idx}-firstName`} className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                    <input id={`guest-${idx}-firstName`} name="firstName" value={guest.firstName || ""} onChange={e => handleGuestChange(idx, e)} className="w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base" required />
                   </div>
                   <div>
-                    <label className="block font-medium text-gray-700 mb-1">Last Name</label>
-                    <input name="lastName" value={guest.lastName || ""} onChange={e => handleGuestChange(idx, e)} className="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400" required />
+                    <label htmlFor={`guest-${idx}-lastName`} className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                    <input id={`guest-${idx}-lastName`} name="lastName" value={guest.lastName || ""} onChange={e => handleGuestChange(idx, e)} className="w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base" required />
                   </div>
                   <div>
-                    <label className="block font-medium text-gray-700 mb-1">Age Group</label>
-                    <select name="ageGroup" value={guest.ageGroup || ""} onChange={e => handleGuestChange(idx, e)} className="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+                    <label htmlFor={`guest-${idx}-ageGroup`} className="block text-sm font-medium text-gray-700 mb-1">Age Group</label>
+                    <select id={`guest-${idx}-ageGroup`} name="ageGroup" value={guest.ageGroup || ""} onChange={e => handleGuestChange(idx, e)} className="w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base" required>
                       <option value="" disabled>Select age group</option>
                       <option value="Child">Child</option>
                       <option value="Teen">Teen</option>
@@ -460,16 +471,25 @@ export default function EventRegisterPage({ params }: { params: Promise<{ id: st
                     </select>
                   </div>
                   <div>
-                    <label className="block font-medium text-gray-700 mb-1">Email</label>
-                    <input name="email" type="email" value={guest.email || ""} onChange={e => handleGuestChange(idx, e)} className="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                    <label htmlFor={`guest-${idx}-email`} className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input id={`guest-${idx}-email`} name="email" type="email" value={guest.email || ""} onChange={e => handleGuestChange(idx, e)} className="w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base" />
                   </div>
                   <div>
-                    <label className="block font-medium text-gray-700 mb-1">Phone</label>
-                    <input name="phone" value={guest.phone || ""} onChange={e => handleGuestChange(idx, e)} className="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                    <label htmlFor={`guest-${idx}-phone`} className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                    <input id={`guest-${idx}-phone`} name="phone" type="tel" inputMode="tel" autoComplete="tel" value={guest.phone || ""} onChange={e => handleGuestChange(idx, e)} placeholder="e.g. (555) 123-4567" className="w-full border border-gray-400 rounded-xl focus:ring-blue-500 focus:border-blue-500 px-4 py-3 text-base" />
                   </div>
                   <div className="md:col-span-2 flex justify-end">
-                    <button type="button" onClick={() => removeGuest(idx)} className="text-red-600 hover:text-red-700 border border-red-200 bg-red-50 px-3 py-1.5 rounded-lg flex items-center transition-colors">
-                      <FaTrashAlt className="mr-2" /> Remove
+                    <button
+                      type="button"
+                      onClick={() => removeGuest(idx)}
+                      className="h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center gap-3 px-5 transition-all duration-300 hover:scale-105"
+                      title="Remove guest"
+                      aria-label="Remove guest"
+                    >
+                      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-200 flex items-center justify-center">
+                        <FaTrashAlt className="w-6 h-6 text-red-600" />
+                      </div>
+                      <span className="font-semibold text-red-700">Remove</span>
                     </button>
                   </div>
                 </div>
@@ -477,9 +497,17 @@ export default function EventRegisterPage({ params }: { params: Promise<{ id: st
             </div>
 
             <div className="md:col-span-2 flex justify-end mt-2">
-              <button type="submit" disabled={submitting} className="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 font-semibold flex items-center min-w-[180px] justify-center transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
-                <FaCheck className="mr-2" />
-                {submitting ? "Registering..." : "Register"}
+              <button
+                type="submit"
+                disabled={submitting}
+                className="h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 px-6 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                title={submitting ? "Registering..." : "Register"}
+                aria-label={submitting ? "Registering..." : "Register"}
+              >
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+                  <FaCheck className="w-6 h-6 text-green-600" />
+                </div>
+                <span className="font-semibold text-green-700">{submitting ? "Registering..." : "Register"}</span>
               </button>
             </div>
           </form>

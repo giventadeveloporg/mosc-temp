@@ -145,11 +145,30 @@ export default function ExecutiveCommitteeList({
   totalCount,
   onPageChange,
 }: ExecutiveCommitteeListProps) {
-  // Calculate pagination
-  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
-  const startItem = totalCount > 0 ? page * pageSize + 1 : 0;
-  const endItem = totalCount > 0 ? Math.min((page + 1) * pageSize, totalCount) : 0;
-  const paginatedMembers = members.slice(page * pageSize, (page + 1) * pageSize);
+  // Search: filter by first name, last name, or title (case-insensitive)
+  const [searchTerm, setSearchTerm] = useState('');
+  const filteredMembers = searchTerm.trim()
+    ? members.filter((m) => {
+        const q = searchTerm.trim().toLowerCase();
+        const first = (m.firstName || '').toLowerCase();
+        const last = (m.lastName || '').toLowerCase();
+        const title = (m.title || '').toLowerCase();
+        const designation = (m.designation || '').toLowerCase();
+        const department = (m.department || '').toLowerCase();
+        return first.includes(q) || last.includes(q) || title.includes(q) || designation.includes(q) || department.includes(q);
+      })
+    : members;
+  const filteredCount = filteredMembers.length;
+  const totalPages = Math.max(1, Math.ceil(filteredCount / pageSize));
+  const startItem = filteredCount > 0 ? page * pageSize + 1 : 0;
+  const endItem = filteredCount > 0 ? Math.min((page + 1) * pageSize, filteredCount) : 0;
+  const paginatedMembers = filteredMembers.slice(page * pageSize, (page + 1) * pageSize);
+
+  // Reset to first page when search changes
+  useEffect(() => {
+    onPageChange(0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only reset page when searchTerm changes
+  }, [searchTerm]);
   
   const handlePrevPage = () => {
     if (page > 0) {
@@ -208,6 +227,25 @@ export default function ExecutiveCommitteeList({
 
   return (
     <div className="bg-white shadow-sm rounded-lg overflow-hidden mx-8 my-6">
+      {/* Search bar */}
+      <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+        <label htmlFor="exec-committee-search" className="sr-only">Search members</label>
+        <input
+          id="exec-committee-search"
+          type="search"
+          placeholder="Search by first name, last name, title, designation, or department..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full max-w-xl px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          aria-label="Search members by name, title, designation, or department"
+        />
+        {searchTerm.trim() && (
+          <p className="mt-2 text-sm text-gray-600">
+            Showing {filteredCount} of {members.length} member{members.length !== 1 ? 's' : ''}
+          </p>
+        )}
+      </div>
+
       {/* Tooltip note for users */}
       <div className="bg-blue-50 border-b border-blue-200 px-6 py-3">
         <p className="text-sm text-blue-700">
@@ -219,6 +257,9 @@ export default function ExecutiveCommitteeList({
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Priority
+              </th>
               <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Member
               </th>
@@ -233,6 +274,9 @@ export default function ExecutiveCommitteeList({
           <tbody className="bg-white divide-y divide-gray-200">
             {paginatedMembers.map((member) => (
               <tr key={member.id} className="hover:bg-gray-50">
+                <td className="px-3 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                  {member.priorityOrder ?? '—'}
+                </td>
                 <td
                   className="px-3 py-3 whitespace-nowrap cursor-pointer"
                   onMouseEnter={(e) => handleMouseEnter(member, e)}
@@ -378,10 +422,11 @@ export default function ExecutiveCommitteeList({
 
         {/* Item Count Text */}
         <div className="text-center mt-3">
-          {totalCount > 0 ? (
+          {filteredCount > 0 ? (
             <div className="inline-flex items-center px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
               <span className="text-sm text-gray-700">
-                Showing <span className="font-bold text-blue-600">{startItem}</span> to <span className="font-bold text-blue-600">{endItem}</span> of <span className="font-bold text-blue-600">{totalCount}</span> members
+                Showing <span className="font-bold text-blue-600">{startItem}</span> to <span className="font-bold text-blue-600">{endItem}</span> of <span className="font-bold text-blue-600">{filteredCount}</span> members
+                {searchTerm.trim() ? ` (filtered from ${members.length})` : ''}
               </span>
             </div>
           ) : (
@@ -389,8 +434,12 @@ export default function ExecutiveCommitteeList({
               <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span className="text-sm font-medium text-orange-700">No members found</span>
-              <span className="text-sm text-orange-600">[No members match your criteria]</span>
+              <span className="text-sm font-medium text-orange-700">
+                {searchTerm.trim() ? 'No members match your search.' : 'No members found.'}
+              </span>
+              {searchTerm.trim() && (
+                <span className="text-sm text-orange-600">Try different keywords.</span>
+              )}
             </div>
           )}
         </div>

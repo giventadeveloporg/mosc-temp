@@ -27,6 +27,8 @@ export const HOMEPAGE_CACHE_KEY_SUFFIXES = [
   'homepage_featured_events_cache',
   'homepage_hero_section_cache',
   'team_page_cache',
+  'manage_events_cache_future',
+  'manage_events_cache_past',
 ] as const;
 
 /** BroadcastChannel name for homepage cache invalidation (admin "Refresh cache" triggers this). */

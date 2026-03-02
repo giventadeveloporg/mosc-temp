@@ -9,11 +9,16 @@ function getApiBase() {
 export async function fetchExecutiveCommitteeMembers(): Promise<ExecutiveCommitteeTeamMemberDTO[]> {
   try {
     const baseUrl = getAppUrl();
-    // Create abort controller for timeout
+    // Proxy injects tenantId.equals per nextjs_api_routes.mdc; only pass filter/sort here
+    const params = new URLSearchParams({
+      'isActive.equals': 'true',
+      sort: 'priorityOrder,asc',
+    });
+    const url = `${baseUrl}/api/proxy/executive-committee-team-members?${params.toString()}`;
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+    const timeout = setTimeout(() => controller.abort(), 15000);
 
-    const response = await fetch(`${baseUrl}/api/proxy/executive-committee-team-members`, {
+    const response = await fetch(url, {
       signal: controller.signal,
       cache: 'no-store',
     });
@@ -25,7 +30,10 @@ export async function fetchExecutiveCommitteeMembers(): Promise<ExecutiveCommitt
     }
 
     const data = await response.json();
-    return Array.isArray(data) ? data : [];
+    // Handle both plain array and Spring Data paged response { content: [...], totalElements }
+    if (Array.isArray(data)) return data;
+    if (data && typeof data === 'object' && Array.isArray(data.content)) return data.content;
+    return [];
   } catch (error) {
     if (error instanceof Error && error.name === 'AbortError') {
       console.warn('Executive committee members fetch timed out after 15 seconds');

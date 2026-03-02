@@ -1,6 +1,6 @@
 'use client';
 import { EventDetailsDTO, EventTypeDetailsDTO, UserProfileDTO, EventCalendarEntryDTO } from '@/types';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { EventList } from '@/components/EventList';
 import { useAuth } from "@clerk/nextjs";
 // Icons removed - using inline SVGs instead
@@ -20,6 +20,9 @@ import {
   hardDeleteEventWithChildrenServer,
   activateEventWithChildrenServer,
 } from '../ApiServerActions';
+import { getHomepageCacheKey } from '@/lib/homepageCacheKeys';
+
+const MANAGE_EVENTS_CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes, same as homepage
 
 export default function ManageEventsPage() {
   const { userId } = useAuth();
@@ -61,9 +64,45 @@ export default function ManageEventsPage() {
   const [activateMessage, setActivateMessage] = useState<string>('');
   const [eventToActivate, setEventToActivate] = useState<EventDetailsDTO | null>(null);
   const [activateChildEventCount, setActivateChildEventCount] = useState(0);
+  const [refreshLoading, setRefreshLoading] = useState(false);
+
+  const cacheKeyForView = getHomepageCacheKey(showPastEvents ? 'manage_events_cache_past' : 'manage_events_cache_future');
+
+  function clearManageEventsCache() {
+    try {
+      sessionStorage.removeItem(getHomepageCacheKey('manage_events_cache_future'));
+      sessionStorage.removeItem(getHomepageCacheKey('manage_events_cache_past'));
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
+  async function handleRefreshFromDb() {
+    setRefreshLoading(true);
+    clearManageEventsCache();
+    await loadAll(0, false);
+    setRefreshLoading(false);
+  }
+
+  useLayoutEffect(() => {
+    if (!userId || page !== 0 || searchTitle || searchId || searchCaption || searchStartDate || searchEndDate) return;
+    try {
+      const raw = sessionStorage.getItem(cacheKeyForView);
+      if (!raw) return;
+      const { events: cachedEvents, totalCount: cachedTotal, timestamp } = JSON.parse(raw);
+      if (Date.now() - timestamp < MANAGE_EVENTS_CACHE_DURATION_MS && Array.isArray(cachedEvents)) {
+        setEvents(cachedEvents);
+        setTotalCount(typeof cachedTotal === 'number' ? cachedTotal : cachedEvents.length);
+        setLoading(false);
+      }
+    } catch (_) {
+      /* ignore */
+    }
+  }, [userId, cacheKeyForView, page, searchTitle, searchId, searchCaption, searchStartDate, searchEndDate]);
 
   async function loadAll(pageNum = 0, checkInitialLoad = false) {
-    setLoading(true);
+    const isDefaultView = pageNum === 0 && !searchTitle && !searchId && !searchCaption && !searchStartDate && !searchEndDate;
+    if (!isDefaultView) setLoading(true);
     setError(null);
     try {
       // Build date filtering based on toggle
@@ -141,6 +180,20 @@ export default function ManageEventsPage() {
       setTotalCount(eventsData.totalCount);
       setEventTypes(types);
       setCalendarEvents(calendarEventsResult);
+      if (pageNum === 0 && !searchTitle && !searchId && !searchCaption && !searchStartDate && !searchEndDate) {
+        try {
+          sessionStorage.setItem(
+            getHomepageCacheKey(loadingPastEvents ? 'manage_events_cache_past' : 'manage_events_cache_future'),
+            JSON.stringify({
+              events: eventsData.events,
+              totalCount: eventsData.totalCount,
+              timestamp: Date.now(),
+            })
+          );
+        } catch (_) {
+          /* ignore */
+        }
+      }
     } catch (e: any) {
       setError(e.message || 'Failed to load data');
     } finally {
@@ -595,6 +648,31 @@ export default function ManageEventsPage() {
             <span className={`text-lg font-semibold transition-colors duration-300 ${showPastEvents ? 'text-blue-600' : 'text-blue-300'}`}>
               Past Events
             </span>
+            <button
+              type="button"
+              onClick={handleRefreshFromDb}
+              disabled={refreshLoading || loading}
+              className="flex-shrink-0 inline-flex h-10 px-4 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-800 font-semibold text-sm items-center justify-center gap-2 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              title="Refresh events from database (clears cache)"
+              aria-label="Refresh events from database"
+            >
+              {refreshLoading || loading ? (
+                <>
+                  <svg className="animate-spin w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  <span>Refreshing…</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  <span>Refresh from database</span>
+                </>
+              )}
+            </button>
           </div>
         </div>
       </div>
