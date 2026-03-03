@@ -488,7 +488,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
         const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
         const url = `${baseUrl}/api/proxy/user-profiles?userId.equals=${encodeURIComponent(userId)}&tenantId.equals=${encodeURIComponent(tenantId)}&size=1`;
 
-        console.log(`[Header] Checking admin status (attempt ${attempt})...`);
+        console.log(`[Header] Checking admin status (attempt ${attempt}), tenantId=${tenantId}, userId=${userId}`);
         const resp = await fetch(url, {
           cache: 'no-store',
           headers: { 'Content-Type': 'application/json' }
@@ -496,19 +496,18 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
 
         if (resp.ok) {
           const data = await resp.json();
-          const profile = Array.isArray(data) ? data[0] : data;
-          console.log('[Header] Profile data from API:', {
-            userId: profile?.userId,
-            userRole: profile?.userRole,
-            attempt,
-          });
+          // Handle both raw array and paginated { content: [...] } responses
+          let profile;
+          if (Array.isArray(data)) {
+            profile = data[0];
+          } else if (data?.content && Array.isArray(data.content)) {
+            profile = data.content[0];
+          } else {
+            profile = data;
+          }
+          const role = profile?.userRole ?? 'NONE';
           const adminResult = isAdminRole(profile?.userRole);
-          console.log('[Header] Admin status check result:', {
-            userId,
-            isAdmin: adminResult,
-            userRole: profile?.userRole,
-            isTenantAdminProp: isTenantAdmin,
-          });
+          console.log(`[Header] Profile API response: userRole="${role}", isAdmin=${adminResult}, profileUserId=${profile?.userId}, dataType=${Array.isArray(data) ? 'array' : typeof data}, dataKeys=${data ? Object.keys(data).join(',') : 'null'}, attempt=${attempt}`);
           if (!cancelled) setIsAdmin(adminResult);
         } else {
           console.warn(`[Header] Admin status check failed (attempt ${attempt}):`, resp.status);
