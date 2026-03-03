@@ -922,13 +922,17 @@ Does the route call auth() or currentUser() in server components?
 3. ✅ **Is the homepage (`/`) NOT skipped?** — In `src/app/layout.tsx`, `skipAuthForRoute` must NOT include `pathname === '/'`; it should only skip `pathname.startsWith('/mosc-old')` and `pathname.startsWith('/mosc')`. If `/` is skipped, the admin check never runs when users land on the homepage and the Admin menu will not appear in production.
 4. ✅ Is `userId` not null (user is logged in)?
 5. ✅ Is `tenantId` matching the database record?
-6. ✅ **Is `user_role = 'ADMIN'` in the `user_profile` table?** (CRITICAL - must be set manually; confirm in **production** DB for production domain, e.g. mosc-temp.com)
+6. ✅ **Is `user_role = 'ADMIN'` or `'SUPER_ADMIN'` in the `user_profile` table?** (CRITICAL - must be set manually; confirm in **production** DB for production domain, e.g. mosc-temp.com). Use `isAdminRole()` from `@/lib/utils` to check — it accepts both `'ADMIN'` and `'SUPER_ADMIN'`.
 7. ✅ Is `isTenantAdmin` prop being passed to Header?
 8. ✅ Has the user logged out and logged back in after role change?
+9. ✅ **Does the Clerk `userId` match the `user_id` in the `user_profile` table?** (CRITICAL — Clerk can assign a **new userId** after re-login if the Clerk application was recreated, the Clerk environment changed (dev→prod), or the user was deleted and re-provisioned in Clerk Dashboard. The old `user_id` in the database will no longer match. Check browser console for `[Header] Checking admin status ... userId=XXX` and compare against the DB. If mismatched, update the DB: `UPDATE user_profile SET user_id = '<new_clerk_userId>', clerk_user_id = '<new_clerk_userId>' WHERE email = '...' AND tenant_id = '...';`)
 
-**Common Cause**: `user_role` is not set to `'ADMIN'` in the database. This must be changed manually:
-- **Via Dashboard**: `/admin/manage-usage` → Edit user → Change Role to `ADMIN` → Save
-- **Via Database**: `UPDATE user_profile SET user_role = 'ADMIN' WHERE user_id = '...' AND tenant_id = '...'`
+**Common Causes**:
+- `user_role` is not set to `'ADMIN'` or `'SUPER_ADMIN'` in the database. This must be changed manually:
+  - **Via Dashboard**: `/admin/manage-usage` → Edit user → Change Role to `ADMIN` → Save
+  - **Via Database**: `UPDATE user_profile SET user_role = 'ADMIN' WHERE user_id = '...' AND tenant_id = '...'`
+- **Clerk userId mismatch**: The `user_id` in the `user_profile` table does not match the Clerk userId. This happens when Clerk issues a new userId (e.g., after Clerk app recreation, environment change, or user re-provisioning). The layout.tsx has email-based fallback logic to auto-update the userId, but it is skipped during satellite sync (`__clerk_synced`). Fix by updating the DB manually:
+  - `UPDATE user_profile SET user_id = '<new_clerk_userId>', clerk_user_id = '<new_clerk_userId>' WHERE email = '<user_email>' AND tenant_id = '<tenant_id>';`
 
 ---
 
@@ -972,8 +976,9 @@ Does the route call auth() or currentUser() in server components?
 3. **Run admin check on ALL routes** (whenever `pathname` is present)—do not limit to `/admin` so the Admin menu shows on public pages (homepage, events, gallery, etc.)
 4. **Do not skip auth on homepage** — In layout, `skipAuthForRoute` must NOT include `pathname === '/'`; only skip `pathname.startsWith('/mosc-old')` and `pathname.startsWith('/mosc')` (routes where ConditionalLayout does not render the main Header).
 5. Query user profile with `userId + tenantId`
-6. Check `userRole === 'ADMIN'` (must be set in database)
+6. Check admin role using `isAdminRole()` from `@/lib/utils` — accepts both `'ADMIN'` and `'SUPER_ADMIN'`
 7. Pass `isTenantAdmin` to Header component
+8. **Verify Clerk userId matches DB `user_id`** — Clerk can assign new userIds after app recreation or environment changes. If mismatched, update DB or rely on email-based fallback in layout.tsx
 
 **User Profile Avatar Pattern**:
 1. Use Clerk's `useUser()` hook to get `user.imageUrl`, `user.firstName`, `user.emailAddresses`

@@ -51,7 +51,7 @@ export default function SyroHeader() {
               <div className="logo-box-img bg-transparent">
                 <div className="logo-img-div">
                   <Image
-                    src="/images/logos/Current_Edits/New%20Edit/Mosc_Header_Logo_1.jpeg"
+                    src="/images/logos/Current_Edits/New%20Edit/Mosc_Header_Logo_4.jpeg"
                     alt="Syro-Malabar Church"
                     width={200}
                     height={100}

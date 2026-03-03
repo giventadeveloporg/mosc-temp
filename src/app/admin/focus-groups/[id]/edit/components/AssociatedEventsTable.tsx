@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import type { EventDetailsDTO } from '@/types';
 import { fetchAssociatedEvents, unlinkEventFromFocusGroup } from '../ApiServerActions';
-import { FaChevronLeft, FaChevronRight, FaUnlink } from 'react-icons/fa';
+import { FaUnlink } from 'react-icons/fa';
 import { formatDateLocal } from '@/lib/date';
 import Link from 'next/link';
 
@@ -101,21 +101,32 @@ export default function AssociatedEventsTable({
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Associated Events</h2>
         
-        {/* Filter Toggle */}
-        <div className="flex gap-2">
+        {/* Filter Toggle - admin action button style */}
+        <div className="flex flex-wrap gap-3">
           <button
             type="button"
             onClick={() => {
               setShowPastEvents(false);
               setCurrentPage(0);
             }}
-            className={`px-3 py-1 text-xs rounded ${
+            className={`flex-shrink-0 h-14 rounded-xl flex items-center justify-center gap-3 px-3 transition-all duration-300 hover:scale-105 ${
               !showPastEvents
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                ? 'bg-blue-100 hover:bg-blue-200'
+                : 'bg-gray-100 hover:bg-gray-200'
             }`}
+            title="Upcoming Events"
+            aria-label="Upcoming Events"
           >
-            Upcoming Events
+            <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
+              !showPastEvents ? 'bg-blue-200' : 'bg-gray-200'
+            }`}>
+              <svg className={`w-6 h-6 ${!showPastEvents ? 'text-blue-600' : 'text-gray-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <span className={`font-semibold ${!showPastEvents ? 'text-blue-700' : 'text-gray-700'}`}>
+              Upcoming Events
+            </span>
           </button>
           <button
             type="button"
@@ -123,13 +134,24 @@ export default function AssociatedEventsTable({
               setShowPastEvents(true);
               setCurrentPage(0);
             }}
-            className={`px-3 py-1 text-xs rounded ${
+            className={`flex-shrink-0 h-14 rounded-xl flex items-center justify-center gap-3 px-3 transition-all duration-300 hover:scale-105 ${
               showPastEvents
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                ? 'bg-blue-100 hover:bg-blue-200'
+                : 'bg-gray-100 hover:bg-gray-200'
             }`}
+            title="Past Events"
+            aria-label="Past Events"
           >
-            Past Events
+            <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
+              showPastEvents ? 'bg-blue-200' : 'bg-gray-200'
+            }`}>
+              <svg className={`w-6 h-6 ${showPastEvents ? 'text-blue-600' : 'text-gray-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <span className={`font-semibold ${showPastEvents ? 'text-blue-700' : 'text-gray-700'}`}>
+              Past Events
+            </span>
           </button>
         </div>
       </div>
@@ -203,13 +225,17 @@ export default function AssociatedEventsTable({
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <button
+                        type="button"
                         onClick={() => handleUnlink(event)}
                         disabled={unlinkingId !== null}
-                        className="flex items-center gap-2 px-3 py-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="flex-shrink-0 h-10 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 px-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         title="Unlink event from focus group"
+                        aria-label="Unlink event from focus group"
                       >
-                        <FaUnlink className="h-4 w-4" />
-                        Unlink
+                        <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-red-200 flex items-center justify-center">
+                          <FaUnlink className="w-4 h-4 text-red-600" />
+                        </div>
+                        <span className="font-semibold text-red-700 text-sm">Unlink</span>
                       </button>
                     </td>
                   </tr>
@@ -218,42 +244,55 @@ export default function AssociatedEventsTable({
             </table>
           </div>
 
-          {/* Pagination Controls */}
+          {/* Pagination Controls - matching admin pagination footer style */}
           <div className="mt-8">
             <div className="flex justify-between items-center">
               <button
                 onClick={handlePrevPage}
                 disabled={isPrevDisabled}
-                className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+                className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+                title="Previous Page"
+                aria-label="Previous Page"
+                type="button"
               >
-                <FaChevronLeft className="h-5 w-5" />
-                Previous
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                </svg>
+                <span>Previous</span>
               </button>
-              <div className="text-sm font-semibold text-gray-700">
-                Page {displayPage} of {totalPages || 1}
+              <div className="px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+                <span className="text-sm font-bold text-blue-700">
+                  Page <span className="text-blue-600">{displayPage}</span> of <span className="text-blue-600">{totalPages || 1}</span>
+                </span>
               </div>
               <button
                 onClick={handleNextPage}
                 disabled={isNextDisabled}
-                className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+                className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+                title="Next Page"
+                aria-label="Next Page"
+                type="button"
               >
-                Next
-                <FaChevronRight className="h-5 w-5" />
+                <span>Next</span>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                </svg>
               </button>
             </div>
-            <div className="text-center text-sm text-gray-600 mt-2">
+            <div className="text-center mt-3">
               {totalCount > 0 ? (
-                <>
-                  Showing <span className="font-medium">{startItem}</span> to{' '}
-                  <span className="font-medium">{endItem}</span> of{' '}
-                  <span className="font-medium">{totalCount}</span> events
-                </>
-              ) : (
-                <div className="flex items-center justify-center gap-2">
-                  <span>No events found</span>
-                  <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-sm font-medium">
-                    [No events match your criteria]
+                <div className="inline-flex items-center px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+                  <span className="text-sm text-gray-700">
+                    Showing <span className="font-bold text-blue-600">{startItem}</span> to <span className="font-bold text-blue-600">{endItem}</span> of <span className="font-bold text-blue-600">{totalCount}</span> events
                   </span>
+                </div>
+              ) : (
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 border-2 border-orange-300 rounded-lg shadow-sm">
+                  <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="text-sm font-medium text-orange-700">No events found</span>
+                  <span className="text-sm text-orange-600">[No events match your criteria]</span>
                 </div>
               )}
             </div>

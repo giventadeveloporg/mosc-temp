@@ -24,16 +24,16 @@ const HisHolinessBaseliosMarthomaMathewsIiiPage = () => {
             {/* Main Content */}
             <div className="lg:col-span-2">
               <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
-                {/* Featured Image - centered, contained */}
+                {/* Featured Image - larger size with 3D card effect */}
                 <div className="mb-8 flex justify-center">
-                  <div className="relative w-full max-w-[280px] aspect-[280/168] rounded-lg overflow-hidden flex items-center justify-center">
+                  <div className="relative w-full max-w-[420px] aspect-[280/168] rounded-xl overflow-hidden flex items-center justify-center bg-white/5 shadow-xl shadow-gray-400/20 transition-all duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] hover:shadow-2xl hover:shadow-gray-500/25 ring-1 ring-black/5">
                     <Image
                       src="/images/holy-synod/hh-scaled.jpg"
                       alt="H.H. Baselios Marthoma Mathews III, The Ninth Catholicos of the East in Malankara"
                       fill
-                      className="object-contain rounded-lg"
+                      className="object-contain rounded-xl"
                       priority
-                      sizes="(max-width: 768px) 100vw, 280px"
+                      sizes="(max-width: 768px) 100vw, 420px"
                     />
                   </div>
                 </div>

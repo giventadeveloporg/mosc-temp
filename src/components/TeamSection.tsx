@@ -482,16 +482,8 @@ const TeamSection: React.FC = () => {
           </div>
         )}
 
-        {/* Enhanced Stats Section */}
-        <div className="mt-32 text-center">
-          <div className="relative">
-            <div className="text-6xl md:text-8xl lg:text-9xl font-bold leading-none tracking-tighter mb-6 bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent">
-              {teamMembers.length}+
-            </div>
-            <div className="absolute inset-0 text-6xl md:text-8xl lg:text-9xl font-bold leading-none tracking-tighter opacity-10 blur-sm bg-gradient-to-br from-cyan-400 to-purple-600 bg-clip-text text-transparent">
-              {teamMembers.length}+
-            </div>
-          </div>
+        {/* Enhanced Stats Section - number removed per request; keep heading and description */}
+        <div className="mt-16 text-center">
           <h3 className="text-xl lg:text-2xl font-semibold text-gray-800 mb-3">
             Dedicated team members
           </h3>
