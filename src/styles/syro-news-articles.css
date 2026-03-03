@@ -36,7 +36,7 @@
   font-size: 18px !important;
   font-weight: 700 !important;
   line-height: 1.35 !important;
-  color: var(--syro-news-heading) !important; /* #0b2848 blue - match catholicatenews.in */
+  color: #1d2c7f !important; /* news titles */
   margin: 0 0 5px !important;
   padding: 0 !important;
   transition: color 0.3s ease !important;

@@ -6,6 +6,9 @@ import FocusGroupEventSearch from './components/FocusGroupEventSearch';
 import AssociatedEventsTable from './components/AssociatedEventsTable';
 import type { FocusGroupDTO, EventDetailsDTO } from '@/types';
 
+/** Initial active state for the form (used for custom-checkbox and hidden input). */
+const initialIsActive = (group: FocusGroupDTO | null) => !!group?.isActive;
+
 interface FocusGroupEditFormProps {
   group: FocusGroupDTO | null;
   focusGroupId: number;
@@ -22,6 +25,7 @@ export default function FocusGroupEditForm({
   initialTotalCount = 0,
 }: FocusGroupEditFormProps) {
   const [coverImageUrl, setCoverImageUrl] = useState<string | undefined>(group?.coverImageUrl);
+  const [isActive, setIsActive] = useState(initialIsActive(group));
   const [refreshKey, setRefreshKey] = useState(0);
 
   const handleImageUploaded = (imageUrl: string) => {
@@ -81,13 +85,43 @@ export default function FocusGroupEditForm({
             value={coverImageUrl || ''}
           />
         </div>
-        <div className="flex items-center gap-2">
-          <input type="hidden" name="isActive" value="false" />
-          <input type="checkbox" name="isActive" value="true" defaultChecked={!!group?.isActive} className="h-4 w-4" />
-          <span className="text-sm">Active</span>
+        <div className="flex items-center gap-3">
+          <input type="hidden" name="isActive" value={isActive ? 'true' : 'false'} />
+          <label htmlFor="isActive-edit" className="flex items-center gap-3 cursor-pointer">
+            <span className="relative flex items-center justify-center">
+              <input
+                type="checkbox"
+                id="isActive-edit"
+                checked={isActive}
+                onChange={(e) => setIsActive(e.target.checked)}
+                className="custom-checkbox"
+                onClick={(e) => e.stopPropagation()}
+              />
+              <span className="custom-checkbox-tick">
+                {isActive && (
+                  <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l5 5L19 7" />
+                  </svg>
+                )}
+              </span>
+            </span>
+            <span className="text-sm font-medium text-gray-700 select-none">Active</span>
+          </label>
         </div>
         <div className="md:col-span-2">
-          <button className="px-4 py-2 bg-blue-600 text-white rounded">Save</button>
+          <button
+            type="submit"
+            className="w-full flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105"
+            title="Save Changes"
+            aria-label="Save Changes"
+          >
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-3 0V7m3 0V5a2 2 0 114 0v2m-3 0h10" />
+              </svg>
+            </div>
+            <span className="font-semibold text-blue-700">Save Changes</span>
+          </button>
         </div>
       </form>
 

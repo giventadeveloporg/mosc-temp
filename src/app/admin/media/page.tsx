@@ -554,6 +554,9 @@ function UploadMediaModal({
   const [isDragOver, setIsDragOver] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // Pending folder selection: show app modal to confirm before accepting (replaces reliance on browser dialog)
+  const [pendingFolder, setPendingFolder] = useState<{ files: FileList; folderName: string } | null>(null);
+  const folderInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -567,12 +570,73 @@ function UploadMediaModal({
   };
 
   const handleFolderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setFiles(e.target.files);
-      if (fileInputRef.current) {
-        const dataTransfer = new DataTransfer();
-        Array.from(e.target.files).forEach(file => dataTransfer.items.add(file));
-        fileInputRef.current.files = dataTransfer.files;
+    const list = e.target.files;
+    if (list && list.length > 0) {
+      const first = list[0] as File & { webkitRelativePath?: string };
+      const folderName = first.webkitRelativePath
+        ? first.webkitRelativePath.split("/")[0]
+        : "selected folder";
+      setPendingFolder({ files: list, folderName });
+    }
+    e.target.value = "";
+  };
+
+  const confirmFolderUpload = () => {
+    if (!pendingFolder) return;
+    const dataTransfer = new DataTransfer();
+    Array.from(pendingFolder.files).forEach((file) => dataTransfer.items.add(file));
+    setFiles(dataTransfer.files);
+    if (fileInputRef.current) {
+      fileInputRef.current.files = dataTransfer.files;
+    }
+    setPendingFolder(null);
+  };
+
+  const cancelFolderUpload = () => {
+    setPendingFolder(null);
+    if (folderInputRef.current) {
+      folderInputRef.current.value = "";
+    }
+  };
+
+  type FileHandle = { kind: "file"; getFile(): Promise<File> };
+  type DirHandle = {
+    kind: "directory";
+    name: string;
+    entries(): AsyncIterableIterator<[string, FileHandle | DirHandle]>;
+  };
+
+  /** Recursively get all File objects from a File System Access API directory handle (avoids browser "Upload X files?" dialog). */
+  const getAllFilesFromHandle = async (dirHandle: DirHandle): Promise<File[]> => {
+    const files: File[] = [];
+    for await (const [, handle] of dirHandle.entries()) {
+      if (handle.kind === "file") {
+        files.push(await handle.getFile());
+      } else if (handle.kind === "directory") {
+        files.push(...(await getAllFilesFromHandle(handle)));
+      }
+    }
+    return files;
+  };
+
+  const handleUploadFolderClick = async () => {
+    if (typeof window === "undefined" || !("showDirectoryPicker" in window)) {
+      folderInputRef.current?.click();
+      return;
+    }
+    try {
+      const dirHandle = await (window as unknown as { showDirectoryPicker(): Promise<DirHandle> }).showDirectoryPicker();
+      const fileList = await getAllFilesFromHandle(dirHandle);
+      if (fileList.length === 0) {
+        setExternalMessage("The selected folder contains no files.");
+        return;
+      }
+      const dt = new DataTransfer();
+      fileList.forEach((f) => dt.items.add(f));
+      setPendingFolder({ files: dt.files, folderName: dirHandle.name });
+    } catch (err) {
+      if ((err as { name?: string })?.name !== "AbortError") {
+        setExternalMessage(err instanceof Error ? err.message : "Could not read folder.");
       }
     }
   };
@@ -851,23 +915,30 @@ function UploadMediaModal({
                 accept="image/*,video/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.svg"
               />
             </label>
-            <label className="relative cursor-pointer">
-              <span className="flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6">
-                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                  </svg>
-                </div>
-                <span className="font-semibold text-green-700">Upload Folder</span>
-              </span>
-              <input
-                type="file"
-                {...({ webkitdirectory: "" } as React.InputHTMLAttributes<HTMLInputElement>)}
-                onChange={handleFolderChange}
-                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                accept="image/*,video/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.svg"
-              />
-            </label>
+            <button
+              type="button"
+              onClick={handleUploadFolderClick}
+              className="flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+              title="Upload Folder"
+              aria-label="Upload Folder"
+            >
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                </svg>
+              </div>
+              <span className="font-semibold text-green-700">Upload Folder</span>
+            </button>
+            <input
+              ref={folderInputRef}
+              type="file"
+              {...({ webkitdirectory: "" } as React.InputHTMLAttributes<HTMLInputElement>)}
+              onChange={handleFolderChange}
+              className="hidden"
+              accept="image/*,video/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.svg"
+              tabIndex={-1}
+              aria-hidden
+            />
           </div>
           {files && files.length > 0 && (
             <div className="text-center mt-2">
@@ -967,6 +1038,46 @@ function UploadMediaModal({
           </button>
         </div>
       </form>
+
+      {pendingFolder && (
+        <Modal open={true} onClose={cancelFolderUpload} title={`Upload ${pendingFolder.files.length} files to this site?`}>
+          <div className="text-center">
+            <p className="text-lg text-gray-700">
+              This will upload all files from <strong>&quot;{pendingFolder.folderName}&quot;</strong>. Do this only if you trust the site.
+            </p>
+            <div className="mt-6 flex justify-center gap-4">
+              <button
+                type="button"
+                onClick={cancelFolderUpload}
+                className="flex-1 flex-shrink-0 h-14 rounded-xl bg-teal-100 hover:bg-teal-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                title="Cancel"
+                aria-label="Cancel"
+              >
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-teal-700">Cancel</span>
+              </button>
+              <button
+                type="button"
+                onClick={confirmFolderUpload}
+                className="flex-1 flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                title="Upload"
+                aria-label="Upload"
+              >
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-blue-700">Upload</span>
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </Modal>
   );
 }
@@ -1009,6 +1120,9 @@ export default function AdminMediaPage() {
   const [selectedMediaIds, setSelectedMediaIds] = useState<Set<number>>(new Set());
   const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
   const [bulkDeletePending, setBulkDeletePending] = useState(false);
+
+  // Message popup (replaces window.alert)
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -1109,7 +1223,7 @@ export default function AdminMediaPage() {
   const handleScrollToSerialNumber = () => {
     const serialNumber = parseInt(serialNumberInput, 10);
     if (isNaN(serialNumber) || serialNumber < 1) {
-      alert('Please enter a valid serial number (1 or greater)');
+      setAlertMessage('Please enter a valid serial number (1 or greater).');
       return;
     }
 
@@ -1144,7 +1258,7 @@ export default function AdminMediaPage() {
         targetElement.classList.remove('ring-4', 'ring-blue-500', 'ring-opacity-50');
       }, 3000);
     } else {
-      alert(`Serial number #${serialNumber} not found on the current page. Please check the number and try again.`);
+      setAlertMessage(`Serial number #${serialNumber} not found on the current page. Please check the number and try again.`);
     }
   }
 
@@ -1173,7 +1287,7 @@ export default function AdminMediaPage() {
       handleCloseModal();
     } catch (error: any) {
       console.error('Failed to save media:', error);
-      alert(`Error: ${error.message}`);
+      setAlertMessage(`Error: ${error.message}`);
     } finally {
       setEditLoading(false);
     }
@@ -1192,7 +1306,7 @@ export default function AdminMediaPage() {
         setMediaList(prev => prev.filter(m => m.id !== deletingMedia.id));
         setDeletingMedia(null);
       } catch (error: any) {
-        alert(`Failed to delete media: ${error.message}`);
+        setAlertMessage(`Failed to delete media: ${error.message}`);
         setDeletingMedia(null);
       }
     });
@@ -1223,7 +1337,7 @@ export default function AdminMediaPage() {
       setSelectedMediaIds(new Set());
       setBulkDeleteConfirmOpen(false);
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'Bulk delete failed');
+      setAlertMessage(err instanceof Error ? err.message : 'Bulk delete failed');
     } finally {
       setBulkDeletePending(false);
     }
@@ -1711,6 +1825,30 @@ export default function AdminMediaPage() {
                   </svg>
                 </div>
                 <span className="font-semibold text-red-700">{bulkDeletePending ? 'Deleting...' : 'Delete selected'}</span>
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {alertMessage !== null && (
+        <Modal open={true} onClose={() => setAlertMessage(null)} title="Notice">
+          <div className="text-center">
+            <p className="text-lg text-gray-700">{alertMessage}</p>
+            <div className="mt-6 flex justify-center">
+              <button
+                onClick={() => setAlertMessage(null)}
+                className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+                title="OK"
+                aria-label="OK"
+                type="button"
+              >
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-blue-700">OK</span>
               </button>
             </div>
           </div>

@@ -357,15 +357,15 @@ export default function SponsorDetailsPage() {
                           setShowSlideshow(true);
                         }
                       }}
-                      className={`${styles.galleryThumbnail} relative bg-gray-100 rounded overflow-hidden hover:opacity-80 transition-opacity cursor-pointer`}
+                      className={`${styles.galleryThumbnail} relative bg-gray-100 rounded overflow-hidden hover:opacity-80 transition-opacity cursor-pointer flex items-center justify-center`}
                     >
                       {mediaItem.fileUrl ? (
                         <Image
                           src={mediaItem.fileUrl}
                           alt={mediaItem.altText || mediaItem.title || 'Media'}
                           fill
-                          className="object-cover"
-                          sizes="(max-width: 640px) 150px, (max-width: 1024px) 120px, 100px"
+                          className="object-contain"
+                          sizes="(max-width: 640px) 150px, (max-width: 1024px) 220px, 220px"
                         />
                       ) : (
                         <div className="flex items-center justify-center h-full text-gray-400">

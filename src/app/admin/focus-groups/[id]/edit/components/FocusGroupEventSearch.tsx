@@ -133,8 +133,8 @@ export default function FocusGroupEventSearch({
           Search Events
         </label>
 
-        {/* Search Type Toggle */}
-        <div className="mb-2 flex gap-2">
+        {/* Search Type Toggle - admin action button style */}
+        <div className="mb-2 flex flex-wrap gap-3">
           <button
             type="button"
             onClick={() => {
@@ -142,13 +142,24 @@ export default function FocusGroupEventSearch({
               setSearchTerm('');
               setIsOpen(true);
             }}
-            className={`px-3 py-1 text-xs rounded ${
+            className={`flex-shrink-0 h-14 rounded-xl flex items-center justify-center gap-3 px-3 transition-all duration-300 hover:scale-105 ${
               searchType === 'title'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                ? 'bg-blue-100 hover:bg-blue-200'
+                : 'bg-gray-100 hover:bg-gray-200'
             }`}
+            title="Search by Title"
+            aria-label="Search by Title"
           >
-            Search by Title
+            <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
+              searchType === 'title' ? 'bg-blue-200' : 'bg-gray-200'
+            }`}>
+              <svg className={`w-6 h-6 ${searchType === 'title' ? 'text-blue-600' : 'text-gray-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <span className={`font-semibold ${searchType === 'title' ? 'text-blue-700' : 'text-gray-700'}`}>
+              Search by Title
+            </span>
           </button>
           <button
             type="button"
@@ -157,13 +168,24 @@ export default function FocusGroupEventSearch({
               setSearchTerm('');
               setIsOpen(true);
             }}
-            className={`px-3 py-1 text-xs rounded ${
+            className={`flex-shrink-0 h-14 rounded-xl flex items-center justify-center gap-3 px-3 transition-all duration-300 hover:scale-105 ${
               searchType === 'id'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                ? 'bg-blue-100 hover:bg-blue-200'
+                : 'bg-gray-100 hover:bg-gray-200'
             }`}
+            title="Search by ID"
+            aria-label="Search by ID"
           >
-            Search by ID
+            <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
+              searchType === 'id' ? 'bg-blue-200' : 'bg-gray-200'
+            }`}>
+              <svg className={`w-6 h-6 ${searchType === 'id' ? 'text-blue-600' : 'text-gray-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+              </svg>
+            </div>
+            <span className={`font-semibold ${searchType === 'id' ? 'text-blue-700' : 'text-gray-700'}`}>
+              Search by ID
+            </span>
           </button>
         </div>
 
