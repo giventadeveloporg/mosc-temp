@@ -163,7 +163,15 @@ export default async function RootLayout({
 
         if (resp.ok) {
           const arr = await resp.json();
-          const p = Array.isArray(arr) ? arr[0] : arr;
+          // Handle both raw array and paginated { content: [...] } responses
+          let p;
+          if (Array.isArray(arr)) {
+            p = arr[0];
+          } else if (arr?.content && Array.isArray(arr.content)) {
+            p = arr.content[0];
+          } else {
+            p = arr;
+          }
 
           if (!p) {
             // Step 2: Profile not found by userId + tenantId
@@ -181,7 +189,15 @@ export default async function RootLayout({
 
                 if (emailResp.ok) {
                   const emailArr = await emailResp.json();
-                  const existingProfile = Array.isArray(emailArr) ? emailArr[0] : emailArr;
+                  // Handle both raw array and paginated { content: [...] } responses
+                  let existingProfile;
+                  if (Array.isArray(emailArr)) {
+                    existingProfile = emailArr[0];
+                  } else if (emailArr?.content && Array.isArray(emailArr.content)) {
+                    existingProfile = emailArr.content[0];
+                  } else {
+                    existingProfile = emailArr;
+                  }
 
                   if (existingProfile && existingProfile.userId !== userId) {
                     // Step 3: Email + tenantId exists but with different userId
