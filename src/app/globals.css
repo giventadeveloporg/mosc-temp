@@ -1805,6 +1805,14 @@ To use a consistent, modern checkbox style with a custom tick mark, use:
   @apply pointer-events-none absolute inset-0 flex items-center justify-center;
 }
 
+.custom-checkbox:checked + .custom-checkbox-tick svg {
+  @apply block;
+}
+
+.custom-checkbox:not(:checked) + .custom-checkbox-tick svg {
+  @apply hidden;
+}
+
 .custom-grid-table {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
