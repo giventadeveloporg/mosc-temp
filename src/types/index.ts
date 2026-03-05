@@ -234,6 +234,10 @@ export interface EventMediaDTO {
    * Reference to gallery album. Mutually exclusive with eventId (media belongs to either an event OR an album, not both).
    */
   albumId?: number;
+  /**
+   * Reference to event_focus_groups association (event-focus-group link). Optional; when set, media is scoped to that focus group for this event.
+   */
+  eventFocusGroupId?: number | null;
 }
 
 /**

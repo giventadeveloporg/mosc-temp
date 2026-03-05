@@ -131,6 +131,10 @@ export default function EventDetailsPage() {
   const [slideshowInitialIndex, setSlideshowInitialIndex] = useState(0);
   // Track failed images for placeholder fallback
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
+  // Focus group filter and options for gallery
+  const [eventFocusGroupIdFilter, setEventFocusGroupIdFilter] = useState<number | null>(null);
+  const [eventFocusGroupOptions, setEventFocusGroupOptions] = useState<{ id: number; name: string }[]>([]);
+  const [focusGroupNameByAssociationId, setFocusGroupNameByAssociationId] = useState<Record<number, string>>({});
 
   useEffect(() => {
     async function fetchEventDetails() {
@@ -142,11 +146,32 @@ export default function EventDetailsPage() {
         const eventData: EventDetailsDTO = await eventRes.json();
         setEvent(eventData);
 
-        // Fetch media
-        const mediaRes = await fetch(`/api/proxy/event-medias?eventId.equals=${eventId}&isEventManagementOfficialDocument.equals=false&sort=updatedAt,desc`);
-        const mediaData = await mediaRes.json();
-        setMedia(Array.isArray(mediaData) ? mediaData : [mediaData]);
+        // Fetch event focus groups and focus group names for filter/labels
+        try {
+          const efgRes = await fetch(`/api/proxy/event-focus-groups?eventId.equals=${eventId}`);
+          const efgData = await efgRes.json();
+          const eventFocusGroups = Array.isArray(efgData) ? efgData : [efgData];
+          const fgRes = await fetch(`/api/proxy/focus-groups?size=500&sort=name,asc`);
+          const fgData = await fgRes.json();
+          const focusGroups = Array.isArray(fgData) ? fgData : [fgData];
+          const byId = new Map<number, { name: string }>();
+          focusGroups.forEach((f: { id?: number; name: string }) => { if (f.id != null) byId.set(f.id, { name: f.name }); });
+          const names: Record<number, string> = {};
+          const options: { id: number; name: string }[] = [];
+          eventFocusGroups.forEach((efg: { id?: number; focusGroupId?: number }) => {
+            if (efg.id != null && efg.focusGroupId != null) {
+              const name = byId.get(efg.focusGroupId)?.name ?? `Focus group ${efg.id}`;
+              names[efg.id] = name;
+              options.push({ id: efg.id, name });
+            }
+          });
+          setEventFocusGroupOptions(options);
+          setFocusGroupNameByAssociationId(names);
+        } catch (e) {
+          console.warn('Failed to fetch event focus groups:', e);
+        }
 
+        // Media is fetched in a separate effect that respects focus group filter
         // Fetch featured performers
         try {
           const performersParams = new URLSearchParams({
@@ -354,6 +379,25 @@ export default function EventDetailsPage() {
     }
     fetchEventDetails();
   }, [eventId]);
+
+  // Fetch media (depends on focus group filter)
+  useEffect(() => {
+    async function fetchMedia() {
+      if (!eventId) return;
+      const params = new URLSearchParams({
+        'eventId.equals': eventId.toString(),
+        'isEventManagementOfficialDocument.equals': 'false',
+        sort: 'updatedAt,desc',
+      });
+      if (eventFocusGroupIdFilter != null) {
+        params.set('eventFocusGroupId.equals', String(eventFocusGroupIdFilter));
+      }
+      const mediaRes = await fetch(`/api/proxy/event-medias?${params.toString()}`);
+      const mediaData = await mediaRes.json();
+      setMedia(Array.isArray(mediaData) ? mediaData : [mediaData]);
+    }
+    fetchMedia();
+  }, [eventId, eventFocusGroupIdFilter]);
 
   if (loading) return <div className="p-8 text-center">Loading event details...</div>;
   if (!event) return <div className="p-8 text-center text-red-500">Event not found.</div>;
@@ -1333,16 +1377,36 @@ export default function EventDetailsPage() {
                       {gallery.length} {gallery.length === 1 ? 'moment captured from this celebration.' : 'moments captured from this celebration.'}
                     </p>
                   </div>
-                  <button
-                    onClick={() => {
-                      setSlideshowInitialIndex(0);
-                      setShowSlideshow(true);
-                    }}
-                    className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5"
-                  >
-                    <Eye className="w-5 h-5" />
-                    View Full Gallery
-                  </button>
+                  <div className="flex flex-wrap items-center gap-4">
+                    {eventFocusGroupOptions.length > 0 && (
+                      <div className="flex items-center gap-2">
+                        <label htmlFor="gallery-focus-group" className="text-sm font-medium text-purple-100 whitespace-nowrap">
+                          Focus group
+                        </label>
+                        <select
+                          id="gallery-focus-group"
+                          value={eventFocusGroupIdFilter ?? ''}
+                          onChange={(e) => setEventFocusGroupIdFilter(e.target.value === '' ? null : Number(e.target.value))}
+                          className="px-3 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-purple-400 text-sm"
+                        >
+                          <option value="">All focus groups</option>
+                          {eventFocusGroupOptions.map((opt) => (
+                            <option key={opt.id} value={opt.id} className="text-gray-900">{opt.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                    <button
+                      onClick={() => {
+                        setSlideshowInitialIndex(0);
+                        setShowSlideshow(true);
+                      }}
+                      className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5"
+                    >
+                      <Eye className="w-5 h-5" />
+                      View Full Gallery
+                    </button>
+                  </div>
                 </div>
 
                 {/* Preview thumbnails grid - Centered like TeamSection */}
@@ -1374,6 +1438,14 @@ export default function EventDetailsPage() {
                               {getMediaTypeIcon(mediaItem.eventMediaType)}
                             </div>
                           )}
+                          {(() => {
+                            const fgId = (mediaItem as { event_focus_group_id?: number | null }).event_focus_group_id ?? mediaItem.eventFocusGroupId;
+                            return fgId != null && focusGroupNameByAssociationId[fgId] ? (
+                              <span className="absolute bottom-2 left-2 right-2 text-xs font-medium text-white bg-black/50 rounded px-2 py-1 truncate">
+                                {focusGroupNameByAssociationId[fgId]}
+                              </span>
+                            ) : null;
+                          })()}
                           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                         </button>
                       ))}

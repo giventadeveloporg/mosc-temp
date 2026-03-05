@@ -1,8 +1,8 @@
 "use client";
 import React, { useRef, useState, useEffect, useCallback, useTransition } from "react";
-import { EventMediaDTO, EventDetailsDTO } from "@/types";
+import { EventMediaDTO, EventDetailsDTO, EventFocusGroupDTO } from "@/types";
 import { FaUsers, FaPhotoVideo, FaCalendarAlt, FaTimes, FaTicketAlt, FaTags, FaHome } from 'react-icons/fa';
-import { deleteMediaServer, editMediaServer, fetchMediaFilteredServer } from '../ApiServerActions';
+import { deleteMediaServer, editMediaServer, fetchMediaFilteredServer, fetchEventFocusGroupsWithNamesServer } from '../ApiServerActions';
 import { fetchEventDetailsServer } from '@/app/admin/ApiServerActions';
 import { createPortal } from "react-dom";
 import Link from 'next/link';
@@ -203,11 +203,13 @@ interface EditMediaModalProps {
   onClose: () => void;
   onSave: (updated: Partial<EventMediaDTO>) => void;
   loading: boolean;
+  /** Options for focus group dropdown: association id -> display name */
+  focusGroupOptions: { id: number; name: string }[];
 }
 
 type MediaCheckboxName = 'isPublic' | 'eventFlyer' | 'isEventManagementOfficialDocument' | 'isHeroImage' | 'isActiveHeroImage' | 'isFeaturedVideo' | 'isHomePageHeroImage' | 'isFeaturedEventImage' | 'isLiveEventImage';
 
-function EditMediaModal({ media, onClose, onSave, loading }: EditMediaModalProps) {
+function EditMediaModal({ media, onClose, onSave, loading, focusGroupOptions }: EditMediaModalProps) {
   const [form, setForm] = useState<Partial<EventMediaDTO>>(() => ({
     id: media.id,
     tenantId: media.tenantId,
@@ -241,6 +243,7 @@ function EditMediaModal({ media, onClose, onSave, loading }: EditMediaModalProps
       (typeof media.startDisplayingFromDate === 'string' ?
         media.startDisplayingFromDate :
         new Date(media.startDisplayingFromDate).toISOString().split('T')[0]) : '',
+    eventFocusGroupId: (media as { event_focus_group_id?: number | null }).event_focus_group_id ?? media.eventFocusGroupId ?? null,
   }));
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
@@ -353,6 +356,26 @@ function EditMediaModal({ media, onClose, onSave, loading }: EditMediaModalProps
               Leave empty to display immediately, or set a future date to schedule when this media should start being displayed.
             </p>
           </div>
+
+          {focusGroupOptions.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700" htmlFor="eventFocusGroupId">
+                Focus Group
+              </label>
+              <select
+                id="eventFocusGroupId"
+                value={form.eventFocusGroupId ?? ''}
+                onChange={(e) => setForm(prev => ({ ...prev, eventFocusGroupId: e.target.value === '' ? null : Number(e.target.value) }))}
+                className="mt-1 block w-full border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-4 py-3 text-base"
+              >
+                <option value="">None</option>
+                {focusGroupOptions.map((opt) => (
+                  <option key={opt.id} value={opt.id}>{opt.name}</option>
+                ))}
+              </select>
+              <p className="mt-1 text-sm text-gray-500">Optional. Associate this media with a focus group for this event.</p>
+            </div>
+          )}
 
           {form.isFeaturedVideo && (
             <div>
@@ -477,6 +500,9 @@ export default function EventMediaListPage() {
   const [isHomePageHeroImage, setIsHomePageHeroImage] = useState<boolean | undefined>(undefined);
   const [isFeaturedEventImage, setIsFeaturedEventImage] = useState<boolean | undefined>(undefined);
   const [isLiveEventImage, setIsLiveEventImage] = useState<boolean | undefined>(undefined);
+  const [eventFocusGroupIdFilter, setEventFocusGroupIdFilter] = useState<number | null>(null);
+  const [eventFocusGroups, setEventFocusGroups] = useState<EventFocusGroupDTO[]>([]);
+  const [focusGroupNameByAssociationId, setFocusGroupNameByAssociationId] = useState<Record<number, string>>({});
   const [serialNumberInput, setSerialNumberInput] = useState('');
   const totalPages = Math.ceil(totalCount / pageSize);
 
@@ -488,6 +514,19 @@ export default function EventMediaListPage() {
   const tooltipTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const mediaGridRef = useRef<HTMLDivElement>(null);
   const pageTopRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!eventId) return;
+    (async () => {
+      try {
+        const { eventFocusGroups: efgs, focusGroupNameByAssociationId: names } = await fetchEventFocusGroupsWithNamesServer(parseInt(eventId, 10));
+        setEventFocusGroups(efgs);
+        setFocusGroupNameByAssociationId(names);
+      } catch (e) {
+        console.error('Failed to fetch event focus groups:', e);
+      }
+    })();
+  }, [eventId]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -505,6 +544,7 @@ export default function EventMediaListPage() {
             isHomePageHeroImage,
             isFeaturedEventImage,
             isLiveEventImage,
+            eventFocusGroupId: eventFocusGroupIdFilter ?? undefined,
           });
           setMedia(mediaResponse.data);
           setTotalCount(mediaResponse.totalCount);
@@ -519,7 +559,7 @@ export default function EventMediaListPage() {
       fetchData();
     }, 500); // Debounce search
     return () => clearTimeout(timer);
-  }, [eventId, page, pageSize, searchTerm, eventFlyerOnly, isFeaturedVideo, isHeroImage, isActiveHeroImage, isHomePageHeroImage, isFeaturedEventImage, isLiveEventImage]);
+  }, [eventId, page, pageSize, searchTerm, eventFlyerOnly, isFeaturedVideo, isHeroImage, isActiveHeroImage, isHomePageHeroImage, isFeaturedEventImage, isLiveEventImage, eventFocusGroupIdFilter]);
 
   function handleCellMouseEnter(media: EventMediaDTO, e: React.MouseEvent<HTMLTableCellElement>, type: 'officialDocs' | 'uploadedMedia', serialNumber: number) {
     // Don't show tooltip if it was recently closed
@@ -967,6 +1007,28 @@ export default function EventMediaListPage() {
               </span>
               <span className="text-sm font-medium text-gray-700 select-none">Live Event Image</span>
             </label>
+
+            {/* Focus group filter */}
+            {eventFocusGroups.length > 0 && (
+              <div className="flex items-center gap-2">
+                <label htmlFor="focus-group-filter" className="text-sm font-medium text-gray-700 select-none whitespace-nowrap">
+                  Focus group
+                </label>
+                <select
+                  id="focus-group-filter"
+                  value={eventFocusGroupIdFilter ?? ''}
+                  onChange={(e) => setEventFocusGroupIdFilter(e.target.value === '' ? null : Number(e.target.value))}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                >
+                  <option value="">All</option>
+                  {eventFocusGroups.map((efg) => (
+                    <option key={efg.id} value={efg.id ?? ''}>
+                      {focusGroupNameByAssociationId[efg.id!] ?? `Focus group ${efg.id}`}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -1021,6 +1083,14 @@ export default function EventMediaListPage() {
                   <div className="p-4">
                     <h3 className="font-semibold text-lg truncate" title={item.title || ''}>{item.title}</h3>
                     <p className="text-gray-600 text-sm h-10 overflow-hidden" title={item.description || ''}>{item.description}</p>
+                    {(() => {
+                      const fgId = (item as { event_focus_group_id?: number | null }).event_focus_group_id ?? item.eventFocusGroupId;
+                      return fgId != null && focusGroupNameByAssociationId[fgId] ? (
+                        <p className="text-xs text-purple-600 mt-1" title="Focus group">
+                          {focusGroupNameByAssociationId[fgId]}
+                        </p>
+                      ) : null;
+                    })()}
                   </div>
                 </div>
                 <div className="p-4 pt-0 flex justify-end gap-2">
@@ -1172,6 +1242,7 @@ export default function EventMediaListPage() {
           onClose={handleCloseModal}
           onSave={handleSave}
           loading={editLoading}
+          focusGroupOptions={eventFocusGroups.map((efg) => ({ id: efg.id!, name: focusGroupNameByAssociationId[efg.id!] ?? `Focus group ${efg.id}` }))}
         />
       )}
       <MediaDetailsTooltip

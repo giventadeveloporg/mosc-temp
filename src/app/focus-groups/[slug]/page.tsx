@@ -1,4 +1,7 @@
+import { auth } from '@clerk/nextjs/server';
 import { getAppUrl } from '@/lib/env';
+import { fetchUserProfileServer } from '@/app/profile/ApiServerActions';
+import FocusGroupJoinLeave from './FocusGroupJoinLeave';
 
 async function fetchGroup(baseUrl: string, slug: string) {
   try {
@@ -22,14 +25,89 @@ async function fetchEvents(baseUrl: string, groupId: number) {
   }
 }
 
+/** Fetch current user's membership for this focus group, if any. */
+async function fetchMyMembership(baseUrl: string, focusGroupId: number, userProfileId: number) {
+  try {
+    const res = await fetch(
+      `${baseUrl}/api/proxy/focus-group-members?focusGroupId.equals=${focusGroupId}&userProfileId.equals=${userProfileId}&size=1`,
+      { cache: 'no-store' }
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    const list = Array.isArray(data) ? data : [];
+    return list.length > 0 ? list[0] : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Fetch members with role EXECUTIVE or ORGANISER (committee). */
+async function fetchCommitteeMembers(baseUrl: string, focusGroupId: number) {
+  try {
+    const res = await fetch(
+      `${baseUrl}/api/proxy/focus-group-members?focusGroupId.equals=${focusGroupId}&size=200`,
+      { cache: 'no-store' }
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    const list = Array.isArray(data) ? data : [];
+    const committee = list.filter(
+      (m: { role?: string }) => m?.role === 'EXECUTIVE' || m?.role === 'ORGANISER'
+    );
+    return committee;
+  } catch {
+    return [];
+  }
+}
+
+async function fetchUserProfileById(baseUrl: string, id: number) {
+  try {
+    const res = await fetch(`${baseUrl}/api/proxy/user-profiles/${id}`, { cache: 'no-store' });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data?.id ? data : null;
+  } catch {
+    return null;
+  }
+}
+
 /** Top padding so content (including cover image) is not cut off by the fixed header. Per design_systems/event_site_general_design_final.json pageLayout.container.topOffset. */
 const PAGE_TOP_OFFSET = 120;
 
-export default async function FocusGroupDetailPage({ params }: { params: { slug: string } }) {
+export default async function FocusGroupDetailPage({
+  params,
+}: {
+  params: Promise<{ slug: string }> | { slug: string };
+}) {
+  const resolvedParams = typeof (params as Promise<{ slug: string }>).then === 'function'
+    ? await (params as Promise<{ slug: string }>)
+    : (params as { slug: string });
+  const slug = typeof resolvedParams.slug === 'string' ? resolvedParams.slug : Array.isArray(resolvedParams.slug) ? resolvedParams.slug[0] : '';
+
   const baseUrl = getAppUrl();
-  const slug = typeof params.slug === 'string' ? params.slug : Array.isArray(params.slug) ? params.slug[0] : '';
   const group = await fetchGroup(baseUrl, slug);
   const events = group?.id ? await fetchEvents(baseUrl, group.id) : [];
+
+  const { userId } = await auth();
+  const profile = userId ? await fetchUserProfileServer(userId) : null;
+  const isLoggedIn = !!userId;
+  const myMembership = group?.id && profile?.id ? await fetchMyMembership(baseUrl, group.id, profile.id) : null;
+  const isMember = !!myMembership;
+  const membershipId = myMembership?.id ?? null;
+
+  const committeeRaw = group?.id ? await fetchCommitteeMembers(baseUrl, group.id) : [];
+  const committeeWithProfiles = await Promise.all(
+    committeeRaw.map(async (m: { userProfileId?: number; id?: number; role?: string }, idx: number) => {
+      const userProfileId = m?.userProfileId ?? (m as any)?.user_profile_id;
+      const profileData = userProfileId ? await fetchUserProfileById(baseUrl, userProfileId) : null;
+      const first = (profileData as any)?.firstName ?? (profileData as any)?.first_name ?? '';
+      const last = (profileData as any)?.lastName ?? (profileData as any)?.last_name ?? '';
+      const name = profileData
+        ? [first, last].filter(Boolean).join(' ') || (profileData as any)?.email || 'Member'
+        : 'Member';
+      return { ...m, displayName: name, role: m?.role ?? (m as any)?.role, _idx: idx };
+    })
+  );
 
   /* Design system: semantic colors for card accents (blue, teal, purple cycle) */
   const cardAccentColors = ['border-indigo-500', 'border-teal-500', 'border-amber-500'] as const;
@@ -66,7 +144,44 @@ export default async function FocusGroupDetailPage({ params }: { params: { slug:
           <p className="text-xs sm:text-sm text-gray-600 text-center sm:text-left max-w-3xl">
             {group?.description || 'Details coming soon.'}
           </p>
+          {/* Join / Leave: PRD focus_group_member_organisers frontend */}
+          {group?.id && (
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <FocusGroupJoinLeave
+                focusGroupId={group.id}
+                isLoggedIn={isLoggedIn}
+                isMember={isMember}
+                membershipId={membershipId}
+                membershipStatus={myMembership?.status ?? (myMembership as any)?.status ?? null}
+                groupName={group?.name || 'Focus Group'}
+                redirectUrl={`/focus-groups/${slug}`}
+              />
+            </div>
+          )}
         </div>
+
+        {/* Executive / Organising Committee: PRD focus_group_member_organisers */}
+        {committeeWithProfiles.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold text-indigo-800 border-l-4 border-indigo-500 pl-3 mb-4 sm:mb-6">
+              Executive / Organising Committee
+            </h2>
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <ul className="space-y-3" role="list">
+                {committeeWithProfiles.map((m: { id?: number; _idx?: number; displayName: string; role?: string }) => (
+                  <li key={m.id ?? m._idx ?? 0} className="flex items-center gap-3 text-sm text-gray-700">
+                    <span className="font-medium text-gray-900">{m.displayName}</span>
+                    {m.role && (
+                      <span className="px-2 py-0.5 rounded bg-indigo-100 text-indigo-700 text-xs font-medium">
+                        {m.role}
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
 
         {/* Upcoming Events: design system section title with colored left border (indigo) */}
         <div className="mb-8">
