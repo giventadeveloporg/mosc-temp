@@ -1797,18 +1797,26 @@ To use a consistent, modern checkbox style with a custom tick mark, use:
 - See prompt below for full usage.
 */
 
+/* Checkbox: per .cursor/rules/ui_style_guide.mdc */
 .custom-checkbox {
-  @apply w-7 h-7 accent-yellow-400 appearance-none border-2 border-gray-400 rounded focus:ring-2 focus:ring-yellow-400 checked:bg-yellow-400 checked:border-yellow-500;
+  @apply h-6 w-6 border-2 border-gray-400 rounded-lg cursor-pointer appearance-none relative bg-white;
 }
-
+.custom-checkbox:checked {
+  @apply bg-blue-600 border-blue-600;
+}
+/* Admin media card: yellow when checked, thicker border */
+.custom-checkbox--yellow {
+  @apply border-4 border-gray-500;
+}
+.custom-checkbox--yellow:checked {
+  @apply bg-yellow-500 border-yellow-500 border-4;
+}
 .custom-checkbox-tick {
-  @apply pointer-events-none absolute inset-0 flex items-center justify-center;
+  @apply absolute inset-0 flex items-center justify-center pointer-events-none;
 }
-
 .custom-checkbox:checked + .custom-checkbox-tick svg {
   @apply block;
 }
-
 .custom-checkbox:not(:checked) + .custom-checkbox-tick svg {
   @apply hidden;
 }

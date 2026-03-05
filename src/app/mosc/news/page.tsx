@@ -72,12 +72,12 @@ export default async function NewsPage() {
         </div>
       )}
 
-      {/* Main content - design system: container 1200px, section padding 60px, grid gap 30px */}
-      <section className="py-syro-xxxl bg-syro-bg-gray">
+      {/* Main content - reduced top/bottom padding so images fit with less empty space */}
+      <section className="py-syro-lg bg-syro-bg-gray">
         <div className="max-w-[1200px] mx-auto px-[15px]">
           <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_380px] gap-syro-xl">
-            {/* Main column - order per PRD: Main News, Featured News, Press Release, Most Read; design system section margin 60px */}
-            <div className="space-y-syro-xxxl">
+            {/* Main column - tighter vertical spacing between sections */}
+            <div className="space-y-syro-xl">
               <ArticleList
                 id="main-news"
                 title="Main News"
