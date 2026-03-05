@@ -470,6 +470,21 @@ function EditMediaModal({ media, onClose, onSave, loading }: EditMediaModalProps
                 </label>
               ))}
             </div>
+            {/* Homepage hero slider tip: only standalone media (no event) appear as slides */}
+            {(form.isHomePageHeroImage || form.isHeroImage) && (
+              <div className="mt-4 p-4 rounded-lg border-2 border-amber-200 bg-amber-50">
+                <p className="text-sm font-semibold text-amber-800 mb-1">Homepage hero slider</p>
+                {media.eventId != null && media.eventId !== undefined ? (
+                  <p className="text-sm text-amber-800">
+                    This media is linked to <strong>Event ID {media.eventId}</strong>. The homepage hero slider only shows media that are <strong>not linked to any event</strong> (standalone). So this image will not appear as a slide until it has no event link. To have images in the slider, upload them from <strong>Admin → Media</strong> (upload there creates standalone media), then check Hero Image and Home Page Hero.
+                  </p>
+                ) : (
+                  <p className="text-sm text-amber-800">
+                    This media is standalone (no event). It can appear in the homepage hero slider. Leave display duration at 0 to use the default 8 seconds. Use a lower <strong>Display Order</strong> (e.g. 0–5) so it appears before others. Leave <strong>Start displaying from date</strong> empty so it shows immediately.
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -1168,19 +1183,12 @@ export default function AdminMediaPage() {
     return () => clearTimeout(timer);
   }, [page, pageSize, searchTerm, eventFlyerOnly, heroImagesOnly, refreshKey]);
 
-  function handleCellMouseEnter(media: EventMediaDTO, e: React.MouseEvent<HTMLDivElement>, type: 'uploadedMedia', serialNumber: number) {
-    // Don't show tooltip if it was recently closed
-    if (isTooltipClosed) return;
-
+  function handleViewClick(media: EventMediaDTO, e: React.MouseEvent<HTMLButtonElement>, serialNumber: number) {
+    e.stopPropagation();
     if (tooltipTimeoutRef.current) clearTimeout(tooltipTimeoutRef.current);
-    setIsCellHovered(true);
     setTooltipAnchorRect(e.currentTarget.getBoundingClientRect());
-    setActiveTooltip({ media, type, serialNumber });
-  }
-
-  function handleCellMouseLeave() {
-    setIsCellHovered(false);
-    // Don't auto-close tooltip - only close on button click
+    setActiveTooltip({ media, type: 'uploadedMedia', serialNumber });
+    setIsTooltipClosed(false);
   }
 
   function handleTooltipMouseEnter() {
@@ -1520,14 +1528,11 @@ export default function AdminMediaPage() {
         </div>
       </div>
 
-      <div className={`mb-4 text-sm border rounded-lg px-4 py-3 ${isTooltipClosed ? 'text-orange-700 bg-orange-50 border-orange-200' : 'text-blue-700 bg-blue-50 border-blue-200'}`}>
+      <div className="mb-4 text-sm border rounded-lg px-4 py-3 text-blue-700 bg-blue-50 border-blue-200">
         <div className="flex items-center gap-2">
-          <span className="font-semibold">{isTooltipClosed ? '⏳' : '💡'} Tip:</span>
+          <span className="font-semibold">💡 Tip:</span>
           <span>
-            {isTooltipClosed
-              ? 'Tooltips temporarily disabled. Please wait a moment before hovering over images again.'
-              : 'Mouse over an image to see full details. Click the × button to close the tooltip dialog.'
-            }
+            Click the <strong>View</strong> button on a card to see full details. Click the × button to close the dialog.
           </span>
         </div>
       </div>
@@ -1604,11 +1609,7 @@ export default function AdminMediaPage() {
                 className="bg-white rounded-lg shadow-md overflow-hidden group flex flex-col justify-between"
               >
                 <div>
-                  <div
-                    className="relative h-48 bg-gray-200 cursor-pointer"
-                    onMouseEnter={(e) => handleCellMouseEnter(item, e as any, 'uploadedMedia', serialNumber)}
-                    onMouseLeave={handleCellMouseLeave}
-                  >
+                  <div className="relative h-48 bg-gray-200">
                     {/* Serial number overlay */}
                     <div className="absolute top-2 left-2 bg-blue-600 text-white px-2 py-1 rounded-full text-sm font-bold z-10 shadow-lg">
                       #{serialNumber}
@@ -1631,48 +1632,62 @@ export default function AdminMediaPage() {
                     <p className="text-gray-600 text-sm h-10 overflow-hidden" title={item.description || ''}>{item.description}</p>
                   </div>
                 </div>
-                {/* Checkbox (left) + Action Buttons - Medium Action Icons Pattern (Media Gallery Grid) */}
-                <div className="p-4 pt-0 flex items-center gap-2">
-                  {/* Per-item checkbox - left of Edit */}
+                {/* Checkbox (left) + Action Buttons - compact so all 4 fit in card; checkbox per ui_style_guide.mdc */}
+                <div className="p-4 pt-0 flex items-center gap-1.5">
+                  {/* Per-item checkbox - custom-checkbox pattern per cursor rule */}
                   {item.id != null && (
-                    <label className="flex-shrink-0 cursor-pointer flex items-center justify-center w-14 h-14 rounded-lg border-2 border-gray-300 bg-gray-50 hover:bg-gray-100 flex items-center justify-center transition-all duration-300 hover:scale-110">
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => toggleSelection(item.id)}
-                        className="sr-only"
-                        aria-label={`Select ${item.title || 'media'}`}
-                      />
-                      <span className={`block w-6 h-6 rounded border-2 flex items-center justify-center ${isSelected ? 'bg-blue-600 border-blue-600' : 'border-gray-400 bg-white'}`}>
-                        {isSelected && (
-                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                    <label className="flex-shrink-0 flex items-center justify-center">
+                      <span className="relative flex items-center justify-center">
+                        <input
+                          type="checkbox"
+                          className="custom-checkbox"
+                          checked={isSelected}
+                          onChange={() => toggleSelection(item.id)}
+                          onClick={(e) => e.stopPropagation()}
+                          aria-label={`Select ${item.title || 'media'}`}
+                        />
+                        <span className="custom-checkbox-tick">
+                          <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l5 5L19 7" />
                           </svg>
-                        )}
+                        </span>
                       </span>
                     </label>
                   )}
+                  {/* View Button */}
+                  <button
+                    onClick={(e) => handleViewClick(item, e, serialNumber)}
+                    className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 hover:bg-green-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                    title="View details"
+                    aria-label="View details"
+                    type="button"
+                  >
+                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  </button>
                   {/* Edit Button */}
                   <button
                     onClick={() => handleEditClick(item)}
-                    className="flex-shrink-0 w-14 h-14 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                    className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
                     title="Edit Media"
                     aria-label="Edit Media"
                     type="button"
                   >
-                    <svg className="text-blue-600 p-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                   </button>
                   {/* Delete Button */}
                   <button
                     onClick={() => handleDelete(item)}
-                    className="flex-shrink-0 w-14 h-14 rounded-lg bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                    className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
                     title="Delete Media"
                     aria-label="Delete Media"
                     type="button"
                   >
-                    <svg className="text-red-600 p-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                   </button>

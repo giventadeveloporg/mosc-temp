@@ -240,7 +240,9 @@ const DynamicHeroImage: React.FC<{
         });
 
         if (!hasEventsInNext4Months) {
-          // No events in next 4 months: use up to 6 standalone hero images (event_id NULL, is_hero_image OR is_home_page_hero_image); fetch by hero flags then filter client-side
+          // No events in next 4 months: use up to STANDALONE_HERO_CAP standalone hero images (event_id NULL, is_hero_image OR is_home_page_hero_image); fetch by hero flags then filter client-side
+          const STANDALONE_HERO_CAP = 24;
+          const STANDALONE_FETCH_SIZE = 100;
           try {
             const tenantId = getTenantId();
             const seenIds = new Set<number>();
@@ -255,38 +257,52 @@ const DynamicHeroImage: React.FC<{
                 });
             let list: (EventMediaDTO & MediaWithSnake)[] = [];
             let res = await fetch(
-              `/api/proxy/event-medias?tenantId.equals=${encodeURIComponent(tenantId)}&isHeroImage.equals=true&size=50&sort=displayOrder,asc`,
+              `/api/proxy/event-medias?tenantId.equals=${encodeURIComponent(tenantId)}&isHeroImage.equals=true&size=${STANDALONE_FETCH_SIZE}&sort=displayOrder,asc`,
               { cache: 'no-store' }
             );
             if (res.ok) {
               const data = await res.json();
-              list = mergeStandalone(normalizeEventMediasResponse(data) as (EventMediaDTO & MediaWithSnake)[]);
-            }
-            if (list.length < 6) {
-              res = await fetch(
-                `/api/proxy/event-medias?tenantId.equals=${encodeURIComponent(tenantId)}&isHomePageHeroImage.equals=true&size=50&sort=displayOrder,asc`,
-                { cache: 'no-store' }
-              );
-              if (res.ok) {
-                const data = await res.json();
-                const more = mergeStandalone(normalizeEventMediasResponse(data) as (EventMediaDTO & MediaWithSnake)[]);
-                list = [...list, ...more].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
+              const normalized = normalizeEventMediasResponse(data) as (EventMediaDTO & MediaWithSnake)[];
+              list = mergeStandalone(normalized);
+              if (normalized.length > 0) {
+                const excludedCount = normalized.filter((m) => !isStandaloneHeroMedia(m) || !isStandaloneHeroEligible(m) || !isHeroMediaDisplayDateValid(m)).length;
+                if (excludedCount > 0) {
+                  console.log('[HeroSection] Standalone hero fetch (isHeroImage):', { fetched: normalized.length, passedFilter: list.length, excluded: excludedCount, tip: 'Excluded if linked to an event, or "Start displaying from date" is in the future.' });
+                }
               }
             }
-            const standalone = list.slice(0, 6);
+            // Always fetch isHomePageHeroImage too so media with only is_home_page_hero_image=true (and not is_hero_image) are included
+            res = await fetch(
+              `/api/proxy/event-medias?tenantId.equals=${encodeURIComponent(tenantId)}&isHomePageHeroImage.equals=true&size=${STANDALONE_FETCH_SIZE}&sort=displayOrder,asc`,
+              { cache: 'no-store' }
+            );
+            if (res.ok) {
+              const data = await res.json();
+              const more = mergeStandalone(normalizeEventMediasResponse(data) as (EventMediaDTO & MediaWithSnake)[]);
+              list = [...list, ...more].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
+            }
+            const beforeCap = list.length;
+            const standalone = list.slice(0, STANDALONE_HERO_CAP);
+            if (beforeCap > STANDALONE_HERO_CAP) {
+              console.log('[HeroSection] Standalone hero cap applied:', { totalEligible: beforeCap, cap: STANDALONE_HERO_CAP, showing: standalone.length, omitted: beforeCap - STANDALONE_HERO_CAP, tip: 'Set Display Order lower (e.g. 0–5) in Admin → Media so preferred images show first.' });
+            }
             processedEvents = [];
             standalone.forEach((m) => {
               const url = getHeroMediaUrl(m);
               if (url) {
                 imageUrls.push(url);
                 durations.push(getHeroMediaDurationMs(m));
+              } else {
+                console.warn('[HeroSection] Standalone hero media skipped (no fileUrl):', { id: m.id, title: m.title });
               }
             });
           } catch (err) {
             console.warn('[HeroSection] Fallback hero media fetch failed:', err);
           }
         } else {
-          // Events in next 4 months: event-based images first, then up to 2 standalone (event_id NULL)
+          // Events in next 4 months: event-based images first, then up to STANDALONE_HERO_CAP_WITH_EVENTS standalone (event_id NULL)
+          const STANDALONE_HERO_CAP_WITH_EVENTS = 12;
+          const STANDALONE_FETCH_SIZE_WITH_EVENTS = 50;
           processedEvents.forEach((e, index) => {
             if (e.thumbnailUrl) {
               imageUrls.push(e.thumbnailUrl);
@@ -316,7 +332,7 @@ const DynamicHeroImage: React.FC<{
             let list: (EventMediaDTO & MediaWithSnake)[] = [];
             // 1) Fetch by isHeroImage=true (includes standalone rows with is_hero_image=true)
             let res = await fetch(
-              `/api/proxy/event-medias?tenantId.equals=${encodeURIComponent(tenantId)}&isHeroImage.equals=true&size=30&sort=displayOrder,asc`,
+              `/api/proxy/event-medias?tenantId.equals=${encodeURIComponent(tenantId)}&isHeroImage.equals=true&size=${STANDALONE_FETCH_SIZE_WITH_EVENTS}&sort=displayOrder,asc`,
               { cache: 'no-store' }
             );
             if (res.ok) {
@@ -324,19 +340,21 @@ const DynamicHeroImage: React.FC<{
               const raw = normalizeEventMediasResponse(data) as (EventMediaDTO & MediaWithSnake)[];
               list = mergeStandalone(raw);
             }
-            // 2) If needed, also fetch by isHomePageHeroImage=true and merge (in case backend only has that filter)
-            if (list.length < 2) {
-              res = await fetch(
-                `/api/proxy/event-medias?tenantId.equals=${encodeURIComponent(tenantId)}&isHomePageHeroImage.equals=true&size=30&sort=displayOrder,asc`,
-                { cache: 'no-store' }
-              );
-              if (res.ok) {
-                const data = await res.json();
-                const raw = normalizeEventMediasResponse(data) as (EventMediaDTO & MediaWithSnake)[];
-                list = [...list, ...mergeStandalone(raw)].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
-              }
+            // 2) Always fetch by isHomePageHeroImage=true and merge so media with only is_home_page_hero_image (and not is_hero_image) are included
+            res = await fetch(
+              `/api/proxy/event-medias?tenantId.equals=${encodeURIComponent(tenantId)}&isHomePageHeroImage.equals=true&size=${STANDALONE_FETCH_SIZE_WITH_EVENTS}&sort=displayOrder,asc`,
+              { cache: 'no-store' }
+            );
+            if (res.ok) {
+              const data = await res.json();
+              const raw = normalizeEventMediasResponse(data) as (EventMediaDTO & MediaWithSnake)[];
+              list = [...list, ...mergeStandalone(raw)].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
             }
-            const standalone = list.slice(0, 2);
+            const beforeCap = list.length;
+            const standalone = list.slice(0, STANDALONE_HERO_CAP_WITH_EVENTS);
+            if (beforeCap > STANDALONE_HERO_CAP_WITH_EVENTS) {
+              console.log('[HeroSection] Standalone hero cap (with events in 4mo):', { totalEligible: beforeCap, cap: STANDALONE_HERO_CAP_WITH_EVENTS, showing: standalone.length, omitted: beforeCap - STANDALONE_HERO_CAP_WITH_EVENTS });
+            }
             if (standalone.length === 0) {
               console.warn(
                 '[HeroSection] No standalone hero images (event_id null) found. Add media in Admin with no event selected (event_id NULL) and either "Home Page Hero Image" or "Hero Image" checked.'

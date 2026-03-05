@@ -318,6 +318,7 @@ export default function FocusGroupCoverImageUpload({
             <p className="text-sm font-medium mb-1">Upload Focus Group Cover Image</p>
             <p className="text-xs text-gray-400 mb-2">This image will be displayed as the cover for the focus group</p>
             <p className="text-xs text-gray-400">Click to upload or drag and drop</p>
+            <p className="text-xs text-gray-400 mt-1">Image should be 800 pixels wide by 480 pixels tall, aspect ratio 5:3.</p>
             <p className="text-xs text-gray-400 mt-1">(JPEG, PNG, GIF - Max 10MB)</p>
           </div>
         )}
