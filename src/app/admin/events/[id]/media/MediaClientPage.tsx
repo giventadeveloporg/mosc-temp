@@ -13,6 +13,8 @@ interface MediaClientPageProps {
   eventDetails: EventDetailsDTO | null;
   officialDocsList: EventMediaDTO[];
   userProfileId: number | null;
+  /** Options for optional focus group on upload (association id -> name) */
+  focusGroupOptions?: { id: number; name: string }[];
 }
 
 // Tooltip component (matches /admin/manage-usage)
@@ -80,7 +82,7 @@ function MediaDetailsTooltip({ media, anchorRect, onClose, onTooltipMouseEnter, 
   );
 }
 
-export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDetails, officialDocsList: initialOfficialDocsList, userProfileId }: MediaClientPageProps) {
+export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDetails, officialDocsList: initialOfficialDocsList, userProfileId, focusGroupOptions = [] }: MediaClientPageProps) {
   const [files, setFiles] = useState<FileList | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -118,6 +120,7 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
   const [isHomePageHeroImage, setIsHomePageHeroImage] = useState(false);
   const [isPublic, setIsPublic] = useState(true);
   const [altText, setAltText] = useState("");
+  const [eventFocusGroupId, setEventFocusGroupId] = useState<number | null>(null);
   const [displayOrder, setDisplayOrder] = useState<number | undefined>(undefined);
   const [startDisplayingFromDate, setStartDisplayingFromDate] = useState("");
   // Home page hero display duration (minutes and seconds)
@@ -293,6 +296,10 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
         formData.append('startDisplayingFromDate', startDisplayingFromDate);
       }
 
+      if (eventFocusGroupId != null) {
+        formData.append('eventFocusGroupId', String(eventFocusGroupId));
+      }
+
       // Home page hero display duration (convert minutes + seconds to total seconds)
       if (isHomePageHeroImage) {
         const minutes = typeof heroDisplayDurationMinutes === 'number' ? heroDisplayDurationMinutes : 0;
@@ -334,6 +341,7 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
       setStartDisplayingFromDate("");
       setHeroDisplayDurationMinutes('');
       setHeroDisplayDurationSeconds('');
+      setEventFocusGroupId(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
 
       // Refresh the page after dialog is shown (user can close it manually or wait for auto-close)
@@ -1197,6 +1205,26 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
             />
             <p className="text-sm text-gray-500 mt-1">Select the date when this media should start being displayed</p>
           </div>
+
+          {focusGroupOptions.length > 0 && (
+            <div className="mt-4 mb-4">
+              <label htmlFor="upload-focus-group" className="block text-sm font-medium text-gray-700 mb-2">
+                Focus group (optional)
+              </label>
+              <select
+                id="upload-focus-group"
+                value={eventFocusGroupId ?? ''}
+                onChange={e => setEventFocusGroupId(e.target.value === '' ? null : Number(e.target.value))}
+                className="border rounded px-3 py-2 border-gray-300"
+              >
+                <option value="">None</option>
+                {focusGroupOptions.map((opt) => (
+                  <option key={opt.id} value={opt.id}>{opt.name}</option>
+                ))}
+              </select>
+              <p className="text-sm text-gray-500 mt-1">Associate this media with a focus group for this event</p>
+            </div>
+          )}
 
           <div className="custom-grid-table mt-2 mb-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
             <div className="custom-grid-cell">

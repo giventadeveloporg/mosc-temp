@@ -5,11 +5,11 @@ import { useRouter } from "next/navigation";
 import type { EventMediaDTO } from "@/types";
 import { FaUsers, FaPhotoVideo, FaCalendarAlt, FaTimes, FaChevronLeft, FaChevronRight, FaTicketAlt, FaUpload, FaTags, FaHome, FaFolderOpen } from 'react-icons/fa';
 import AdminNavigation from '@/components/AdminNavigation';
-import { createPortal } from "react-dom";
 import { Modal } from "@/components/Modal";
 import { formatInTimeZone } from 'date-fns-tz';
 import EventFormHelpTooltip from '@/components/EventFormHelpTooltip';
 import MediaImageSpecHelpContent from '@/components/MediaImageSpecHelpContent';
+import { getClientTenantId } from '@/lib/env';
 
 // Helper function for timezone-aware date formatting
 function formatDateInTimezone(dateString: string, timezone: string = 'America/New_York'): string {
@@ -20,147 +20,6 @@ function formatDateInTimezone(dateString: string, timezone: string = 'America/Ne
     // Fallback to simple date formatting if timezone parsing fails
     return new Date(dateString).toLocaleDateString();
   }
-}
-
-// Tooltip component with improved functionality
-function MediaDetailsTooltip({ media, anchorRect, onClose, onTooltipMouseEnter, onTooltipMouseLeave, tooltipType, serialNumber }: {
-  media: EventMediaDTO | null,
-  anchorRect: DOMRect | null,
-  onClose: () => void,
-  onTooltipMouseEnter: () => void,
-  onTooltipMouseLeave: () => void,
-  tooltipType: 'uploadedMedia' | null,
-  serialNumber?: number
-}) {
-  if (!media || !anchorRect) return null;
-  const entries = Object.entries(media).filter(([key]) => key !== 'fileUrl' && key !== 'preSignedUrl');
-  const tooltipWidth = 600; // Increased width
-  const thWidth = 200; // Increased column width
-  const spacing = 16; // Increased spacing
-
-  // Mobile responsive positioning
-  const isMobile = window.innerWidth <= 768;
-  let top = anchorRect.top;
-  let left = anchorRect.right + spacing;
-
-  // Mobile positioning - center the tooltip
-  if (isMobile) {
-    left = Math.max(spacing, (window.innerWidth - tooltipWidth) / 2);
-    top = Math.max(spacing, anchorRect.top - 50);
-  } else {
-    // Desktop positioning - to the right of the anchor
-    if (left + tooltipWidth > window.innerWidth) {
-      left = anchorRect.left - tooltipWidth - spacing;
-    }
-  }
-
-  // Clamp position to stay within the viewport
-  const estimatedHeight = 400; // Increased height
-  if (top + estimatedHeight > window.innerHeight) {
-    top = window.innerHeight - estimatedHeight - spacing;
-  }
-  if (top < spacing) {
-    top = spacing;
-  }
-  if (left < spacing) {
-    left = spacing;
-  }
-  if (left + tooltipWidth > window.innerWidth) {
-    left = window.innerWidth - tooltipWidth - spacing;
-  }
-
-  const style: React.CSSProperties = {
-    position: 'fixed',
-    top,
-    left,
-    zIndex: 9999,
-    width: isMobile ? Math.min(tooltipWidth, window.innerWidth - 32) : tooltipWidth,
-    maxWidth: isMobile ? '90vw' : 600,
-    maxHeight: isMobile ? '70vh' : 500, // Increased height
-    overflowY: 'auto',
-    pointerEvents: 'auto',
-    background: '#fff',
-    borderWidth: 2,
-    borderStyle: 'solid',
-    borderColor: '#3b82f6', // Blue border for better visibility
-    borderRadius: 16,
-    boxShadow: '0 8px 32px rgba(0,0,0,0.2)', // Enhanced shadow
-    fontSize: 16, // Increased font size
-    padding: 20, // Increased padding
-    paddingBottom: 20,
-  };
-
-  return createPortal(
-    <div
-      className="admin-tooltip"
-      style={style}
-      tabIndex={-1}
-      onMouseEnter={onTooltipMouseEnter}
-      onMouseLeave={onTooltipMouseLeave}
-    >
-      {/* Header with close button and hint */}
-      <div className="sticky top-0 right-0 z-10 bg-white flex justify-between items-center mb-4 pb-2 border-b border-gray-200">
-        <div className="flex items-center gap-3">
-          {serialNumber && (
-            <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-bold">
-              #{serialNumber}
-            </div>
-          )}
-          <span className="text-sm text-gray-600 font-medium">
-            Click the × button to close this dialog
-          </span>
-        </div>
-        <button
-          onClick={onClose}
-          className="w-10 h-10 text-2xl bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all"
-          aria-label="Close tooltip"
-        >
-          <FaTimes />
-        </button>
-      </div>
-
-      <table className="admin-tooltip-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <tbody>
-          {entries.map(([key, value]) => (
-            <tr key={key} className="border-b border-gray-100">
-              <th style={{
-                textAlign: 'left',
-                width: thWidth,
-                minWidth: thWidth,
-                maxWidth: thWidth,
-                fontWeight: 600,
-                wordBreak: 'break-word',
-                whiteSpace: 'normal',
-                boxSizing: 'border-box',
-                padding: '12px 16px 12px 0',
-                fontSize: '14px',
-                color: '#374151'
-              }}>
-                {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-              </th>
-              <td style={{
-                textAlign: 'left',
-                width: 'auto',
-                padding: '12px 0',
-                fontSize: '14px',
-                color: '#6b7280'
-              }}>
-                {typeof value === 'boolean' ? (
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                    {value ? 'Yes' : 'No'}
-                  </span>
-                ) : value instanceof Date ? value.toLocaleString() :
-                  (key.toLowerCase().includes('date') || key.toLowerCase().includes('at')) && value ? formatDateInTimezone(value, 'America/New_York') :
-                    value === null || value === undefined || value === '' ? <span className="text-gray-400 italic">(empty)</span> : String(value)
-                }
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>,
-    document.body
-  );
 }
 
 interface EditMediaModalProps {
@@ -453,14 +312,14 @@ function EditMediaModal({ media, onClose, onSave, loading }: EditMediaModalProps
                   <span className="relative flex items-center justify-center">
                     <input
                       type="checkbox"
-                      className="custom-checkbox"
+                      className="custom-checkbox custom-checkbox--yellow"
                       checked={Boolean(form[name])}
                       onChange={() => handleCheckboxChange(name)}
                       onClick={(e) => e.stopPropagation()}
                     />
                     <span className="custom-checkbox-tick">
                       {Boolean(form[name]) && (
-                        <svg className="text-black" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
+                        <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l5 5L19 7" />
                         </svg>
                       )}
@@ -1015,11 +874,11 @@ function UploadMediaModal({
                   type="checkbox"
                   checked={state}
                   onChange={e => set(e.target.checked)}
-                  className="custom-checkbox"
+                  className="custom-checkbox custom-checkbox--yellow"
                 />
                 <span className="custom-checkbox-tick">
                   {state && (
-                    <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
+                    <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l5 5L19 7" />
                     </svg>
                   )}
@@ -1112,13 +971,13 @@ export default function AdminMediaPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [eventFlyerOnly, setEventFlyerOnly] = useState(false);
   const [heroImagesOnly, setHeroImagesOnly] = useState(false);
+  /** Enabled after first paginated load with no filters, so initial load always shows all media. */
+  const [filtersEnabled, setFiltersEnabled] = useState(false);
   const [serialNumberInput, setSerialNumberInput] = useState('');
   const totalPages = Math.ceil(totalCount / pageSize);
   const router = useRouter();
 
   const [activeTooltip, setActiveTooltip] = useState<{ media: EventMediaDTO, type: 'uploadedMedia', serialNumber: number } | null>(null);
-  const [tooltipAnchorRect, setTooltipAnchorRect] = useState<DOMRect | null>(null);
-  const [isTooltipHovered, setIsTooltipHovered] = useState(false);
   const [isCellHovered, setIsCellHovered] = useState(false);
   const [isTooltipClosed, setIsTooltipClosed] = useState(false);
   const tooltipTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -1145,17 +1004,24 @@ export default function AdminMediaPage() {
         setLoading(true);
         setError(null);
         try {
+          // First load: no checkbox filters (Event Flyer / Hero) so we show a paginated list of all media.
+          // Filters are applied only after first load completes (filtersEnabled) and user checks a box.
+          // Always include tenantId so backend returns media for current tenant (required for multi-tenant).
+          const tenantId = getClientTenantId();
           let url = `/api/proxy/event-medias?page=${page}&size=${pageSize}&sort=updatedAt,desc`;
+          if (tenantId) {
+            url += `&tenantId.equals=${encodeURIComponent(tenantId)}`;
+          }
 
           if (searchTerm) {
             url += `&title.contains=${encodeURIComponent(searchTerm)}`;
           }
 
-          if (eventFlyerOnly) {
+          if (filtersEnabled && eventFlyerOnly) {
             url += `&eventFlyer.equals=true`;
           }
 
-          if (heroImagesOnly) {
+          if (filtersEnabled && heroImagesOnly) {
             url += `&isHeroImage.equals=true`;
           }
 
@@ -1163,14 +1029,40 @@ export default function AdminMediaPage() {
           if (!res.ok) throw new Error("Failed to fetch media files");
 
           const data = await res.json();
-          setMediaList(Array.isArray(data) ? data : [data]);
+          // Backend may return array, or paged { content: [], totalElements: N } or { content: [], total_elements: N }
+          const list = Array.isArray(data) ? data : (data?.content != null ? data.content : [data]);
+          setMediaList(list);
 
-          // Get total count from header
+          // Get total count from header or response (camelCase or snake_case); required for pagination
           const totalCountHeader = res.headers.get('x-total-count');
+          let total = 0;
           if (totalCountHeader) {
-            setTotalCount(parseInt(totalCountHeader, 10));
+            total = parseInt(totalCountHeader, 10) || 0;
+          } else if (data?.totalElements != null) {
+            total = Number(data.totalElements);
+          } else if (data?.total_elements != null) {
+            total = Number(data.total_elements);
+          } else if (data?.totalCount != null) {
+            total = Number(data.totalCount);
+          } else if (data?.total_count != null) {
+            total = Number(data.total_count);
+          } else if (data?.totalPages != null && typeof data?.size === 'number') {
+            total = Number(data.totalPages) * Number(data.size);
+          } else if (data?.total_pages != null && typeof data?.size === 'number') {
+            total = Number(data.total_pages) * Number(data.size);
+          } else if (Array.isArray(data)) {
+            total = data.length;
           } else {
-            setTotalCount(data.length);
+            total = list.length;
+          }
+          setTotalCount(total);
+          if (process.env.NODE_ENV === 'development' && total <= pageSize && list.length === pageSize) {
+            console.warn('[Admin Media] Total count may be wrong (only one page). Response keys:', data && typeof data === 'object' ? Object.keys(data) : [], 'total:', total, 'list.length:', list.length);
+          }
+
+          // Enable filter checkboxes after first successful load (no checkbox filters applied)
+          if (!filtersEnabled && !eventFlyerOnly && !heroImagesOnly) {
+            setFiltersEnabled(true);
           }
         } catch (e: any) {
           setError(e.message || "Failed to load media files");
@@ -1179,48 +1071,21 @@ export default function AdminMediaPage() {
         }
       }
       fetchMedia();
-    }, 500); // Debounce search
+    }, searchTerm ? 500 : 0); // Debounce only when searching; first load immediate
     return () => clearTimeout(timer);
   }, [page, pageSize, searchTerm, eventFlyerOnly, heroImagesOnly, refreshKey]);
 
   function handleViewClick(media: EventMediaDTO, e: React.MouseEvent<HTMLButtonElement>, serialNumber: number) {
     e.stopPropagation();
     if (tooltipTimeoutRef.current) clearTimeout(tooltipTimeoutRef.current);
-    setTooltipAnchorRect(e.currentTarget.getBoundingClientRect());
     setActiveTooltip({ media, type: 'uploadedMedia', serialNumber });
     setIsTooltipClosed(false);
   }
 
-  function handleTooltipMouseEnter() {
-    setIsTooltipHovered(true);
-  }
-
-  function handleTooltipMouseLeave() {
-    setIsTooltipHovered(false);
-    // Don't auto-close tooltip - only close on button click
-  }
-
   function handleCloseTooltip() {
     setActiveTooltip(null);
-    setTooltipAnchorRect(null);
-    setIsTooltipHovered(false);
     setIsCellHovered(false);
     setIsTooltipClosed(true);
-
-    // Scroll to the top of the page to move away from the tooltip area
-    if (pageTopRef.current) {
-      pageTopRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-        inline: 'nearest'
-      });
-    } else {
-      // Fallback: scroll to top of window
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-    }
 
     // Reset the closed state after a delay to allow tooltips again
     setTimeout(() => {
@@ -1484,20 +1349,21 @@ export default function AdminMediaPage() {
             </button>
           </div>
 
-          {/* Event flyers and hero images filters */}
+          {/* Event flyers and hero images filters — enabled only after first load (paginated list of all media) */}
           <div className="flex flex-wrap items-center gap-4">
-            <label className="flex items-center gap-2 cursor-pointer">
+            <label className={`flex items-center gap-2 ${filtersEnabled ? 'cursor-pointer' : 'cursor-not-allowed opacity-70'}`} title={filtersEnabled ? 'Filter by event flyers' : 'Filters enable after the list loads'}>
               <span className="relative flex items-center justify-center">
                 <input
                   type="checkbox"
-                  className="custom-checkbox"
+                  className="custom-checkbox custom-checkbox--yellow"
                   checked={eventFlyerOnly}
+                  disabled={!filtersEnabled}
                   onChange={(e) => setEventFlyerOnly(e.target.checked)}
                   onClick={(e) => e.stopPropagation()}
                 />
                 <span className="custom-checkbox-tick">
                   {eventFlyerOnly && (
-                    <svg className="text-black" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
+                    <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l5 5L19 7" />
                     </svg>
                   )}
@@ -1505,18 +1371,19 @@ export default function AdminMediaPage() {
               </span>
               <span className="text-sm font-medium text-gray-700 select-none">Event Flyers Only</span>
             </label>
-            <label className="flex items-center gap-2 cursor-pointer">
+            <label className={`flex items-center gap-2 ${filtersEnabled ? 'cursor-pointer' : 'cursor-not-allowed opacity-70'}`} title={filtersEnabled ? 'Filter by hero images' : 'Filters enable after the list loads'}>
               <span className="relative flex items-center justify-center">
                 <input
                   type="checkbox"
-                  className="custom-checkbox"
+                  className="custom-checkbox custom-checkbox--yellow"
                   checked={heroImagesOnly}
+                  disabled={!filtersEnabled}
                   onChange={(e) => setHeroImagesOnly(e.target.checked)}
                   onClick={(e) => e.stopPropagation()}
                 />
                 <span className="custom-checkbox-tick">
                   {heroImagesOnly && (
-                    <svg className="text-black" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
+                    <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l5 5L19 7" />
                     </svg>
                   )}
@@ -1553,12 +1420,12 @@ export default function AdminMediaPage() {
                     type="checkbox"
                     checked={allOnPageSelected}
                     onChange={toggleSelectAllOnPage}
-                    className="custom-checkbox"
+                    className="custom-checkbox custom-checkbox--yellow"
                     aria-label="Select all on this page"
                   />
                   <span className="custom-checkbox-tick">
                     {allOnPageSelected && (
-                      <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
+                      <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l5 5L19 7" />
                       </svg>
                     )}
@@ -1606,8 +1473,30 @@ export default function AdminMediaPage() {
               <div
                 key={item.id}
                 data-serial-number={serialNumber}
-                className="bg-white rounded-lg shadow-md overflow-hidden group flex flex-col justify-between"
+                className="relative bg-white rounded-lg shadow-md overflow-hidden group flex flex-col justify-between"
               >
+                {/* Checkbox: top right corner of card */}
+                {item.id != null && (
+                  <label className="absolute top-2 right-2 z-20 flex flex-col items-center cursor-pointer" title="Select media">
+                    <span className="relative flex items-center justify-center">
+                      <input
+                        type="checkbox"
+                        className="custom-checkbox custom-checkbox--yellow"
+                        checked={isSelected}
+                        onChange={() => toggleSelection(item.id)}
+                        onClick={(e) => e.stopPropagation()}
+                        aria-label="Select media"
+                      />
+                      <span className="custom-checkbox-tick">
+                        {isSelected && (
+                          <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l5 5L19 7" />
+                          </svg>
+                        )}
+                      </span>
+                    </span>
+                  </label>
+                )}
                 <div>
                   <div className="relative h-48 bg-gray-200">
                     {/* Serial number overlay */}
@@ -1632,28 +1521,8 @@ export default function AdminMediaPage() {
                     <p className="text-gray-600 text-sm h-10 overflow-hidden" title={item.description || ''}>{item.description}</p>
                   </div>
                 </div>
-                {/* Checkbox (left) + Action Buttons - compact so all 4 fit in card; checkbox per ui_style_guide.mdc */}
-                <div className="p-4 pt-0 flex items-center gap-1.5">
-                  {/* Per-item checkbox - custom-checkbox pattern per cursor rule */}
-                  {item.id != null && (
-                    <label className="flex-shrink-0 flex items-center justify-center">
-                      <span className="relative flex items-center justify-center">
-                        <input
-                          type="checkbox"
-                          className="custom-checkbox"
-                          checked={isSelected}
-                          onChange={() => toggleSelection(item.id)}
-                          onClick={(e) => e.stopPropagation()}
-                          aria-label={`Select ${item.title || 'media'}`}
-                        />
-                        <span className="custom-checkbox-tick">
-                          <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l5 5L19 7" />
-                          </svg>
-                        </span>
-                      </span>
-                    </label>
-                  )}
+                {/* Action Buttons: View, Edit, Delete */}
+                <div className="p-4 pt-0 flex items-center justify-start gap-1.5">
                   {/* View Button */}
                   <button
                     onClick={(e) => handleViewClick(item, e, serialNumber)}
@@ -1891,15 +1760,35 @@ export default function AdminMediaPage() {
           setMessage={setUploadMessage}
         />
       )}
-      <MediaDetailsTooltip
-        media={activeTooltip?.media || null}
-        anchorRect={tooltipAnchorRect}
-        onClose={handleCloseTooltip}
-        onTooltipMouseEnter={handleTooltipMouseEnter}
-        onTooltipMouseLeave={handleTooltipMouseLeave}
-        tooltipType={activeTooltip?.type || null}
-        serialNumber={activeTooltip?.serialNumber}
-      />
+      {/* View details: same Modal style as Confirm Deletion */}
+      {activeTooltip?.media && (
+        <Modal
+          open={true}
+          onClose={handleCloseTooltip}
+          title={activeTooltip.serialNumber != null ? `Media Details #${activeTooltip.serialNumber}` : 'Media Details'}
+        >
+          <div className="max-h-[60vh] overflow-y-auto">
+            {Object.entries(activeTooltip.media)
+              .filter(([key]) => key !== 'fileUrl' && key !== 'preSignedUrl')
+              .map(([key, value]) => (
+                <div key={key} className="border-b border-gray-100 py-3 first:pt-0">
+                  <div className="text-sm font-semibold text-gray-700 mb-0.5">
+                    {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    {typeof value === 'boolean' ? (
+                      <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                        {value ? 'Yes' : 'No'}
+                      </span>
+                    ) : value instanceof Date ? value.toLocaleString() :
+                      (key.toLowerCase().includes('date') || key.toLowerCase().includes('at')) && value ? formatDateInTimezone(value, 'America/New_York') :
+                        value === null || value === undefined || value === '' ? <span className="text-gray-400 italic">(empty)</span> : String(value)}
+                  </div>
+                </div>
+              ))}
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }

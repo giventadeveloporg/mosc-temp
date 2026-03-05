@@ -31,7 +31,17 @@ export default function SyroBannerShortcuts() {
                   />
                 </div>
                 <div className="quick-title">
-                  <h6 className="mb-0">{item.title}</h6>
+                  <h6 className="mb-0">
+                    {item.title === 'CATHOLICATE NEWS' ? (
+                      <>
+                        CATHOLICATE
+                        <br />
+                        NEWS
+                      </>
+                    ) : (
+                      item.title
+                    )}
+                  </h6>
                 </div>
               </Link>
             </div>

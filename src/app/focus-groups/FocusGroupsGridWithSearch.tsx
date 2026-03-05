@@ -68,70 +68,77 @@ export default function FocusGroupsGridWithSearch({ groups, total }: FocusGroups
         )}
       </div>
 
-      {/* Focus Groups Grid */}
+      {/* Focus Groups Grid - colored cards with cycling accent */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-        {paginatedGroups.map((g) => (
-          <div
-            key={g.id}
-            className="group block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300"
-          >
-            <a href={`/focus-groups/${encodeURIComponent(g.slug || '')}`} className="block text-center">
-              <div
-                className="h-60 rounded-lg mb-4 overflow-hidden flex items-center justify-center"
-                style={{
-                  backgroundColor: '#f3f4f6',
-                  ...(g.coverImageUrl
-                    ? {
-                        backgroundImage: `url(${g.coverImageUrl})`,
-                        backgroundSize: 'contain',
-                        backgroundPosition: 'center',
-                        backgroundRepeat: 'no-repeat',
-                      }
-                    : {}),
-                }}
-              />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-300">
-                {g.name}
-              </h3>
-              <p className="text-gray-600 text-sm leading-relaxed line-clamp-3 mb-4">
-                {g.description || 'No description provided.'}
-              </p>
-            </a>
+        {paginatedGroups.map((g, index) => {
+          const colorScheme = [
+            { card: 'bg-blue-50/80 border-l-4 border-blue-500', title: 'group-hover:text-blue-700', accent: 'text-blue-600', border: 'border-blue-200', eventHover: 'hover:bg-blue-100' },
+            { card: 'bg-teal-50/80 border-l-4 border-teal-500', title: 'group-hover:text-teal-700', accent: 'text-teal-600', border: 'border-teal-200', eventHover: 'hover:bg-teal-100' },
+            { card: 'bg-amber-50/80 border-l-4 border-amber-500', title: 'group-hover:text-amber-700', accent: 'text-amber-600', border: 'border-amber-200', eventHover: 'hover:bg-amber-100' },
+            { card: 'bg-indigo-50/80 border-l-4 border-indigo-500', title: 'group-hover:text-indigo-700', accent: 'text-indigo-600', border: 'border-indigo-200', eventHover: 'hover:bg-indigo-100' },
+          ][index % 4];
+          return (
+            <div
+              key={g.id}
+              className={`group block rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300 ${colorScheme.card}`}
+            >
+              <a href={`/focus-groups/${encodeURIComponent(g.slug || '')}`} className="block text-center">
+                <div
+                  className="h-60 rounded-lg mb-4 overflow-hidden flex items-center justify-center bg-white/60"
+                  style={{
+                    ...(g.coverImageUrl
+                      ? {
+                          backgroundImage: `url(${g.coverImageUrl})`,
+                          backgroundSize: 'contain',
+                          backgroundPosition: 'center',
+                          backgroundRepeat: 'no-repeat',
+                        }
+                      : { backgroundColor: 'rgba(243, 244, 246, 0.8)' }),
+                  }}
+                />
+                <h3 className={`text-xl font-semibold text-gray-900 mb-2 transition-colors duration-300 ${colorScheme.title}`}>
+                  {g.name}
+                </h3>
+                <p className="text-gray-700 text-sm leading-relaxed line-clamp-3 mb-4">
+                  {g.description || 'No description provided.'}
+                </p>
+              </a>
 
-            {g.events && g.events.length > 0 && (
-              <div className="mt-4 pt-4 border-t border-gray-200 text-center">
-                <h4 className="text-sm font-semibold text-gray-700 mb-2">Upcoming Events</h4>
-                <div className="space-y-2">
-                  {g.events.slice(0, 3).map((event: any) => (
-                    <a
-                      key={event.id}
-                      href={`/event/${event.id}`}
-                      className="block p-2 rounded-lg hover:bg-gray-50 transition-colors duration-300"
-                    >
-                      <div className="text-xs text-gray-500">
-                        {event.startDate} • {event.startTime}
-                      </div>
-                      <div className="text-sm font-medium text-gray-900 mt-1 line-clamp-1">{event.title}</div>
-                    </a>
-                  ))}
-                  {g.events.length > 3 && (
-                    <a
-                      href={`/focus-groups/${encodeURIComponent(g.slug || '')}`}
-                      className="block text-xs text-blue-600 hover:text-blue-800 mt-2 font-medium transition-colors duration-300"
-                    >
-                      View all {g.events.length} events →
-                    </a>
-                  )}
+              {g.events && g.events.length > 0 && (
+                <div className={`mt-4 pt-4 border-t ${colorScheme.border} text-center`}>
+                  <h4 className={`text-sm font-semibold mb-2 ${colorScheme.accent}`}>Upcoming Events</h4>
+                  <div className="space-y-2">
+                    {g.events.slice(0, 3).map((event: any) => (
+                      <a
+                        key={event.id}
+                        href={`/event/${event.id}`}
+                        className={`block p-2 rounded-lg transition-colors duration-300 ${colorScheme.eventHover}`}
+                      >
+                        <div className="text-xs text-gray-600">
+                          {event.startDate} • {event.startTime}
+                        </div>
+                        <div className="text-sm font-medium text-gray-900 mt-1 line-clamp-1">{event.title}</div>
+                      </a>
+                    ))}
+                    {g.events.length > 3 && (
+                      <a
+                        href={`/focus-groups/${encodeURIComponent(g.slug || '')}`}
+                        className={`block text-xs mt-2 font-medium transition-colors duration-300 ${colorScheme.accent} hover:opacity-80`}
+                      >
+                        View all {g.events.length} events →
+                      </a>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
-            {g.events && g.events.length === 0 && (
-              <div className="mt-4 pt-4 border-t border-gray-200 text-center">
-                <p className="text-xs text-gray-500">No upcoming events</p>
-              </div>
-            )}
-          </div>
-        ))}
+              )}
+              {g.events && g.events.length === 0 && (
+                <div className={`mt-4 pt-4 border-t ${colorScheme.border} text-center`}>
+                  <p className="text-xs text-gray-500">No upcoming events</p>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {filteredCount === 0 && (

@@ -827,3 +827,489 @@ body:has(.syro-layout) {
   box-shadow: 0 0 0 30px rgba(190, 25, 41, 0.85) inset !important;
   background-color: transparent !important;
 }
+
+/* ===== Banner shortcuts: 3 links in first row, 2 in second row (no text/icon cutoff) ===== */
+.syro-layout #banner-shortcuts-section.quicklink {
+  background-color: #dc354533 !important;
+  background-image: none !important;
+  position: relative !important;
+}
+
+/* Dotted pattern only at the end (bottom) of the section */
+.syro-layout #banner-shortcuts-section.quicklink::after {
+  content: '' !important;
+  display: block !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 40px !important;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.65) 1.5px, transparent 1.5px) !important;
+  background-size: 12px 12px !important;
+  background-position: 0 0 !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+.syro-layout #banner-shortcuts-section.quicklink .container {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.syro-layout #banner-shortcuts-section #banner-shortcuts.row {
+  display: grid !important;
+  grid-template-columns: minmax(8rem, 1fr) repeat(2, 1fr) !important;
+  gap: 0.35rem 0.5rem !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.syro-layout #banner-shortcuts-section #banner-shortcuts .col {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.syro-layout #banner-shortcuts-section .quick-link-card {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  min-width: 0 !important;
+  overflow: visible !important;
+  padding: 0.4rem 0.25rem !important;
+}
+
+.syro-layout #banner-shortcuts-section .quick-link-card .quick-icon {
+  flex-shrink: 0 !important;
+  width: 40px !important;
+  min-width: 40px !important;
+}
+
+.syro-layout #banner-shortcuts-section .quick-link-card .quick-icon img {
+  width: 100% !important;
+  height: auto !important;
+  object-fit: contain !important;
+}
+
+.syro-layout #banner-shortcuts-section .quick-link-card .quick-title {
+  min-width: 0 !important;
+  flex: 1 !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
+}
+
+.syro-layout #banner-shortcuts-section .quick-link-card .quick-title h6 {
+  margin-bottom: 0 !important;
+  white-space: nowrap !important;
+  line-height: 1.25 !important;
+}
+
+/* CATHOLICATE NEWS: line 1 = CATHOLICATE, line 2 = NEWS; no truncation */
+.syro-layout #banner-shortcuts-section #banner-shortcuts .col:first-child .quick-title {
+  overflow: visible !important;
+  min-width: 0 !important;
+}
+
+.syro-layout #banner-shortcuts-section #banner-shortcuts .col:first-child .quick-title h6 {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  display: block !important;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+}
+
+@media screen and (max-width: 767px) {
+  .syro-layout #banner-shortcuts-section .quick-link-card .quick-title h6 {
+    font-size: 0.7rem !important;
+  }
+}
+
+/* ===== MOSC mobile view: content alignment (reference: syromalabarchurch.in) ===== */
+@media screen and (max-width: 767px) {
+  .syro-layout .container,
+  .syro-layout main .container {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
+  }
+
+  .syro-layout .row {
+    margin-left: -0.5rem !important;
+    margin-right: -0.5rem !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    box-sizing: border-box !important;
+  }
+
+  .syro-layout .row:not(#banner-shortcuts) > [class*='col'] {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Banner shortcuts: tighter container padding so link text fits on one line */
+  #banner-shortcuts-section.quicklink .container {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+
+  /* About section: single column, no left offset */
+  .syro-layout section.about-us .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .syro-layout section.about-us .about-data {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    text-align: center !important;
+  }
+
+  .syro-layout section.about-us .about-data .main-title h1 {
+    text-align: center !important;
+    font-size: clamp(1.5rem, 5vw, 2rem) !important;
+  }
+
+  .syro-layout section.about-us .about-content p {
+    text-align: center !important;
+    font-size: 1rem !important;
+    line-height: 1.6 !important;
+  }
+
+  .syro-layout section.about-us .about-data .primary-button {
+    display: inline-block !important;
+    margin: 0 auto !important;
+  }
+
+  /* About images: mobile layout = 1 large left + 2 stacked smaller right (like screenshot) */
+  .syro-layout section.about-us .about-images .row {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: stretch !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+  }
+
+  .syro-layout section.about-us .about-images .col-6.about-img-1 {
+    flex: 0 0 52% !important;
+    max-width: 52% !important;
+    width: 52% !important;
+    display: flex !important;
+    align-items: stretch !important;
+  }
+
+  .syro-layout section.about-us .about-images .col-6.about-img-1 .img-1-container {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 220px !important;
+    display: flex !important;
+    align-items: stretch !important;
+  }
+
+  .syro-layout section.about-us .about-images .col-6.about-img-1 .img-1-container .img-1 {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    display: block !important;
+  }
+
+  .syro-layout section.about-us .about-images .col-6.about-img-1 .img-1-container .img-1 img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+
+  .syro-layout section.about-us .about-images .col-6:not(.about-img-1) {
+    flex: 0 0 calc(48% - 0.5rem) !important;
+    max-width: calc(48% - 0.5rem) !important;
+    width: calc(48% - 0.5rem) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+    margin-bottom: 0 !important;
+    min-height: 220px !important;
+  }
+
+  .syro-layout section.about-us .about-images .col-6:not(.about-img-1) .img-2,
+  .syro-layout section.about-us .about-images .col-6:not(.about-img-1) .img-3 {
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+    width: 100% !important;
+    display: block !important;
+    position: relative !important;
+  }
+
+  .syro-layout section.about-us .about-images .col-6:not(.about-img-1) .img-2 img,
+  .syro-layout section.about-us .about-images .col-6:not(.about-img-1) .img-3 img {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+
+  .syro-layout section.about-us .about-images .col-6:not(.about-img-1) .img-2 {
+    margin-bottom: 0 !important;
+  }
+
+  .syro-layout section.about-us .img-border {
+    border: 4px solid #ffffff !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Section title: prevent overflow from vertical label */
+  .syro-layout .section-title {
+    position: relative !important;
+    left: 0 !important;
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+  }
+
+  .syro-layout .section-title h6 {
+    writing-mode: horizontal-tb !important;
+    transform: none !important;
+    position: relative !important;
+    left: 0 !important;
+    font-size: 0.9375rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .syro-layout .section-title::after {
+    display: none !important;
+  }
+
+  /* Circular notification: stack columns */
+  .syro-layout section.Circularnotification .row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.5rem !important;
+  }
+
+  .syro-layout section.Circularnotification .col,
+  .syro-layout section.Circularnotification .col-lg-2 {
+    flex: 0 0 auto !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* Cardinal / Catholicos section: full-width responsive layout, no left gap */
+  .syro-layout .syro-cardinal-section .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    max-width: 100% !important;
+  }
+
+  .syro-layout .syro-cardinal-section .row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .syro-layout .syro-cardinal-section .col-lg-6 {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .syro-layout .syro-cardinal-section .syro-cardinal-details {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    text-align: center !important;
+  }
+
+  .syro-layout .syro-cardinal-section .syro-cardinal-section-title.section-title {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex-shrink: 0 !important;
+    margin-bottom: 0.75rem !important;
+    text-align: left !important;
+  }
+
+  .syro-layout .syro-cardinal-section .syro-cardinal-section-title.section-title h6 {
+    width: 100% !important;
+  }
+
+  .syro-layout .syro-cardinal-section .syro-cardinal-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    text-align: center !important;
+    flex: none !important;
+  }
+
+  .syro-layout .syro-cardinal-section .syro-cardinal-heading,
+  .syro-layout .syro-cardinal-section .syro-cardinal-name-bar {
+    text-align: center !important;
+  }
+
+  .syro-layout .syro-cardinal-section .syro-cardinal-name-bar {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .syro-layout .syro-cardinal-section .syro-cardinal-about {
+    text-align: left !important;
+    font-size: 1rem !important;
+    line-height: 1.6 !important;
+  }
+
+  .syro-layout .syro-cardinal-section .syro-cardinal-profile {
+    display: flex !important;
+    justify-content: center !important;
+  }
+
+  .syro-layout .syro-cardinal-section .syro-cardinal-images {
+    display: flex !important;
+    justify-content: center !important;
+  }
+
+  /* Cardinal image block (mobile): main image as card + pink panel behind overlay, like second screenshot */
+  .syro-layout .syro-cardinal-section .syro-cardinal-main-img-wrap.cardinal-black-white-div {
+    max-width: 100% !important;
+    width: 100% !important;
+    background: #e8e8e8 !important;
+    border-radius: 12px !important;
+    border: 3px solid #ffffff !important;
+    padding: 0.5rem !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+  }
+
+  .syro-layout .syro-cardinal-section .syro-cardinal-main-img-wrap .cardinal-black-white {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 8px !important;
+    display: block !important;
+  }
+
+  .syro-layout .syro-cardinal-section .syro-cardinal-overlay.cardinal-color-div {
+    position: absolute !important;
+    right: 0.5rem !important;
+    bottom: 0.5rem !important;
+    left: auto !important;
+    top: auto !important;
+    transform: translate(-12%, 35%) !important;
+    border: 3px solid #ffffff !important;
+    border-radius: 10px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+    z-index: 2 !important;
+  }
+
+  .syro-layout .syro-cardinal-section .syro-cardinal-overlay.cardinal-color-div::before {
+    display: block !important;
+    content: '' !important;
+    position: absolute !important;
+    z-index: -1 !important;
+    left: -12px !important;
+    top: -12px !important;
+    right: -12px !important;
+    bottom: -12px !important;
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 50%, #f1aeb5 100%) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.15) !important;
+  }
+
+  .syro-layout .syro-cardinal-section .syro-cardinal-overlay.cardinal-color-div img {
+    width: 140px !important;
+    height: auto !important;
+    border-radius: 8px !important;
+  }
+
+  /* Liturgy section */
+  .syro-layout section.liturgy .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .syro-layout section.liturgy .liturgy-container .main-title h2 {
+    text-align: center !important;
+  }
+
+  .syro-layout section.liturgy .liturgy-data .row {
+    flex-direction: column !important;
+  }
+
+  .syro-layout section.liturgy .liturgy-data .col-lg-3,
+  .syro-layout section.liturgy .liturgy-data .col-lg-9 {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  .syro-layout section.liturgy .col-12.d-flex {
+    justify-content: center !important;
+  }
+
+  /* Locations section */
+  .syro-layout section.syromalabar-locations .location-container {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    text-align: center !important;
+  }
+
+  .syro-layout section.syromalabar-locations .main-title h2 {
+    text-align: center !important;
+  }
+
+  .syro-layout section.syromalabar-locations .location-map {
+    padding: 1rem !important;
+    margin: 1.5rem 0 !important;
+  }
+
+  /* Quick links bar (below header): prevent horizontal overflow */
+  .syro-layout .syro-quicklinks-bar .container {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+    max-width: 100% !important;
+  }
+
+  .syro-layout .syro-quicklinks-bar .syro-quicklinks-inner {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+  }
+
+  /* Header logo: prevent overflow */
+  .syro-layout #syro-header-bar.logo-container {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+
+  .syro-layout #syro-header-bar .logo-box-img .logo-img-div img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Footer: padding-left on second and third sections (Quick Links + third column) */
+  .syro-layout footer .footer-container .row > div:nth-child(2),
+  .syro-layout footer .footer-container .row > div:nth-child(3) {
+    padding-left: 1rem !important;
+  }
+
+  /* Footer: pl-3 on inner div of second and third sections (mobile) */
+  .syro-layout footer .footer-container .row > div:nth-child(2) > div,
+  .syro-layout footer .footer-container .row > div:nth-child(3) > div {
+    padding-left: 0.75rem !important;
+  }
+
+  /* Main content no horizontal scroll */
+  .syro-layout #mainContent.syro-main {
+    overflow-x: hidden !important;
+  }
+}

@@ -16,7 +16,8 @@ import {
   FaCalendarAlt,
   FaClock,
   FaMapMarkerAlt,
-  FaTicketAlt
+  FaTicketAlt,
+  FaObjectGroup
 } from 'react-icons/fa';
 import type { EventDetailsDTO } from '@/types';
 
@@ -225,6 +226,18 @@ export default function EventOverviewPage() {
                   <FaImage className="w-10 h-10 text-purple-500" />
                 </div>
                 <span className="font-semibold text-center leading-tight">Event Media</span>
+              </Link>
+
+              <Link
+                href={`/admin/events/${eventId}/focus-groups`}
+                className="flex flex-col items-center justify-center bg-amber-50 hover:bg-amber-100 text-amber-800 rounded-lg shadow-md p-4 text-xs transition-all group"
+                title="Focus Groups"
+                aria-label="Focus Groups"
+              >
+                <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-amber-100 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                  <FaObjectGroup className="w-10 h-10 text-amber-500" />
+                </div>
+                <span className="font-semibold text-center leading-tight">Focus Groups</span>
               </Link>
 
               <Link

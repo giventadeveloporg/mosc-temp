@@ -1,7 +1,7 @@
 "use server";
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import { getTenantId, getAppUrl, getApiBaseUrl } from '@/lib/env';
-import type { EventMediaDTO } from '@/types';
+import type { EventMediaDTO, EventFocusGroupDTO, FocusGroupDTO } from '@/types';
 import { withTenantId } from '@/lib/withTenantId';
 
 // Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
@@ -40,6 +40,7 @@ export async function fetchMediaFilteredServer(
     isHomePageHeroImage?: boolean;
     isFeaturedEventImage?: boolean;
     isLiveEventImage?: boolean;
+    eventFocusGroupId?: number | null;
   } = {}
 ) {
   const params = new URLSearchParams({
@@ -77,6 +78,9 @@ export async function fetchMediaFilteredServer(
   }
   if (filters.isLiveEventImage !== undefined) {
     params.append('isLiveEventImage.equals', String(filters.isLiveEventImage));
+  }
+  if (filters.eventFocusGroupId != null && filters.eventFocusGroupId !== undefined) {
+    params.append('eventFocusGroupId.equals', String(filters.eventFocusGroupId));
   }
 
   const url = `${getApiBase()}/api/event-medias?${params.toString()}`;
@@ -125,6 +129,8 @@ export interface MediaUploadParams {
   files: File[];
   isTeamMemberProfileImage?: boolean; // Add optional parameter for team member profile images
   startDisplayingFromDate: string; // Required parameter - date when media should start being displayed
+  /** Optional event_focus_groups association id; when set, media is scoped to that focus group for this event. */
+  eventFocusGroupId?: number | null;
 }
 
 export async function uploadMedia(eventId: number, {
@@ -143,7 +149,8 @@ export async function uploadMedia(eventId: number, {
   userProfileId,
   files,
   isTeamMemberProfileImage = false, // Default to false for regular event media
-  startDisplayingFromDate
+  startDisplayingFromDate,
+  eventFocusGroupId,
 }: MediaUploadParams) {
   // Validate required fields
   if (!title || title.trim() === '') {
@@ -195,6 +202,10 @@ export async function uploadMedia(eventId: number, {
 
   // Append startDisplayingFromDate (required field)
   formData.append('startDisplayingFromDate', startDisplayingFromDate);
+
+  if (eventFocusGroupId != null && eventFocusGroupId !== undefined) {
+    formData.append('eventFocusGroupId', String(eventFocusGroupId));
+  }
 
   // Use the proxy endpoint (not direct backend call)
   const url = `${getAppUrl()}/api/proxy/event-medias/upload-multiple`;
@@ -324,6 +335,57 @@ export async function fetchEventDetailsByIdServer(eventId: number) {
     return null;
   }
   return await res.json();
+}
+
+/**
+ * Fetch event-focus-groups associations for an event (for dropdown and labels).
+ * Uses proxy; do not add tenantId.equals (proxy injects it).
+ */
+export async function fetchEventFocusGroupsForEventServer(eventId: number): Promise<EventFocusGroupDTO[]> {
+  if (!eventId) return [];
+  const baseUrl = getAppUrl();
+  const url = `${baseUrl}/api/proxy/event-focus-groups?eventId.equals=${eventId}`;
+  const res = await fetchWithJwtRetry(url, { cache: 'no-store' });
+  if (!res.ok) {
+    console.error(`Failed to fetch event focus groups for event ${eventId}: ${res.statusText}`);
+    return [];
+  }
+  const data = await res.json();
+  return Array.isArray(data) ? data : [data];
+}
+
+/**
+ * Fetch focus groups (for resolving names by id). Uses proxy with size limit.
+ */
+async function fetchFocusGroupsServer(size: number = 500): Promise<FocusGroupDTO[]> {
+  const baseUrl = getAppUrl();
+  const url = `${baseUrl}/api/proxy/focus-groups?size=${size}&sort=name,asc`;
+  const res = await fetchWithJwtRetry(url, { cache: 'no-store' });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return Array.isArray(data) ? data : [data];
+}
+
+/**
+ * Returns event focus groups for the event and a map of association id -> focus group name
+ * for dropdown options and media list labels.
+ */
+export async function fetchEventFocusGroupsWithNamesServer(
+  eventId: number
+): Promise<{ eventFocusGroups: EventFocusGroupDTO[]; focusGroupNameByAssociationId: Record<number, string> }> {
+  const [eventFocusGroups, allFocusGroups] = await Promise.all([
+    fetchEventFocusGroupsForEventServer(eventId),
+    fetchFocusGroupsServer(),
+  ]);
+  const focusById = new Map<number, FocusGroupDTO>(allFocusGroups.filter(f => f.id != null).map(f => [f.id!, f]));
+  const focusGroupNameByAssociationId: Record<number, string> = {};
+  for (const efg of eventFocusGroups) {
+    if (efg.id != null && efg.focusGroupId != null) {
+      const fg = focusById.get(efg.focusGroupId);
+      if (fg?.name) focusGroupNameByAssociationId[efg.id] = fg.name;
+    }
+  }
+  return { eventFocusGroups, focusGroupNameByAssociationId };
 }
 
 // Add upload and delete actions as needed

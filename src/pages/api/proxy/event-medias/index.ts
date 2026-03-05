@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getCachedApiJwt } from "@/lib/api/jwt";
-import { getApiBaseUrl } from '@/lib/env';
+import { getApiBaseUrl, getTenantId } from '@/lib/env';
 
 const API_BASE_URL = getApiBaseUrl();
 
@@ -22,12 +22,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { method, query } = req;
 
     let apiUrl = `${API_BASE_URL}/api/event-medias`;
-    // Forward query params (e.g., eventId)
+    // Forward query params (e.g., eventId, page, size, sort)
     const params = new URLSearchParams();
     for (const key in query) {
       const value = query[key];
       if (Array.isArray(value)) value.forEach(v => params.append(key, v));
       else if (typeof value !== 'undefined') params.append(key, value);
+    }
+    // Backend requires tenantId for list GET so media for current tenant is returned
+    if (method === 'GET' && !params.has('tenantId.equals')) {
+      try {
+        params.append('tenantId.equals', getTenantId());
+      } catch (e) {
+        console.warn('Event media proxy: tenantId not set, list may be empty');
+      }
     }
     const qs = params.toString();
     if (qs) apiUrl += `?${qs}`;
@@ -82,7 +90,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       if (contentType && contentType.includes('application/json')) {
         const data = await apiRes.json();
-        console.log(`Event media proxy success: JSON response with ${Array.isArray(data) ? data.length : 1} items`);
+        const totalHeader = apiRes.headers.get('x-total-count');
+        if (totalHeader) res.setHeader('x-total-count', totalHeader);
+        console.log(`Event media proxy success: JSON response with ${Array.isArray(data) ? data.length : 1} items${totalHeader ? `, x-total-count: ${totalHeader}` : ''}`);
         res.status(apiRes.status).json(data);
       } else {
         // Handle non-JSON responses (shouldn't happen for this endpoint)

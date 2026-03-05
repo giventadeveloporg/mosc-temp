@@ -1,4 +1,5 @@
 import { getAppUrl } from '@/lib/env';
+import RemoveMemberButton from './RemoveMemberButton';
 
 async function fetchGroup(baseUrl: string, id: string) {
   try {
@@ -106,36 +107,39 @@ export default async function ManageGroupMembersPage(props: { params: Promise<{ 
                   <td className="px-4 py-3 text-sm text-gray-700">{String(m.role || '').toUpperCase()}</td>
                   <td className="px-4 py-3 text-sm text-gray-700">{String(m.status || '').toUpperCase()}</td>
                   <td className="px-4 py-3 text-right text-sm">
-                    <form action={`${baseUrl}/api/proxy/focus-group-members/${m.id}`} method="post" className="inline-flex flex-wrap items-center gap-2 justify-end">
-                      <input type="hidden" name="_method" value="PATCH" />
-                      <input
-                        type="text"
-                        name="role"
-                        placeholder="MEMBER/LEAD/ADMIN"
-                        className="block w-28 border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-3 py-2 text-sm"
-                        defaultValue={String(m.role || '').toUpperCase()}
-                      />
-                      <input
-                        type="text"
-                        name="status"
-                        placeholder="ACTIVE/INACTIVE/PENDING"
-                        className="block w-28 border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-3 py-2 text-sm"
-                        defaultValue={String(m.status || '').toUpperCase()}
-                      />
-                      <button
-                        type="submit"
-                        className="flex-shrink-0 h-10 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 px-3"
-                        title="Update member"
-                        aria-label="Update member"
-                      >
-                        <span className="w-8 h-8 rounded-lg bg-blue-200 flex items-center justify-center">
-                          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                          </svg>
-                        </span>
-                        <span className="font-semibold text-blue-700 text-sm hidden sm:inline">Update</span>
-                      </button>
-                    </form>
+                    <div className="inline-flex flex-wrap items-center gap-2 justify-end">
+                      <form action={`${baseUrl}/api/proxy/focus-group-members/${m.id}`} method="post" className="inline-flex flex-wrap items-center gap-2">
+                        <input type="hidden" name="_method" value="PATCH" />
+                        <input
+                          type="text"
+                          name="role"
+                          placeholder="MEMBER/LEAD/ADMIN"
+                          className="block w-28 border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-3 py-2 text-sm"
+                          defaultValue={String(m.role || '').toUpperCase()}
+                        />
+                        <input
+                          type="text"
+                          name="status"
+                          placeholder="ACTIVE/INACTIVE/PENDING"
+                          className="block w-28 border border-gray-400 rounded-xl focus:border-blue-500 focus:ring-blue-500 px-3 py-2 text-sm"
+                          defaultValue={String(m.status || '').toUpperCase()}
+                        />
+                        <button
+                          type="submit"
+                          className="flex-shrink-0 h-10 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 px-3"
+                          title="Update member"
+                          aria-label="Update member"
+                        >
+                          <span className="w-8 h-8 rounded-lg bg-blue-200 flex items-center justify-center">
+                            <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                          </span>
+                          <span className="font-semibold text-blue-700 text-sm hidden sm:inline">Update</span>
+                        </button>
+                      </form>
+                      <RemoveMemberButton memberId={m.id} />
+                    </div>
                   </td>
                 </tr>
               ))}
