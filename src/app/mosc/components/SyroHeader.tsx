@@ -17,6 +17,18 @@ const navigationItems = [
   { name: 'SAINTS', href: '/mosc/saints' },
 ];
 
+const quickLinks = [
+  { name: 'Spiritual Organisations', href: '/mosc/spiritual-organizations' },
+  { name: 'Publications', href: '/mosc/publications' },
+  { name: 'Institutions', href: '/mosc/institutions' },
+  { name: 'Training', href: '/mosc/training' },
+  { name: 'Theological Seminaries', href: '/mosc/theological-seminaries' },
+  { name: 'Lectionary', href: '/mosc/lectionary' },
+  { name: 'Downloads', href: '/mosc/downloads' },
+  { name: 'Calendar', href: '/mosc/calendar' },
+  { name: 'Gallery', href: '/mosc/gallery' },
+];
+
 export default function SyroHeader() {
   const [offcanvasOpen, setOffcanvasOpen] = useState(false);
   const pathname = usePathname();
@@ -152,6 +164,23 @@ export default function SyroHeader() {
                     Home
                   </Link>
                   {navigationItems.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setOffcanvasOpen(false)}
+                      className={`nav-link ${isActive(item.href) ? 'active fw-bold' : ''}`}
+                    >
+                      {item.name}
+                    </Link>
+                  ))}
+                </nav>
+              </div>
+            </div>
+            <div className="row mt-4">
+              <div className="col-12">
+                <h6 className="text-uppercase fw-semibold mb-2 menu-overlay">Quick Links</h6>
+                <nav className="d-flex flex-column gap-1">
+                  {quickLinks.map((item) => (
                     <Link
                       key={item.href}
                       href={item.href}

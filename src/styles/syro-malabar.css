@@ -53,6 +53,20 @@ body:has(.syro-layout) {
 .syro-layout .syro-main {
   padding-left: 0;
   padding-right: 0;
+  padding-top: 0;
+  margin-top: 0;
+}
+/* Remove space above banner image on MOSC home */
+.syro-layout .syro-main > div:first-child,
+.syro-layout .syro-main > div > section.hero-banner,
+.syro-layout #mainContent.syro-main > div > section.hero-banner,
+.syro-layout .hero-banner,
+.syro-layout .hero-banner .hero-body,
+/* #mainContent > div > section[1] > div > div (main-slider wrapper) */
+#mainContent > div > section:first-of-type > div > div,
+.syro-layout .hero-banner .hero-body > div {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
 }
 /* Sections full width like syromalabarchurch.in (no inner scroll, content flows) */
 .syro-layout #mainContent.syro-main section,
@@ -862,6 +876,13 @@ body:has(.syro-layout) {
   gap: 0.35rem 0.5rem !important;
   margin-left: 0 !important;
   margin-right: 0 !important;
+}
+
+/* Desktop: all banner shortcut links in a single line */
+@media screen and (min-width: 768px) {
+  .syro-layout #banner-shortcuts-section #banner-shortcuts.row {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  }
 }
 
 .syro-layout #banner-shortcuts-section #banner-shortcuts .col {
