@@ -88,28 +88,51 @@ INSERT INTO public.batch_job_instance (job_instance_id, version, job_name, job_k
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (1, 2, 1, '2026-01-25 19:12:14.259173', '2026-01-25 19:12:14.832543', '2026-01-25 19:12:17.239322', 'COMPLETED', 'COMPLETED', '', '2026-01-25 19:12:17.239859');
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (2, 2, 2, '2026-01-26 02:10:49.092015', '2026-01-26 02:10:49.17664', '2026-01-26 02:10:50.170487', 'COMPLETED', 'COMPLETED', '', '2026-01-26 02:10:50.171498');
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (3, 2, 4, '2026-02-02 17:57:22.251567', '2026-02-02 17:57:22.935482', '2026-02-02 17:57:23.065089', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
+
   Detail: Key (step_execution_id)=(2) already exists.
+
 	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
+
 	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+
 	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
+
 	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
+
 	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
+
 	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
+
 	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
+
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+
 	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+
 	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+
 	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+
 	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+
 	at ', '2026-02-02 17:57:23.06555');
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (4, 2, 5, '2026-02-03 03:01:30.612013', '2026-02-03 03:01:30.681468', '2026-02-03 03:01:32.795254', 'COMPLETED', 'COMPLETED', '', '2026-02-03 03:01:32.795596');
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (5, 2, 6, '2026-02-03 06:06:40.747993', '2026-02-03 06:06:40.82336', '2026-02-03 06:06:41.869126', 'COMPLETED', 'COMPLETED', '', '2026-02-03 06:06:41.869409');
@@ -128,341 +151,663 @@ INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (50, 2, 51, '2026-02-08 01:12:01.299358', '2026-02-08 01:12:01.371802', '2026-02-08 01:12:02.333225', 'COMPLETED', 'COMPLETED', '', '2026-02-08 01:12:02.333692');
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (51, 2, 52, '2026-02-08 06:32:02.072248', '2026-02-08 06:32:02.315102', '2026-02-08 06:32:05.301713', 'COMPLETED', 'COMPLETED', '', '2026-02-08 06:32:05.303103');
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (19, 2, 34, '2026-02-19 23:59:58.989873', '2026-02-19 23:59:59.021075', '2026-02-19 23:59:59.053118', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
+
   Detail: Key (step_execution_id)=(4) already exists.
+
 	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
+
 	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+
 	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
+
 	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
+
 	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
+
 	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
+
 	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
+
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+
 	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+
 	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+
 	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+
 	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+
 	at ', '2026-02-19 23:59:59.053298');
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (17, 2, 32, '2026-02-19 11:59:58.51585', '2026-02-19 11:59:58.808383', '2026-02-19 11:59:58.876166', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
+
   Detail: Key (step_execution_id)=(2) already exists.
+
 	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
+
 	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+
 	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
+
 	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
+
 	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
+
 	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
+
 	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
+
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+
 	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+
 	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+
 	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+
 	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+
 	at ', '2026-02-19 11:59:58.876839');
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (18, 2, 33, '2026-02-19 17:59:59.128693', '2026-02-19 17:59:59.172772', '2026-02-19 17:59:59.224648', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
+
   Detail: Key (step_execution_id)=(3) already exists.
+
 	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
+
 	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+
 	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
+
 	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
+
 	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
+
 	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
+
 	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
+
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+
 	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+
 	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+
 	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+
 	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+
 	at ', '2026-02-19 17:59:59.224972');
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (20, 2, 35, '2026-02-20 05:59:59.107542', '2026-02-20 05:59:59.141884', '2026-02-20 05:59:59.198897', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
+
   Detail: Key (step_execution_id)=(5) already exists.
+
 	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
+
 	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+
 	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
+
 	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
+
 	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
+
 	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
+
 	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
+
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+
 	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+
 	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+
 	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+
 	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+
 	at ', '2026-02-20 05:59:59.199354');
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (21, 2, 36, '2026-02-20 11:59:59.243844', '2026-02-20 11:59:59.281183', '2026-02-20 11:59:59.340343', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
+
   Detail: Key (step_execution_id)=(6) already exists.
+
 	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
+
 	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+
 	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
+
 	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
+
 	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
+
 	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
+
 	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
+
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+
 	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+
 	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+
 	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+
 	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+
 	at ', '2026-02-20 11:59:59.340641');
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (22, 2, 37, '2026-02-20 17:59:59.10185', '2026-02-20 17:59:59.134982', '2026-02-20 17:59:59.196089', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
+
   Detail: Key (step_execution_id)=(7) already exists.
+
 	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
+
 	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+
 	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
+
 	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
+
 	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
+
 	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
+
 	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
+
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+
 	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+
 	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+
 	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+
 	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+
 	at ', '2026-02-20 17:59:59.196818');
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (27, 2, 42, '2026-02-21 23:59:59.067034', '2026-02-21 23:59:59.087243', '2026-02-21 23:59:59.11633', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
+
   Detail: Key (step_execution_id)=(12) already exists.
+
 	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
+
 	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+
 	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
+
 	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
+
 	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
+
 	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
+
 	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
+
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+
 	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+
 	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+
 	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+
 	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+
 	at', '2026-02-21 23:59:59.11647');
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (23, 2, 38, '2026-02-20 23:59:59.076656', '2026-02-20 23:59:59.10959', '2026-02-20 23:59:59.146995', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
+
   Detail: Key (step_execution_id)=(8) already exists.
+
 	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
+
 	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+
 	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
+
 	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
+
 	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
+
 	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
+
 	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
+
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+
 	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+
 	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+
 	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+
 	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+
 	at ', '2026-02-20 23:59:59.147124');
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (24, 2, 39, '2026-02-21 05:59:59.082505', '2026-02-21 05:59:59.114409', '2026-02-21 05:59:59.150673', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
+
   Detail: Key (step_execution_id)=(9) already exists.
+
 	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
+
 	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+
 	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
+
 	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
+
 	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
+
 	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
+
 	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
+
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+
 	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+
 	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+
 	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+
 	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+
 	at ', '2026-02-21 05:59:59.152032');
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (25, 2, 40, '2026-02-21 11:59:59.084361', '2026-02-21 11:59:59.105262', '2026-02-21 11:59:59.138135', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
+
   Detail: Key (step_execution_id)=(10) already exists.
+
 	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
+
 	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+
 	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
+
 	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
+
 	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
+
 	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
+
 	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
+
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+
 	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+
 	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+
 	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+
 	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+
 	at', '2026-02-21 11:59:59.138251');
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (26, 2, 41, '2026-02-21 17:59:59.105571', '2026-02-21 17:59:59.125822', '2026-02-21 17:59:59.159243', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
+
   Detail: Key (step_execution_id)=(11) already exists.
+
 	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
+
 	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+
 	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
+
 	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
+
 	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
+
 	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
+
 	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
+
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+
 	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+
 	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+
 	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+
 	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+
 	at', '2026-02-21 17:59:59.159426');
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (28, 2, 43, '2026-02-22 05:59:59.038177', '2026-02-22 05:59:59.06355', '2026-02-22 05:59:59.094994', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
+
   Detail: Key (step_execution_id)=(13) already exists.
+
 	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
+
 	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+
 	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
+
 	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
+
 	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
+
 	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
+
 	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
+
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+
 	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+
 	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+
 	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+
 	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+
 	at', '2026-02-22 05:59:59.095157');
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (42, 2, 60, '2026-02-26 11:59:59.514264', '2026-02-26 11:59:59.581502', '2026-02-26 12:00:00.761015', 'COMPLETED', 'COMPLETED', '', '2026-02-26 12:00:00.761742');
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (29, 2, 44, '2026-02-22 11:59:59.055426', '2026-02-22 11:59:59.075167', '2026-02-22 11:59:59.105344', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
+
   Detail: Key (step_execution_id)=(14) already exists.
+
 	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
+
 	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+
 	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
+
 	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
+
 	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
+
 	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
+
 	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
+
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+
 	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+
 	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+
 	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+
 	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+
 	at', '2026-02-22 11:59:59.10545');
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (30, 2, 45, '2026-02-22 17:59:59.074281', '2026-02-22 17:59:59.100912', '2026-02-22 17:59:59.130634', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
+
   Detail: Key (step_execution_id)=(15) already exists.
+
 	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
+
 	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+
 	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
+
 	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
+
 	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
+
 	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
+
 	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
+
 	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
+
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+
 	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+
 	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+
 	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+
 	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+
 	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+
 	at', '2026-02-22 17:59:59.130726');
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (31, 2, 46, '2026-02-22 23:59:59.069921', '2026-02-22 23:59:59.095866', '2026-02-23 00:00:00.27549', 'COMPLETED', 'COMPLETED', '', '2026-02-23 00:00:00.275765');
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (43, 2, 61, '2026-02-26 17:59:59.339885', '2026-02-26 17:59:59.416027', '2026-02-26 17:59:59.937068', 'COMPLETED', 'COMPLETED', '', '2026-02-26 17:59:59.93737');
@@ -556,12 +901,18 @@ INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tena
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4405, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-01-25 19:12:13.561311', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4407, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-01-26 02:10:48.92341', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4409, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-02 09:58:03.313648', '2026-02-02 09:58:04.125704', 812, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
 	VALUES (?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4411, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-02 15:48:39.351004', '2026-02-02 15:48:39.689021', 338, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4413, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-02 17:57:22.052896', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4415, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-03 03:01:30.499843', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
@@ -581,132 +932,225 @@ INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tena
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4443, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-08 01:12:01.141275', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4445, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-08 06:32:01.743217', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4447, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-11 23:59:59.090299', '2026-02-11 23:59:59.212515', 122, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
 	VALUES (?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4449, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-12 06:00:00.498941', '2026-02-12 06:00:00.766934', 267, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4451, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-12 11:59:59.156415', '2026-02-12 11:59:59.250289', 93, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
 	VALUES (?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(4) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4453, 'promotionTestEmailJob', 'PROMOTION_TEST_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-02-12 12:34:56.480306', '2026-02-12 12:34:57.980979', 1500, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","templateId":4102,"recipientEmail":"giventauser@gmail.com"}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4455, 'promotionTestEmailJob', 'PROMOTION_TEST_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-02-12 12:41:18.590312', '2026-02-12 12:41:18.919643', 329, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","templateId":5052,"recipientEmail":"giventauser@gmail.com"}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4457, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-12 17:59:58.839232', '2026-02-12 17:59:58.954106', 114, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
 	VALUES (?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(5) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4459, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-12 23:59:59.036595', '2026-02-12 23:59:59.18736', 150, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
 	VALUES (?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(6) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4461, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-13 05:59:59.080774', '2026-02-13 05:59:59.226064', 145, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
 	VALUES (?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(7) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4463, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-13 11:59:58.99783', '2026-02-13 11:59:59.121461', 123, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
 	VALUES (?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(8) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4465, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-13 17:59:59.013298', '2026-02-13 17:59:59.140849', 127, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
 	VALUES (?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(9) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4467, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-13 23:59:59.060978', '2026-02-13 23:59:59.153627', 92, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
 	VALUES (?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(10) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4469, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-14 05:59:59.05423', '2026-02-14 05:59:59.16544', 111, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
 	VALUES (?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(11) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4471, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-14 11:59:58.984103', '2026-02-14 11:59:59.03505', 50, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
 	VALUES (?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(12) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4473, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-14 17:59:59.129185', '2026-02-14 17:59:59.253068', 123, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
 	VALUES (?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(13) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4475, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-14 23:59:58.970393', '2026-02-14 23:59:59.084166', 113, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
 	VALUES (?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(14) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4477, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-15 05:59:59.073777', '2026-02-15 05:59:59.196247', 122, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
 	VALUES (?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(15) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4479, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-15 11:59:59.119266', '2026-02-15 11:59:59.240567', 121, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
 	VALUES (?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(16) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4481, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-15 17:59:59.084056', '2026-02-15 17:59:59.222735', 138, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
 	VALUES (?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(17) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4483, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-15 23:59:59.141651', '2026-02-15 23:59:59.29987', 158, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(3) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4485, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-16 05:59:59.085766', '2026-02-16 05:59:59.216895', 131, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(4) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4487, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-16 11:59:59.149212', '2026-02-16 11:59:59.290418', 141, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(5) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4489, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-16 17:59:59.155504', '2026-02-16 17:59:59.29312', 137, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(6) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4491, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-16 23:59:59.097441', '2026-02-16 23:59:59.237444', 140, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(7) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4493, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-17 05:59:59.04358', '2026-02-17 05:59:59.186304', 142, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(8) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4495, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-17 11:59:59.218792', '2026-02-17 11:59:59.402091', 183, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(9) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4497, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-17 17:59:59.039182', '2026-02-17 17:59:59.182704', 143, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(10) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4499, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-17 23:59:59.016341', '2026-02-17 23:59:59.096947', 80, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(11) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4501, 'contactFormEmailJob', 'CONTACT_FORM_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-02-18 04:24:41.064681', '2026-02-18 04:24:42.862082', 1797, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","fromEmail":"gain@hotmail.com","toEmail":"info@mosc.in"}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4503, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-18 05:59:59.604348', '2026-02-18 05:59:59.793864', 189, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(12) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4555, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-23 23:59:59.077234', '2026-02-23 23:59:59.20395', 126, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
 	VALUES (?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(50) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4505, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-18 11:59:59.243575', '2026-02-18 11:59:59.362902', 119, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(13) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4565, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-25 06:00:00.560094', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4507, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-18 17:59:59.097355', '2026-02-18 17:59:59.199274', 101, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(14) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4509, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-19 00:00:00.056614', '2026-02-19 00:00:00.538922', 482, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(15) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4511, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-19 05:59:59.076668', '2026-02-19 05:59:59.177905', 101, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(16) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4513, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-19 11:59:58.444751', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4515, 'contactFormEmailJob', 'CONTACT_FORM_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-02-19 13:54:11.921075', '2026-02-19 13:54:13.626624', 1705, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","fromEmail":"dhanya@keleno.com","toEmail":"info@mosc.in"}');
@@ -730,12 +1174,18 @@ INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tena
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4551, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-23 11:59:59.000774', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4553, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-23 17:59:59.13965', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4557, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-24 05:59:59.165754', '2026-02-24 05:59:59.310217', 144, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
 	VALUES (?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(51) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4559, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-24 11:59:59.101711', '2026-02-24 11:59:59.234431', 132, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
 	VALUES (?, ?, ?, ?)
+
 ]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(52) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4561, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-24 17:59:59.118241', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4563, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-24 23:59:59.027181', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
@@ -755,33 +1205,98 @@ INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tena
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4593, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-27 17:59:59.049328', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4595, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-27 23:59:59.075538', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4597, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-01 06:00:00.39427', '2026-03-01 06:00:00.834472', 440, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
+  Detail: Key (job_instance_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4599, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-01 11:59:58.965786', '2026-03-01 11:59:59.06753', 101, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
+  Detail: Key (job_execution_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4601, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-01 17:59:59.013609', '2026-03-01 17:59:59.083007', 69, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
+  Detail: Key (job_instance_id)=(4) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4603, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-01 23:59:59.065287', '2026-03-01 23:59:59.173669', 108, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
+  Detail: Key (job_instance_id)=(5) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4605, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-02 05:59:58.970168', '2026-03-02 05:59:59.102805', 132, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
+  Detail: Key (job_instance_id)=(6) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4607, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-02 11:59:59.067571', '2026-03-02 11:59:59.198777', 131, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
+  Detail: Key (job_instance_id)=(7) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4609, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-02 17:59:59.055131', '2026-03-02 17:59:59.166968', 111, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
+  Detail: Key (job_instance_id)=(8) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4611, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-02 23:59:59.017073', '2026-03-02 23:59:59.136351', 119, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
 	VALUES (?, ?, ?, ?)
 ]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
   Detail: Key (job_instance_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4599, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-01 11:59:58.965786', '2026-03-01 11:59:59.06753', 101, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4613, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-03 05:59:58.997096', '2026-03-03 05:59:59.131709', 134, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
 	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
   Detail: Key (job_execution_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4601, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-01 17:59:59.013609', '2026-03-01 17:59:59.083007', 69, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4615, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-03 11:59:59.01668', '2026-03-03 11:59:59.132187', 115, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
 	VALUES (?, ?, ?, ?)
 ]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
   Detail: Key (job_instance_id)=(4) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4603, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-01 23:59:59.065287', '2026-03-01 23:59:59.173669', 108, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4617, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-03 17:59:58.919515', '2026-03-03 17:59:59.051274', 131, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
 	VALUES (?, ?, ?, ?)
 ]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
   Detail: Key (job_instance_id)=(5) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4605, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-02 05:59:58.970168', '2026-03-02 05:59:59.102805', 132, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4619, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-03 23:59:59.068691', '2026-03-03 23:59:59.184947', 116, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
 	VALUES (?, ?, ?, ?)
 ]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
   Detail: Key (job_instance_id)=(6) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4607, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-02 11:59:59.067571', '2026-03-02 11:59:59.198777', 131, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4621, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-04 05:59:59.004038', '2026-03-04 05:59:59.13432', 130, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
 	VALUES (?, ?, ?, ?)
 ]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
   Detail: Key (job_instance_id)=(7) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4609, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-02 17:59:59.055131', '2026-03-02 17:59:59.166968', 111, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4623, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-04 11:59:58.953354', '2026-03-04 11:59:59.086181', 132, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
 	VALUES (?, ?, ?, ?)
 ]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
   Detail: Key (job_instance_id)=(8) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4625, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-04 17:59:58.97233', '2026-03-04 17:59:59.111082', 138, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(9) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4627, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-05 00:00:00.255272', '2026-03-05 00:00:00.518169', 262, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(10) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4629, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-05 05:59:59.217609', '2026-03-05 05:59:59.507303', 289, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(43) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4631, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-05 11:59:59.115486', '2026-03-05 11:59:59.218763', 103, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(44) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 
 
 --
@@ -1139,35 +1654,55 @@ INSERT INTO public.event_details (id, tenant_id, title, caption, description, st
 INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (5, 'tenant_demo_001', 'Summer Fest', 'Summer Festival', 'A festival with games, food, and music.', '2025-09-20', '2025-01-22', '2025-09-20', '10:00', '20:00', 'America/New_York', 'Downtown Plaza', NULL, 400, 'TICKETED', true, 3, true, true, true, '2025-09-12 23:59:00', '2025-09-12 23:59:00', NULL, NULL, false, true, false, NULL, NULL, 'events@example.com', 6, 6, '2025-06-14 23:13:02.565', '2025-09-07 18:33:43.178', false, false, false, true, 4, 0, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'STRIPE_ONLY', false);
 INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (6356, 'tenant_demo_002', 'New Year', 'A Showcase Of Performance Arts & Rhythm.', '"Spark of Kerala," a showcase of performance arts and rhythm organized by MCEFEE, taking place in the USA from August to September 2025.  Γò¼├┤Γö£├ºΓö£Γöé	Featured Artists: Swasika, Afsal, Mokksha, Akhila Anand, Veda Mithra, Sidhique Roshan, Kukku, Minnale Nazeer, Shiju, Vipin Kumar, Jojo Mathew, Suneeshmon.
 
+
+
 Γò¼├┤Γö£├ºΓö£Γöé	Contact Information: Booking contacts Sujith (+1 551-283-2437) and Arun (+1 551-221-1972), and email contactus@mcefee.org.
+
+
 
 ', '2025-11-27', '2025-11-27', '2025-11-27', '05:00 PM', '09:00 PM', 'America/New_York', 'Breslin Performing Arts Center, 262 S Main St, Lodi, NJ 07644', NULL, 300, 'ticketed', true, 8, false, false, false, NULL, NULL, NULL, NULL, false, true, false, NULL, NULL, 'events@example.com', NULL, 3, '2025-11-19 22:14:31.359', '2025-11-20 01:15:50.261237', false, false, false, false, 0, 0, '{"isFundraiserEvent":false,"isCharityEvent":false}', NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'STRIPE_ONLY', false);
 INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (6852, 'tenant_demo_002', 'New Year', 'A Showcase Of Performance Arts & Rhythm.', '"Spark of Kerala," a showcase of performance arts and rhythm organized by MCEFEE, taking place in the USA from August to September 2025.  Γò¼├┤Γö£├ºΓö£Γöé	Featured Artists: Swasika, Afsal, Mokksha, Akhila Anand, Veda Mithra, Sidhique Roshan, Kukku, Minnale Nazeer, Shiju, Vipin Kumar, Jojo Mathew, Suneeshmon.
 
+
+
 Γò¼├┤Γö£├ºΓö£Γöé	Contact Information: Booking contacts Sujith (+1 551-283-2437) and Arun (+1 551-221-1972), and email contactus@mcefee.org.
+
+
 
 ', '2025-11-29', '2025-11-27', '2025-11-29', '05:00 PM', '09:00 PM', 'America/New_York', 'Breslin Performing Arts Center, 262 S Main St, Lodi, NJ 07644', NULL, 300, 'ticketed', true, 8, false, false, false, NULL, NULL, NULL, NULL, false, true, false, NULL, NULL, 'events@example.com', NULL, 3, '2025-11-20 04:40:50.857912', '2025-11-20 01:15:50.261237', false, false, false, false, 0, 0, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 6356, 6356, 'STRIPE_ONLY', false);
 INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (3, 'tenant_demo_002', 'Knanaya STAGE SHOW', 'Community / Family Entertainment Day', 'Swasika | Afsal | Mokksha | Akhila Anand | Sidique Roshan | Kukku Shiju | Vipin Kumar | Jojo Mathew | Suneeshmon', '2025-11-04', '2025-11-02', '2025-11-29', '05:00 PM', '08:00 PM', 'America/New_York', 'IKCC Knanaya Community Center, 400 Willow Grv Rd, Stony Point, NY 10980', NULL, 200, 'ticketed', false, 4, true, false, false, '2025-09-05 23:59:00', '2025-09-05 23:59:00', NULL, NULL, false, true, false, NULL, NULL, 'events@example.com', 4, 1, '2025-06-14 23:13:02.565', '2025-11-20 00:37:48.917267', false, false, false, false, 0, 0, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'STRIPE_ONLY', false);
 INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (1, 'tenant_demo_002', 'KHNJ Mega Onam 2025', 'KHNJ Mega Onam 2025', 'Grand Vazhayila Onasadhya, Mega Thiruvathira, Mahabali Procession with Thalapoli, Chendamelam, Pulikali, Cultural Programs, Meet & Greet with Friends & Family, Mega Stage Show.', '2025-09-10', '2025-01-05', '2025-09-10', '11:00 AM', '06:00 PM', 'America/New_York', 'Jo Ann Arts Center, 200 Rues Ln, East Brunswick, NJ 08816', NULL, 500, 'ticketed', false, 5, true, true, false, '2025-08-12 23:59:00', '2025-08-12 23:59:00', NULL, NULL, false, true, false, NULL, NULL, 'events@example.com', 2, 6, '2025-06-14 23:13:02.565', '2025-11-20 00:37:49.030968', false, false, false, false, 0, 0, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'STRIPE_ONLY', false);
 INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (6901, 'tenant_demo_002', 'New Year (Copy)_2', 'A Showcase Of Performance Arts & Rhythm.', '"Spark of Kerala," a showcase of performance arts and rhythm organized by MCEFEE, taking place in the USA from August to September 2025.  Γò¼├┤Γö£├ºΓö£Γöé	Featured Artists: Swasika, Afsal, Mokksha, Akhila Anand, Veda Mithra, Sidhique Roshan, Kukku, Minnale Nazeer, Shiju, Vipin Kumar, Jojo Mathew, Suneeshmon.
 
+
+
 Γò¼├┤Γö£├ºΓö£Γöé	Contact Information: Booking contacts Sujith (+1 551-283-2437) and Arun (+1 551-221-1972), and email contactus@mcefee.org.
+
+
 
 ', '2025-11-20', '2025-11-20', '2025-11-21', '05:00 PM', '09:00 PM', 'America/New_York', 'Breslin Performing Arts Center, 262 S Main St, Lodi, NJ 07644', NULL, 300, 'ticketed', true, 8, false, false, false, NULL, NULL, NULL, NULL, false, true, false, NULL, NULL, 'events@example.com', NULL, 3, '2025-11-20 05:17:38.905', '2025-11-20 00:52:55.888283', false, false, false, false, 0, 0, '{"isFundraiserEvent":false,"isCharityEvent":false}', NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'STRIPE_ONLY', false);
 INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (6851, 'tenant_demo_002', 'New Year', 'A Showcase Of Performance Arts & Rhythm.', '"Spark of Kerala," a showcase of performance arts and rhythm organized by MCEFEE, taking place in the USA from August to September 2025.  Γò¼├┤Γö£├ºΓö£Γöé	Featured Artists: Swasika, Afsal, Mokksha, Akhila Anand, Veda Mithra, Sidhique Roshan, Kukku, Minnale Nazeer, Shiju, Vipin Kumar, Jojo Mathew, Suneeshmon.
 
+
+
 Γò¼├┤Γö£├ºΓö£Γöé	Contact Information: Booking contacts Sujith (+1 551-283-2437) and Arun (+1 551-221-1972), and email contactus@mcefee.org.
+
+
 
 ', '2025-11-28', '2025-11-27', '2025-11-28', '05:00 PM', '09:00 PM', 'America/New_York', 'Breslin Performing Arts Center, 262 S Main St, Lodi, NJ 07644', NULL, 300, 'ticketed', true, 8, false, false, false, NULL, NULL, NULL, NULL, false, true, false, NULL, NULL, 'events@example.com', NULL, 3, '2025-11-20 04:40:50.85454', '2025-11-20 01:15:50.261237', false, false, false, false, 0, 0, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 6356, 6356, 'STRIPE_ONLY', false);
 INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (7051, 'tenant_demo_002', 'Regn Test', '', '', '2025-12-22', '2025-12-03', '2025-12-22', '08:29 AM', '02:29 PM', 'America/Chicago', 'Grand Hall', 'fgfffgfgfgfg', NULL, 'free', true, 12, false, false, false, NULL, NULL, NULL, NULL, false, true, NULL, NULL, NULL, 'events@example.com', NULL, 2, '2025-11-22 02:30:31.39', '2025-12-03 20:20:24.835196', true, false, false, false, 0, 0, '{"isFundraiserEvent":false,"isCharityEvent":false}', NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'STRIPE_ONLY', false);
 INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (4201, 'tenant_demo_002', 'Event 1', '', '', '2026-02-17', '2026-01-14', '2026-02-18', '12:04 PM', '12:06 PM', 'UTC', '', '', NULL, 'ticketed', true, NULL, false, false, false, NULL, NULL, NULL, NULL, false, true, NULL, NULL, NULL, 'sales@giventa.com', NULL, 1, '2026-01-14 12:05:22.659', '2026-02-15 18:19:01.159975', false, false, false, false, 0, 0, '{"isFundraiserEvent":false,"isCharityEvent":false}', NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'MANUAL_ONLY', true);
 INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (4202, 'tenant_demo_002', 'Givebutter Test', 'Givebutter Test', '', '2027-01-26', '2026-01-14', '2027-01-26', '12:38 PM', '04:38 PM', 'Australia/Sydney', '', '', NULL, 'ticketed', true, NULL, false, false, false, NULL, NULL, NULL, NULL, false, true, NULL, NULL, NULL, 'sales@giventa.com', NULL, 5, '2026-01-14 12:37:01.643', '2026-02-27 16:38:55.592138', false, false, false, true, 0, 0, '{"isFundraiserEvent":true,"isCharityEvent":false,"zeroFeeProvider":"GIVEBUTTER","givebutterWidgetId":"j1ek6j"}', NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'STRIPE_ONLY', false);
-INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (8321, 'tenant_demo_002', 'Fundraiser Registration Required', 'Fundraiser Registration Required', 'Fundraiser Registration Required', '2026-03-26', '2026-02-24', '2026-03-26', '12:38 PM', '04:38 PM', 'Australia/Sydney', '', '', NULL, 'free', true, NULL, false, false, false, NULL, NULL, NULL, NULL, false, true, NULL, NULL, NULL, 'sales@giventa.com', NULL, 5, '2026-02-24 03:45:30.891', '2026-02-26 21:22:26.438708', true, false, false, true, 0, 0, '{"isFundraiserEvent":true,"isCharityEvent":false,"zeroFeeProvider":"GIVEBUTTER","givebutterWidgetId":"j1ek6j"}', NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'STRIPE_ONLY', false);
 INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (2, 'tenant_demo_002', 'MCEFEE Spark of Kerala', 'A Showcase Of Performance Arts & Rhythm.', '"Spark of Kerala," a showcase of performance arts and rhythm organized by MCEFEE, taking place in the USA from August to September 2025.  Γò¼├┤Γö£├ºΓö£Γöé	Featured Artists: Swasika, Afsal, Mokksha, Akhila Anand, Veda Mithra, Sidhique Roshan, Kukku, Minnale Nazeer, Shiju, Vipin Kumar, Jojo Mathew, Suneeshmon.
+
+
 
 Γò¼├┤Γö£├ºΓö£Γöé	Contact Information: Booking contacts Sujith (+1 551-283-2437) and Arun (+1 551-221-1972), and email contactus@mcefee.org.
 
-', '2027-02-27', '2025-12-24', '2027-02-27', '05:00 PM', '09:00 PM', 'America/New_York', 'Breslin Performing Arts Center, 262 S Main St, Lodi, NJ 07644', NULL, 300, 'ticketed', true, 8, false, false, false, '2025-08-28 23:59:00', '2025-08-28 23:59:00', NULL, NULL, false, true, false, NULL, NULL, 'sales@giventa.com', 3, 3, '2025-06-14 23:13:02.565', '2026-02-24 20:47:55.09135', false, false, false, true, 0, 2, '{"isFundraiserEvent":false,"isCharityEvent":false}', 'https://wwwgiventacom.eventcube.io/events/93642/event-cube-test/?embed=true', NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'STRIPE_ONLY', false);
+
+
+', '2027-02-27', '2025-12-24', '2027-02-27', '05:00 PM', '09:00 PM', 'America/New_York', 'Breslin Performing Arts Center, 262 S Main St, Lodi, NJ 07644', NULL, 300, 'ticketed', true, 8, false, false, false, '2025-08-28 23:59:00', '2025-08-28 23:59:00', NULL, NULL, false, true, false, NULL, NULL, 'sales@giventa.com', 3, 3, '2025-06-14 23:13:02.565', '2026-03-02 23:44:44.524425', false, false, false, true, 0, 2, '{"isFundraiserEvent":false,"isCharityEvent":false}', 'https://wwwgiventacom.eventcube.io/events/93642/event-cube-test/?embed=true', NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'STRIPE_ONLY', false);
+INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (8321, 'tenant_demo_002', 'Fundraiser Registration Required', 'Fundraiser Registration Required', 'Fundraiser Registration Required', '2026-03-26', '2026-02-24', '2026-03-26', '12:38 PM', '04:38 PM', 'Australia/Sydney', '', '', NULL, 'free', true, NULL, false, false, false, NULL, NULL, NULL, NULL, false, true, NULL, NULL, NULL, 'sales@giventa.com', NULL, 5, '2026-02-24 03:45:30.891', '2026-03-05 18:25:16.297961', true, false, false, true, 0, 0, '{"isFundraiserEvent":true,"isCharityEvent":false,"zeroFeeProvider":"GIVEBUTTER","givebutterWidgetId":"j1ek6j"}', NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'STRIPE_ONLY', false);
 
 
 --
@@ -1315,16 +1850,16 @@ INSERT INTO public.event_admin_audit_log (id, tenant_id, action, table_name, rec
 -- Data for Name: event_attendee; Type: TABLE DATA; Schema: public; Owner: event_site_app
 --
 
-INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (1, 'tenant_demo_001', 1, 1, 'CONFIRMED', '2025-06-22 11:31:26.559053', NULL, NULL, NULL, 'MEMBER', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'CHECKED_IN', NULL, NULL, NULL, NULL, NULL, 'ATTENDEE:1|EVENT:1|TENANT:tenant_demo_001|NAME:Alice Johnson|EVENT_TITLE:KHNJ Mega Onam 2025|TIMESTAMP:1772340334.103267|TYPE:MEMBER', true, '2026-03-01 04:45:34.103267', 'DIRECT', NULL, 0, '2025-06-22 11:31:26.559053', '2025-06-22 11:31:26.559053', 'Alice', 'Johnson', 'alice.johnson@example.com', '555-1001', true);
-INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (2, 'tenant_demo_001', 1, 2, 'CONFIRMED', '2025-06-22 11:31:26.559053', NULL, NULL, NULL, 'ADMIN', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'NOT_CHECKED_IN', NULL, NULL, NULL, NULL, NULL, 'ATTENDEE:2|EVENT:1|TENANT:tenant_demo_001|NAME:Bob Smith|EVENT_TITLE:KHNJ Mega Onam 2025|TIMESTAMP:1772340334.118852|TYPE:ADMIN', true, '2026-03-01 04:45:34.118852', 'DIRECT', NULL, 0, '2025-06-22 11:31:26.559053', '2025-06-22 11:31:26.559053', 'Bob', 'Smith', 'bob.smith@example.com', '555-1002', true);
-INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (3, 'tenant_demo_001', 2, 3, 'PENDING', '2025-06-22 11:31:26.559053', NULL, NULL, NULL, 'VOLUNTEER', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'NOT_CHECKED_IN', NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, 'DIRECT', NULL, 0, '2025-06-22 11:31:26.559053', '2025-06-22 11:31:26.559053', 'Carol', 'Williams', 'carol.williams@example.com', '555-1003', false);
-INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (4, 'tenant_demo_001', 3, 4, 'WAITLISTED', '2025-06-22 11:31:26.559053', NULL, NULL, NULL, 'ORGANIZER', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'NOT_CHECKED_IN', NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, 'DIRECT', NULL, 0, '2025-06-22 11:31:26.559053', '2025-06-22 11:31:26.559053', 'David', 'Brown', 'david.brown@example.com', '555-1004', true);
-INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (5, 'tenant_demo_001', 4, 5, 'CANCELLED', '2025-06-22 11:31:26.559053', NULL, NULL, NULL, 'SUPER_ADMIN', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'NO_SHOW', NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, 'DIRECT', NULL, 0, '2025-06-22 11:31:26.559053', '2025-06-22 11:31:26.559053', 'Eve', 'Davis', 'eve.davis@example.com', '555-1005', false);
-INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (6, 'tenant_demo_001', 5, 6, 'CONFIRMED', '2025-06-22 11:31:26.559053', NULL, NULL, NULL, 'MEMBER', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'CHECKED_IN', NULL, NULL, NULL, NULL, NULL, 'ATTENDEE:6|EVENT:5|TENANT:tenant_demo_001|NAME:Frank Miller|EVENT_TITLE:Summer Fest|TIMESTAMP:1772340334.155578|TYPE:MEMBER', true, '2026-03-01 04:45:34.155578', 'DIRECT', NULL, 0, '2025-06-22 11:31:26.559053', '2025-06-22 11:31:26.559053', 'Frank', 'Miller', 'frank.miller@example.com', '555-1006', true);
-INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (4301, 'tenant_demo_002', 2, NULL, 'REGISTERED', '2025-11-13 23:21:56.135', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-11-13 23:21:56.135', '2025-11-13 23:21:56.135', 'Gain', 'Joseph', 'giventauser@gmail.com', '', NULL);
-INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (7151, 'tenant_demo_002', 7051, NULL, 'PENDING', '2025-11-22 04:21:17.89', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-11-22 04:21:17.89', '2025-11-22 04:21:46.608', 'Gain Joseph', 'Joseph', 'giventauser@gmail.com', '3123430073', NULL);
-INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (7152, 'tenant_demo_002', 7051, NULL, 'REGISTERED', '2025-11-22 04:40:54.909', NULL, NULL, NULL, NULL, '', '', '', '', '', '', 0, 0, NULL, NULL, NULL, NULL, NULL, '', NULL, NULL, NULL, NULL, NULL, NULL, '2025-11-22 04:40:54.909', '2025-11-22 00:01:19.109303', 'Gain Joseph', 'Joseph', 'giventauser@gmail.com', '3123430073', NULL);
-INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (8322, 'tenant_demo_002', 8321, NULL, 'PENDING', '2026-02-26 04:02:19.216', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-02-26 04:02:19.216', '2026-02-26 04:12:58.527', 'Mary', 'Doe', 'mosc.admin.user@keleno.com', '2354525235', NULL);
+INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, admin_notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (1, 'tenant_demo_001', 1, 1, 'CONFIRMED', '2025-06-22 11:31:26.559053', NULL, NULL, NULL, 'MEMBER', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'CHECKED_IN', NULL, NULL, NULL, NULL, NULL, NULL, 'ATTENDEE:1|EVENT:1|TENANT:tenant_demo_001|NAME:Alice Johnson|EVENT_TITLE:KHNJ Mega Onam 2025|TIMESTAMP:1772492670.205092|TYPE:MEMBER', true, '2026-03-02 23:04:30.205092', 'DIRECT', NULL, 0, '2025-06-22 11:31:26.559053', '2025-06-22 11:31:26.559053', 'Alice', 'Johnson', 'alice.johnson@example.com', '555-1001', true);
+INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, admin_notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (2, 'tenant_demo_001', 1, 2, 'CONFIRMED', '2025-06-22 11:31:26.559053', NULL, NULL, NULL, 'ADMIN', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'NOT_CHECKED_IN', NULL, NULL, NULL, NULL, NULL, NULL, 'ATTENDEE:2|EVENT:1|TENANT:tenant_demo_001|NAME:Bob Smith|EVENT_TITLE:KHNJ Mega Onam 2025|TIMESTAMP:1772492670.219256|TYPE:ADMIN', true, '2026-03-02 23:04:30.219256', 'DIRECT', NULL, 0, '2025-06-22 11:31:26.559053', '2025-06-22 11:31:26.559053', 'Bob', 'Smith', 'bob.smith@example.com', '555-1002', true);
+INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, admin_notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (3, 'tenant_demo_001', 2, 3, 'PENDING', '2025-06-22 11:31:26.559053', NULL, NULL, NULL, 'VOLUNTEER', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'NOT_CHECKED_IN', NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, 'DIRECT', NULL, 0, '2025-06-22 11:31:26.559053', '2025-06-22 11:31:26.559053', 'Carol', 'Williams', 'carol.williams@example.com', '555-1003', false);
+INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, admin_notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (4, 'tenant_demo_001', 3, 4, 'WAITLISTED', '2025-06-22 11:31:26.559053', NULL, NULL, NULL, 'ORGANIZER', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'NOT_CHECKED_IN', NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, 'DIRECT', NULL, 0, '2025-06-22 11:31:26.559053', '2025-06-22 11:31:26.559053', 'David', 'Brown', 'david.brown@example.com', '555-1004', true);
+INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, admin_notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (5, 'tenant_demo_001', 4, 5, 'CANCELLED', '2025-06-22 11:31:26.559053', NULL, NULL, NULL, 'SUPER_ADMIN', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'NO_SHOW', NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, 'DIRECT', NULL, 0, '2025-06-22 11:31:26.559053', '2025-06-22 11:31:26.559053', 'Eve', 'Davis', 'eve.davis@example.com', '555-1005', false);
+INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, admin_notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (6, 'tenant_demo_001', 5, 6, 'CONFIRMED', '2025-06-22 11:31:26.559053', NULL, NULL, NULL, 'MEMBER', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'CHECKED_IN', NULL, NULL, NULL, NULL, NULL, NULL, 'ATTENDEE:6|EVENT:5|TENANT:tenant_demo_001|NAME:Frank Miller|EVENT_TITLE:Summer Fest|TIMESTAMP:1772492670.246783|TYPE:MEMBER', true, '2026-03-02 23:04:30.246783', 'DIRECT', NULL, 0, '2025-06-22 11:31:26.559053', '2025-06-22 11:31:26.559053', 'Frank', 'Miller', 'frank.miller@example.com', '555-1006', true);
+INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, admin_notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (4301, 'tenant_demo_002', 2, NULL, 'REGISTERED', '2025-11-13 23:21:56.135', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-11-13 23:21:56.135', '2025-11-13 23:21:56.135', 'Gain', 'Joseph', 'giventauser@gmail.com', '', NULL);
+INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, admin_notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (7151, 'tenant_demo_002', 7051, NULL, 'PENDING', '2025-11-22 04:21:17.89', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-11-22 04:21:17.89', '2025-11-22 04:21:46.608', 'Gain Joseph', 'Joseph', 'giventauser@gmail.com', '3123430073', NULL);
+INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, admin_notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (7152, 'tenant_demo_002', 7051, NULL, 'REGISTERED', '2025-11-22 04:40:54.909', NULL, NULL, NULL, NULL, '', '', '', '', '', '', 0, 0, NULL, NULL, NULL, NULL, NULL, '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-11-22 04:40:54.909', '2025-11-22 00:01:19.109303', 'Gain Joseph', 'Joseph', 'giventauser@gmail.com', '3123430073', NULL);
+INSERT INTO public.event_attendee (id, tenant_id, event_id, user_id, registration_status, registration_date, confirmation_date, cancellation_date, cancellation_reason, attendee_type, special_requirements, dietary_restrictions, accessibility_needs, emergency_contact_name, emergency_contact_phone, emergency_contact_relationship, total_number_of_guests, number_of_guests_checked_in, check_in_status, check_in_time, check_out_time, attendance_rating, feedback, notes, admin_notes, qr_code_data, qr_code_generated, qr_code_generated_at, registration_source, waitlist_position, priority_score, created_at, updated_at, first_name, last_name, email, phone, is_member) VALUES (8322, 'tenant_demo_002', 8321, NULL, 'PENDING', '2026-03-02 23:08:18.066', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'fgfgfgfgfgfgfgff', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-03-02 23:08:18.066', '2026-03-02 23:08:38.014286', 'Gain Joseph', 'Joseph', 'mosc.admin.user@keleno.com', '', NULL);
 
 
 --
@@ -1398,9 +1933,6 @@ INSERT INTO public.event_featured_performers (id, tenant_id, event_id, name, sta
 --
 
 INSERT INTO public.focus_group (id, tenant_id, name, slug, description, cover_image_url, is_active, created_at, updated_at) VALUES (4001, 'tenant_demo_001', 'Gain Joseph', 'dsdssds', '46182', '', true, '2025-10-28 14:14:44.123714', '2025-10-28 14:14:44.123714');
-INSERT INTO public.focus_group (id, tenant_id, name, slug, description, cover_image_url, is_active, created_at, updated_at) VALUES (4002, 'tenant_demo_002', 'Gain Joseph', 'rtrtrt', '56746', '', true, '2025-11-04 04:10:50.575748', '2025-11-04 04:10:50.575748');
-INSERT INTO public.focus_group (id, tenant_id, name, slug, description, cover_image_url, is_active, created_at, updated_at) VALUES (8310, 'tenant_demo_002', 'Test', 'test-test', '', '', true, '2026-02-19 09:03:50.613203', '2026-02-19 09:03:50.613203');
-INSERT INTO public.focus_group (id, tenant_id, name, slug, description, cover_image_url, is_active, created_at, updated_at) VALUES (8311, 'tenant_demo_002', 'Test1', 'test1-test1', '', '', true, '2026-02-19 09:04:14.528576', '2026-02-19 09:04:14.528576');
 INSERT INTO public.focus_group (id, tenant_id, name, slug, description, cover_image_url, is_active, created_at, updated_at) VALUES (8312, 'tenant_demo_002', 'test2', 'test2-test2', '', '', true, '2026-02-19 09:04:30.733003', '2026-02-19 09:04:30.733003');
 INSERT INTO public.focus_group (id, tenant_id, name, slug, description, cover_image_url, is_active, created_at, updated_at) VALUES (8313, 'tenant_demo_002', 'test4', 'test4-test4', '', '', true, '2026-02-19 09:05:15.146325', '2026-02-19 09:05:15.146325');
 INSERT INTO public.focus_group (id, tenant_id, name, slug, description, cover_image_url, is_active, created_at, updated_at) VALUES (8314, 'tenant_demo_002', 'test5', 'test5', '', '', true, '2026-02-19 09:05:28.7327', '2026-02-19 09:05:28.7327');
@@ -1408,7 +1940,10 @@ INSERT INTO public.focus_group (id, tenant_id, name, slug, description, cover_im
 INSERT INTO public.focus_group (id, tenant_id, name, slug, description, cover_image_url, is_active, created_at, updated_at) VALUES (8316, 'tenant_demo_002', 'test7', 'test7', '', '', true, '2026-02-19 09:05:58.338992', '2026-02-19 09:05:58.338992');
 INSERT INTO public.focus_group (id, tenant_id, name, slug, description, cover_image_url, is_active, created_at, updated_at) VALUES (8317, 'tenant_demo_002', 'test8', 'test8', '', '', true, '2026-02-19 09:06:33.177752', '2026-02-19 09:06:33.177752');
 INSERT INTO public.focus_group (id, tenant_id, name, slug, description, cover_image_url, is_active, created_at, updated_at) VALUES (8318, 'tenant_demo_002', 'test9', 'test9', '', '', true, '2026-02-19 09:06:46.497638', '2026-02-19 09:06:46.497638');
-INSERT INTO public.focus_group (id, tenant_id, name, slug, description, cover_image_url, is_active, created_at, updated_at) VALUES (8319, 'tenant_demo_002', 'test3', 'test3', '', '', true, '2026-02-19 09:07:58.352404', '2026-02-19 09:07:58.352404');
+INSERT INTO public.focus_group (id, tenant_id, name, slug, description, cover_image_url, is_active, created_at, updated_at) VALUES (4002, 'tenant_demo_002', 'Gain Joseph', 'rtrtrt', '56746', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/focus-groups/focus-group-id/4002/cover_image_1772540438301_f8b17ade.jpg', true, '2025-11-04 04:10:50.575748', '2026-03-03 12:20:47.875956');
+INSERT INTO public.focus_group (id, tenant_id, name, slug, description, cover_image_url, is_active, created_at, updated_at) VALUES (8310, 'tenant_demo_002', 'Test', 'test-test', '', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/focus-groups/focus-group-id/8310/cover_image_1772632972261_f2085693.jpg', true, '2026-02-19 09:03:50.613203', '2026-03-04 14:03:00.794997');
+INSERT INTO public.focus_group (id, tenant_id, name, slug, description, cover_image_url, is_active, created_at, updated_at) VALUES (8311, 'tenant_demo_002', 'Chloe', 'test1-test1', '', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/focus-groups/focus-group-id/8311/cover_image_1772684239579_8f8a7c39.jpg', true, '2026-02-19 09:04:14.528576', '2026-03-05 04:17:32.424359');
+INSERT INTO public.focus_group (id, tenant_id, name, slug, description, cover_image_url, is_active, created_at, updated_at) VALUES (8319, 'tenant_demo_002', 'GD', 'test3', '', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/focus-groups/focus-group-id/8319/cover_image_1772711100499_be47e165.webp', true, '2026-02-19 09:07:58.352404', '2026-03-05 11:45:27.536866');
 
 
 --
@@ -1462,7 +1997,7 @@ INSERT INTO public.event_sponsors (id, tenant_id, event_id, name, type, company_
 INSERT INTO public.event_sponsors (id, tenant_id, event_id, name, type, company_name, tagline, description, website_url, contact_email, contact_phone, logo_url, hero_image_url, banner_image_url, is_active, priority_ranking, facebook_url, instagram_url, twitter_url, linkedin_url, youtube_url, tiktok_url, created_at, updated_at) VALUES (3, 'tenant_demo_001', NULL, 'Federal Bank', 'Gold Sponsor', 'Federal Bank', 'Your Perfect Banking Partner', 'Premier private sector bank committed to supporting cultural and community events.', 'https://www.federalbank.co.in', 'events@federalbank.co.in', '+91-484-2630606', 'https://s3.amazonaws.com/bucket/sponsors/3/logo/federal_logo.png', 'https://s3.amazonaws.com/bucket/sponsors/3/hero/federal_hero.jpg', 'https://s3.amazonaws.com/bucket/sponsors/3/banner/federal_banner.jpg', true, 80, 'https://facebook.com/federalbank', 'https://instagram.com/federalbank', 'https://twitter.com/federalbank', 'https://linkedin.com/company/federal-bank', NULL, NULL, '2025-01-10 10:00:00', '2025-01-10 10:00:00');
 INSERT INTO public.event_sponsors (id, tenant_id, event_id, name, type, company_name, tagline, description, website_url, contact_email, contact_phone, logo_url, hero_image_url, banner_image_url, is_active, priority_ranking, facebook_url, instagram_url, twitter_url, linkedin_url, youtube_url, tiktok_url, created_at, updated_at) VALUES (5, 'tenant_demo_002', NULL, 'Malayalam Manorama', 'Media Partner', 'Manorama', 'Truth Above All', 'Leading Malayalam newspaper and media group promoting cultural events and community engagement.', 'https://www.manoramaonline.com', 'events@manoramaonline.com', '+91-471-2518000', 'https://s3.amazonaws.com/bucket/sponsors/5/logo/manorama_logo.png', 'https://s3.amazonaws.com/bucket/sponsors/5/hero/manorama_hero.jpg', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/sponsor/sponsor_id/5/sponsor_banner_1763068307886_8234bcce.jpeg', true, 60, 'https://facebook.com/manoramaonline', 'https://instagram.com/manoramaonline', 'https://twitter.com/manoramaonline', 'https://linkedin.com/company/manorama', NULL, NULL, '2025-01-10 10:00:00', '2025-11-13 21:11:49.66901');
 INSERT INTO public.event_sponsors (id, tenant_id, event_id, name, type, company_name, tagline, description, website_url, contact_email, contact_phone, logo_url, hero_image_url, banner_image_url, is_active, priority_ranking, facebook_url, instagram_url, twitter_url, linkedin_url, youtube_url, tiktok_url, created_at, updated_at) VALUES (4, 'tenant_demo_002', NULL, 'Kerala State Beverages Corporation', 'Gold', 'KSBC', 'Quality in Every Drop', 'Government corporation supporting cultural events and promoting responsible consumption.', 'https://www.ksbc.kerala.gov.in', 'info@ksbc.kerala.gov.in', '+91-471-2321234', 'https://s3.amazonaws.com/bucket/sponsors/4/logo/ksbc_logo.png', 'https://s3.amazonaws.com/bucket/sponsors/4/hero/ksbc_hero.jpg', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/sponsor/sponsor_id/4/sponsor_banner_1763068337152_1fe871ac.png', true, 70, 'https://facebook.com/ksbc', 'https://instagram.com/ksbc', NULL, 'https://linkedin.com/company/ksbc', NULL, NULL, '2025-01-10 10:00:00', '2025-01-10 10:00:00');
-INSERT INTO public.event_sponsors (id, tenant_id, event_id, name, type, company_name, tagline, description, website_url, contact_email, contact_phone, logo_url, hero_image_url, banner_image_url, is_active, priority_ranking, facebook_url, instagram_url, twitter_url, linkedin_url, youtube_url, tiktok_url, created_at, updated_at) VALUES (4551, 'tenant_demo_002', NULL, 'Joseph', 'Gold', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, true, 1, NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-14 17:38:32.106254', '2026-01-14 17:38:32.106254');
+INSERT INTO public.event_sponsors (id, tenant_id, event_id, name, type, company_name, tagline, description, website_url, contact_email, contact_phone, logo_url, hero_image_url, banner_image_url, is_active, priority_ranking, facebook_url, instagram_url, twitter_url, linkedin_url, youtube_url, tiktok_url, created_at, updated_at) VALUES (4551, 'tenant_demo_002', NULL, 'Dr. Roy C J', 'Gold', 'Confident Group', NULL, 'Confident Group is a prominent real estate developer in India, founded in 2005 by CJ Roy, with significant operations in Bengaluru and Kerala, and a growing presence in the UAE.', 'https://www.confident-group.com/about-us/', 'sales@confident-group.com', '+91-6366906990', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/sponsor/sponsor_id/4551/sponsor_logo_1772531171598_096fcd45.webp', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/sponsor/sponsor_id/4551/sponsor_hero_1772530533861_cc48143c.webp', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/sponsor/sponsor_id/4551/sponsor_banner_1772529170013_c011aab4.webp', true, 1, 'https://www.facebook.com/ConfidentGroup/about/', 'https://www.instagram.com/accounts/login/?next=https%3A%2F%2Fwww.instagram.com%2Fofficial.confidentgroup%2F&is_from_rle', 'https://x.com/ConfidentGroup1', 'https://in.linkedin.com/company/confidentgroup', NULL, NULL, '2026-01-14 17:38:32.106254', '2026-01-14 17:38:32.106254');
 
 
 --
@@ -1481,6 +2016,7 @@ INSERT INTO public.event_sponsors_join (id, tenant_id, event_id, sponsor_id, cus
 -- Data for Name: gallery_album; Type: TABLE DATA; Schema: public; Owner: event_site_app
 --
 
+INSERT INTO public.gallery_album (id, tenant_id, title, description, cover_image_url, is_public, display_order, created_at, updated_at, created_by_id) VALUES (8332, 'tenant_demo_002', 'Chicago Malayalee Association', NULL, 'https://th.bing.com/th/id/OIP.C1VGUUaJiC1q8JsCiY7ZuwHaHa?w=153&h=180&c=7&r=0&o=7&pid=1.7&rm=3', true, 0, '2026-03-03 12:57:27.329', '2026-03-03 14:09:49.192824', NULL);
 
 
 --
@@ -1525,13 +2061,33 @@ INSERT INTO public.event_media (id, tenant_id, title, description, event_media_t
 INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (4050, 'tenant_demo_002', 'street_fair.jfif', '115941', 'image/jpeg', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/events/tenantId/tenant_demo_001/event-id/1/street_fair_1750026381257_f70e40cf.jfif', NULL, 'image/jpeg', 10551, true, false, false, false, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/events/tenantId/tenant_demo_001/event-id/1/street_fair_1750026381257_f70e40cf.jfif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250615T222621Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3600&X-Amz-Credential=AKIATIT5HARDKCWNLQMU%2F20250615%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=7b739490bda78d4127fbeb267d77856a11cc59a83b24e90c666a76783393e15d', NULL, NULL, NULL, NULL, false, NULL, false, false, '2025-01-15', '2025-06-15 22:26:21.363', '2025-06-15 22:26:21.363', 2, 1, NULL, NULL, NULL, NULL, 0, false, NULL, false, false, NULL);
 INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (4950, 'tenant_demo_002', 'kanj_cine_star_nite_2025.avif', NULL, 'image/avif', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/events/tenantId/tenant_demo_001/event-id/4500/kanj_cine_star_nite_2025_1750045123063_470db4ac.avif', NULL, 'image/avif', 76564, true, false, false, false, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/events/tenantId/tenant_demo_001/event-id/4500/kanj_cine_star_nite_2025_1750045123063_470db4ac.avif?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250616T033843Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3599&X-Amz-Credential=AKIATIT5HARDKCWNLQMU%2F20250616%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=96f8190f8b95f7185b5d7f92423c3682577db0728032abee59b781f82e280718', NULL, NULL, NULL, NULL, false, NULL, false, false, '2025-01-24', '2025-06-16 03:38:43.228', '2025-06-16 03:38:43.228', 2, 1, NULL, NULL, NULL, NULL, 0, false, NULL, false, false, NULL);
 INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (5200, 'tenant_demo_002', 'spark_kerala_event_2025_1920px', 'spark_kerala_event_2025_1920px.jpeg', 'image/jpeg', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/events/tenantId/tenant_demo_001/event-id/2/spark_kerala_event_2025_1756990296631_42abe2fa.jpeg', NULL, NULL, 194143, true, true, false, false, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/events/tenantId/tenant_demo_001/event-id/2/spark_kerala_event_2025_1756990296631_42abe2fa.jpeg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250904T125136Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3600&X-Amz-Credential=AKIATIT5HARDKCWNLQMU%2F20250904%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=d99cbd7351a1a8a69e0704c007328d7f0dc931fba9f76948e97008a45a1685ce', NULL, NULL, NULL, NULL, NULL, NULL, false, false, '2025-01-08', '2025-09-04 12:51:36.975', '2025-09-04 12:51:36.975', 2, 4651, NULL, NULL, NULL, NULL, 0, false, NULL, false, false, NULL);
-INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (8317, 'tenant_demo_002', 'sdsdsdsd', 'sdssssdsds', 'image/jpeg', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/hero_image_sample_2_1771874746491_9d9f7371.jpeg', NULL, NULL, 830015, true, false, NULL, false, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/hero_image_sample_2_1771874746491_9d9f7371.jpeg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260223T192546Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3600&X-Amz-Credential=AKIATIT5HARDH77LVIYW%2F20260223%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=26da495b9ca070cc633c74b38db0ae58091f31da8e519977a810adbc8a2604c4', NULL, NULL, NULL, NULL, NULL, NULL, true, false, '2026-02-23', '2026-02-23 19:25:46.594557', '2026-02-23 19:25:46.594559', NULL, 1, NULL, NULL, NULL, NULL, 0, true, NULL, false, false, NULL);
 INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (8319, 'tenant_demo_002', 'sdsdsdsd', 'sdssssdsds', 'image/jpeg', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/hero_image_sample_4_1771874747010_88f96e51.jpeg', NULL, NULL, 865066, true, false, NULL, false, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/hero_image_sample_4_1771874747010_88f96e51.jpeg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260223T192547Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3599&X-Amz-Credential=AKIATIT5HARDH77LVIYW%2F20260223%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=f133a2cbd41d897ca6b63cef3cad368974e60a495528cd4ce8d8d56fb98d659b', NULL, NULL, NULL, NULL, NULL, NULL, true, false, '2026-02-23', '2026-02-23 19:25:47.107906', '2026-02-23 19:25:47.107908', NULL, 1, NULL, NULL, NULL, NULL, 0, true, NULL, false, false, NULL);
 INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (8320, 'tenant_demo_002', 'Dinner_Fundraiser', '', 'image/jpeg', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/events/tenantId/tenant_demo_002/event-id/8321/event_media_1771905453380_4b492525.jpeg', NULL, NULL, 746070, true, false, NULL, false, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/events/tenantId/tenant_demo_002/event-id/8321/event_media_1771905453380_4b492525.jpeg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260224T035733Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3600&X-Amz-Credential=AKIATIT5HARDH77LVIYW%2F20260224%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=190a6d6275026ccc1f275b9fe8cd2f46706628bed3c6944e0d249be0b6d6e6e1', NULL, '', NULL, NULL, false, '', true, false, '2026-02-24', '2026-02-24 03:57:33.74501', '2026-02-24 04:08:56.917', 8321, 5152, NULL, NULL, NULL, NULL, 0, true, NULL, false, false, NULL);
 INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (8318, 'tenant_demo_002', 'sdsdsdsd', 'sdssssdsds', 'image/jpeg', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/hero_image_sample_3_1771874746745_5cd03ed0.jpeg', NULL, NULL, 983380, true, false, NULL, false, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/hero_image_sample_3_1771874746745_5cd03ed0.jpeg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260223T192546Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3599&X-Amz-Credential=AKIATIT5HARDH77LVIYW%2F20260223%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=3781e1244cc39356fda03122508795843aa12f46428bab756c21bbf0293e5676', NULL, '', NULL, NULL, false, '', true, false, '2026-02-23', '2026-02-23 19:25:46.85528', '2026-02-23 19:25:46.855282', NULL, 1, NULL, NULL, NULL, NULL, 0, true, NULL, false, false, NULL);
 INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (8321, 'tenant_demo_002', 'Dinner_Fundraiser_Event_Strip', 'Dinner_Fundraiser_Event_Strip', 'image/jpeg', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/events/tenantId/tenant_demo_002/event-id/8321/event_media_1771907029244_e982e3fd.jpeg', NULL, NULL, 916154, true, false, NULL, false, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/events/tenantId/tenant_demo_002/event-id/8321/event_media_1771907029244_e982e3fd.jpeg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260224T042349Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3600&X-Amz-Credential=AKIATIT5HARDH77LVIYW%2F20260224%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=034d7ef0816e4fcc9b9514c895f98cfe8f6efaa260d4584e73663119492a5786', NULL, NULL, NULL, NULL, NULL, NULL, false, false, '2026-02-24', '2026-02-24 04:23:49.575007', '2026-02-24 04:23:49.575018', 8321, 5152, NULL, NULL, NULL, NULL, 0, false, NULL, true, false, NULL);
 INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (8316, 'tenant_demo_002', 'sdsdsdsd', 'sdssssdsds', 'image/jpeg', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/hero_image_sample_1_1771874745852_d50ac846.jpeg', NULL, NULL, 715919, true, false, NULL, false, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/hero_image_sample_1_1771874745852_d50ac846.jpeg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260223T192546Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3600&X-Amz-Credential=AKIATIT5HARDH77LVIYW%2F20260223%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=8bcbbd2c64bb79df39075d77540f2705bee388194f796e1c34ba4c4e0993a1ce', NULL, '', NULL, NULL, false, '', true, false, '2026-02-23', '2026-02-23 19:25:46.282637', '2026-02-23 19:25:46.282665', NULL, 1, NULL, NULL, NULL, NULL, 0, true, NULL, false, false, NULL);
-INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (8323, 'tenant_demo_002', 'hero sample', 'hero sample description', 'image/jpeg', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/hero_image_new_1772435983975_f9c040bd.jpeg', NULL, NULL, 2335105, true, false, NULL, false, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/hero_image_new_1772435983975_f9c040bd.jpeg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260302T071945Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3600&X-Amz-Credential=AKIATIT5HARDH77LVIYW%2F20260302%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=7c81eb12c659dc45e362f3eb8434ccb5a4345794927ec8be3759a65dff4c2fd6', NULL, '', NULL, NULL, false, '', true, false, '2026-03-01', '2026-03-02 07:19:45.861239', '2026-03-02 07:19:45.861243', NULL, 1, NULL, NULL, NULL, NULL, 0, true, NULL, false, false, NULL);
+INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (8324, 'tenant_demo_002', 'Focus Group Cover Image', 'Cover image for focus group', 'FOCUS_GROUP_COVER_IMAGE', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/focus-groups/focus-group-id/8310/cover_image_1772511314212_66c06f58.jpeg', NULL, NULL, NULL, true, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-03-03', '2026-03-03 04:15:15.874721', '2026-03-03 04:15:15.874723', NULL, NULL, NULL, NULL, NULL, NULL, 0, false, NULL, false, false, NULL);
+INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (8327, 'tenant_demo_002', 'Sponsor banner - 4551', 'Sponsor banner image', 'SPONSOR_BANNER', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/sponsor/sponsor_id/4551/sponsor_banner_1772529170013_c011aab4.webp', NULL, NULL, 299202, true, NULL, NULL, NULL, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/sponsor/sponsor_id/4551/sponsor_banner_1772529170013_c011aab4.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260303T091250Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3599&X-Amz-Credential=AKIATIT5HARDH77LVIYW%2F20260303%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=670f080263806d98fec57a602a6d0e2c49bb89d8569b39626b3c4020e8711674', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-03-03', '2026-03-03 09:12:50.327837', '2026-03-03 09:12:50.327847', NULL, 1, 4551, NULL, NULL, NULL, 0, false, NULL, false, false, NULL);
+INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (8328, 'tenant_demo_002', 'Sponsor hero - 4551', 'Sponsor hero image', 'SPONSOR_HERO', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/sponsor/sponsor_id/4551/sponsor_hero_1772530196347_fec86f36.webp', NULL, NULL, 6198, true, NULL, NULL, NULL, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/sponsor/sponsor_id/4551/sponsor_hero_1772530196347_fec86f36.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260303T092956Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3599&X-Amz-Credential=AKIATIT5HARDH77LVIYW%2F20260303%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=0cee581bf20f2383b6def682ae4cb0cd7d0bcf9f7c54d2b60f5ea3b09bb735c3', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-03-03', '2026-03-03 09:29:56.608988', '2026-03-03 09:29:56.608999', NULL, 1, 4551, NULL, NULL, NULL, 0, false, NULL, false, false, NULL);
+INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (8329, 'tenant_demo_002', 'Sponsor hero - 4551', 'Sponsor hero image', 'SPONSOR_HERO', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/sponsor/sponsor_id/4551/sponsor_hero_1772530533861_cc48143c.webp', NULL, NULL, 4312, true, NULL, NULL, NULL, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/sponsor/sponsor_id/4551/sponsor_hero_1772530533861_cc48143c.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260303T093534Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3599&X-Amz-Credential=AKIATIT5HARDH77LVIYW%2F20260303%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=1687d7aba26019593398a4c03a583d6903066911097d14e71faffbba5b644296', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-03-03', '2026-03-03 09:35:34.197731', '2026-03-03 09:35:34.197747', NULL, 1, 4551, NULL, NULL, NULL, 0, false, NULL, false, false, NULL);
+INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (8331, 'tenant_demo_002', 'Sponsor logo - 4551', 'Sponsor logo image', 'SPONSOR_LOGO', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/sponsor/sponsor_id/4551/sponsor_logo_1772531171598_096fcd45.webp', NULL, NULL, 3988, true, NULL, NULL, NULL, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/sponsor/sponsor_id/4551/sponsor_logo_1772531171598_096fcd45.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260303T094611Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3599&X-Amz-Credential=AKIATIT5HARDH77LVIYW%2F20260303%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=100835e000d1fe3a94fec66ae5e018e81421558922c30182684391d595d25700', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-03-03', '2026-03-03 09:46:11.923502', '2026-03-03 09:46:11.923515', NULL, 1, 4551, NULL, NULL, NULL, 0, false, NULL, false, false, NULL);
+INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (8332, 'tenant_demo_002', 'Focus Group Cover Image', 'Cover image for focus group', 'FOCUS_GROUP_COVER_IMAGE', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/focus-groups/focus-group-id/4002/cover_image_1772540438301_f8b17ade.jpg', NULL, NULL, NULL, true, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-03-03', '2026-03-03 12:20:38.682225', '2026-03-03 12:20:38.68223', NULL, NULL, NULL, NULL, NULL, NULL, 0, false, NULL, false, false, NULL);
+INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (8333, 'tenant_demo_002', 'Chicago Malayalee Association', NULL, 'image/jpeg', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/CMA_LOGO_1772542871027_43353626.jpg', NULL, NULL, 80924, true, false, NULL, false, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/CMA_LOGO_1772542871027_43353626.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260303T130111Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3599&X-Amz-Credential=AKIATIT5HARDH77LVIYW%2F20260303%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=a96f74d62bd8d94fd5f5e9a7c5d6e494e8dd8eaa6df584d4b1ab00c95ee74c4e', NULL, NULL, NULL, NULL, false, NULL, false, false, '2026-03-03', '2026-03-03 13:01:11.342419', '2026-03-03 13:01:11.397', NULL, 5152, NULL, NULL, NULL, NULL, 0, false, NULL, false, false, 8332);
+INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (8334, 'tenant_demo_002', 'Association', NULL, 'image/webp', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/malayalee-US-banner_1772546793151_33385d6d.webp', NULL, NULL, 14704, true, false, NULL, false, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/malayalee-US-banner_1772546793151_33385d6d.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260303T140633Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3600&X-Amz-Credential=AKIATIT5HARDH77LVIYW%2F20260303%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=3d4d47ef80ff4944a2a54f6f02639aa24deefee5c1f455bae51356864f13c632', NULL, NULL, NULL, NULL, false, NULL, false, false, '2026-03-03', '2026-03-03 14:06:33.303123', '2026-03-03 14:06:33.342', NULL, 5152, NULL, NULL, NULL, NULL, 0, false, NULL, false, false, 8332);
+INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (8336, 'tenant_demo_002', 'Association program', '', 'image/webp', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/kalamela-2024-banner-copy_1772548051961_66881753.webp', NULL, NULL, 299202, true, false, NULL, false, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/kalamela-2024-banner-copy_1772548051961_66881753.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260303T142732Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3600&X-Amz-Credential=AKIATIT5HARDH77LVIYW%2F20260303%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=d2e758dff93bd884304eef0cbc9466e583820337fd8706b59269f45eae8a7811', NULL, NULL, NULL, NULL, false, NULL, false, false, '2026-03-03', '2026-03-03 14:27:32.070316', '2026-03-03 14:27:32.945', NULL, 5152, NULL, NULL, NULL, NULL, 0, false, NULL, false, false, 8332);
+INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (8323, 'tenant_demo_002', 'hero_sample_1', 'hero sample description', 'image/jpeg', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/hero_image_new_1772435983975_f9c040bd.jpeg', NULL, NULL, 2335105, true, false, NULL, false, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/hero_image_new_1772435983975_f9c040bd.jpeg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260302T071945Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3600&X-Amz-Credential=AKIATIT5HARDH77LVIYW%2F20260302%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=7c81eb12c659dc45e362f3eb8434ccb5a4345794927ec8be3759a65dff4c2fd6', NULL, '', NULL, NULL, false, '', true, false, '2026-03-01', '2026-03-02 07:19:45.861239', '2026-03-02 07:19:45.861243', NULL, 1, NULL, NULL, NULL, NULL, 0, true, NULL, false, false, NULL);
+INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (8335, 'tenant_demo_002', 'Association program', '', 'image/webp', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/chicago-malayalee-association_1772548051712_77915901.webp', NULL, NULL, 3988, true, false, NULL, false, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/chicago-malayalee-association_1772548051712_77915901.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260303T142731Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3599&X-Amz-Credential=AKIATIT5HARDH77LVIYW%2F20260303%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=d8c07ed56547b3dfbfcc02a23dfe1986f7c1c934dad86263354bd2d2002fae68', NULL, NULL, NULL, NULL, false, NULL, false, false, '2026-03-03', '2026-03-03 14:27:31.959995', '2026-03-03 14:27:32.112', NULL, 5152, NULL, NULL, NULL, NULL, 0, false, NULL, false, false, 8332);
+INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (8337, 'tenant_demo_002', 'Chicago Malayalee Association glimpse', NULL, 'image/webp', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/chicago-malayalee-association_1772550817389_98c54c6a.webp', NULL, NULL, 3988, true, false, NULL, false, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/chicago-malayalee-association_1772550817389_98c54c6a.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260303T151337Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3599&X-Amz-Credential=AKIATIT5HARDH77LVIYW%2F20260303%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=1c2f5367e27aae8952c32918ca147c62135a8f7508ddcd024e0114d3233dacdd', NULL, NULL, NULL, NULL, NULL, NULL, false, false, '2026-03-03', '2026-03-03 15:13:37.590163', '2026-03-03 15:13:37.590184', NULL, 1, NULL, NULL, NULL, NULL, 0, false, NULL, false, false, NULL);
+INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (8339, 'tenant_demo_002', 'Chicago Malayalee Association glimpse', NULL, 'image/webp', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/CJ-Roy_1772550818127_e7ae16b5.webp', NULL, NULL, 6198, true, false, NULL, false, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/CJ-Roy_1772550818127_e7ae16b5.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260303T151338Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3599&X-Amz-Credential=AKIATIT5HARDH77LVIYW%2F20260303%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=f2d67274dc94f3e3aea67ade7d14c42391c15a0a75d549116d9a65577d1ebbdc', NULL, NULL, NULL, NULL, NULL, NULL, false, false, '2026-03-03', '2026-03-03 15:13:38.192206', '2026-03-03 15:13:38.192208', NULL, 1, NULL, NULL, NULL, NULL, 0, false, NULL, false, false, NULL);
+INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (8340, 'tenant_demo_002', 'Chicago Malayalee Association glimpse', NULL, 'image/webp', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/malayalee-US-banner_1772550818491_3ccc7a41.webp', NULL, NULL, 14704, true, false, NULL, false, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/malayalee-US-banner_1772550818491_3ccc7a41.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260303T151338Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3599&X-Amz-Credential=AKIATIT5HARDH77LVIYW%2F20260303%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=72f299ff8f6c69fcdfd18b37a5411c79d6d9a6ccf90a1c5226d3919a92e68bed', NULL, NULL, NULL, NULL, NULL, NULL, false, false, '2026-03-03', '2026-03-03 15:13:38.554729', '2026-03-03 15:13:38.554731', NULL, 1, NULL, NULL, NULL, NULL, 0, false, NULL, false, false, NULL);
+INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (8341, 'tenant_demo_002', 'Chicago Malayalee Association glimpse', NULL, 'image/webp', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/roy-cj_1772550818689_3d92e30d.webp', NULL, NULL, 4312, true, false, NULL, false, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/roy-cj_1772550818689_3d92e30d.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260303T151338Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3599&X-Amz-Credential=AKIATIT5HARDH77LVIYW%2F20260303%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=fa336e1674846c180d84703b9e77e9d648422a7dde91f85886244611a039c75c', NULL, NULL, NULL, NULL, NULL, NULL, false, false, '2026-03-03', '2026-03-03 15:13:38.751644', '2026-03-03 15:13:38.751648', NULL, 1, NULL, NULL, NULL, NULL, 0, false, NULL, false, false, NULL);
+INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (8317, 'tenant_demo_002', 'Hero_sample_2', 'Hero sample', 'image/jpeg', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/hero_image_sample_2_1771874746491_9d9f7371.jpeg', NULL, NULL, 830015, true, false, NULL, false, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/hero_image_sample_2_1771874746491_9d9f7371.jpeg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260223T192546Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3600&X-Amz-Credential=AKIATIT5HARDH77LVIYW%2F20260223%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=26da495b9ca070cc633c74b38db0ae58091f31da8e519977a810adbc8a2604c4', NULL, '', NULL, NULL, false, '', true, false, '2026-02-24', '2026-02-23 19:25:46.594557', '2026-02-23 19:25:46.594559', NULL, 1, NULL, NULL, NULL, NULL, 0, true, NULL, false, false, NULL);
+INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (8342, 'tenant_demo_002', 'Focus Group Cover Image', 'Cover image for focus group', 'FOCUS_GROUP_COVER_IMAGE', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/focus-groups/focus-group-id/8310/cover_image_1772632972261_f2085693.jpg', NULL, NULL, NULL, true, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-03-04', '2026-03-04 14:02:52.667844', '2026-03-04 14:02:52.667846', NULL, NULL, NULL, NULL, NULL, NULL, 0, false, NULL, false, false, NULL);
+INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (8343, 'tenant_demo_002', 'Focus Group Cover Image', 'Cover image for focus group', 'FOCUS_GROUP_COVER_IMAGE', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/focus-groups/focus-group-id/8311/cover_image_1772633054060_219b0d63.jpg', NULL, NULL, NULL, true, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-03-04', '2026-03-04 14:04:14.351091', '2026-03-04 14:04:14.3512', NULL, NULL, NULL, NULL, NULL, NULL, 0, false, NULL, false, false, NULL);
+INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (8338, 'tenant_demo_002', 'Chicago Malayalee Association glimpse', '', 'image/webp', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/kalamela-2024-banner-copy_1772550817875_445044d9.webp', NULL, NULL, 299202, true, false, NULL, false, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/kalamela-2024-banner-copy_1772550817875_445044d9.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20260303T151337Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3599&X-Amz-Credential=AKIATIT5HARDH77LVIYW%2F20260303%2Fus-east-2%2Fs3%2Faws4_request&X-Amz-Signature=541fe650433f9ff2be215f713264dd131aa06668345ccca103bcd4c28f9ef762', NULL, '', NULL, NULL, false, '', true, true, '2026-03-03', '2026-03-03 15:13:37.989951', '2026-03-03 15:13:37.989953', NULL, 1, NULL, NULL, NULL, NULL, 0, true, NULL, false, false, NULL);
+INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (8344, 'tenant_demo_002', 'Focus Group Cover Image', 'Cover image for focus group', 'FOCUS_GROUP_COVER_IMAGE', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/focus-groups/focus-group-id/8311/cover_image_1772633307047_00c88aae.png', NULL, NULL, NULL, true, false, false, false, '', NULL, '', NULL, NULL, false, '', true, false, '2026-03-04', '2026-03-04 14:08:27.292667', '2026-03-04 14:08:27.292673', NULL, NULL, NULL, NULL, NULL, NULL, 0, false, NULL, false, false, NULL);
+INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (8345, 'tenant_demo_002', 'Focus Group Cover Image', 'Cover image for focus group', 'FOCUS_GROUP_COVER_IMAGE', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/focus-groups/focus-group-id/8311/cover_image_1772684239579_8f8a7c39.jpg', NULL, NULL, NULL, true, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-03-05', '2026-03-05 04:17:20.7633', '2026-03-05 04:17:20.763304', NULL, NULL, NULL, NULL, NULL, NULL, 0, false, NULL, false, false, NULL);
+INSERT INTO public.event_media (id, tenant_id, title, description, event_media_type, storage_type, file_url, file_data_content_type, content_type, file_size, is_public, event_flyer, is_email_header_image, is_event_management_official_document, pre_signed_url, pre_signed_url_expires_at, alt_text, display_order, download_count, is_featured_video, featured_video_url, is_hero_image, is_active_hero_image, start_displaying_from_date, created_at, updated_at, event_id, uploaded_by_id, sponsor_id, event_sponsors_join_id, performer_id, director_id, priority_ranking, is_home_page_hero_image, home_page_hero_display_duration_seconds, is_featured_event_image, is_live_event_image, album_id) VALUES (8346, 'tenant_demo_002', 'Focus Group Cover Image', 'Cover image for focus group', 'FOCUS_GROUP_COVER_IMAGE', 'S3', 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/focus-groups/focus-group-id/8319/cover_image_1772711100499_be47e165.webp', NULL, NULL, NULL, true, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-03-05', '2026-03-05 11:45:00.795227', '2026-03-05 11:45:00.795231', NULL, NULL, NULL, NULL, NULL, NULL, 0, false, NULL, false, false, NULL);
 
 
 --
@@ -1646,10 +2202,10 @@ INSERT INTO public.event_ticket_type (id, tenant_id, name, description, price, i
 INSERT INTO public.event_ticket_type (id, tenant_id, name, description, price, is_service_fee_included, service_fee, code, available_quantity, sold_quantity, remaining_quantity, is_active, sale_start_date, sale_end_date, min_quantity_per_order, max_quantity_per_order, requires_approval, sort_order, created_at, updated_at, event_id) VALUES (4051, 'tenant_demo_002', 'Demo', 'sdfsfdgsdfgsdfgsdfg', 100.00, false, 0.00, '234', 100, 0, 100, true, NULL, NULL, 1, 10, false, 0, '2026-01-14 09:01:19.23', '2026-01-14 09:01:19.23', 6901);
 INSERT INTO public.event_ticket_type (id, tenant_id, name, description, price, is_service_fee_included, service_fee, code, available_quantity, sold_quantity, remaining_quantity, is_active, sale_start_date, sale_end_date, min_quantity_per_order, max_quantity_per_order, requires_approval, sort_order, created_at, updated_at, event_id) VALUES (7352, 'tenant_demo_002', 'Silver Sponsor', 'zxzxzxzxzxzx', 0.60, false, 0.00, 'Silver_Sponsor', 100, 0, 100, true, NULL, NULL, 1, 10, false, 0, '2026-01-19 06:09:05.511', '2026-01-19 06:09:05.511', 4201);
 INSERT INTO public.event_ticket_type (id, tenant_id, name, description, price, is_service_fee_included, service_fee, code, available_quantity, sold_quantity, remaining_quantity, is_active, sale_start_date, sale_end_date, min_quantity_per_order, max_quantity_per_order, requires_approval, sort_order, created_at, updated_at, event_id) VALUES (7351, 'tenant_demo_002', 'Gold Sponsor', 'zzzxzxzxz', 0.70, false, 0.00, 'Gold_Sponsor', 100, NULL, NULL, true, NULL, NULL, 1, 10, NULL, NULL, '2026-01-19 06:08:25.41', '2026-01-25 11:14:20.480911', 4201);
-INSERT INTO public.event_ticket_type (id, tenant_id, name, description, price, is_service_fee_included, service_fee, code, available_quantity, sold_quantity, remaining_quantity, is_active, sale_start_date, sale_end_date, min_quantity_per_order, max_quantity_per_order, requires_approval, sort_order, created_at, updated_at, event_id) VALUES (4152, 'tenant_demo_002', 'FirstClass', 'fdfddfdf', 0.60, false, 0.00, 'SPRING10', 100, NULL, NULL, true, NULL, NULL, 1, 10, false, 0, '2025-11-13 23:10:25.922', '2026-03-01 04:45:35.834089', 2);
-INSERT INTO public.event_ticket_type (id, tenant_id, name, description, price, is_service_fee_included, service_fee, code, available_quantity, sold_quantity, remaining_quantity, is_active, sale_start_date, sale_end_date, min_quantity_per_order, max_quantity_per_order, requires_approval, sort_order, created_at, updated_at, event_id) VALUES (7551, 'tenant_demo_002', 'Gold Sponsor', 'xzxzxzx', 0.70, false, 0.00, 'Gold_Sponsor', 50, 25, 45, true, NULL, NULL, 1, 10, false, 0, '2026-01-22 17:20:18.536', '2026-03-01 04:45:35.91413', 4202);
-INSERT INTO public.event_ticket_type (id, tenant_id, name, description, price, is_service_fee_included, service_fee, code, available_quantity, sold_quantity, remaining_quantity, is_active, sale_start_date, sale_end_date, min_quantity_per_order, max_quantity_per_order, requires_approval, sort_order, created_at, updated_at, event_id) VALUES (7552, 'tenant_demo_002', 'Silver Sponsor', 'ssdssssdss', 0.60, false, 0.00, 'Silver_Sponsor', 50, 5, 49, true, NULL, NULL, 1, 10, false, 0, '2026-01-22 17:21:15.843', '2026-03-01 04:45:35.922452', 4202);
-INSERT INTO public.event_ticket_type (id, tenant_id, name, description, price, is_service_fee_included, service_fee, code, available_quantity, sold_quantity, remaining_quantity, is_active, sale_start_date, sale_end_date, min_quantity_per_order, max_quantity_per_order, requires_approval, sort_order, created_at, updated_at, event_id) VALUES (4151, 'tenant_demo_002', 'Balcony', 'sdsdsdss', 0.70, true, 0.00, 'fdfdfd', 100, 30, 94, true, NULL, NULL, 1, 10, false, 0, '2025-11-13 23:09:56.934', '2026-03-01 04:45:35.936882', 2);
+INSERT INTO public.event_ticket_type (id, tenant_id, name, description, price, is_service_fee_included, service_fee, code, available_quantity, sold_quantity, remaining_quantity, is_active, sale_start_date, sale_end_date, min_quantity_per_order, max_quantity_per_order, requires_approval, sort_order, created_at, updated_at, event_id) VALUES (4152, 'tenant_demo_002', 'FirstClass', 'fdfddfdf', 0.60, false, 0.00, 'SPRING10', 100, NULL, NULL, true, NULL, NULL, 1, 10, false, 0, '2025-11-13 23:10:25.922', '2026-03-02 23:04:31.903462', 2);
+INSERT INTO public.event_ticket_type (id, tenant_id, name, description, price, is_service_fee_included, service_fee, code, available_quantity, sold_quantity, remaining_quantity, is_active, sale_start_date, sale_end_date, min_quantity_per_order, max_quantity_per_order, requires_approval, sort_order, created_at, updated_at, event_id) VALUES (7551, 'tenant_demo_002', 'Gold Sponsor', 'xzxzxzx', 0.70, false, 0.00, 'Gold_Sponsor', 50, 30, 45, true, NULL, NULL, 1, 10, false, 0, '2026-01-22 17:20:18.536', '2026-03-02 23:04:31.977768', 4202);
+INSERT INTO public.event_ticket_type (id, tenant_id, name, description, price, is_service_fee_included, service_fee, code, available_quantity, sold_quantity, remaining_quantity, is_active, sale_start_date, sale_end_date, min_quantity_per_order, max_quantity_per_order, requires_approval, sort_order, created_at, updated_at, event_id) VALUES (7552, 'tenant_demo_002', 'Silver Sponsor', 'ssdssssdss', 0.60, false, 0.00, 'Silver_Sponsor', 50, 6, 49, true, NULL, NULL, 1, 10, false, 0, '2026-01-22 17:21:15.843', '2026-03-02 23:04:31.990542', 4202);
+INSERT INTO public.event_ticket_type (id, tenant_id, name, description, price, is_service_fee_included, service_fee, code, available_quantity, sold_quantity, remaining_quantity, is_active, sale_start_date, sale_end_date, min_quantity_per_order, max_quantity_per_order, requires_approval, sort_order, created_at, updated_at, event_id) VALUES (4151, 'tenant_demo_002', 'Balcony', 'sdsdsdss', 0.70, true, 0.00, 'fdfdfd', 100, 36, 94, true, NULL, NULL, 1, 10, false, 0, '2025-11-13 23:09:56.934', '2026-03-02 23:04:32.011024', 2);
 
 
 --
@@ -1675,30 +2231,42 @@ INSERT INTO public.event_ticket_transaction_item (id, tenant_id, transaction_id,
 
 
 --
+-- Data for Name: tenant_organization; Type: TABLE DATA; Schema: public; Owner: event_site_app
+--
+
+INSERT INTO public.tenant_organization (id, tenant_id, organization_name, domain, primary_color, secondary_color, logo_url, contact_email, contact_phone, subscription_plan, subscription_status, subscription_start_date, subscription_end_date, monthly_fee_usd, stripe_customer_id, is_active, created_at, updated_at) VALUES (1, 'tenant_demo_001', 'Malayalees US', NULL, NULL, NULL, NULL, 'contact1@example.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, true, '2025-06-22 11:31:27.518852', '2025-06-22 11:31:27.518852');
+INSERT INTO public.tenant_organization (id, tenant_id, organization_name, domain, primary_color, secondary_color, logo_url, contact_email, contact_phone, subscription_plan, subscription_status, subscription_start_date, subscription_end_date, monthly_fee_usd, stripe_customer_id, is_active, created_at, updated_at) VALUES (3, 'tenant_demo_003', 'Charity Org', NULL, NULL, NULL, NULL, 'contact3@example.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, true, '2025-06-22 11:31:27.518852', '2025-06-22 11:31:27.518852');
+INSERT INTO public.tenant_organization (id, tenant_id, organization_name, domain, primary_color, secondary_color, logo_url, contact_email, contact_phone, subscription_plan, subscription_status, subscription_start_date, subscription_end_date, monthly_fee_usd, stripe_customer_id, is_active, created_at, updated_at) VALUES (4, 'tenant_demo_004', 'Family Org', NULL, NULL, NULL, NULL, 'contact4@example.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, true, '2025-06-22 11:31:27.518852', '2025-06-22 11:31:27.518852');
+INSERT INTO public.tenant_organization (id, tenant_id, organization_name, domain, primary_color, secondary_color, logo_url, contact_email, contact_phone, subscription_plan, subscription_status, subscription_start_date, subscription_end_date, monthly_fee_usd, stripe_customer_id, is_active, created_at, updated_at) VALUES (5, 'tenant_demo_005', 'VIP Org', NULL, NULL, NULL, NULL, 'contact5@example.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, true, '2025-06-22 11:31:27.518852', '2025-06-22 11:31:27.518852');
+INSERT INTO public.tenant_organization (id, tenant_id, organization_name, domain, primary_color, secondary_color, logo_url, contact_email, contact_phone, subscription_plan, subscription_status, subscription_start_date, subscription_end_date, monthly_fee_usd, stripe_customer_id, is_active, created_at, updated_at) VALUES (6, 'tenant_demo_006', 'Summer Org', NULL, NULL, NULL, NULL, 'contact6@example.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, true, '2025-06-22 11:31:27.518852', '2025-06-22 11:31:27.518852');
+INSERT INTO public.tenant_organization (id, tenant_id, organization_name, domain, primary_color, secondary_color, logo_url, contact_email, contact_phone, subscription_plan, subscription_status, subscription_start_date, subscription_end_date, monthly_fee_usd, stripe_customer_id, is_active, created_at, updated_at) VALUES (2, 'tenant_demo_002', 'Techies US', '', '#3B82F6', '#1E40AF', '', 'contact2@example.com', '', 'BASIC', 'TRIAL', NULL, NULL, 0.00, '', true, '2025-06-22 11:31:27.518852', '2026-01-13 06:42:44.040745');
+
+
+--
 -- Data for Name: executive_committee_team_members; Type: TABLE DATA; Schema: public; Owner: event_site_app
 --
 
-INSERT INTO public.executive_committee_team_members (id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (2, 'ddddddd', 'Joseph', 'nbnbnbnbnbbnb', '', 'bvbvbvbv', 'giventauser@gmail.com', 0, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/media/tenantId/tenant_demo_001/executive-team-members/latha_krishnan_1757093444035_7cfd3510.jpeg', NULL, '', '', '', NULL, true, '', '', '', '2025-09-05 17:30:43.745627+00', '2025-09-05 17:30:43.745627+00');
-INSERT INTO public.executive_committee_team_members (id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (3, 'Manaoj', 'Joseph', 'nnnbnbbnbnbnbnbb', '', '', 'giventauser@gmail.com', 0, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/media/tenantId/tenant_demo_001/executive-team-members/Manoj_Kizhakkoot_1757093467818_a471c9c7.png', NULL, '', '', '', NULL, true, '', '', '', '2025-09-05 17:31:07.135061+00', '2025-09-05 17:31:07.135061+00');
-INSERT INTO public.executive_committee_team_members (id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (5304, 'Test', 'person4', 'sdfsgsfg', '', '', '', 0, NULL, NULL, '', '', '', NULL, true, '', '', '', '2026-01-13 13:20:48.876278+00', '2026-01-13 13:20:48.876278+00');
-INSERT INTO public.executive_committee_team_members (id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (4151, 'Test', 'person5', 'dfgdsfg', '', '', '', 0, NULL, NULL, '', '', '', NULL, true, '', '', '', '2026-01-14 11:45:56.894632+00', '2026-01-14 11:45:56.894632+00');
-INSERT INTO public.executive_committee_team_members (id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (4152, 'Test', 'person6', 'sdfgsdfg', '', '', '', 0, NULL, NULL, '', '', '', NULL, true, '', '', '', '2026-01-14 11:46:22.756593+00', '2026-01-14 11:46:22.756593+00');
-INSERT INTO public.executive_committee_team_members (id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (4153, 'Test', 'perosn7', 'sdfgsdfg', '', '', '', 0, NULL, NULL, '', '', '', NULL, true, '', '', '', '2026-01-14 11:46:37.057887+00', '2026-01-14 11:46:37.057887+00');
-INSERT INTO public.executive_committee_team_members (id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (4154, 'Test', 'person8', 'sdfgdfg', '', '', '', 0, NULL, NULL, '', '', '', NULL, true, '', '', '', '2026-01-14 11:46:51.23387+00', '2026-01-14 11:46:51.23387+00');
-INSERT INTO public.executive_committee_team_members (id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (4155, 'Test', 'person9', 'sdfgdsfg', '', '', '', 0, NULL, NULL, '', '', '', NULL, true, '', '', '', '2026-01-14 11:47:35.737431+00', '2026-01-14 11:47:35.737431+00');
-INSERT INTO public.executive_committee_team_members (id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (4156, 'Test ', 'person10', 'bdgdgh', '', '', '', 0, NULL, NULL, '', '', '', NULL, true, '', '', '', '2026-01-14 11:47:47.062863+00', '2026-01-14 11:47:47.062863+00');
-INSERT INTO public.executive_committee_team_members (id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (4157, 'Test', 'perosn11', 'xddghdgh', '', '', '', 0, NULL, NULL, '', '', '', NULL, true, '', '', '', '2026-01-14 11:48:03.507591+00', '2026-01-14 11:48:03.507591+00');
-INSERT INTO public.executive_committee_team_members (id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (4158, 'Test', 'person12', 'dfgsfgsfg', '', '', '', 0, NULL, NULL, '', '', '', NULL, true, '', '', '', '2026-01-14 11:48:16.620334+00', '2026-01-14 11:48:16.620334+00');
-INSERT INTO public.executive_committee_team_members (id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (4159, 'Test', 'person13', 'sfdgdfgsdfg', '', '', '', 0, NULL, NULL, '', '', '', NULL, true, '', '', '', '2026-01-14 11:48:30.63973+00', '2026-01-14 11:48:30.63973+00');
-INSERT INTO public.executive_committee_team_members (id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (4160, 'Test', 'person14', 'sfgsfgsfg', '', '', '', 0, NULL, NULL, '', '', '', NULL, true, '', '', '', '2026-01-14 11:48:44.48062+00', '2026-01-14 11:48:44.48062+00');
-INSERT INTO public.executive_committee_team_members (id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (4161, 'Test', 'person15', 'sfgdsfgdsfg', '', '', '', 0, NULL, NULL, '', '', '', NULL, true, '', '', '', '2026-01-14 11:49:00.129586+00', '2026-01-14 11:49:00.129586+00');
-INSERT INTO public.executive_committee_team_members (id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (4162, 'Test', 'person16', 'sdgsfg', '', '', '', 0, NULL, NULL, '', '', '', NULL, true, '', '', '', '2026-01-14 11:49:22.110084+00', '2026-01-14 11:49:22.110084+00');
-INSERT INTO public.executive_committee_team_members (id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (4163, 'Test', 'person17', 'sdgsdfg', '', '', '', 0, NULL, NULL, '', '', '', NULL, true, '', '', '', '2026-01-14 11:49:45.165191+00', '2026-01-14 11:49:45.165191+00');
-INSERT INTO public.executive_committee_team_members (id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (1, 'Gain', 'Joseph', 'bnbnbbnb', 'asasasa', 'bnbnbbnb', 'giventauser@gmail.com', 0, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/media/tenantId/tenant_demo_001/executive-team-members/arun_sadasivan_1757093414753_3e098d44.jpeg', NULL, '', '', '', NULL, true, '', '', '', '2025-09-05 17:30:12.146626+00', '2025-09-05 17:30:12.146626+00');
-INSERT INTO public.executive_committee_team_members (id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (5302, 'John', 'Doe', 'Mr', 'HR Manager', '', 'johndoetest@gmail.com', 0, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/executive-team-members/Executive_member4__1__1771598811290_9be53a5f.jpeg', '["Leadership","Human Resource Management"]', '', '', 'Management', '2026-02-06', true, 'https://www.linkedin.com', 'https://www.youtube.com', 'https://www.facebook.com', '2026-01-13 13:20:20.2445+00', '2026-01-13 13:20:20.2445+00');
-INSERT INTO public.executive_committee_team_members (id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (5303, 'Test', 'person3', 'xdfgsdfg', '', '', '', 1, NULL, NULL, '', '', '', NULL, true, '', '', '', '2026-01-13 13:20:34.998888+00', '2026-01-13 13:20:34.998888+00');
-INSERT INTO public.executive_committee_team_members (id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (8320, 'Mary ', 'John', 'Ms', 'Executive Member', 'Mary is an experienced Public Relations Officer with 10 years of expertise in media relations, corporate communications, and brand management.', 'marydoetest343@gmail.com', 0, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/executive-team-members/Executive_member4__2__1771829225544_2e82ef18.jpeg', '["Media Relation","Corporate Communication","Brand Management"]', '', '', 'Public Relation', '2026-01-01', true, '', 'https://x.com/', '', '2026-02-23 06:47:03.71862+00', '2026-02-23 06:47:03.71862+00');
-INSERT INTO public.executive_committee_team_members (id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (5301, 'Mary', 'Doe Doe', 'Ms', 'Executive Member', '', 'marydoetest@gmail.com', 0, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/executive-team-members/Executive_member3_1771598340045_99376a4a.jpeg', '["Leadership","Financial Management"]', '', '', 'Management', '2026-02-06', true, 'https://www.linkedin.com', 'https://www.youtube.com', 'https://www.facebook.com', '2026-01-13 13:20:04.216117+00', '2026-01-13 13:20:04.216117+00');
+INSERT INTO public.executive_committee_team_members (id, tenant_id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (3, 'tenant_demo_002', 'Manaoj', 'Joseph', 'nnnbnbbnbnbnbnbb', '', '', 'giventauser@gmail.com', 1, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/media/tenantId/tenant_demo_001/executive-team-members/Manoj_Kizhakkoot_1757093467818_a471c9c7.png', NULL, '', '', '', NULL, true, '', '', '', '2025-09-05 13:31:07.135+00', '2025-09-05 13:31:07.135+00');
+INSERT INTO public.executive_committee_team_members (id, tenant_id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (1, 'tenant_demo_002', 'Gain', 'Joseph', 'bnbnbbnb', 'asasasa', 'bnbnbbnb', 'giventauser@gmail.com', 2, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/media/tenantId/tenant_demo_001/executive-team-members/arun_sadasivan_1757093414753_3e098d44.jpeg', NULL, '', '', '', NULL, true, '', '', '', '2025-09-05 13:30:12.146+00', '2025-09-05 13:30:12.146+00');
+INSERT INTO public.executive_committee_team_members (id, tenant_id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (2, 'tenant_demo_002', 'ddddddd', 'Joseph', 'nbnbnbnbnbbnb', '', 'bvbvbvbv', 'giventauser@gmail.com', 4, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/media/tenantId/tenant_demo_001/executive-team-members/latha_krishnan_1757093444035_7cfd3510.jpeg', NULL, '', '', '', NULL, true, '', '', '', '2025-09-05 13:30:43.745+00', '2025-09-05 13:30:43.745+00');
+INSERT INTO public.executive_committee_team_members (id, tenant_id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (8320, 'tenant_demo_002', 'Mary ', 'John', 'Ms', 'Executive Member', 'Mary is an experienced Public Relations Officer with 10 years of expertise in media relations, corporate communications, and brand management.', 'marydoetest343@gmail.com', 5, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/executive-team-members/Executive_member4__2__1771829225544_2e82ef18.jpeg', '["Media Relation","Corporate Communication","Brand Management"]', '', '', 'Public Relation', '2026-01-01', true, '', 'https://x.com/', '', '2026-02-23 01:47:03.718+00', '2026-02-23 01:47:03.718+00');
+INSERT INTO public.executive_committee_team_members (id, tenant_id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (5302, 'tenant_demo_002', 'John', 'Doe', 'Mr', 'HR Manager', '', 'johndoetest@gmail.com', 6, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/executive-team-members/Executive_member4__1__1771598811290_9be53a5f.jpeg', '["Leadership","Human Resource Management"]', '', '', 'Management', '2026-02-06', true, 'https://www.linkedin.com', 'https://www.youtube.com', 'https://www.facebook.com', '2026-01-13 08:20:20.244+00', '2026-01-13 08:20:20.244+00');
+INSERT INTO public.executive_committee_team_members (id, tenant_id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (5301, 'tenant_demo_002', 'Mary', 'Doe', 'Ms', 'Executive Member', '', 'marydoetest@gmail.com', 7, 'https://eventapp-media-bucket.s3.us-east-2.amazonaws.com/dev/media/tenantId/tenant_demo_002/executive-team-members/Executive_member3_1771598340045_99376a4a.jpeg', '["Leadership","Financial Management"]', '', '', 'Management', '2026-02-06', true, 'https://www.linkedin.com', 'https://www.youtube.com', 'https://www.facebook.com', '2026-01-13 08:20:04.216+00', '2026-01-13 08:20:04.216+00');
+INSERT INTO public.executive_committee_team_members (id, tenant_id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (4151, 'tenant_demo_001', 'Test', 'person5', 'dfgdsfg', '', '', '', 16, NULL, NULL, '', '', '', NULL, true, '', '', '', '2026-01-14 06:45:56.894+00', '2026-03-02 13:14:06.349+00');
+INSERT INTO public.executive_committee_team_members (id, tenant_id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (4152, 'tenant_demo_001', 'Test', 'person6', 'sdfgsdfg', '', '', '', 17, NULL, NULL, '', '', '', NULL, true, '', '', '', '2026-01-14 06:46:22.756+00', '2026-03-02 13:14:06.349+00');
+INSERT INTO public.executive_committee_team_members (id, tenant_id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (4153, 'tenant_demo_001', 'Test', 'perosn7', 'sdfgsdfg', '', '', '', 18, NULL, NULL, '', '', '', NULL, true, '', '', '', '2026-01-14 06:46:37.057+00', '2026-03-02 13:14:06.349+00');
+INSERT INTO public.executive_committee_team_members (id, tenant_id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (4154, 'tenant_demo_001', 'Test', 'person8', 'sdfgdfg', '', '', '', 19, NULL, NULL, '', '', '', NULL, true, '', '', '', '2026-01-14 06:46:51.233+00', '2026-03-02 13:14:06.349+00');
+INSERT INTO public.executive_committee_team_members (id, tenant_id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (4155, 'tenant_demo_002', 'Test', 'person9', 'sdfgdsfg', '', '', '', 20, NULL, NULL, '', '', '', NULL, true, '', '', '', '2026-01-14 06:47:35.737+00', '2026-03-02 13:14:06.349+00');
+INSERT INTO public.executive_committee_team_members (id, tenant_id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (4156, 'tenant_demo_001', 'Test ', 'person10', 'bdgdgh', '', '', '', 21, NULL, NULL, '', '', '', NULL, true, '', '', '', '2026-01-14 06:47:47.062+00', '2026-03-02 13:14:06.349+00');
+INSERT INTO public.executive_committee_team_members (id, tenant_id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (4157, 'tenant_demo_002', 'Test', 'perosn11', 'xddghdgh', '', '', '', 22, NULL, NULL, '', '', '', NULL, true, '', '', '', '2026-01-14 06:48:03.507+00', '2026-03-02 13:14:06.349+00');
+INSERT INTO public.executive_committee_team_members (id, tenant_id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (4158, 'tenant_demo_001', 'Test', 'person12', 'dfgsfgsfg', '', '', '', 23, NULL, NULL, '', '', '', NULL, true, '', '', '', '2026-01-14 06:48:16.62+00', '2026-03-02 13:14:06.349+00');
+INSERT INTO public.executive_committee_team_members (id, tenant_id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (4159, 'tenant_demo_002', 'Test', 'person13', 'sfdgdfgsdfg', '', '', '', 24, NULL, NULL, '', '', '', NULL, true, '', '', '', '2026-01-14 06:48:30.639+00', '2026-03-02 13:14:06.349+00');
+INSERT INTO public.executive_committee_team_members (id, tenant_id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (4160, 'tenant_demo_002', 'Test', 'person14', 'sfgsfgsfg', '', '', '', 25, NULL, NULL, '', '', '', NULL, true, '', '', '', '2026-01-14 06:48:44.48+00', '2026-03-02 13:14:06.349+00');
+INSERT INTO public.executive_committee_team_members (id, tenant_id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (4161, 'tenant_demo_002', 'Test', 'person15', 'sfgdsfgdsfg', '', '', '', 26, NULL, NULL, '', '', '', NULL, true, '', '', '', '2026-01-14 06:49:00.129+00', '2026-03-02 13:14:06.349+00');
+INSERT INTO public.executive_committee_team_members (id, tenant_id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (4162, 'tenant_demo_002', 'Test', 'person16', 'sdgsfg', '', '', '', 27, NULL, NULL, '', '', '', NULL, true, '', '', '', '2026-01-14 06:49:22.11+00', '2026-03-02 13:14:06.349+00');
+INSERT INTO public.executive_committee_team_members (id, tenant_id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (5303, 'tenant_demo_002', 'Test', 'person3', 'xdfgsdfg', '', '', '', 29, NULL, NULL, '', '', '', NULL, true, '', '', '', '2026-01-13 08:20:34.998+00', '2026-03-02 13:14:06.349+00');
+INSERT INTO public.executive_committee_team_members (id, tenant_id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (5304, 'tenant_demo_001', 'Test', 'person4', 'sdfsgsfg', '', '', '', 30, NULL, NULL, '', '', '', NULL, true, '', '', '', '2026-01-13 08:20:48.876+00', '2026-03-02 13:14:06.349+00');
+INSERT INTO public.executive_committee_team_members (id, tenant_id, first_name, last_name, title, designation, bio, email, priority_order, profile_image_url, expertise, image_background, image_style, department, join_date, is_active, linkedin_url, twitter_url, website_url, created_at, updated_at) VALUES (4163, 'tenant_demo_002', 'Test', 'person17', 'sdgsdfg', '', '', '', 29, NULL, NULL, '', '', '', NULL, true, '', '', '', '2026-01-14 06:49:45.165+00', '2026-03-02 13:14:06.349+00');
 
 
 --
@@ -1812,46 +2380,86 @@ INSERT INTO public.membership_subscription (id, tenant_id, user_profile_id, memb
 
 INSERT INTO public.promotion_email_template (id, tenant_id, event_id, template_name, template_type, subject, from_email, body_html, footer_html, header_image_url, footer_image_url, promotion_code, discount_code_id, is_active, created_by_id, created_at, updated_at) VALUES (4101, 'tenant_demo_002', 2, 'template 1', 'EVENT_PROMOTION', 'template 1', 'giventauser@gmail.com', '<div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; background: #f9f9f9; border-radius: 8px; padding: 24px; text-align: center;">
 
+
+
   <h2 style="color: #1a237e; margin-bottom: 12px;">Special Offer Just for You!</h2>
+
+
 
   <p style="font-size: 18px; color: #333; margin-bottom: 8px;">Use the code below to get an exclusive discount:</p>
 
+
+
   <div style="font-size: 24px; font-weight: bold; color: #1565c0; background: #e3f2fd; border-radius: 6px; display: inline-block; padding: 12px 32px; margin-bottom: 12px;">SAVE20</div>
 
+
+
   <p style="font-size: 16px; color: #444;">Enter this code at checkout to enjoy your savings!</p>
+
+
 
 </div>', NULL, '', '', NULL, NULL, true, NULL, '2025-12-04 02:21:46.637859', '2025-12-04 02:47:07.241759');
 INSERT INTO public.promotion_email_template (id, tenant_id, event_id, template_name, template_type, subject, from_email, body_html, footer_html, header_image_url, footer_image_url, promotion_code, discount_code_id, is_active, created_by_id, created_at, updated_at) VALUES (4102, 'tenant_demo_002', 2, 'template 1 (Copy)', 'EVENT_PROMOTION', 'template 1', 'sales@giventa.com', '<div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; background: #f9f9f9; border-radius: 8px; padding: 24px; text-align: center;">
 
+
+
   <h2 style="color: #1a237e; margin-bottom: 12px;">Special Offer Just for You!</h2>
+
+
 
   <p style="font-size: 18px; color: #333; margin-bottom: 8px;">Use the code below to get an exclusive discount:</p>
 
+
+
   <div style="font-size: 24px; font-weight: bold; color: #1565c0; background: #e3f2fd; border-radius: 6px; display: inline-block; padding: 12px 32px; margin-bottom: 12px;">SAVE20</div>
 
+
+
   <p style="font-size: 16px; color: #444;">Enter this code at checkout to enjoy your savings!</p>
+
+
 
 </div>', NULL, '', '', NULL, NULL, true, NULL, '2025-12-04 02:56:04.570325', '2025-12-04 03:14:03.748681');
 INSERT INTO public.promotion_email_template (id, tenant_id, event_id, template_name, template_type, subject, from_email, body_html, footer_html, header_image_url, footer_image_url, promotion_code, discount_code_id, is_active, created_by_id, created_at, updated_at) VALUES (5051, 'tenant_demo_002', NULL, 'template 1 (Copy)', 'NEWS_LETTER', 'just the email subject', 'sales@giventa.com', '<div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; background: #f9f9f9; border-radius: 8px; padding: 24px; text-align: center;">
 
+
+
   <h2 style="color: #1a237e; margin-bottom: 12px;">Special Offer Just for You!</h2>
+
+
 
   <p style="font-size: 18px; color: #333; margin-bottom: 8px;">Use the code below to get an exclusive discount:</p>
 
+
+
   <div style="font-size: 24px; font-weight: bold; color: #1565c0; background: #e3f2fd; border-radius: 6px; display: inline-block; padding: 12px 32px; margin-bottom: 12px;">SAVE20</div>
 
+
+
   <p style="font-size: 16px; color: #444;">Enter this code at checkout to enjoy your savings!</p>
+
+
 
 </div>', NULL, '', '', NULL, NULL, true, NULL, '2026-01-12 03:55:26.179189', '2026-01-12 03:55:26.179211');
 INSERT INTO public.promotion_email_template (id, tenant_id, event_id, template_name, template_type, subject, from_email, body_html, footer_html, header_image_url, footer_image_url, promotion_code, discount_code_id, is_active, created_by_id, created_at, updated_at) VALUES (5052, 'tenant_demo_002', NULL, 'Test template', 'NEWS_LETTER', 'giventauser@gmail.com', 'sales@giventa.com', '<div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; background: #f9f9f9; border-radius: 8px; padding: 24px; text-align: center;">
 
+
+
   <h2 style="color: #1a237e; margin-bottom: 12px;">Special Offer Just for You!</h2>
+
+
 
   <p style="font-size: 18px; color: #333; margin-bottom: 8px;">Use the code below to get an exclusive discount:</p>
 
+
+
   <div style="font-size: 24px; font-weight: bold; color: #1565c0; background: #e3f2fd; border-radius: 6px; display: inline-block; padding: 12px 32px; margin-bottom: 12px;">SAVE20</div>
 
+
+
   <p style="font-size: 16px; color: #444;">Enter this code at checkout to enjoy your savings!</p>
+
+
 
 </div>', NULL, '', '', NULL, NULL, true, NULL, '2026-01-12 04:01:17.410089', '2026-01-12 04:03:45.56019');
 
@@ -1911,18 +2519,6 @@ INSERT INTO public.rel_event_details__discount_codes (event_details_id, discount
 
 
 --
--- Data for Name: tenant_organization; Type: TABLE DATA; Schema: public; Owner: event_site_app
---
-
-INSERT INTO public.tenant_organization (id, tenant_id, organization_name, domain, primary_color, secondary_color, logo_url, contact_email, contact_phone, subscription_plan, subscription_status, subscription_start_date, subscription_end_date, monthly_fee_usd, stripe_customer_id, is_active, created_at, updated_at) VALUES (1, 'tenant_demo_001', 'Malayalees US', NULL, NULL, NULL, NULL, 'contact1@example.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, true, '2025-06-22 11:31:27.518852', '2025-06-22 11:31:27.518852');
-INSERT INTO public.tenant_organization (id, tenant_id, organization_name, domain, primary_color, secondary_color, logo_url, contact_email, contact_phone, subscription_plan, subscription_status, subscription_start_date, subscription_end_date, monthly_fee_usd, stripe_customer_id, is_active, created_at, updated_at) VALUES (3, 'tenant_demo_003', 'Charity Org', NULL, NULL, NULL, NULL, 'contact3@example.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, true, '2025-06-22 11:31:27.518852', '2025-06-22 11:31:27.518852');
-INSERT INTO public.tenant_organization (id, tenant_id, organization_name, domain, primary_color, secondary_color, logo_url, contact_email, contact_phone, subscription_plan, subscription_status, subscription_start_date, subscription_end_date, monthly_fee_usd, stripe_customer_id, is_active, created_at, updated_at) VALUES (4, 'tenant_demo_004', 'Family Org', NULL, NULL, NULL, NULL, 'contact4@example.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, true, '2025-06-22 11:31:27.518852', '2025-06-22 11:31:27.518852');
-INSERT INTO public.tenant_organization (id, tenant_id, organization_name, domain, primary_color, secondary_color, logo_url, contact_email, contact_phone, subscription_plan, subscription_status, subscription_start_date, subscription_end_date, monthly_fee_usd, stripe_customer_id, is_active, created_at, updated_at) VALUES (5, 'tenant_demo_005', 'VIP Org', NULL, NULL, NULL, NULL, 'contact5@example.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, true, '2025-06-22 11:31:27.518852', '2025-06-22 11:31:27.518852');
-INSERT INTO public.tenant_organization (id, tenant_id, organization_name, domain, primary_color, secondary_color, logo_url, contact_email, contact_phone, subscription_plan, subscription_status, subscription_start_date, subscription_end_date, monthly_fee_usd, stripe_customer_id, is_active, created_at, updated_at) VALUES (6, 'tenant_demo_006', 'Summer Org', NULL, NULL, NULL, NULL, 'contact6@example.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, true, '2025-06-22 11:31:27.518852', '2025-06-22 11:31:27.518852');
-INSERT INTO public.tenant_organization (id, tenant_id, organization_name, domain, primary_color, secondary_color, logo_url, contact_email, contact_phone, subscription_plan, subscription_status, subscription_start_date, subscription_end_date, monthly_fee_usd, stripe_customer_id, is_active, created_at, updated_at) VALUES (2, 'tenant_demo_002', 'Techies US', '', '#3B82F6', '#1E40AF', '', 'contact2@example.com', '', 'BASIC', 'TRIAL', NULL, NULL, 0.00, '', true, '2025-06-22 11:31:27.518852', '2026-01-13 06:42:44.040745');
-
-
---
 -- Data for Name: tenant_email_addresses; Type: TABLE DATA; Schema: public; Owner: event_site_app
 --
 
@@ -1976,7 +2572,7 @@ INSERT INTO public.user_task (id, tenant_id, title, description, status, priorit
 -- Name: batch_job_execution_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: event_site_app
 --
 
-SELECT pg_catalog.setval('public.batch_job_execution_log_id_seq', 4609, true);
+SELECT pg_catalog.setval('public.batch_job_execution_log_id_seq', 4631, true);
 
 
 --
@@ -1990,7 +2586,7 @@ SELECT pg_catalog.setval('public.batch_job_execution_seq', 2, true);
 -- Name: batch_job_seq; Type: SEQUENCE SET; Schema: public; Owner: event_site_app
 --
 
-SELECT pg_catalog.setval('public.batch_job_seq', 8, true);
+SELECT pg_catalog.setval('public.batch_job_seq', 44, true);
 
 
 --
@@ -2039,7 +2635,7 @@ SELECT pg_catalog.setval('public.event_score_card_id_seq', 1, true);
 -- Name: sequence_generator; Type: SEQUENCE SET; Schema: public; Owner: event_site_app
 --
 
-SELECT pg_catalog.setval('public.sequence_generator', 8323, true);
+SELECT pg_catalog.setval('public.sequence_generator', 8346, true);
 
 
 --

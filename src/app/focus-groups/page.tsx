@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { getAppUrl } from '@/lib/env';
 import FocusGroupsGridWithSearch from './FocusGroupsGridWithSearch';
 
@@ -48,6 +49,18 @@ export default async function FocusGroupsPage() {
         <p className="text-xs sm:text-sm text-gray-600 text-center sm:text-left">
           Explore our specialized groups and their upcoming activities.
         </p>
+        {/* Hero image: full width of content area; use w-full h-auto so it spans entire width with no crop. Recommended source: width ≥1200px (e.g. 1200×400 or 1920×640). */}
+        <div className="mt-4 sm:mt-6 w-full rounded-lg overflow-hidden">
+          <Image
+            src="/images/MalayaleeUS-subpage-HeroImage.png"
+            alt="Focus Groups"
+            width={1200}
+            height={400}
+            className="w-full h-auto object-contain"
+            priority
+            sizes="100vw"
+          />
+        </div>
       </div>
 
       {/* Focus Groups Grid with Search - same search bar as admin/executive-committee */}
