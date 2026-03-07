@@ -1,22 +1,33 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import type { EventDetailsDTO } from '@/types';
 import { fetchAssociatedEvents, unlinkEventFromFocusGroup } from '../ApiServerActions';
 import { FaUnlink } from 'react-icons/fa';
 import { formatDateLocal } from '@/lib/date';
 import Link from 'next/link';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel,
+} from '@/components/ui/alert-dialog';
 
 interface AssociatedEventsTableProps {
   focusGroupId: number;
   initialEvents?: EventDetailsDTO[];
   initialTotalCount?: number;
+  onUnlinked?: () => void;
 }
 
 export default function AssociatedEventsTable({
   focusGroupId,
   initialEvents = [],
   initialTotalCount = 0,
+  onUnlinked,
 }: AssociatedEventsTableProps) {
   const [events, setEvents] = useState<EventDetailsDTO[]>(initialEvents);
   const [totalCount, setTotalCount] = useState(initialTotalCount);
@@ -26,11 +37,14 @@ export default function AssociatedEventsTable({
   const [error, setError] = useState<string | null>(null);
   const [showPastEvents, setShowPastEvents] = useState(false);
   const [unlinkingId, setUnlinkingId] = useState<number | null>(null);
+  const [eventToUnlink, setEventToUnlink] = useState<EventDetailsDTO | null>(null);
+  const isInitialMount = useRef(true);
+  const justSyncedFromInitial = useRef(false);
 
-  const totalPages = Math.ceil(totalCount / pageSize);
+  const totalPages = Math.ceil(totalCount / pageSize) || 1;
   const displayPage = currentPage + 1;
-  const startItem = currentPage * pageSize + 1;
-  const endItem = Math.min((currentPage + 1) * pageSize, totalCount);
+  const startItem = totalCount > 0 ? currentPage * pageSize + 1 : 0;
+  const endItem = totalCount > 0 ? Math.min((currentPage + 1) * pageSize, totalCount) : 0;
 
   const isPrevDisabled = currentPage === 0 || loading;
   const isNextDisabled = currentPage >= totalPages - 1 || loading;
@@ -53,7 +67,24 @@ export default function AssociatedEventsTable({
     }
   };
 
+  // Sync from server when initial data changes (e.g. after router.refresh() following link)
   useEffect(() => {
+    setEvents(initialEvents);
+    setTotalCount(initialTotalCount);
+    setCurrentPage(0);
+    justSyncedFromInitial.current = true;
+  }, [initialEvents, initialTotalCount]);
+
+  // Load events when user changes page or toggles Upcoming/Past; skip on first mount and right after sync so we keep server list
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    if (justSyncedFromInitial.current) {
+      justSyncedFromInitial.current = false;
+      return;
+    }
     loadEvents(currentPage);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focusGroupId, currentPage, showPastEvents]);
@@ -70,27 +101,28 @@ export default function AssociatedEventsTable({
     }
   };
 
-  const handleUnlink = async (event: EventDetailsDTO) => {
+  const openUnlinkDialog = (event: EventDetailsDTO) => {
     if (!event.id) return;
+    setError(null);
+    setEventToUnlink(event);
+  };
 
-    if (!confirm(`Are you sure you want to unlink "${event.title}" from this focus group?`)) {
-      return;
-    }
+  const closeUnlinkDialog = () => {
+    if (!unlinkingId) setEventToUnlink(null);
+  };
 
-    setUnlinkingId(event.id);
+  const handleConfirmUnlink = async () => {
+    if (!eventToUnlink?.id) return;
+
+    setUnlinkingId(eventToUnlink.id);
+    setError(null);
     try {
-      await unlinkEventFromFocusGroup(event.id, focusGroupId);
-      
-      // Refresh the events list
-      await loadEvents(currentPage);
-      
-      // If we're on the last page and it becomes empty, go to previous page
-      if (events.length === 1 && currentPage > 0) {
-        setCurrentPage(prev => prev - 1);
-      }
+      await unlinkEventFromFocusGroup(eventToUnlink.id, focusGroupId);
+      setEventToUnlink(null);
+      onUnlinked?.();
     } catch (err: any) {
       console.error('Failed to unlink event:', err);
-      alert(`Failed to unlink event: ${err.message || 'Unknown error'}`);
+      setError(err?.message || 'Failed to unlink event. Please try again.');
     } finally {
       setUnlinkingId(null);
     }
@@ -101,7 +133,7 @@ export default function AssociatedEventsTable({
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Associated Events</h2>
         
-        {/* Filter Toggle - admin action button style */}
+        {/* Filter Toggle - two distinct colors: blue (upcoming) and purple (past), no gray */}
         <div className="flex flex-wrap gap-3">
           <button
             type="button"
@@ -112,19 +144,19 @@ export default function AssociatedEventsTable({
             className={`flex-shrink-0 h-14 rounded-xl flex items-center justify-center gap-3 px-3 transition-all duration-300 hover:scale-105 ${
               !showPastEvents
                 ? 'bg-blue-100 hover:bg-blue-200'
-                : 'bg-gray-100 hover:bg-gray-200'
+                : 'bg-purple-100 hover:bg-purple-200'
             }`}
             title="Upcoming Events"
             aria-label="Upcoming Events"
           >
             <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
-              !showPastEvents ? 'bg-blue-200' : 'bg-gray-200'
+              !showPastEvents ? 'bg-blue-200' : 'bg-purple-200'
             }`}>
-              <svg className={`w-6 h-6 ${!showPastEvents ? 'text-blue-600' : 'text-gray-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className={`w-6 h-6 ${!showPastEvents ? 'text-blue-600' : 'text-purple-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
-            <span className={`font-semibold ${!showPastEvents ? 'text-blue-700' : 'text-gray-700'}`}>
+            <span className={`font-semibold ${!showPastEvents ? 'text-blue-700' : 'text-purple-700'}`}>
               Upcoming Events
             </span>
           </button>
@@ -137,19 +169,19 @@ export default function AssociatedEventsTable({
             className={`flex-shrink-0 h-14 rounded-xl flex items-center justify-center gap-3 px-3 transition-all duration-300 hover:scale-105 ${
               showPastEvents
                 ? 'bg-blue-100 hover:bg-blue-200'
-                : 'bg-gray-100 hover:bg-gray-200'
+                : 'bg-purple-100 hover:bg-purple-200'
             }`}
             title="Past Events"
             aria-label="Past Events"
           >
             <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
-              showPastEvents ? 'bg-blue-200' : 'bg-gray-200'
+              showPastEvents ? 'bg-blue-200' : 'bg-purple-200'
             }`}>
-              <svg className={`w-6 h-6 ${showPastEvents ? 'text-blue-600' : 'text-gray-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className={`w-6 h-6 ${showPastEvents ? 'text-blue-600' : 'text-purple-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <span className={`font-semibold ${showPastEvents ? 'text-blue-700' : 'text-gray-700'}`}>
+            <span className={`font-semibold ${showPastEvents ? 'text-blue-700' : 'text-purple-700'}`}>
               Past Events
             </span>
           </button>
@@ -226,7 +258,7 @@ export default function AssociatedEventsTable({
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <button
                         type="button"
-                        onClick={() => handleUnlink(event)}
+                        onClick={() => openUnlinkDialog(event)}
                         disabled={unlinkingId !== null}
                         className="flex-shrink-0 h-10 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 px-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         title="Unlink event from focus group"
@@ -299,6 +331,61 @@ export default function AssociatedEventsTable({
           </div>
         </>
       )}
+
+      {/* Unlink confirmation dialog - per dialog_button_styling.mdc */}
+      <AlertDialog open={!!eventToUnlink} onOpenChange={(open) => !open && closeUnlinkDialog()}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Unlink event from focus group</AlertDialogTitle>
+            <AlertDialogDescription>
+              {eventToUnlink ? (
+                <>
+                  Are you sure you want to unlink <strong>{eventToUnlink.title}</strong> from this focus group? The event will no longer be associated with this focus group.
+                </>
+              ) : (
+                'Confirm unlink'
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex flex-row gap-3 sm:gap-4">
+            <AlertDialogCancel
+              onClick={closeUnlinkDialog}
+              className="flex-1 flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105"
+              title="Cancel"
+              aria-label="Cancel"
+            >
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </div>
+              <span className="font-semibold text-blue-700">Cancel</span>
+            </AlertDialogCancel>
+            <button
+              type="button"
+              onClick={handleConfirmUnlink}
+              disabled={!!unlinkingId}
+              className="flex-1 flex-shrink-0 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              title="Unlink event"
+              aria-label="Unlink event"
+            >
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-200 flex items-center justify-center">
+                {unlinkingId ? (
+                  <svg className="animate-spin w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                ) : (
+                  <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                )}
+              </div>
+              <span className="font-semibold text-red-700">{unlinkingId ? 'Unlinking...' : 'Unlink'}</span>
+            </button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
