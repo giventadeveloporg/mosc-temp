@@ -40,6 +40,7 @@ export default function EventSponsorsPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [viewDetailsSponsor, setViewDetailsSponsor] = useState<EventSponsorsDTO | null>(null);
   const [selectedSponsor, setSelectedSponsor] = useState<EventSponsorsDTO | null>(null);
 
   // Form state - aligned with DTO schema
@@ -220,11 +221,6 @@ export default function EventSponsorsPage() {
     });
   };
 
-  const openEditModal = (sponsor: EventSponsorsDTO) => {
-    // Navigate to detail/edit page instead of opening modal
-    router.push(`/admin/event-sponsors/${sponsor.id}`);
-  };
-
   const openDeleteModal = (sponsor: EventSponsorsDTO) => {
     setSelectedSponsor(sponsor);
     setIsDeleteModalOpen(true);
@@ -320,16 +316,27 @@ export default function EventSponsorsPage() {
 
   return (
     <div className="w-full overflow-x-hidden box-border" style={{ paddingTop: '120px' }}>
+      {/* Page Title - Above admin group buttons */}
+      <div className="w-full px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 mb-4">
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">Global Sponsors</h1>
+      </div>
       {/* Navigation Section - Full Width, Separate Responsive Container */}
       <div className="w-full px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 mb-6 sm:mb-8">
         <AdminNavigation currentPage="event-sponsors" />
       </div>
       {/* Main Content Section - Constrained Width */}
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-8">
-        {/* Page Header */}
-        <div className="mb-4 sm:mb-6 md:mb-8">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left mb-2">Global Sponsors</h1>
-          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 text-center sm:text-left">(You can add or disassociate these items with any events. Please go to the corresponding event page to manage these associated entities.)</p>
+        {/* Info tip: how to associate sponsors with an event */}
+        <div className="mb-4 sm:mb-6 flex items-start gap-3 p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+          <svg className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div className="text-sm text-blue-800 dark:text-blue-200">
+            <p className="font-semibold mb-1">Associating sponsors with an event</p>
+            <p className="text-blue-700 dark:text-blue-300">
+              To associate a sponsor with a particular event, go to <strong>Manage Events</strong>, open the event, then click the <strong>Event Sponsors</strong> button in the event&apos;s admin button group. There you can add or remove sponsors for that event. This page only manages <strong>global sponsors</strong> (the master list).
+            </p>
+          </div>
         </div>
 
         {/* Toast Message */}
@@ -409,9 +416,9 @@ export default function EventSponsorsPage() {
           columns={columns}
           loading={loading}
           onSort={handleSort}
-          onEdit={openEditModal}
+          onView={(s) => setViewDetailsSponsor(s)}
+          getEditHref={(s) => `/admin/event-sponsors/${s.id}`}
           onDelete={openDeleteModal}
-          onView={openEditModal} // Use onView for row clicks to navigate
           sortKey={sortKey}
           sortDirection={sortDirection}
           emptyMessage="No sponsors found"
@@ -543,6 +550,35 @@ export default function EventSponsorsPage() {
         confirmText="Delete"
         variant="danger"
       />
+
+      {/* View details modal - same style as admin/media Media Details */}
+      {viewDetailsSponsor && (
+        <Modal
+          isOpen={true}
+          onClose={() => setViewDetailsSponsor(null)}
+          title={viewDetailsSponsor.id != null ? `Sponsor Details #${viewDetailsSponsor.id}` : 'Sponsor Details'}
+          size="lg"
+        >
+          <div className="max-h-[60vh] overflow-y-auto">
+            {Object.entries(viewDetailsSponsor)
+              .filter(([key]) => !key.startsWith('_'))
+              .map(([key, value]) => (
+                <div key={key} className="border-b border-gray-100 py-3 first:pt-0">
+                  <div className="text-sm font-semibold text-gray-700 mb-0.5">
+                    {key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    {typeof value === 'boolean' ? (
+                      <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                        {value ? 'Yes' : 'No'}
+                      </span>
+                    ) : value instanceof Date ? value.toLocaleString() : (key.toLowerCase().includes('date') || key.toLowerCase().includes('at')) && value ? new Date(String(value)).toLocaleString() : value === null || value === undefined || value === '' ? <span className="text-gray-400 italic">(empty)</span> : String(value)}
+                  </div>
+                </div>
+              ))}
+          </div>
+        </Modal>
+      )}
 
       {/* Upload Dialogs */}
       {formData.id && (

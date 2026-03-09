@@ -1,6 +1,5 @@
 import React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { Metadata } from 'next';
 import QuickLinks from '../../components/QuickLinks';
 import SyroPageBanner from '../../components/SyroPageBanner';
@@ -139,14 +138,6 @@ export default function EngineeringCollegesPage() {
 
               <div className="mt-8 hidden lg:block">
                 <QuickLinks />
-              </div>
-              <div className="mt-8 flex justify-center">
-                <Link href="/mosc/institutions" className="inline-flex items-center px-6 py-3 bg-syro-red text-white font-syro-primary font-medium rounded-lg hover:bg-syro-red/90 transition-all duration-300 shadow-syro-card">
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                  Back to All Institutions
-                </Link>
               </div>
             </div>
             <div className="space-y-6 lg:col-span-1">

@@ -121,7 +121,7 @@ export default function AdminPage() {
     {
       href: '/admin/event-sponsors',
       icon: 'handshake',
-      label: 'Event Sponsors',
+      label: 'Global Sponsors',
       color: 'emerald',
       key: 'event-sponsors'
     },

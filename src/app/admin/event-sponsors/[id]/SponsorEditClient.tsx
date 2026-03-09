@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { FaArrowLeft, FaSpinner } from 'react-icons/fa';
+import { FaSpinner } from 'react-icons/fa';
 import AdminNavigation from '@/components/AdminNavigation';
 import SponsorImageUploadDialog from '@/components/sponsors/SponsorImageUploadDialog';
 import SponsorMediaGallery from '@/components/sponsors/SponsorMediaGallery';
@@ -109,15 +109,22 @@ export default function SponsorEditClient({
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{ paddingTop: '180px' }}>
-      {/* Header */}
+      {/* Header - Back button per admin_action_buttons_styling.mdc (Indigo = Navigation) */}
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <button
+            type="button"
             onClick={() => router.push('/admin/event-sponsors')}
-            className="flex items-center space-x-2 text-foreground hover:text-primary reverent-transition"
+            className="flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+            title="Back to Sponsors"
+            aria-label="Back to Sponsors"
           >
-            <FaArrowLeft className="h-4 w-4" />
-            <span>Back to Sponsors</span>
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
+              <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+            </div>
+            <span className="font-semibold text-indigo-700">Back to Sponsors</span>
           </button>
         </div>
       </div>
@@ -386,27 +393,39 @@ export default function SponsorEditClient({
             </div>
           </div>
 
-          <div className="flex justify-end space-x-3 pt-4">
+          {/* Form actions per admin_action_buttons_styling.mdc: Cancel (blue), Update (blue) */}
+          <div className="flex justify-end gap-3 pt-4">
             <button
               type="button"
               onClick={() => router.push('/admin/event-sponsors')}
-              className="px-4 py-2 text-sm font-medium text-foreground bg-card border border-border rounded-md hover:bg-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring reverent-transition"
+              className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+              title="Cancel"
+              aria-label="Cancel"
             >
-              Cancel
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </div>
+              <span className="font-semibold text-blue-700">Cancel</span>
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary border border-transparent rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring reverent-transition disabled:opacity-50"
+              className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              title="Update Sponsor"
+              aria-label="Update Sponsor"
             >
-              {loading ? (
-                <span className="flex items-center space-x-2">
-                  <FaSpinner className="animate-spin h-4 w-4" />
-                  <span>Saving...</span>
-                </span>
-              ) : (
-                'Update Sponsor'
-              )}
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+                {loading ? (
+                  <FaSpinner className="animate-spin w-6 h-6 text-blue-600" />
+                ) : (
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                )}
+              </div>
+              <span className="font-semibold text-blue-700">{loading ? 'Saving...' : 'Update Sponsor'}</span>
             </button>
           </div>
         </form>
