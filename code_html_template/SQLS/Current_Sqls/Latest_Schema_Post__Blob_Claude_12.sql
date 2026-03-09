@@ -223,6 +223,9 @@ DROP TABLE IF EXISTS public.donation_statistics CASCADE;
 
 DROP TABLE IF EXISTS public.tenant_email_addresses CASCADE;
 
+-- Satellite domain configuration
+DROP TABLE IF EXISTS public.satellite_domain CASCADE;
+
 -- News portal tables (drop children first, then parents)
 DROP TABLE IF EXISTS public.news_article_category CASCADE;
 DROP TABLE IF EXISTS public.news_article CASCADE;
@@ -4832,6 +4835,85 @@ CREATE TRIGGER trg_donation_statistics_updated_at
     EXECUTE FUNCTION public.update_updated_at_column();
 
 -- =====================================================
+-- SATELLITE DOMAIN CONFIGURATION TABLE
+-- =====================================================
+-- Stores satellite domain configuration for multi-tenant architecture.
+-- Replaces static config/satellites.json with database-backed configuration.
+-- Allows runtime addition of new satellite domains without redeployment.
+
+CREATE TABLE public.satellite_domain (
+    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    satellite_key character varying(100) NOT NULL,
+    domain character varying(500) NOT NULL,
+    hostname character varying(255) NOT NULL,
+    display_name character varying(255) NOT NULL,
+    tenant_id character varying(255),
+    enabled boolean DEFAULT true NOT NULL,
+    added_date timestamp without time zone DEFAULT now(),
+
+    -- Branding basics
+    org_name character varying(255),
+    full_name character varying(500),
+    tagline character varying(500),
+
+    -- Logo configuration
+    logo_type character varying(50) DEFAULT 'text',
+    logo_url character varying(1024),
+    logo_primary_color character varying(50),
+    logo_secondary_color character varying(50),
+
+    -- Theme colors
+    theme_primary_color character varying(50),
+    theme_hover_color character varying(50),
+    theme_active_color character varying(50),
+
+    -- Contact information
+    contact_address character varying(1024),
+    contact_phone character varying(100),
+    contact_toll_free character varying(100),
+    contact_email character varying(255),
+
+    -- Social media links
+    social_facebook character varying(1024),
+    social_twitter character varying(1024),
+    social_linkedin character varying(1024),
+    social_youtube character varying(1024),
+
+    -- Auth page display flags
+    show_on_auth_header boolean DEFAULT true NOT NULL,
+    show_on_auth_footer boolean DEFAULT true NOT NULL,
+
+    -- Timestamps
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    CONSTRAINT satellite_domain_pkey PRIMARY KEY (id),
+    CONSTRAINT ux_satellite_domain_satellite_key UNIQUE (satellite_key),
+    CONSTRAINT ux_satellite_domain_hostname UNIQUE (hostname)
+);
+
+CREATE INDEX idx_satellite_domain_tenant_id ON public.satellite_domain(tenant_id);
+CREATE INDEX idx_satellite_domain_enabled ON public.satellite_domain(enabled) WHERE enabled = true;
+
+COMMENT ON TABLE public.satellite_domain IS 'Satellite domain configuration for multi-tenant architecture. Each row represents a satellite site that authenticates via the primary domain.';
+COMMENT ON COLUMN public.satellite_domain.satellite_key IS 'Unique short identifier for the satellite (e.g. mosc-temp, mcefee-temp).';
+COMMENT ON COLUMN public.satellite_domain.domain IS 'Full domain URL with protocol (e.g. https://www.mosc-temp.com).';
+COMMENT ON COLUMN public.satellite_domain.hostname IS 'Domain hostname without protocol (e.g. www.mosc-temp.com).';
+COMMENT ON COLUMN public.satellite_domain.logo_type IS 'Logo display type: text (render org name as text) or image (use logo_url).';
+
+-- Trigger for updated_at
+CREATE TRIGGER trg_satellite_domain_updated_at
+    BEFORE UPDATE ON public.satellite_domain
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+-- Seed existing satellite domains from config/satellites.json
+INSERT INTO public.satellite_domain (satellite_key, domain, hostname, display_name, tenant_id, enabled, added_date, org_name, full_name, tagline, logo_type, logo_primary_color, logo_secondary_color, theme_primary_color, theme_hover_color, theme_active_color, contact_address, contact_phone, contact_email, social_facebook, social_twitter, social_linkedin, social_youtube, show_on_auth_header, show_on_auth_footer)
+VALUES
+    ('mcefee-temp', 'https://www.mcefee-temp.com', 'www.mcefee-temp.com', 'MCEFEE Temp', 'tenant_demo_001', true, '2025-11-01', 'MCEFEE', 'Malayalee Cultural Events Federation for Education & Empowerment', 'A NONPROFIT CORPORATION', 'text', '#9333ea', '#a855f7', '#60a5fa', '#3b82f6', '#2563eb', '123 Cultural Lane, Hope City, HC 12345, United States', '+1 (555) 123-4567', 'contact@mcefee-temp.com', '#', '#', '#', '#', true, true),
+    ('mosc-temp', 'https://www.mosc-temp.com', 'www.mosc-temp.com', 'MOSC Temp', 'tenant_demo_002', true, '2025-11-01', 'Unite India', 'Unite India - Bringing Communities Together', 'A NONPROFIT CORPORATION', 'text', '#9333ea', '#a855f7', '#60a5fa', '#3b82f6', '#2563eb', '123 Charity Lane, Hope City, HC 12345, United States', '+1 (555) 123-4567', 'contact@mosc-temp.com', '#', '#', '#', '#', true, true),
+    ('md-strikers', 'https://www.md-strikers.com', 'www.md-strikers.com', 'MD Strikers', 'tenant_demo_003', true, '2025-11-01', 'MD Strikers', 'Maryland Strikers Sports Association', 'A NONPROFIT SPORTS ORGANIZATION', 'text', '#dc2626', '#ef4444', '#60a5fa', '#3b82f6', '#2563eb', '456 Stadium Road, Baltimore, MD 21201, United States', '+1 (555) 987-6543', 'contact@md-strikers.com', '#', '#', '#', '#', true, true);
+
+-- =====================================================
 -- NEWS PORTAL TABLES
 -- =====================================================
 -- Tables follow schema standards: id bigint with sequence_generator, tenant_id, created_at/updated_at.
@@ -5176,6 +5258,7 @@ SELECT pg_catalog.setval(
                    COALESCE((SELECT MAX(id) FROM public.news_flash), 0),
                    COALESCE((SELECT MAX(id) FROM public.news_live_stream_config), 0),
                    COALESCE((SELECT MAX(id) FROM public.news_article_category), 0),
+                   COALESCE((SELECT MAX(id) FROM public.satellite_domain), 0),
                    1
                ),
                true

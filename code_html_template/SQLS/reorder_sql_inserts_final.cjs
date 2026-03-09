@@ -18,6 +18,7 @@ const TABLE_ORDER = [
   'event_calendar_entry',
   'event_live_update',
   'event_live_update_attachment',
+  'gallery_album',   // parent of event_media.album_id (fk_event_media_album_id)
   'event_media',
   'event_organizer',
   'event_poll',
@@ -34,6 +35,7 @@ const TABLE_ORDER = [
   'tenant_organization',
   'tenant_settings',
   'tenant_email_addresses',
+  'satellite_domain',
   'user_payment_transaction',
   'user_subscription',
   'user_task',

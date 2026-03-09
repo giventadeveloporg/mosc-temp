@@ -207,10 +207,14 @@ No changes are required to middleware or ConditionalLayout for this behavior. Af
 **The `userRole` field in the `user_profile` table MUST be set to `'ADMIN'` for a user to have admin access.**
 
 **How Admin Role is Determined**:
-- ✅ **Database Field**: `user_profile.user_role` must equal `'ADMIN'` (case-sensitive)
+- ✅ **Database Field**: `user_profile.user_role` must equal `'ADMIN'` or `'SUPER_ADMIN'` (use `isAdminRole()` from `@/lib/utils`)
 - ✅ **Tenant-Scoped**: The check uses `userId + tenantId` to find the correct record
 - ✅ **Not from Clerk**: Admin role is NOT determined from Clerk metadata - it comes from the database
 - ❌ **Not from userStatus**: `userStatus` (APPROVED, PENDING_APPROVAL, etc.) does NOT grant admin access
+
+**Admin menu and `user_status`**:
+- **Current behavior**: The Admin menu is shown based **only** on `user_role` (ADMIN/SUPER_ADMIN). `user_status` (e.g. `PENDING_APPROVAL`, `APPROVED`, `REJECTED`) is **not** used to hide the Admin menu. So a user with `user_role = 'ADMIN'` and `user_status = 'PENDING_APPROVAL'` will still see the Admin menu.
+- **If you need to restrict the Admin menu to approved users only**: Require both `isAdminRole(profile.userRole)` and `profile.userStatus === 'APPROVED'` (or your chosen status) in the root layout when setting `isTenantAdmin`. Document that product decision in this rule and in the layout comment.
 
 **How to Grant Admin Access**:
 
@@ -638,6 +642,30 @@ if (isSatellite) {
 - **Same repo for both domains**: Add/update the sign-in page, Header, and signout-redirect page once; deploy to both Amplify apps. Both get the same code; behavior is determined by hostname and env (primary vs satellite).
 - **Two repos**: Apply the same sign-in and Header logic in both. Add the signout-redirect page at least to the **primary** repo; having it in both repos is fine and keeps codebases in sync.
 
+### **CRITICAL: Primary Domain Must Stay Deployed for Satellite Auth to Work**
+
+The **primary** (e.g. https://www.event-site-manager.com/) must remain deployed. If you remove or undeploy the primary app (e.g. from AWS Amplify), **sign-in and sign-out on the satellite (mosc-temp.com) will break**. This is by design, not a bug.
+
+**Why:**
+
+1. **Sign-in (satellite)**  
+   - User on mosc-temp.com goes to `/sign-in`.  
+   - The sign-in page detects satellite and **redirects** to the primary:  
+     `https://www.event-site-manager.com/sign-in?redirect_url=https://mosc-temp.com`  
+   - The **primary** serves the Clerk `<SignIn />` page. After successful sign-in, Clerk redirects the user back to `redirect_url` (the satellite).  
+   - If the primary app is gone, that URL returns 404 or an error → sign-in never completes.
+
+2. **Sign-out (satellite)**  
+   - User on mosc-temp.com clicks Sign out.  
+   - The Header detects satellite and **redirects** to the primary:  
+     `https://www.event-site-manager.com/auth/signout-redirect?redirect_url=https://mosc-temp.com`  
+   - The **primary’s** `/auth/signout-redirect` page runs: it calls Clerk `signOut()` then redirects the user back to the satellite with `?clerk_signout=true` so the satellite can clear local state.  
+   - If the primary app is gone, that URL returns 404 → sign-out never runs and the satellite cannot clear the session properly.
+
+So the authentication mechanism is **not** different on the two domains: the **satellite depends on the primary** to host the actual sign-in UI and the sign-out redirect handler. Same Clerk credentials on both sides only mean they share the same Clerk application; the **primary app must be running** for satellite redirects to succeed.
+
+**Summary:** Do not delete or undeploy the primary (event-site-manager.com). Keep both Amplify apps (primary + satellite) deployed. If you need only one public-facing site, you can point users to the satellite and keep the primary as a “hidden” auth backend, but the primary deployment must stay live.
+
 ### **Anti-Pattern: Using NEXT_PUBLIC_CLERK_DOMAIN for "Am I Satellite?"**
 
 ```typescript
@@ -649,6 +677,34 @@ if (hostname.includes(satelliteDomain.replace('www.', ''))) {
 ```
 
 **Fix**: Detect primary first via `NEXT_PUBLIC_PRIMARY_DOMAIN`; only then treat as satellite when `hostname.includes('mosc-temp.com')` (or another explicit satellite host).
+
+### **Satellite: “Email Already Taken” and User in Database but Not in Clerk Dashboard**
+
+**Scenario**: Same email exists in your `user_profile` table and you can log in on the **primary** (e.g. event-site-manager.com) with that email, but (1) on the **satellite** (mosc-temp.com) when you try to **register** you see “email already taken”, and (2) that user does not appear in Clerk Dashboard’s user list.
+
+**Is it because the same code runs on both domains?**  
+**No.** Running the same Next.js app on both the primary (event-site-manager.com) and the satellite (mosc-temp.com) is the intended Clerk satellite setup. It does not conflict with Clerk.
+
+**Why “email already taken” on the satellite when registering?**
+
+- On the satellite, “Sign up” redirects to the **primary** `/sign-up` (Clerk `<SignUp />`).
+- **Clerk** allows only one user per email in a single Clerk application. Both domains use the **same** Clerk application (same API keys).
+- If that email **already has an account** in Clerk (e.g. you signed in or signed up earlier on the primary), Clerk will reject a new sign-up with “email already taken”.
+- So the message is from **Clerk**, not from your database. The database row exists because the app created/updated `user_profile` when you signed in on the primary (layout bootstrap / ProfileBootstrapper).
+
+**What to do:** For that email, use **Sign in** on the satellite (which redirects to primary sign-in), not Sign up. After signing in on the primary, Clerk redirects back to the satellite and the same user is used.
+
+**Why does the user not show in Clerk Dashboard?**
+
+- If you can **log in** on the primary with that email, Clerk **does** have that user. Login cannot succeed without a Clerk user.
+- Typical causes for not seeing them in the Dashboard: (1) viewing a **different** Clerk application (e.g. Development vs Production), (2) viewing a different **environment** (e.g. Production vs Development), or (3) filtering/search in the Dashboard.
+- Check the **same** Clerk application and **Production** environment that event-site-manager.com uses; the user should appear there.
+
+**Summary**
+
+- Same code on primary and satellite is **correct**; it does not break Clerk.
+- “Email already taken” on satellite sign-up = Clerk rejecting duplicate sign-up; use **Sign in** instead.
+- User in DB but “not in Clerk” while able to log in on primary = user **is** in Clerk; check the correct Clerk app and Production instance in the Dashboard.
 
 ---
 
