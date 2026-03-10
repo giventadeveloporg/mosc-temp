@@ -1301,6 +1301,16 @@ export default function AdminMediaPage() {
         <EventFormHelpTooltip fieldName="Image specifications" title="Image specifications for hero and event media" customContent={<MediaImageSpecHelpContent />} />
       </div>
 
+      {/* Info tooltip for image size and dimensions */}
+      <div className="mb-4 px-4 py-3 rounded-lg border-2 border-amber-300 bg-amber-50 shadow-sm">
+        <p className="text-sm font-semibold text-amber-800">
+          Info tooltip for image size and dimensions
+        </p>
+        <p className="text-xs text-amber-700 mt-1">
+          Recommended sizes and aspect ratios for hero images, event flyers, and gallery media. Hover over the image spec tip above for full details.
+        </p>
+      </div>
+
       <div className="mb-8 bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-xl font-bold text-gray-800 mb-4">Search Media</h2>
 
