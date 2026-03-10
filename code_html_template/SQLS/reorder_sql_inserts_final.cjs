@@ -18,6 +18,8 @@ const TABLE_ORDER = [
   'event_calendar_entry',
   'event_live_update',
   'event_live_update_attachment',
+  'event_sponsors',      // parent of event_media.sponsor_id (fk_event_media_sponsor_id)
+  'event_sponsors_join',
   'gallery_album',   // parent of event_media.album_id (fk_event_media_album_id)
   'event_media',
   'event_organizer',
@@ -43,8 +45,6 @@ const TABLE_ORDER = [
   'event_emails',
   'event_featured_performers',
   'event_program_directors',
-  'event_sponsors',
-  'event_sponsors_join',
   'executive_committee_team_members',
   'event_recurrence_series',
   'focus_group',
