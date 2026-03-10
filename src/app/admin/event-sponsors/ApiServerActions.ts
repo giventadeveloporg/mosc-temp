@@ -54,7 +54,8 @@ export async function fetchEventSponsorServer(id: number) {
 }
 
 export async function createEventSponsorServer(sponsor: Omit<EventSponsorsDTO, 'id' | 'createdAt' | 'updatedAt'>) {
-  const payload = withTenantId(sponsor);
+  const now = new Date().toISOString();
+  const payload = withTenantId({ ...sponsor, createdAt: now, updatedAt: now });
 
   const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-sponsors`, {
     method: 'POST',

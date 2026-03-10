@@ -362,6 +362,25 @@ export default function SponsorEditClient({
             </div>
           </div>
 
+          {/* Sponsor image specification info tip */}
+          <div className="mb-4 sm:mb-6 flex items-start gap-3 p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+            <svg className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div className="text-sm text-blue-800 dark:text-blue-200">
+              <p className="font-semibold mb-1">Where sponsor images appear</p>
+              <p className="text-blue-700 dark:text-blue-300 mb-2">
+                <strong>Home page:</strong> OurSponsorsSection → SponsorCard shows the sponsor banner via <code className="bg-blue-100 dark:bg-blue-800/50 px-1 rounded">sponsor.bannerImageUrl</code> (no logo-specific “hero” on the main homepage hero).
+              </p>
+              <p className="text-blue-700 dark:text-blue-300 mb-2">
+                <strong>Upload banner image:</strong> recommended dimensions <code className="bg-blue-100 dark:bg-blue-800/50 px-1 rounded">width=800, height=600</code> (4:3 aspect ratio). Other sizes are scaled with <code className="bg-blue-100 dark:bg-blue-800/50 px-1 rounded">object-contain</code> — no cropping, aspect ratio preserved.
+              </p>
+              <p className="text-blue-700 dark:text-blue-300">
+                <strong>Display rule:</strong> SponsorCard renders the banner with <code className="bg-blue-100 dark:bg-blue-800/50 px-1 rounded">width={800} height={600}</code>, <code className="bg-blue-100 dark:bg-blue-800/50 px-1 rounded">className="w-full h-auto object-contain ..."</code> inside a <code className="bg-blue-100 dark:bg-blue-800/50 px-1 rounded">relative w-full h-auto rounded-t-2xl overflow-hidden</code> container (image containment rule).
+              </p>
+            </div>
+          </div>
+
           {/* Image Upload Section with Drag-and-Drop */}
           <div className="border-t border-border pt-6">
             <h3 className="text-lg font-heading font-medium text-foreground mb-4">Images</h3>

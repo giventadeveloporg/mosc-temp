@@ -1293,22 +1293,22 @@ export default function AdminMediaPage() {
         </div>
       </div>
 
+      {/* Info tip: point to ? button for image specification */}
+      <div className="mb-4 px-4 py-3 rounded-lg border-2 border-amber-300 bg-amber-50 shadow-sm">
+        <p className="text-sm font-semibold text-amber-800">
+          Image size and dimensions
+        </p>
+        <p className="text-xs text-amber-700 mt-1">
+          Click <strong>?</strong> button to see the image specification. Recommended sizes and aspect ratios for hero images, event flyers, and gallery media.
+        </p>
+      </div>
+
       {/* Image spec guidance - same as edit events help tip */}
       <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between">
         <span className="text-sm font-medium text-gray-700">
           Image specifications for hero and event media (Section 1–3). Mouse over for details.
         </span>
         <EventFormHelpTooltip fieldName="Image specifications" title="Image specifications for hero and event media" customContent={<MediaImageSpecHelpContent />} />
-      </div>
-
-      {/* Info tooltip for image size and dimensions */}
-      <div className="mb-4 px-4 py-3 rounded-lg border-2 border-amber-300 bg-amber-50 shadow-sm">
-        <p className="text-sm font-semibold text-amber-800">
-          Info tooltip for image size and dimensions
-        </p>
-        <p className="text-xs text-amber-700 mt-1">
-          Recommended sizes and aspect ratios for hero images, event flyers, and gallery media. Hover over the image spec tip above for full details.
-        </p>
       </div>
 
       <div className="mb-8 bg-white p-6 rounded-lg shadow-md">

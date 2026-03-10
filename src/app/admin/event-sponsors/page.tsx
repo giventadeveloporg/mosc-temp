@@ -5,8 +5,7 @@ import { FaPlus, FaSearch, FaEdit, FaTrash, FaFilter, FaChevronLeft, FaChevronRi
 import { useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import DataTable, { Column } from '@/components/ui/DataTable';
-import Modal from '@/components/ui/Modal';
-import ConfirmModal from '@/components/ui/Modal';
+import Modal, { ConfirmModal } from '@/components/ui/Modal';
 import ImageUpload from '@/components/ui/ImageUpload';
 import AdminNavigation from '@/components/AdminNavigation';
 import SponsorImageUploadDialog from '@/components/sponsors/SponsorImageUploadDialog';
@@ -634,17 +633,39 @@ interface SponsorFormProps {
   onBannerUploadClick?: () => void;
 }
 
+// Map non-standard input names to formData keys to avoid browser "Saved info" autofill (Chrome matches name="name", "email", "tel", etc.)
+const SPONSOR_FORM_FIELD_MAP: Record<string, string> = {
+  sn: 'name',
+  ct: 'type',
+  cn: 'companyName',
+  pr: 'priorityRanking',
+  ce: 'contactEmail',
+  cp: 'contactPhone',
+  wu: 'websiteUrl',
+  ia: 'isActive',
+  tl: 'tagline',
+  dc: 'description',
+  fu: 'facebookUrl',
+  tu: 'twitterUrl',
+  lu: 'linkedinUrl',
+  iu: 'instagramUrl',
+};
+
 function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onLogoUploadClick, onHeroUploadClick, onBannerUploadClick }: SponsorFormProps) {
+  // Prevent browser "Saved info" autofill: all fillable fields start readOnly; first focus anywhere unlocks form
+  const [formAutofillLock, setFormAutofillLock] = React.useState(true);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
+    const formKey = SPONSOR_FORM_FIELD_MAP[name] ?? name;
 
     if (type === 'checkbox') {
       const checked = (e.target as HTMLInputElement).checked;
-      setFormData(prev => ({ ...prev, [name]: checked }));
+      setFormData(prev => ({ ...prev, [formKey]: checked }));
     } else if (type === 'number') {
-      setFormData(prev => ({ ...prev, [name]: Number(value) }));
+      setFormData(prev => ({ ...prev, [formKey]: Number(value) }));
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      setFormData(prev => ({ ...prev, [formKey]: value }));
     }
   };
 
@@ -671,7 +692,12 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onL
   const canUploadImages = !!formData.id;
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-6"
+      autoComplete="off"
+      onFocusCapture={() => setFormAutofillLock(false)}
+    >
       {/* Basic Information */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
@@ -680,10 +706,12 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onL
           </label>
           <input
             type="text"
-            name="name"
+            name="sn"
             value={formData.name || ''}
             onChange={handleChange}
             required
+            autoComplete="off"
+            readOnly={formAutofillLock}
             className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
             placeholder="Enter sponsor name"
           />
@@ -694,10 +722,11 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onL
             Type *
           </label>
           <select
-            name="type"
+            name="ct"
             value={formData.type || ''}
             onChange={handleChange}
             required
+            autoComplete="off"
             className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
           >
             <option value="">Select sponsor type</option>
@@ -708,16 +737,20 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onL
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-foreground mb-1">
+          <label className="block text-sm font-medium text-foreground mb-1" htmlFor="f-cn">
             Company Name
           </label>
           <input
+            id="f-cn"
             type="text"
-            name="companyName"
+            name="cn"
             value={formData.companyName || ''}
             onChange={handleChange}
+            autoComplete="one-time-code"
+            readOnly={formAutofillLock}
             className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
-            placeholder="Enter company name"
+            placeholder="e.g. Acme Inc."
+            aria-label="Company or organization name"
           />
         </div>
 
@@ -727,11 +760,13 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onL
           </label>
           <input
             type="number"
-            name="priorityRanking"
+            name="pr"
             value={formData.priorityRanking || 1}
             onChange={handleChange}
             min="1"
             required
+            autoComplete="off"
+            readOnly={formAutofillLock}
             className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
             placeholder="Enter priority ranking (1 = highest priority)"
           />
@@ -741,30 +776,40 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onL
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-foreground mb-1">
+          <label className="block text-sm font-medium text-foreground mb-1" htmlFor="f-ce">
             Contact Email
           </label>
           <input
-            type="email"
-            name="contactEmail"
+            id="f-ce"
+            type="text"
+            inputMode="email"
+            name="ce"
             value={formData.contactEmail || ''}
             onChange={handleChange}
+            autoComplete="one-time-code"
+            readOnly={formAutofillLock}
             className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
-            placeholder="Enter contact email"
+            placeholder="e.g. name@company.com"
+            aria-label="Contact email address"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-foreground mb-1">
+          <label className="block text-sm font-medium text-foreground mb-1" htmlFor="f-cp">
             Contact Phone
           </label>
           <input
-            type="tel"
-            name="contactPhone"
+            id="f-cp"
+            type="text"
+            inputMode="tel"
+            name="cp"
             value={formData.contactPhone || ''}
             onChange={handleChange}
+            autoComplete="one-time-code"
+            readOnly={formAutofillLock}
             className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
-            placeholder="Enter contact phone"
+            placeholder="e.g. +1 234 567 8900"
+            aria-label="Contact phone number"
           />
         </div>
 
@@ -773,10 +818,13 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onL
             Website URL
           </label>
           <input
-            type="url"
-            name="websiteUrl"
+            type="text"
+            inputMode="url"
+            name="wu"
             value={formData.websiteUrl || ''}
             onChange={handleChange}
+            autoComplete="off"
+            readOnly={formAutofillLock}
             className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
             placeholder="https://example.com"
           />
@@ -785,7 +833,7 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onL
         <div className="flex items-center">
           <input
             type="checkbox"
-            name="isActive"
+            name="ia"
             checked={formData.isActive || false}
             onChange={handleChange}
             className="h-4 w-4 text-primary focus:ring-ring border-border rounded"
@@ -802,10 +850,12 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onL
         </label>
         <input
           type="text"
-          name="tagline"
+          name="tl"
           value={formData.tagline || ''}
           onChange={handleChange}
           maxLength={500}
+          autoComplete="off"
+          readOnly={formAutofillLock}
           className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
           placeholder="Enter sponsor tagline (max 500 characters)"
         />
@@ -816,10 +866,12 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onL
           Description
         </label>
         <textarea
-          name="description"
+          name="dc"
           value={formData.description || ''}
           onChange={handleChange}
           rows={4}
+          autoComplete="off"
+          readOnly={formAutofillLock}
           className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
           placeholder="Enter detailed description about the sponsor"
         />
@@ -833,9 +885,11 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onL
           </label>
           <input
             type="url"
-            name="facebookUrl"
+            name="fu"
             value={formData.facebookUrl || ''}
             onChange={handleChange}
+            autoComplete="off"
+            readOnly={formAutofillLock}
             className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
             placeholder="https://facebook.com/sponsor"
           />
@@ -847,9 +901,11 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onL
           </label>
           <input
             type="url"
-            name="twitterUrl"
+            name="tu"
             value={formData.twitterUrl || ''}
             onChange={handleChange}
+            autoComplete="off"
+            readOnly={formAutofillLock}
             className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
             placeholder="https://twitter.com/sponsor"
           />
@@ -861,9 +917,11 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onL
           </label>
           <input
             type="url"
-            name="linkedinUrl"
+            name="lu"
             value={formData.linkedinUrl || ''}
             onChange={handleChange}
+            autoComplete="off"
+            readOnly={formAutofillLock}
             className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
             placeholder="https://linkedin.com/company/sponsor"
           />
@@ -875,9 +933,11 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onL
           </label>
           <input
             type="url"
-            name="instagramUrl"
+            name="iu"
             value={formData.instagramUrl || ''}
             onChange={handleChange}
+            autoComplete="off"
+            readOnly={formAutofillLock}
             className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
             placeholder="https://instagram.com/sponsor"
           />
@@ -987,20 +1047,41 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onL
         </div>
       )}
 
-      <div className="flex justify-end space-x-3 pt-4">
+      <div className="flex justify-end gap-3 pt-4">
         <button
           type="button"
           onClick={() => window.history.back()}
-          className="px-4 py-2 text-sm font-medium text-foreground bg-card border border-border rounded-md hover:bg-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring reverent-transition"
+          className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 px-6 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          title="Cancel"
+          aria-label="Cancel"
         >
-          Cancel
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </div>
+          <span className="font-semibold text-blue-700">Cancel</span>
         </button>
         <button
           type="submit"
           disabled={loading}
-          className="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary border border-transparent rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring reverent-transition disabled:opacity-50"
+          className="flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 px-6 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+          title={loading ? 'Saving...' : submitText}
+          aria-label={loading ? 'Saving...' : submitText}
         >
-          {loading ? 'Saving...' : submitText}
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+            {loading ? (
+              <svg className="animate-spin w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+            ) : (
+              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+          </div>
+          <span className="font-semibold text-green-700">{loading ? 'Saving...' : submitText}</span>
         </button>
       </div>
     </form>

@@ -261,11 +261,9 @@ export default function DataTable<T extends Record<string, any>>({
                           {hasEdit && (getEditHref ? (
                             <a
                               href={getEditHref(item)}
-                              target="_blank"
-                              rel="noopener noreferrer"
                               className={`${actionButtonClass} bg-blue-100 hover:bg-blue-200`}
-                              title="Edit (opens in new tab)"
-                              aria-label="Edit (opens in new tab)"
+                              title="Edit"
+                              aria-label="Edit"
                               onClick={(e) => e.stopPropagation()}
                             >
                               <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

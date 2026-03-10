@@ -53,70 +53,99 @@ const OurSponsorsSection: React.FC = () => {
     return cardBackgrounds[index % cardBackgrounds.length];
   };
 
+  // Resolve banner URL from event_medias (SPONSOR_BANNER, lowest priority first). Runs on every load so new/updated media shows.
+  async function resolveBannersForSponsors(
+    baseUrl: string,
+    limitedSponsors: EventSponsorsDTO[]
+  ): Promise<EventSponsorsDTO[]> {
+    return Promise.all(
+      limitedSponsors.map(async (s: EventSponsorsDTO) => {
+        if (!s.id) return { ...s };
+        try {
+          const bannerParams = new URLSearchParams({
+            'sponsorId.equals': String(s.id),
+            'eventMediaType.equals': 'SPONSOR_BANNER',
+            sort: 'priorityRanking,asc',
+            size: '1',
+          });
+          const bannerRes = await fetch(`${baseUrl}/api/proxy/event-medias?${bannerParams.toString()}`, { cache: 'no-store' });
+          if (!bannerRes.ok) return { ...s };
+          const bannerData = await bannerRes.json();
+          let bannerMedia: { fileUrl?: string }[] = [];
+          if (bannerData && typeof bannerData === 'object' && '_embedded' in bannerData && 'eventMedias' in bannerData._embedded) {
+            bannerMedia = Array.isArray(bannerData._embedded.eventMedias) ? bannerData._embedded.eventMedias : [];
+          } else {
+            bannerMedia = Array.isArray(bannerData) ? bannerData : [bannerData];
+          }
+          const firstBanner = bannerMedia.find((m: { fileUrl?: string }) => m.fileUrl);
+          const resolvedBannerUrl = firstBanner?.fileUrl || s.bannerImageUrl;
+          return { ...s, bannerImageUrl: resolvedBannerUrl };
+        } catch {
+          return { ...s };
+        }
+      })
+    );
+  }
+
   useEffect(() => {
     async function fetchSponsors() {
-      // Check cache first (instant, no deferral needed for cached data)
-      try {
-        const cachedData = sessionStorage.getItem(CACHE_KEY);
-        if (cachedData) {
-          const { data, timestamp } = JSON.parse(cachedData);
-          if (Date.now() - timestamp < CACHE_DURATION) {
-            console.log('✅ Using cached sponsors data');
-            setSponsors(data);
-            setLoading(false);
-            return;
-          }
-        }
-      } catch (error) {
-        console.warn('Failed to read sponsors cache:', error);
-      }
+      const baseUrl = getAppUrl();
 
       // Defer network request until page is ready + delay
       if (!shouldFetch) return;
 
-      setLoading(true);
       setFetchError(false);
+      let rawSponsors: EventSponsorsDTO[] = [];
+
       try {
-        // Fetch sponsors sorted by priority ranking (ascending = highest priority first), tenant-scoped
-        const baseUrl = getAppUrl();
-        const tenantId = getTenantId();
-        const params = new URLSearchParams({
-          'tenantId.equals': tenantId,
-          sort: 'priorityRanking,asc',
-          page: '0',
-          size: '15', // Maximum 15 sponsors
-          'isActive.equals': 'true' // Only active sponsors
-        });
+        // Try cache first for raw sponsor list only (so we can always re-resolve banners and show new/updated images)
+        try {
+          const cachedData = sessionStorage.getItem(CACHE_KEY);
+          if (cachedData) {
+            const { data, timestamp } = JSON.parse(cachedData);
+            if (Date.now() - timestamp < CACHE_DURATION && Array.isArray(data)) {
+              rawSponsors = data;
+              console.log('✅ Using cached sponsors list, resolving banners from event_medias');
+            }
+          }
+        } catch (error) {
+          console.warn('Failed to read sponsors cache:', error);
+        }
 
-        const response = await fetch(`${baseUrl}/api/proxy/event-sponsors?${params.toString()}`, {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-          cache: 'no-store',
-        });
-
-        if (response.ok) {
+        if (rawSponsors.length === 0) {
+          setLoading(true);
+          const tenantId = getTenantId();
+          const params = new URLSearchParams({
+            'tenantId.equals': tenantId,
+            sort: 'priorityRanking,asc',
+            page: '0',
+            size: '15',
+            'isActive.equals': 'true'
+          });
+          const response = await fetch(`${baseUrl}/api/proxy/event-sponsors?${params.toString()}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            cache: 'no-store',
+          });
+          if (!response.ok) {
+            console.warn('Failed to fetch sponsors:', response.status);
+            setFetchError(true);
+            return;
+          }
           const data = await response.json();
           const sponsorsList = Array.isArray(data) ? data : [];
-
-          // Limit to maximum 15 sponsors (top priority ranking)
-          const limitedSponsors = sponsorsList.slice(0, 15);
-          console.log('✅ Fetched sponsors for homepage:', limitedSponsors.length, 'out of', sponsorsList.length);
-
-          // Cache the data
+          rawSponsors = sponsorsList.slice(0, 15);
+          console.log('✅ Fetched sponsors for homepage:', rawSponsors.length);
           try {
-            sessionStorage.setItem(CACHE_KEY, JSON.stringify({
-              data: limitedSponsors,
-              timestamp: Date.now()
-            }));
+            sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data: rawSponsors, timestamp: Date.now() }));
           } catch (error) {
             console.warn('Failed to cache sponsors data:', error);
           }
-
-          setSponsors(limitedSponsors);
-        } else {
-          console.warn('Failed to fetch sponsors:', response.status);
-          setFetchError(true);
         }
+
+        // Always resolve banners from event_medias so new/updated images (e.g. priority 1) show without waiting for cache expiry
+        const sponsorsWithBanners = await resolveBannersForSponsors(baseUrl, rawSponsors);
+        setSponsors(sponsorsWithBanners);
       } catch (error) {
         console.error('Error fetching sponsors:', error);
         setFetchError(true);
