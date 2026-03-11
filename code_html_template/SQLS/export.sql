@@ -87,29 +87,52 @@ INSERT INTO public.batch_job_instance (job_instance_id, version, job_name, job_k
 
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (1, 2, 1, '2026-01-25 19:12:14.259173', '2026-01-25 19:12:14.832543', '2026-01-25 19:12:17.239322', 'COMPLETED', 'COMPLETED', '', '2026-01-25 19:12:17.239859');
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (2, 2, 2, '2026-01-26 02:10:49.092015', '2026-01-26 02:10:49.17664', '2026-01-26 02:10:50.170487', 'COMPLETED', 'COMPLETED', '', '2026-01-26 02:10:50.171498');
-INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (3, 2, 4, '2026-02-02 17:57:22.251567', '2026-02-02 17:57:22.935482', '2026-02-02 17:57:23.065089', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
-  Detail: Key (step_execution_id)=(2) already exists.
-	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
-	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
-	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
-	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
-	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
-	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
-	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
-	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
-	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
-	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
-	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (3, 2, 4, '2026-02-02 17:57:22.251567', '2026-02-02 17:57:22.935482', '2026-02-02 17:57:23.065089', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
+
+  Detail: Key (step_execution_id)=(2) already exists.
+
+	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
+
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
+
+	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
+
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
+
+	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
+
+	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
+
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+
 	at ', '2026-02-02 17:57:23.06555');
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (4, 2, 5, '2026-02-03 03:01:30.612013', '2026-02-03 03:01:30.681468', '2026-02-03 03:01:32.795254', 'COMPLETED', 'COMPLETED', '', '2026-02-03 03:01:32.795596');
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (5, 2, 6, '2026-02-03 06:06:40.747993', '2026-02-03 06:06:40.82336', '2026-02-03 06:06:41.869126', 'COMPLETED', 'COMPLETED', '', '2026-02-03 06:06:41.869409');
@@ -127,342 +150,664 @@ INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (49, 2, 50, '2026-02-07 18:11:52.153989', '2026-02-07 18:11:52.427598', '2026-02-07 18:11:54.760359', 'COMPLETED', 'COMPLETED', '', '2026-02-07 18:11:54.760941');
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (50, 2, 51, '2026-02-08 01:12:01.299358', '2026-02-08 01:12:01.371802', '2026-02-08 01:12:02.333225', 'COMPLETED', 'COMPLETED', '', '2026-02-08 01:12:02.333692');
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (51, 2, 52, '2026-02-08 06:32:02.072248', '2026-02-08 06:32:02.315102', '2026-02-08 06:32:05.301713', 'COMPLETED', 'COMPLETED', '', '2026-02-08 06:32:05.303103');
-INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (19, 2, 34, '2026-02-19 23:59:58.989873', '2026-02-19 23:59:59.021075', '2026-02-19 23:59:59.053118', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
-  Detail: Key (step_execution_id)=(4) already exists.
-	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
-	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
-	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
-	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
-	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
-	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
-	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
-	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
-	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
-	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
-	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (19, 2, 34, '2026-02-19 23:59:58.989873', '2026-02-19 23:59:59.021075', '2026-02-19 23:59:59.053118', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
+
+  Detail: Key (step_execution_id)=(4) already exists.
+
+	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
+
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
+
+	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
+
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
+
+	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
+
+	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
+
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+
 	at ', '2026-02-19 23:59:59.053298');
-INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (17, 2, 32, '2026-02-19 11:59:58.51585', '2026-02-19 11:59:58.808383', '2026-02-19 11:59:58.876166', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
-  Detail: Key (step_execution_id)=(2) already exists.
-	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
-	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
-	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
-	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
-	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
-	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
-	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
-	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
-	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
-	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
-	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (17, 2, 32, '2026-02-19 11:59:58.51585', '2026-02-19 11:59:58.808383', '2026-02-19 11:59:58.876166', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
+
+  Detail: Key (step_execution_id)=(2) already exists.
+
+	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
+
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
+
+	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
+
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
+
+	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
+
+	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
+
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+
 	at ', '2026-02-19 11:59:58.876839');
-INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (18, 2, 33, '2026-02-19 17:59:59.128693', '2026-02-19 17:59:59.172772', '2026-02-19 17:59:59.224648', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
-  Detail: Key (step_execution_id)=(3) already exists.
-	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
-	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
-	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
-	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
-	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
-	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
-	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
-	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
-	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
-	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
-	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (18, 2, 33, '2026-02-19 17:59:59.128693', '2026-02-19 17:59:59.172772', '2026-02-19 17:59:59.224648', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
+
+  Detail: Key (step_execution_id)=(3) already exists.
+
+	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
+
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
+
+	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
+
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
+
+	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
+
+	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
+
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+
 	at ', '2026-02-19 17:59:59.224972');
-INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (20, 2, 35, '2026-02-20 05:59:59.107542', '2026-02-20 05:59:59.141884', '2026-02-20 05:59:59.198897', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
-  Detail: Key (step_execution_id)=(5) already exists.
-	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
-	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
-	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
-	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
-	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
-	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
-	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
-	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
-	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
-	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
-	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (20, 2, 35, '2026-02-20 05:59:59.107542', '2026-02-20 05:59:59.141884', '2026-02-20 05:59:59.198897', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
+
+  Detail: Key (step_execution_id)=(5) already exists.
+
+	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
+
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
+
+	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
+
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
+
+	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
+
+	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
+
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+
 	at ', '2026-02-20 05:59:59.199354');
-INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (21, 2, 36, '2026-02-20 11:59:59.243844', '2026-02-20 11:59:59.281183', '2026-02-20 11:59:59.340343', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
-  Detail: Key (step_execution_id)=(6) already exists.
-	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
-	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
-	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
-	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
-	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
-	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
-	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
-	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
-	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
-	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
-	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (21, 2, 36, '2026-02-20 11:59:59.243844', '2026-02-20 11:59:59.281183', '2026-02-20 11:59:59.340343', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
+
+  Detail: Key (step_execution_id)=(6) already exists.
+
+	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
+
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
+
+	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
+
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
+
+	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
+
+	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
+
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+
 	at ', '2026-02-20 11:59:59.340641');
-INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (22, 2, 37, '2026-02-20 17:59:59.10185', '2026-02-20 17:59:59.134982', '2026-02-20 17:59:59.196089', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
-  Detail: Key (step_execution_id)=(7) already exists.
-	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
-	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
-	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
-	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
-	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
-	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
-	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
-	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
-	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
-	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
-	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (22, 2, 37, '2026-02-20 17:59:59.10185', '2026-02-20 17:59:59.134982', '2026-02-20 17:59:59.196089', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
+
+  Detail: Key (step_execution_id)=(7) already exists.
+
+	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
+
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
+
+	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
+
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
+
+	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
+
+	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
+
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+
 	at ', '2026-02-20 17:59:59.196818');
-INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (27, 2, 42, '2026-02-21 23:59:59.067034', '2026-02-21 23:59:59.087243', '2026-02-21 23:59:59.11633', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
-  Detail: Key (step_execution_id)=(12) already exists.
-	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
-	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
-	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
-	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
-	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
-	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
-	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
-	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
-	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
-	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
-	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (27, 2, 42, '2026-02-21 23:59:59.067034', '2026-02-21 23:59:59.087243', '2026-02-21 23:59:59.11633', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
+
+  Detail: Key (step_execution_id)=(12) already exists.
+
+	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
+
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
+
+	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
+
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
+
+	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
+
+	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
+
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+
 	at', '2026-02-21 23:59:59.11647');
-INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (23, 2, 38, '2026-02-20 23:59:59.076656', '2026-02-20 23:59:59.10959', '2026-02-20 23:59:59.146995', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
-  Detail: Key (step_execution_id)=(8) already exists.
-	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
-	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
-	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
-	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
-	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
-	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
-	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
-	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
-	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
-	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
-	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (23, 2, 38, '2026-02-20 23:59:59.076656', '2026-02-20 23:59:59.10959', '2026-02-20 23:59:59.146995', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
+
+  Detail: Key (step_execution_id)=(8) already exists.
+
+	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
+
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
+
+	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
+
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
+
+	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
+
+	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
+
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+
 	at ', '2026-02-20 23:59:59.147124');
-INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (24, 2, 39, '2026-02-21 05:59:59.082505', '2026-02-21 05:59:59.114409', '2026-02-21 05:59:59.150673', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
-  Detail: Key (step_execution_id)=(9) already exists.
-	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
-	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
-	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
-	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
-	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
-	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
-	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
-	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
-	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
-	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
-	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (24, 2, 39, '2026-02-21 05:59:59.082505', '2026-02-21 05:59:59.114409', '2026-02-21 05:59:59.150673', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
+
+  Detail: Key (step_execution_id)=(9) already exists.
+
+	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
+
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
+
+	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
+
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
+
+	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
+
+	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
+
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+
 	at ', '2026-02-21 05:59:59.152032');
-INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (25, 2, 40, '2026-02-21 11:59:59.084361', '2026-02-21 11:59:59.105262', '2026-02-21 11:59:59.138135', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
-  Detail: Key (step_execution_id)=(10) already exists.
-	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
-	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
-	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
-	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
-	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
-	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
-	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
-	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
-	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
-	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
-	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (25, 2, 40, '2026-02-21 11:59:59.084361', '2026-02-21 11:59:59.105262', '2026-02-21 11:59:59.138135', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
+
+  Detail: Key (step_execution_id)=(10) already exists.
+
+	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
+
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
+
+	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
+
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
+
+	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
+
+	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
+
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+
 	at', '2026-02-21 11:59:59.138251');
-INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (26, 2, 41, '2026-02-21 17:59:59.105571', '2026-02-21 17:59:59.125822', '2026-02-21 17:59:59.159243', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
-  Detail: Key (step_execution_id)=(11) already exists.
-	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
-	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
-	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
-	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
-	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
-	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
-	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
-	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
-	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
-	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
-	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (26, 2, 41, '2026-02-21 17:59:59.105571', '2026-02-21 17:59:59.125822', '2026-02-21 17:59:59.159243', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
+
+  Detail: Key (step_execution_id)=(11) already exists.
+
+	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
+
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
+
+	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
+
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
+
+	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
+
+	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
+
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+
 	at', '2026-02-21 17:59:59.159426');
-INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (28, 2, 43, '2026-02-22 05:59:59.038177', '2026-02-22 05:59:59.06355', '2026-02-22 05:59:59.094994', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
-  Detail: Key (step_execution_id)=(13) already exists.
-	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
-	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
-	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
-	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
-	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
-	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
-	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
-	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
-	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
-	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
-	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (28, 2, 43, '2026-02-22 05:59:59.038177', '2026-02-22 05:59:59.06355', '2026-02-22 05:59:59.094994', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
+
+  Detail: Key (step_execution_id)=(13) already exists.
+
+	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
+
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
+
+	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
+
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
+
+	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
+
+	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
+
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+
 	at', '2026-02-22 05:59:59.095157');
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (42, 2, 60, '2026-02-26 11:59:59.514264', '2026-02-26 11:59:59.581502', '2026-02-26 12:00:00.761015', 'COMPLETED', 'COMPLETED', '', '2026-02-26 12:00:00.761742');
-INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (29, 2, 44, '2026-02-22 11:59:59.055426', '2026-02-22 11:59:59.075167', '2026-02-22 11:59:59.105344', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
-  Detail: Key (step_execution_id)=(14) already exists.
-	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
-	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
-	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
-	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
-	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
-	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
-	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
-	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
-	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
-	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
-	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (29, 2, 44, '2026-02-22 11:59:59.055426', '2026-02-22 11:59:59.075167', '2026-02-22 11:59:59.105344', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
+
+  Detail: Key (step_execution_id)=(14) already exists.
+
+	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
+
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
+
+	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
+
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
+
+	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
+
+	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
+
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+
 	at', '2026-02-22 11:59:59.10545');
-INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (30, 2, 45, '2026-02-22 17:59:59.074281', '2026-02-22 17:59:59.100912', '2026-02-22 17:59:59.130634', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
-  Detail: Key (step_execution_id)=(15) already exists.
-	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
-	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
-	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
-	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
-	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
-	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
-	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
-	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
-	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
-	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
-	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
-	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (30, 2, 45, '2026-02-22 17:59:59.074281', '2026-02-22 17:59:59.100912', '2026-02-22 17:59:59.130634', 'FAILED', 'FAILED', 'org.springframework.dao.DuplicateKeyException: PreparedStatementCallback; SQL [INSERT INTO BATCH_STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, CREATE_TIME)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_step_execution_pkey"
+
+  Detail: Key (step_execution_id)=(15) already exists.
+
+	at org.springframework.jdbc.support.SQLStateSQLExceptionTranslator.doTranslate(SQLStateSQLExceptionTranslator.java:108)
+
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:73)
+
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:82)
+
+	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1572)
+
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:667)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:960)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1015)
+
+	at org.springframework.jdbc.core.JdbcTemplate.update(JdbcTemplate.java:1020)
+
+	at org.springframework.batch.core.repository.dao.JdbcStepExecutionDao.saveStepExecution(JdbcStepExecutionDao.java:159)
+
+	at org.springframework.batch.core.repository.support.SimpleJobRepository.add(SimpleJobRepository.java:209)
+
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:391)
+
 	at', '2026-02-22 17:59:59.130726');
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (31, 2, 46, '2026-02-22 23:59:59.069921', '2026-02-22 23:59:59.095866', '2026-02-23 00:00:00.27549', 'COMPLETED', 'COMPLETED', '', '2026-02-23 00:00:00.275765');
 INSERT INTO public.batch_job_execution (job_execution_id, version, job_instance_id, create_time, start_time, end_time, status, exit_code, exit_message, last_updated) VALUES (43, 2, 61, '2026-02-26 17:59:59.339885', '2026-02-26 17:59:59.416027', '2026-02-26 17:59:59.937068', 'COMPLETED', 'COMPLETED', '', '2026-02-26 17:59:59.93737');
@@ -555,13 +900,19 @@ INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tena
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4403, 'manualPaymentConfirmationEmailJob', 'MANUAL_PAYMENT_CONFIRMATION_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-01-22 22:55:27.545249', '2026-01-22 22:55:32.599837', 5054, 1, 1, 0, NULL, 'API', '{"paymentRequestId":8151,"eventId":4201,"tenantId":"tenant_demo_002","recipientEmail":"giventauser@gmail.com"}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4405, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-01-25 19:12:13.561311', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4407, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-01-26 02:10:48.92341', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4409, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-02 09:58:03.313648', '2026-02-02 09:58:04.125704', 812, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4409, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-02 09:58:03.313648', '2026-02-02 09:58:04.125704', 812, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4411, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-02 15:48:39.351004', '2026-02-02 15:48:39.689021', 338, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4411, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-02 15:48:39.351004', '2026-02-02 15:48:39.689021', 338, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4413, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-02 17:57:22.052896', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4415, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-03 03:01:30.499843', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
@@ -580,133 +931,226 @@ INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tena
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4441, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-07 18:11:51.5707', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4443, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-08 01:12:01.141275', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4445, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-08 06:32:01.743217', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4447, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-11 23:59:59.090299', '2026-02-11 23:59:59.212515', 122, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4447, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-11 23:59:59.090299', '2026-02-11 23:59:59.212515', 122, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4449, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-12 06:00:00.498941', '2026-02-12 06:00:00.766934', 267, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4449, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-12 06:00:00.498941', '2026-02-12 06:00:00.766934', 267, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4451, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-12 11:59:59.156415', '2026-02-12 11:59:59.250289', 93, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4451, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-12 11:59:59.156415', '2026-02-12 11:59:59.250289', 93, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(4) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4453, 'promotionTestEmailJob', 'PROMOTION_TEST_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-02-12 12:34:56.480306', '2026-02-12 12:34:57.980979', 1500, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","templateId":4102,"recipientEmail":"giventauser@gmail.com"}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4455, 'promotionTestEmailJob', 'PROMOTION_TEST_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-02-12 12:41:18.590312', '2026-02-12 12:41:18.919643', 329, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","templateId":5052,"recipientEmail":"giventauser@gmail.com"}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4457, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-12 17:59:58.839232', '2026-02-12 17:59:58.954106', 114, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4457, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-12 17:59:58.839232', '2026-02-12 17:59:58.954106', 114, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(5) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4459, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-12 23:59:59.036595', '2026-02-12 23:59:59.18736', 150, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4459, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-12 23:59:59.036595', '2026-02-12 23:59:59.18736', 150, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(6) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4461, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-13 05:59:59.080774', '2026-02-13 05:59:59.226064', 145, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4461, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-13 05:59:59.080774', '2026-02-13 05:59:59.226064', 145, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(7) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4463, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-13 11:59:58.99783', '2026-02-13 11:59:59.121461', 123, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4463, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-13 11:59:58.99783', '2026-02-13 11:59:59.121461', 123, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(8) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4465, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-13 17:59:59.013298', '2026-02-13 17:59:59.140849', 127, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4465, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-13 17:59:59.013298', '2026-02-13 17:59:59.140849', 127, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(9) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4467, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-13 23:59:59.060978', '2026-02-13 23:59:59.153627', 92, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4467, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-13 23:59:59.060978', '2026-02-13 23:59:59.153627', 92, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(10) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4469, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-14 05:59:59.05423', '2026-02-14 05:59:59.16544', 111, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4469, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-14 05:59:59.05423', '2026-02-14 05:59:59.16544', 111, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(11) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4471, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-14 11:59:58.984103', '2026-02-14 11:59:59.03505', 50, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4471, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-14 11:59:58.984103', '2026-02-14 11:59:59.03505', 50, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(12) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4473, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-14 17:59:59.129185', '2026-02-14 17:59:59.253068', 123, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4473, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-14 17:59:59.129185', '2026-02-14 17:59:59.253068', 123, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(13) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4475, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-14 23:59:58.970393', '2026-02-14 23:59:59.084166', 113, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4475, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-14 23:59:58.970393', '2026-02-14 23:59:59.084166', 113, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(14) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4477, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-15 05:59:59.073777', '2026-02-15 05:59:59.196247', 122, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4477, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-15 05:59:59.073777', '2026-02-15 05:59:59.196247', 122, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(15) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4479, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-15 11:59:59.119266', '2026-02-15 11:59:59.240567', 121, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4479, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-15 11:59:59.119266', '2026-02-15 11:59:59.240567', 121, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(16) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4481, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-15 17:59:59.084056', '2026-02-15 17:59:59.222735', 138, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4481, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-15 17:59:59.084056', '2026-02-15 17:59:59.222735', 138, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(17) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4483, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-15 23:59:59.141651', '2026-02-15 23:59:59.29987', 158, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4483, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-15 23:59:59.141651', '2026-02-15 23:59:59.29987', 158, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(3) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4485, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-16 05:59:59.085766', '2026-02-16 05:59:59.216895', 131, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4485, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-16 05:59:59.085766', '2026-02-16 05:59:59.216895', 131, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(4) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4487, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-16 11:59:59.149212', '2026-02-16 11:59:59.290418', 141, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4487, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-16 11:59:59.149212', '2026-02-16 11:59:59.290418', 141, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(5) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4489, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-16 17:59:59.155504', '2026-02-16 17:59:59.29312', 137, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4489, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-16 17:59:59.155504', '2026-02-16 17:59:59.29312', 137, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(6) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4491, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-16 23:59:59.097441', '2026-02-16 23:59:59.237444', 140, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4491, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-16 23:59:59.097441', '2026-02-16 23:59:59.237444', 140, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(7) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4493, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-17 05:59:59.04358', '2026-02-17 05:59:59.186304', 142, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4493, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-17 05:59:59.04358', '2026-02-17 05:59:59.186304', 142, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(8) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4495, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-17 11:59:59.218792', '2026-02-17 11:59:59.402091', 183, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4495, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-17 11:59:59.218792', '2026-02-17 11:59:59.402091', 183, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(9) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4497, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-17 17:59:59.039182', '2026-02-17 17:59:59.182704', 143, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4497, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-17 17:59:59.039182', '2026-02-17 17:59:59.182704', 143, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(10) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4499, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-17 23:59:59.016341', '2026-02-17 23:59:59.096947', 80, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4499, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-17 23:59:59.016341', '2026-02-17 23:59:59.096947', 80, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(11) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4501, 'contactFormEmailJob', 'CONTACT_FORM_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-02-18 04:24:41.064681', '2026-02-18 04:24:42.862082', 1797, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","fromEmail":"gain@hotmail.com","toEmail":"info@mosc.in"}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4503, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-18 05:59:59.604348', '2026-02-18 05:59:59.793864', 189, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4503, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-18 05:59:59.604348', '2026-02-18 05:59:59.793864', 189, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(12) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4555, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-23 23:59:59.077234', '2026-02-23 23:59:59.20395', 126, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4555, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-23 23:59:59.077234', '2026-02-23 23:59:59.20395', 126, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(50) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4505, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-18 11:59:59.243575', '2026-02-18 11:59:59.362902', 119, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4505, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-18 11:59:59.243575', '2026-02-18 11:59:59.362902', 119, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(13) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4565, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-25 06:00:00.560094', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4507, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-18 17:59:59.097355', '2026-02-18 17:59:59.199274', 101, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4507, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-18 17:59:59.097355', '2026-02-18 17:59:59.199274', 101, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(14) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4509, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-19 00:00:00.056614', '2026-02-19 00:00:00.538922', 482, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4509, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-19 00:00:00.056614', '2026-02-19 00:00:00.538922', 482, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(15) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4511, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-19 05:59:59.076668', '2026-02-19 05:59:59.177905', 101, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4511, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-19 05:59:59.076668', '2026-02-19 05:59:59.177905', 101, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(16) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4513, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-19 11:59:58.444751', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4515, 'contactFormEmailJob', 'CONTACT_FORM_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-02-19 13:54:11.921075', '2026-02-19 13:54:13.626624', 1705, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","fromEmail":"dhanya@keleno.com","toEmail":"info@mosc.in"}');
@@ -729,13 +1173,19 @@ INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tena
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4549, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-23 05:59:59.13856', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4551, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-23 11:59:59.000774', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4553, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-23 17:59:59.13965', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4557, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-24 05:59:59.165754', '2026-02-24 05:59:59.310217', 144, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4557, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-24 05:59:59.165754', '2026-02-24 05:59:59.310217', 144, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(51) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4559, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-24 11:59:59.101711', '2026-02-24 11:59:59.234431', 132, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4559, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-02-24 11:59:59.101711', '2026-02-24 11:59:59.234431', 132, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(52) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4561, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-24 17:59:59.118241', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4563, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-24 23:59:59.027181', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
@@ -754,133 +1204,229 @@ INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tena
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4591, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-27 11:59:59.089219', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4593, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-27 17:59:59.049328', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4595, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'RUNNING', 'tenant_demo_002', '2026-02-27 23:59:59.075538', NULL, NULL, 0, 0, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4597, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-01 06:00:00.39427', '2026-03-01 06:00:00.834472', 440, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4597, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-01 06:00:00.39427', '2026-03-01 06:00:00.834472', 440, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4599, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-01 11:59:58.965786', '2026-03-01 11:59:59.06753', 101, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4599, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-01 11:59:58.965786', '2026-03-01 11:59:59.06753', 101, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4601, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-01 17:59:59.013609', '2026-03-01 17:59:59.083007', 69, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4601, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-01 17:59:59.013609', '2026-03-01 17:59:59.083007', 69, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(4) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4603, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-01 23:59:59.065287', '2026-03-01 23:59:59.173669', 108, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4603, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-01 23:59:59.065287', '2026-03-01 23:59:59.173669', 108, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(5) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4605, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-02 05:59:58.970168', '2026-03-02 05:59:59.102805', 132, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4605, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-02 05:59:58.970168', '2026-03-02 05:59:59.102805', 132, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(6) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4607, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-02 11:59:59.067571', '2026-03-02 11:59:59.198777', 131, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4607, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-02 11:59:59.067571', '2026-03-02 11:59:59.198777', 131, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(7) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4609, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-02 17:59:59.055131', '2026-03-02 17:59:59.166968', 111, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4609, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-02 17:59:59.055131', '2026-03-02 17:59:59.166968', 111, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(8) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4611, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-02 23:59:59.017073', '2026-03-02 23:59:59.136351', 119, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4611, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-02 23:59:59.017073', '2026-03-02 23:59:59.136351', 119, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4643, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-07 11:59:58.938551', '2026-03-07 11:59:58.986162', 47, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4643, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-07 11:59:58.938551', '2026-03-07 11:59:58.986162', 47, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(7) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4613, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-03 05:59:58.997096', '2026-03-03 05:59:59.131709', 134, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4613, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-03 05:59:58.997096', '2026-03-03 05:59:59.131709', 134, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4615, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-03 11:59:59.01668', '2026-03-03 11:59:59.132187', 115, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4615, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-03 11:59:59.01668', '2026-03-03 11:59:59.132187', 115, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(4) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4617, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-03 17:59:58.919515', '2026-03-03 17:59:59.051274', 131, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4617, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-03 17:59:58.919515', '2026-03-03 17:59:59.051274', 131, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(5) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4619, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-03 23:59:59.068691', '2026-03-03 23:59:59.184947', 116, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4619, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-03 23:59:59.068691', '2026-03-03 23:59:59.184947', 116, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(6) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4621, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-04 05:59:59.004038', '2026-03-04 05:59:59.13432', 130, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4621, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-04 05:59:59.004038', '2026-03-04 05:59:59.13432', 130, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(7) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4623, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-04 11:59:58.953354', '2026-03-04 11:59:59.086181', 132, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4623, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-04 11:59:58.953354', '2026-03-04 11:59:59.086181', 132, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(8) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4625, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-04 17:59:58.97233', '2026-03-04 17:59:59.111082', 138, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4625, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-04 17:59:58.97233', '2026-03-04 17:59:59.111082', 138, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(9) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4627, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-05 00:00:00.255272', '2026-03-05 00:00:00.518169', 262, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4627, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-05 00:00:00.255272', '2026-03-05 00:00:00.518169', 262, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(10) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4629, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-05 05:59:59.217609', '2026-03-05 05:59:59.507303', 289, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4629, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-05 05:59:59.217609', '2026-03-05 05:59:59.507303', 289, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(43) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4631, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-05 11:59:59.115486', '2026-03-05 11:59:59.218763', 103, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4631, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-05 11:59:59.115486', '2026-03-05 11:59:59.218763', 103, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(44) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4633, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-06 05:59:59.164572', '2026-03-06 05:59:59.497754', 333, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4633, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-06 05:59:59.164572', '2026-03-06 05:59:59.497754', 333, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4635, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-06 11:59:59.10985', '2026-03-06 11:59:59.246162', 136, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4635, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-06 11:59:59.10985', '2026-03-06 11:59:59.246162', 136, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED)
+
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_execution_pkey"
+
   Detail: Key (job_execution_id)=(2) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4637, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-06 17:59:59.153157', '2026-03-06 17:59:59.261476', 108, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4637, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-06 17:59:59.153157', '2026-03-06 17:59:59.261476', 108, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(4) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4639, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-06 23:59:59.02013', '2026-03-06 23:59:59.146983', 126, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4639, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-06 23:59:59.02013', '2026-03-06 23:59:59.146983', 126, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(5) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4641, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-07 05:59:59.001761', '2026-03-07 05:59:59.057117', 55, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4641, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-07 05:59:59.001761', '2026-03-07 05:59:59.057117', 55, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(6) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4645, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-07 17:59:59.011083', '2026-03-07 17:59:59.066131', 55, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4645, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-07 17:59:59.011083', '2026-03-07 17:59:59.066131', 55, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(8) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4647, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-07 23:59:58.957583', '2026-03-07 23:59:59.017701', 60, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4647, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-07 23:59:58.957583', '2026-03-07 23:59:59.017701', 60, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(9) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4649, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-08 05:59:59.183861', '2026-03-08 05:59:59.306781', 122, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4649, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-08 05:59:59.183861', '2026-03-08 05:59:59.306781', 122, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(10) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4651, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-08 11:59:59.057128', '2026-03-08 11:59:59.156015', 98, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4651, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-08 11:59:59.057128', '2026-03-08 11:59:59.156015', 98, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(11) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4653, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-08 17:59:59.03081', '2026-03-08 17:59:59.090814', 60, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4653, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-08 17:59:59.03081', '2026-03-08 17:59:59.090814', 60, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(12) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4655, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-08 23:59:58.953587', '2026-03-08 23:59:58.99855', 44, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4655, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-08 23:59:58.953587', '2026-03-08 23:59:58.99855', 44, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(13) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4657, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-09 06:00:00.431328', '2026-03-09 06:00:00.764318', 332, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4657, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-09 06:00:00.431328', '2026-03-09 06:00:00.764318', 332, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(14) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
-INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4659, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-09 11:59:59.078209', '2026-03-09 11:59:59.190553', 112, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
-	VALUES (?, ?, ?, ?)
-]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4659, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-09 11:59:59.078209', '2026-03-09 11:59:59.190553', 112, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+
+	VALUES (?, ?, ?, ?)
+
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+
   Detail: Key (job_instance_id)=(15) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4661, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-10 00:00:00.444017', '2026-03-10 00:00:00.790049', 346, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
 	VALUES (?, ?, ?, ?)
@@ -1253,35 +1799,55 @@ INSERT INTO public.event_details (id, tenant_id, title, caption, description, st
 INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (10, 'tenant_demo_001', 'Spring Gala', 'Annual Spring Gala', 'A celebration of spring with music and food.', '2025-08-10', '2025-01-16', '2025-08-10', '18:00', '23:00', 'America/New_York', 'Grand Hall', NULL, 200, 'TICKETED', true, 2, true, false, true, '2025-08-05 23:59:00', '2025-08-05 23:59:00', NULL, NULL, false, true, false, NULL, NULL, 'events@example.com', 1, 1, '2025-06-14 23:13:02.565', '2025-09-04 04:48:18.789', true, false, false, false, 0, 0, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'STRIPE_ONLY', false);
 INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (6, 'tenant_demo_001', 'Spring Gala', 'Annual Spring Gala', 'A celebration of spring with music and food.', '2025-09-20', '2025-01-18', '2025-09-20', '10:00 AM', '08:00 PM', 'America/New_York', 'Grand Hall', NULL, 200, 'TICKETED', true, 2, true, false, true, '2025-08-05 23:59:00', '2025-08-05 23:59:00', NULL, NULL, false, true, false, NULL, NULL, 'events@example.com', 1, 1, '2025-06-14 23:13:02.565', '2025-09-07 18:14:15.542', true, false, false, false, 2, 0, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'STRIPE_ONLY', false);
 INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (5, 'tenant_demo_001', 'Summer Fest', 'Summer Festival', 'A festival with games, food, and music.', '2025-09-20', '2025-01-22', '2025-09-20', '10:00', '20:00', 'America/New_York', 'Downtown Plaza', NULL, 400, 'TICKETED', true, 3, true, true, true, '2025-09-12 23:59:00', '2025-09-12 23:59:00', NULL, NULL, false, true, false, NULL, NULL, 'events@example.com', 6, 6, '2025-06-14 23:13:02.565', '2025-09-07 18:33:43.178', false, false, false, true, 4, 0, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'STRIPE_ONLY', false);
-INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (6356, 'tenant_demo_002', 'New Year', 'A Showcase Of Performance Arts & Rhythm.', '"Spark of Kerala," a showcase of performance arts and rhythm organized by MCEFEE, taking place in the USA from August to September 2025.  Γò¼├┤Γö£├ºΓö£Γöé	Featured Artists: Swasika, Afsal, Mokksha, Akhila Anand, Veda Mithra, Sidhique Roshan, Kukku, Minnale Nazeer, Shiju, Vipin Kumar, Jojo Mathew, Suneeshmon.
-
-Γò¼├┤Γö£├ºΓö£Γöé	Contact Information: Booking contacts Sujith (+1 551-283-2437) and Arun (+1 551-221-1972), and email contactus@mcefee.org.
-
+INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (6356, 'tenant_demo_002', 'New Year', 'A Showcase Of Performance Arts & Rhythm.', '"Spark of Kerala," a showcase of performance arts and rhythm organized by MCEFEE, taking place in the USA from August to September 2025.  Γò¼├┤Γö£├ºΓö£Γöé	Featured Artists: Swasika, Afsal, Mokksha, Akhila Anand, Veda Mithra, Sidhique Roshan, Kukku, Minnale Nazeer, Shiju, Vipin Kumar, Jojo Mathew, Suneeshmon.
+
+
+
+Γò¼├┤Γö£├ºΓö£Γöé	Contact Information: Booking contacts Sujith (+1 551-283-2437) and Arun (+1 551-221-1972), and email contactus@mcefee.org.
+
+
+
 ', '2025-11-27', '2025-11-27', '2025-11-27', '05:00 PM', '09:00 PM', 'America/New_York', 'Breslin Performing Arts Center, 262 S Main St, Lodi, NJ 07644', NULL, 300, 'ticketed', true, 8, false, false, false, NULL, NULL, NULL, NULL, false, true, false, NULL, NULL, 'events@example.com', NULL, 3, '2025-11-19 22:14:31.359', '2025-11-20 01:15:50.261237', false, false, false, false, 0, 0, '{"isFundraiserEvent":false,"isCharityEvent":false}', NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'STRIPE_ONLY', false);
-INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (6852, 'tenant_demo_002', 'New Year', 'A Showcase Of Performance Arts & Rhythm.', '"Spark of Kerala," a showcase of performance arts and rhythm organized by MCEFEE, taking place in the USA from August to September 2025.  Γò¼├┤Γö£├ºΓö£Γöé	Featured Artists: Swasika, Afsal, Mokksha, Akhila Anand, Veda Mithra, Sidhique Roshan, Kukku, Minnale Nazeer, Shiju, Vipin Kumar, Jojo Mathew, Suneeshmon.
-
-Γò¼├┤Γö£├ºΓö£Γöé	Contact Information: Booking contacts Sujith (+1 551-283-2437) and Arun (+1 551-221-1972), and email contactus@mcefee.org.
-
+INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (6852, 'tenant_demo_002', 'New Year', 'A Showcase Of Performance Arts & Rhythm.', '"Spark of Kerala," a showcase of performance arts and rhythm organized by MCEFEE, taking place in the USA from August to September 2025.  Γò¼├┤Γö£├ºΓö£Γöé	Featured Artists: Swasika, Afsal, Mokksha, Akhila Anand, Veda Mithra, Sidhique Roshan, Kukku, Minnale Nazeer, Shiju, Vipin Kumar, Jojo Mathew, Suneeshmon.
+
+
+
+Γò¼├┤Γö£├ºΓö£Γöé	Contact Information: Booking contacts Sujith (+1 551-283-2437) and Arun (+1 551-221-1972), and email contactus@mcefee.org.
+
+
+
 ', '2025-11-29', '2025-11-27', '2025-11-29', '05:00 PM', '09:00 PM', 'America/New_York', 'Breslin Performing Arts Center, 262 S Main St, Lodi, NJ 07644', NULL, 300, 'ticketed', true, 8, false, false, false, NULL, NULL, NULL, NULL, false, true, false, NULL, NULL, 'events@example.com', NULL, 3, '2025-11-20 04:40:50.857912', '2025-11-20 01:15:50.261237', false, false, false, false, 0, 0, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 6356, 6356, 'STRIPE_ONLY', false);
 INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (3, 'tenant_demo_002', 'Knanaya STAGE SHOW', 'Community / Family Entertainment Day', 'Swasika | Afsal | Mokksha | Akhila Anand | Sidique Roshan | Kukku Shiju | Vipin Kumar | Jojo Mathew | Suneeshmon', '2025-11-04', '2025-11-02', '2025-11-29', '05:00 PM', '08:00 PM', 'America/New_York', 'IKCC Knanaya Community Center, 400 Willow Grv Rd, Stony Point, NY 10980', NULL, 200, 'ticketed', false, 4, true, false, false, '2025-09-05 23:59:00', '2025-09-05 23:59:00', NULL, NULL, false, true, false, NULL, NULL, 'events@example.com', 4, 1, '2025-06-14 23:13:02.565', '2025-11-20 00:37:48.917267', false, false, false, false, 0, 0, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'STRIPE_ONLY', false);
 INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (1, 'tenant_demo_002', 'KHNJ Mega Onam 2025', 'KHNJ Mega Onam 2025', 'Grand Vazhayila Onasadhya, Mega Thiruvathira, Mahabali Procession with Thalapoli, Chendamelam, Pulikali, Cultural Programs, Meet & Greet with Friends & Family, Mega Stage Show.', '2025-09-10', '2025-01-05', '2025-09-10', '11:00 AM', '06:00 PM', 'America/New_York', 'Jo Ann Arts Center, 200 Rues Ln, East Brunswick, NJ 08816', NULL, 500, 'ticketed', false, 5, true, true, false, '2025-08-12 23:59:00', '2025-08-12 23:59:00', NULL, NULL, false, true, false, NULL, NULL, 'events@example.com', 2, 6, '2025-06-14 23:13:02.565', '2025-11-20 00:37:49.030968', false, false, false, false, 0, 0, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'STRIPE_ONLY', false);
-INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (6901, 'tenant_demo_002', 'New Year (Copy)_2', 'A Showcase Of Performance Arts & Rhythm.', '"Spark of Kerala," a showcase of performance arts and rhythm organized by MCEFEE, taking place in the USA from August to September 2025.  Γò¼├┤Γö£├ºΓö£Γöé	Featured Artists: Swasika, Afsal, Mokksha, Akhila Anand, Veda Mithra, Sidhique Roshan, Kukku, Minnale Nazeer, Shiju, Vipin Kumar, Jojo Mathew, Suneeshmon.
-
-Γò¼├┤Γö£├ºΓö£Γöé	Contact Information: Booking contacts Sujith (+1 551-283-2437) and Arun (+1 551-221-1972), and email contactus@mcefee.org.
-
+INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (6901, 'tenant_demo_002', 'New Year (Copy)_2', 'A Showcase Of Performance Arts & Rhythm.', '"Spark of Kerala," a showcase of performance arts and rhythm organized by MCEFEE, taking place in the USA from August to September 2025.  Γò¼├┤Γö£├ºΓö£Γöé	Featured Artists: Swasika, Afsal, Mokksha, Akhila Anand, Veda Mithra, Sidhique Roshan, Kukku, Minnale Nazeer, Shiju, Vipin Kumar, Jojo Mathew, Suneeshmon.
+
+
+
+Γò¼├┤Γö£├ºΓö£Γöé	Contact Information: Booking contacts Sujith (+1 551-283-2437) and Arun (+1 551-221-1972), and email contactus@mcefee.org.
+
+
+
 ', '2025-11-20', '2025-11-20', '2025-11-21', '05:00 PM', '09:00 PM', 'America/New_York', 'Breslin Performing Arts Center, 262 S Main St, Lodi, NJ 07644', NULL, 300, 'ticketed', true, 8, false, false, false, NULL, NULL, NULL, NULL, false, true, false, NULL, NULL, 'events@example.com', NULL, 3, '2025-11-20 05:17:38.905', '2025-11-20 00:52:55.888283', false, false, false, false, 0, 0, '{"isFundraiserEvent":false,"isCharityEvent":false}', NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'STRIPE_ONLY', false);
-INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (6851, 'tenant_demo_002', 'New Year', 'A Showcase Of Performance Arts & Rhythm.', '"Spark of Kerala," a showcase of performance arts and rhythm organized by MCEFEE, taking place in the USA from August to September 2025.  Γò¼├┤Γö£├ºΓö£Γöé	Featured Artists: Swasika, Afsal, Mokksha, Akhila Anand, Veda Mithra, Sidhique Roshan, Kukku, Minnale Nazeer, Shiju, Vipin Kumar, Jojo Mathew, Suneeshmon.
-
-Γò¼├┤Γö£├ºΓö£Γöé	Contact Information: Booking contacts Sujith (+1 551-283-2437) and Arun (+1 551-221-1972), and email contactus@mcefee.org.
-
+INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (6851, 'tenant_demo_002', 'New Year', 'A Showcase Of Performance Arts & Rhythm.', '"Spark of Kerala," a showcase of performance arts and rhythm organized by MCEFEE, taking place in the USA from August to September 2025.  Γò¼├┤Γö£├ºΓö£Γöé	Featured Artists: Swasika, Afsal, Mokksha, Akhila Anand, Veda Mithra, Sidhique Roshan, Kukku, Minnale Nazeer, Shiju, Vipin Kumar, Jojo Mathew, Suneeshmon.
+
+
+
+Γò¼├┤Γö£├ºΓö£Γöé	Contact Information: Booking contacts Sujith (+1 551-283-2437) and Arun (+1 551-221-1972), and email contactus@mcefee.org.
+
+
+
 ', '2025-11-28', '2025-11-27', '2025-11-28', '05:00 PM', '09:00 PM', 'America/New_York', 'Breslin Performing Arts Center, 262 S Main St, Lodi, NJ 07644', NULL, 300, 'ticketed', true, 8, false, false, false, NULL, NULL, NULL, NULL, false, true, false, NULL, NULL, 'events@example.com', NULL, 3, '2025-11-20 04:40:50.85454', '2025-11-20 01:15:50.261237', false, false, false, false, 0, 0, NULL, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 6356, 6356, 'STRIPE_ONLY', false);
 INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (7051, 'tenant_demo_002', 'Regn Test', '', '', '2025-12-22', '2025-12-03', '2025-12-22', '08:29 AM', '02:29 PM', 'America/Chicago', 'Grand Hall', 'fgfffgfgfgfg', NULL, 'free', true, 12, false, false, false, NULL, NULL, NULL, NULL, false, true, NULL, NULL, NULL, 'events@example.com', NULL, 2, '2025-11-22 02:30:31.39', '2025-12-03 20:20:24.835196', true, false, false, false, 0, 0, '{"isFundraiserEvent":false,"isCharityEvent":false}', NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'STRIPE_ONLY', false);
 INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (4201, 'tenant_demo_002', 'Event 1', '', '', '2026-02-17', '2026-01-14', '2026-02-18', '12:04 PM', '12:06 PM', 'UTC', '', '', NULL, 'ticketed', true, NULL, false, false, false, NULL, NULL, NULL, NULL, false, true, NULL, NULL, NULL, 'sales@giventa.com', NULL, 1, '2026-01-14 12:05:22.659', '2026-02-15 18:19:01.159975', false, false, false, false, 0, 0, '{"isFundraiserEvent":false,"isCharityEvent":false}', NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'MANUAL_ONLY', true);
 INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (4202, 'tenant_demo_002', 'Givebutter Test', 'Givebutter Test', '', '2027-01-26', '2026-01-14', '2027-01-26', '12:38 PM', '04:38 PM', 'Australia/Sydney', '', '', NULL, 'ticketed', true, NULL, false, false, false, NULL, NULL, NULL, NULL, false, true, NULL, NULL, NULL, 'sales@giventa.com', NULL, 5, '2026-01-14 12:37:01.643', '2026-02-27 16:38:55.592138', false, false, false, true, 0, 0, '{"isFundraiserEvent":true,"isCharityEvent":false,"zeroFeeProvider":"GIVEBUTTER","givebutterWidgetId":"j1ek6j"}', NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'STRIPE_ONLY', false);
-INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (2, 'tenant_demo_002', 'MCEFEE Spark of Kerala', 'A Showcase Of Performance Arts & Rhythm.', '"Spark of Kerala," a showcase of performance arts and rhythm organized by MCEFEE, taking place in the USA from August to September 2025.  Γò¼├┤Γö£├ºΓö£Γöé	Featured Artists: Swasika, Afsal, Mokksha, Akhila Anand, Veda Mithra, Sidhique Roshan, Kukku, Minnale Nazeer, Shiju, Vipin Kumar, Jojo Mathew, Suneeshmon.
-
-Γò¼├┤Γö£├ºΓö£Γöé	Contact Information: Booking contacts Sujith (+1 551-283-2437) and Arun (+1 551-221-1972), and email contactus@mcefee.org.
-
+INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (2, 'tenant_demo_002', 'MCEFEE Spark of Kerala', 'A Showcase Of Performance Arts & Rhythm.', '"Spark of Kerala," a showcase of performance arts and rhythm organized by MCEFEE, taking place in the USA from August to September 2025.  Γò¼├┤Γö£├ºΓö£Γöé	Featured Artists: Swasika, Afsal, Mokksha, Akhila Anand, Veda Mithra, Sidhique Roshan, Kukku, Minnale Nazeer, Shiju, Vipin Kumar, Jojo Mathew, Suneeshmon.
+
+
+
+Γò¼├┤Γö£├ºΓö£Γöé	Contact Information: Booking contacts Sujith (+1 551-283-2437) and Arun (+1 551-221-1972), and email contactus@mcefee.org.
+
+
+
 ', '2027-02-27', '2025-12-24', '2027-02-27', '05:00 PM', '09:00 PM', 'America/New_York', 'Breslin Performing Arts Center, 262 S Main St, Lodi, NJ 07644', NULL, 300, 'ticketed', true, 8, false, false, false, '2025-08-28 23:59:00', '2025-08-28 23:59:00', NULL, NULL, false, true, false, NULL, NULL, 'sales@giventa.com', 3, 3, '2025-06-14 23:13:02.565', '2026-03-02 23:44:44.524425', false, false, false, true, 0, 2, '{"isFundraiserEvent":false,"isCharityEvent":false}', 'https://wwwgiventacom.eventcube.io/events/93642/event-cube-test/?embed=true', NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'STRIPE_ONLY', false);
 INSERT INTO public.event_details (id, tenant_id, title, caption, description, start_date, promotion_start_date, end_date, start_time, end_time, timezone, location, directions_to_venue, capacity, admission_type, is_active, max_guests_per_attendee, allow_guests, require_guest_approval, enable_guest_pricing, registration_deadline, cancellation_deadline, minimum_age, maximum_age, requires_approval, enable_waitlist, enable_qr_code, external_registration_url, email_header_image_url, from_email, created_by_id, event_type_id, created_at, updated_at, is_registration_required, is_sports_event, is_live, is_featured_event, featured_event_priority_ranking, live_event_priority_ranking, donation_metadata, eventcube_embed_url, event_recurrence_metadata, is_recurring, recurrence_pattern, recurrence_interval, recurrence_end_type, recurrence_end_date, recurrence_occurrences, recurrence_weekly_days, recurrence_monthly_day, parent_event_id, recurrence_series_id, payment_flow_mode, manual_payment_enabled) VALUES (8321, 'tenant_demo_002', 'Fundraiser Registration Required', 'Fundraiser Registration Required', 'Fundraiser Registration Required', '2026-03-26', '2026-02-24', '2026-03-26', '12:38 PM', '04:38 PM', 'Australia/Sydney', '', '', NULL, 'free', true, NULL, false, false, false, NULL, NULL, NULL, NULL, false, true, NULL, NULL, NULL, 'sales@giventa.com', NULL, 5, '2026-02-24 03:45:30.891', '2026-03-05 18:25:16.297961', true, false, false, true, 0, 0, '{"isFundraiserEvent":true,"isCharityEvent":false,"zeroFeeProvider":"GIVEBUTTER","givebutterWidgetId":"j1ek6j"}', NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'STRIPE_ONLY', false);
 
@@ -1967,49 +2533,89 @@ INSERT INTO public.membership_subscription (id, tenant_id, user_profile_id, memb
 -- Data for Name: promotion_email_template; Type: TABLE DATA; Schema: public; Owner: event_site_admin
 --
 
-INSERT INTO public.promotion_email_template (id, tenant_id, event_id, template_name, template_type, subject, from_email, body_html, footer_html, header_image_url, footer_image_url, promotion_code, discount_code_id, is_active, created_by_id, created_at, updated_at) VALUES (4101, 'tenant_demo_002', 2, 'template 1', 'EVENT_PROMOTION', 'template 1', 'giventauser@gmail.com', '<div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; background: #f9f9f9; border-radius: 8px; padding: 24px; text-align: center;">
-
-  <h2 style="color: #1a237e; margin-bottom: 12px;">Special Offer Just for You!</h2>
-
-  <p style="font-size: 18px; color: #333; margin-bottom: 8px;">Use the code below to get an exclusive discount:</p>
-
-  <div style="font-size: 24px; font-weight: bold; color: #1565c0; background: #e3f2fd; border-radius: 6px; display: inline-block; padding: 12px 32px; margin-bottom: 12px;">SAVE20</div>
-
-  <p style="font-size: 16px; color: #444;">Enter this code at checkout to enjoy your savings!</p>
-
+INSERT INTO public.promotion_email_template (id, tenant_id, event_id, template_name, template_type, subject, from_email, body_html, footer_html, header_image_url, footer_image_url, promotion_code, discount_code_id, is_active, created_by_id, created_at, updated_at) VALUES (4101, 'tenant_demo_002', 2, 'template 1', 'EVENT_PROMOTION', 'template 1', 'giventauser@gmail.com', '<div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; background: #f9f9f9; border-radius: 8px; padding: 24px; text-align: center;">
+
+
+
+  <h2 style="color: #1a237e; margin-bottom: 12px;">Special Offer Just for You!</h2>
+
+
+
+  <p style="font-size: 18px; color: #333; margin-bottom: 8px;">Use the code below to get an exclusive discount:</p>
+
+
+
+  <div style="font-size: 24px; font-weight: bold; color: #1565c0; background: #e3f2fd; border-radius: 6px; display: inline-block; padding: 12px 32px; margin-bottom: 12px;">SAVE20</div>
+
+
+
+  <p style="font-size: 16px; color: #444;">Enter this code at checkout to enjoy your savings!</p>
+
+
+
 </div>', NULL, '', '', NULL, NULL, true, NULL, '2025-12-04 02:21:46.637859', '2025-12-04 02:47:07.241759');
-INSERT INTO public.promotion_email_template (id, tenant_id, event_id, template_name, template_type, subject, from_email, body_html, footer_html, header_image_url, footer_image_url, promotion_code, discount_code_id, is_active, created_by_id, created_at, updated_at) VALUES (4102, 'tenant_demo_002', 2, 'template 1 (Copy)', 'EVENT_PROMOTION', 'template 1', 'sales@giventa.com', '<div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; background: #f9f9f9; border-radius: 8px; padding: 24px; text-align: center;">
-
-  <h2 style="color: #1a237e; margin-bottom: 12px;">Special Offer Just for You!</h2>
-
-  <p style="font-size: 18px; color: #333; margin-bottom: 8px;">Use the code below to get an exclusive discount:</p>
-
-  <div style="font-size: 24px; font-weight: bold; color: #1565c0; background: #e3f2fd; border-radius: 6px; display: inline-block; padding: 12px 32px; margin-bottom: 12px;">SAVE20</div>
-
-  <p style="font-size: 16px; color: #444;">Enter this code at checkout to enjoy your savings!</p>
-
+INSERT INTO public.promotion_email_template (id, tenant_id, event_id, template_name, template_type, subject, from_email, body_html, footer_html, header_image_url, footer_image_url, promotion_code, discount_code_id, is_active, created_by_id, created_at, updated_at) VALUES (4102, 'tenant_demo_002', 2, 'template 1 (Copy)', 'EVENT_PROMOTION', 'template 1', 'sales@giventa.com', '<div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; background: #f9f9f9; border-radius: 8px; padding: 24px; text-align: center;">
+
+
+
+  <h2 style="color: #1a237e; margin-bottom: 12px;">Special Offer Just for You!</h2>
+
+
+
+  <p style="font-size: 18px; color: #333; margin-bottom: 8px;">Use the code below to get an exclusive discount:</p>
+
+
+
+  <div style="font-size: 24px; font-weight: bold; color: #1565c0; background: #e3f2fd; border-radius: 6px; display: inline-block; padding: 12px 32px; margin-bottom: 12px;">SAVE20</div>
+
+
+
+  <p style="font-size: 16px; color: #444;">Enter this code at checkout to enjoy your savings!</p>
+
+
+
 </div>', NULL, '', '', NULL, NULL, true, NULL, '2025-12-04 02:56:04.570325', '2025-12-04 03:14:03.748681');
-INSERT INTO public.promotion_email_template (id, tenant_id, event_id, template_name, template_type, subject, from_email, body_html, footer_html, header_image_url, footer_image_url, promotion_code, discount_code_id, is_active, created_by_id, created_at, updated_at) VALUES (5051, 'tenant_demo_002', NULL, 'template 1 (Copy)', 'NEWS_LETTER', 'just the email subject', 'sales@giventa.com', '<div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; background: #f9f9f9; border-radius: 8px; padding: 24px; text-align: center;">
-
-  <h2 style="color: #1a237e; margin-bottom: 12px;">Special Offer Just for You!</h2>
-
-  <p style="font-size: 18px; color: #333; margin-bottom: 8px;">Use the code below to get an exclusive discount:</p>
-
-  <div style="font-size: 24px; font-weight: bold; color: #1565c0; background: #e3f2fd; border-radius: 6px; display: inline-block; padding: 12px 32px; margin-bottom: 12px;">SAVE20</div>
-
-  <p style="font-size: 16px; color: #444;">Enter this code at checkout to enjoy your savings!</p>
-
+INSERT INTO public.promotion_email_template (id, tenant_id, event_id, template_name, template_type, subject, from_email, body_html, footer_html, header_image_url, footer_image_url, promotion_code, discount_code_id, is_active, created_by_id, created_at, updated_at) VALUES (5051, 'tenant_demo_002', NULL, 'template 1 (Copy)', 'NEWS_LETTER', 'just the email subject', 'sales@giventa.com', '<div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; background: #f9f9f9; border-radius: 8px; padding: 24px; text-align: center;">
+
+
+
+  <h2 style="color: #1a237e; margin-bottom: 12px;">Special Offer Just for You!</h2>
+
+
+
+  <p style="font-size: 18px; color: #333; margin-bottom: 8px;">Use the code below to get an exclusive discount:</p>
+
+
+
+  <div style="font-size: 24px; font-weight: bold; color: #1565c0; background: #e3f2fd; border-radius: 6px; display: inline-block; padding: 12px 32px; margin-bottom: 12px;">SAVE20</div>
+
+
+
+  <p style="font-size: 16px; color: #444;">Enter this code at checkout to enjoy your savings!</p>
+
+
+
 </div>', NULL, '', '', NULL, NULL, true, NULL, '2026-01-12 03:55:26.179189', '2026-01-12 03:55:26.179211');
-INSERT INTO public.promotion_email_template (id, tenant_id, event_id, template_name, template_type, subject, from_email, body_html, footer_html, header_image_url, footer_image_url, promotion_code, discount_code_id, is_active, created_by_id, created_at, updated_at) VALUES (5052, 'tenant_demo_002', NULL, 'Test template', 'NEWS_LETTER', 'giventauser@gmail.com', 'sales@giventa.com', '<div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; background: #f9f9f9; border-radius: 8px; padding: 24px; text-align: center;">
-
-  <h2 style="color: #1a237e; margin-bottom: 12px;">Special Offer Just for You!</h2>
-
-  <p style="font-size: 18px; color: #333; margin-bottom: 8px;">Use the code below to get an exclusive discount:</p>
-
-  <div style="font-size: 24px; font-weight: bold; color: #1565c0; background: #e3f2fd; border-radius: 6px; display: inline-block; padding: 12px 32px; margin-bottom: 12px;">SAVE20</div>
-
-  <p style="font-size: 16px; color: #444;">Enter this code at checkout to enjoy your savings!</p>
-
+INSERT INTO public.promotion_email_template (id, tenant_id, event_id, template_name, template_type, subject, from_email, body_html, footer_html, header_image_url, footer_image_url, promotion_code, discount_code_id, is_active, created_by_id, created_at, updated_at) VALUES (5052, 'tenant_demo_002', NULL, 'Test template', 'NEWS_LETTER', 'giventauser@gmail.com', 'sales@giventa.com', '<div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; background: #f9f9f9; border-radius: 8px; padding: 24px; text-align: center;">
+
+
+
+  <h2 style="color: #1a237e; margin-bottom: 12px;">Special Offer Just for You!</h2>
+
+
+
+  <p style="font-size: 18px; color: #333; margin-bottom: 8px;">Use the code below to get an exclusive discount:</p>
+
+
+
+  <div style="font-size: 24px; font-weight: bold; color: #1565c0; background: #e3f2fd; border-radius: 6px; display: inline-block; padding: 12px 32px; margin-bottom: 12px;">SAVE20</div>
+
+
+
+  <p style="font-size: 16px; color: #444;">Enter this code at checkout to enjoy your savings!</p>
+
+
+
 </div>', NULL, '', '', NULL, NULL, true, NULL, '2026-01-12 04:01:17.410089', '2026-01-12 04:03:45.56019');
 
 
@@ -2198,5 +2804,5 @@ SELECT pg_catalog.setval('public.sequence_generator', 8411, true);
 
 --
 -- PostgreSQL database dump complete
---
+-- sample
 
