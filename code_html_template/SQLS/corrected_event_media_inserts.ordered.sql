@@ -2599,5 +2599,3 @@ INSERT INTO public.databasechangeloglock (id, locked, lockgranted, lockedby) VAL
 INSERT INTO public.databasechangeloglock (id, locked, lockgranted, lockedby) VALUES (5, false, '2025-06-22 11:31:27.859976', 'admin5');
 
 INSERT INTO public.databasechangeloglock (id, locked, lockgranted, lockedby) VALUES (6, false, '2025-06-22 11:31:27.859976', 'admin6');
-
--- Nail-biter
