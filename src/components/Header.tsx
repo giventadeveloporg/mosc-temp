@@ -371,7 +371,7 @@ function UserAvatarDropdown({
             <Link
               href="/profile"
               onClick={() => setIsOpen(false)}
-              className={`header-dropdown-item flex items-center gap-3 ${pathname === '/profile' ? 'active' : ''}`}
+              className={`header-dropdown-item font-semibold flex items-center gap-3 ${pathname === '/profile' ? 'active' : ''}`}
               role="menuitem"
               aria-label="View profile"
             >
@@ -828,7 +828,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                         {hasDropdown ? (
                           <>
                             <div
-                              className={`header-nav-link flex items-center gap-1.5 cursor-pointer ${(item.name === 'About' && isAboutActive) || (item.name === 'Features' && isFeaturesActive)
+                              className={`header-nav-link font-semibold flex items-center gap-1.5 cursor-pointer ${(item.name === 'About' && isAboutActive) || (item.name === 'Features' && isFeaturesActive)
                                   ? 'active'
                                   : ''
                                 }`}
@@ -874,7 +874,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                                           handleSmoothScroll(e, subItem.href);
                                         }
                                       }}
-                                      className={`header-dropdown-item block ${isSubItemActive ? 'active' : ''}`}
+                                      className={`header-dropdown-item font-semibold block ${isSubItemActive ? 'active' : ''}`}
                                       role="menuitem"
                                       aria-label={`Navigate to ${subItem.name}`}
                                     >
@@ -888,7 +888,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                         ) : (
                           <Link
                             href={item.href}
-                            className={`header-nav-link ${item.active ? 'active' : ''}`}
+                            className={`header-nav-link font-semibold ${item.active ? 'active' : ''}`}
                             onClick={(e) => handleSmoothScroll(e, item.href)}
                             aria-label={getNavAriaLabel(item.name)}
                             aria-current={item.active ? 'page' : undefined}
@@ -908,7 +908,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                   <>
                     <Link
                       href="/sign-in"
-                      className="header-nav-link"
+                      className="header-nav-link font-semibold"
                     >
                       <span>Sign In</span>
                     </Link>
@@ -926,7 +926,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                       <div className="relative group">
                         <Link
                           href="/admin"
-                          className={`header-nav-link flex items-center gap-1.5 ${pathname?.startsWith("/admin") ? 'active' : ''}`}
+                          className={`header-nav-link font-semibold flex items-center gap-1.5 ${pathname?.startsWith("/admin") ? 'active' : ''}`}
                         >
                           <span>Admin</span>
                           <ChevronDown
@@ -949,7 +949,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                                 return (
                                   <div key={subItem.name} className="relative group/membership">
                                     <div
-                                      className={`header-dropdown-item flex items-center justify-between cursor-pointer ${isMembershipActive ? 'active' : ''}`}
+                                      className={`header-dropdown-item font-semibold flex items-center justify-between cursor-pointer ${isMembershipActive ? 'active' : ''}`}
                                     >
                                       <span>{subItem.name}</span>
                                       <ChevronDown
@@ -967,7 +967,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                                             <Link
                                               key={subSubItem.name}
                                               href={subSubItem.href}
-                                              className={`header-dropdown-item block ${isSubSubItemActive ? 'active' : ''}`}
+                                              className={`header-dropdown-item font-semibold block ${isSubSubItemActive ? 'active' : ''}`}
                                               role="menuitem"
                                               aria-label={`Navigate to ${subSubItem.name}`}
                                             >
@@ -985,7 +985,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                                 <Link
                                   key={subItem.name}
                                   href={subItem.href}
-                                  className={`header-dropdown-item block ${pathname?.startsWith(subItem.href) ? 'active' : ''}`}
+                                  className={`header-dropdown-item font-semibold block ${pathname?.startsWith(subItem.href) ? 'active' : ''}`}
                                   role="menuitem"
                                   aria-label={`Navigate to ${subItem.name}`}
                                 >
@@ -1152,10 +1152,10 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                                   }}
                                   className={`
                                     block py-2.5 px-4 rounded-lg
-                                    font-['Plus_Jakarta_Sans'] text-sm font-medium
+                                    font-['Plus_Jakarta_Sans'] text-sm font-semibold
                                     transition-all duration-200
                                     ${isSubItemActive
-                                      ? 'text-[var(--header-accent-primary)] font-semibold bg-[var(--header-active-bg)]'
+                                      ? 'text-[var(--header-accent-primary)] bg-[var(--header-active-bg)]'
                                       : 'text-[var(--header-text-secondary)] hover:text-[var(--header-accent-primary)] hover:bg-[var(--header-hover-bg)]'
                                     }
                                   `}
@@ -1333,10 +1333,10 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                                             href={subSubItem.href}
                                             className={`
                                               block py-2 px-4 rounded-lg
-                                              font-['Plus_Jakarta_Sans'] text-xs font-medium
+                                              font-['Plus_Jakarta_Sans'] text-xs font-semibold
                                               transition-all duration-200
                                               ${isSubSubItemActive
-                                                ? 'text-[var(--header-accent-primary)] font-semibold bg-[var(--header-active-bg)]'
+                                                ? 'text-[var(--header-accent-primary)] bg-[var(--header-active-bg)]'
                                                 : 'text-[var(--header-text-secondary)] hover:text-[var(--header-accent-primary)] hover:bg-[var(--header-hover-bg)]'
                                               }
                                             `}

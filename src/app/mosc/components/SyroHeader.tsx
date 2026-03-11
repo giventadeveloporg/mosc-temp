@@ -134,6 +134,28 @@ export default function SyroHeader() {
         </div>
       </header>
 
+      {/* Quick Links bar below header - desktop only; same links also in menu */}
+      <div className="syro-quicklinks-bar d-none d-lg-block" aria-label="Quick Links">
+        <div className="container">
+          <div className="syro-quicklinks-inner d-flex align-items-center flex-wrap py-2 justify-content-center">
+            <span className="syro-quicklinks-label fw-semibold me-2">Quick Links</span>
+            <span className="syro-quicklinks-sep d-none d-xl-inline-block me-2" aria-hidden="true" />
+            <ul className="list-unstyled mb-0 d-flex align-items-center flex-wrap gap-1 justify-content-center">
+              {quickLinks.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className={`syro-quicklink ${isActive(item.href) ? 'fw-bold' : ''}`}
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+
       {/* Detailed Menu Offcanvas (match static #detailedmenu) */}
       <div
         className={`offcanvas offcanvas-start ${offcanvasOpen ? 'show' : ''}`}

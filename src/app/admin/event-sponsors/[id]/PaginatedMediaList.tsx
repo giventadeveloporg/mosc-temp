@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FaSpinner, FaImage, FaEdit, FaSave, FaBan, FaTrashAlt } from 'react-icons/fa';
 import Image from 'next/image';
@@ -17,6 +17,23 @@ interface PaginatedMediaListProps {
   pageSize: number;
   totalPages: number;
   refreshKey?: number;
+  searchTerm?: string;
+  filterBannerOnly?: boolean;
+  filterLogoOnly?: boolean;
+  filterHeroOnly?: boolean;
+}
+
+function matchesBanner(media: EventMediaDTO): boolean {
+  const t = (media.eventMediaType || '').toUpperCase();
+  return t.includes('BANNER');
+}
+function matchesLogo(media: EventMediaDTO): boolean {
+  const t = (media.eventMediaType || '').toUpperCase();
+  return t.includes('LOGO');
+}
+function matchesHero(media: EventMediaDTO): boolean {
+  const t = (media.eventMediaType || '').toUpperCase();
+  return t.includes('HERO') || Boolean(media.isHeroImage);
 }
 
 export default function PaginatedMediaList({
@@ -27,10 +44,14 @@ export default function PaginatedMediaList({
   pageSize,
   totalPages,
   refreshKey = 0,
+  searchTerm = '',
+  filterBannerOnly = false,
+  filterLogoOnly = false,
+  filterHeroOnly = false,
 }: PaginatedMediaListProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [mediaList, setMediaList] = useState<EventMediaDTO[]>(initialMediaList);
+  const [allMedia, setAllMedia] = useState<EventMediaDTO[]>(initialMediaList);
   const [loading, setLoading] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<EventMediaDTO | null>(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -41,33 +62,65 @@ export default function PaginatedMediaList({
   const [deletingMediaId, setDeletingMediaId] = useState<number | null>(null);
   const [mediaToDelete, setMediaToDelete] = useState<EventMediaDTO | null>(null);
 
-  // Load media when page changes or refreshKey changes
+  // Filter and search: apply to allMedia to get filtered list, then paginate
+  const filteredMedia = useMemo(() => {
+    let list = allMedia;
+    const term = (searchTerm || '').trim().toLowerCase();
+    if (term) {
+      list = list.filter((m) => (m.title || '').toLowerCase().includes(term));
+    }
+    const anyTypeFilter = filterBannerOnly || filterLogoOnly || filterHeroOnly;
+    if (anyTypeFilter) {
+      list = list.filter((m) => {
+        if (filterBannerOnly && matchesBanner(m)) return true;
+        if (filterLogoOnly && matchesLogo(m)) return true;
+        if (filterHeroOnly && matchesHero(m)) return true;
+        return false;
+      });
+    }
+    return list.sort((a, b) => (a.priorityRanking ?? 0) - (b.priorityRanking ?? 0));
+  }, [allMedia, searchTerm, filterBannerOnly, filterLogoOnly, filterHeroOnly]);
+
+  const filteredCount = filteredMedia.length;
+  const filteredTotalPages = Math.max(1, Math.ceil(filteredCount / pageSize));
+  const safePage = Math.min(currentPage, Math.max(0, filteredTotalPages - 1));
+  const displayList = useMemo(
+    () => filteredMedia.slice(safePage * pageSize, (safePage + 1) * pageSize),
+    [filteredMedia, safePage, pageSize]
+  );
+
+  // Load all media when refreshKey or page changes (store full list; filtering is client-side)
   const loadMedia = useCallback(async () => {
     if (!sponsorId) return;
 
     setLoading(true);
     try {
-      const allMedia = await fetchSponsorMediaServer(sponsorId);
-      const startIndex = currentPage * pageSize;
-      const endIndex = startIndex + pageSize;
-      const paginatedMedia = allMedia.slice(startIndex, endIndex);
-      setMediaList(paginatedMedia);
+      const all = await fetchSponsorMediaServer(sponsorId);
+      setAllMedia(all);
     } catch (error) {
       console.error('Failed to fetch sponsor media:', error);
-      // Fallback to initialMediaList if fetch fails
-      setMediaList(initialMediaList);
+      setAllMedia(initialMediaList);
     } finally {
       setLoading(false);
     }
-  }, [sponsorId, currentPage, pageSize, initialMediaList]);
+  }, [sponsorId, initialMediaList]);
 
-  // Load media on mount and when page/refreshKey changes
   useEffect(() => {
     loadMedia();
   }, [loadMedia, refreshKey]);
 
+  // When search or filters are applied and current page would be out of range, reset to page 0
+  useEffect(() => {
+    if (!searchTerm && !filterBannerOnly && !filterLogoOnly && !filterHeroOnly) return;
+    if (currentPage > 0 && filteredTotalPages <= currentPage) {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('page', '0');
+      router.replace(`?${params.toString()}`, { scroll: false });
+    }
+  }, [searchTerm, filterBannerOnly, filterLogoOnly, filterHeroOnly, currentPage, filteredTotalPages, searchParams, router]);
+
   const handlePageChange = (newPage: number) => {
-    if (newPage < 0 || newPage >= totalPages || loading) return;
+    if (newPage < 0 || newPage >= filteredTotalPages || loading) return;
 
     const params = new URLSearchParams(searchParams.toString());
     params.set('page', newPage.toString());
@@ -77,19 +130,12 @@ export default function PaginatedMediaList({
   const handlePriorityUpdate = async (mediaId: number, priorityRanking: number) => {
     try {
       await updateMediaPriorityRankingServer(mediaId, priorityRanking);
-
-      // Update local state
-      setMediaList(prev =>
+      setAllMedia(prev =>
         prev.map(m =>
-          m.id === mediaId
-            ? { ...m, priorityRanking }
-            : m
+          m.id === mediaId ? { ...m, priorityRanking } : m
         ).sort((a, b) => (a.priorityRanking || 0) - (b.priorityRanking || 0))
       );
-
       setEditingPriority(null);
-
-      // Refresh the page to show updated order
       router.refresh();
     } catch (error) {
       console.error('Failed to update priority:', error);
@@ -141,7 +187,7 @@ export default function PaginatedMediaList({
       e.stopPropagation();
       (e.currentTarget as HTMLButtonElement).blur();
     }
-    const media = mediaList.find(m => m.id === mediaId);
+    const media = allMedia.find(m => m.id === mediaId) ?? displayList.find(m => m.id === mediaId);
     if (media) {
       setMediaToDelete(media);
     }
@@ -221,13 +267,16 @@ export default function PaginatedMediaList({
     }
   };
 
-  // Pagination calculations
-  const startItem = totalCount > 0 ? currentPage * pageSize + 1 : 0;
-  const endItem = totalCount > 0 ? Math.min((currentPage + 1) * pageSize, totalCount) : 0;
-  const isPrevDisabled = currentPage === 0 || loading;
-  const isNextDisabled = currentPage >= totalPages - 1 || loading;
+  // Pagination: use filtered counts when search/filters are active
+  const effectiveTotal = filteredCount;
+  const effectivePages = filteredTotalPages;
+  const effectivePage = safePage;
+  const startItem = effectiveTotal > 0 ? effectivePage * pageSize + 1 : 0;
+  const endItem = effectiveTotal > 0 ? Math.min((effectivePage + 1) * pageSize, effectiveTotal) : 0;
+  const isPrevDisabled = effectivePage === 0 || loading;
+  const isNextDisabled = effectivePage >= effectivePages - 1 || loading;
 
-  if (loading && mediaList.length === 0) {
+  if (loading && allMedia.length === 0) {
     return (
       <div className="flex justify-center items-center py-12">
         <FaSpinner className="animate-spin h-8 w-8 text-primary" />
@@ -237,15 +286,19 @@ export default function PaginatedMediaList({
 
   return (
     <div>
-      {/* Media Grid */}
-      {mediaList.length === 0 ? (
+      {/* Media Grid - use displayList (filtered + paginated) */}
+      {displayList.length === 0 ? (
         <div className="text-center py-12">
           <FaImage className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-          <p className="text-muted-foreground">No media files found for this sponsor.</p>
+          <p className="text-muted-foreground">
+            {allMedia.length === 0
+              ? 'No media files found for this sponsor.'
+              : 'No media match the current search or filters.'}
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
-          {mediaList.map((media) => (
+          {displayList.map((media) => (
             <div
               key={media.id}
               className="bg-muted/50 rounded-lg overflow-hidden border border-border reverent-hover"
@@ -328,7 +381,7 @@ export default function PaginatedMediaList({
       <div className="mt-8">
         <div className="flex justify-between items-center">
           <button
-            onClick={() => handlePageChange(currentPage - 1)}
+            onClick={() => handlePageChange(effectivePage - 1)}
             disabled={isPrevDisabled}
             className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
             title="Previous Page"
@@ -342,11 +395,11 @@ export default function PaginatedMediaList({
           </button>
           <div className="px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
             <span className="text-sm font-bold text-blue-700">
-              Page <span className="text-blue-600">{currentPage + 1}</span> of <span className="text-blue-600">{totalPages}</span>
+              Page <span className="text-blue-600">{effectivePage + 1}</span> of <span className="text-blue-600">{effectivePages}</span>
             </span>
           </div>
           <button
-            onClick={() => handlePageChange(currentPage + 1)}
+            onClick={() => handlePageChange(effectivePage + 1)}
             disabled={isNextDisabled}
             className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
             title="Next Page"
@@ -360,10 +413,10 @@ export default function PaginatedMediaList({
           </button>
         </div>
         <div className="text-center mt-3">
-          {totalCount > 0 ? (
+          {effectiveTotal > 0 ? (
             <div className="inline-flex items-center px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
               <span className="text-sm text-gray-700">
-                Showing <span className="font-bold text-blue-600">{startItem}</span> to <span className="font-bold text-blue-600">{endItem}</span> of <span className="font-bold text-blue-600">{totalCount}</span> {totalCount === 1 ? 'item' : 'items'}
+                Showing <span className="font-bold text-blue-600">{startItem}</span> to <span className="font-bold text-blue-600">{endItem}</span> of <span className="font-bold text-blue-600">{effectiveTotal}</span> {effectiveTotal === 1 ? 'item' : 'items'}
               </span>
             </div>
           ) : (
