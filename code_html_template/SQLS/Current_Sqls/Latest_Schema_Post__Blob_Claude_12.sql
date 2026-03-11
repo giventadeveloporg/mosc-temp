@@ -4907,11 +4907,6 @@ CREATE TRIGGER trg_satellite_domain_updated_at
     EXECUTE FUNCTION public.update_updated_at_column();
 
 -- Seed existing satellite domains from config/satellites.json
-INSERT INTO public.satellite_domain (satellite_key, domain, hostname, display_name, tenant_id, enabled, added_date, org_name, full_name, tagline, logo_type, logo_primary_color, logo_secondary_color, theme_primary_color, theme_hover_color, theme_active_color, contact_address, contact_phone, contact_email, social_facebook, social_twitter, social_linkedin, social_youtube, show_on_auth_header, show_on_auth_footer)
-VALUES
-    ('mcefee-temp', 'https://www.mcefee-temp.com', 'www.mcefee-temp.com', 'MCEFEE Temp', 'tenant_demo_001', true, '2025-11-01', 'MCEFEE', 'Malayalee Cultural Events Federation for Education & Empowerment', 'A NONPROFIT CORPORATION', 'text', '#9333ea', '#a855f7', '#60a5fa', '#3b82f6', '#2563eb', '123 Cultural Lane, Hope City, HC 12345, United States', '+1 (555) 123-4567', 'contact@mcefee-temp.com', '#', '#', '#', '#', true, true),
-    ('mosc-temp', 'https://www.mosc-temp.com', 'www.mosc-temp.com', 'MOSC Temp', 'tenant_demo_002', true, '2025-11-01', 'Unite India', 'Unite India - Bringing Communities Together', 'A NONPROFIT CORPORATION', 'text', '#9333ea', '#a855f7', '#60a5fa', '#3b82f6', '#2563eb', '123 Charity Lane, Hope City, HC 12345, United States', '+1 (555) 123-4567', 'contact@mosc-temp.com', '#', '#', '#', '#', true, true),
-    ('md-strikers', 'https://www.md-strikers.com', 'www.md-strikers.com', 'MD Strikers', 'tenant_demo_003', true, '2025-11-01', 'MD Strikers', 'Maryland Strikers Sports Association', 'A NONPROFIT SPORTS ORGANIZATION', 'text', '#dc2626', '#ef4444', '#60a5fa', '#3b82f6', '#2563eb', '456 Stadium Road, Baltimore, MD 21201, United States', '+1 (555) 987-6543', 'contact@md-strikers.com', '#', '#', '#', '#', true, true);
 
 -- =====================================================
 -- NEWS PORTAL TABLES
