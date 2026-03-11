@@ -94,10 +94,12 @@ export default function SponsorDetailsPage() {
   if (loading) return <div className="p-8 text-center">Loading sponsor details...</div>;
   if (!sponsor) return <div className="p-8 text-center text-red-500">Sponsor not found.</div>;
 
-  // Find hero image - prioritize banner image
-  const heroImage = media.find((m) => m.fileUrl && (m.isHomePageHeroImage || m.isFeaturedEventImage)) ||
-                    media.find((m) => m.fileUrl);
-  const gallery = media.filter((m) => m.fileUrl && (!heroImage || m.id !== heroImage.id));
+  // Banner (hero): use SPONSOR_BANNER media with lowest priority (media already sorted by priorityRanking,asc)
+  const primaryBannerMedia = media.find((m) => m.fileUrl && (m.eventMediaType === 'SPONSOR_BANNER'));
+  const bannerDisplayUrl = primaryBannerMedia?.fileUrl || sponsor.bannerImageUrl || undefined;
+
+  // Gallery: all media with fileUrl, excluding the primary banner so it does not duplicate in the grid
+  const gallery = media.filter((m) => m.fileUrl && (primaryBannerMedia ? m.id !== primaryBannerMedia.id : true));
 
   // Get preview images (first 12 media items for grid display)
   const previewMedia = gallery.slice(0, 12);
@@ -109,12 +111,12 @@ export default function SponsorDetailsPage() {
       <section className="relative w-full bg-transparent">
         <div className="w-full relative min-h-[200px]">
           {/* Main hero image container */}
-          {(sponsor.bannerImageUrl || heroImage?.fileUrl) && !heroImageError ? (
+          {bannerDisplayUrl && !heroImageError ? (
             <div className="relative w-full flex items-center justify-center min-h-[200px]" style={{ maxWidth: '100%' }}>
               {/* Blurred background image */}
               <div className="absolute inset-0 w-full h-full min-h-[200px]" style={{ zIndex: 0 }}>
                 <Image
-                  src={sponsor.bannerImageUrl || heroImage?.fileUrl || ''}
+                  src={bannerDisplayUrl}
                   alt="Sponsor banner background"
                   fill
                   className="object-cover w-full h-full blur-lg scale-105"
@@ -131,7 +133,7 @@ export default function SponsorDetailsPage() {
               {/* Main hero image */}
               <div className="relative w-full flex items-center justify-center min-h-[200px]" style={{ zIndex: 1, maxWidth: '100%' }}>
                 <Image
-                  src={sponsor.bannerImageUrl || heroImage?.fileUrl || ''}
+                  src={bannerDisplayUrl}
                   alt={`${sponsor.name} Banner`}
                   width={1920}
                   height={1900}

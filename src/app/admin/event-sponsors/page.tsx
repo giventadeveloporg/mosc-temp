@@ -5,8 +5,7 @@ import { FaPlus, FaSearch, FaEdit, FaTrash, FaFilter, FaChevronLeft, FaChevronRi
 import { useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import DataTable, { Column } from '@/components/ui/DataTable';
-import Modal from '@/components/ui/Modal';
-import ConfirmModal from '@/components/ui/Modal';
+import Modal, { ConfirmModal } from '@/components/ui/Modal';
 import ImageUpload from '@/components/ui/ImageUpload';
 import AdminNavigation from '@/components/AdminNavigation';
 import SponsorImageUploadDialog from '@/components/sponsors/SponsorImageUploadDialog';
@@ -40,6 +39,7 @@ export default function EventSponsorsPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [viewDetailsSponsor, setViewDetailsSponsor] = useState<EventSponsorsDTO | null>(null);
   const [selectedSponsor, setSelectedSponsor] = useState<EventSponsorsDTO | null>(null);
 
   // Form state - aligned with DTO schema
@@ -220,11 +220,6 @@ export default function EventSponsorsPage() {
     });
   };
 
-  const openEditModal = (sponsor: EventSponsorsDTO) => {
-    // Navigate to detail/edit page instead of opening modal
-    router.push(`/admin/event-sponsors/${sponsor.id}`);
-  };
-
   const openDeleteModal = (sponsor: EventSponsorsDTO) => {
     setSelectedSponsor(sponsor);
     setIsDeleteModalOpen(true);
@@ -320,16 +315,27 @@ export default function EventSponsorsPage() {
 
   return (
     <div className="w-full overflow-x-hidden box-border" style={{ paddingTop: '120px' }}>
+      {/* Page Title - Above admin group buttons */}
+      <div className="w-full px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 mb-4">
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">Global Sponsors</h1>
+      </div>
       {/* Navigation Section - Full Width, Separate Responsive Container */}
       <div className="w-full px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 mb-6 sm:mb-8">
         <AdminNavigation currentPage="event-sponsors" />
       </div>
       {/* Main Content Section - Constrained Width */}
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-8">
-        {/* Page Header */}
-        <div className="mb-4 sm:mb-6 md:mb-8">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left mb-2">Global Sponsors</h1>
-          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 text-center sm:text-left">(You can add or disassociate these items with any events. Please go to the corresponding event page to manage these associated entities.)</p>
+        {/* Info tip: how to associate sponsors with an event */}
+        <div className="mb-4 sm:mb-6 flex items-start gap-3 p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+          <svg className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div className="text-sm text-blue-800 dark:text-blue-200">
+            <p className="font-semibold mb-1">Associating sponsors with an event</p>
+            <p className="text-blue-700 dark:text-blue-300">
+              To associate a sponsor with a particular event, go to <strong>Manage Events</strong>, open the event, then click the <strong>Event Sponsors</strong> button in the event&apos;s admin button group. There you can add or remove sponsors for that event. This page only manages <strong>global sponsors</strong> (the master list).
+            </p>
+          </div>
         </div>
 
         {/* Toast Message */}
@@ -409,9 +415,9 @@ export default function EventSponsorsPage() {
           columns={columns}
           loading={loading}
           onSort={handleSort}
-          onEdit={openEditModal}
+          onView={(s) => setViewDetailsSponsor(s)}
+          getEditHref={(s) => `/admin/event-sponsors/${s.id}`}
           onDelete={openDeleteModal}
-          onView={openEditModal} // Use onView for row clicks to navigate
           sortKey={sortKey}
           sortDirection={sortDirection}
           emptyMessage="No sponsors found"
@@ -544,6 +550,35 @@ export default function EventSponsorsPage() {
         variant="danger"
       />
 
+      {/* View details modal - same style as admin/media Media Details */}
+      {viewDetailsSponsor && (
+        <Modal
+          isOpen={true}
+          onClose={() => setViewDetailsSponsor(null)}
+          title={viewDetailsSponsor.id != null ? `Sponsor Details #${viewDetailsSponsor.id}` : 'Sponsor Details'}
+          size="lg"
+        >
+          <div className="max-h-[60vh] overflow-y-auto">
+            {Object.entries(viewDetailsSponsor)
+              .filter(([key]) => !key.startsWith('_'))
+              .map(([key, value]) => (
+                <div key={key} className="border-b border-gray-100 py-3 first:pt-0">
+                  <div className="text-sm font-semibold text-gray-700 mb-0.5">
+                    {key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    {typeof value === 'boolean' ? (
+                      <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                        {value ? 'Yes' : 'No'}
+                      </span>
+                    ) : value instanceof Date ? value.toLocaleString() : (key.toLowerCase().includes('date') || key.toLowerCase().includes('at')) && value ? new Date(String(value)).toLocaleString() : value === null || value === undefined || value === '' ? <span className="text-gray-400 italic">(empty)</span> : String(value)}
+                  </div>
+                </div>
+              ))}
+          </div>
+        </Modal>
+      )}
+
       {/* Upload Dialogs */}
       {formData.id && (
         <>
@@ -598,17 +633,39 @@ interface SponsorFormProps {
   onBannerUploadClick?: () => void;
 }
 
+// Map non-standard input names to formData keys to avoid browser "Saved info" autofill (Chrome matches name="name", "email", "tel", etc.)
+const SPONSOR_FORM_FIELD_MAP: Record<string, string> = {
+  sn: 'name',
+  ct: 'type',
+  cn: 'companyName',
+  pr: 'priorityRanking',
+  ce: 'contactEmail',
+  cp: 'contactPhone',
+  wu: 'websiteUrl',
+  ia: 'isActive',
+  tl: 'tagline',
+  dc: 'description',
+  fu: 'facebookUrl',
+  tu: 'twitterUrl',
+  lu: 'linkedinUrl',
+  iu: 'instagramUrl',
+};
+
 function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onLogoUploadClick, onHeroUploadClick, onBannerUploadClick }: SponsorFormProps) {
+  // Prevent browser "Saved info" autofill: all fillable fields start readOnly; first focus anywhere unlocks form
+  const [formAutofillLock, setFormAutofillLock] = React.useState(true);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
+    const formKey = SPONSOR_FORM_FIELD_MAP[name] ?? name;
 
     if (type === 'checkbox') {
       const checked = (e.target as HTMLInputElement).checked;
-      setFormData(prev => ({ ...prev, [name]: checked }));
+      setFormData(prev => ({ ...prev, [formKey]: checked }));
     } else if (type === 'number') {
-      setFormData(prev => ({ ...prev, [name]: Number(value) }));
+      setFormData(prev => ({ ...prev, [formKey]: Number(value) }));
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      setFormData(prev => ({ ...prev, [formKey]: value }));
     }
   };
 
@@ -635,7 +692,12 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onL
   const canUploadImages = !!formData.id;
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-6"
+      autoComplete="off"
+      onFocusCapture={() => setFormAutofillLock(false)}
+    >
       {/* Basic Information */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
@@ -644,10 +706,12 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onL
           </label>
           <input
             type="text"
-            name="name"
+            name="sn"
             value={formData.name || ''}
             onChange={handleChange}
             required
+            autoComplete="off"
+            readOnly={formAutofillLock}
             className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
             placeholder="Enter sponsor name"
           />
@@ -658,10 +722,11 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onL
             Type *
           </label>
           <select
-            name="type"
+            name="ct"
             value={formData.type || ''}
             onChange={handleChange}
             required
+            autoComplete="off"
             className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
           >
             <option value="">Select sponsor type</option>
@@ -672,16 +737,20 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onL
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-foreground mb-1">
+          <label className="block text-sm font-medium text-foreground mb-1" htmlFor="f-cn">
             Company Name
           </label>
           <input
+            id="f-cn"
             type="text"
-            name="companyName"
+            name="cn"
             value={formData.companyName || ''}
             onChange={handleChange}
+            autoComplete="one-time-code"
+            readOnly={formAutofillLock}
             className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
-            placeholder="Enter company name"
+            placeholder="e.g. Acme Inc."
+            aria-label="Company or organization name"
           />
         </div>
 
@@ -691,11 +760,13 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onL
           </label>
           <input
             type="number"
-            name="priorityRanking"
+            name="pr"
             value={formData.priorityRanking || 1}
             onChange={handleChange}
             min="1"
             required
+            autoComplete="off"
+            readOnly={formAutofillLock}
             className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
             placeholder="Enter priority ranking (1 = highest priority)"
           />
@@ -705,30 +776,40 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onL
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-foreground mb-1">
+          <label className="block text-sm font-medium text-foreground mb-1" htmlFor="f-ce">
             Contact Email
           </label>
           <input
-            type="email"
-            name="contactEmail"
+            id="f-ce"
+            type="text"
+            inputMode="email"
+            name="ce"
             value={formData.contactEmail || ''}
             onChange={handleChange}
+            autoComplete="one-time-code"
+            readOnly={formAutofillLock}
             className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
-            placeholder="Enter contact email"
+            placeholder="e.g. name@company.com"
+            aria-label="Contact email address"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-foreground mb-1">
+          <label className="block text-sm font-medium text-foreground mb-1" htmlFor="f-cp">
             Contact Phone
           </label>
           <input
-            type="tel"
-            name="contactPhone"
+            id="f-cp"
+            type="text"
+            inputMode="tel"
+            name="cp"
             value={formData.contactPhone || ''}
             onChange={handleChange}
+            autoComplete="one-time-code"
+            readOnly={formAutofillLock}
             className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
-            placeholder="Enter contact phone"
+            placeholder="e.g. +1 234 567 8900"
+            aria-label="Contact phone number"
           />
         </div>
 
@@ -737,10 +818,13 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onL
             Website URL
           </label>
           <input
-            type="url"
-            name="websiteUrl"
+            type="text"
+            inputMode="url"
+            name="wu"
             value={formData.websiteUrl || ''}
             onChange={handleChange}
+            autoComplete="off"
+            readOnly={formAutofillLock}
             className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
             placeholder="https://example.com"
           />
@@ -749,7 +833,7 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onL
         <div className="flex items-center">
           <input
             type="checkbox"
-            name="isActive"
+            name="ia"
             checked={formData.isActive || false}
             onChange={handleChange}
             className="h-4 w-4 text-primary focus:ring-ring border-border rounded"
@@ -766,10 +850,12 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onL
         </label>
         <input
           type="text"
-          name="tagline"
+          name="tl"
           value={formData.tagline || ''}
           onChange={handleChange}
           maxLength={500}
+          autoComplete="off"
+          readOnly={formAutofillLock}
           className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
           placeholder="Enter sponsor tagline (max 500 characters)"
         />
@@ -780,10 +866,12 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onL
           Description
         </label>
         <textarea
-          name="description"
+          name="dc"
           value={formData.description || ''}
           onChange={handleChange}
           rows={4}
+          autoComplete="off"
+          readOnly={formAutofillLock}
           className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
           placeholder="Enter detailed description about the sponsor"
         />
@@ -797,9 +885,11 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onL
           </label>
           <input
             type="url"
-            name="facebookUrl"
+            name="fu"
             value={formData.facebookUrl || ''}
             onChange={handleChange}
+            autoComplete="off"
+            readOnly={formAutofillLock}
             className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
             placeholder="https://facebook.com/sponsor"
           />
@@ -811,9 +901,11 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onL
           </label>
           <input
             type="url"
-            name="twitterUrl"
+            name="tu"
             value={formData.twitterUrl || ''}
             onChange={handleChange}
+            autoComplete="off"
+            readOnly={formAutofillLock}
             className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
             placeholder="https://twitter.com/sponsor"
           />
@@ -825,9 +917,11 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onL
           </label>
           <input
             type="url"
-            name="linkedinUrl"
+            name="lu"
             value={formData.linkedinUrl || ''}
             onChange={handleChange}
+            autoComplete="off"
+            readOnly={formAutofillLock}
             className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
             placeholder="https://linkedin.com/company/sponsor"
           />
@@ -839,9 +933,11 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onL
           </label>
           <input
             type="url"
-            name="instagramUrl"
+            name="iu"
             value={formData.instagramUrl || ''}
             onChange={handleChange}
+            autoComplete="off"
+            readOnly={formAutofillLock}
             className="w-full border border-border rounded-lg px-3 py-2 bg-input text-foreground focus:ring-2 focus:ring-ring focus:border-ring reverent-transition"
             placeholder="https://instagram.com/sponsor"
           />
@@ -951,20 +1047,41 @@ function SponsorForm({ formData, setFormData, onSubmit, loading, submitText, onL
         </div>
       )}
 
-      <div className="flex justify-end space-x-3 pt-4">
+      <div className="flex justify-end gap-3 pt-4">
         <button
           type="button"
           onClick={() => window.history.back()}
-          className="px-4 py-2 text-sm font-medium text-foreground bg-card border border-border rounded-md hover:bg-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring reverent-transition"
+          className="flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 px-6 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          title="Cancel"
+          aria-label="Cancel"
         >
-          Cancel
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-200 flex items-center justify-center">
+            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </div>
+          <span className="font-semibold text-blue-700">Cancel</span>
         </button>
         <button
           type="submit"
           disabled={loading}
-          className="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary border border-transparent rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring reverent-transition disabled:opacity-50"
+          className="flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 px-6 transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+          title={loading ? 'Saving...' : submitText}
+          aria-label={loading ? 'Saving...' : submitText}
         >
-          {loading ? 'Saving...' : submitText}
+          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
+            {loading ? (
+              <svg className="animate-spin w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+            ) : (
+              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+          </div>
+          <span className="font-semibold text-green-700">{loading ? 'Saving...' : submitText}</span>
         </button>
       </div>
     </form>

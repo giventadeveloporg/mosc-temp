@@ -299,7 +299,8 @@ export default function SyroFooter() {
             <div className="footer-bottom">
               <p className="text-white text-center mb-2 d-block d-lg-none">Giventa Inc. USA</p>
               <p className="text-white text-center mb-2 d-block d-lg-none">
-                © {currentYear()} The Malankara Orthodox Church. All rights reserved.
+                © {currentYear()} The Malankara Orthodox Church.
+                <span className="block mt-1">All rights reserved.</span>
               </p>
             </div>
           </div>

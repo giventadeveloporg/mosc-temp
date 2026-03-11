@@ -307,7 +307,7 @@ const Footer = () => {
               >
                 Malayalees US Charity Organization
               </Link>
-              . All rights reserved. Making hope happen.
+              .<span className="block md:inline"> All rights reserved.</span> Making hope happen.
             </p>
 
             <nav className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-6">

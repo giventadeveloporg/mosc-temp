@@ -80,19 +80,19 @@ export default function SyroPageBanner({ title, centerText, breadcrumbFrom = 'ho
   const config = BREADCRUMB_CONFIG[breadcrumbFrom];
   return (
     <section
-      className="relative flex h-[150px] items-center overflow-hidden uppercase"
+      className="relative flex min-h-[150px] h-auto items-center overflow-hidden uppercase py-4 md:py-0 md:h-[150px]"
       style={{
         background: 'linear-gradient(-90deg, #dc354662, #ff790348)',
       }}
     >
-      <div className="relative z-10 flex h-full w-full items-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className={`flex h-full w-full items-center ${centerText ? 'justify-center' : 'justify-between'}`}>
-          <div className={`flex flex-col justify-center ${centerText ? 'text-center' : 'pr-24 md:pr-40'}`}>
-            <h2 className="font-syro-display text-2xl font-semibold text-syro-blue uppercase tracking-wide">
+      <div className="relative z-10 flex h-full min-h-full w-full items-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className={`flex h-full min-h-full w-full items-center ${centerText ? 'justify-center' : 'justify-between'}`}>
+          <div className={`syro-banner-content flex flex-col justify-center min-w-0 flex-1 ${centerText ? 'text-center' : 'pr-24 md:pr-40'}`}>
+            <h2 className="font-syro-display text-base sm:text-xl lg:text-2xl font-semibold text-syro-blue uppercase tracking-wide break-words">
               {title}
             </h2>
             <nav aria-label="Breadcrumb" className="mt-1">
-              <ol className={`flex flex-wrap items-center gap-x-1.5 text-sm font-medium uppercase tracking-wide ${centerText ? 'justify-center' : ''}`}>
+              <ol className={`flex flex-wrap items-center gap-x-1.5 text-xs sm:text-sm font-medium uppercase tracking-wide ${centerText ? 'justify-center' : ''}`}>
                 <li>
                   <Link
                     href={config.href}

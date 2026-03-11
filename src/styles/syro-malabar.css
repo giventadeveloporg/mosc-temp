@@ -426,7 +426,7 @@ body:has(.syro-layout) {
     position: relative;
     margin-left: 0;
     margin-bottom: 0;
-    padding-left: 15px;
+    padding-left: 8px;
     border-left: 5px solid #dc3545;
   }
 
@@ -947,6 +947,50 @@ body:has(.syro-layout) {
 
 /* ===== MOSC mobile view: content alignment (reference: syromalabarchurch.in) ===== */
 @media screen and (max-width: 767px) {
+  /* Breadcrumb / page banner section (first section in mainContent): smaller text on mobile so title and breadcrumb fit */
+  .syro-layout #mainContent.syro-main section:first-of-type {
+    min-height: 120px !important;
+    height: auto !important;
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+    align-items: center !important;
+  }
+  .syro-layout #mainContent.syro-main section:first-of-type h2,
+  .syro-layout #mainContent.syro-main section:first-of-type .font-syro-display {
+    font-size: 0.875rem !important;
+    line-height: 1.3 !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+  .syro-layout #mainContent.syro-main section:first-of-type nav,
+  .syro-layout #mainContent.syro-main section:first-of-type nav ol {
+    font-size: 0.6875rem !important;
+    line-height: 1.35 !important;
+  }
+}
+
+/* Breadcrumb / page banner (first section): vertical alignment of text on all pages and viewports */
+.syro-layout #mainContent.syro-main section:first-of-type {
+  display: flex !important;
+  align-items: center !important;
+}
+.syro-layout #mainContent.syro-main section:first-of-type > div {
+  display: flex !important;
+  align-items: center !important;
+  min-height: 100% !important;
+}
+.syro-layout #mainContent.syro-main section:first-of-type > div > div {
+  display: flex !important;
+  align-items: center !important;
+  min-height: 100% !important;
+}
+.syro-layout #mainContent.syro-main section:first-of-type .syro-banner-content {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+}
+
+@media screen and (max-width: 767px) {
   .syro-layout .container,
   .syro-layout main .container {
     width: 100% !important;
@@ -1106,6 +1150,20 @@ body:has(.syro-layout) {
     display: none !important;
   }
 
+  /* Red vertical line for section headings (match Our Saints & Blessed): About Us, Liturgical Calendar, Our Presence */
+  .syro-layout section.about-us .section-title,
+  .syro-layout section.liturgy .section-title,
+  .syro-layout section.syromalabar-locations .section-title {
+    padding-left: 8px !important;
+    border-left: 5px solid #dc3545 !important;
+  }
+
+  /* Our Saints & Blesseds h6: align text left in mobile view */
+  .syro-layout .syro-saints-container .our-saints-section-title h6,
+  .syro-layout section.about-us .our-saints-container .our-saints-section-title h6 {
+    text-align: left !important;
+  }
+
   /* Circular notification: stack columns */
   .syro-layout section.Circularnotification .row {
     flex-direction: column !important;
@@ -1177,6 +1235,10 @@ body:has(.syro-layout) {
   .syro-layout .syro-cardinal-section .syro-cardinal-heading,
   .syro-layout .syro-cardinal-section .syro-cardinal-name-bar {
     text-align: center !important;
+  }
+
+  .syro-layout .syro-cardinal-section .syro-cardinal-heading {
+    text-align: left !important;
   }
 
   .syro-layout .syro-cardinal-section .syro-cardinal-name-bar {

@@ -19,11 +19,17 @@ export interface DataTableProps<T> {
   onEdit?: (item: T) => void;
   onDelete?: (item: T) => void;
   onView?: (item: T) => void;
+  /** When provided, View action is rendered as a link so right-click shows "Open link in new tab" */
+  getViewHref?: (item: T) => string;
+  /** When provided, Edit action is rendered as a link so right-click shows "Open link in new tab" */
+  getEditHref?: (item: T) => string;
   sortKey?: string;
   sortDirection?: 'asc' | 'desc';
   emptyMessage?: string;
   className?: string;
 }
+
+const actionButtonClass = 'flex-shrink-0 w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110';
 
 export default function DataTable<T extends Record<string, any>>({
   data,
@@ -33,11 +39,16 @@ export default function DataTable<T extends Record<string, any>>({
   onEdit,
   onDelete,
   onView,
+  getViewHref,
+  getEditHref,
   sortKey,
   sortDirection,
   emptyMessage = 'No data available',
   className = '',
 }: DataTableProps<T>) {
+  const hasView = onView || getViewHref;
+  const hasEdit = onEdit || getEditHref;
+  const hasActions = hasView || hasEdit || onDelete;
   const handleSort = (key: string) => {
     if (!onSort) return;
 
@@ -182,7 +193,7 @@ export default function DataTable<T extends Record<string, any>>({
                     </div>
                   </th>
                 ))}
-                {(onEdit || onDelete || onView) && (
+                {hasActions && (
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
@@ -193,7 +204,7 @@ export default function DataTable<T extends Record<string, any>>({
               {data.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={columns.length + (onEdit || onDelete || onView ? 1 : 0)}
+                    colSpan={columns.length + (hasActions ? 1 : 0)}
                     className="px-6 py-12 text-center text-gray-500"
                   >
                     {emptyMessage}
@@ -203,8 +214,8 @@ export default function DataTable<T extends Record<string, any>>({
                 data.map((item, index) => (
                   <tr
                     key={index}
-                    className={`hover:bg-gray-50 ${onView ? 'cursor-pointer' : ''}`}
-                    onClick={() => onView && onView(item)}
+                    className={`hover:bg-gray-50 ${hasView ? 'cursor-pointer' : ''}`}
+                    onClick={() => hasView && (getViewHref ? window.open(getViewHref(item), '_blank', 'noopener,noreferrer') : onView?.(item))}
                   >
                     {columns.map((column) => (
                       <td
@@ -216,13 +227,28 @@ export default function DataTable<T extends Record<string, any>>({
                           : item[column.key]}
                       </td>
                     ))}
-                    {(onEdit || onDelete || onView) && (
+                    {hasActions && (
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-                          {onView && (
+                          {hasView && (getViewHref ? (
+                            <a
+                              href={getViewHref(item)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={`${actionButtonClass} bg-green-100 hover:bg-green-200`}
+                              title="View (opens in new tab)"
+                              aria-label="View (opens in new tab)"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              </svg>
+                            </a>
+                          ) : (
                             <button
-                              onClick={() => onView(item)}
-                              className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                              onClick={() => onView?.(item)}
+                              className={`${actionButtonClass} bg-green-100 hover:bg-green-200`}
                               title="View"
                               aria-label="View"
                             >
@@ -231,11 +257,23 @@ export default function DataTable<T extends Record<string, any>>({
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                               </svg>
                             </button>
-                          )}
-                          {onEdit && (
+                          ))}
+                          {hasEdit && (getEditHref ? (
+                            <a
+                              href={getEditHref(item)}
+                              className={`${actionButtonClass} bg-blue-100 hover:bg-blue-200`}
+                              title="Edit"
+                              aria-label="Edit"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                              </svg>
+                            </a>
+                          ) : (
                             <button
-                              onClick={() => onEdit(item)}
-                              className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                              onClick={() => onEdit?.(item)}
+                              className={`${actionButtonClass} bg-blue-100 hover:bg-blue-200`}
                               title="Edit"
                               aria-label="Edit"
                             >
@@ -243,7 +281,7 @@ export default function DataTable<T extends Record<string, any>>({
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                               </svg>
                             </button>
-                          )}
+                          ))}
                           {onDelete && (
                             <button
                               onClick={() => {

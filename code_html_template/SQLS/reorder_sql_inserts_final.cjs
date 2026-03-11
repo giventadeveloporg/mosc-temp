@@ -18,6 +18,9 @@ const TABLE_ORDER = [
   'event_calendar_entry',
   'event_live_update',
   'event_live_update_attachment',
+  'event_sponsors',      // parent of event_media.sponsor_id (fk_event_media_sponsor_id)
+  'event_sponsors_join',
+  'gallery_album',   // parent of event_media.album_id (fk_event_media_album_id)
   'event_media',
   'event_organizer',
   'event_poll',
@@ -34,6 +37,7 @@ const TABLE_ORDER = [
   'tenant_organization',
   'tenant_settings',
   'tenant_email_addresses',
+  'satellite_domain',
   'user_payment_transaction',
   'user_subscription',
   'user_task',
@@ -41,8 +45,6 @@ const TABLE_ORDER = [
   'event_emails',
   'event_featured_performers',
   'event_program_directors',
-  'event_sponsors',
-  'event_sponsors_join',
   'executive_committee_team_members',
   'event_recurrence_series',
   'focus_group',
@@ -147,6 +149,26 @@ function main() {
         tableInserts[table] = [];
       }
       tableInserts[table].push(statement);
+    }
+  }
+
+  // Deduplicate by primary key (first value in VALUES) for tables that can have duplicate ids in export
+  const TABLES_DEDUPE_BY_ID = ['satellite_domain'];
+  const valuesIdRegex = /VALUES\s*\(\s*(\d+)/;
+  for (const table of TABLES_DEDUPE_BY_ID) {
+    if (!tableInserts[table] || tableInserts[table].length <= 1) continue;
+    const byId = new Map(); // id -> statement (last occurrence wins)
+    for (const stmt of tableInserts[table]) {
+      const m = stmt.match(valuesIdRegex);
+      const id = m ? m[1] : null;
+      if (id != null) byId.set(id, stmt);
+      else byId.set(stmt, stmt);
+    }
+    const before = tableInserts[table].length;
+    tableInserts[table] = Array.from(byId.values());
+    const after = tableInserts[table].length;
+    if (before > after) {
+      console.log(`   • Deduplicated ${table}: ${before} → ${after} insert(s) by id`);
     }
   }
 

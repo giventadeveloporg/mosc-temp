@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import FocusGroupCoverImageUpload from '@/components/FocusGroupCoverImageUpload';
 import FocusGroupEventSearch from './components/FocusGroupEventSearch';
 import AssociatedEventsTable from './components/AssociatedEventsTable';
@@ -24,9 +25,9 @@ export default function FocusGroupEditForm({
   initialEvents = [],
   initialTotalCount = 0,
 }: FocusGroupEditFormProps) {
+  const router = useRouter();
   const [coverImageUrl, setCoverImageUrl] = useState<string | undefined>(group?.coverImageUrl);
   const [isActive, setIsActive] = useState(initialIsActive(group));
-  const [refreshKey, setRefreshKey] = useState(0);
 
   const handleImageUploaded = (imageUrl: string) => {
     setCoverImageUrl(imageUrl);
@@ -43,8 +44,13 @@ export default function FocusGroupEditForm({
   };
 
   const handleEventAssociated = () => {
-    // Trigger refresh of the events table
-    setRefreshKey(prev => prev + 1);
+    // Refresh server data so the table receives updated initialEvents/initialTotalCount (all linked events)
+    router.refresh();
+  };
+
+  const handleEventUnlinked = () => {
+    // Refresh server data so the table receives updated initialEvents/initialTotalCount after unlink
+    router.refresh();
   };
 
   return (
@@ -127,10 +133,10 @@ export default function FocusGroupEditForm({
 
       {/* Associated Events Table - Below form */}
       <AssociatedEventsTable
-        key={refreshKey}
         focusGroupId={focusGroupId}
         initialEvents={initialEvents}
         initialTotalCount={initialTotalCount}
+        onUnlinked={handleEventUnlinked}
       />
     </div>
   );
