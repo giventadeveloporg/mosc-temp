@@ -4907,7 +4907,7 @@ CREATE TRIGGER trg_satellite_domain_updated_at
     EXECUTE FUNCTION public.update_updated_at_column();
 
 -- Seed existing satellite domains from config/satellites.json
-
+--seed removed
 -- =====================================================
 -- NEWS PORTAL TABLES
 -- =====================================================
