@@ -419,7 +419,12 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [openMobileDropdowns, setOpenMobileDropdowns] = useState<Record<string, boolean>>({});
 
-  // CRITICAL: Check for sign-out flag IMMEDIATELY on mount, before Clerk loads
+  // CRITICAL: Check for sign-out flag and call signOut() on satellite domain.
+  // Just clearing localStorage is NOT enough — Clerk stores session in HTTP-only cookies
+  // that can only be cleared via signOut(). Without this, the avatar/admin menu persist.
+  const [pendingSignOut, setPendingSignOut] = useState(false);
+
+  // Phase 1: Detect flag on mount (runs immediately, before Clerk loads)
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -427,21 +432,42 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
     const clerkSignedOut = urlParams.get('clerk_signout');
 
     if (clerkSignedOut === 'true') {
-      console.log('[Header] Detected clerk_signout=true flag');
+      console.log('[Header] Detected clerk_signout=true flag, waiting for Clerk to load...');
+      setPendingSignOut(true);
 
-      // Clear all Clerk-related items from localStorage
+      // Clean URL immediately so the flag doesn't persist on reload
+      urlParams.delete('clerk_signout');
+      const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+      window.history.replaceState({}, '', newUrl);
+    }
+  }, []);
+
+  // Phase 2: Once Clerk is loaded, call signOut() to clear the session properly
+  useEffect(() => {
+    if (!pendingSignOut || !isLoaded) return;
+
+    const performSignOut = async () => {
+      console.log('[Header] Clerk loaded, calling signOut() on satellite domain...');
+      try {
+        await signOut();
+        console.log('[Header] signOut() completed on satellite domain');
+      } catch (error) {
+        console.error('[Header] signOut() error on satellite:', error);
+      }
+
+      // Clear localStorage as backup
       Object.keys(localStorage).forEach(key => {
         if (key.includes('clerk') || key.includes('__clerk')) {
           localStorage.removeItem(key);
         }
       });
 
-      // Remove flag from URL and reload
-      urlParams.delete('clerk_signout');
-      const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
-      window.location.replace(newUrl);
-    }
-  }, []);
+      setPendingSignOut(false);
+      window.location.replace(window.location.pathname);
+    };
+
+    performSignOut();
+  }, [pendingSignOut, isLoaded, signOut]);
 
   // Debug: Log auth state changes
   useEffect(() => {
