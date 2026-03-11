@@ -42,6 +42,12 @@ export default function SponsorEditClient({
   // Media refresh state
   const [mediaRefreshKey, setMediaRefreshKey] = useState(0);
 
+  // Search and filter for Overview media section (same pattern as admin media page)
+  const [mediaSearchTerm, setMediaSearchTerm] = useState('');
+  const [filterBannerOnly, setFilterBannerOnly] = useState(false);
+  const [filterLogoOnly, setFilterLogoOnly] = useState(false);
+  const [filterHeroOnly, setFilterHeroOnly] = useState(false);
+
   React.useEffect(() => {
     if (toastMessage) {
       const timer = setTimeout(() => setToastMessage(null), 5000);
@@ -453,9 +459,58 @@ export default function SponsorEditClient({
       {/* Overview Section with Paginated Media Files */}
       <div className="bg-card rounded-lg sacred-shadow p-6">
         <h2 className="font-heading font-semibold text-2xl text-foreground mb-4">Overview</h2>
-        <p className="font-body text-muted-foreground mb-6">
+        <p className="font-body text-muted-foreground mb-4">
           Media files associated with this sponsor. Files are sorted by priority ranking (lower = higher priority).
         </p>
+
+        {/* Search Media bar + type filters (same pattern as admin media page) */}
+        <div className="mb-8 bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-xl font-bold text-gray-800 mb-4">Search Media</h3>
+          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center">
+            <div className="w-full lg:w-[560px] lg:flex-shrink-0 flex-grow">
+              <label htmlFor="sponsor-media-search" className="block text-sm font-medium text-gray-700 mb-1">
+                Search by Title
+              </label>
+              <input
+                id="sponsor-media-search"
+                type="text"
+                placeholder="Enter media title to search..."
+                value={mediaSearchTerm}
+                onChange={(e) => setMediaSearchTerm(e.target.value)}
+                className="w-full min-w-0 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              />
+            </div>
+            <div className="flex flex-wrap items-center gap-4 lg:flex-shrink-0 lg:ml-auto">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={filterBannerOnly}
+                  onChange={(e) => setFilterBannerOnly(e.target.checked)}
+                  className="h-4 w-4 text-primary focus:ring-ring border-border rounded"
+                />
+                <span className="text-sm font-medium text-gray-700 select-none">Banner images</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={filterLogoOnly}
+                  onChange={(e) => setFilterLogoOnly(e.target.checked)}
+                  className="h-4 w-4 text-primary focus:ring-ring border-border rounded"
+                />
+                <span className="text-sm font-medium text-gray-700 select-none">Logo images</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={filterHeroOnly}
+                  onChange={(e) => setFilterHeroOnly(e.target.checked)}
+                  className="h-4 w-4 text-primary focus:ring-ring border-border rounded"
+                />
+                <span className="text-sm font-medium text-gray-700 select-none">Hero images</span>
+              </label>
+            </div>
+          </div>
+        </div>
 
         <PaginatedMediaList
           sponsorId={sponsor.id!}
@@ -465,6 +520,10 @@ export default function SponsorEditClient({
           pageSize={pageSize}
           totalPages={totalPages}
           refreshKey={mediaRefreshKey}
+          searchTerm={mediaSearchTerm}
+          filterBannerOnly={filterBannerOnly}
+          filterLogoOnly={filterLogoOnly}
+          filterHeroOnly={filterHeroOnly}
         />
       </div>
 

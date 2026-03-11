@@ -48,6 +48,15 @@ body:has(.syro-layout) {
   min-height: 0;
 }
 
+/* Sticky header on MOSC: keep header bar at top while scrolling */
+.syro-layout header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(11, 40, 72, 0.08);
+}
+
 /* Main content: full width, no extra padding (match syromalabarchurch.in #mainContent) */
 #mainContent.syro-main,
 .syro-layout .syro-main {
@@ -158,6 +167,7 @@ body:has(.syro-layout) {
   color: #0b2848;
   text-decoration: none;
   font-size: 0.75rem;
+  font-weight: 600;
 }
 #syro-header-bar .main-menu .btn-link {
   color: #0b2848;
@@ -189,7 +199,7 @@ body:has(.syro-layout) {
   overflow-x: auto;
 }
 .syro-quicklinks-inner {
-  font-size: calc(0.875rem * 0.75);
+  font-size: 0.875rem;
   column-gap: 0.5rem;
   row-gap: 0;
   white-space: nowrap;
@@ -220,7 +230,7 @@ body:has(.syro-layout) {
 .syro-quicklinks-bar .syro-quicklink {
   color: #0b2848;
   text-decoration: none;
-  padding: 0.2rem 0.35rem;
+  padding: 0.3rem 0.5rem;
   border-radius: 2px;
   white-space: nowrap;
 }
@@ -404,12 +414,14 @@ body:has(.syro-layout) {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12;
   }
 
-  /* Saints block inside About: no extra max-width, align to column (match syromalabarchurch.in) */
+  /* Saints block inside About: no extra max-width, align to column (match syromalabarchurch.in).
+   * Extra margin-top moves section down so title and slider are not hidden by the right-column
+   * decorative images (cross/circle) that overlap from the about-images column. */
   .about-data .our-saints-container.syro-saints-container {
     max-width: none;
     margin-left: 0;
     margin-right: 0;
-    margin-top: 28px;
+    margin-top: 72px;
     margin-bottom: 0;
     padding: 0;
     position: relative;
@@ -448,6 +460,15 @@ body:has(.syro-layout) {
   }
   .about-data .syro-saints-slider-container {
     margin-top: 24px;
+  }
+  /* Desktop: saints block and slider spacing so title is visible */
+  @media (min-width: 768px) {
+    .about-data .our-saints-container.syro-saints-container {
+      margin-top: 100px;
+    }
+    .about-data .our-saints-container.syro-saints-container .our-saints-slider-container.syro-saints-slider-container {
+      margin-top: 56px;
+    }
   }
 
   /* Viewport: no scrollbar, no page movement (like static tiny-slider) */
