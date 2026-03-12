@@ -160,35 +160,31 @@ export default async function DirectoryPage() {
 
   return (
     <div className="bg-syro-bg-gray">
-      <SyroPageBanner title="Directory" breadcrumbFrom="home" />
+      <SyroPageBanner
+        title="Directory"
+        breadcrumbFrom="home"
+        description={leadText}
+      />
 
       {/* Content - same layout and design as /mosc/administration */}
       <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Intro card - same structure as administration (title + content, no icon) */}
-          <div className="bg-white p-10 rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] mb-16">
-            <h2 className="font-syro-display text-[2.2rem] font-bold text-black mb-5">
-              Malankara Orthodox Directory
-            </h2>
-            <p className="font-syro-primary text-xl text-syro-dark-gray leading-relaxed mb-8">
-              {leadText}
-            </p>
-            <div className="flex justify-center">
-              <a
-                href="https://directory.mosc.in/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="syro-primary-button inline-flex items-center gap-2 px-8 py-4 font-body font-semibold text-lg"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
-                <span>Access Directory at directory.mosc.in</span>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </a>
-            </div>
+          {/* Access Directory button below breadcrumb */}
+          <div className="flex justify-center mb-16">
+            <a
+              href="https://directory.mosc.in/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="syro-primary-button inline-flex items-center gap-2 px-8 py-4 font-body font-semibold text-lg"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+              <span>Access Directory at directory.mosc.in</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
           </div>
 
           {/* Section title - left red bar (same as administration) */}

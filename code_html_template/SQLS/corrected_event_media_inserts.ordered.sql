@@ -952,6 +952,8 @@ INSERT INTO public.promotion_email_sent_log (id, tenant_id, template_id, event_i
 
 INSERT INTO public.promotion_email_sent_log (id, tenant_id, template_id, event_id, recipient_email, subject, promotion_code, discount_code_id, sent_at, is_test_email, email_status, error_message, sent_by_id) VALUES (8305, 'tenant_demo_002', 5052, NULL, 'giventauser@gmail.com', 'giventauser@gmail.com', NULL, NULL, '2026-02-12 12:41:18.930288', true, 'SENT', NULL, NULL);
 
+INSERT INTO public.promotion_email_sent_log (id, tenant_id, template_id, event_id, recipient_email, subject, promotion_code, discount_code_id, sent_at, is_test_email, email_status, error_message, sent_by_id) VALUES (8422, 'tenant_demo_002', 4102, 2, 'giventauser@gmail.com', 'template 1', NULL, NULL, '2026-03-12 17:57:51.1386', true, 'SENT', NULL, NULL);
+
 INSERT INTO public.manual_payment_request (id, tenant_id, event_id, ticket_transaction_id, requester_email, requester_first_name, requester_last_name, requester_phone, amount_due, payment_method_type, payment_handle, payment_instructions, status, proof_of_payment_file_key, proof_of_payment_file_url, proof_of_payment_uploaded_at, received_at, received_by, void_reason, created_at, updated_at) VALUES (7451, 'tenant_demo_002', 4201, 7501, 'giventauser@gmail.com', NULL, NULL, '3123430073', 0.70, 'ZELLE_MANUAL', NULL, NULL, 'REQUESTED', NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-19 06:16:28.36327', '2026-01-19 06:16:28.36327');
 
 INSERT INTO public.manual_payment_request (id, tenant_id, event_id, ticket_transaction_id, requester_email, requester_first_name, requester_last_name, requester_phone, amount_due, payment_method_type, payment_handle, payment_instructions, status, proof_of_payment_file_key, proof_of_payment_file_url, proof_of_payment_uploaded_at, received_at, received_by, void_reason, created_at, updated_at) VALUES (7452, 'tenant_demo_002', 4201, 7502, 'giventauser@gmail.com', NULL, NULL, '3123430073', 0.60, 'VENMO_MANUAL', NULL, NULL, 'REQUESTED', NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-19 06:29:19.829396', '2026-01-19 07:11:04.146987');
@@ -1478,6 +1480,28 @@ INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tena
 	VALUES (?, ?, ?, ?)
 ]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
   Detail: Key (job_instance_id)=(9) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4677, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-11 23:59:59.117156', '2026-03-11 23:59:59.2218', 104, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(10) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4679, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-12 05:59:59.13956', '2026-03-12 05:59:59.237076', 97, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(11) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4681, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-12 11:59:59.084166', '2026-03-12 11:59:59.197509', 113, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(12) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4683, 'promotionTestEmailJob', 'PROMOTION_TEST_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-03-12 17:57:49.379157', '2026-03-12 17:57:51.117043', 1737, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","templateId":4102,"recipientEmail":"giventauser@gmail.com"}');
+
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4685, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-12 17:59:58.888527', '2026-03-12 17:59:58.935889', 47, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(13) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 
 INSERT INTO public.batch_job_instance (job_instance_id, version, job_name, job_key) VALUES (1, 0, 'subscriptionRenewalJob', '6a7abbacc0380f19c0822f89e35b997e');
 
