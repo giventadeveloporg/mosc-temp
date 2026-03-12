@@ -2,7 +2,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import ContactForm from '../email/components/ContactForm';
 import QuickLinks from '../components/QuickLinks';
-import SyroPageHero from '../components/SyroPageHero';
+import SyroPageBanner from '../components/SyroPageBanner';
 
 export const metadata: Metadata = {
   title: 'Contact Us',
@@ -10,12 +10,16 @@ export const metadata: Metadata = {
     'Get in touch with the Malankara Orthodox Syrian Church. Send us your questions, feedback, or prayer requests.',
 };
 
+const BANNER_DESCRIPTION =
+  'We would love to hear from you. Please fill out the form below and we will get back to you as soon as possible.';
+
 export default function ContactFormEmailPage() {
   return (
     <div className="bg-syro-bg-gray">
-      <SyroPageHero
+      <SyroPageBanner
         title="Contact Us"
-        description="We would love to hear from you. Please fill out the form below and we will get back to you as soon as possible."
+        breadcrumbFrom="home"
+        description={BANNER_DESCRIPTION}
       />
 
       {/* Contact Form Section */}

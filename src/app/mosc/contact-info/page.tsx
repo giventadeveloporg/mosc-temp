@@ -1,7 +1,6 @@
 import React from 'react';
 import QuickLinks from '../components/QuickLinks';
 import SyroPageBanner from '../components/SyroPageBanner';
-import SyroSectionTitle from '../components/SyroSectionTitle';
 
 export const metadata = {
   title: 'Contact Info | MOSC',
@@ -37,13 +36,19 @@ const ContactInfoPage = () => {
     }
   };
 
+  const BANNER_DESCRIPTION =
+    'Contact information for the Malankara Orthodox Syrian Church headquarters at Catholicate Palace, Kottayam, Kerala, India.';
+
   return (
     <div className="bg-syro-bg-gray">
-      <SyroPageBanner title="Contact Info" breadcrumbFrom="home" />
+      <SyroPageBanner
+        title="Contact Info"
+        breadcrumbFrom="home"
+        description={BANNER_DESCRIPTION}
+      />
 
       <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <SyroSectionTitle>Contact Information</SyroSectionTitle>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
             {/* Address Card */}
             <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">

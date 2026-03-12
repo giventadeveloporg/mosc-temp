@@ -48,13 +48,15 @@ body:has(.syro-layout) {
   min-height: 0;
 }
 
-/* Sticky header on MOSC: keep header bar at top while scrolling */
-.syro-layout header {
+/* Sticky header + Quick Links bar on MOSC: keep both at top while scrolling; no shadow below header */
+.syro-layout .syro-sticky-header-wrapper {
   position: sticky;
   top: 0;
   z-index: 1000;
   background: #fff;
-  box-shadow: 0 1px 3px rgba(11, 40, 72, 0.08);
+}
+.syro-layout .syro-sticky-header-wrapper header {
+  background: #fff;
 }
 
 /* Main content: full width, no extra padding (match syromalabarchurch.in #mainContent) */
@@ -111,6 +113,13 @@ body:has(.syro-layout) {
   color: #000 !important;
 }
 
+/* Locations panel (section 7): white text on blue background – override #mainContent h3/p */
+#mainContent section.syromalabar-locations .syro-locations-panel h3,
+#mainContent section.syromalabar-locations .syro-locations-panel p,
+#mainContent section.syromalabar-locations .syro-locations-panel .syro-locations-text-content {
+  color: #ffffff !important;
+}
+
 /* Selected sidebar item: all text (including p) must be white on red background */
 #mainContent a.bg-syro-red p,
 #mainContent a.bg-syro-red span {
@@ -155,6 +164,102 @@ body:has(.syro-layout) {
   pointer-events: none;
 }
 
+/* Worldwide Locations panel (below heading): dark blue gradient, text block, map, CTA – match syromalabarchurch.in */
+.syro-locations-panel {
+  position: relative;
+  background: #004e92;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 1.5rem;
+  padding: 2rem 1.5rem 1.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* Subtle dot pattern top-right */
+.syro-locations-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40%;
+  height: 50%;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.08) 2px, transparent 2px);
+  background-size: 12px 12px;
+  pointer-events: none;
+}
+
+.syro-locations-panel-inner {
+  position: relative;
+  z-index: 1;
+}
+
+.syro-locations-text-block {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.syro-locations-accent-bar {
+  flex-shrink: 0;
+  width: 6px;
+  min-height: 56px;
+  background: linear-gradient(180deg, #f0a050 0%, #e85c4a 50%, #dc3545 100%);
+  border-radius: 3px;
+  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.25);
+}
+
+.syro-locations-text-content {
+  flex: 1;
+  color: #ffffff !important;
+}
+
+.syro-locations-panel-title {
+  color: #ffffff !important;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 0.35rem 0;
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+}
+
+.syro-locations-panel-desc {
+  color: #ffffff !important;
+  font-size: 1rem;
+  font-weight: 400;
+  margin: 0;
+  opacity: 0.95;
+  line-height: 1.4;
+}
+
+.syro-locations-map-wrap {
+  width: 100%;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.syro-locations-map-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  vertical-align: middle;
+}
+
+/* Cursor pointer when hovering over location pin areas on the map */
+.syro-locations-map-wrap area[href] {
+  cursor: pointer;
+}
+
+.syro-locations-cta {
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin: 0;
+  opacity: 0.95;
+}
+
 /* Nav bar: always show nav items and menu icon (Bootstrap collapse is hidden by default) */
 #syro-header-bar .navbar-collapse.collapse {
   display: flex !important;
@@ -197,6 +302,7 @@ body:has(.syro-layout) {
   border-top: 1px solid rgba(0, 0, 0, 0.06);
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   overflow-x: auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 .syro-quicklinks-inner {
   font-size: 0.875rem;
@@ -421,7 +527,7 @@ body:has(.syro-layout) {
     max-width: none;
     margin-left: 0;
     margin-right: 0;
-    margin-top: 72px;
+    margin-top: 48px;
     margin-bottom: 0;
     padding: 0;
     position: relative;
@@ -464,10 +570,10 @@ body:has(.syro-layout) {
   /* Desktop: saints block and slider spacing so title is visible */
   @media (min-width: 768px) {
     .about-data .our-saints-container.syro-saints-container {
-      margin-top: 100px;
+      margin-top: 76px;
     }
     .about-data .our-saints-container.syro-saints-container .our-saints-slider-container.syro-saints-slider-container {
-      margin-top: 56px;
+      margin-top: 40px;
     }
   }
 
@@ -1371,9 +1477,19 @@ body:has(.syro-layout) {
     text-align: center !important;
   }
 
-  .syro-layout section.syromalabar-locations .location-map {
-    padding: 1rem !important;
-    margin: 1.5rem 0 !important;
+  .syro-layout section.syromalabar-locations .syro-locations-panel {
+    padding: 1.25rem 1rem 1rem !important;
+    margin-top: 1rem !important;
+  }
+
+  .syro-layout section.syromalabar-locations .syro-locations-panel-title {
+    font-size: 1.25rem !important;
+    color: #ffffff !important;
+  }
+
+  .syro-layout section.syromalabar-locations .syro-locations-panel-desc {
+    font-size: 0.95rem !important;
+    color: #ffffff !important;
   }
 
   /* Quick links bar (below header): prevent horizontal overflow */

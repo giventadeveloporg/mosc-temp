@@ -56,6 +56,7 @@ export default function SyroHeader() {
 
   return (
     <>
+      <div className="syro-sticky-header-wrapper">
       <header>
         <div id="syro-header-bar" className="logo-container d-flex align-items-center bg-transparent justify-content-between">
           <Link href="/mosc" className="unset-link">
@@ -154,6 +155,7 @@ export default function SyroHeader() {
             </ul>
           </div>
         </div>
+      </div>
       </div>
 
       {/* Detailed Menu Offcanvas (match static #detailedmenu) */}

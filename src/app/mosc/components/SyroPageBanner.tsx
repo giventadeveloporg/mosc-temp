@@ -6,6 +6,8 @@ import Link from 'next/link';
 export interface SyroPageBannerProps {
   /** Page title shown in uppercase (e.g. "Holy Synod") */
   title: string;
+  /** Optional description shown in the banner below the breadcrumb */
+  description?: string;
   /** When true, center the title and breadcrumb text (e.g. on saints subpages) */
   centerText?: boolean;
   /** Breadcrumb path: 'home' = Home / Title, 'gallery' = Gallery / Title, 'news' = News / Title, 'directory' = Directory / Title, etc. */
@@ -76,18 +78,18 @@ export function SyroBreadcrumb({ breadcrumbFrom, currentTitle }: SyroBreadcrumbP
   );
 }
 
-export default function SyroPageBanner({ title, centerText, breadcrumbFrom = 'home' }: SyroPageBannerProps) {
+export default function SyroPageBanner({ title, description, centerText, breadcrumbFrom = 'home' }: SyroPageBannerProps) {
   const config = BREADCRUMB_CONFIG[breadcrumbFrom];
   return (
     <section
-      className="relative flex min-h-[150px] h-auto items-center overflow-hidden uppercase py-4 md:py-0 md:h-[150px]"
+      className="relative flex min-h-[150px] h-auto items-center overflow-hidden uppercase py-4 md:py-0 md:min-h-[150px]"
       style={{
         background: 'linear-gradient(-90deg, #dc354662, #ff790348)',
       }}
     >
-      <div className="relative z-10 flex h-full min-h-full w-full items-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 flex h-full min-h-full w-full items-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-6">
         <div className={`flex h-full min-h-full w-full items-center ${centerText ? 'justify-center' : 'justify-between'}`}>
-          <div className={`syro-banner-content flex flex-col justify-center min-w-0 flex-1 ${centerText ? 'text-center' : 'pr-24 md:pr-40'}`}>
+          <div className={`syro-banner-content flex flex-col justify-center min-w-0 flex-1 ${centerText ? 'text-center' : description ? 'pr-24 md:pr-64' : 'pr-24 md:pr-40'}`}>
             <h2 className="font-syro-display text-base sm:text-xl lg:text-2xl font-semibold text-syro-blue uppercase tracking-wide break-words">
               {title}
             </h2>
@@ -109,6 +111,11 @@ export default function SyroPageBanner({ title, centerText, breadcrumbFrom = 'ho
                 </li>
               </ol>
             </nav>
+            {description && (
+              <p className="font-syro-primary text-base sm:text-lg text-syro-dark-gray leading-relaxed mt-3 normal-case">
+                {description}
+              </p>
+            )}
           </div>
         </div>
       </div>

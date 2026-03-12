@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 const SHORTCUTS = [
-  { title: 'CATHOLICATE NEWS', href: '#', icon: '/mosc/assets/images/icons/PRESS-icon.svg', odd: true },
+  { title: 'CATHOLICATE NEWS', href: '/mosc/news', icon: '/mosc/assets/images/icons/PRESS-icon.svg', odd: true },
   { title: 'DOWNLOADS', href: '/mosc/downloads', icon: '/mosc/assets/images/icons/CIRCULAR-icon.svg', odd: false },
   { title: 'E-MAIL', href: '/mosc/contact-form-email', icon: '/mosc/assets/images/icons/PRESS-icon.svg', odd: true },
   { title: 'GALLERY', href: '/mosc/gallery', icon: '/mosc/assets/images/icons/GALLERY-icon.svg', odd: false },

@@ -90,29 +90,22 @@ const churchSections = [
   },
 ];
 
-const introCardShadow = 'rgba(50,50,93,0.25) 0px 6px 12px -2px, rgba(0,0,0,0.3) 0px 3px 7px -3px';
 const cardShadow = 'rgba(50,50,93,0.25) 0px 6px 12px -2px, rgba(0,0,0,0.3) 0px 3px 7px -3px';
+
+const BANNER_DESCRIPTION =
+  'Explore our faith, heritage, and tradition—from the Throne of St. Thomas to the Creed, theology, spirituality, Syrian heritage, history, the Holy Myron, and liturgy.';
 
 const TheChurchPage = () => {
   return (
     <div className="bg-syro-bg-gray">
-      <SyroPageBanner title="The Church" />
+      <SyroPageBanner
+        title="The Church"
+        breadcrumbFrom="home"
+        description={BANNER_DESCRIPTION}
+      />
 
       <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div
-            className="bg-white p-10 rounded-lg shadow-lg mb-16"
-            style={{ boxShadow: introCardShadow }}
-          >
-            <h2 className="font-syro-display text-3xl font-bold text-black mb-5">
-              The Church
-            </h2>
-            <p className="font-syro-primary text-xl text-syro-dark-gray leading-relaxed">
-              Explore our faith, heritage, and tradition—from the Throne of St. Thomas to the Creed,
-              theology, spirituality, Syrian heritage, history, the Holy Myron, and liturgy.
-            </p>
-          </div>
-
           <h3 className="text-2xl font-light text-syro-dark-gray mb-10 pl-8 border-l-4 border-syro-red">
             The Malankara Orthodox Syrian Church
           </h3>

@@ -914,6 +914,23 @@ INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tena
 	VALUES (?, ?, ?, ?)
 ]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
   Detail: Key (job_instance_id)=(9) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4677, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-11 23:59:59.117156', '2026-03-11 23:59:59.2218', 104, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(10) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4679, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-12 05:59:59.13956', '2026-03-12 05:59:59.237076', 97, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(11) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4681, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-12 11:59:59.084166', '2026-03-12 11:59:59.197509', 113, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(12) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4683, 'promotionTestEmailJob', 'PROMOTION_TEST_EMAIL', 'COMPLETED', 'tenant_demo_002', '2026-03-12 17:57:49.379157', '2026-03-12 17:57:51.117043', 1737, 1, 1, 0, NULL, 'API', '{"tenantId":"tenant_demo_002","templateId":4102,"recipientEmail":"giventauser@gmail.com"}');
+INSERT INTO public.batch_job_execution_log (id, job_name, job_type, status, tenant_id, started_at, completed_at, duration_ms, processed_count, success_count, failed_count, error_message, triggered_by, parameters_json) VALUES (4685, 'subscriptionRenewalJob', 'SUBSCRIPTION_RENEWAL', 'FAILED', 'tenant_demo_002', '2026-03-12 17:59:58.888527', '2026-03-12 17:59:58.935889', 47, 0, 0, 0, 'PreparedStatementCallback; SQL [INSERT INTO BATCH_JOB_INSTANCE(JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION)
+	VALUES (?, ?, ?, ?)
+]; ERROR: duplicate key value violates unique constraint "batch_job_instance_pkey"
+  Detail: Key (job_instance_id)=(13) already exists.', 'API', '{"tenantId":"tenant_demo_002","batchSize":100,"maxSubscriptions":10000}');
 
 
 --
@@ -2054,6 +2071,7 @@ INSERT INTO public.promotion_email_sent_log (id, tenant_id, template_id, event_i
 INSERT INTO public.promotion_email_sent_log (id, tenant_id, template_id, event_id, recipient_email, subject, promotion_code, discount_code_id, sent_at, is_test_email, email_status, error_message, sent_by_id) VALUES (4051, 'tenant_demo_002', 4102, 2, 'mosc.test@keleno.com', 'template 1', NULL, NULL, '2026-01-07 03:55:02.21668', true, 'SENT', NULL, NULL);
 INSERT INTO public.promotion_email_sent_log (id, tenant_id, template_id, event_id, recipient_email, subject, promotion_code, discount_code_id, sent_at, is_test_email, email_status, error_message, sent_by_id) VALUES (8304, 'tenant_demo_002', 4102, 2, 'giventauser@gmail.com', 'template 1', NULL, NULL, '2026-02-12 12:34:57.993142', true, 'SENT', NULL, NULL);
 INSERT INTO public.promotion_email_sent_log (id, tenant_id, template_id, event_id, recipient_email, subject, promotion_code, discount_code_id, sent_at, is_test_email, email_status, error_message, sent_by_id) VALUES (8305, 'tenant_demo_002', 5052, NULL, 'giventauser@gmail.com', 'giventauser@gmail.com', NULL, NULL, '2026-02-12 12:41:18.930288', true, 'SENT', NULL, NULL);
+INSERT INTO public.promotion_email_sent_log (id, tenant_id, template_id, event_id, recipient_email, subject, promotion_code, discount_code_id, sent_at, is_test_email, email_status, error_message, sent_by_id) VALUES (8422, 'tenant_demo_002', 4102, 2, 'giventauser@gmail.com', 'template 1', NULL, NULL, '2026-03-12 17:57:51.1386', true, 'SENT', NULL, NULL);
 
 
 --
@@ -2150,7 +2168,7 @@ INSERT INTO public.user_task (id, tenant_id, title, description, status, priorit
 -- Name: batch_job_execution_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: event_site_admin
 --
 
-SELECT pg_catalog.setval('public.batch_job_execution_log_id_seq', 4675, true);
+SELECT pg_catalog.setval('public.batch_job_execution_log_id_seq', 4685, true);
 
 
 --
@@ -2164,7 +2182,7 @@ SELECT pg_catalog.setval('public.batch_job_execution_seq', 2, true);
 -- Name: batch_job_seq; Type: SEQUENCE SET; Schema: public; Owner: event_site_admin
 --
 
-SELECT pg_catalog.setval('public.batch_job_seq', 9, true);
+SELECT pg_catalog.setval('public.batch_job_seq', 13, true);
 
 
 --
@@ -2213,7 +2231,7 @@ SELECT pg_catalog.setval('public.event_score_card_id_seq', 1, true);
 -- Name: sequence_generator; Type: SEQUENCE SET; Schema: public; Owner: event_site_admin
 --
 
-SELECT pg_catalog.setval('public.sequence_generator', 8421, true);
+SELECT pg_catalog.setval('public.sequence_generator', 8422, true);
 
 
 --

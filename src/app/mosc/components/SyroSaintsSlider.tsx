@@ -14,6 +14,7 @@ const SAINTS = [
 /** Duplicated for seamless infinite loop */
 const SAINTS_LOOP = [...SAINTS, ...SAINTS];
 
+const N = SAINTS.length;
 const GAP_PX = 10;
 const AUTOPLAY_MS = 4000;
 const SPEED_MS = 1000;
@@ -29,7 +30,11 @@ export default function SyroSaintsSlider({ embedInAbout }: SyroSaintsSliderProps
   const [currentIndex, setCurrentIndex] = useState(0);
   const [translatePx, setTranslatePx] = useState(0);
   const [slideStepPx, setSlideStepPx] = useState(0);
+  const skipTransitionRef = useRef(false);
+  const [transitionDisabled, setTransitionDisabled] = useState(false);
   const autoplayRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const currentIndexRef = useRef(0);
+  currentIndexRef.current = currentIndex;
 
   const updateSlideStep = useCallback(() => {
     const viewport = viewportRef.current;
@@ -58,17 +63,82 @@ export default function SyroSaintsSlider({ embedInAbout }: SyroSaintsSliderProps
     setTranslatePx(-currentIndex * slideStepPx);
   }, [currentIndex, slideStepPx]);
 
-  const goPrev = useCallback(() => {
-    setCurrentIndex((prev) => (prev - 1 + SAINTS_LOOP.length) % SAINTS_LOOP.length);
+  /** Reset from clone (index N) back to 0 without animation so loop is seamless */
+  const resetToStart = useCallback(() => {
+    skipTransitionRef.current = true;
+    setTransitionDisabled(true);
+    setCurrentIndex(0);
+    setTranslatePx(0);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        skipTransitionRef.current = false;
+        setTransitionDisabled(false);
+      });
+    });
   }, []);
 
+  /** Jump to end clone without animation so prev from 0 is seamless */
+  const jumpToEndClone = useCallback(() => {
+    if (slideStepPx <= 0) return;
+    skipTransitionRef.current = true;
+    setTransitionDisabled(true);
+    const endIndex = SAINTS_LOOP.length - 1;
+    setCurrentIndex(endIndex);
+    setTranslatePx(-endIndex * slideStepPx);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        skipTransitionRef.current = false;
+        setTransitionDisabled(false);
+      });
+    });
+  }, [slideStepPx]);
+
+  const goPrev = useCallback(() => {
+    if (currentIndex === 0) {
+      jumpToEndClone();
+      return;
+    }
+    setCurrentIndex((prev) => prev - 1);
+  }, [currentIndex, jumpToEndClone]);
+
   const goNext = useCallback(() => {
-    setCurrentIndex((prev) => (prev + 1) % SAINTS_LOOP.length);
-  }, []);
+    if (currentIndex === SAINTS_LOOP.length - 1) {
+      skipTransitionRef.current = true;
+      setTransitionDisabled(true);
+      setCurrentIndex(0);
+      setTranslatePx(0);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          skipTransitionRef.current = false;
+          setTransitionDisabled(false);
+        });
+      });
+      return;
+    }
+    setCurrentIndex((prev) => prev + 1);
+  }, [currentIndex]);
+
+  const handleTransitionEnd = useCallback(
+    (e: React.TransitionEvent<HTMLUListElement>) => {
+      if (e.propertyName !== 'transform') return;
+      if (currentIndex === N) resetToStart();
+    },
+    [currentIndex, resetToStart]
+  );
 
   useEffect(() => {
     autoplayRef.current = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % SAINTS_LOOP.length);
+      const prev = currentIndexRef.current;
+      if (prev === SAINTS_LOOP.length - 1) {
+        setTransitionDisabled(true);
+        setCurrentIndex(0);
+        setTranslatePx(0);
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => setTransitionDisabled(false));
+        });
+      } else {
+        setCurrentIndex(prev + 1);
+      }
     }, AUTOPLAY_MS);
     return () => {
       if (autoplayRef.current) clearInterval(autoplayRef.current);
@@ -111,8 +181,9 @@ export default function SyroSaintsSlider({ embedInAbout }: SyroSaintsSliderProps
             id="saints"
             style={{
               transform: `translate3d(${translatePx}px, 0, 0)`,
-              transition: `transform ${SPEED_MS}ms ease`,
+              transition: transitionDisabled ? 'none' : `transform ${SPEED_MS}ms ease`,
             }}
+            onTransitionEnd={handleTransitionEnd}
           >
             {SAINTS_LOOP.map((saint, i) => (
               <li key={`${saint.name}-${i}`}>
