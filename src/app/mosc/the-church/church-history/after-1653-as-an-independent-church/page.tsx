@@ -5,9 +5,9 @@ import SyroPageBanner from '../../../components/SyroPageBanner';
 import TheChurchSidebar from '../../TheChurchSidebar';
 
 export const metadata = {
-  title: 'After 1653 as an Independent Church',
+  title: 'As an independent Church | History | The Church | MOSC',
   description:
-    'The Orthodox Thomas Christians after 1653 till the end of the 18th century: Mar Thoma bishops, West Syrian connection, and the struggle for freedom.',
+    'The Orthodox Thomas Christians after 1653 till the end of the 18th century: Mar Thoma bishops, West Syrian connection, West Syrianization, East Syrian identity, and the strength of the Orthodox.',
 };
 
 export default async function After1653Page({
@@ -21,8 +21,9 @@ export default async function After1653Page({
   return (
     <div className="bg-syro-bg-gray">
       <SyroPageBanner
-        title="After 1653 as an Independent Church"
+        title="As an independent Church"
         breadcrumbFrom={breadcrumbFrom}
+        breadcrumbParent={breadcrumbFrom === 'the-church' ? { label: 'History', href: '/mosc/the-church/church-history' } : undefined}
       />
 
       <section className="py-16 bg-syro-bg-gray">
@@ -43,21 +44,24 @@ export default async function After1653Page({
                   <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mt-6 mb-4">
                     The Orthodox Thomas Christians After 1653 Till the End of the 18th Century
                   </h2>
-
+                  <h3 className="font-syro-display font-semibold text-xl text-syro-blue mt-6 mb-3">
+                    Introduction
+                  </h3>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                    The Thomas Christians who had freed themselves in 1653 from enforced submission
-                    under Rome stood for a time together under their leader Mar Thoma, elevated by
-                    the community to the status and function of bishop. The Portuguese–Roman
-                    Catholics did not accept defeat and tried repeatedly to resubject the Thomas
-                    Christians. Those who stood with Mar Thoma, even after a larger section defected
-                    to Rome, strengthened their stand as an independent church—the Orthodox Church
-                    of India today. From 1663 the Dutch replaced the Portuguese; the Dutch did not
-                    persecute the Orthodox but largely ignored them, while the Roman side enjoyed
-                    political support.
+                    The Thomas Christians as a whole who had freed themselves in 1653 from their enforced enslavement under Rome stood for some time together under their leader Mar Thoma, who was elevated by the community to the status and function of bishop. But the Portuguese–Roman Catholics were not willing to accept the defeat and were not ready to allow the Thomas Christians to move so freely as they desired. As a result they tried to disturb the Thomas Christians invariably from then onwards till now, primarily intending their resubmersion ultimately under Roman Catholicism. But the Thomas Christians who strongly stood with Mar Thoma, even after the defection of a larger section from among them to Rome, desisting all such submersion attempts from time to time strengthened more and more in their stand as an independent church—and they are the Orthodox Church of India now. From 1663 though the political change was decidedly unfavourable, the political climate was helpful to them because during the time of the Dutch there remained no custom of colonial and royal powers entering into the religious field and forcing people to embrace one way or the other, as had happened under the Portuguese. It is a fact that during the Dutch the Roman Catholics were powerful and the Dutch had promised to support them rather than their opponents like Mar Thoma and his adherents. Though the Dutch did not openly persecute Mar Thoma and followers, on the whole the Dutch policy was to ignore that section as a neglected community. Out of such situation the Roman side took much more advantage.
+                  </p>
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
+                    With the arrival of the Dutch the Padroado rule of Portugal ended; then onwards the Propaganda missionaries who came directly under the jurisdiction of the papacy began to dominate the ecclesiastical scenario in Malabar. All of them had only one aim with reference to the Thomas Christians: not to bring them closer to the early culture and history and make them a strong community in India, but to make them owe allegiance to Rome and Roman Catholicism with or without the Portuguese Crown. Although the Dutch rule did not allow the Portuguese to continue their government for long, it did not allow the growth of a free church tradition in Kerala that rejected Roman supremacy.
+                  </p>
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
+                    It was in such a contrary political situation that the Orthodox Thomas Christians under a series of bishops known as Mar Thoma stepped in to defend their freedom as a church against all undoings of the Roman Catholics. Among the Mar Thoma bishops, Mar Thoma I, IV, V and VI were great leaders of this church and indeed builders of it.
+                  </p>
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
+                    From 1665 under Mar Thoma I a relationship with the West Syrian Patriarchate was established when at their request a certain Gregorios arrived. Again in 1685 two bishops of that persuasion came. From 1751 also three bishops were present from there. These West Syrian bishops&apos; presence was helpful to preserve and strengthen the Malankara Orthodox Church&apos;s desire for Syrian identity and internal freedom as an Indian church against the encounters of Roman Catholicism and Romanization. But on the other hand this relation in the course of time became harmful to that church, similar to what had happened during the Portuguese period through Roman Catholicism. That church since 1653, which was continuing in East Syrian ecclesiastical qualities, was damaged and taken over to West Syrianization through the presence and actions of the West Syrian bishops. Moreover the West Syrian Patriarch, seeing the plightful condition of this church, tried several times to have control over it like the papacy, especially in church jurisdiction, thus endangering its desire to preserve national freedom and administrative independence. But till 1876 the leaders of this Indian church were able to desist all such attempts. As a result from time to time there were divisions and quarrels. Therefore the West Syrian connection of the Malankara Orthodox Church did not help much the latter to develop and strengthen as a free church in Kerala with its own national identity. The West Syrian church too, due to its centuries of oppressed conditions under Muslim rule, had lost appropriate vision of Christianity. Hence all the troubles in their relation with the Indian Orthodox church. Now we shall brief the various conditions of this church particularly under the Mar Thoma bishops.
                   </p>
 
                   <h3 className="font-syro-display font-semibold text-xl text-syro-blue mt-8 mb-3">
-                    Orthodox Church Under Mar Thoma Bishops
+                    Orthodox Church Under Mar Thoma
                   </h3>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                     From 1653 till 1816 the Orthodox Church was led by eight bishops with the

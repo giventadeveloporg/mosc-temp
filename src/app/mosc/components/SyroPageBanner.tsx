@@ -12,6 +12,8 @@ export interface SyroPageBannerProps {
   centerText?: boolean;
   /** Breadcrumb path: 'home' = Home / Title, 'gallery' = Gallery / Title, 'news' = News / Title, 'directory' = Directory / Title, etc. */
   breadcrumbFrom?: 'home' | 'gallery' | 'downloads' | 'calendar' | 'holy-synod' | 'saints' | 'the-church' | 'catholicate' | 'administration' | 'ecumenical' | 'dioceses' | 'spiritual-organizations' | 'publications' | 'institutions' | 'training' | 'theological-seminaries' | 'lectionary' | 'news' | 'directory';
+  /** Optional middle segment for 3-level breadcrumb (e.g. The Church / Theology / Christology). Used on the-church subpages under Theology, Spirituality, History, Liturgy. */
+  breadcrumbParent?: { label: string; href: string };
 }
 
 /**
@@ -78,7 +80,7 @@ export function SyroBreadcrumb({ breadcrumbFrom, currentTitle }: SyroBreadcrumbP
   );
 }
 
-export default function SyroPageBanner({ title, description, centerText, breadcrumbFrom = 'home' }: SyroPageBannerProps) {
+export default function SyroPageBanner({ title, description, centerText, breadcrumbFrom = 'home', breadcrumbParent }: SyroPageBannerProps) {
   const config = BREADCRUMB_CONFIG[breadcrumbFrom];
   return (
     <section
@@ -106,9 +108,28 @@ export default function SyroPageBanner({ title, description, centerText, breadcr
                 <li className="text-[#990b3f]" aria-hidden="true">
                   /
                 </li>
-                <li className="text-syro-red" aria-current="page">
-                  {title}
-                </li>
+                {breadcrumbParent ? (
+                  <>
+                    <li>
+                      <Link
+                        href={breadcrumbParent.href}
+                        className="text-[#990b3f] hover:text-syro-red transition-colors duration-300"
+                      >
+                        {breadcrumbParent.label}
+                      </Link>
+                    </li>
+                    <li className="text-[#990b3f]" aria-hidden="true">
+                      /
+                    </li>
+                    <li className="text-syro-red" aria-current="page">
+                      {title}
+                    </li>
+                  </>
+                ) : (
+                  <li className="text-syro-red" aria-current="page">
+                    {title}
+                  </li>
+                )}
               </ol>
             </nav>
             {description && (

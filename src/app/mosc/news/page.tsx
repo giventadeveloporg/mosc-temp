@@ -72,8 +72,8 @@ export default async function NewsPage() {
         </div>
       )}
 
-      {/* Main content - reduced top/bottom padding so images fit with less empty space */}
-      <section className="py-syro-lg bg-syro-bg-gray">
+      {/* Main content - no top padding so Main News title aligns at top like Featured News */}
+      <section className="pt-0 pb-syro-lg bg-syro-bg-gray">
         <div className="max-w-[1200px] mx-auto px-[15px]">
           <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_380px] gap-syro-xl">
             {/* Main column - tighter vertical spacing between sections */}

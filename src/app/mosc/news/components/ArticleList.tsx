@@ -33,11 +33,11 @@ export function ArticleList({ title, articles, baseHref, compact, id }: ArticleL
     <section id={id} className="syro-news-article-section scroll-mt-24 rounded-[5px] bg-white overflow-hidden shadow-syro-card transition-shadow duration-500 hover:shadow-syro-card-hover">
       {/* Design system section title: h3 1.8rem/600 #0b2848, red accent bar ::after → use border-l */}
       {/* Design system: table/chart title 1.8rem/600 #0b2848, red accent bar 7px left */}
-      <h2 className="syro-news-section-title text-syro-h3 font-semibold text-syro-blue pl-5 py-syro-lg border-b border-syro-table-border bg-white border-l-[7px] border-l-syro-red">
+      <h2 className="syro-news-section-title text-syro-h3 font-semibold text-syro-blue pl-5 pt-syro-lg pb-2 border-b border-syro-table-border bg-white border-l-[7px] border-l-syro-red">
         {title}
       </h2>
       {articles.length > 0 ? (
-        <ul className={`grid gap-4 px-syro-lg py-1.5 ${compact ? 'grid-cols-1 max-w-2xl' : 'grid-cols-1 md:grid-cols-2'}`}>
+        <ul className={`grid gap-4 px-syro-lg pt-1.5 pb-1.5 ${compact ? 'grid-cols-1 max-w-2xl' : 'grid-cols-1 md:grid-cols-2'}`}>
           {articles.map((article) => (
             <li key={article.id} className="min-h-0">
               <Link

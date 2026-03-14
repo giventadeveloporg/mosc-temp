@@ -120,7 +120,7 @@ const ContactInfoPage = () => {
                 <div>
                   <a 
                     href={`tel:+91${contactInfo.phone.primary.replace(/\s/g, '')}`}
-                    className="font-syro-primary text-lg text-syro-red hover:text-accent transition-all duration-300 block"
+                    className="font-syro-primary text-lg text-syro-red hover:text-syro-blue transition-all duration-300 block"
                   >
                     {contactInfo.phone.primary}
                   </a>
@@ -128,7 +128,7 @@ const ContactInfoPage = () => {
                 <div>
                   <a 
                     href={`tel:+91${contactInfo.phone.secondary.replace(/\s/g, '')}`}
-                    className="font-syro-primary text-lg text-syro-red hover:text-accent transition-all duration-300 block"
+                    className="font-syro-primary text-lg text-syro-red hover:text-syro-blue transition-all duration-300 block"
                   >
                     {contactInfo.phone.secondary}
                   </a>
@@ -165,7 +165,7 @@ const ContactInfoPage = () => {
               <div>
                 <a 
                   href={`mailto:${contactInfo.email.catholicos.address}`}
-                  className="font-syro-primary text-lg text-syro-red hover:text-accent transition-all duration-300"
+                  className="font-syro-primary text-lg text-syro-red hover:text-syro-blue transition-all duration-300"
                 >
                   {contactInfo.email.catholicos.address}
                 </a>
@@ -198,7 +198,7 @@ const ContactInfoPage = () => {
               <div>
                 <a 
                   href={`mailto:${contactInfo.email.pro.address}`}
-                  className="font-syro-primary text-lg text-syro-red hover:text-accent transition-all duration-300"
+                  className="font-syro-primary text-lg text-syro-red hover:text-syro-blue transition-all duration-300"
                 >
                   {contactInfo.email.pro.address}
                 </a>

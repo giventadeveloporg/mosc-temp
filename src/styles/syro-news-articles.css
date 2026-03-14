@@ -8,6 +8,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700;800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
+/* mainContent/div/div/div/div/div on news page */
+#mainContent > div > div > div > div > div {
+  max-height: 350px;
+}
+
 /* ---- Design system palette (syromalabar_site_general_design_final.json) ---- */
 :root {
   --syro-news-body: #506276;
@@ -18,6 +23,24 @@
   --syro-news-link: #dc3545;
   --syro-news-link-hover: #be1929;
   --syro-news-caption: #818181;
+}
+
+/* ---- News list: section layout – heading on top of list (like Featured News), never side-by-side ---- */
+#main-news.syro-news-article-section,
+.syro-news-article-section {
+  display: flex !important;
+  flex-direction: column !important;
+}
+.syro-news-article-section .syro-news-section-title {
+  flex: 0 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+.syro-news-article-section > ul {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 /* ---- News list: section title – design system chart/table title 1.8rem/600 #0b2848; accent bar via Tailwind border-l ---- */
