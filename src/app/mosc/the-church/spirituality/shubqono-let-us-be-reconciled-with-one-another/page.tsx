@@ -23,6 +23,7 @@ export default async function ShubqonoPage({
       <SyroPageBanner
         title="Shubqono – Let us be Reconciled with One Another"
         breadcrumbFrom={breadcrumbFrom}
+        breadcrumbParent={breadcrumbFrom === 'the-church' ? { label: 'Spirituality', href: '/mosc/the-church/spirituality' } : undefined}
       />
 
       <section className="py-16 bg-syro-bg-gray">

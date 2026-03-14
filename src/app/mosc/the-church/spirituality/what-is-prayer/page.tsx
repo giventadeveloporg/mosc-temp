@@ -20,7 +20,11 @@ export default async function WhatIsPrayerPage({
 
   return (
     <div className="bg-syro-bg-gray">
-      <SyroPageBanner title="What is Prayer?" breadcrumbFrom={breadcrumbFrom} />
+      <SyroPageBanner
+        title="What is Prayer?"
+        breadcrumbFrom={breadcrumbFrom}
+        breadcrumbParent={breadcrumbFrom === 'the-church' ? { label: 'Spirituality', href: '/mosc/the-church/spirituality' } : undefined}
+      />
 
       <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

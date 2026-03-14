@@ -6,9 +6,9 @@ import SyroPageBanner from '../../components/SyroPageBanner';
 import TheChurchSidebar from '../TheChurchSidebar';
 
 export const metadata = {
-  title: 'The Holy Myron',
+  title: 'The Holy Myron | The Church | MOSC',
   description:
-    'The divine and life-giving mystery of the Holy Myron. By the divine power, we speak of the mysteries of the cross and the holy anointing—its origin, meaning, and consecration in the Orthodox tradition.',
+    'The divine and life-giving mystery of the Holy Myron: etymology, oils, tradition from Moses, apostolic consecration, symbolism, procession, and consecration—fifty-three chapters on the holy anointing.',
 };
 
 export default async function TheHolyMyronPage({
@@ -40,26 +40,17 @@ export default async function TheHolyMyronPage({
                 </div>
 
                 <div className="prose prose-lg max-w-none">
-                  <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-4">
-                    On the Divine and Life-Giving Myron
-                  </h2>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-8">
-                    Now that discourse on the holy cross has reached a conclusion, the discourse
-                    proceeds speedily in order to indicate briefly concerning the holy and divine
-                    Myron.
-                  </p>
-
-                  <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">
-                    Chapter 1
-                  </h3>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                    The word &apos;Myron&apos; is translated in the Syriac language as
-                    &apos;muro&apos;. Etymologically the word muro—with which the dead are
-                    embalmed—signifies mortality. Thus it signifies the mortality of Our Lord for
-                    our sake. Solomon also called Him &quot;Oil of Myrrh&quot; (Songs 1:2). The
-                    Greeks too call it Myron in the Greek language. In two ways it is called Myron:
-                    first, because of the fragrance—every kind of oil composed from many fragrant
-                    plants is called Myron; aromatic herbs are also called Myron.
+                    By the divine power, we have spoken at length on the mysteries of the cross. We next write about the divine and life-giving mystery of the Holy Myron.
+                  </p>
+                  <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mt-8 mb-4">
+                    CHAPTER 1
+                  </h2>
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-4">
+                    Now that discourse on the holy cross has reached a conclusion, the discourse proceeds speedily in order to indicate briefly concerning the holy and divine Myron.
+                  </p>
+                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
+                    The word &apos;Myron&apos; is translated in the Syriac language as &apos;muro&apos;. Etymologically the word muro—with which the dead are embalmed—signifies mortality. Thus it signifies the mortality of Our Lord for our sake. Solomon also called Him &quot;Oil of Myrrh&quot; (Songs 1:2). The Greeks too call it Myron in the Greek language. In two ways it is called Myron: first, because of the fragrance—every kind of oil composed from many fragrant plants is called Myron; aromatic herbs are also called Myron.
                   </p>
 
                   <h3 className="font-syro-display font-semibold text-lg text-syro-blue mt-8 mb-3">

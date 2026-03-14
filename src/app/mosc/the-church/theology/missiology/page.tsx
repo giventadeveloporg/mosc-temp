@@ -20,7 +20,11 @@ export default async function MissiologyPage({
 
   return (
     <div className="bg-syro-bg-gray">
-      <SyroPageBanner title="Missiology" breadcrumbFrom={breadcrumbFrom} />
+      <SyroPageBanner
+        title="Missiology"
+        breadcrumbFrom={breadcrumbFrom}
+        breadcrumbParent={breadcrumbFrom === 'the-church' ? { label: 'Theology', href: '/mosc/the-church/theology' } : undefined}
+      />
 
       <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

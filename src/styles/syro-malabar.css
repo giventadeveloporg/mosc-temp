@@ -1017,10 +1017,16 @@ body:has(.syro-layout) {
   max-width: 100% !important;
 }
 
+/* Remove vertical line after the last shortcut (CONTACT INFO) */
+.syro-layout #banner-shortcuts-section #banner-shortcuts .col:last-child .quick-link-card.be-1 {
+  border-right: none !important;
+}
+
 .syro-layout #banner-shortcuts-section .quick-link-card {
   display: flex !important;
   align-items: center !important;
   justify-content: flex-start !important;
+  gap: 0.75rem !important;
   min-width: 0 !important;
   overflow: visible !important;
   padding: 0.4rem 0.25rem !important;

@@ -19,7 +19,11 @@ export default async function TheGreatLentPage({
 
   return (
     <div className="bg-syro-bg-gray">
-      <SyroPageBanner title="The Great Lent" breadcrumbFrom={breadcrumbFrom} />
+      <SyroPageBanner
+        title="The Great Lent"
+        breadcrumbFrom={breadcrumbFrom}
+        breadcrumbParent={breadcrumbFrom === 'the-church' ? { label: 'Spirituality', href: '/mosc/the-church/spirituality' } : undefined}
+      />
 
       <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

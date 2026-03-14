@@ -23,20 +23,14 @@ export default function PublicationsPage() {
 
   return (
     <div className="min-h-screen bg-syro-bg-gray">
-      <SyroPageBanner title="Publications" breadcrumbFrom="home" />
+      <SyroPageBanner
+        title="Publications"
+        breadcrumbFrom="home"
+        description="Official publications of the Malankara Orthodox Syrian Church, including the Malankara Sabha Magazine (Masika) and other church literature."
+      />
 
       <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Intro card (matches administration .admin-intro-card) */}
-          <div className="bg-white p-10 rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] mb-16">
-            <h2 className="font-syro-display text-[2.2rem] font-bold text-black mb-5">
-              Publications
-            </h2>
-            <p className="font-syro-primary text-xl text-syro-dark-gray leading-relaxed">
-              Official publications of the Malankara Orthodox Syrian Church, including the Malankara Sabha Magazine (Masika) and other church literature.
-            </p>
-          </div>
-
           {/* Section title - left red bar (matches administration .admin-section-title) */}
           <h3 className="text-2xl font-light text-[#798daf] mb-10 pl-8 border-l-[7px] border-syro-red">
             Church Publications
