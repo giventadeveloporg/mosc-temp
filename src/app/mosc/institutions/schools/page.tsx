@@ -4,6 +4,7 @@ import { Metadata } from 'next';
 import QuickLinks from '../../components/QuickLinks';
 import SyroPageBanner from '../../components/SyroPageBanner';
 import InstitutionsSidebar from '../components/InstitutionsSidebar';
+import { formatPhoneNumbers } from '../lib/formatPhone';
 
 export const metadata: Metadata = {
   title: 'Schools | Institutions | MOSC',
@@ -18,7 +19,13 @@ function SchoolCard({ school, index }: { school: SchoolEntry; index: number }) {
       <h3 className="font-syro-display font-semibold text-lg text-syro-blue mb-3">{school.name}</h3>
       <div className="space-y-2 font-syro-primary text-sm text-syro-dark-gray">
         <p>{school.location}</p>
-        {school.phone && <p className="font-medium text-syro-blue">Ph: {school.phone}</p>}
+        {school.phone && (
+          <p className="font-medium text-syro-blue">
+            {formatPhoneNumbers(school.phone).map((num, i) => (
+              <span key={i} className="block">{i === 0 ? `Ph: ${num}` : num}</span>
+            ))}
+          </p>
+        )}
       </div>
     </div>
   );
@@ -29,7 +36,13 @@ function SchoolCardCompact({ school, index }: { school: SchoolEntry; index: numb
     <div className="bg-white rounded-lg p-4 shadow-syro-card-sm hover:shadow-syro-card transition-all duration-300 border-l-4 border-syro-red">
       <h3 className="font-syro-display font-semibold text-base text-syro-blue mb-1">{school.name}</h3>
       <p className="font-syro-primary text-sm text-syro-dark-gray">{school.location}</p>
-      {school.phone && <p className="font-syro-primary text-sm font-medium text-syro-blue mt-1">Ph: {school.phone}</p>}
+      {school.phone && (
+        <p className="font-syro-primary text-sm font-medium text-syro-blue mt-1">
+          {formatPhoneNumbers(school.phone).map((num, i) => (
+            <span key={i} className="block">{i === 0 ? `Ph: ${num}` : num}</span>
+          ))}
+        </p>
+      )}
     </div>
   );
 }

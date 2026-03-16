@@ -144,23 +144,6 @@ export default function KalpanaPage() {
         </div>
       </section>
 
-      {/* Navigation */}
-      <section className="py-12 bg-syro-bg-gray">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-center">
-            <Link
-              href="/mosc/downloads"
-              className="inline-flex items-center px-6 py-3 bg-syro-red text-white font-syro-primary font-medium rounded-lg hover:bg-syro-red/90 transition-all duration-300 shadow-syro-card"
-            >
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              Back to All Downloads
-            </Link>
-          </div>
-        </div>
-      </section>
-
       <QuickLinks />
     </div>
   );

@@ -4,6 +4,7 @@ import { Metadata } from 'next';
 import QuickLinks from '../../components/QuickLinks';
 import SyroPageBanner from '../../components/SyroPageBanner';
 import InstitutionsSidebar from '../components/InstitutionsSidebar';
+import { formatPhoneNumbers } from '../lib/formatPhone';
 
 export const metadata: Metadata = {
   title: 'Engineering Colleges | Institutions | MOSC',
@@ -116,7 +117,16 @@ export default function EngineeringCollegesPage() {
                     {college.contact.address?.map((line, i) => (
                       <p key={i}>{line}</p>
                     ))}
-                    {college.contact.phone && <p><span className="font-medium text-syro-blue">Phone:</span> {college.contact.phone}</p>}
+                    {college.contact.phone && (
+                      <p>
+                        <span className="font-medium text-syro-blue">Phone:</span>
+                        <span className="block mt-1">
+                          {formatPhoneNumbers(college.contact.phone).map((num, i) => (
+                            <span key={i} className="block">{num}</span>
+                          ))}
+                        </span>
+                      </p>
+                    )}
                     {college.contact.fax && <p><span className="font-medium text-syro-blue">Fax:</span> {college.contact.fax}</p>}
                     {college.contact.emails?.map((email, i) => (
                       <p key={i}>

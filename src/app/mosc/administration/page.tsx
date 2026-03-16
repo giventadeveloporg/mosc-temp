@@ -75,8 +75,8 @@ const AdministrationPage = () => {
       {/* Content - matches HTML structure and style */}
       <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Intro card (HTML .admin-intro-card) */}
-          <div className="bg-white p-10 rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] mb-16">
+          {/* Intro card (HTML .admin-intro-card) - slight theme tint */}
+          <div className="bg-syro-red/5 p-10 rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] mb-16 border-l-4 border-syro-red">
             <p className="font-syro-primary text-xl text-syro-dark-gray leading-relaxed">
               The Malankara Orthodox Syrian Church is administered according to its Constitution, Canon Law, and the structures of the Holy Episcopal Synod, Malankara Association, Managing Committee, Working Committee, and bodies at diocesan and parish levels.
             </p>

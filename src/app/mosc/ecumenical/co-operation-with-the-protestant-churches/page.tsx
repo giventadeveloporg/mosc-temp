@@ -21,29 +21,21 @@ const CoOperationWithProtestantChurchesPage = () => {
             <div className="lg:col-span-2">
               <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-8">
                 <div className="prose prose-lg max-w-none">
+                  <h2 className="font-syro-display font-semibold text-2xl text-syro-blue mb-6">
+                    Co-operation with the Protestant Churches
+                  </h2>
                   <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-6">
                     <p>
-                      It is a fact that there is no healthy and lively talks between the Orthodox
-                      and CSI, Marthoma Churches. However, the Malankara Church has strong
-                      relations and cooperation with these churches as they share many things in
-                      common.
+                      It is a fact that there is no healthy and lively talks between the Orthodox and CSI, Marthoma Churches. However, the Malankara Church has strong relations and cooperation with these churches as they share many things in common.
                     </p>
-
                     <p>
-                      These three Churches cooperate in the theological education. FFRRC
-                      (Federated Faculty for Research in Religion and Culture), the theological
-                      organization has helped to foster the relation among these Churches.
+                      These three Churches cooperate in the theological education. FFRRC (Federated Faculty for Research in Religion and Culture), the theological organization has helped to foster the relation among these Churches.
                     </p>
-
                     <p>
-                      Though we had certain dialogues with the Lutheran Church in the past, it is
-                      not very lively in recent years.
+                      Though we had certain dialogues with the Lutheran Church in the past, it is not very lively in recent years.
                     </p>
-
                     <p>
-                      Ecumenical ventures in modern times: His Holiness Baselios Marthoma Paulose
-                      II is also very keen to encourage ecumenical relations. Various ecclesiastical
-                      visits during a short span of time have paid rich dividends.
+                      Ecumenical ventures in modern times. His Holiness Baselios Marthoma Paulose II is also very keen to encourage ecumenical relations. Various ecclesiastical visits during a short span of time have paid rich dividends.
                     </p>
                   </div>
                 </div>
