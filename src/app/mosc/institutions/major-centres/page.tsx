@@ -4,6 +4,7 @@ import { Metadata } from 'next';
 import QuickLinks from '../../components/QuickLinks';
 import SyroPageBanner from '../../components/SyroPageBanner';
 import InstitutionsSidebar from '../components/InstitutionsSidebar';
+import { formatPhoneNumbers } from '../lib/formatPhone';
 
 export const metadata: Metadata = {
   title: 'Major Centres | Institutions | MOSC',
@@ -116,7 +117,12 @@ export default function MajorCentresPage() {
                       )}
                       {centre.contact.phone && (
                         <p>
-                          <span className="font-medium text-syro-blue">Phone:</span> {centre.contact.phone}
+                          <span className="font-medium text-syro-blue">Phone:</span>
+                          <span className="block mt-1">
+                            {formatPhoneNumbers(centre.contact.phone).map((num, i) => (
+                              <span key={i} className="block">{num}</span>
+                            ))}
+                          </span>
                         </p>
                       )}
                       {centre.contact.emails && centre.contact.emails.map((email, i) => (

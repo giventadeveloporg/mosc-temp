@@ -1,7 +1,8 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import DiocesesQuickLinksNav from '../DiocesesQuickLinksNav';
+import QuickLinks from '../../components/QuickLinks';
+import DiocesesSidebar from '../DiocesesSidebar';
 import SyroPageBanner from '../../components/SyroPageBanner';
 
 export const metadata = {
@@ -41,73 +42,19 @@ const dioceseofchennaidiocesePage = () => {
 
                 </div>
               </div>
+              {/* Quick Links - below content (desktop, same as administration) */}
+              <div className="mt-8 hidden lg:block">
+                <QuickLinks />
+              </div>
             </div>
 
             {/* Sidebar */}
             <div className="space-y-6 lg:col-span-1">
-              <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-6 mb-6">
-                <h3 className="font-syro-display font-semibold text-lg text-syro-blue mb-4">
-                  Dioceses
-                </h3>
-                <nav className="space-y-2">
-                  <Link 
-                    href="/mosc/dioceses" 
-                    className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300 hidden"
-                  >
-                    Dioceses Overview
-                  </Link>
-                  <div className="border-t border-syro-table-border my-2"></div>
-                  <div className="px-3 py-2 text-xs font-semibold text-syro-dark-gray uppercase tracking-wide">
-                    India Dioceses
-                  </div>
-                  <Link 
-                      href="/mosc/dioceses/diocese-of-chennai-diocese" 
-                      className="block px-3 py-2 bg-syro-red text-white rounded-md font-syro-primary text-sm transition-all duration-300"
-                    >
-                      Diocese of Madras
-                    </Link>
-                  <Link 
-                      href="/mosc/dioceses/diocese-of-bangalore" 
-                      className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
-                    >
-                      Diocese of Bangalore
-                    </Link>
-                  <Link 
-                      href="/mosc/dioceses/diocese-of-mumbai" 
-                      className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
-                    >
-                      Diocese of Bombay
-                    </Link>
-                  <Link 
-                      href="/mosc/dioceses/diocese-of-calcutta" 
-                      className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
-                    >
-                      Diocese of Calcutta
-                    </Link>
-                  <Link 
-                      href="/mosc/dioceses/diocese-of-delhi" 
-                      className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
-                    >
-                      Diocese of Delhi
-                    </Link>
-                  <Link 
-                      href="/mosc/dioceses/diocese-of-ahmedabad" 
-                      className="block px-3 py-2 text-syro-dark-gray hover:text-syro-red hover:bg-syro-bg-gray rounded-md font-syro-primary text-sm transition-all duration-300"
-                    >
-                      Diocese of Ahmedabad
-                    </Link>
-                </nav>
-              </div>
-
-              {/* Quick Links - desktop only in sidebar */}
-              <div className="hidden lg:block">
-                <DiocesesQuickLinksNav />
-              </div>
+              <DiocesesSidebar />
             </div>
           </div>
-          {/* Quick Links - mobile only: just above footer */}
           <div className="mt-8 lg:hidden">
-            <DiocesesQuickLinksNav />
+            <QuickLinks />
           </div>
         </div>
       </section>

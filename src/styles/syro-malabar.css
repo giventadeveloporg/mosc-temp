@@ -240,16 +240,62 @@ body:has(.syro-layout) {
   background: rgba(255, 255, 255, 0.04);
 }
 
+/* Overlay pins container (same pattern as syro-malabar-church index.html #eparchy_countries) */
+.syro-locations-map-wrap.syro-img-map-container {
+  position: relative;
+}
+
+.syro-eparchy-countries {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.syro-eparchy-countries > div {
+  pointer-events: auto;
+  cursor: pointer;
+  min-height: 15%;
+  min-width: 6%;
+  transform: translate(-50%, -50%);
+}
+
+.syro-eparchy-countries .syro-country-tooltips {
+  display: block;
+  padding: 80% 5%;
+}
+
+/* Left-to-right pin positions (1200×600 map): South West America, North East America, UK, Africa, India */
+.syro-eparchy-countries .south-west-america {
+  left: 18.33%;
+  top: 33.33%;
+}
+
+.syro-eparchy-countries .north-east-america {
+  left: 33.33%;
+  top: 60%;
+}
+
+.syro-eparchy-countries .uk {
+  left: 46.67%;
+  top: 30%;
+}
+
+.syro-eparchy-countries .africa {
+  left: 50%;
+  top: 66.67%;
+}
+
+.syro-eparchy-countries .india {
+  left: 68.33%;
+  top: 50%;
+}
+
 .syro-locations-map-img {
   width: 100%;
   height: auto;
   display: block;
   vertical-align: middle;
-}
-
-/* Cursor pointer when hovering over location pin areas on the map */
-.syro-locations-map-wrap area[href] {
-  cursor: pointer;
 }
 
 .syro-locations-cta {

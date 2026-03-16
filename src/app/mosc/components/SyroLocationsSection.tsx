@@ -30,15 +30,25 @@ export default function SyroLocationsSection() {
                   <p className="syro-locations-panel-desc">Our Church is Situated Around The World</p>
                 </div>
               </div>
-              <div className="syro-locations-map-wrap">
-                {/* Image map so hover over pin areas shows cursor: pointer (coordinates for 1200×600 image) */}
-                <map name="diocese-locations-map">
-                  <area shape="circle" coords="220,200,45" href="#" aria-label="North America" className="syro-map-pin-area" />
-                  <area shape="circle" coords="560,180,45" href="#" aria-label="Europe" className="syro-map-pin-area" />
-                  <area shape="circle" coords="400,360,45" href="#" aria-label="South America" className="syro-map-pin-area" />
-                  <area shape="circle" coords="600,400,45" href="#" aria-label="Africa" className="syro-map-pin-area" />
-                  <area shape="circle" coords="820,300,45" href="#" aria-label="India" className="syro-map-pin-area" />
-                </map>
+              <div className="syro-locations-map-wrap syro-img-map-container">
+                {/* Overlay pins like syro-malabar-church index.html: div#eparchy_countries with positioned divs and tooltip spans */}
+                <div id="syro-eparchy-countries" className="syro-eparchy-countries">
+                  <div className="south-west-america position-absolute" role="button" tabIndex={0} aria-label="South West America">
+                    <span className="syro-country-tooltips" title="South West America" />
+                  </div>
+                  <div className="north-east-america position-absolute" role="button" tabIndex={0} aria-label="North East America">
+                    <span className="syro-country-tooltips" title="North East America" />
+                  </div>
+                  <div className="uk position-absolute" role="button" tabIndex={0} aria-label="UK">
+                    <span className="syro-country-tooltips" title="UK" />
+                  </div>
+                  <div className="africa position-absolute" role="button" tabIndex={0} aria-label="Africa">
+                    <span className="syro-country-tooltips" title="Africa" />
+                  </div>
+                  <div className="india position-absolute" role="button" tabIndex={0} aria-label="India">
+                    <span className="syro-country-tooltips" title="India" />
+                  </div>
+                </div>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/images/dioceses/mosc-diocese-map%20(2).jpg"
@@ -47,7 +57,6 @@ export default function SyroLocationsSection() {
                   height={600}
                   className="syro-locations-map-img"
                   style={{ width: '100%', height: 'auto' }}
-                  useMap="#diocese-locations-map"
                 />
               </div>
             </div>

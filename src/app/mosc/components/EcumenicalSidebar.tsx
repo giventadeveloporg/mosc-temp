@@ -22,9 +22,6 @@ const ecumenicalItems: EcumenicalItem[] = [
   { name: 'The Successor of St. Thomas in Europe', href: '/mosc/ecumenical/the-successor-of-st-thomas-in-europe' },
   { name: 'Co-operation with the Protestant Churches', href: '/mosc/ecumenical/co-operation-with-the-protestant-churches' },
   { name: 'Ecumenical ventures in modern times', href: '/mosc/ecumenical/ecumenical-ventures-in-modern-times' },
-  { name: 'Protestant Churches', href: '/mosc/ecumenical/protestant-churches' },
-  { name: 'Oriental Orthodox', href: '/mosc/ecumenical/oriental-orthodox' },
-  { name: 'Interfaith Dialogue', href: '/mosc/ecumenical/interfaith-dialogue' },
 ];
 
 export default function EcumenicalSidebar() {

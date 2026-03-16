@@ -49,20 +49,28 @@ const worldcouncilofchurchesPage = () => {
                       In terms of effectual and practical works the Department concentrates in four major areas, which are- a) Inter-Church relations b) State, National and International levels of ecumenical bodies c) Academic endeavors and mutual exchanges and d) Orthodox Mission. The Department is in the process of getting revamped in terms of its practical organization and outreaches.
                     </p>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Contact email: ecumenical@malankaraorthodoxchurch.in
-                    </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
+                    Contact email:{' '}
+                    <a href="mailto:ecumenical@malankaraorthodoxchurch.in" className="text-syro-red hover:underline font-medium">
+                      ecumenical@malankaraorthodoxchurch.in
+                    </a>
+                  </p>
+                  <div className="mb-8">
+                    <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-1">
                       President: H.G. Dr. Youhanon Mar Demetrios Metropolitan
                     </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Email: mar.demetrios@gmail.com
+                    <p className="font-syro-primary text-syro-dark-gray leading-relaxed pl-4 mt-2 border-l-2 border-syro-red/30">
+                      Email: <a href="mailto:mar.demetrios@gmail.com" className="text-syro-red hover:underline font-medium">mar.demetrios@gmail.com</a>
                     </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
+                  </div>
+
+                  <div className="mb-6">
+                    <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-1">
                       Secretary: Fr. Aswin Fernandis
                     </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Email: ecumenical@mosc.in
+                    <p className="font-syro-primary text-syro-dark-gray leading-relaxed pl-4 mt-2 border-l-2 border-syro-red/30">
+                      Email: <a href="mailto:ecumenical@mosc.in" className="text-syro-red hover:underline font-medium">ecumenical@mosc.in</a>
                     </p>
+                  </div>
                 </div>
               </div>
 
