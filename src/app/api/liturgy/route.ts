@@ -55,6 +55,7 @@ interface StrapiResponse {
 const LITURGY_DATA_SOURCE = process.env.LITURGY_DATA_SOURCE || 'external';
 const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || process.env.STRAPI_URL || 'http://localhost:1337';
 const TENANT_ID = process.env.NEXT_PUBLIC_TENANT_ID || '';
+/** External SMCIM liturgy API – used when LITURGY_DATA_SOURCE !== 'strapi' */
 const LITURGY_API_BASE = 'https://www.apiwebser.smcimprojects.com/api';
 
 // ---------------------------------------------------------------------------
@@ -82,10 +83,24 @@ export async function GET(request: NextRequest) {
 
 async function fetchFromStrapi(lng: string): Promise<NextResponse> {
   try {
+    // Per documentation: every list request must filter by tenant. Never omit the tenant filter.
+    if (!TENANT_ID || TENANT_ID.trim() === '') {
+      console.error('[Liturgy API] NEXT_PUBLIC_TENANT_ID is required when using Strapi. Set it in .env.local.');
+      return NextResponse.json(
+        {
+          error:
+            'Liturgy (Strapi) requires NEXT_PUBLIC_TENANT_ID. Set NEXT_PUBLIC_TENANT_ID in .env.local and restart the server.',
+        },
+        { status: 503 }
+      );
+    }
+
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 
-    // Next available liturgy day: date >= today, sort by date asc, take single record
+    // Next available liturgy day: date >= today, sort by date asc, take single record.
+    // Always include tenant filter per liturgy-calendar API docs (filters[tenant][tenantId][$eq]).
     const baseParams = new URLSearchParams({
+      'filters[tenant][tenantId][$eq]': TENANT_ID,
       'filters[date][$gte]': today,
       'filters[publishedAt][$notNull]': 'true',
       'populate[0]': 'readings',
@@ -100,52 +115,40 @@ async function fetchFromStrapi(lng: string): Promise<NextResponse> {
       reqHeaders['Authorization'] = `Bearer ${strapiToken}`;
     }
 
-    // Build candidate URLs: try with tenant first (if configured), then without.
-    // The liturgy-day content type may or may not have a tenant relation;
-    // when the relation is absent Strapi can return 200 with empty data or 400.
-    // In either case, fall back to querying without the tenant filter.
-    const urls: string[] = [];
-    if (TENANT_ID) {
-      const withTenant = new URLSearchParams(baseParams);
-      withTenant.set('filters[tenant][tenantId][$eq]', TENANT_ID);
-      urls.push(`${STRAPI_URL}/api/liturgy-days?${withTenant.toString()}`);
+    const url = `${STRAPI_URL}/api/liturgy-days?${baseParams.toString()}`;
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Liturgy API] Strapi request (tenant in query):', url.replace(TENANT_ID, '***'));
     }
-    urls.push(`${STRAPI_URL}/api/liturgy-days?${baseParams.toString()}`);
 
-    let json: StrapiResponse | null = null;
-    for (const url of urls) {
+    const res = await fetch(url, { method: 'GET', headers: reqHeaders, next: { revalidate: 3600 } });
+
+    if (!res.ok) {
+      const errBody = await res.text();
       if (process.env.NODE_ENV === 'development') {
-        console.log('[Liturgy API] Strapi request:', url.replace(TENANT_ID || '__NONE__', '***'));
+        console.log('[Liturgy API] Strapi returned', res.status, 'Body:', errBody.slice(0, 500));
       }
-      const res = await fetch(url, { method: 'GET', headers: reqHeaders, next: { revalidate: 3600 } });
-
-      if (!res.ok) {
-        if (process.env.NODE_ENV === 'development') {
-          const errBody = await res.text();
-          console.log('[Liturgy API] Strapi returned', res.status, '-- trying next URL. Body:', errBody.slice(0, 500));
-        }
-        continue;
-      }
-
-      const body: StrapiResponse = await res.json();
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[Liturgy API] Strapi raw response (' + (body.data?.length ?? 0) + ' items):', JSON.stringify(body, null, 2).slice(0, 2000));
-      }
-
-      if (body.data && body.data.length > 0) {
-        json = body;
-        break;
-      }
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[Liturgy API] 0 results -- trying next URL');
-      }
+      return NextResponse.json(
+        { error: 'Strapi liturgy-days request failed' },
+        { status: 502 }
+      );
     }
+
+    const body: StrapiResponse = await res.json();
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Liturgy API] Strapi raw response (' + (body.data?.length ?? 0) + ' items)');
+    }
+
+    const json: StrapiResponse | null = body.data && body.data.length > 0 ? body : null;
 
     if (!json) {
       if (process.env.NODE_ENV === 'development') {
         console.log('[Liturgy API] Strapi: no liturgy day found for date >=', today, '-- returning empty message');
       }
-      return NextResponse.json({ message: [] }, { status: 200 });
+      const emptyBody: { message: LiturgyReading[]; _debug?: { source: string; url: string } } = { message: [] };
+      if (process.env.NODE_ENV === 'development') {
+        emptyBody._debug = { source: 'Strapi', url: `${STRAPI_URL}/api/liturgy-days` };
+      }
+      return NextResponse.json(emptyBody, { status: 200 });
     }
 
     const strapiDay: StrapiLiturgyDay = json.data[0];
@@ -155,7 +158,14 @@ async function fetchFromStrapi(lng: string): Promise<NextResponse> {
       console.log('[Liturgy API] Mapped', message.length, 'readings for', lng, 'date', strapiDay.date);
     }
 
-    return NextResponse.json({ message, liturgyDate: strapiDay.date });
+    const responseBody: { message: LiturgyReading[]; liturgyDate: string; _debug?: { source: string; url: string } } = {
+      message,
+      liturgyDate: strapiDay.date,
+    };
+    if (process.env.NODE_ENV === 'development') {
+      responseBody._debug = { source: 'Strapi', url: `${STRAPI_URL}/api/liturgy-days` };
+    }
+    return NextResponse.json(responseBody);
   } catch (err) {
     console.error('[Liturgy API] Strapi fetch error:', err);
     return NextResponse.json(
@@ -241,7 +251,11 @@ async function fetchFromExternalApi(lng: string): Promise<NextResponse> {
     }
 
     const data: LiturgyApiResponse = await res.json();
-    return NextResponse.json(data);
+    const body = { ...data } as LiturgyApiResponse & { _debug?: { source: string; url: string } };
+    if (process.env.NODE_ENV === 'development') {
+      body._debug = { source: 'External SMCIM API', url: `${LITURGY_API_BASE}/liturgy` };
+    }
+    return NextResponse.json(body);
   } catch (err) {
     console.error('[Liturgy API] External fetch error:', err);
     return NextResponse.json(

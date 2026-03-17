@@ -214,7 +214,7 @@ export default function SyroFooter() {
                 </div>
                 <div className="social-media">
                   <h6 className="mb-2 text-white">Social With Us</h6>
-                  <ul id="socialmedias" className="list-unstyled d-flex flex-wrap gap-2 align-items-center">
+                  <ul id="socialmedias" className="list-unstyled d-flex flex-wrap gap-2 align-items-center p-2">
                     {hasAnySocial && (
                       <>
                         {settings?.facebookUrl?.trim() && (
