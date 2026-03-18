@@ -142,12 +142,9 @@ export default clerkMiddleware(
   },
   {
     ...satConfig,
-    frontendApiProxy: {
-      // Only enable in production — in local dev, Clerk uses its own dev FAPI domain
-      // directly and doesn't need a proxy. In production, the proxy is required because
-      // clerk.event-site-manager.com needs to be reached through /__clerk/* with proper headers.
-      enabled: process.env.NODE_ENV === 'production',
-    },
+    // NOTE: frontendApiProxy REMOVED. The CNAME clerk.event-site-manager.com is verified
+    // and points to frontend-api.clerk.services, so Clerk reaches its FAPI directly.
+    // The proxy was causing auth failures (couldn't register in Clerk Dashboard).
     signInUrl: process.env.NEXT_PUBLIC_APP_URL?.includes('amplifyapp.com') || process.env.NEXT_PUBLIC_APP_URL?.includes('mosc-temp.com')
       ? `https://${process.env.NEXT_PUBLIC_PRIMARY_DOMAIN || 'www.event-site-manager.com'}/sign-in`
       : '/sign-in',
@@ -156,10 +153,9 @@ export default clerkMiddleware(
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and static files
-    // NOTE: __clerk is included in the matcher so frontendApiProxy can intercept and proxy
-    // requests with proper headers. The old manual rewrite has been removed.
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    '/(api|trpc|__clerk)(.*)',
+    // Skip Next.js internals, static files, AND /__clerk
+    // __clerk excluded — using CNAME (clerk.event-site-manager.com) directly, no proxy needed.
+    '/((?!_next|__clerk|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    '/(api|trpc)(.*)',
   ],
 };
