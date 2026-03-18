@@ -88,15 +88,19 @@ export default async function RootLayout({
     (satelliteDomain && hostname.includes(satelliteDomain.replace('www.', '')));
 
   // Satellite domains must redirect to primary domain for authentication
+  // Clerk v7: proxyUrl removed — frontendApiProxy in clerkMiddleware handles it.
+  // afterSignOutUrl moved from UserButton to provider level.
   clerkProps = isSatellite
     ? {
       isSatellite: true,
       domain: satelliteDomain,
       signInUrl: `https://${primaryDomain}/sign-in`,
       signUpUrl: `https://${primaryDomain}/sign-up`,
+      afterSignOutUrl: '/',
     }
     : {
       allowedRedirectOrigins: appUrl ? [appUrl] : [],
+      afterSignOutUrl: '/',
     };
 
   // Determine tenant-scoped admin flag on the server
@@ -364,7 +368,9 @@ export default async function RootLayout({
     isTenantAdmin = false;
   }
 
-  const layoutContent = (
+  // Clerk v7 / Core 3: ClerkProvider must be inside <body>, not wrapping <html>.
+  // We inline the ClerkProvider wrapping instead of using a separate layoutContent variable.
+  return (
       <html lang="en" suppressHydrationWarning>
         <head>
           {/* Header Design System Fonts - DM Serif Display + Plus Jakarta Sans */}
@@ -374,6 +380,8 @@ export default async function RootLayout({
           <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
         </head>
         <body className={inter.className + " flex flex-col min-h-screen"} suppressHydrationWarning>
+          {CLERK_KEY ? (
+          <ClerkProvider publishableKey={CLERK_KEY} {...clerkProps}>
           <ClerkSyncUrlCleanup />
           <ClerkSatelliteSyncGate />
           <TenantIdInjector />
@@ -408,16 +416,44 @@ export default async function RootLayout({
           />
           {/* Mobile Debug Console - Always available for log copying, even on error pages */}
           <MobileDebugConsole />
+          </ClerkProvider>
+          ) : (
+          <>
+          <ClerkSyncUrlCleanup />
+          <ClerkSatelliteSyncGate />
+          <TenantIdInjector />
+          <TrpcProvider>
+            <TenantSettingsProvider>
+              <ConditionalLayout
+                header={<Header hideMenuItems={false} isTenantAdmin={isTenantAdmin} />}
+                footer={<Footer />}
+              >
+                {children}
+              </ConditionalLayout>
+            </TenantSettingsProvider>
+          </TrpcProvider>
+          <Script
+            id="hcaptcha-config"
+            strategy="beforeInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                window.hcaptchaConfig = {
+                  passive: true,
+                  usePassiveEventListeners: true
+                };
+              `,
+            }}
+          />
+          <Script
+            id="givebutter-widget"
+            src="https://widgets.givebutter.com/latest.umd.cjs?acct=mKoUpYQebNsn6RqA&p=other"
+            strategy="afterInteractive"
+            async
+          />
+          <MobileDebugConsole />
+          </>
+          )}
         </body>
       </html>
   );
-
-  if (CLERK_KEY) {
-    return (
-      <ClerkProvider publishableKey={CLERK_KEY} {...clerkProps}>
-        {layoutContent}
-      </ClerkProvider>
-    );
-  }
-  return layoutContent;
 }
