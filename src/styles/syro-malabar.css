@@ -243,6 +243,7 @@ body:has(.syro-layout) {
 /* Overlay pins container (same pattern as syro-malabar-church index.html #eparchy_countries) */
 .syro-locations-map-wrap.syro-img-map-container {
   position: relative;
+  overflow: visible;
 }
 
 .syro-eparchy-countries {
@@ -250,45 +251,55 @@ body:has(.syro-layout) {
   inset: 0;
   z-index: 1;
   pointer-events: none;
+  overflow: visible;
 }
 
+/* Pin wrapper: no hover, so tooltip does not trigger on empty space around pin */
 .syro-eparchy-countries > div {
+  pointer-events: none;
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+/* Only the circle (pin) triggers tooltip; hit area = pin graphic only */
+.syro-eparchy-countries .syro-country-tooltips,
+.syro-eparchy-countries .country-tooltips {
   pointer-events: auto;
   cursor: pointer;
-  min-height: 15%;
-  min-width: 6%;
-  transform: translate(-50%, -50%);
-}
-
-.syro-eparchy-countries .syro-country-tooltips {
   display: block;
-  padding: 80% 5%;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
 }
 
-/* Left-to-right pin positions (1200×600 map): South West America, North East America, UK, Africa, India */
+/* Pin positions over map: South West America, North East America, UK, Africa, India */
 .syro-eparchy-countries .south-west-america {
-  left: 18.33%;
-  top: 33.33%;
+  left: 15.33%;
+  top: 45.33%;
 }
 
 .syro-eparchy-countries .north-east-america {
-  left: 33.33%;
-  top: 60%;
+  left: 26.33%;
+  top: 21%;
 }
 
 .syro-eparchy-countries .uk {
-  left: 46.67%;
-  top: 30%;
+  left: 45.67%;
+  top: 10%;
 }
 
 .syro-eparchy-countries .africa {
-  left: 50%;
-  top: 66.67%;
+  left: 54%;
+  top: 44.67%;
 }
 
 .syro-eparchy-countries .india {
-  left: 68.33%;
-  top: 50%;
+  left: 67.33%;
+  top: 32%;
 }
 
 .syro-locations-map-img {
@@ -296,6 +307,13 @@ body:has(.syro-layout) {
   height: auto;
   display: block;
   vertical-align: middle;
+}
+
+/* Bootstrap tooltip custom class for location pins (match syromalabarchurch.in) */
+.location-tooltip {
+  --bs-tooltip-bg: #dc3545;
+  font-size: 18px;
+  opacity: 1 !important;
 }
 
 .syro-locations-cta {
