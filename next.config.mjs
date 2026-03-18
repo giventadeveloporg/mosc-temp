@@ -47,13 +47,11 @@ const nextConfig = {
 
   // No redirects from /mosc; /mosc-old exists on its own (rewrite only)
 
-  // Rewrites: /mosc = app/mosc (Syro), /mosc-old = app/mosc-old (legacy) via filesystem; no path rewrites needed.
+  // Clerk FAPI proxy is now handled by clerkMiddleware's frontendApiProxy option (v7+).
+  // The old manual rewrite for /__clerk/* has been removed because it didn't forward
+  // required headers (Clerk-Proxy-Url, Clerk-Secret-Key, X-Forwarded-For).
   async rewrites() {
-    const clerkFrontendApi = process.env.NEXT_PUBLIC_CLERK_FRONTEND_API_URL || 'https://clerk.event-site-manager.com';
-
-    return [
-      { source: '/__clerk/:path*', destination: `${clerkFrontendApi}/:path*` },
-    ];
+    return [];
   },
 
   // Configure headers if needed

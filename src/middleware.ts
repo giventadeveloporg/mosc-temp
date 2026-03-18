@@ -8,19 +8,22 @@ const DEBUG_MIDDLEWARE = process.env.NEXT_PUBLIC_DEBUG_MIDDLEWARE === 'true';
 const debugLog = (...args: unknown[]) => { if (DEBUG_MIDDLEWARE) console.log(...args); };
 
 /**
- * Clerk v6 Middleware
+ * Clerk v7 / Core 3 Middleware
  *
- * CRITICAL: Clerk 6 requires the default export to be the return value of clerkMiddleware()
+ * CRITICAL: Clerk 7 requires the default export to be the return value of clerkMiddleware()
  * so it can detect usage and allow auth() in layout.tsx. Do not wrap in a custom function.
  *
  * - Public routes: do not call auth.protect(), return NextResponse.next() with x-pathname.
  * - Protected routes: call auth.protect(), then return NextResponse.next() with x-pathname.
  * - x-pathname on request headers so layout can read it via headers() (Next.js 15+).
+ * - frontendApiProxy handles FAPI proxying with proper headers (Clerk-Proxy-Url,
+ *   Clerk-Secret-Key, X-Forwarded-For). Replaces old manual Next.js rewrite.
  *
  * See: .cursor/rules/clerk_auth_admin_user_lookup.mdc
  */
 
 // Satellite config (disabled for localhost)
+// Clerk v7: proxyUrl removed — frontendApiProxy in clerkMiddleware handles FAPI proxying.
 const isLocalhost = process.env.NEXT_PUBLIC_APP_URL?.includes('localhost') ||
                     process.env.NEXT_PUBLIC_APP_URL?.includes('127.0.0.1') ||
                     !process.env.NEXT_PUBLIC_APP_URL;
@@ -29,13 +32,10 @@ const isSatEnv = !isLocalhost && (
   process.env.NEXT_PUBLIC_APP_URL?.includes('mosc-temp.com')
 );
 const satDomain = process.env.NEXT_PUBLIC_CLERK_DOMAIN || (process.env.NEXT_PUBLIC_APP_URL?.includes('mosc-temp.com') ? 'www.mosc-temp.com' : undefined);
-const satProxyUrl = process.env.NEXT_PUBLIC_CLERK_PROXY_URL;
 const satConfig: Record<string, unknown> = {};
 if (isSatEnv && !isLocalhost) {
   if (satDomain) {
     Object.assign(satConfig, { isSatellite: true, domain: satDomain });
-  } else if (satProxyUrl) {
-    Object.assign(satConfig, { isSatellite: true, proxyUrl: satProxyUrl });
   }
 }
 
@@ -142,6 +142,9 @@ export default clerkMiddleware(
   },
   {
     ...satConfig,
+    frontendApiProxy: {
+      enabled: true,
+    },
     signInUrl: process.env.NEXT_PUBLIC_APP_URL?.includes('amplifyapp.com') || process.env.NEXT_PUBLIC_APP_URL?.includes('mosc-temp.com')
       ? `https://${process.env.NEXT_PUBLIC_PRIMARY_DOMAIN || 'www.event-site-manager.com'}/sign-in`
       : '/sign-in',
@@ -150,8 +153,10 @@ export default clerkMiddleware(
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and static files (Clerk-recommended pattern)
+    // Skip Next.js internals and static files
+    // NOTE: __clerk is included in the matcher so frontendApiProxy can intercept and proxy
+    // requests with proper headers. The old manual rewrite has been removed.
     '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    '/(api|trpc)(.*)',
+    '/(api|trpc|__clerk)(.*)',
   ],
 };
