@@ -1,3 +1,5 @@
+import Script from 'next/script';
+
 /**
  * Renders static Syro CSS and font links in the initial HTML so styles are available
  * from first paint, preventing menu bar flickering. Server Component - no client-side injection.
@@ -11,6 +13,8 @@ export default function SyroStaticAssets() {
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
       {/* Syro styles - available from first paint, eliminates flicker */}
       <link rel="stylesheet" href={`${base}/css/bootstrap.min.css`} data-syro-static="true" />
+      {/* Bootstrap JS for tooltips (e.g. location pins on map) */}
+      <Script src={`${base}/js/bootstrap.bundle.min.js`} strategy="afterInteractive" />
       <link rel="stylesheet" href={`${base}/css/swiper-bundle.min.css`} data-syro-static="true" />
       <link rel="stylesheet" href={`${base}/css/tiny-slider.css`} data-syro-static="true" />
       <link rel="stylesheet" href={`${base}/fonts/fontawesome/css/all.min.css`} data-syro-static="true" />

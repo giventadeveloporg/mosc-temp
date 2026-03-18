@@ -23,8 +23,6 @@ export default function SyroLiturgySection() {
   const [liturgyDate, setLiturgyDate] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [sourceLabel, setSourceLabel] = useState<{ source: string; url: string } | null>(null);
-
   const fetchReadings = useCallback((language: 'en' | 'ml') => {
     setLoading(true);
     setError(null);
@@ -37,17 +35,15 @@ export default function SyroLiturgySection() {
         }
         return res.json();
       })
-      .then((data: { message?: LiturgyReading[]; liturgyDate?: string; _debug?: { source: string; url: string } }) => {
+      .then((data: { message?: LiturgyReading[]; liturgyDate?: string }) => {
         const list = Array.isArray(data?.message) ? data.message : [];
         setReadings(list);
         setLiturgyDate(data?.liturgyDate ?? null);
-        setSourceLabel(data?._debug ?? null);
       })
       .catch((err) => {
         setError(err instanceof Error ? err.message : 'Failed to load liturgy readings');
         setReadings(null);
         setLiturgyDate(null);
-        setSourceLabel(null);
       })
       .finally(() => {
         setLoading(false);
@@ -221,22 +217,6 @@ export default function SyroLiturgySection() {
                                   No readings available for this day.
                                 </p>
                               )}
-
-                            {/* Dev-only: show which URL/source the liturgy data comes from */}
-                            {sourceLabel && (
-                              <p
-                                style={{
-                                  fontSize: '12px',
-                                  color: '#95b6d9',
-                                  opacity: 0.9,
-                                  marginTop: '8px',
-                                  marginBottom: 0,
-                                }}
-                                title={sourceLabel.url}
-                              >
-                                Data from: {sourceLabel.source} — {sourceLabel.url}
-                              </p>
-                            )}
 
                             {/* Readings data */}
                             {!loading &&

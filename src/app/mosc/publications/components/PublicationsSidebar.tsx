@@ -1,7 +1,6 @@
 import Link from 'next/link';
 
 const PUBLICATIONS_LINKS: { slug: string; label: string }[] = [
-  { slug: '', label: 'Publications' },
   { slug: 'malankara-sabha-magazine-masika', label: 'Malankara Sabha Magazine (Masika)' },
 ];
 
