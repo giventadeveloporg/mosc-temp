@@ -33,4 +33,6 @@ export const DIOCESES_LIST: { name: string; href: string }[] = [
   { name: 'Diocese of Northeast America', href: '/mosc/dioceses/northeast-america' },
   { name: 'Diocese of South West America', href: '/mosc/dioceses/diocese-of-south-west-america' },
   { name: 'Diocese of UK Europe and Africa', href: '/mosc/dioceses/diocese-of-uk-europe-and-africa' },
+  { name: 'ASIA PACIFIC', href: '/mosc/dioceses/asia-pacific' },
+  { name: 'CANADA', href: '/mosc/dioceses/canada' },
 ];

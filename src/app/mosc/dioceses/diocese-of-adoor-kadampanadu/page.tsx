@@ -45,13 +45,38 @@ const dioceseofadoorkadampanaduPage = () => {
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       H.G. Zacharias mar Aprem appointed as the first metropolitanÂ  of Adoor - Kadampanadu diocese.Under the Spiritual Guidance and friutful leadership of mar Aprem Metropolitan ,the diocese started a couple of Spiritual and charitable initiatives.More over the diocese runs Sreyas Art and Graphics Dept., Sreyas Art and Theology Dept.,Sreyas Old age and retirement home etc.
                     </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Address:
-Sreyas Aramana, Mar Epiphanios Centre, Kannamcode, Adoor P.O
-Pathanamthitta â€“ 691523
-drzachariasmaraprem@gmail.com, akdiocese@gmail.com
-Ph: 04734 227117, 227271
-                    </p>
+                  <div className="mt-8 flex max-w-xl overflow-hidden rounded-lg border border-syro-table-border bg-syro-bg-gray shadow-syro-card">
+                    <div className="w-[7px] flex-shrink-0 bg-syro-red" aria-hidden="true" />
+                    <div className="flex-1 p-5 font-syro-primary text-syro-dark-gray leading-relaxed space-y-2 text-sm">
+                      <p className="mb-1">
+                        <span className="font-semibold">Office:</span>
+                        <br />
+                        Sreyas Aramana, Mar Epiphanios Centre,
+                        <br />
+                        Kannamcode, Adoor - 691 523.
+                      </p>
+                      <p>
+                        <span className="font-semibold">Phone:</span> 04734 227117, 227271
+                      </p>
+                      <p>
+                        <span className="font-semibold">E-mail:</span>{' '}
+                        <a href="mailto:akdiocese@gmail.com" className="text-syro-red hover:underline font-medium">akdiocese@gmail.com</a>
+                      </p>
+                      <p>
+                        <a
+                          href="https://share.google/znjgX8wo7d6N676rM"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="syro-primary-button inline-flex items-center gap-2 w-fit"
+                        >
+                          <span>View on Map</span>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                          </svg>
+                        </a>
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
               {/* Quick Links - below content (desktop, same as administration) */}

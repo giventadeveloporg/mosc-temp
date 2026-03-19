@@ -50,17 +50,6 @@ const dioceseofthiruvananthapuramdiocesePage = () => {
                     The Charitable and Educational Society of the Thiruvananthapuram Orthodox Diocese is a registered society established in 1991 for starting and managing institutions of higher education in Thiruvananthapuram. The Society is sponsored by Thiruvananthapuram Diocese of Malankara Orthodox Church. H.G. Geevarghese Mar Dioscoros was the founder President of the Society. H. H. Baselios Mar Thoma Paulose II, the Catholicose of the East, is the patron of the Society. The metropolitan of the Thiruvananthapuram Orthodox Diocese, H. G. Dr. Gabriel Mar Gregorios, is the present president of the Society. The society runs Mar Dioscorus College of Pharmacy (MDCP), Sreekariyam.
                   </p>
 
-                  <div className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6 space-y-1">
-                    <p><strong>Mailing Address:</strong> Orthodox church centre, Ulloor Medical college P.O Trivandrum -695011 / V M D M Centre, Edamulakkal P.O, Anchal</p>
-                    <p><strong>Ph:</strong> 0475 2273493</p>
-                    <p><strong>Email:</strong>{' '}
-                      <a href="mailto:gabrielmargregorios@gmail.com" className="text-syro-red hover:underline font-medium">gabrielmargregorios@gmail.com</a>
-                    </p>
-                    <p><strong>Web:</strong>{' '}
-                      <a href="https://www.tvmdiocese.org/" target="_blank" rel="noopener noreferrer" className="text-syro-red hover:underline font-medium">www.tvmdiocese.org</a>
-                    </p>
-                  </div>
-
                   <h3 className="font-syro-display font-semibold text-xl text-syro-blue mt-8 mb-4">
                     H.G. Geevarghese Mar Dioscorus – 1st Metropolitan of Thiruvananthapuram Diocese
                   </h3>
@@ -76,6 +65,39 @@ const dioceseofthiruvananthapuramdiocesePage = () => {
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       He died on 23rd July 1999 and was interred in Holy Trinity Ashram, Ranny.
                     </p>
+
+                  <div className="mt-8 flex max-w-xl overflow-hidden rounded-lg border border-syro-table-border bg-syro-bg-gray shadow-syro-card">
+                    <div className="w-[7px] flex-shrink-0 bg-syro-red" aria-hidden="true" />
+                    <div className="flex-1 p-5 font-syro-primary text-syro-dark-gray leading-relaxed space-y-2 text-sm">
+                      <p className="mb-1">
+                        <span className="font-semibold">Office:</span>
+                        <br />
+                        Sreyas Aramana, Mar Epiphanios Centre,
+                        <br />
+                        Kannamcode, Adoor - 691 523.
+                      </p>
+                      <p>
+                        <span className="font-semibold">Phone:</span> 04734 227117, 227271
+                      </p>
+                      <p>
+                        <span className="font-semibold">E-mail:</span>{' '}
+                        <a href="mailto:akdiocese@gmail.com" className="text-syro-red hover:underline font-medium">akdiocese@gmail.com</a>
+                      </p>
+                      <p>
+                        <a
+                          href="https://share.google/znjgX8wo7d6N676rM"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="syro-primary-button inline-flex items-center gap-2 w-fit"
+                        >
+                          <span>View on Map</span>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                          </svg>
+                        </a>
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
               {/* Quick Links - below content (desktop, same as administration) */}

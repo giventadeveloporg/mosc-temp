@@ -42,15 +42,39 @@ const dioceseofkottarakarapunalurPage = () => {
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       Kottarakkara Punalur Diocese is one of the 30 dioceses of the Malankara Orthodox Syrian Church. The diocese was created after dividing the then existed Thiruvananthapuram Diocese and Kollam Diocese on 15 August 2010. The new diocese was inagurated on 23 January 2011. H.G. Yuhanon Mar Thevodoros was installed the first Metropolitan of the diocese.Kottarakkara Kottappuram Seminary is the Bishop house of the Diocese
                     </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Address: - Kottapuram Seminary,Â Pulamon,Â Kottarakara.
-                    </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Phone: 0474- 2652755, 9446664270
-                    </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Email: kottappuramseminary@gmail.com
-                    </p>
+
+                  <div className="mt-8 flex max-w-xl overflow-hidden rounded-lg border border-syro-table-border bg-syro-bg-gray shadow-syro-card">
+                    <div className="w-[7px] flex-shrink-0 bg-syro-red" aria-hidden="true" />
+                    <div className="flex-1 p-5 font-syro-primary text-syro-dark-gray leading-relaxed space-y-2 text-sm">
+                      <p className="mb-1">
+                        <span className="font-semibold">Office:</span>
+                        <br />
+                        Kottapuram Seminary,
+                        <br />
+                        Pulamon, Kottarakkara.
+                      </p>
+                      <p>
+                        <span className="font-semibold">Phone:</span> 0474 2652755, 9446664270
+                      </p>
+                      <p>
+                        <span className="font-semibold">E-mail:</span>{' '}
+                        <a href="mailto:kottappuramseminary@gmail.com" className="text-syro-red hover:underline font-medium">kottappuramseminary@gmail.com</a>
+                      </p>
+                      <p>
+                        <a
+                          href="https://share.google/xVfBYcCfzWpngjd6k"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="syro-primary-button inline-flex items-center gap-2 w-fit"
+                        >
+                          <span>View on Map</span>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                          </svg>
+                        </a>
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
               {/* Quick Links - below content (desktop, same as administration) */}
