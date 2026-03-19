@@ -99,18 +99,38 @@ const dioceseofmavelikaraPage = () => {
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       All parishes under the diocese are urged to promote and implement Eco- friendly practices in order to protect our natural environment.
                     </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Contact details
-                    </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      TheobhavanAramana, Thazhakkara P.O, Mavelikkara- 690102
-                    </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Phone: 0479-2309900
-                    </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Email: marpachomios@gmail.com,mavelikaraorthodoxdiocese@gmail.com
-                    </p>
+                  <div className="mt-8 flex max-w-xl overflow-hidden rounded-lg border border-syro-table-border bg-syro-bg-gray shadow-syro-card">
+                    <div className="w-[7px] flex-shrink-0 bg-syro-red" aria-hidden="true" />
+                    <div className="flex-1 p-5 font-syro-primary text-syro-dark-gray leading-relaxed space-y-2 text-sm">
+                      <p className="mb-1">
+                        <span className="font-semibold">Office:</span>
+                        <br />
+                        Theo Bhavan, Thazhakara P.O,
+                        <br />
+                        Mavelikara - 690 102
+                      </p>
+                      <p>
+                        <span className="font-semibold">Ph:</span> (O) 0479 2309900
+                      </p>
+                      <p>
+                        <span className="font-semibold">E-mail:</span>{' '}
+                        <a href="mailto:marpachomios@gmail.com" className="text-syro-red hover:underline font-medium">marpachomios@gmail.com</a>
+                      </p>
+                      <p>
+                        <a
+                          href="https://share.google/KFuhxKZGb9NPAskrr"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="syro-primary-button inline-flex items-center gap-2 w-fit"
+                        >
+                          <span>View on Map</span>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                          </svg>
+                        </a>
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
               {/* Quick Links - below content (desktop, same as administration) */}

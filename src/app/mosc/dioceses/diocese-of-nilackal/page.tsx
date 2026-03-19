@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import QuickLinks from '../../components/QuickLinks';
@@ -45,32 +45,58 @@ The name Nilackal is associated with the Christian Community founded by St.Thoma
 All the spiritual organizations of Malankara Orthodox Church and the movements like Ecology Commission, Sushrushaka Sangam, Lehari Virudha Sangam, Dasamsadayaka Sangam,Â  INAMS are also performing at its best.
 The Diocese purchased a building of about 12000 Sq.feet in Ranni Town andÂ  made it the head quarters of the diocese with the name St.Thomas Aramana. Many majorÂ  projects like construction of a Convention Centre at Catholicate Centre Ranni, Completion of the Catholicate Centre at Angamoozhi, Nilackal, beginning of St.Gregorios Mission Centre at Vellayil, Ayroor and starting of anÂ  Education Institution are under serious consideration. The new diocese also made initiative in various charitable activities by supporting the poor and the needy of the diocese as well as the society around.
                     </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Address: Nilackal Orthodox diocesan Centre, Â St.Thomas Aramana, Pazhavangadi P.O, Ranni, Pathanamthitta- 689673
-                    </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Phone: 04735- 224477
-                    </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Email: nilackaldiocese@gmail.com
-                    </p>
+                  <div className="mt-8 flex max-w-xl overflow-hidden rounded-lg border border-syro-table-border bg-syro-bg-gray shadow-syro-card">
+                    <div className="w-[7px] flex-shrink-0 bg-syro-red" aria-hidden="true" />
+                    <div className="flex-1 p-5 font-syro-primary text-syro-dark-gray leading-relaxed space-y-2 text-sm">
+                      <p className="mb-1">
+                        <span className="font-semibold">Office:</span>
+                        <br />
+                        Nilackal Orthodox Diocesan Centre,
+                        <br />
+                        St. Thomas Aramana, Pazhavangadi PO,
+                        <br />
+                        Ranni, Pathanamthitta - 689 673
+                      </p>
+                      <p>
+                        <span className="font-semibold">Ph:</span> 04735 224477
+                      </p>
+                      <p>
+                        <span className="font-semibold">E-mail:</span>{' '}
+                        <a href="mailto:nilackaldiocese@gmail.com" className="text-syro-red hover:underline font-medium">nilackaldiocese@gmail.com</a>
+                      </p>
+                      <p>
+                        <a
+                          href="https://share.google/MrTzPdx3iH3rftLIx"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="syro-primary-button inline-flex items-center gap-2 w-fit"
+                        >
+                          <span>View on Map</span>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                          </svg>
+                        </a>
+                      </p>
+                </div>
+              </div>
+ Â
                 </div>
               </div>
               {/* Quick Links - below content (desktop, same as administration) */}
               <div className="mt-8 hidden lg:block">
                 <QuickLinks />
+                </div>
               </div>
-            </div>
 
             {/* Sidebar */}
             <div className="space-y-6 lg:col-span-1">
               <DiocesesSidebar />
-            </div>
-          </div>
+                </div>
+              </div>
           <div className="mt-8 lg:hidden">
             <QuickLinks />
-          </div>
-        </div>
+                </div>
+              </div>
       </section>
     </div>
   );
