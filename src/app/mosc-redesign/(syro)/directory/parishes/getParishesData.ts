@@ -63,6 +63,8 @@ export async function getParishesData(options: {
   nameSearch?: string;
   /** Case-insensitive match on parish vicar (priest) name — Strapi `filters[vicar][name][$containsi]`. */
   vicarNameSearch?: string;
+  /** Strapi `filters[diocese][documentId][$eq]` — parishes linked to this diocese. */
+  dioceseDocumentId?: string;
   page?: number;
   pageSize?: number;
 }): Promise<ParishesListResult> {
@@ -73,6 +75,8 @@ export async function getParishesData(options: {
 
   const params = new URLSearchParams();
   params.set('filters[tenant][tenantId][$eq]', tenantId);
+  const dioceseId = options.dioceseDocumentId?.trim();
+  if (dioceseId) params.set('filters[diocese][documentId][$eq]', dioceseId);
   const nameQuery = options.nameSearch?.trim();
   if (nameQuery) params.set('filters[name][$containsi]', nameQuery);
   const vicarQuery = options.vicarNameSearch?.trim();

@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getDioceseByDocumentId } from '../getDiocesesData';
+import { getParishesData } from '../../parishes/getParishesData';
 import SyroPageBanner from '../../../components/SyroPageBanner';
 
 type PageProps = { params: Promise<{ documentId: string }> };
@@ -22,6 +23,15 @@ export default async function DioceseDetailPage({ params }: PageProps) {
   const { documentId } = await params;
   const diocese = await getDioceseByDocumentId(documentId);
   if (!diocese) notFound();
+
+  const { pagination: parishPagination } = await getParishesData({
+    dioceseDocumentId: documentId,
+    page: 1,
+    pageSize: 1,
+  });
+  const parishTotal = parishPagination.total;
+  const hasParishes = parishTotal > 0;
+  const parishesListHref = `/mosc-redesign/directory/parishes?diocese=${encodeURIComponent(documentId)}`;
 
   return (
     <div className="min-h-screen bg-syro-bg-gray">
@@ -93,6 +103,23 @@ export default async function DioceseDetailPage({ params }: PageProps) {
                 >
                   {diocese.website}
                 </a>
+              </div>
+            )}
+            {hasParishes && (
+              <div className="pt-2 border-t border-syro-table-border/40">
+                <h3 className="font-heading font-medium text-syro-blue mb-2">Parishes</h3>
+                <p className="font-body text-syro-dark-gray mb-3">
+                  {parishTotal} parish{parishTotal !== 1 ? 'es' : ''} in this diocese are listed in the directory.
+                </p>
+                <Link
+                  href={parishesListHref}
+                  className="inline-flex items-center gap-2 no-underline font-light text-white bg-[#dc3545] py-2.5 px-5 border-r-[7px] border-r-[#be1929] transition-[1s] hover:bg-[#be1929] hover:border-r-[6px] hover:border-r-[#dc3545] hover:text-white"
+                >
+                  View paginated list of parishes
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </Link>
               </div>
             )}
           </div>

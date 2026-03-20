@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { getParishesData } from './getParishesData';
+import { getDioceseByDocumentId } from '../dioceses/getDiocesesData';
 import type { Parish } from './types';
 import SyroPageBanner from '../../components/SyroPageBanner';
 
@@ -15,13 +16,14 @@ export const metadata: Metadata = {
 const PAGE_SIZE = 20;
 const BASE_PATH = '/mosc-redesign/directory/parishes';
 
-type PageProps = { searchParams: Promise<{ page?: string; q?: string; pq?: string }> };
+type PageProps = { searchParams: Promise<{ page?: string; q?: string; pq?: string; diocese?: string }> };
 
-function buildUrl(page: number, q?: string, pq?: string): string {
+function buildUrl(page: number, q?: string, pq?: string, dioceseDocumentId?: string): string {
   const params = new URLSearchParams();
   if (page > 1) params.set('page', String(page));
   if (q?.trim()) params.set('q', q.trim());
   if (pq?.trim()) params.set('pq', pq.trim());
+  if (dioceseDocumentId?.trim()) params.set('diocese', dioceseDocumentId.trim());
   const query = params.toString();
   return query ? `${BASE_PATH}?${query}` : BASE_PATH;
 }
@@ -31,29 +33,42 @@ export default async function ParishesPage({ searchParams }: PageProps) {
   const page = Math.max(1, parseInt(params.page ?? '1', 10) || 1);
   const nameSearch = typeof params.q === 'string' ? params.q : undefined;
   const priestSearch = typeof params.pq === 'string' ? params.pq : undefined;
+  const dioceseParam = typeof params.diocese === 'string' ? params.diocese.trim() : '';
+  const dioceseForFilter = dioceseParam.length > 0 ? dioceseParam : undefined;
+  const dioceseRecord = dioceseForFilter ? await getDioceseByDocumentId(dioceseForFilter) : null;
+  const hasDioceseScope = Boolean(dioceseForFilter);
   const searchTerm = nameSearch?.trim() ?? '';
   const priestTerm = priestSearch?.trim() ?? '';
   const hasParishSearch = searchTerm.length > 0;
-  const hasPriestSearch = priestTerm.length > 0;
+  const hasPriestSearch = !hasDioceseScope && priestTerm.length > 0;
   const hasSearch = hasParishSearch || hasPriestSearch;
 
   const { parishes, pagination } = await getParishesData({
     nameSearch: nameSearch?.trim() || undefined,
-    vicarNameSearch: priestSearch?.trim() || undefined,
+    vicarNameSearch: hasDioceseScope ? undefined : priestSearch?.trim() || undefined,
+    dioceseDocumentId: dioceseForFilter,
     page,
     pageSize: PAGE_SIZE,
   });
 
-  const subtitle = !hasSearch
-    ? `${pagination.total} paris${pagination.total !== 1 ? 'hes' : 'h'}. Data from the directory Parish API.`
-    : (() => {
-        const bits: string[] = [];
-        if (hasParishSearch) bits.push(`parish name contains "${searchTerm}"`);
-        if (hasPriestSearch) bits.push(`vicar name contains "${priestTerm}"`);
-        const n = pagination.total;
-        const noun = n === 1 ? 'parish' : 'parishes';
-        return `${n} ${noun} where ${bits.join(' and ')}.`;
-      })();
+  const subtitle = (() => {
+    const n = pagination.total;
+    const parishWord = n === 1 ? 'parish' : 'parishes';
+    if (!hasSearch && !hasDioceseScope) {
+      return `${n} paris${n !== 1 ? 'hes' : 'h'}. Data from the directory Parish API.`;
+    }
+    if (!hasSearch && hasDioceseScope && dioceseRecord) {
+      return `${n} ${parishWord} under ${dioceseRecord.name}.`;
+    }
+    if (!hasSearch && hasDioceseScope && !dioceseRecord) {
+      return `Diocese filter applied (record not found in directory). ${n} ${parishWord} in API results.`;
+    }
+    const bits: string[] = [];
+    if (hasParishSearch) bits.push(`parish name contains "${searchTerm}"`);
+    if (hasPriestSearch) bits.push(`vicar name contains "${priestTerm}"`);
+    const filterNote = hasDioceseScope && dioceseRecord ? ` (under ${dioceseRecord.name})` : '';
+    return `${n} ${parishWord} where ${bits.join(' and ')}${filterNote}.`;
+  })();
 
   return (
     <div className="min-h-screen bg-syro-bg-gray">
@@ -68,8 +83,13 @@ export default async function ParishesPage({ searchParams }: PageProps) {
 
       <section className="py-12 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-6 space-y-3" role="search" aria-label="Search parishes and vicars">
+          <div
+            className="mb-6 space-y-3"
+            role="search"
+            aria-label={hasDioceseScope ? 'Search parishes' : 'Search parishes and vicars'}
+          >
             <form method="get" action={BASE_PATH} className="flex flex-col gap-3">
+              {dioceseForFilter ? <input type="hidden" name="diocese" value={dioceseForFilter} /> : null}
               <div className="flex flex-wrap gap-2 items-end">
                 <div className="flex-1 min-w-[200px]">
                   <label htmlFor="parishes-name-search" className="font-body text-sm text-syro-dark-gray block mb-1">
@@ -84,24 +104,26 @@ export default async function ParishesPage({ searchParams }: PageProps) {
                     className="font-body w-full px-4 py-2 border border-syro-table-border rounded-lg bg-white text-syro-blue placeholder:text-syro-dark-gray focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2"
                   />
                 </div>
-                <div className="flex-1 min-w-[200px]">
-                  <label htmlFor="parishes-priest-search" className="font-body text-sm text-syro-dark-gray block mb-1">
-                    Vicar / priest name
-                  </label>
-                  <input
-                    id="parishes-priest-search"
-                    type="search"
-                    name="pq"
-                    defaultValue={priestSearch ?? ''}
-                    placeholder="Filter by vicar name..."
-                    className="font-body w-full px-4 py-2 border border-syro-table-border rounded-lg bg-white text-syro-blue placeholder:text-syro-dark-gray focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2"
-                  />
-                </div>
+                {!hasDioceseScope && (
+                  <div className="flex-1 min-w-[200px]">
+                    <label htmlFor="parishes-priest-search" className="font-body text-sm text-syro-dark-gray block mb-1">
+                      Vicar / priest name
+                    </label>
+                    <input
+                      id="parishes-priest-search"
+                      type="search"
+                      name="pq"
+                      defaultValue={priestSearch ?? ''}
+                      placeholder="Filter by vicar name..."
+                      className="font-body w-full px-4 py-2 border border-syro-table-border rounded-lg bg-white text-syro-blue placeholder:text-syro-dark-gray focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2"
+                    />
+                  </div>
+                )}
                 <button type="submit" className="syro-primary-button inline-flex items-center gap-2 px-4 py-2 shrink-0">
                   Search
                 </button>
               </div>
-              {hasSearch && (
+              {(hasSearch || hasDioceseScope) && (
                 <Link href={BASE_PATH} className="font-body text-sm text-syro-dark-gray hover:text-syro-red hover:underline inline-block">
                   Clear all filters
                 </Link>
@@ -111,7 +133,13 @@ export default async function ParishesPage({ searchParams }: PageProps) {
 
           {parishes.length === 0 ? (
             <div className="bg-white rounded-lg p-8 text-center border-l-4 border-syro-red shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px]">
-              <p className="font-body text-syro-dark-gray">No parishes listed yet. Data is loaded from the directory Parish API.</p>
+              <p className="font-body text-syro-dark-gray">
+                {hasDioceseScope && dioceseRecord
+                  ? `No parishes match your search in ${dioceseRecord.name}.`
+                  : hasDioceseScope
+                    ? 'No parishes found for this diocese filter.'
+                    : 'No parishes listed yet. Data is loaded from the directory Parish API.'}
+              </p>
               <Link href="/mosc-redesign/directory" className="inline-block no-underline font-light text-white bg-[#dc3545] py-2.5 px-5 border-r-[7px] border-r-[#be1929] mt-4 transition-[1s] hover:bg-[#be1929] hover:border-r-[6px] hover:border-r-[#dc3545] hover:text-white">
             ← Back to Directory
           </Link>
@@ -128,10 +156,30 @@ export default async function ParishesPage({ searchParams }: PageProps) {
                   <span className="font-body text-sm text-syro-dark-gray">Page {pagination.page} of {pagination.pageCount}</span>
                   <div className="flex gap-3">
                     {pagination.page > 1 && (
-                      <Link href={buildUrl(pagination.page - 1, nameSearch, priestSearch)} className="px-4 py-2 bg-syro-red/10 text-syro-blue font-body font-medium rounded-lg hover:bg-syro-red/20 reverent-transition">Previous</Link>
+                      <Link
+                        href={buildUrl(
+                          pagination.page - 1,
+                          nameSearch,
+                          hasDioceseScope ? undefined : priestSearch,
+                          dioceseForFilter,
+                        )}
+                        className="px-4 py-2 bg-syro-red/10 text-syro-blue font-body font-medium rounded-lg hover:bg-syro-red/20 reverent-transition"
+                      >
+                        Previous
+                      </Link>
                     )}
                     {pagination.page < pagination.pageCount && (
-                      <Link href={buildUrl(pagination.page + 1, nameSearch, priestSearch)} className="px-4 py-2 bg-syro-red/10 text-syro-blue font-body font-medium rounded-lg hover:bg-syro-red/20 reverent-transition">Next</Link>
+                      <Link
+                        href={buildUrl(
+                          pagination.page + 1,
+                          nameSearch,
+                          hasDioceseScope ? undefined : priestSearch,
+                          dioceseForFilter,
+                        )}
+                        className="px-4 py-2 bg-syro-red/10 text-syro-blue font-body font-medium rounded-lg hover:bg-syro-red/20 reverent-transition"
+                      >
+                        Next
+                      </Link>
                     )}
                   </div>
                 </div>
