@@ -117,10 +117,10 @@ export default function MoscRedesignHeader() {
               href={card.href}
               role="menuitem"
               aria-current={subActive ? 'page' : undefined}
-              className={`block px-3 py-2 text-[11px] transition-colors ${
+              className={`block px-3 py-2 text-[11px] transition-colors no-underline visited:no-underline ${
                 subActive
-                  ? 'text-warmGold bg-white/15 font-semibold'
-                  : 'text-white/95 hover:text-warmGold hover:bg-white/10'
+                  ? 'text-warmGold visited:text-warmGold bg-white/15 font-semibold'
+                  : 'text-white/95 visited:text-white/95 hover:text-warmGold hover:bg-white/10'
               }`}
             >
               {card.shortTitle}
@@ -187,8 +187,10 @@ export default function MoscRedesignHeader() {
                     href={link.href}
                     aria-current={adminNavActive ? 'page' : undefined}
                     aria-expanded={adminMenuOpen}
-                    className={`relative font-medium text-[11px] px-3 py-2 transition-all duration-200 whitespace-nowrap flex items-center gap-0.5 overflow-visible ${
-                      adminHoverOrOpen ? 'text-warmGold' : 'text-white/95 hover:text-warmGold'
+                    className={`relative font-medium text-[11px] px-3 py-2 transition-all duration-200 whitespace-nowrap flex items-center gap-0.5 overflow-visible no-underline visited:no-underline ${
+                      adminHoverOrOpen
+                        ? 'text-warmGold visited:text-warmGold'
+                        : 'text-white/95 visited:text-white/95 hover:text-warmGold'
                     }`}
                   >
                     <span
@@ -216,8 +218,10 @@ export default function MoscRedesignHeader() {
                       key={link.label}
                       href={link.href}
                       aria-current={navActive ? 'page' : undefined}
-                      className={`relative font-medium text-[11px] px-3 py-2 transition-all duration-200 whitespace-nowrap group overflow-hidden ${
-                        navActive ? 'text-warmGold' : 'text-white/95 hover:text-warmGold'
+                      className={`relative font-medium text-[11px] px-3 py-2 transition-all duration-200 whitespace-nowrap group overflow-hidden no-underline visited:no-underline ${
+                        navActive
+                          ? 'text-warmGold visited:text-warmGold'
+                          : 'text-white/95 visited:text-white/95 hover:text-warmGold'
                       }`}
                     >
                       <span
@@ -261,10 +265,10 @@ export default function MoscRedesignHeader() {
                   <Link
                     href={link.href}
                     aria-current={adminNavActive ? 'page' : undefined}
-                    className={`block text-xs font-semibold py-2 px-2 rounded transition-all duration-200 ${
+                    className={`block text-xs font-semibold py-2 px-2 rounded transition-all duration-200 no-underline visited:no-underline ${
                       adminNavActive
-                        ? 'text-burgundy bg-burgundy/15'
-                        : 'text-burgundy-dark hover:text-burgundy hover:bg-burgundy/10'
+                        ? 'text-burgundy visited:text-burgundy bg-burgundy/15'
+                        : 'text-burgundy-dark visited:text-burgundy-dark hover:text-burgundy hover:bg-burgundy/10'
                     }`}
                     onClick={() => setMobileMenuOpen(false)}
                   >
@@ -278,10 +282,10 @@ export default function MoscRedesignHeader() {
                           <Link
                             href={card.href}
                             aria-current={subActive ? 'page' : undefined}
-                            className={`block text-[11px] py-1.5 px-2 rounded transition-all duration-200 ${
+                            className={`block text-[11px] py-1.5 px-2 rounded transition-all duration-200 no-underline visited:no-underline ${
                               subActive
-                                ? 'text-burgundy font-semibold bg-burgundy/10'
-                                : 'text-burgundy-dark/90 hover:text-burgundy hover:bg-burgundy/10'
+                                ? 'text-burgundy visited:text-burgundy font-semibold bg-burgundy/10'
+                                : 'text-burgundy-dark/90 visited:text-burgundy-dark/90 hover:text-burgundy hover:bg-burgundy/10'
                             }`}
                             onClick={() => setMobileMenuOpen(false)}
                           >
@@ -300,10 +304,10 @@ export default function MoscRedesignHeader() {
                       key={link.label}
                       href={link.href}
                       aria-current={navActive ? 'page' : undefined}
-                      className={`block text-xs py-2 px-2 rounded transition-all duration-200 ${
+                      className={`block text-xs py-2 px-2 rounded transition-all duration-200 no-underline visited:no-underline ${
                         navActive
-                          ? 'text-burgundy font-semibold bg-burgundy/15'
-                          : 'text-burgundy-dark hover:text-burgundy hover:bg-burgundy/10'
+                          ? 'text-burgundy visited:text-burgundy font-semibold bg-burgundy/15'
+                          : 'text-burgundy-dark visited:text-burgundy-dark hover:text-burgundy hover:bg-burgundy/10'
                       }`}
                       onClick={() => setMobileMenuOpen(false)}
                     >
@@ -325,7 +329,7 @@ export default function MoscRedesignHeader() {
               <Link
                 key={ql.label}
                 href={ql.href}
-                className="relative text-parchment-light font-semibold text-[10px] px-3 py-2 whitespace-nowrap border-r border-white/10 last:border-r-0 group overflow-hidden transition-colors duration-200 hover:text-warmGold"
+                className="relative text-parchment-light visited:text-parchment-light font-semibold text-[10px] px-3 py-2 whitespace-nowrap border-r border-white/10 last:border-r-0 group overflow-hidden transition-colors duration-200 hover:text-warmGold no-underline visited:no-underline"
               >
                 <span className="absolute inset-0 bg-warmBrown scale-y-0 group-hover:scale-y-100 transition-transform duration-200 origin-bottom" />
                 <span className="relative z-10">{ql.label}</span>
