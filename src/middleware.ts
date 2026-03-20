@@ -58,6 +58,8 @@ const isPublicRouteClerk = createRouteMatcher([
   '/api/logs(.*)',
   '/mosc-old(.*)',
   '/mosc(.*)',
+  /** Rocket redesign + Syro mirror — distinct path segment from `/mosc`, must be listed explicitly */
+  '/mosc-redesign(.*)',
   '/events(.*)',
   '/sponsors(.*)',
   '/team(.*)',

@@ -65,7 +65,7 @@ export default async function RootLayout({
     /^\/api\/diagnostic/,
     /^\/api\/logs/,
     /^\/mosc-old/,
-    /^\/mosc(?!-old)/,  // /mosc and /mosc/... (Syro app at app/mosc)
+    /^\/mosc(?!-old)/,  // /mosc, /mosc/..., /mosc-redesign/... (Syro + rocket redesign; not /mosc-old)
     /^\/events/,
     /^\/sponsors/,
     /^\/gallery/,
@@ -105,7 +105,7 @@ export default async function RootLayout({
 
   // Determine tenant-scoped admin flag on the server
   // Run auth + profile lookup on all routes that show the main Header (including /) so Admin menu appears for admins (per clerk_auth rule).
-  // Only skip /mosc-old and /mosc — ConditionalLayout does not render the main Header there.
+  // Only skip /mosc-old, /mosc, /mosc-redesign — ConditionalLayout does not render the main Header there.
   // CRITICAL: Also skip during Clerk satellite sync (?__clerk_synced=true). On the first
   // load after redirect from primary, the session cookie is being established for SUBSEQUENT
   // requests. Calling auth() now would either hang (blocking the entire server response for
