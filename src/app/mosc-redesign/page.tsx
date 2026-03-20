@@ -1,10 +1,12 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { Anek_Malayalam } from "next/font/google";
 import InteractiveWorldMap from "@/components/ui/InteractiveWorldMap";
 import MoscRedesignHeader from "@/components/mosc-redesign/MoscRedesignHeader";
 import MoscRedesignFooter from "@/components/mosc-redesign/MoscRedesignFooter";
+import type { LiturgyReading } from "@/app/mosc/components/SyroLiturgySection";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface Saint {
@@ -55,6 +57,17 @@ const regions: Region[] = [
 { id: "india", label: "India" }];
 
 
+const anekMalayalam = Anek_Malayalam({
+  subsets: ["latin", "malayalam"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+function formatLiturgyDisplayDate(liturgyDate: string | null): string {
+  const d = liturgyDate ? new Date(`${liturgyDate}T12:00:00`) : new Date();
+  return d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+}
+
 const slides = [
 {
   image: "https://www.mosc-temp.com/mosc/assets/images/mosc_images/bava_thirumeni_pope_visit.jpeg",
@@ -73,7 +86,50 @@ export default function HomePage() {
   const [hoveredRegion, setHoveredRegion] = useState<string | null>(null);
   const [saintIndex, setSaintIndex] = useState(0);
   const [readingLang, setReadingLang] = useState<"english" | "malayalam">("english");
+  const [liturgyReadings, setLiturgyReadings] = useState<LiturgyReading[] | null>(null);
+  const [liturgyDate, setLiturgyDate] = useState<string | null>(null);
+  const [liturgyLoading, setLiturgyLoading] = useState(true);
+  const [liturgyError, setLiturgyError] = useState<string | null>(null);
   const sliderRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  /** Ignore out-of-order responses when switching English ↔ Malayalam quickly */
+  const liturgyRequestIdRef = useRef(0);
+
+  const fetchLiturgyReadings = useCallback((lng: "en" | "ml") => {
+    const requestId = ++liturgyRequestIdRef.current;
+    setLiturgyLoading(true);
+    setLiturgyError(null);
+    setLiturgyReadings(null);
+    fetch(`/api/liturgy?lng=${lng}`)
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then((body: { error?: string }) => {
+            throw new Error(body?.error ?? "Failed to load readings");
+          });
+        }
+        return res.json();
+      })
+      .then((data: { message?: LiturgyReading[]; liturgyDate?: string }) => {
+        if (requestId !== liturgyRequestIdRef.current) return;
+        const list = Array.isArray(data?.message) ? data.message : [];
+        setLiturgyReadings(list);
+        setLiturgyDate(data?.liturgyDate ?? null);
+      })
+      .catch((err) => {
+        if (requestId !== liturgyRequestIdRef.current) return;
+        setLiturgyError(err instanceof Error ? err.message : "Failed to load liturgy readings");
+        setLiturgyReadings(null);
+        setLiturgyDate(null);
+      })
+      .finally(() => {
+        if (requestId !== liturgyRequestIdRef.current) return;
+        setLiturgyLoading(false);
+      });
+  }, []);
+
+  useEffect(() => {
+    const lng = readingLang === "english" ? "en" : "ml";
+    fetchLiturgyReadings(lng);
+  }, [readingLang, fetchLiturgyReadings]);
 
   // Parallax scroll state
   const [scrollY, setScrollY] = useState(0);
@@ -396,14 +452,17 @@ export default function HomePage() {
               <h2 className="text-3xl md:text-4xl font-bold text-warmBrown-dark mb-2 leading-tight">
                 Daily <span className="text-burgundy">Readings</span>
               </h2>
-              <p className="text-warmGold-dark font-semibold mb-6">19 March 2026</p>
+              <p className="text-warmGold-dark font-semibold mb-6">{formatLiturgyDisplayDate(liturgyDate)}</p>
 
-              {/* Language toggle */}
+              {/* Language toggle — same API as /mosc SyroLiturgySection: /api/liturgy?lng=en|ml */}
               <div className="flex gap-2 mb-6">
                 {(["english", "malayalam"] as const).map((lang) =>
                 <button
                   key={lang}
+                  type="button"
                   onClick={() => setReadingLang(lang)}
+                  aria-pressed={readingLang === lang}
+                  aria-label={lang === "english" ? "Show readings in English" : "Show readings in Malayalam"}
                   className={`px-5 py-2 rounded-lg text-sm font-semibold capitalize transition-all duration-200 ${
                   readingLang === lang ?
                   "bg-burgundy text-white shadow-md shadow-burgundy/30" : "border border-burgundy/30 text-warmBrown hover:border-burgundy hover:text-burgundy hover:bg-burgundy/5"}`
@@ -413,24 +472,74 @@ export default function HomePage() {
                 )}
               </div>
 
-              <div className="bg-parchment-deep rounded-xl p-5 border border-burgundy/20">
-                {readingLang === "english" ?
-                <div className="space-y-3">
-                  <div className="flex gap-3 group/item hover:bg-burgundy/5 rounded-lg p-2 -mx-2 transition-colors duration-200">
-                    <span className="text-burgundy text-xs font-bold uppercase tracking-wider w-20 shrink-0 pt-0.5">First</span>
-                    <p className="text-warmGray-dark text-sm">Isaiah 55:6-9 — Seek the Lord while he may be found</p>
+              <div
+                className={`bg-parchment-deep rounded-xl p-5 border border-burgundy/20 ${
+                  readingLang === "malayalam" ? anekMalayalam.className : "font-dm-sans"
+                }`}
+                lang={readingLang === "malayalam" ? "ml" : "en"}
+              >
+                {liturgyLoading && (
+                  <div className="flex items-center py-4" aria-live="polite">
+                    <div
+                      className="h-5 w-5 border-2 border-burgundy/25 border-t-burgundy rounded-full animate-spin mr-3 shrink-0"
+                      role="status"
+                      aria-hidden
+                    />
+                    <span className="text-warmGray-dark text-sm">Loading readings…</span>
                   </div>
-                  <div className="flex gap-3 group/item hover:bg-burgundy/5 rounded-lg p-2 -mx-2 transition-colors duration-200">
-                    <span className="text-burgundy text-xs font-bold uppercase tracking-wider w-20 shrink-0 pt-0.5">Epistle</span>
-                    <p className="text-warmGray-dark text-sm">Romans 8:14-17 — Led by the Spirit of God</p>
+                )}
+
+                {liturgyError && !liturgyLoading && (
+                  <div className="text-warmGray-dark text-sm py-2 space-y-2">
+                    {liturgyError.includes("Access Denied") || liturgyError.includes("LITURGY_API_TOKEN") ? (
+                      <>
+                        <p className="font-medium">Daily readings are temporarily unavailable.</p>
+                        <p>
+                          Visit the{" "}
+                          <a
+                            href="https://www.syromalabarliturgy.org/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-burgundy underline hover:text-burgundy-dark"
+                          >
+                            Syro-Malabar Commission for Liturgy
+                          </a>{" "}
+                          for readings.
+                        </p>
+                      </>
+                    ) : (
+                      <p>{liturgyError}</p>
+                    )}
                   </div>
-                  <div className="flex gap-3 group/item hover:bg-burgundy/5 rounded-lg p-2 -mx-2 transition-colors duration-200">
-                    <span className="text-warmGold-dark text-xs font-bold uppercase tracking-wider w-20 shrink-0 pt-0.5">Gospel</span>
-                    <p className="text-warmGray-dark text-sm">Luke 15:11-32 — The Parable of the Prodigal Son</p>
+                )}
+
+                {!liturgyLoading && !liturgyError && liturgyReadings && liturgyReadings.length === 0 && (
+                  <p className="text-warmGray-dark text-sm py-4">No readings available for this day.</p>
+                )}
+
+                {!liturgyLoading && !liturgyError && liturgyReadings && liturgyReadings.length > 0 && (
+                  <div className="space-y-3">
+                    {liturgyReadings[0]?.liturgy_day_heading && (
+                      <p className="text-burgundy text-sm font-medium">{liturgyReadings[0].liturgy_day_heading}</p>
+                    )}
+                    {liturgyReadings[0]?.season_name && (
+                      <h3 className="text-lg font-bold text-warmBrown-dark">{liturgyReadings[0].season_name}</h3>
+                    )}
+                    <ul className="space-y-3 list-none pl-0">
+                      {liturgyReadings.map((r, i) => (
+                        <li key={i} className="flex gap-3 text-sm text-warmGray-dark leading-relaxed">
+                          <span className="text-burgundy shrink-0 mt-0.5" aria-hidden>
+                            ✝
+                          </span>
+                          <span>
+                            {r.liturgy_heading}
+                            {r.content_place && <span> ( {r.content_place} )</span>}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                </div> :
-                <p className="text-warmGray-dark text-sm text-center py-4">Malayalam readings loading...</p>
-                }
+                )}
               </div>
             </div>
           </div>

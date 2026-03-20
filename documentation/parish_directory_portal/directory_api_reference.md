@@ -204,6 +204,7 @@ Parishes under a diocese, with optional vicar (priest) and structured address fi
 | `filters[tenant][tenantId][$eq]` | Yes | Tenant ID |
 | `filters[diocese][documentId][$eq]` | No | Filter by diocese documentId |
 | `filters[diocese][slug][$eq]` | No | Filter by diocese slug |
+| `filters[vicar][name][$containsi]` | No | Filter parishes whose current vicar's name contains the string (case-insensitive) |
 | `sort` | No | e.g. `name:asc` |
 | `populate[0]` | No | `diocese` — diocese relation |
 | `populate[1]` | No | `vicar` — current vicar (priest) |

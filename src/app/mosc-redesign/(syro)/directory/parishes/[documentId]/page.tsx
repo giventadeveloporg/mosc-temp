@@ -38,6 +38,11 @@ export default async function ParishDetailPage({ params }: PageProps) {
             ← Back to Parishes
           </Link>
           {parish.dioceseName && <p className="font-body text-syro-dark-gray mt-1">{parish.dioceseName}</p>}
+          {parish.vicarName && (
+            <p className="font-body text-syro-dark-gray mt-2">
+              Vicar: <span className="font-medium text-syro-blue">{parish.vicarName}</span>
+            </p>
+          )}
         </div>
       </section>
 

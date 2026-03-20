@@ -2,6 +2,12 @@
  * Scoped overrides for /mosc-redesign inner pages: align legacy Syro utility classes
  * with MOSC rocket design system (parchment / burgundy / DM Sans).
  */
+
+/* Ensure header dropdowns are not clipped by shell (Syro pages use overflow on body/main). */
+.mosc-redesign-subpage-shell.syro-layout > header {
+  overflow: visible;
+}
+
 .mosc-redesign-subpage-shell .bg-syro-bg-gray {
   background-color: #f5edd8 !important;
 }

@@ -103,8 +103,8 @@
 <body>
   <div class="header">
     <h1>Admin Test Suite Report</h1>
-    <p>Generated: 3/2/2026, 11:52:16 PM</p>
-    <p>Duration: 208.92s</p>
+    <p>Generated: 3/5/2026, 5:04:01 PM</p>
+    <p>Duration: 349.41s</p>
   </div>
 
   <div class="stats">
@@ -113,11 +113,11 @@
       <div class="stat-label">Total Tests</div>
     </div>
     <div class="stat-card passed">
-      <div class="stat-number">21</div>
+      <div class="stat-number">20</div>
       <div class="stat-label">Passed</div>
     </div>
     <div class="stat-card failed">
-      <div class="stat-number">2</div>
+      <div class="stat-number">3</div>
       <div class="stat-label">Failed</div>
     </div>
     <div class="stat-card skipped">
@@ -135,93 +135,127 @@
             <div>
               <div class="test-name">[admin-001] Admin Dashboard</div>
               <div class="test-details">
-                /admin • 5703ms • Priority: critical
+                /admin • 7446ms • Priority: critical
               </div>
             </div>
-            <span class="test-status passed">PASSED</span>
+            <span class="test-status failed">FAILED</span>
           </div>
-          
-          
-            <div class="test-error">
-              ⚠️ JavaScript Errors (1):
-              <ul style="margin: 5px 0; padding-left: 20px;">
-                <li><strong>Error:</strong> Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-
-https://react.dev/link/hydration-mismatch
-
-  ...
-    <LoadingBoundary loading={null}>
-      <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
-        <RedirectBoundary>
-          <RedirectErrorBoundary router={{...}}>
-            <InnerLayoutRouter url="/admin/mem..." tree={[...]} cacheNode={{lazyData:null, ...}} segmentPath={[...]}>
-              <SegmentViewNode type="page" pagePath="admin/memb...">
-                <SegmentTrieNode>
-                <AdminSubscriptionsPage>
-                  <AdminSubscriptionsClient subscriptions={[...]} totalCount={1} currentPage={1} pageSize={20} ...>
-                    <div className="max-w-5xl ..." style={{...}}>
-                      <div>
-                      <AdminNavigation>
-                      <div>
-                      <div className="bg-white r...">
-                        <table className="w-full bor...">
-                          <thead>
-                          <tbody>
-                            <tr className="border-b h...">
-                              <td>
-                              <td>
-                              <td>
-                              <td>
-                              <td className="py-3 px-4 font-body text-sm text-foreground">
-+                               2/24/2026
--                               2/25/2026
-                              ...
-                      ...
-              ...
-            ...
-<br><pre style="background: #f5f5f5; padding: 5px; margin: 5px 0; border-radius: 3px; font-size: 11px; overflow-x: auto;">Error: Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-</pre></li>
-              </ul>
-            </div>
+          <div class="test-error">❌ Console error detected:<br><br>Console error: Error fetching sponsors: TypeError: Failed to fetch<br>    at fetchSponsors (webpack-internal:///(app-pages-browser)/./src/components/OurSponsorsSection.tsx:100:44)<br>    at OurSponsorsSection.useEffect (webpack-internal:///(app-pages-browser)/./src/components/OurSponsorsSection.tsx:134:13)<br>    at Object.react_stack_bottom_frame (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:23669:20)<br>    at runWithFiberInDEV (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:872:30)<br>    at commitHookEffectListMount (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:12345:29)<br>    at commitHookPassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:12466:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14387:13)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14390:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14514:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14514:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14514:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14390:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14390:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14485:17)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14458:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14390:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14390:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>Location: webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31<br><br>---<br><br>Console error: [Header] Error checking admin status (attempt 1): TypeError: Failed to fetch<br>    at Header.useEffect.checkAdminStatus (webpack-internal:///(app-pages-browser)/./src/components/Header.tsx:634:44)<br>    at Header.useEffect (webpack-internal:///(app-pages-browser)/./src/components/Header.tsx:696:13)<br>    at Object.react_stack_bottom_frame (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:23669:20)<br>    at runWithFiberInDEV (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:872:30)<br>    at commitHookEffectListMount (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:12345:29)<br>    at commitHookPassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:12466:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14387:13)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14514:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14514:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14514:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14514:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14514:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14514:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14514:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14514:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14514:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14514:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14514:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14514:11)<br>    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)<br>Location: webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31</div>
           
           
             <div class="test-details" style="color: #f59e0b;">
-              ⚠️ Console Warnings/Errors (60):
+              ⚠️ Console Warnings/Errors (62):
               <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px;">
-                <li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(https://humble-monkey-3.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js:18:7047)</span></li><li><strong>[warning]</strong> Clerk: The prop "afterSignInUrl" is deprecated and should be replaced with the new "fallbackRedirectUrl" or "forceRedirectUrl" props instead. Learn more: https://clerk.com/docs/guides/custom-redirects#redirect-url-props <span style="color: #6b7280; font-size: 11px;">(https://humble-monkey-3.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js:18:7047)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(https://humble-monkey-3.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js:18:7047)</span></li><li><strong>[warning]</strong> Clerk: The prop "afterSignInUrl" is deprecated and should be replaced with the new "fallbackRedirectUrl" or "forceRedirectUrl" props instead. Learn more: https://clerk.com/docs/guides/custom-redirects#redirect-url-props <span style="color: #6b7280; font-size: 11px;">(https://humble-monkey-3.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js:18:7047)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(https://humble-monkey-3.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js:18:7047)</span></li><li><strong>[warning]</strong> Clerk: The prop "afterSignInUrl" is deprecated and should be replaced with the new "fallbackRedirectUrl" or "forceRedirectUrl" props instead. Learn more: https://clerk.com/docs/guides/custom-redirects#redirect-url-props <span style="color: #6b7280; font-size: 11px;">(https://humble-monkey-3.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js:18:7047)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(https://humble-monkey-3.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js:18:7047)</span></li><li><strong>[warning]</strong> Clerk: The prop "afterSignInUrl" is deprecated and should be replaced with the new "fallbackRedirectUrl" or "forceRedirectUrl" props instead. Learn more: https://clerk.com/docs/guides/custom-redirects#redirect-url-props <span style="color: #6b7280; font-size: 11px;">(https://humble-monkey-3.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js:18:7047)</span></li><li><strong>[error]</strong> %o
-
-%s ReferenceError: safeAuth is not defined
-    at EventDashboardPage (about://React/Server/webpack-internal:///(rsc)/./src/app/admin/events/dashboard/page.tsx?6:172:24)
-    at resolveErrorDev (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2396:46)
-    at processFullStringRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2882:23)
-    at processFullBinaryRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2825:7)
-    at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3028:15)
-    at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3294:13) The above error occurred in the <EventDashboardPage> component. It was handled by the <ErrorBoundaryHandler> error boundary. <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/react-client-callbacks/error-boundary-callbacks.js:67:24)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Caught error: safeAuth is not defined <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li>
-                <li style="color: #6b7280; font-style: italic;">... and 50 more</li>
+                <li><strong>[error]</strong> Error fetching sponsors: TypeError: Failed to fetch
+    at fetchSponsors (webpack-internal:///(app-pages-browser)/./src/components/OurSponsorsSection.tsx:100:44)
+    at OurSponsorsSection.useEffect (webpack-internal:///(app-pages-browser)/./src/components/OurSponsorsSection.tsx:134:13)
+    at Object.react_stack_bottom_frame (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:23669:20)
+    at runWithFiberInDEV (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:872:30)
+    at commitHookEffectListMount (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:12345:29)
+    at commitHookPassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:12466:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14387:13)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14390:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14514:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14514:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14514:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14390:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14390:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14485:17)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14458:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14390:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14390:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [Header] Error checking admin status (attempt 1): TypeError: Failed to fetch
+    at Header.useEffect.checkAdminStatus (webpack-internal:///(app-pages-browser)/./src/components/Header.tsx:634:44)
+    at Header.useEffect (webpack-internal:///(app-pages-browser)/./src/components/Header.tsx:696:13)
+    at Object.react_stack_bottom_frame (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:23669:20)
+    at runWithFiberInDEV (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:872:30)
+    at commitHookEffectListMount (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:12345:29)
+    at commitHookPassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:12466:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14387:13)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14514:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14514:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14514:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14514:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14514:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14514:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14514:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14514:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14514:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14514:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14380:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14514:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11)
+    at commitPassiveMountOnFiber (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14514:11)
+    at recursivelyTraversePassiveMountEffects (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js:14360:11) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(https://humble-monkey-3.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js:18:7047)</span></li><li><strong>[warning]</strong> Clerk: The prop "afterSignInUrl" is deprecated and should be replaced with the new "fallbackRedirectUrl" or "forceRedirectUrl" props instead. Learn more: https://clerk.com/docs/guides/custom-redirects#redirect-url-props <span style="color: #6b7280; font-size: 11px;">(https://humble-monkey-3.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js:18:7047)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(https://humble-monkey-3.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js:18:7047)</span></li><li><strong>[warning]</strong> Clerk: The prop "afterSignInUrl" is deprecated and should be replaced with the new "fallbackRedirectUrl" or "forceRedirectUrl" props instead. Learn more: https://clerk.com/docs/guides/custom-redirects#redirect-url-props <span style="color: #6b7280; font-size: 11px;">(https://humble-monkey-3.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js:18:7047)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(https://humble-monkey-3.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js:18:7047)</span></li><li><strong>[warning]</strong> Clerk: The prop "afterSignInUrl" is deprecated and should be replaced with the new "fallbackRedirectUrl" or "forceRedirectUrl" props instead. Learn more: https://clerk.com/docs/guides/custom-redirects#redirect-url-props <span style="color: #6b7280; font-size: 11px;">(https://humble-monkey-3.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js:18:7047)</span></li><li><strong>[warning]</strong> Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview <span style="color: #6b7280; font-size: 11px;">(https://humble-monkey-3.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js:18:7047)</span></li><li><strong>[warning]</strong> Clerk: The prop "afterSignInUrl" is deprecated and should be replaced with the new "fallbackRedirectUrl" or "forceRedirectUrl" props instead. Learn more: https://clerk.com/docs/guides/custom-redirects#redirect-url-props <span style="color: #6b7280; font-size: 11px;">(https://humble-monkey-3.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js:18:7047)</span></li>
+                <li style="color: #6b7280; font-style: italic;">... and 52 more</li>
               </ul>
             </div>
           
           
-            <div class="test-details">
-              📊 Elements found: 3/0
-            </div>
           
+            <div class="test-details">
+              📸 <a href="E:\project_workspace\mosc-temp\TestSprite\admin-tests\screenshots\failure-admin-001-1772747949827.png" target="_blank">View Screenshot</a>
+            </div>
           
         </div>
       
@@ -230,70 +264,12 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-002] Manage Users (Usage)</div>
               <div class="test-details">
-                /admin/manage-usage • 8312ms • Priority: critical
+                /admin/manage-usage • 25666ms • Priority: critical
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
           </div>
           
-          
-            <div class="test-error">
-              ⚠️ JavaScript Errors (1):
-              <ul style="margin: 5px 0; padding-left: 20px;">
-                <li><strong>Error:</strong> Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-
-https://react.dev/link/hydration-mismatch
-
-  ...
-    <LoadingBoundary loading={null}>
-      <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
-        <RedirectBoundary>
-          <RedirectErrorBoundary router={{...}}>
-            <InnerLayoutRouter url="/admin/mem..." tree={[...]} cacheNode={{lazyData:null, ...}} segmentPath={[...]}>
-              <SegmentViewNode type="page" pagePath="admin/memb...">
-                <SegmentTrieNode>
-                <AdminSubscriptionsPage>
-                  <AdminSubscriptionsClient subscriptions={[...]} totalCount={1} currentPage={1} pageSize={20} ...>
-                    <div className="max-w-5xl ..." style={{...}}>
-                      <div>
-                      <AdminNavigation>
-                      <div>
-                      <div className="bg-white r...">
-                        <table className="w-full bor...">
-                          <thead>
-                          <tbody>
-                            <tr className="border-b h...">
-                              <td>
-                              <td>
-                              <td>
-                              <td>
-                              <td className="py-3 px-4 font-body text-sm text-foreground">
-+                               2/24/2026
--                               2/25/2026
-                              ...
-                      ...
-              ...
-            ...
-<br><pre style="background: #f5f5f5; padding: 5px; margin: 5px 0; border-radius: 3px; font-size: 11px; overflow-x: auto;">Error: Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-</pre></li>
-              </ul>
-            </div>
           
           
             <div class="test-details" style="color: #f59e0b;">
@@ -307,7 +283,7 @@ It can also happen if the client has a browser extension installed which messes 
     at processFullStringRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2882:23)
     at processFullBinaryRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2825:7)
     at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3028:15)
-    at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3294:13) The above error occurred in the <EventDashboardPage> component. It was handled by the <ErrorBoundaryHandler> error boundary. <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/react-client-callbacks/error-boundary-callbacks.js:67:24)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Caught error: safeAuth is not defined <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Digest: 2282117228 <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Stack: ReferenceError: safeAuth is not defined
+    at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3294:13) The above error occurred in the <EventDashboardPage> component. It was handled by the <ErrorBoundaryHandler> error boundary. <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/react-client-callbacks/error-boundary-callbacks.js:67:24)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Caught error: safeAuth is not defined <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Digest: 3447423148 <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Stack: ReferenceError: safeAuth is not defined
     at EventDashboardPage (about://React/Server/webpack-internal:///(rsc)/./src/app/admin/events/dashboard/page.tsx?6:172:24)
     at resolveErrorDev (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2396:46)
     at processFullStringRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2882:23)
@@ -331,70 +307,12 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-003] Manage Events</div>
               <div class="test-details">
-                /admin/manage-events • 8695ms • Priority: critical
+                /admin/manage-events • 11237ms • Priority: critical
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
           </div>
           
-          
-            <div class="test-error">
-              ⚠️ JavaScript Errors (1):
-              <ul style="margin: 5px 0; padding-left: 20px;">
-                <li><strong>Error:</strong> Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-
-https://react.dev/link/hydration-mismatch
-
-  ...
-    <LoadingBoundary loading={null}>
-      <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
-        <RedirectBoundary>
-          <RedirectErrorBoundary router={{...}}>
-            <InnerLayoutRouter url="/admin/mem..." tree={[...]} cacheNode={{lazyData:null, ...}} segmentPath={[...]}>
-              <SegmentViewNode type="page" pagePath="admin/memb...">
-                <SegmentTrieNode>
-                <AdminSubscriptionsPage>
-                  <AdminSubscriptionsClient subscriptions={[...]} totalCount={1} currentPage={1} pageSize={20} ...>
-                    <div className="max-w-5xl ..." style={{...}}>
-                      <div>
-                      <AdminNavigation>
-                      <div>
-                      <div className="bg-white r...">
-                        <table className="w-full bor...">
-                          <thead>
-                          <tbody>
-                            <tr className="border-b h...">
-                              <td>
-                              <td>
-                              <td>
-                              <td>
-                              <td className="py-3 px-4 font-body text-sm text-foreground">
-+                               2/24/2026
--                               2/25/2026
-                              ...
-                      ...
-              ...
-            ...
-<br><pre style="background: #f5f5f5; padding: 5px; margin: 5px 0; border-radius: 3px; font-size: 11px; overflow-x: auto;">Error: Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-</pre></li>
-              </ul>
-            </div>
           
           
             <div class="test-details" style="color: #f59e0b;">
@@ -408,13 +326,13 @@ It can also happen if the client has a browser extension installed which messes 
     at processFullStringRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2882:23)
     at processFullBinaryRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2825:7)
     at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3028:15)
-    at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3294:13) The above error occurred in the <EventDashboardPage> component. It was handled by the <ErrorBoundaryHandler> error boundary. <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/react-client-callbacks/error-boundary-callbacks.js:67:24)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Caught error: safeAuth is not defined <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Digest: 2282117228 <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Stack: ReferenceError: safeAuth is not defined
+    at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3294:13) The above error occurred in the <EventDashboardPage> component. It was handled by the <ErrorBoundaryHandler> error boundary. <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/react-client-callbacks/error-boundary-callbacks.js:67:24)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Caught error: safeAuth is not defined <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Digest: 3447423148 <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Stack: ReferenceError: safeAuth is not defined
     at EventDashboardPage (about://React/Server/webpack-internal:///(rsc)/./src/app/admin/events/dashboard/page.tsx?6:172:24)
     at resolveErrorDev (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2396:46)
     at processFullStringRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2882:23)
     at processFullBinaryRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2825:7)
     at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3028:15)
-    at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3294:13) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Caught error: safeAuth is not defined <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Digest: 2282117228 <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li>
+    at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3294:13) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Caught error: safeAuth is not defined <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Digest: 3447423148 <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li>
                 <li style="color: #6b7280; font-style: italic;">... and 46 more</li>
               </ul>
             </div>
@@ -435,70 +353,12 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-004] Event Analytics Dashboard</div>
               <div class="test-details">
-                /admin/events/dashboard • 6915ms • Priority: high
+                /admin/events/dashboard • 11790ms • Priority: high
               </div>
             </div>
             <span class="test-status failed">FAILED</span>
           </div>
           <div class="test-error">❌ Console error detected:<br><br>Console error: %o<br><br>%s ReferenceError: safeAuth is not defined<br>    at EventDashboardPage (about://React/Server/webpack-internal:///(rsc)/./src/app/admin/events/dashboard/page.tsx?6:172:24)<br>    at resolveErrorDev (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2396:46)<br>    at processFullStringRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2882:23)<br>    at processFullBinaryRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2825:7)<br>    at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3028:15)<br>    at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3294:13) The above error occurred in the <EventDashboardPage> component. It was handled by the <ErrorBoundaryHandler> error boundary.<br>Location: webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/react-client-callbacks/error-boundary-callbacks.js:67:24<br><br>---<br><br>Console error: [ROOT-ERROR] Caught error: safeAuth is not defined<br>Location: webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31<br><br>---<br><br>Console error: [ROOT-ERROR] Stack: ReferenceError: safeAuth is not defined<br>    at EventDashboardPage (about://React/Server/webpack-internal:///(rsc)/./src/app/admin/events/dashboard/page.tsx?6:172:24)<br>    at resolveErrorDev (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2396:46)<br>    at processFullStringRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2882:23)<br>    at processFullBinaryRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2825:7)<br>    at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3028:15)<br>    at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3294:13)<br>Location: webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31<br><br>---<br><br>Console error: [ROOT-ERROR] Caught error: safeAuth is not defined<br>Location: webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31<br><br>---<br><br>Console error: [ROOT-ERROR] Stack: ReferenceError: safeAuth is not defined<br>    at EventDashboardPage (about://React/Server/webpack-internal:///(rsc)/./src/app/admin/events/dashboard/page.tsx?6:172:24)<br>    at resolveErrorDev (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2396:46)<br>    at processFullStringRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2882:23)<br>    at processFullBinaryRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2825:7)<br>    at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3028:15)<br>    at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3294:13)<br>Location: webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31</div>
-          
-            <div class="test-error">
-              ⚠️ JavaScript Errors (1):
-              <ul style="margin: 5px 0; padding-left: 20px;">
-                <li><strong>Error:</strong> Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-
-https://react.dev/link/hydration-mismatch
-
-  ...
-    <LoadingBoundary loading={null}>
-      <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
-        <RedirectBoundary>
-          <RedirectErrorBoundary router={{...}}>
-            <InnerLayoutRouter url="/admin/mem..." tree={[...]} cacheNode={{lazyData:null, ...}} segmentPath={[...]}>
-              <SegmentViewNode type="page" pagePath="admin/memb...">
-                <SegmentTrieNode>
-                <AdminSubscriptionsPage>
-                  <AdminSubscriptionsClient subscriptions={[...]} totalCount={1} currentPage={1} pageSize={20} ...>
-                    <div className="max-w-5xl ..." style={{...}}>
-                      <div>
-                      <AdminNavigation>
-                      <div>
-                      <div className="bg-white r...">
-                        <table className="w-full bor...">
-                          <thead>
-                          <tbody>
-                            <tr className="border-b h...">
-                              <td>
-                              <td>
-                              <td>
-                              <td>
-                              <td className="py-3 px-4 font-body text-sm text-foreground">
-+                               2/24/2026
--                               2/25/2026
-                              ...
-                      ...
-              ...
-            ...
-<br><pre style="background: #f5f5f5; padding: 5px; margin: 5px 0; border-radius: 3px; font-size: 11px; overflow-x: auto;">Error: Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-</pre></li>
-              </ul>
-            </div>
           
           
             <div class="test-details" style="color: #f59e0b;">
@@ -512,13 +372,13 @@ It can also happen if the client has a browser extension installed which messes 
     at processFullStringRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2882:23)
     at processFullBinaryRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2825:7)
     at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3028:15)
-    at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3294:13) The above error occurred in the <EventDashboardPage> component. It was handled by the <ErrorBoundaryHandler> error boundary. <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/react-client-callbacks/error-boundary-callbacks.js:67:24)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Caught error: safeAuth is not defined <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Digest: 2282117228 <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Stack: ReferenceError: safeAuth is not defined
+    at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3294:13) The above error occurred in the <EventDashboardPage> component. It was handled by the <ErrorBoundaryHandler> error boundary. <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/react-client-callbacks/error-boundary-callbacks.js:67:24)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Caught error: safeAuth is not defined <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Digest: 3447423148 <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Stack: ReferenceError: safeAuth is not defined
     at EventDashboardPage (about://React/Server/webpack-internal:///(rsc)/./src/app/admin/events/dashboard/page.tsx?6:172:24)
     at resolveErrorDev (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2396:46)
     at processFullStringRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2882:23)
     at processFullBinaryRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2825:7)
     at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3028:15)
-    at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3294:13) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Caught error: safeAuth is not defined <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Digest: 2282117228 <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Stack: ReferenceError: safeAuth is not defined
+    at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3294:13) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Caught error: safeAuth is not defined <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Digest: 3447423148 <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Stack: ReferenceError: safeAuth is not defined
     at EventDashboardPage (about://React/Server/webpack-internal:///(rsc)/./src/app/admin/events/dashboard/page.tsx?6:172:24)
     at resolveErrorDev (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2396:46)
     at processFullStringRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2882:23)
@@ -532,7 +392,7 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details">
-              📸 <a href="C:\project_workspace\mosc-temp\TestSprite\admin-tests\screenshots\failure-admin-004-1772495361361.png" target="_blank">View Screenshot</a>
+              📸 <a href="E:\project_workspace\mosc-temp\TestSprite\admin-tests\screenshots\failure-admin-004-1772747999114.png" target="_blank">View Screenshot</a>
             </div>
           
         </div>
@@ -542,70 +402,12 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-005] Event Registrations</div>
               <div class="test-details">
-                /admin/events/registrations • 7389ms • Priority: high
+                /admin/events/registrations • 9547ms • Priority: high
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
           </div>
           
-          
-            <div class="test-error">
-              ⚠️ JavaScript Errors (1):
-              <ul style="margin: 5px 0; padding-left: 20px;">
-                <li><strong>Error:</strong> Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-
-https://react.dev/link/hydration-mismatch
-
-  ...
-    <LoadingBoundary loading={null}>
-      <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
-        <RedirectBoundary>
-          <RedirectErrorBoundary router={{...}}>
-            <InnerLayoutRouter url="/admin/mem..." tree={[...]} cacheNode={{lazyData:null, ...}} segmentPath={[...]}>
-              <SegmentViewNode type="page" pagePath="admin/memb...">
-                <SegmentTrieNode>
-                <AdminSubscriptionsPage>
-                  <AdminSubscriptionsClient subscriptions={[...]} totalCount={1} currentPage={1} pageSize={20} ...>
-                    <div className="max-w-5xl ..." style={{...}}>
-                      <div>
-                      <AdminNavigation>
-                      <div>
-                      <div className="bg-white r...">
-                        <table className="w-full bor...">
-                          <thead>
-                          <tbody>
-                            <tr className="border-b h...">
-                              <td>
-                              <td>
-                              <td>
-                              <td>
-                              <td className="py-3 px-4 font-body text-sm text-foreground">
-+                               2/24/2026
--                               2/25/2026
-                              ...
-                      ...
-              ...
-            ...
-<br><pre style="background: #f5f5f5; padding: 5px; margin: 5px 0; border-radius: 3px; font-size: 11px; overflow-x: auto;">Error: Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-</pre></li>
-              </ul>
-            </div>
           
           
             <div class="test-details" style="color: #f59e0b;">
@@ -619,13 +421,13 @@ It can also happen if the client has a browser extension installed which messes 
     at processFullStringRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2882:23)
     at processFullBinaryRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2825:7)
     at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3028:15)
-    at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3294:13) The above error occurred in the <PollsPage> component. It was handled by the <ErrorBoundaryHandler> error boundary. <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/react-client-callbacks/error-boundary-callbacks.js:67:24)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Caught error: safeAuth is not defined <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Digest: 3953986528 <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Stack: ReferenceError: safeAuth is not defined
+    at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3294:13) The above error occurred in the <PollsPage> component. It was handled by the <ErrorBoundaryHandler> error boundary. <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/react-client-callbacks/error-boundary-callbacks.js:67:24)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Caught error: safeAuth is not defined <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Digest: 4161139360 <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Stack: ReferenceError: safeAuth is not defined
     at PollsPage (about://React/Server/webpack-internal:///(rsc)/./src/app/admin/polls/page.tsx?6:15:24)
     at resolveErrorDev (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2396:46)
     at processFullStringRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2882:23)
     at processFullBinaryRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2825:7)
     at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3028:15)
-    at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3294:13) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Caught error: safeAuth is not defined <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Digest: 3953986528 <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li>
+    at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3294:13) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Caught error: safeAuth is not defined <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Digest: 4161139360 <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li>
                 <li style="color: #6b7280; font-style: italic;">... and 35 more</li>
               </ul>
             </div>
@@ -646,70 +448,12 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-006] Poll Management</div>
               <div class="test-details">
-                /admin/polls • 8374ms • Priority: medium
+                /admin/polls • 11658ms • Priority: medium
               </div>
             </div>
             <span class="test-status failed">FAILED</span>
           </div>
           <div class="test-error">❌ Console error detected:<br><br>Console error: %o<br><br>%s ReferenceError: safeAuth is not defined<br>    at PollsPage (about://React/Server/webpack-internal:///(rsc)/./src/app/admin/polls/page.tsx?6:15:24)<br>    at resolveErrorDev (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2396:46)<br>    at processFullStringRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2882:23)<br>    at processFullBinaryRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2825:7)<br>    at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3028:15)<br>    at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3294:13) The above error occurred in the <PollsPage> component. It was handled by the <ErrorBoundaryHandler> error boundary.<br>Location: webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/react-client-callbacks/error-boundary-callbacks.js:67:24<br><br>---<br><br>Console error: [ROOT-ERROR] Caught error: safeAuth is not defined<br>Location: webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31<br><br>---<br><br>Console error: [ROOT-ERROR] Stack: ReferenceError: safeAuth is not defined<br>    at PollsPage (about://React/Server/webpack-internal:///(rsc)/./src/app/admin/polls/page.tsx?6:15:24)<br>    at resolveErrorDev (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2396:46)<br>    at processFullStringRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2882:23)<br>    at processFullBinaryRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2825:7)<br>    at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3028:15)<br>    at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3294:13)<br>Location: webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31<br><br>---<br><br>Console error: [ROOT-ERROR] Caught error: safeAuth is not defined<br>Location: webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31<br><br>---<br><br>Console error: [ROOT-ERROR] Stack: ReferenceError: safeAuth is not defined<br>    at PollsPage (about://React/Server/webpack-internal:///(rsc)/./src/app/admin/polls/page.tsx?6:15:24)<br>    at resolveErrorDev (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2396:46)<br>    at processFullStringRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2882:23)<br>    at processFullBinaryRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2825:7)<br>    at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3028:15)<br>    at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3294:13)<br>Location: webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31</div>
-          
-            <div class="test-error">
-              ⚠️ JavaScript Errors (1):
-              <ul style="margin: 5px 0; padding-left: 20px;">
-                <li><strong>Error:</strong> Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-
-https://react.dev/link/hydration-mismatch
-
-  ...
-    <LoadingBoundary loading={null}>
-      <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
-        <RedirectBoundary>
-          <RedirectErrorBoundary router={{...}}>
-            <InnerLayoutRouter url="/admin/mem..." tree={[...]} cacheNode={{lazyData:null, ...}} segmentPath={[...]}>
-              <SegmentViewNode type="page" pagePath="admin/memb...">
-                <SegmentTrieNode>
-                <AdminSubscriptionsPage>
-                  <AdminSubscriptionsClient subscriptions={[...]} totalCount={1} currentPage={1} pageSize={20} ...>
-                    <div className="max-w-5xl ..." style={{...}}>
-                      <div>
-                      <AdminNavigation>
-                      <div>
-                      <div className="bg-white r...">
-                        <table className="w-full bor...">
-                          <thead>
-                          <tbody>
-                            <tr className="border-b h...">
-                              <td>
-                              <td>
-                              <td>
-                              <td>
-                              <td className="py-3 px-4 font-body text-sm text-foreground">
-+                               2/24/2026
--                               2/25/2026
-                              ...
-                      ...
-              ...
-            ...
-<br><pre style="background: #f5f5f5; padding: 5px; margin: 5px 0; border-radius: 3px; font-size: 11px; overflow-x: auto;">Error: Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-</pre></li>
-              </ul>
-            </div>
           
           
             <div class="test-details" style="color: #f59e0b;">
@@ -723,13 +467,13 @@ It can also happen if the client has a browser extension installed which messes 
     at processFullStringRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2882:23)
     at processFullBinaryRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2825:7)
     at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3028:15)
-    at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3294:13) The above error occurred in the <PollsPage> component. It was handled by the <ErrorBoundaryHandler> error boundary. <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/react-client-callbacks/error-boundary-callbacks.js:67:24)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Caught error: safeAuth is not defined <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Digest: 3953986528 <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Stack: ReferenceError: safeAuth is not defined
+    at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3294:13) The above error occurred in the <PollsPage> component. It was handled by the <ErrorBoundaryHandler> error boundary. <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/client/react-client-callbacks/error-boundary-callbacks.js:67:24)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Caught error: safeAuth is not defined <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Digest: 4161139360 <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Stack: ReferenceError: safeAuth is not defined
     at PollsPage (about://React/Server/webpack-internal:///(rsc)/./src/app/admin/polls/page.tsx?6:15:24)
     at resolveErrorDev (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2396:46)
     at processFullStringRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2882:23)
     at processFullBinaryRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2825:7)
     at processBinaryChunk (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3028:15)
-    at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3294:13) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Caught error: safeAuth is not defined <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Digest: 3953986528 <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Stack: ReferenceError: safeAuth is not defined
+    at progress (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:3294:13) <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Caught error: safeAuth is not defined <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Digest: 4161139360 <span style="color: #6b7280; font-size: 11px;">(webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:56:31)</span></li><li><strong>[error]</strong> [ROOT-ERROR] Stack: ReferenceError: safeAuth is not defined
     at PollsPage (about://React/Server/webpack-internal:///(rsc)/./src/app/admin/polls/page.tsx?6:15:24)
     at resolveErrorDev (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2396:46)
     at processFullStringRow (webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-server-dom-webpack/cjs/react-server-dom-webpack-client.browser.development.js:2882:23)
@@ -743,7 +487,7 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details">
-              📸 <a href="C:\project_workspace\mosc-temp\TestSprite\admin-tests\screenshots\failure-admin-006-1772495377250.png" target="_blank">View Screenshot</a>
+              📸 <a href="E:\project_workspace\mosc-temp\TestSprite\admin-tests\screenshots\failure-admin-006-1772748020634.png" target="_blank">View Screenshot</a>
             </div>
           
         </div>
@@ -756,70 +500,12 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-007] Focus Groups</div>
               <div class="test-details">
-                /admin/focus-groups • 8329ms • Priority: medium
+                /admin/focus-groups • 12292ms • Priority: medium
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
           </div>
           
-          
-            <div class="test-error">
-              ⚠️ JavaScript Errors (1):
-              <ul style="margin: 5px 0; padding-left: 20px;">
-                <li><strong>Error:</strong> Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-
-https://react.dev/link/hydration-mismatch
-
-  ...
-    <LoadingBoundary loading={null}>
-      <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
-        <RedirectBoundary>
-          <RedirectErrorBoundary router={{...}}>
-            <InnerLayoutRouter url="/admin/mem..." tree={[...]} cacheNode={{lazyData:null, ...}} segmentPath={[...]}>
-              <SegmentViewNode type="page" pagePath="admin/memb...">
-                <SegmentTrieNode>
-                <AdminSubscriptionsPage>
-                  <AdminSubscriptionsClient subscriptions={[...]} totalCount={1} currentPage={1} pageSize={20} ...>
-                    <div className="max-w-5xl ..." style={{...}}>
-                      <div>
-                      <AdminNavigation>
-                      <div>
-                      <div className="bg-white r...">
-                        <table className="w-full bor...">
-                          <thead>
-                          <tbody>
-                            <tr className="border-b h...">
-                              <td>
-                              <td>
-                              <td>
-                              <td>
-                              <td className="py-3 px-4 font-body text-sm text-foreground">
-+                               2/24/2026
--                               2/25/2026
-                              ...
-                      ...
-              ...
-            ...
-<br><pre style="background: #f5f5f5; padding: 5px; margin: 5px 0; border-radius: 3px; font-size: 11px; overflow-x: auto;">Error: Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-</pre></li>
-              </ul>
-            </div>
           
           
             <div class="test-details" style="color: #f59e0b;">
@@ -846,70 +532,12 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-008] Membership Plans</div>
               <div class="test-details">
-                /admin/membership/plans • 8562ms • Priority: high
+                /admin/membership/plans • 13489ms • Priority: high
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
           </div>
           
-          
-            <div class="test-error">
-              ⚠️ JavaScript Errors (1):
-              <ul style="margin: 5px 0; padding-left: 20px;">
-                <li><strong>Error:</strong> Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-
-https://react.dev/link/hydration-mismatch
-
-  ...
-    <LoadingBoundary loading={null}>
-      <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
-        <RedirectBoundary>
-          <RedirectErrorBoundary router={{...}}>
-            <InnerLayoutRouter url="/admin/mem..." tree={[...]} cacheNode={{lazyData:null, ...}} segmentPath={[...]}>
-              <SegmentViewNode type="page" pagePath="admin/memb...">
-                <SegmentTrieNode>
-                <AdminSubscriptionsPage>
-                  <AdminSubscriptionsClient subscriptions={[...]} totalCount={1} currentPage={1} pageSize={20} ...>
-                    <div className="max-w-5xl ..." style={{...}}>
-                      <div>
-                      <AdminNavigation>
-                      <div>
-                      <div className="bg-white r...">
-                        <table className="w-full bor...">
-                          <thead>
-                          <tbody>
-                            <tr className="border-b h...">
-                              <td>
-                              <td>
-                              <td>
-                              <td>
-                              <td className="py-3 px-4 font-body text-sm text-foreground">
-+                               2/24/2026
--                               2/25/2026
-                              ...
-                      ...
-              ...
-            ...
-<br><pre style="background: #f5f5f5; padding: 5px; margin: 5px 0; border-radius: 3px; font-size: 11px; overflow-x: auto;">Error: Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-</pre></li>
-              </ul>
-            </div>
           
           
             <div class="test-details" style="color: #f59e0b;">
@@ -933,70 +561,12 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-009] Membership Subscriptions</div>
               <div class="test-details">
-                /admin/membership/subscriptions • 7116ms • Priority: high
+                /admin/membership/subscriptions • 12917ms • Priority: high
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
           </div>
           
-          
-            <div class="test-error">
-              ⚠️ JavaScript Errors (1):
-              <ul style="margin: 5px 0; padding-left: 20px;">
-                <li><strong>Error:</strong> Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-
-https://react.dev/link/hydration-mismatch
-
-  ...
-    <LoadingBoundary loading={null}>
-      <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
-        <RedirectBoundary>
-          <RedirectErrorBoundary router={{...}}>
-            <InnerLayoutRouter url="/admin/mem..." tree={[...]} cacheNode={{lazyData:null, ...}} segmentPath={[...]}>
-              <SegmentViewNode type="page" pagePath="admin/memb...">
-                <SegmentTrieNode>
-                <AdminSubscriptionsPage>
-                  <AdminSubscriptionsClient subscriptions={[...]} totalCount={1} currentPage={1} pageSize={20} ...>
-                    <div className="max-w-5xl ..." style={{...}}>
-                      <div>
-                      <AdminNavigation>
-                      <div>
-                      <div className="bg-white r...">
-                        <table className="w-full bor...">
-                          <thead>
-                          <tbody>
-                            <tr className="border-b h...">
-                              <td>
-                              <td>
-                              <td>
-                              <td>
-                              <td className="py-3 px-4 font-body text-sm text-foreground">
-+                               2/24/2026
--                               2/25/2026
-                              ...
-                      ...
-              ...
-            ...
-<br><pre style="background: #f5f5f5; padding: 5px; margin: 5px 0; border-radius: 3px; font-size: 11px; overflow-x: auto;">Error: Hydration failed because the server rendered text didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-</pre></li>
-              </ul>
-            </div>
           
           
             <div class="test-details" style="color: #f59e0b;">
@@ -1023,7 +593,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-010] Email Addresses</div>
               <div class="test-details">
-                /admin/tenant-email-addresses • 6964ms • Priority: medium
+                /admin/tenant-email-addresses • 12199ms • Priority: medium
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1052,7 +622,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-011] Bulk Email</div>
               <div class="test-details">
-                /admin/bulk-email • 6488ms • Priority: medium
+                /admin/bulk-email • 8736ms • Priority: medium
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1081,7 +651,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-012] Newsletter Emails</div>
               <div class="test-details">
-                /admin/newsletter-emails • 9778ms • Priority: medium
+                /admin/newsletter-emails • 13555ms • Priority: medium
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1113,7 +683,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-013] Media Management</div>
               <div class="test-details">
-                /admin/media • 8797ms • Priority: medium
+                /admin/media • 13892ms • Priority: medium
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1145,7 +715,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-014] Executive Committee</div>
               <div class="test-details">
-                /admin/executive-committee • 14714ms • Priority: medium
+                /admin/executive-committee • 22030ms • Priority: medium
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1174,7 +744,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-015] Event Sponsors (Global)</div>
               <div class="test-details">
-                /admin/event-sponsors • 8134ms • Priority: medium
+                /admin/event-sponsors • 13534ms • Priority: medium
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1203,7 +773,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-016] Global Performers</div>
               <div class="test-details">
-                /admin/event-featured-performers • 11068ms • Priority: medium
+                /admin/event-featured-performers • 10217ms • Priority: medium
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1232,7 +802,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-017] Global Contacts</div>
               <div class="test-details">
-                /admin/event-contacts • 9992ms • Priority: medium
+                /admin/event-contacts • 9235ms • Priority: medium
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1261,7 +831,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-018] Global Emails</div>
               <div class="test-details">
-                /admin/event-emails • 6501ms • Priority: medium
+                /admin/event-emails • 14771ms • Priority: medium
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1290,7 +860,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-019] Global Program Directors</div>
               <div class="test-details">
-                /admin/event-program-directors • 6928ms • Priority: medium
+                /admin/event-program-directors • 15109ms • Priority: medium
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1322,7 +892,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-020] Organizations</div>
               <div class="test-details">
-                /admin/tenant-management/organizations • 16708ms • Priority: high
+                /admin/tenant-management/organizations • 13951ms • Priority: high
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1340,7 +910,7 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details">
-              📊 Elements found: 4/0
+              📊 Elements found: 3/0
             </div>
           
           
@@ -1351,7 +921,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-021] Tenant Settings</div>
               <div class="test-details">
-                /admin/tenant-management/settings • 14315ms • Priority: high
+                /admin/tenant-management/settings • 12297ms • Priority: high
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1369,7 +939,7 @@ It can also happen if the client has a browser extension installed which messes 
           
           
             <div class="test-details">
-              📊 Elements found: 4/0
+              📊 Elements found: 3/0
             </div>
           
           
@@ -1380,7 +950,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-022] Test CRUD</div>
               <div class="test-details">
-                /admin/tenant-management/test • 7427ms • Priority: low
+                /admin/tenant-management/test • 12247ms • Priority: low
               </div>
             </div>
             <span class="test-status passed">PASSED</span>
@@ -1412,7 +982,7 @@ It can also happen if the client has a browser extension installed which messes 
             <div>
               <div class="test-name">[admin-023] Test Stripe</div>
               <div class="test-details">
-                /admin/test-stripe • 7177ms • Priority: low
+                /admin/test-stripe • 9593ms • Priority: low
               </div>
             </div>
             <span class="test-status passed">PASSED</span>

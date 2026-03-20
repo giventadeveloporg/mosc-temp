@@ -25,6 +25,9 @@ function parseParish(raw: Record<string, unknown>, baseUrl: string): Parish {
   let dioceseName: string | null = null;
   const diocese = raw.diocese as Record<string, unknown> | undefined;
   if (diocese && typeof diocese.name === 'string') dioceseName = diocese.name;
+  let vicarName: string | null = null;
+  const vicar = raw.vicar as Record<string, unknown> | undefined;
+  if (vicar && typeof vicar.name === 'string') vicarName = vicar.name;
   const image = raw.image;
   const imageUrl = image && baseUrl ? getMediaUrl(image, baseUrl) : null;
   const imageAlt = image ? (getMediaAlt(image) ?? null) : null;
@@ -33,6 +36,7 @@ function parseParish(raw: Record<string, unknown>, baseUrl: string): Parish {
     name,
     slug,
     dioceseName,
+    vicarName,
     address,
     addressLine1,
     addressLine2,
@@ -57,6 +61,8 @@ const DEFAULT_PAGINATION: StrapiPagination = {
 
 export async function getParishesData(options: {
   nameSearch?: string;
+  /** Case-insensitive match on parish vicar (priest) name — Strapi `filters[vicar][name][$containsi]`. */
+  vicarNameSearch?: string;
   page?: number;
   pageSize?: number;
 }): Promise<ParishesListResult> {
@@ -69,9 +75,12 @@ export async function getParishesData(options: {
   params.set('filters[tenant][tenantId][$eq]', tenantId);
   const nameQuery = options.nameSearch?.trim();
   if (nameQuery) params.set('filters[name][$containsi]', nameQuery);
+  const vicarQuery = options.vicarNameSearch?.trim();
+  if (vicarQuery) params.set('filters[vicar][name][$containsi]', vicarQuery);
   params.set('sort', 'name:asc');
   params.set('populate[0]', 'diocese');
   params.set('populate[1]', 'image');
+  params.set('populate[2]', 'vicar');
   const page = Math.max(1, options.page ?? 1);
   const pageSize = Math.min(100, Math.max(1, options.pageSize ?? 20));
   params.set('pagination[page]', String(page));
@@ -109,7 +118,7 @@ export async function getParishByDocumentId(documentId: string): Promise<Parish 
   const base = getStrapiApiBase();
   if (!baseUrl || !base || !documentId) return null;
   try {
-    const res = await fetch(`${base}/parishes/${documentId}?populate[0]=diocese&populate[1]=image`, {
+    const res = await fetch(`${base}/parishes/${documentId}?populate[0]=diocese&populate[1]=image&populate[2]=vicar`, {
       headers: getStrapiHeaders(),
       cache: 'no-store',
     });
