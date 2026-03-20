@@ -14,7 +14,7 @@ export default function ConditionalLayout({ children, header, footer }: Conditio
 
   // Legacy MOSC app at /mosc-old (app/mosc-old)
   const isMoscOldRoute = pathname?.startsWith("/mosc-old") ?? false;
-  // Syro app at /mosc (app/mosc)
+  // Syro apps: /mosc (app/mosc), /mosc-redesign (app/mosc-redesign — rocket home + (syro) subpages)
   const isMoscRoute = (pathname?.startsWith("/mosc") && !pathname?.startsWith("/mosc-old")) ?? false;
 
   // For /mosc-old and /mosc, render children without main app header/footer
