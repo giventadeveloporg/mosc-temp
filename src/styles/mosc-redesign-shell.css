@@ -1,0 +1,11 @@
+/**
+ * Scoped overrides for /mosc-redesign inner pages: align legacy Syro utility classes
+ * with MOSC rocket design system (parchment / burgundy / DM Sans).
+ */
+.mosc-redesign-subpage-shell .bg-syro-bg-gray {
+  background-color: #f5edd8 !important;
+}
+
+.mosc-redesign-subpage-shell .text-syro-dark-gray {
+  color: #3d0d0d !important;
+}
