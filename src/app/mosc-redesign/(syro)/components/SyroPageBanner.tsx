@@ -14,6 +14,8 @@ export interface SyroPageBannerProps {
   breadcrumbFrom?: 'home' | 'gallery' | 'downloads' | 'calendar' | 'holy-synod' | 'saints' | 'the-church' | 'catholicate' | 'administration' | 'ecumenical' | 'dioceses' | 'spiritual-organizations' | 'publications' | 'institutions' | 'training' | 'theological-seminaries' | 'lectionary' | 'news' | 'directory';
   /** Optional middle segment for 3-level breadcrumb (e.g. The Church / Theology / Christology). Used on the-church subpages under Theology, Spirituality, History, Liturgy. */
   breadcrumbParent?: { label: string; href: string };
+  /** When true, omit the breadcrumb nav (e.g. diocese-scoped parish list where the parent “Directory” link is not desired). Title stays in the h2. */
+  hideBreadcrumbNav?: boolean;
 }
 
 /**
@@ -80,7 +82,14 @@ export function SyroBreadcrumb({ breadcrumbFrom, currentTitle }: SyroBreadcrumbP
   );
 }
 
-export default function SyroPageBanner({ title, description, centerText, breadcrumbFrom = 'home', breadcrumbParent }: SyroPageBannerProps) {
+export default function SyroPageBanner({
+  title,
+  description,
+  centerText,
+  breadcrumbFrom = 'home',
+  breadcrumbParent,
+  hideBreadcrumbNav = false,
+}: SyroPageBannerProps) {
   const config = BREADCRUMB_CONFIG[breadcrumbFrom];
   return (
     <section
@@ -97,43 +106,45 @@ export default function SyroPageBanner({ title, description, centerText, breadcr
             <h2 className="text-base sm:text-xl lg:text-2xl font-bold text-white uppercase tracking-wide break-words drop-shadow-sm">
               {title}
             </h2>
-            <nav aria-label="Breadcrumb" className="mt-1">
-              <ol className={`flex flex-wrap items-center gap-x-1.5 text-xs sm:text-sm font-medium uppercase tracking-wide ${centerText ? 'justify-center' : ''}`}>
-                <li>
-                  <Link
-                    href={config.href}
-                    className="text-parchment-light/90 hover:text-warmGold transition-colors duration-300"
-                  >
-                    {config.label}
-                  </Link>
-                </li>
-                <li className="text-parchment-light/70" aria-hidden="true">
-                  /
-                </li>
-                {breadcrumbParent ? (
-                  <>
-                    <li>
-                      <Link
-                        href={breadcrumbParent.href}
-                        className="text-parchment-light/90 hover:text-warmGold transition-colors duration-300"
-                      >
-                        {breadcrumbParent.label}
-                      </Link>
-                    </li>
-                    <li className="text-parchment-light/70" aria-hidden="true">
-                      /
-                    </li>
+            {!hideBreadcrumbNav && (
+              <nav aria-label="Breadcrumb" className="mt-1">
+                <ol className={`flex flex-wrap items-center gap-x-1.5 text-xs sm:text-sm font-medium uppercase tracking-wide ${centerText ? 'justify-center' : ''}`}>
+                  <li>
+                    <Link
+                      href={config.href}
+                      className="text-parchment-light/90 hover:text-warmGold transition-colors duration-300"
+                    >
+                      {config.label}
+                    </Link>
+                  </li>
+                  <li className="text-parchment-light/70" aria-hidden="true">
+                    /
+                  </li>
+                  {breadcrumbParent ? (
+                    <>
+                      <li>
+                        <Link
+                          href={breadcrumbParent.href}
+                          className="text-parchment-light/90 hover:text-warmGold transition-colors duration-300"
+                        >
+                          {breadcrumbParent.label}
+                        </Link>
+                      </li>
+                      <li className="text-parchment-light/70" aria-hidden="true">
+                        /
+                      </li>
+                      <li className="text-warmGold" aria-current="page">
+                        {title}
+                      </li>
+                    </>
+                  ) : (
                     <li className="text-warmGold" aria-current="page">
                       {title}
                     </li>
-                  </>
-                ) : (
-                  <li className="text-warmGold" aria-current="page">
-                    {title}
-                  </li>
-                )}
-              </ol>
-            </nav>
+                  )}
+                </ol>
+              </nav>
+            )}
             {description && (
               <p className="text-base sm:text-lg text-parchment-light/95 leading-relaxed mt-3 normal-case font-normal">
                 {description}

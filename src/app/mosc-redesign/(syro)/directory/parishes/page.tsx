@@ -72,7 +72,11 @@ export default async function ParishesPage({ searchParams }: PageProps) {
 
   return (
     <div className="min-h-screen bg-syro-bg-gray">
-      <SyroPageBanner title="Parishes" breadcrumbFrom="directory" />
+      <SyroPageBanner
+        title="Parishes"
+        breadcrumbFrom="directory"
+        hideBreadcrumbNav={hasDioceseScope}
+      />
       <section className="relative bg-syro-bg-gray py-8 lg:py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <p className="font-body text-syro-dark-gray mt-2">
@@ -104,6 +108,7 @@ export default async function ParishesPage({ searchParams }: PageProps) {
                     className="font-body w-full px-4 py-2 border border-syro-table-border rounded-lg bg-white text-syro-blue placeholder:text-syro-dark-gray focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2"
                   />
                 </div>
+                {/* Vicar/priest search omitted when ?diocese= is set (diocese-scoped list). */}
                 {!hasDioceseScope && (
                   <div className="flex-1 min-w-[200px]">
                     <label htmlFor="parishes-priest-search" className="font-body text-sm text-syro-dark-gray block mb-1">
@@ -124,8 +129,15 @@ export default async function ParishesPage({ searchParams }: PageProps) {
                 </button>
               </div>
               {(hasSearch || hasDioceseScope) && (
-                <Link href={BASE_PATH} className="font-body text-sm text-syro-dark-gray hover:text-syro-red hover:underline inline-block">
-                  Clear all filters
+                <Link
+                  href={
+                    hasDioceseScope && dioceseForFilter
+                      ? `${BASE_PATH}?diocese=${encodeURIComponent(dioceseForFilter)}`
+                      : BASE_PATH
+                  }
+                  className="font-body text-sm text-syro-dark-gray hover:text-syro-red hover:underline inline-block"
+                >
+                  {hasDioceseScope ? 'Clear search' : 'Clear all filters'}
                 </Link>
               )}
             </form>
