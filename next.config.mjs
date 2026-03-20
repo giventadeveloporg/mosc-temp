@@ -3,6 +3,8 @@ const nextConfig = {
   // Standalone output for AWS Amplify Lambda deployment
   // Creates a self-contained build with all dependencies bundled
   output: 'standalone',
+  // Smaller deploy artifact (Amplify ~220MB output limit); omit client source maps in production
+  productionBrowserSourceMaps: false,
   typescript: {
     ignoreBuildErrors: true,
   },
