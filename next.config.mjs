@@ -3,9 +3,6 @@ const nextConfig = {
   // Standalone output for AWS Amplify Lambda deployment
   // Creates a self-contained build with all dependencies bundled
   output: 'standalone',
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -52,6 +49,10 @@ const nextConfig = {
     // Add custom webpack config here if needed
     return config;
   },
+
+  // Next.js 16+ defaults to Turbopack for `next build`; an empty config acknowledges
+  // we have a webpack hook above but are OK with Turbopack defaults (see Next.js tip).
+  turbopack: {},
 
   // No redirects from /mosc; /mosc-old exists on its own (rewrite only)
 
@@ -132,7 +133,7 @@ const nextConfig = {
   // Enable experimental features if needed
   experimental: {
     // Allow large multipart bodies (e.g. multi-file media upload) so middleware does not truncate at 10MB
-    middlewareClientMaxBodySize: '100mb',
+    proxyClientMaxBodySize: '100mb',
     serverActions: {
       bodySizeLimit: '50mb', // Increase from default 1mb to 50mb for file uploads
     },
