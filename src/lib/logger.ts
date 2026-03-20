@@ -1,8 +1,9 @@
 /**
- * Robust logging utility that can't be stripped by Next.js production builds
+ * Tagged logging for server, API routes, and Edge middleware.
  *
- * This uses process.stderr.write which is preserved in production,
- * unlike console.log which may be removed by tree-shaking.
+ * IMPORTANT: Do not use Node-only APIs (`process.stderr`, `fs`, etc.) here.
+ * This module is imported by `src/middleware.ts` (Edge Runtime). Edge has no
+ * `process.stderr` — referencing it breaks production/Turbopack builds.
  */
 
 type LogLevel = 'INFO' | 'WARN' | 'ERROR' | 'DEBUG';
@@ -16,29 +17,22 @@ interface LogMessage {
 }
 
 /**
- * Write log to stderr (can't be stripped by Next.js)
+ * Emit structured log (works in Node, Edge middleware, and browser).
+ * Uses only `console.*` — no `process.stderr` (not available in Edge middleware).
  */
 function writeLog(logMessage: LogMessage): void {
-  const logString = JSON.stringify(logMessage);
+  const humanLine = `[${logMessage.tag}] [${logMessage.level}] ${logMessage.message}`;
+  const data = logMessage.data ?? '';
 
-  // Use process.stderr.write which is ALWAYS preserved in production
-  if (typeof process !== 'undefined' && process.stderr) {
-    process.stderr.write(`[ROBUST-LOG] ${logString}\n`);
-  }
-
-  // Also use console.log as backup (may be stripped in production)
-  console.log(`[${logMessage.tag}] [${logMessage.level}] ${logMessage.message}`, logMessage.data || '');
-
-  // Force flush (ensures logs are written immediately)
-  if (typeof process !== 'undefined' && process.stderr && typeof process.stderr.write === 'function') {
-    try {
-      // @ts-ignore
-      if (process.stderr.isTTY === false) {
-        // In non-TTY mode (like AWS Lambda), force flush
-      }
-    } catch (e) {
-      // Ignore flush errors
-    }
+  switch (logMessage.level) {
+    case 'ERROR':
+      console.error(humanLine, data);
+      break;
+    case 'WARN':
+      console.warn(humanLine, data);
+      break;
+    default:
+      console.log(humanLine, data);
   }
 }
 
