@@ -1,8 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Standalone output for AWS Amplify Lambda deployment
-  // Creates a self-contained build with all dependencies bundled
-  output: 'standalone',
+  // Do NOT use output: 'standalone' for AWS Amplify Hosting SSR.
+  // Standalone adds .next/standalone/ (traced node_modules + server) while .next/server still
+  // exists — often ~300MB+ total and exceeds Amplify's ~220MB deploy artifact cap.
+  // Amplify Hosting compute bundles from the default .next layout (see AWS deploy-nextjs-app docs).
+  // For self-hosted Docker with standalone, use a separate build profile or Dockerfile that sets output.
   // Smaller deploy artifact (Amplify ~220MB output limit); omit client source maps in production
   productionBrowserSourceMaps: false,
   typescript: {
@@ -52,8 +54,9 @@ const nextConfig = {
     return config;
   },
 
-  // Next.js 16+ defaults to Turbopack for `next build`; an empty config acknowledges
-  // we have a webpack hook above but are OK with Turbopack defaults (see Next.js tip).
+  // Production builds use `next build --webpack` (see package.json) so `.next/dev` is not
+  // produced (~hundreds of MB). Amplify deploy artifact is `.next` only; shipping `.next/dev`
+  // exceeds the ~220MB SSR cap. `next dev` still uses Turbopack by default.
   turbopack: {},
 
   // No redirects from /mosc; /mosc-old exists on its own (rewrite only)
@@ -141,8 +144,19 @@ const nextConfig = {
     },
   },
 
-  // Server external packages (moved from experimental in Next.js 15)
-  serverExternalPackages: [],
+  // Keep large / native deps out of the webpack server bundle; load from node_modules at runtime.
+  // Shrinks .next/server (helps stay under Amplify SSR ~220MB deploy artifact cap).
+  serverExternalPackages: [
+    '@prisma/client',
+    'prisma',
+    'sharp',
+    'stripe',
+    'xlsx',
+    '@zxing/library',
+    '@zxing/browser',
+    'svix',
+    'jsonwebtoken',
+  ],
 
   env: {
     // Clerk environment variables

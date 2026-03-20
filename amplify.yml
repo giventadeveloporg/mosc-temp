@@ -19,6 +19,9 @@ frontend:
         - rm -rf .next/cache
         # Typegen only — not needed to run the app in Lambda
         - rm -rf .next/types
+        # Next.js 16+ can leave a large .next/dev tree (Turbopack/webpack dev artifacts); not used at runtime.
+        # Removing it is required to stay under Amplify SSR ~220MB deploy artifact limit.
+        - rm -rf .next/dev
   artifacts:
     baseDirectory: .next
     files:
