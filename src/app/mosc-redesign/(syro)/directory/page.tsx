@@ -169,24 +169,6 @@ export default async function DirectoryPage() {
       {/* Content - same layout and design as /mosc/administration */}
       <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Access Directory button below breadcrumb */}
-          <div className="flex justify-center mb-16">
-            <a
-              href="https://directory.mosc.in/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="syro-primary-button inline-flex items-center gap-2 px-8 py-4 font-body font-semibold text-lg"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-              <span>Access Directory at directory.mosc.in</span>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </a>
-          </div>
-
           {/* Section title - left red bar (same as administration) */}
           <h3 className="text-2xl font-light text-[#798daf] mb-10 pl-8 border-l-[7px] border-syro-red">
             Directory Sections
