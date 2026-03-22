@@ -133,23 +133,22 @@ export default function MoscRedesignHeader() {
 
   return (
     <header className="sticky top-0 z-[1000] overflow-visible shadow-md border-b-2 border-burgundy/40">
-      {/* Row 1: Logo + Church Name */}
+      {/* Row 1: Logo */}
       <div className="bg-parchment-deep border-b border-burgundy/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-16 py-2">
-          <div className="flex items-center justify-between">
-            <Link href="/mosc-redesign" className="flex items-center gap-3 group">
-              <div className="relative w-16 h-16 md:w-20 md:h-20 flex-shrink-0">
-                <Image
-                  src="https://www.mosc-temp.com/images/logos/Current_Edits/New%20Edit/Mosc_Header_Logo9.png"
-                  alt="Malankara Orthodox Syrian Church official logo"
-                  fill
-                  className="object-contain"
-                  priority
-                />
-              </div>
-              <span className="text-burgundy-dark font-bold text-lg md:text-xl leading-tight tracking-wide">
-                Malankara Orthodox Syrian Church
-              </span>
+          <div className="flex items-center justify-between gap-4">
+            <Link
+              href="/mosc-redesign"
+              className="relative w-16 h-16 md:w-20 md:h-20 flex-shrink-0 block group"
+              aria-label="Malankara Orthodox Syrian Church — Home"
+            >
+              <Image
+                src="https://www.mosc-temp.com/images/logos/Current_Edits/New%20Edit/Mosc_Header_Logo9.png"
+                alt=""
+                fill
+                className="object-contain"
+                priority
+              />
             </Link>
 
             <button
@@ -317,12 +316,36 @@ export default function MoscRedesignHeader() {
                 })()
               )
             )}
+
+            <div className="mt-3 pt-3 border-t border-burgundy/20">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-burgundy/70 px-2 mb-2">Quick links</p>
+              <div className="flex flex-col">
+                {MOSC_REDESIGN_QUICK_LINKS.map((ql) => {
+                  const quickActive = pathname === ql.href || pathname.startsWith(`${ql.href}/`);
+                  return (
+                    <Link
+                      key={ql.label}
+                      href={ql.href}
+                      aria-current={quickActive ? 'page' : undefined}
+                      className={`text-xs py-2 px-2 rounded transition-all duration-200 no-underline visited:no-underline border-b border-burgundy/10 last:border-b-0 ${
+                        quickActive
+                          ? 'text-burgundy visited:text-burgundy font-semibold bg-burgundy/15'
+                          : 'text-burgundy-dark visited:text-burgundy-dark hover:text-burgundy hover:bg-burgundy/10'
+                      }`}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {ql.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Row 3: Quick Links Bar */}
-      <div className="relative z-10 bg-burgundy overflow-x-auto border-t border-white/10">
+      {/* Row 3: Quick Links Bar (desktop only — mobile: inside hamburger above) */}
+      <div className="relative z-10 bg-burgundy overflow-x-auto border-t border-white/10 hidden lg:block">
         <div className="max-w-7xl mx-auto px-4 lg:px-16">
           <div className="flex items-center gap-0 min-w-max justify-end ml-auto">
             {MOSC_REDESIGN_QUICK_LINKS.map((ql) => (
