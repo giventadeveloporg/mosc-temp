@@ -4,26 +4,32 @@ import React, { useState, useEffect, useLayoutEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { formatInTimeZone } from 'date-fns-tz';
-import type { EventDetailsDTO, EventMediaDTO } from '@/types';
 import { useFilteredEvents } from '@/hooks/useFilteredEvents';
 import { getOverlayInfo } from '@/lib/heroOverlay';
 import { useDeferredFetch } from '@/hooks/usePageReady';
 import { getHomepageCacheKey } from '@/lib/homepageCacheKeys';
+import {
+  MAX_FEATURED_EVENTS_HOMEPAGE,
+  type FeaturedEventWithMedia,
+} from '@/lib/homepage/featuredEvents';
 
-interface FeaturedEventWithMedia {
-  event: EventDetailsDTO;
-  media: EventMediaDTO;
-}
-
-const MAX_FEATURED_EVENTS = 3;
+const MAX_FEATURED_EVENTS = MAX_FEATURED_EVENTS_HOMEPAGE;
 const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes (same as UpcomingEventsSection)
 
-const FeaturedEventsSection: React.FC = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  // Displayed list: from cache (instant) or from useFilteredEvents (after load)
-  const [displayedEvents, setDisplayedEvents] = useState<FeaturedEventWithMedia[]>([]);
-  const featuredFetchEnabled = useDeferredFetch(500);
-  const { filteredEvents, isLoading, error } = useFilteredEvents('featured', featuredFetchEnabled);
+type FeaturedEventsSectionProps = {
+  /** SSR seed — same shape as client filter; shows in first paint when provided */
+  initialFeaturedEvents?: FeaturedEventWithMedia[];
+};
+
+const FeaturedEventsSection: React.FC<FeaturedEventsSectionProps> = ({
+  initialFeaturedEvents = [],
+}) => {
+  const [isVisible, setIsVisible] = useState(() => initialFeaturedEvents.length > 0);
+  const [displayedEvents, setDisplayedEvents] = useState<FeaturedEventWithMedia[]>(() =>
+    initialFeaturedEvents.slice(0, MAX_FEATURED_EVENTS)
+  );
+  const featuredFetchEnabled = useDeferredFetch(0);
+  const { filteredEvents, isLoading } = useFilteredEvents('featured', featuredFetchEnabled);
 
   const CACHE_KEY = getHomepageCacheKey('homepage_featured_events_cache');
 
@@ -42,7 +48,7 @@ const FeaturedEventsSection: React.FC = () => {
     }
   }, [CACHE_KEY]);
 
-  // When useFilteredEvents has data: update displayed list, write cache, show after short delay if not already visible
+  // When useFilteredEvents has data: update displayed list, write cache, show immediately (no 300ms delay)
   useEffect(() => {
     if (isLoading || filteredEvents.length === 0) return;
 
@@ -55,8 +61,7 @@ const FeaturedEventsSection: React.FC = () => {
     }
 
     if (!isVisible) {
-      const t = setTimeout(() => setIsVisible(true), 300);
-      return () => clearTimeout(t);
+      setIsVisible(true);
     }
   }, [isLoading, filteredEvents, CACHE_KEY, isVisible]);
 
