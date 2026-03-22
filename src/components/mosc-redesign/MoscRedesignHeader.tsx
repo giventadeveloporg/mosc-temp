@@ -132,8 +132,8 @@ export default function MoscRedesignHeader() {
   );
 
   return (
-    <header className="sticky top-0 z-[1000] overflow-visible shadow-md border-b-2 border-burgundy/40">
-      {/* Row 1: Logo */}
+    <header className="sticky top-0 z-[1000] w-full shrink-0 overflow-visible shadow-md border-b-2 border-burgundy/40">
+      {/* Row 1: Logo + hamburger (mobile); part of one sticky block with nav + quick links (desktop) */}
       <div className="bg-parchment-deep border-b border-burgundy/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-16 py-2">
           <div className="flex items-center justify-between gap-4">
