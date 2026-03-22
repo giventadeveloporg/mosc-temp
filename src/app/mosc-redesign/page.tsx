@@ -150,10 +150,14 @@ export default function HomePage() {
   const visibleSaints = saints.slice(saintIndex, saintIndex + 3);
 
   return (
-    <div className="min-h-screen bg-parchment font-dm-sans overflow-x-hidden">
-
+    <div className="min-h-screen bg-parchment font-dm-sans flex flex-col">
+      {/*
+        Sticky header must NOT sit inside overflow-x-hidden (breaks position:sticky in browsers).
+        /mosc uses syro-layout + overflow only on main; we mirror that with a content wrapper.
+      */}
       <MoscRedesignHeader />
 
+      <div className="flex-1 min-w-0 w-full overflow-x-hidden">
       {/* ── HERO: mobile = contain + letterbox; md+ = cover, full-bleed panoramic ─ */}
       <section className="relative w-full min-h-[260px] h-[min(42vh,320px)] sm:min-h-[300px] md:h-auto md:min-h-[380px] md:aspect-[5/2] md:max-h-[min(56vh,580px)] overflow-hidden bg-[#1a1410] md:bg-stone-900">
         {slides.map((slide, i) =>
@@ -587,6 +591,7 @@ export default function HomePage() {
       </section>
 
       <MoscRedesignFooter />
+      </div>
     </div>);
 
 }

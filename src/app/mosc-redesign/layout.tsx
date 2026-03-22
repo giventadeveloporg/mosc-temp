@@ -1,5 +1,11 @@
 import type { Metadata } from 'next';
 import { DM_Sans } from 'next/font/google';
+/**
+ * Same scroll / sticky foundation as /mosc (syro-malabar.css + .syro-layout):
+ * html:has(.syro-layout) + body flex column so `position: sticky` works on mobile
+ * and the home page (global html/body overflow-x alone can break sticky).
+ */
+import '@/styles/syro-malabar.css';
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
@@ -19,7 +25,7 @@ export const metadata: Metadata = {
 export default function MoscRedesignLayout({ children }: { children: React.ReactNode }) {
   return (
     <div
-      className={`${dmSans.variable} ${dmSans.className} min-h-screen bg-parchment font-dm-sans text-warmGray-dark antialiased`}
+      className={`${dmSans.variable} ${dmSans.className} syro-layout min-h-screen bg-parchment font-dm-sans text-warmGray-dark antialiased`}
     >
       {children}
     </div>
