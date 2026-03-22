@@ -154,33 +154,40 @@ export default function HomePage() {
 
       <MoscRedesignHeader />
 
-      {/* ── HERO SLIDER ────────────────────────────────────────────────── */}
-      <section className="relative h-[300px] md:h-[400px] overflow-hidden">
+      {/* ── HERO: mobile = contain + letterbox; md+ = cover, full-bleed panoramic ─ */}
+      <section className="relative w-full min-h-[260px] h-[min(42vh,320px)] sm:min-h-[300px] md:h-auto md:min-h-[380px] md:aspect-[5/2] md:max-h-[min(56vh,580px)] overflow-hidden bg-[#1a1410] md:bg-stone-900">
         {slides.map((slide, i) =>
         <div
           key={i}
           className={`absolute inset-0 transition-opacity duration-1000 ${i === currentSlide ? "opacity-100" : "opacity-0"}`}>
-          <div
-            className="absolute inset-0"
-            style={{ transform: `translateY(${scrollY * 0.3}px)`, willChange: "transform" }}>
-            <Image src={slide.image} alt={slide.alt} fill className="object-cover" priority={i === 0} />
+          <div className="absolute inset-0">
+            <Image
+              src={slide.image}
+              alt={slide.alt}
+              fill
+              className="object-contain object-center md:object-cover md:object-center"
+              priority={i === 0}
+              sizes="100vw"
+            />
           </div>
         </div>
         )}
 
-        {/* Readability overlay — matches reference full-bleed hero */}
-        <div className="absolute inset-0 z-[5] bg-gradient-to-r from-black/55 via-black/25 to-transparent pointer-events-none" aria-hidden />
+        <div
+          className="absolute inset-0 z-[5] bg-gradient-to-r from-black/80 via-black/45 to-transparent pointer-events-none md:from-black/45 md:via-black/20 md:to-transparent"
+          aria-hidden
+        />
 
         {/* Slide content overlay */}
-        <div className="relative z-10 h-full flex items-center">
+        <div className="relative z-10 flex min-h-[inherit] h-full items-center py-8 md:py-10">
           <div className="max-w-7xl mx-auto px-6 lg:px-16 w-full">
-            <div className="max-w-lg">
+            <div className="max-w-lg rounded-xl bg-black/55 px-5 py-4 md:px-6 md:py-5 ring-1 ring-white/25 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-[2px]">
               <div className="w-12 h-0.5 bg-warmGold mb-4" />
-              <h1 className="text-3xl md:text-5xl font-bold text-white leading-tight mb-4">
+              <h1 className="text-3xl md:text-5xl font-bold text-white leading-tight mb-4 [text-shadow:0_2px_14px_rgba(0,0,0,0.95)]">
                 Malankara Orthodox<br />
-                <span className="text-warmGold">Syrian Church</span>
+                <span className="text-warmGold [text-shadow:0_2px_16px_rgba(0,0,0,0.98)]">Syrian Church</span>
               </h1>
-              <p className="text-parchment/90 text-sm md:text-base leading-relaxed">
+              <p className="text-white text-sm md:text-base leading-relaxed font-medium [text-shadow:0_1px_10px_rgba(0,0,0,0.9)]">
                 Rooted in the Apostolic ministry of St. Thomas in India
               </p>
             </div>
@@ -386,19 +393,12 @@ export default function HomePage() {
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="grid lg:grid-cols-5 gap-10 items-center">
-            {/* Images */}
-            <div className="lg:col-span-2 flex gap-4">
-              <div className="flex-1 rounded-2xl overflow-hidden aspect-[3/4] relative shadow-xl border border-burgundy/30 hover:border-burgundy/60 transition-all duration-300 hover:shadow-burgundy/30">
+            {/* Images — single portrait */}
+            <div className="lg:col-span-2 flex justify-center lg:justify-start">
+              <div className="w-full max-w-[320px] rounded-2xl overflow-hidden aspect-[3/4] relative shadow-xl border border-burgundy/30 hover:border-burgundy/60 transition-all duration-300 hover:shadow-burgundy/30">
                 <Image
                   src="https://www.mosc-temp.com/mosc/assets/images/mosc_images/Baselios_Marthoma_Mathews_III.jpeg"
                   alt="His Holiness Baselios Marthoma Mathews III, Catholicos of the East and Malankara Metropolitan, in full episcopal vestments"
-                  fill
-                  className="object-cover" />
-              </div>
-              <div className="flex-1 rounded-2xl overflow-hidden aspect-[3/4] relative shadow-xl mt-8 border border-burgundy/30 hover:border-burgundy/60 transition-all duration-300 hover:shadow-burgundy/30">
-                <Image
-                  src="https://www.mosc-temp.com/mosc/assets/images/mosc_images/Baselios_Marthoma_Mathews_III_2.jpeg"
-                  alt="His Holiness Baselios Marthoma Mathews III during an official church ceremony"
                   fill
                   className="object-cover" />
               </div>

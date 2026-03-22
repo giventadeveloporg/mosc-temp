@@ -24,6 +24,13 @@ export async function bootstrapUserProfile({
     const tenantId = getTenantId();
     let token = await getCachedApiJwt();
 
+    /** Backend TenantContextFilter + getUserProfileByUserId require X-Tenant-ID (query alone is not enough). */
+    const tenantAuthHeaders = (t: string, extra?: Record<string, string>) => ({
+      Authorization: `Bearer ${t}`,
+      'X-Tenant-ID': tenantId,
+      ...extra,
+    });
+
     // Create abort controller for timeout
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000); // 15 second timeout
@@ -32,7 +39,7 @@ export async function bootstrapUserProfile({
     // CRITICAL: If profile exists with correct userId, do NOT update anything
     // This prevents overwriting existing firstName, lastName, email fields
     let res = await fetch(`${getApiBase()}/api/user-profiles/by-user/${userId}?tenantId.equals=${tenantId}`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: tenantAuthHeaders(token),
       cache: 'no-store',
       signal: controller.signal,
     });
@@ -43,7 +50,7 @@ export async function bootstrapUserProfile({
       const newTimeout = setTimeout(() => newController.abort(), 15000);
       token = await generateApiJwt();
       res = await fetch(`${getApiBase()}/api/user-profiles/by-user/${userId}?tenantId.equals=${tenantId}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: tenantAuthHeaders(token),
         cache: 'no-store',
         signal: newController.signal,
       });
@@ -72,13 +79,13 @@ export async function bootstrapUserProfile({
       if (email) {
         let emailToken = token;
         let emailRes = await fetch(`${getApiBase()}/api/user-profiles?email.equals=${encodeURIComponent(email)}&tenantId.equals=${tenantId}`, {
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${emailToken}` },
+          headers: tenantAuthHeaders(emailToken, { 'Content-Type': 'application/json' }),
           cache: 'no-store',
         });
         if (emailRes.status === 401) {
           emailToken = await generateApiJwt();
           emailRes = await fetch(`${getApiBase()}/api/user-profiles?email.equals=${encodeURIComponent(email)}&tenantId.equals=${tenantId}`, {
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${emailToken}` },
+            headers: tenantAuthHeaders(emailToken, { 'Content-Type': 'application/json' }),
             cache: 'no-store',
           });
         }
@@ -187,14 +194,14 @@ export async function bootstrapUserProfile({
             let updateToken = token;
             let updateRes = await fetch(`${getApiBase()}/api/user-profiles/${userProfile.id}`, {
               method: 'PATCH', // Use PATCH instead of PUT to avoid overwriting fields
-              headers: { 'Content-Type': 'application/merge-patch+json', Authorization: `Bearer ${updateToken}` },
+              headers: tenantAuthHeaders(updateToken, { 'Content-Type': 'application/merge-patch+json' }),
               body: JSON.stringify(updatePayload),
             });
             if (updateRes.status === 401) {
               updateToken = await generateApiJwt();
               updateRes = await fetch(`${getApiBase()}/api/user-profiles/${userProfile.id}`, {
                 method: 'PATCH', // Use PATCH instead of PUT
-                headers: { 'Content-Type': 'application/merge-patch+json', Authorization: `Bearer ${updateToken}` },
+                headers: tenantAuthHeaders(updateToken, { 'Content-Type': 'application/merge-patch+json' }),
                 body: JSON.stringify(updatePayload),
               });
             }
@@ -217,14 +224,14 @@ export async function bootstrapUserProfile({
       let createToken = token;
       let createRes = await fetch(`${getApiBase()}/api/user-profiles`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${createToken}` },
+        headers: tenantAuthHeaders(createToken, { "Content-Type": "application/json" }),
         body: JSON.stringify(profile),
       });
       if (createRes.status === 401) {
         createToken = await generateApiJwt();
         createRes = await fetch(`${getApiBase()}/api/user-profiles`, {
           method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${createToken}` },
+          headers: tenantAuthHeaders(createToken, { "Content-Type": "application/json" }),
           body: JSON.stringify(profile),
         });
       }

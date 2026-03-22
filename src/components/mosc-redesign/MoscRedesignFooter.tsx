@@ -183,15 +183,22 @@ export default function MoscRedesignFooter() {
             </ul>
           </div>
 
-          {/* Logo + social */}
+          {/* Logo + social — logo on light gradient panel so gold/cream artwork reads on dark footer */}
           <div className="flex flex-col items-center lg:items-end text-center lg:text-right">
-            <div className="relative w-24 h-24 mb-4">
-              <Image
-                src="https://www.mosc-temp.com/images/logos/Current_Edits/New%20Edit/Mosc_Header_Logo9.png"
-                alt="Malankara Orthodox Syrian Church"
-                fill
-                className="object-contain"
-              />
+            <div className="mb-4 w-fit max-w-full">
+              <div
+                className="rounded-2xl p-4 sm:p-5 bg-gradient-to-br from-parchment-light via-parchment to-parchment-mid border-2 border-warmGold/55 shadow-[0_12px_40px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.65)] ring-1 ring-white/25"
+              >
+                <div className="relative h-28 w-28 sm:h-32 sm:w-32 mx-auto lg:mx-0 lg:ml-auto">
+                  <Image
+                    src="https://www.mosc-temp.com/images/logos/Current_Edits/New%20Edit/Mosc_Header_Logo9.png"
+                    alt="Malankara Orthodox Syrian Church"
+                    fill
+                    className="object-contain drop-shadow-sm"
+                    sizes="(max-width: 640px) 112px, 128px"
+                  />
+                </div>
+              </div>
             </div>
             <p className="text-parchment-light/80 text-xs leading-relaxed max-w-xs">
               The Malankara Orthodox Syrian Church traces its origins to the apostolic mission of St. Thomas in India.
