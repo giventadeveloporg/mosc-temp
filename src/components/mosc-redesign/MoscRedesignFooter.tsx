@@ -293,6 +293,17 @@ export default function MoscRedesignFooter() {
             <p className="text-parchment-light/70 text-xs text-center">
               © {new Date().getFullYear()} Malankara Orthodox Syrian Church. All rights reserved.
             </p>
+            <p className="text-parchment-light/55 text-[11px] text-center">
+              Powered by{' '}
+              <a
+                href="https://www.giventa.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-parchment-light/75 hover:text-warmGold transition-colors underline-offset-2 hover:underline"
+              >
+                Giventa Inc., USA
+              </a>
+            </p>
             <div className="flex flex-wrap justify-center gap-4 text-xs">
               <Link href="/mosc-redesign/privacy-policy" className="text-parchment-light/70 hover:text-warmGold transition-colors">
                 Privacy Policy
