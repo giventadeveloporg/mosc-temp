@@ -91,6 +91,9 @@ export default function SyroPageBanner({
   hideBreadcrumbNav = false,
 }: SyroPageBannerProps) {
   const config = BREADCRUMB_CONFIG[breadcrumbFrom];
+  const breadcrumbLinkClass = 'text-white/90 hover:text-white transition-colors duration-300';
+  const breadcrumbSeparatorClass = 'text-white/70';
+  const breadcrumbCurrentClass = 'text-white font-semibold';
   return (
     <section
       className="relative flex min-h-[150px] h-auto items-center overflow-hidden uppercase py-4 md:py-0 md:min-h-[160px] font-dm-sans border-b border-burgundy/25"
@@ -112,12 +115,12 @@ export default function SyroPageBanner({
                   <li>
                     <Link
                       href={config.href}
-                      className="text-parchment-light/90 hover:text-warmGold transition-colors duration-300"
+                      className={breadcrumbLinkClass}
                     >
                       {config.label}
                     </Link>
                   </li>
-                  <li className="text-parchment-light/70" aria-hidden="true">
+                  <li className={breadcrumbSeparatorClass} aria-hidden="true">
                     /
                   </li>
                   {breadcrumbParent ? (
@@ -125,20 +128,20 @@ export default function SyroPageBanner({
                       <li>
                         <Link
                           href={breadcrumbParent.href}
-                          className="text-parchment-light/90 hover:text-warmGold transition-colors duration-300"
+                          className={breadcrumbLinkClass}
                         >
                           {breadcrumbParent.label}
                         </Link>
                       </li>
-                      <li className="text-parchment-light/70" aria-hidden="true">
+                      <li className={breadcrumbSeparatorClass} aria-hidden="true">
                         /
                       </li>
-                      <li className="text-warmGold" aria-current="page">
+                      <li className={breadcrumbCurrentClass} aria-current="page">
                         {title}
                       </li>
                     </>
                   ) : (
-                    <li className="text-warmGold" aria-current="page">
+                    <li className={breadcrumbCurrentClass} aria-current="page">
                       {title}
                     </li>
                   )}

@@ -14,6 +14,7 @@ interface Saint {
   href: string;
   image: string;
   alt: string;
+  imageClassName?: string;
 }
 
 interface Region {
@@ -32,13 +33,14 @@ const saints: Saint[] = [
 {
   name: "St. Basilios Yeldho",
   href: "/mosc-redesign/saints/st-baselios-yeldho-kothamangalam-bava",
-  image: "https://img.rocket.new/generatedImages/rocket_gen_img_1380920cf-1773947408866.png",
-  alt: "Portrait of St. Basilios Yeldho Kothamangalam Bava in episcopal vestments"
+  image: "/images/saints/st-baselios-yeldho-kothamangalam-bava.jpg",
+  alt: "Portrait of St. Basilios Yeldho Kothamangalam Bava in episcopal vestments",
+  imageClassName: "scale-y-90 origin-top"
 },
 {
   name: "St. Geevarghese",
   href: "/mosc-redesign/saints/st-geevarghese-mar-dionysius-vattasseril",
-  image: "https://www.mosc-temp.com/mosc/assets/images/mosc_images/St_Geevarghese.jpg",
+  image: "/images/saints/st-geevarghese-mar-dionysius-vattasseril.jpg",
   alt: "Portrait of St. Geevarghese Mar Dionysius Vattasseril in traditional attire"
 },
 {
@@ -159,7 +161,7 @@ export default function HomePage() {
 
       <div className="flex-1 min-w-0 w-full overflow-x-hidden">
       {/* ── HERO: mobile = contain + letterbox; md+ = cover, full-bleed panoramic ─ */}
-      <section className="relative w-full min-h-[260px] h-[min(42vh,320px)] sm:min-h-[300px] md:h-auto md:min-h-[380px] md:aspect-[5/2] md:max-h-[min(56vh,580px)] overflow-hidden bg-[#1a1410] md:bg-stone-900">
+      <section className="relative w-full min-h-[220px] h-[min(38vh,280px)] sm:min-h-[260px] md:h-auto md:min-h-[340px] md:aspect-[5/2] md:max-h-[min(52vh,540px)] overflow-hidden bg-[#1a1410] md:bg-stone-900">
         {slides.map((slide, i) =>
         <div
           key={i}
@@ -183,17 +185,13 @@ export default function HomePage() {
         />
 
         {/* Slide content overlay */}
-        <div className="relative z-10 flex min-h-[inherit] h-full items-center py-8 md:py-10">
+        <div className="relative z-10 flex min-h-[inherit] h-full items-center py-5 md:py-7">
           <div className="max-w-7xl mx-auto px-6 lg:px-16 w-full">
-            <div className="max-w-lg rounded-xl bg-black/55 px-5 py-4 md:px-6 md:py-5 ring-1 ring-white/25 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-[2px]">
-              <div className="w-12 h-0.5 bg-warmGold mb-4" />
-              <h1 className="text-3xl md:text-5xl font-bold text-white leading-tight mb-4 [text-shadow:0_2px_14px_rgba(0,0,0,0.95)]">
-                Malankara Orthodox<br />
-                <span className="text-warmGold [text-shadow:0_2px_16px_rgba(0,0,0,0.98)]">Syrian Church</span>
-              </h1>
-              <p className="text-white text-sm md:text-base leading-relaxed font-medium [text-shadow:0_1px_10px_rgba(0,0,0,0.9)]">
+            <div className="max-w-xl rounded-xl bg-black/55 px-4 py-3 md:px-5 md:py-4 ring-1 ring-white/25 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-[2px]">
+              <div className="w-12 h-0.5 bg-warmGold mb-3" />
+              <h1 className="text-white text-xl sm:text-2xl md:text-3xl font-bold leading-snug [text-shadow:0_2px_14px_rgba(0,0,0,0.95)]">
                 Rooted in the Apostolic ministry of St. Thomas in India
-              </p>
+              </h1>
             </div>
           </div>
         </div>
@@ -367,9 +365,16 @@ export default function HomePage() {
               <Link
                 key={saint.name}
                 href={saint.href}
-                className="group relative rounded-xl overflow-hidden aspect-[3/4] block border border-burgundy/20 hover:border-burgundy/60 transition-all duration-300 hover:shadow-xl hover:shadow-burgundy/30 hover:-translate-y-1 transform">
-                <Image src={saint.image} alt={saint.alt} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
-                <div className="absolute inset-0 bg-gradient-to-t from-warmBrown-dark/90 via-warmBrown-dark/20 to-transparent group-hover:from-burgundy/90 transition-colors duration-300" />
+                className="group relative mx-auto w-3/4 rounded-xl overflow-hidden aspect-[6/5] block border border-burgundy/20 bg-parchment-deep hover:border-burgundy/60 transition-all duration-300 hover:shadow-xl hover:shadow-burgundy/30 hover:-translate-y-1 transform">
+                <Image
+                  src={saint.image}
+                  alt={saint.alt}
+                  fill
+                  quality={95}
+                  sizes="(max-width: 640px) 75vw, (max-width: 768px) 37.5vw, 25vw"
+                  className={`object-contain object-top transition-transform duration-500 ${saint.imageClassName ?? "group-hover:scale-105"}`}
+                />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-warmBrown-dark/90 via-warmBrown-dark/20 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-4">
                   <p className="text-white font-semibold text-sm leading-tight">{saint.name}</p>
                   <span className="text-warmGold text-xs mt-1 inline-flex items-center gap-1 group-hover:gap-2 transition-all">
@@ -450,12 +455,9 @@ export default function HomePage() {
 
             {/* Calendar content */}
             <div className="bg-parchment-light rounded-2xl p-8 border border-burgundy/20 shadow-sm">
-              <span className="inline-block text-burgundy text-xs font-bold tracking-widest uppercase mb-3 border border-burgundy/30 px-3 py-1 rounded-full bg-burgundy/10">
+              <span className="inline-block text-burgundy text-lg font-bold tracking-widest uppercase mb-3 border border-burgundy/30 px-3 py-1 rounded-full bg-burgundy/10">
                 Liturgical Calendar
               </span>
-              <h2 className="text-3xl md:text-4xl font-bold text-warmBrown-dark mb-2 leading-tight">
-                Daily <span className="text-burgundy">Readings</span>
-              </h2>
               <p className="text-warmGold-dark font-semibold mb-6">{formatLiturgyDisplayDate(liturgyDate)}</p>
 
               {/* Language toggle — same API as /mosc SyroLiturgySection: /api/liturgy?lng=en|ml */}

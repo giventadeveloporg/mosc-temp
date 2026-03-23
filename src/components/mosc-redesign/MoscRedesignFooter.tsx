@@ -105,7 +105,7 @@ export default function MoscRedesignFooter() {
   };
 
   return (
-    <footer className="bg-warmBrown-dark text-parchment-light">
+    <footer className="bg-burgundy-dark text-parchment-light">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-16 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           {/* Contact form */}
@@ -186,16 +186,14 @@ export default function MoscRedesignFooter() {
           {/* Logo + social — logo on light gradient panel so gold/cream artwork reads on dark footer */}
           <div className="flex flex-col items-center lg:items-end text-center lg:text-right">
             <div className="mb-4 w-fit max-w-full">
-              <div
-                className="rounded-2xl p-4 sm:p-5 bg-gradient-to-br from-parchment-light via-parchment to-parchment-mid border-2 border-warmGold/55 shadow-[0_12px_40px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.65)] ring-1 ring-white/25"
-              >
-                <div className="relative h-28 w-28 sm:h-32 sm:w-32 mx-auto lg:mx-0 lg:ml-auto">
+              <div>
+                <div className="relative h-56 w-56 sm:h-56 sm:w-56 mx-auto lg:mx-0 lg:ml-auto">
                   <Image
-                    src="https://www.mosc-temp.com/images/logos/Current_Edits/New%20Edit/Mosc_Header_Logo9.png"
+                    src="/images/logos/MOSC_LOGO-Footer.png"
                     alt="Malankara Orthodox Syrian Church"
                     fill
                     className="object-contain drop-shadow-sm"
-                    sizes="(max-width: 640px) 112px, 128px"
+                    sizes="(max-width: 640px) 224px, 224px"
                   />
                 </div>
               </div>

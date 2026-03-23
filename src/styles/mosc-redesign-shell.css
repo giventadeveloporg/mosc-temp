@@ -24,6 +24,24 @@
   color: #3d0d0d !important;
 }
 
+/* Body copy: burgundy-brown (Tailwind text-burgundy-dark) — subpages only; overrides syro-malabar #mainContent p #000 */
+.mosc-redesign-subpage-shell.syro-layout #mainContent.syro-main p {
+  color: rgb(92 61 61 / var(--tw-text-opacity, 1)) !important;
+}
+
+/* Keep exceptions that must stay light on dark / colored panels (higher specificity than rule above) */
+.mosc-redesign-subpage-shell.syro-layout #mainContent.syro-main section:first-of-type .syro-banner-content p {
+  color: #fff !important;
+}
+.mosc-redesign-subpage-shell.syro-layout #mainContent section.syromalabar-locations .syro-locations-panel p,
+.mosc-redesign-subpage-shell.syro-layout #mainContent section.syromalabar-locations .syro-locations-panel .syro-locations-text-content {
+  color: #ffffff !important;
+}
+.mosc-redesign-subpage-shell.syro-layout #mainContent a.bg-syro-red p,
+.mosc-redesign-subpage-shell.syro-layout #mainContent a.bg-syro-red span {
+  color: #fff !important;
+}
+
 .mosc-redesign-subpage-shell.syro-layout #mainContent .text-syro-blue,
 .mosc-redesign-subpage-shell.syro-layout .text-syro-blue {
   color: #3d0d0d !important;

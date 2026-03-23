@@ -135,19 +135,22 @@ export default function MoscRedesignHeader() {
     <header className="sticky top-0 z-[1000] w-full shrink-0 overflow-visible shadow-md border-b-2 border-burgundy/40">
       {/* Row 1: Logo + hamburger (mobile); part of one sticky block with nav + quick links (desktop) */}
       <div className="bg-parchment-deep border-b border-burgundy/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-16 py-2">
+        <div className="max-w-7xl px-4 sm:px-6 lg:px-16 py-2">
           <div className="flex items-center justify-between gap-4">
             <Link
               href="/mosc-redesign"
-              className="relative w-16 h-16 md:w-20 md:h-20 flex-shrink-0 block group"
+              className="inline-flex items-center flex-shrink-0 group"
               aria-label="Malankara Orthodox Syrian Church — Home"
             >
               <Image
-                src="https://www.mosc-temp.com/images/logos/Current_Edits/New%20Edit/Mosc_Header_Logo9.png"
+                src="/images/logos/MOSC_NEW_LOGO.png"
                 alt=""
-                fill
-                className="object-contain"
+                width={800}
+                height={200}
+                className="h-16 w-auto md:h-20 object-contain object-left"
                 priority
+                sizes="(max-width: 1024px) 85vw, 600px"
+                style={{ width: 'auto' }}
               />
             </Link>
 
