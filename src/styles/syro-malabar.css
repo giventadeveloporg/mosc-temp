@@ -113,6 +113,18 @@ body:has(.syro-layout) {
   color: #000 !important;
 }
 
+/* Keep subpage banner title white (override global #mainContent h2 rule) */
+.syro-layout #mainContent.syro-main section:first-of-type .syro-banner-content h2 {
+  color: #fff !important;
+}
+
+/* Keep subpage banner breadcrumb + description white (override global #mainContent p rule) */
+.syro-layout #mainContent.syro-main section:first-of-type .syro-banner-content nav a,
+.syro-layout #mainContent.syro-main section:first-of-type .syro-banner-content nav li,
+.syro-layout #mainContent.syro-main section:first-of-type .syro-banner-content p {
+  color: #fff !important;
+}
+
 /* Locations panel (section 7): white text on blue background – override #mainContent h3/p */
 #mainContent section.syromalabar-locations .syro-locations-panel h3,
 #mainContent section.syromalabar-locations .syro-locations-panel p,
