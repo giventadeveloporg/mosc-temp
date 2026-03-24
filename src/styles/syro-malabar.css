@@ -113,16 +113,28 @@ body:has(.syro-layout) {
   color: #000 !important;
 }
 
-/* Keep subpage banner title white (override global #mainContent h2 rule) */
-.syro-layout #mainContent.syro-main section:first-of-type .syro-banner-content h2 {
-  color: #fff !important;
+/* Subpage banner (SyroPageBanner): three distinct colors on burgundy/pink gradient */
+.syro-layout #mainContent.syro-main section:first-of-type .syro-banner-content h2,
+.syro-layout #mainContent.syro-main section:first-of-type .syro-banner-content h2.syro-banner-title {
+  color: #fef3c7 !important; /* amber-100 — page title */
 }
 
-/* Keep subpage banner breadcrumb + description white (override global #mainContent p rule) */
-.syro-layout #mainContent.syro-main section:first-of-type .syro-banner-content nav a,
-.syro-layout #mainContent.syro-main section:first-of-type .syro-banner-content nav li,
+.syro-layout #mainContent.syro-main section:first-of-type .syro-banner-content nav a {
+  color: #cffafe !important; /* cyan-100 — breadcrumb links */
+}
+.syro-layout #mainContent.syro-main section:first-of-type .syro-banner-content nav a:hover {
+  color: #ffffff !important;
+}
+.syro-layout #mainContent.syro-main section:first-of-type .syro-banner-content nav li[aria-hidden="true"] {
+  color: rgba(103, 232, 249, 0.6) !important; /* cyan-300 — separators */
+}
+.syro-layout #mainContent.syro-main section:first-of-type .syro-banner-content nav li[aria-current="page"] {
+  color: #ffffff !important; /* current segment */
+}
+
+.syro-layout #mainContent.syro-main section:first-of-type .syro-banner-content p.syro-banner-description,
 .syro-layout #mainContent.syro-main section:first-of-type .syro-banner-content p {
-  color: #fff !important;
+  color: #fbcfe8 !important; /* pink-200 — distinct from title (amber) + breadcrumb (cyan), readable on burgundy */
 }
 
 /* Locations panel (section 7): white text on blue background – override #mainContent h3/p */

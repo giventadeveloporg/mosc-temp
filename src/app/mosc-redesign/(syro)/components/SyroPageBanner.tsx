@@ -91,9 +91,11 @@ export default function SyroPageBanner({
   hideBreadcrumbNav = false,
 }: SyroPageBannerProps) {
   const config = BREADCRUMB_CONFIG[breadcrumbFrom];
-  const breadcrumbLinkClass = 'text-white/90 hover:text-white transition-colors duration-300';
-  const breadcrumbSeparatorClass = 'text-white/70';
-  const breadcrumbCurrentClass = 'text-white font-semibold';
+  /** Breadcrumb row: cool cyan family on burgundy gradient (distinct from title + description). */
+  const breadcrumbLinkClass =
+    'text-cyan-100 hover:text-white transition-colors duration-300 [text-shadow:0_1px_2px_rgba(0,0,0,0.25)]';
+  const breadcrumbSeparatorClass = 'text-cyan-300/60';
+  const breadcrumbCurrentClass = 'text-white font-semibold [text-shadow:0_1px_2px_rgba(0,0,0,0.3)]';
   return (
     <section
       className="relative flex min-h-[150px] h-auto items-center overflow-hidden uppercase py-4 md:py-0 md:min-h-[160px] font-dm-sans border-b border-burgundy/25"
@@ -106,11 +108,11 @@ export default function SyroPageBanner({
       <div className="relative z-10 flex h-full min-h-full w-full items-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-6">
         <div className={`flex h-full min-h-full w-full items-center ${centerText ? 'justify-center' : 'justify-between'}`}>
           <div className={`syro-banner-content flex flex-col justify-center min-w-0 flex-1 ${centerText ? 'text-center' : description ? 'pr-24 md:pr-64' : 'pr-24 md:pr-40'}`}>
-            <h2 className="text-base sm:text-xl lg:text-2xl font-bold text-white uppercase tracking-wide break-words drop-shadow-sm">
+            <h2 className="syro-banner-title text-base sm:text-xl lg:text-2xl font-bold text-amber-100 uppercase tracking-wide break-words drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)]">
               {title}
             </h2>
             {!hideBreadcrumbNav && (
-              <nav aria-label="Breadcrumb" className="mt-1">
+              <nav aria-label="Breadcrumb" className="syro-banner-breadcrumb mt-1">
                 <ol className={`flex flex-wrap items-center gap-x-1.5 text-xs sm:text-sm font-medium uppercase tracking-wide ${centerText ? 'justify-center' : ''}`}>
                   <li>
                     <Link
@@ -149,7 +151,7 @@ export default function SyroPageBanner({
               </nav>
             )}
             {description && (
-              <p className="text-base sm:text-lg text-parchment-light/95 leading-relaxed mt-3 normal-case font-normal">
+              <p className="syro-banner-description text-base sm:text-lg text-pink-200 leading-relaxed mt-3 normal-case font-normal [text-shadow:0_1px_4px_rgba(0,0,0,0.35)]">
                 {description}
               </p>
             )}

@@ -29,9 +29,9 @@
   color: rgb(92 61 61 / var(--tw-text-opacity, 1)) !important;
 }
 
-/* Keep exceptions that must stay light on dark / colored panels (higher specificity than rule above) */
-.mosc-redesign-subpage-shell.syro-layout #mainContent.syro-main section:first-of-type .syro-banner-content p {
-  color: #fff !important;
+/* Banner description: pink-200 — must beat #mainContent.syro-main p body rule; distinct from amber title + cyan breadcrumb */
+.mosc-redesign-subpage-shell.syro-layout #mainContent.syro-main section:first-of-type .syro-banner-content p.syro-banner-description {
+  color: #fbcfe8 !important;
 }
 .mosc-redesign-subpage-shell.syro-layout #mainContent section.syromalabar-locations .syro-locations-panel p,
 .mosc-redesign-subpage-shell.syro-layout #mainContent section.syromalabar-locations .syro-locations-panel .syro-locations-text-content {

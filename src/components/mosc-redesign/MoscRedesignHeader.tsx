@@ -136,20 +136,20 @@ export default function MoscRedesignHeader() {
       {/* Row 1: Logo + hamburger (mobile); part of one sticky block with nav + quick links (desktop) */}
       <div className="bg-parchment-deep border-b border-burgundy/20">
         <div className="max-w-7xl px-4 sm:px-6 lg:px-16 py-2">
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex min-w-0 items-center justify-between gap-2 sm:gap-4">
             <Link
               href="/mosc-redesign"
-              className="inline-flex items-center flex-shrink-0 group"
+              className="group inline-flex min-w-0 max-w-[calc(100%-3rem)] flex-1 items-center sm:max-w-[calc(100%-3.5rem)] lg:max-w-none lg:flex-none"
               aria-label="Malankara Orthodox Syrian Church — Home"
             >
               <Image
-                src="/images/logos/MOSC_NEW_LOGO.png"
+                src="/images/logos/Current_Edits/Header%20Logo%20Redesign/Header_3_Bg_removed.png"
                 alt=""
                 width={800}
                 height={200}
-                className="h-16 w-auto md:h-20 object-contain object-left"
+                className="h-12 w-auto max-w-full object-contain object-left sm:h-14 md:h-16 lg:h-20"
                 priority
-                sizes="(max-width: 1024px) 85vw, 600px"
+                sizes="(max-width: 1023px) min(calc(100vw - 5rem), 480px), 600px"
                 style={{ width: 'auto' }}
               />
             </Link>
@@ -157,7 +157,7 @@ export default function MoscRedesignHeader() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden text-burgundy/80 hover:text-burgundy p-2"
+              className="flex-shrink-0 lg:hidden text-burgundy/80 hover:text-burgundy p-2"
               aria-label="Toggle mobile menu"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
