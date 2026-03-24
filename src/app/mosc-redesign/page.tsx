@@ -133,15 +133,6 @@ export default function HomePage() {
     fetchLiturgyReadings(lng);
   }, [readingLang, fetchLiturgyReadings]);
 
-  // Parallax scroll state
-  const [scrollY, setScrollY] = useState(0);
-
-  useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   useEffect(() => {
     sliderRef.current = setInterval(() => {
       setCurrentSlide((p) => (p + 1) % slides.length);
@@ -283,29 +274,16 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-16">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Images collage */}
-            <div className="relative h-[380px] md:h-[480px]">
-              <div className="absolute top-0 left-0 w-3/4 h-3/4 rounded-2xl overflow-hidden shadow-xl shadow-burgundy/20 border border-burgundy/30 transition-transform duration-500 hover:scale-[1.02]">
+            <div className="relative h-[500px] md:h-[650px] lg:w-[125%] lg:-ml-[25%]">
+              {/* Main image: full-width/full-height card, contained so it never gets cropped */}
+              <div className="absolute inset-0 overflow-hidden transition-transform duration-500 hover:scale-[1.01]">
                 <Image
-                  src="https://www.mosc-temp.com/mosc/assets/images/mosc_images/Malankara_Orthodox_Fathers_Image.jpeg"
+                  src="/images/logos/MOSC-image-collage-1.png"
                   alt="Malankara Orthodox Church fathers and bishops gathered in a formal assembly"
                   fill
-                  className="object-cover" />
+                  className="object-contain object-left" />
               </div>
-              <div className="absolute bottom-0 right-0 w-1/2 h-1/2 rounded-2xl overflow-hidden shadow-xl shadow-warmGold/20 border-4 border-parchment transition-transform duration-500 hover:scale-[1.02]">
-                <Image
-                  src="https://www.mosc-temp.com/mosc/assets/images/mosc_images/Cross_Image.png"
-                  alt="Malankara Orthodox Syrian Church cross symbol representing the faith"
-                  fill
-                  className="object-cover" />
-              </div>
-              {/* Decorative circle */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full overflow-hidden border-4 border-warmGold shadow-lg z-10">
-                <Image
-                  src="https://www.mosc-temp.com/mosc/assets/images/mosc_images/MOSC_Cross_Inside_Circle.png"
-                  alt="MOSC cross emblem inside circle, the official seal of the Malankara Orthodox Syrian Church"
-                  fill
-                  className="object-cover" />
-              </div>
+
             </div>
 
             {/* Text */}
@@ -390,15 +368,15 @@ export default function HomePage() {
 
       {/* ── CATHOLICOS PROFILE ─────────────────────────────────────────── */}
       <section className="py-16 md:py-24 bg-parchment-deep relative overflow-hidden border-b border-burgundy/15">
-        {/* Decorative bg */}
-        <div className="absolute inset-0 opacity-20">
-          <div
-            className="absolute top-0 right-0 w-96 h-96 bg-burgundy rounded-full blur-3xl"
-            style={{ transform: `translateY(${(scrollY - 600) * 0.12}px)`, willChange: "transform" }} />
-          <div
-            className="absolute bottom-0 left-0 w-64 h-64 bg-warmGold rounded-full blur-3xl"
-            style={{ transform: `translateY(${(scrollY - 600) * -0.1}px)`, willChange: "transform" }} />
-        </div>
+        {/* Decorative bg: radial gradients avoid blur-filter banding blocks on some desktop displays. */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          aria-hidden
+          style={{
+            backgroundImage:
+              "radial-gradient(42rem 26rem at 92% 0%, rgba(192,40,74,0.16), rgba(192,40,74,0) 72%), radial-gradient(28rem 18rem at 8% 100%, rgba(200,134,10,0.14), rgba(200,134,10,0) 74%)",
+          }}
+        />
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="grid lg:grid-cols-5 gap-10 items-center">
@@ -444,13 +422,12 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-16">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Calendar image */}
-            <div className="relative h-72 md:h-96 rounded-2xl overflow-hidden shadow-xl shadow-burgundy/15 border-2 border-burgundy/25 hover:border-burgundy/50 hover:shadow-burgundy/25 transition-all duration-300 group">
+            <div className="relative h-72 md:h-96 rounded-2xl overflow-hidden transition-all duration-300 group">
               <Image
-                src="https://www.mosc-temp.com/mosc/assets/images/mosc_images/liturgy.jpg"
+                src="/images/logos/Liturgical-Calendar-Image.jpg"
                 alt="Malankara Orthodox Syrian Church liturgical calendar showing feast days and holy seasons"
                 fill
-                className="object-cover group-hover:scale-105 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-t from-warmBrown-dark/60 to-transparent" />
+                className="object-contain object-center group-hover:scale-105 transition-transform duration-500" />
             </div>
 
             {/* Calendar content */}
