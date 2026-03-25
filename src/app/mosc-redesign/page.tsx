@@ -152,7 +152,7 @@ export default function HomePage() {
 
       <div className="flex-1 min-w-0 w-full overflow-x-hidden">
       {/* ── HERO: mobile = contain + letterbox; md+ = cover, full-bleed panoramic ─ */}
-      <section className="relative w-full min-h-[220px] h-[min(38vh,280px)] sm:min-h-[260px] md:h-auto md:min-h-[340px] md:aspect-[5/2] md:max-h-[min(52vh,540px)] overflow-hidden bg-[#1a1410] md:bg-stone-900">
+      <section className="relative w-full min-h-[240px] h-[min(34vh,290px)] sm:min-h-[270px] md:h-auto md:min-h-[350px] md:aspect-[5/2] md:max-h-[min(42vh,490px)] overflow-hidden bg-[#1a1410] md:bg-stone-900">
         {slides.map((slide, i) =>
         <div
           key={i}
@@ -162,7 +162,6 @@ export default function HomePage() {
               src={slide.image}
               alt={slide.alt}
               fill
-              className="object-contain object-center md:object-cover md:object-center"
               priority={i === 0}
               sizes="100vw"
             />
@@ -171,21 +170,9 @@ export default function HomePage() {
         )}
 
         <div
-          className="absolute inset-0 z-[5] bg-gradient-to-r from-black/80 via-black/45 to-transparent pointer-events-none md:from-black/45 md:via-black/20 md:to-transparent"
+          className="pointer-events-none absolute inset-0 z-[5] hidden bg-gradient-to-r from-black/45 via-black/20 to-transparent md:block"
           aria-hidden
         />
-
-        {/* Slide content overlay */}
-        <div className="relative z-10 flex min-h-[inherit] h-full items-center py-5 md:py-7">
-          <div className="max-w-7xl mx-auto px-6 lg:px-16 w-full">
-            <div className="max-w-xl rounded-xl bg-black/55 px-4 py-3 md:px-5 md:py-4 ring-1 ring-white/25 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-[2px]">
-              <div className="w-12 h-0.5 bg-warmGold mb-3" />
-              <h1 className="text-white text-xl sm:text-2xl md:text-3xl font-bold leading-snug [text-shadow:0_2px_14px_rgba(0,0,0,0.95)]">
-                Rooted in the Apostolic ministry of St. Thomas in India
-              </h1>
-            </div>
-          </div>
-        </div>
 
         {/* Pagination dots */}
         <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-10 flex gap-2">
@@ -274,11 +261,11 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-16">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Images collage */}
-            <div className="relative h-[500px] md:h-[650px] lg:w-[125%] lg:-ml-[25%]">
+            <div className="relative h-[390px] md:h-[480px] lg:w-[105%] lg:-ml-[5%]">
               {/* Main image: full-width/full-height card, contained so it never gets cropped */}
               <div className="absolute inset-0 overflow-hidden transition-transform duration-500 hover:scale-[1.01]">
                 <Image
-                  src="/images/logos/MOSC-image-collage-1.png"
+                  src="/images/logos/MOSC-image-collage.png"
                   alt="Malankara Orthodox Church fathers and bishops gathered in a formal assembly"
                   fill
                   className="object-contain object-left" />
