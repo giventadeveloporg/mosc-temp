@@ -12,11 +12,25 @@ import type {
 import { getClientTenantId } from '@/lib/env';
 import {
   createOfficialDocumentYearBundleServer,
+  deleteOfficialDocumentMediaServer,
   fetchOfficialDocumentCategoriesServer,
   fetchOfficialDocumentYearBundlesServer,
+  fetchTenantOfficialDocumentsPagedServer,
   fetchTenantOfficialDocumentsServer,
+  patchOfficialDocumentMediaServer,
   patchOfficialDocumentYearBundleServer,
 } from './ApiServerActions';
+import Modal from '@/components/ui/Modal';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 function isImageMedia(d: EventMediaDTO): boolean {
   const t = (d.eventMediaType || '').toLowerCase();
@@ -38,6 +52,10 @@ function resolveCoverPreviewUrl(
 type Props = {
   initialCategories: OfficialDocumentCategoryDTO[];
   initialDocuments: EventMediaDTO[];
+  initialTotalElements: number;
+  initialTotalPages: number;
+  initialPage: number;
+  listPageSize: number;
   initialBundles: OfficialDocumentYearBundleDTO[];
   categorySource: 'api' | 'fallback';
   categoryMessage?: string;
@@ -46,6 +64,10 @@ type Props = {
 export default function OfficialDocumentsClient({
   initialCategories,
   initialDocuments,
+  initialTotalElements,
+  initialTotalPages,
+  initialPage,
+  listPageSize,
   initialBundles,
   categorySource: initialCategorySource,
   categoryMessage: initialCategoryMessage,
@@ -56,6 +78,12 @@ export default function OfficialDocumentsClient({
   const [categorySource, setCategorySource] = useState<'api' | 'fallback'>(initialCategorySource);
   const [categoryMessage, setCategoryMessage] = useState<string | undefined>(initialCategoryMessage);
   const [documents, setDocuments] = useState<EventMediaDTO[]>(initialDocuments);
+  const [totalElements, setTotalElements] = useState(initialTotalElements);
+  const [totalPages, setTotalPages] = useState(initialTotalPages);
+  const [currentPage, setCurrentPage] = useState(initialPage);
+  const pageSize = listPageSize;
+  const [listLoading, setListLoading] = useState(false);
+  const [coverSourceDocs, setCoverSourceDocs] = useState<EventMediaDTO[]>([]);
   const [bundles, setBundles] = useState<OfficialDocumentYearBundleDTO[]>(initialBundles);
   const [categorySlug, setCategorySlug] = useState('');
   const [year, setYear] = useState(new Date().getFullYear());
@@ -75,9 +103,38 @@ export default function OfficialDocumentsClient({
   const [bundleBusy, setBundleBusy] = useState(false);
   const [coverSelectId, setCoverSelectId] = useState<number | '' | 'none'>('none');
 
+  const [editing, setEditing] = useState<EventMediaDTO | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editIsPublic, setEditIsPublic] = useState(false);
+  const [editYear, setEditYear] = useState(new Date().getFullYear());
+  const [editCategoryId, setEditCategoryId] = useState<number | ''>('');
+  const [editSaving, setEditSaving] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
+
+  const [deleting, setDeleting] = useState<EventMediaDTO | null>(null);
+  const [deleteBusy, setDeleteBusy] = useState(false);
+
+  const [quickAddOpen, setQuickAddOpen] = useState(false);
+  const [qaCategorySlug, setQaCategorySlug] = useState('');
+  const [qaYear, setQaYear] = useState(new Date().getFullYear());
+  const [qaTitlePrefix, setQaTitlePrefix] = useState('Official Document');
+  const [qaDescription, setQaDescription] = useState('');
+  const [qaIsPublic, setQaIsPublic] = useState(false);
+  const [qaFile, setQaFile] = useState<File | null>(null);
+  const [qaBusy, setQaBusy] = useState(false);
+  const [qaError, setQaError] = useState<string | null>(null);
+
   useEffect(() => {
     setBundles(initialBundles);
   }, [initialBundles]);
+
+  useEffect(() => {
+    setDocuments(initialDocuments);
+    setTotalElements(initialTotalElements);
+    setTotalPages(initialTotalPages);
+    setCurrentPage(initialPage);
+  }, [initialDocuments, initialTotalElements, initialTotalPages, initialPage]);
 
   const selectedCategory = useMemo(
     () => categories.find((c) => c.slug === categorySlug),
@@ -94,25 +151,44 @@ export default function OfficialDocumentsClient({
 
   const coverCandidateDocs = useMemo(() => {
     if (selectedCategoryId == null) return [];
-    return documents.filter(
+    return coverSourceDocs.filter(
       (d) =>
         d.officialDocumentCategoryId === selectedCategoryId &&
         d.officialDocumentYear === year &&
         isImageMedia(d) &&
         d.id != null
     );
-  }, [documents, selectedCategoryId, year]);
+  }, [coverSourceDocs, selectedCategoryId, year]);
+
+  useEffect(() => {
+    if (selectedCategoryId == null) {
+      setCoverSourceDocs([]);
+      return;
+    }
+    let cancelled = false;
+    void fetchTenantOfficialDocumentsServer({
+      year,
+      officialDocumentCategoryId: selectedCategoryId,
+      size: 500,
+    }).then((list) => {
+      if (!cancelled) setCoverSourceDocs(list);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedCategoryId, year]);
 
   /** Include current cover media if it is not in the filtered list (e.g. different filter). */
   const coverSelectOptions = useMemo(() => {
     const curId = currentBundle?.coverEventMediaId;
     const base = coverCandidateDocs;
     if (curId != null && !base.some((d) => d.id === curId)) {
-      const extra = documents.find((d) => d.id === curId && isImageMedia(d));
+      const pool = [...coverSourceDocs, ...documents];
+      const extra = pool.find((d) => d.id === curId && isImageMedia(d));
       if (extra?.id != null) return [...base, extra];
     }
     return base;
-  }, [coverCandidateDocs, currentBundle?.coverEventMediaId, documents]);
+  }, [coverCandidateDocs, currentBundle?.coverEventMediaId, coverSourceDocs, documents]);
 
   useEffect(() => {
     const cur = currentBundle?.coverEventMediaId;
@@ -149,13 +225,165 @@ export default function OfficialDocumentsClient({
     }
   };
 
-  const reloadDocuments = useCallback(async () => {
-    const f: { year?: number; officialDocumentCategoryId?: number } = {};
-    if (filterYear !== '') f.year = filterYear;
-    if (filterCategoryId !== '') f.officialDocumentCategoryId = filterCategoryId;
-    const next = await fetchTenantOfficialDocumentsServer(f);
-    setDocuments(next);
-  }, [filterYear, filterCategoryId]);
+  const reloadDocuments = useCallback(
+    async (page: number) => {
+      setListLoading(true);
+      try {
+        const filters = {
+          ...(filterYear !== '' ? { year: filterYear } : {}),
+          ...(filterCategoryId !== '' ? { officialDocumentCategoryId: filterCategoryId } : {}),
+        };
+        let result = await fetchTenantOfficialDocumentsPagedServer({
+          page,
+          size: pageSize,
+          ...filters,
+        });
+        if (result.content.length === 0 && page > 0) {
+          result = await fetchTenantOfficialDocumentsPagedServer({
+            page: page - 1,
+            size: pageSize,
+            ...filters,
+          });
+        }
+        setDocuments(result.content);
+        setTotalElements(result.totalElements);
+        setTotalPages(result.totalPages);
+        setCurrentPage(result.page);
+      } finally {
+        setListLoading(false);
+      }
+    },
+    [filterYear, filterCategoryId, pageSize]
+  );
+
+  const openEdit = (row: EventMediaDTO) => {
+    setEditError(null);
+    setEditing(row);
+    setEditTitle(row.title || '');
+    setEditDescription(row.description || '');
+    setEditIsPublic(!!row.isPublic);
+    setEditYear(row.officialDocumentYear ?? new Date().getFullYear());
+    setEditCategoryId(
+      row.officialDocumentCategoryId != null ? row.officialDocumentCategoryId : ''
+    );
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editing?.id) return;
+    if (!editTitle.trim()) {
+      setEditError('Title is required.');
+      return;
+    }
+    if (editCategoryId === '') {
+      setEditError('Category is required.');
+      return;
+    }
+    setEditSaving(true);
+    setEditError(null);
+    try {
+      const r = await patchOfficialDocumentMediaServer(editing.id, editing, {
+        title: editTitle.trim(),
+        description: editDescription.trim(),
+        isPublic: editIsPublic,
+        officialDocumentYear: editYear,
+        officialDocumentCategoryId: typeof editCategoryId === 'number' ? editCategoryId : null,
+      });
+      if (!r.ok) {
+        setEditError(r.message);
+        return;
+      }
+      setEditing(null);
+      await reloadDocuments(currentPage);
+      router.refresh();
+    } catch (e) {
+      setEditError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setEditSaving(false);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleting?.id) return;
+    setDeleteBusy(true);
+    try {
+      const r = await deleteOfficialDocumentMediaServer(deleting.id);
+      if (!r.ok) {
+        setError(r.message);
+        return;
+      }
+      setDeleting(null);
+      await reloadDocuments(currentPage);
+      await reloadBundles();
+      router.refresh();
+    } finally {
+      setDeleteBusy(false);
+    }
+  };
+
+  const handleQuickAddSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setQaError(null);
+    if (!tenantId) {
+      setQaError('Tenant ID is not configured.');
+      return;
+    }
+    if (!qaCategorySlug.trim()) {
+      setQaError('Select a category.');
+      return;
+    }
+    if (!qaFile) {
+      setQaError('Choose a file.');
+      return;
+    }
+    setQaBusy(true);
+    try {
+      const form = new FormData();
+      form.append('tenantId', tenantId);
+      form.append('categorySlug', qaCategorySlug.trim().toLowerCase());
+      form.append('officialDocumentYear', String(qaYear));
+      if (qaTitlePrefix.trim()) form.append('titlePrefix', qaTitlePrefix.trim());
+      if (qaDescription.trim()) form.append('description', qaDescription.trim());
+      form.append('isPublic', qaIsPublic ? 'true' : 'false');
+      form.append('files', qaFile);
+
+      const res = await fetch('/api/proxy/event-medias/upload/bulk-tenant-official', {
+        method: 'POST',
+        headers: { 'X-Tenant-ID': tenantId },
+        body: form,
+      });
+
+      if (!res.ok) {
+        let detail = `Upload failed (${res.status})`;
+        try {
+          const j = await res.json();
+          if (j?.message) detail = j.message;
+          else if (j?.error) detail = String(j.error);
+        } catch {
+          /* ignore */
+        }
+        setQaError(detail);
+        return;
+      }
+
+      setQuickAddOpen(false);
+      setQaFile(null);
+      await reloadDocuments(0);
+      await reloadBundles();
+      if (selectedCategoryId != null) {
+        const list = await fetchTenantOfficialDocumentsServer({
+          year,
+          officialDocumentCategoryId: selectedCategoryId,
+          size: 500,
+        });
+        setCoverSourceDocs(list);
+      }
+      router.refresh();
+    } catch (err) {
+      setQaError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setQaBusy(false);
+    }
+  };
 
   const handleBulkUpload = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -218,7 +446,7 @@ export default function OfficialDocumentsClient({
       setFiles(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
       if (folderInputRef.current) folderInputRef.current.value = '';
-      await reloadDocuments();
+      await reloadDocuments(0);
       await reloadBundles();
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -284,7 +512,26 @@ export default function OfficialDocumentsClient({
     }
   };
 
-  const coverPreview = resolveCoverPreviewUrl(currentBundle, documents);
+  const mediaPoolForCover = useMemo(() => {
+    const m = new Map<number, EventMediaDTO>();
+    [...coverSourceDocs, ...documents].forEach((d) => {
+      if (d.id != null) m.set(d.id, d);
+    });
+    return Array.from(m.values());
+  }, [coverSourceDocs, documents]);
+
+  const coverPreview = resolveCoverPreviewUrl(currentBundle, mediaPoolForCover);
+
+  const displayPage = currentPage + 1;
+  const totalPagesForNav = totalPages > 0 ? totalPages : 1;
+  const startItem = totalElements > 0 ? currentPage * pageSize + 1 : 0;
+  const endItem =
+    totalElements > 0
+      ? Math.min(currentPage * pageSize + documents.length, totalElements)
+      : 0;
+  const isPrevDisabled = currentPage <= 0 || listLoading;
+  const isNextDisabled =
+    listLoading || totalElements === 0 || currentPage >= totalPagesForNav - 1;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -525,7 +772,7 @@ export default function OfficialDocumentsClient({
             </div>
             <button
               type="button"
-              onClick={() => void reloadDocuments()}
+              onClick={() => void reloadDocuments(0)}
               className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium"
             >
               Apply
@@ -538,9 +785,18 @@ export default function OfficialDocumentsClient({
               Refresh categories
             </button>
           </div>
-          <p className="text-sm text-gray-500">
-            {documents.length} document(s) loaded. Filters use backend criteria when supported.
-          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setQuickAddOpen(true)}
+              className="px-4 py-2 rounded-xl bg-teal-100 hover:bg-teal-200 text-teal-900 text-sm font-semibold transition-all"
+            >
+              Add one file…
+            </button>
+            <p className="text-sm text-gray-500">
+              Page {currentPage + 1} — {totalElements} total. Filters apply when you click Apply.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -639,7 +895,12 @@ export default function OfficialDocumentsClient({
       </div>
 
       <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900 px-6 py-4 border-b border-gray-200">Tenant official documents</h2>
+        <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900">Tenant official documents</h2>
+          {listLoading && (
+            <span className="text-sm text-gray-500">Loading…</span>
+          )}
+        </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -649,19 +910,22 @@ export default function OfficialDocumentsClient({
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category id</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Public</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Link</th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {documents.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
                     No documents found. Upload above or adjust filters.
                   </td>
                 </tr>
               ) : (
                 documents.map((d) => (
                   <tr key={d.id != null ? `doc-${d.id}` : `doc-${d.title}-${d.createdAt}`}>
-                    <td className="px-4 py-3 text-sm text-gray-900">{d.title}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900 max-w-xs truncate" title={d.title}>
+                      {d.title}
+                    </td>
                     <td className="px-4 py-3 text-sm text-gray-600">{d.officialDocumentYear ?? '—'}</td>
                     <td className="px-4 py-3 text-sm text-gray-600">{d.officialDocumentCategoryId ?? '—'}</td>
                     <td className="px-4 py-3 text-sm">{d.isPublic ? 'Yes' : 'No'}</td>
@@ -679,13 +943,316 @@ export default function OfficialDocumentsClient({
                         '—'
                       )}
                     </td>
+                    <td className="px-4 py-3 text-right">
+                      <div className="flex justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => openEdit(d)}
+                          disabled={d.id == null}
+                          className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-40"
+                          title="Edit"
+                          aria-label="Edit document"
+                        >
+                          <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDeleting(d)}
+                          disabled={d.id == null}
+                          className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-100 hover:bg-red-200 flex items-center justify-center transition-all duration-300 hover:scale-110 disabled:opacity-40"
+                          title="Delete"
+                          aria-label="Delete document"
+                        >
+                          <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))
               )}
             </tbody>
           </table>
         </div>
+
+        <div className="mt-8 px-6 pb-6">
+          <div className="flex justify-between items-center">
+            <button
+              type="button"
+              onClick={() => void reloadDocuments(Math.max(0, currentPage - 1))}
+              disabled={isPrevDisabled}
+              className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+              title="Previous Page"
+              aria-label="Previous Page"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+              </svg>
+              <span>Previous</span>
+            </button>
+            <div className="px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+              <span className="text-sm font-bold text-blue-700">
+                Page <span className="text-blue-600">{displayPage}</span> of{' '}
+                <span className="text-blue-600">{totalPagesForNav}</span>
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => void reloadDocuments(Math.min(totalPagesForNav - 1, currentPage + 1))}
+              disabled={isNextDisabled}
+              className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+              title="Next Page"
+              aria-label="Next Page"
+            >
+              <span>Next</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+          <div className="text-center mt-3">
+            {totalElements > 0 ? (
+              <div className="inline-flex items-center px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
+                <span className="text-sm text-gray-700">
+                  Showing <span className="font-bold text-blue-600">{startItem}</span> to{' '}
+                  <span className="font-bold text-blue-600">{endItem}</span> of{' '}
+                  <span className="font-bold text-blue-600">{totalElements}</span> documents
+                </span>
+              </div>
+            ) : (
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 border-2 border-orange-300 rounded-lg shadow-sm">
+                <span className="text-sm font-medium text-orange-700">No documents match the current filters</span>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
+
+      <Modal
+        isOpen={!!editing}
+        onClose={() => setEditing(null)}
+        title="Edit official document"
+        size="lg"
+      >
+        <div className="p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+            <input
+              type="text"
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <textarea
+              value={editDescription}
+              onChange={(e) => setEditDescription(e.target.value)}
+              rows={3}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Year</label>
+            <input
+              type="number"
+              min={1900}
+              max={2100}
+              value={editYear}
+              onChange={(e) => setEditYear(parseInt(e.target.value, 10) || new Date().getFullYear())}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+            <select
+              value={editCategoryId === '' ? '' : String(editCategoryId)}
+              onChange={(e) =>
+                setEditCategoryId(e.target.value === '' ? '' : parseInt(e.target.value, 10))
+              }
+              className="w-full border border-gray-300 rounded-lg px-3 py-2"
+            >
+              <option value="">Select category</option>
+              {categories.map((c) =>
+                c.id != null ? (
+                  <option key={c.id} value={c.id}>
+                    {c.displayName} ({c.slug})
+                  </option>
+                ) : null
+              )}
+            </select>
+          </div>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={editIsPublic}
+              onChange={(e) => setEditIsPublic(e.target.checked)}
+            />
+            <span className="text-sm text-gray-700">Public</span>
+          </label>
+          {editError && (
+            <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">{editError}</div>
+          )}
+          <div className="flex justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => setEditing(null)}
+              className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              disabled={editSaving}
+              onClick={() => void handleSaveEdit()}
+              className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium disabled:opacity-50"
+            >
+              {editSaving ? 'Saving…' : 'Save'}
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={quickAddOpen}
+        onClose={() => {
+          setQuickAddOpen(false);
+          setQaError(null);
+        }}
+        title="Add one file"
+        size="lg"
+      >
+        <form onSubmit={handleQuickAddSubmit} className="p-6 space-y-4">
+          <p className="text-sm text-gray-600">
+            Uploads a single file to the tenant library (same API as bulk upload). Use bulk upload for many files or
+            folders.
+          </p>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Category (slug)</label>
+            {categories.length > 0 ? (
+              <select
+                value={qaCategorySlug}
+                onChange={(e) => setQaCategorySlug(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                required
+              >
+                <option value="">Select category</option>
+                {categories.map((c) => (
+                  <option key={c.id ?? c.slug} value={c.slug}>
+                    {c.displayName} ({c.slug})
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                type="text"
+                value={qaCategorySlug}
+                onChange={(e) => setQaCategorySlug(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                required
+              />
+            )}
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Year</label>
+            <input
+              type="number"
+              min={1900}
+              max={2100}
+              value={qaYear}
+              onChange={(e) => setQaYear(parseInt(e.target.value, 10) || new Date().getFullYear())}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Title prefix</label>
+            <input
+              type="text"
+              value={qaTitlePrefix}
+              onChange={(e) => setQaTitlePrefix(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Description (optional)</label>
+            <textarea
+              value={qaDescription}
+              onChange={(e) => setQaDescription(e.target.value)}
+              rows={2}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2"
+            />
+          </div>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={qaIsPublic}
+              onChange={(e) => setQaIsPublic(e.target.checked)}
+            />
+            <span className="text-sm text-gray-700">Public</span>
+          </label>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">File</label>
+            <input
+              type="file"
+              onChange={(e) => setQaFile(e.target.files?.[0] ?? null)}
+              className="w-full text-sm"
+            />
+          </div>
+          {qaError && (
+            <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">{qaError}</div>
+          )}
+          <div className="flex justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => setQuickAddOpen(false)}
+              className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={qaBusy}
+              className="px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-medium disabled:opacity-50"
+            >
+              {qaBusy ? 'Uploading…' : 'Upload'}
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      <AlertDialog open={!!deleting} onOpenChange={(open) => !open && setDeleting(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete document?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This removes the library entry for <strong>{deleting?.title}</strong>. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex flex-row gap-3 sm:gap-4">
+            <AlertDialogCancel
+              className="flex-1 flex-shrink-0 h-14 rounded-xl bg-blue-100 hover:bg-blue-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105"
+              disabled={deleteBusy}
+            >
+              <span className="font-semibold text-blue-700">Cancel</span>
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                void handleConfirmDelete();
+              }}
+              disabled={deleteBusy}
+              className="flex-1 flex-shrink-0 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 disabled:opacity-50"
+            >
+              <span className="font-semibold text-red-700">{deleteBusy ? 'Deleting…' : 'Delete'}</span>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

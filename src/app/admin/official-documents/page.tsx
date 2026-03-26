@@ -2,15 +2,17 @@ import OfficialDocumentsClient from './OfficialDocumentsClient';
 import {
   fetchOfficialDocumentCategoriesServer,
   fetchOfficialDocumentYearBundlesServer,
-  fetchTenantOfficialDocumentsServer,
+  fetchTenantOfficialDocumentsPagedServer,
 } from './ApiServerActions';
 
 export const dynamic = 'force-dynamic';
 
+const LIST_PAGE_SIZE = 20;
+
 export default async function OfficialDocumentsPage() {
-  const [categoryResult, documents, initialBundles] = await Promise.all([
+  const [categoryResult, docsPage, initialBundles] = await Promise.all([
     fetchOfficialDocumentCategoriesServer(),
-    fetchTenantOfficialDocumentsServer(),
+    fetchTenantOfficialDocumentsPagedServer({ page: 0, size: LIST_PAGE_SIZE }),
     fetchOfficialDocumentYearBundlesServer(),
   ]);
 
@@ -19,7 +21,11 @@ export default async function OfficialDocumentsPage() {
       initialCategories={categoryResult.categories}
       categorySource={categoryResult.source}
       categoryMessage={categoryResult.message}
-      initialDocuments={documents}
+      initialDocuments={docsPage.content}
+      initialTotalElements={docsPage.totalElements}
+      initialTotalPages={docsPage.totalPages}
+      initialPage={docsPage.page}
+      listPageSize={docsPage.size}
       initialBundles={initialBundles}
     />
   );

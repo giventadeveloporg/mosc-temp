@@ -19,6 +19,38 @@ function parseSpringPage<T>(data: unknown): T[] {
   return [];
 }
 
+function parseSpringPageMeta(data: unknown): {
+  content: unknown[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
+} {
+  if (Array.isArray(data)) {
+    return {
+      content: data,
+      totalElements: data.length,
+      totalPages: 1,
+      number: 0,
+      size: data.length || 20,
+    };
+  }
+  if (data && typeof data === 'object') {
+    const o = data as Record<string, unknown>;
+    const content = Array.isArray(o.content) ? o.content : [];
+    const size = typeof o.size === 'number' && o.size > 0 ? o.size : 20;
+    const number = typeof o.number === 'number' ? o.number : 0;
+    const totalElements =
+      typeof o.totalElements === 'number' ? o.totalElements : content.length;
+    const totalPages =
+      typeof o.totalPages === 'number'
+        ? o.totalPages
+        : Math.max(1, Math.ceil(totalElements / size));
+    return { content, totalElements, totalPages, number, size };
+  }
+  return { content: [], totalElements: 0, totalPages: 0, number: 0, size: 20 };
+}
+
 function normalizeOfficialDocumentCategory(row: Record<string, unknown>): OfficialDocumentCategoryDTO {
   return {
     id: typeof row.id === 'number' ? row.id : undefined,
@@ -131,16 +163,18 @@ export async function fetchOfficialDocumentCategoriesServer(): Promise<OfficialD
   }
 }
 
+/** All matching rows (up to `size`) — used for cover picker and legacy refresh. */
 export async function fetchTenantOfficialDocumentsServer(filters?: {
   year?: number;
   officialDocumentCategoryId?: number;
+  size?: number;
 }): Promise<EventMediaDTO[]> {
   try {
     const params = new URLSearchParams();
     params.append('tenantId.equals', getTenantId());
     params.append('isEventManagementOfficialDocument.equals', 'true');
     params.append('sort', 'createdAt,desc');
-    params.append('size', '500');
+    params.append('size', String(filters?.size ?? 500));
     if (filters?.year != null) params.append('officialDocumentYear.equals', String(filters.year));
     if (filters?.officialDocumentCategoryId != null) {
       params.append('officialDocumentCategoryId.equals', String(filters.officialDocumentCategoryId));
@@ -153,6 +187,111 @@ export async function fetchTenantOfficialDocumentsServer(filters?: {
   } catch (e) {
     console.error('[official-documents] fetchTenantOfficialDocumentsServer:', e);
     return [];
+  }
+}
+
+export type OfficialDocumentsPageResult = {
+  content: EventMediaDTO[];
+  totalElements: number;
+  totalPages: number;
+  page: number;
+  size: number;
+};
+
+/** Paginated list for admin table (Spring `page` / `size`). */
+export async function fetchTenantOfficialDocumentsPagedServer(filters: {
+  year?: number;
+  officialDocumentCategoryId?: number;
+  page?: number;
+  size?: number;
+}): Promise<OfficialDocumentsPageResult> {
+  const page = filters.page ?? 0;
+  const size = filters.size ?? 20;
+  try {
+    const params = new URLSearchParams();
+    params.append('tenantId.equals', getTenantId());
+    params.append('isEventManagementOfficialDocument.equals', 'true');
+    params.append('sort', 'createdAt,desc');
+    params.append('page', String(page));
+    params.append('size', String(size));
+    if (filters.year != null) params.append('officialDocumentYear.equals', String(filters.year));
+    if (filters.officialDocumentCategoryId != null) {
+      params.append('officialDocumentCategoryId.equals', String(filters.officialDocumentCategoryId));
+    }
+    const url = `${getApiBaseUrl()}/api/event-medias?${params.toString()}`;
+    const res = await fetchWithJwtRetry(url, { cache: 'no-store' });
+    if (!res.ok) {
+      return { content: [], totalElements: 0, totalPages: 0, page, size };
+    }
+    const data = await res.json();
+    const meta = parseSpringPageMeta(data);
+    const content = meta.content as EventMediaDTO[];
+    return {
+      content,
+      totalElements: meta.totalElements,
+      totalPages: meta.totalPages,
+      page: meta.number,
+      size: meta.size,
+    };
+  } catch (e) {
+    console.error('[official-documents] fetchTenantOfficialDocumentsPagedServer:', e);
+    return { content: [], totalElements: 0, totalPages: 0, page, size };
+  }
+}
+
+export async function patchOfficialDocumentMediaServer(
+  mediaId: number,
+  existing: EventMediaDTO,
+  updates: {
+    title: string;
+    description?: string;
+    isPublic: boolean;
+    officialDocumentYear: number;
+    officialDocumentCategoryId: number | null;
+  }
+): Promise<{ ok: true; media: EventMediaDTO } | { ok: false; message: string }> {
+  try {
+    const url = `${getApiBaseUrl()}/api/event-medias/${mediaId}`;
+    const finalPayload = withTenantId({
+      id: mediaId,
+      title: updates.title,
+      description: updates.description ?? '',
+      isPublic: updates.isPublic,
+      officialDocumentYear: updates.officialDocumentYear,
+      officialDocumentCategoryId: updates.officialDocumentCategoryId,
+      eventMediaType: existing.eventMediaType || 'gallery',
+      storageType: existing.storageType || 's3',
+      updatedAt: new Date().toISOString(),
+    });
+    const res = await fetchWithJwtRetry(url, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/merge-patch+json' },
+      body: JSON.stringify(finalPayload),
+    });
+    if (!res.ok) {
+      const t = await res.text().catch(() => '');
+      return { ok: false, message: t || `HTTP ${res.status}` };
+    }
+    const media = (await res.json()) as EventMediaDTO;
+    return { ok: true, media };
+  } catch (e) {
+    return { ok: false, message: e instanceof Error ? e.message : String(e) };
+  }
+}
+
+export async function deleteOfficialDocumentMediaServer(
+  mediaId: number
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  try {
+    const url = `${getApiBaseUrl()}/api/event-medias/${mediaId}?tenantId.equals=${encodeURIComponent(getTenantId())}`;
+    const res = await fetchWithJwtRetry(url, { method: 'DELETE', cache: 'no-store' });
+    if (!res.ok) {
+      const t = await res.text().catch(() => '');
+      return { ok: false, message: t || `HTTP ${res.status}` };
+    }
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, message: e instanceof Error ? e.message : String(e) };
   }
 }
 
