@@ -143,14 +143,14 @@ export default function HomePage() {
   const visibleSaints = saints.slice(saintIndex, saintIndex + 3);
 
   return (
-    <div className="min-h-screen bg-parchment font-dm-sans flex flex-col">
+    <div className="mosc-redesign-subpage-shell syro-layout min-h-screen flex flex-col bg-parchment font-dm-sans text-warmGray-dark antialiased">
       {/*
         Sticky header must NOT sit inside overflow-x-hidden (breaks position:sticky in browsers).
         /mosc uses syro-layout + overflow only on main; we mirror that with a content wrapper.
       */}
       <MoscRedesignHeader />
 
-      <div className="flex-1 min-w-0 w-full overflow-x-hidden">
+      <main id="mainContent" className="syro-main flex-1 min-w-0 overflow-x-hidden bg-parchment">
       {/* ── HERO: mobile = contain + letterbox; md+ = cover, full-bleed panoramic ─ */}
       <section className="relative w-full min-h-[240px] h-[min(34vh,290px)] sm:min-h-[270px] md:h-auto md:min-h-[350px] md:aspect-[5/2] md:max-h-[min(42vh,490px)] overflow-hidden bg-[#1a1410] md:bg-stone-900">
         {slides.map((slide, i) =>
@@ -168,11 +168,6 @@ export default function HomePage() {
           </div>
         </div>
         )}
-
-        <div
-          className="pointer-events-none absolute inset-0 z-[5] hidden bg-gradient-to-r from-black/45 via-black/20 to-transparent md:block"
-          aria-hidden
-        />
 
         {/* Pagination dots */}
         <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-10 flex gap-2">
@@ -259,18 +254,44 @@ export default function HomePage() {
       {/* ── ABOUT US (always visible — IntersectionObserver + opacity-0 caused empty gaps) ─ */}
       <section className="py-16 md:py-24 bg-parchment border-b border-burgundy/15">
         <div className="max-w-7xl mx-auto px-6 lg:px-16">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-12 items-stretch">
             {/* Images collage */}
-            <div className="relative h-[390px] md:h-[480px] lg:w-[105%] lg:-ml-[5%]">
-              {/* Main image: full-width/full-height card, contained so it never gets cropped */}
-              <div className="absolute inset-0 overflow-hidden transition-transform duration-500 hover:scale-[1.01]">
+            <div className="relative h-[350px] md:h-[450px] lg:h-[480px] lg:w-[100%]">
+              {/* Top-right square: Bishops */}
+              <div className="absolute right-2 top-0 w-[48%] aspect-square overflow-hidden border-4 border-white shadow-2xl shadow-burgundy/40">
                 <Image
-                  src="/images/logos/MOSC-image-collage.png"
-                  alt="Malankara Orthodox Church fathers and bishops gathered in a formal assembly"
+                  src="/images/logos/About US/Bishops-image-AboutUs.jpg"
+                  alt="Bishops in church sanctuary"
                   fill
-                  className="object-contain object-left" />
+                  className="object-cover"
+                />
               </div>
 
+              {/* Gradient back plate behind center-left square (img-1-container::before equivalent) */}
+              <div
+                className="absolute z-0 left-[-34px] top-[57%] w-[42%] h-[44%]"
+                style={{ background: "linear-gradient(#dc3545, #dc354588, #eaebef59)" }}
+              />
+
+              {/* Center-left square: Christ and St. Thomas */}
+              <div className="absolute z-10 left-0 top-[38%] w-[42%] aspect-square overflow-hidden border-4 border-white shadow-2xl shadow-burgundy/35">
+                <Image
+                  src="/images/logos/About US/Chirst-Thomas-AboutUs.jpg"
+                  alt="Christ with St. Thomas"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+
+              {/* Bottom-right square: Cross plate */}
+              <div className="absolute right-2 -bottom-14 w-[48%] aspect-square overflow-hidden border-4 border-white bg-burgundy/20 shadow-2xl shadow-burgundy/35">
+                <Image
+                  src="/images/logos/About US/Cross-PlateOnly-AboutUs.png"
+                  alt="Cross plate in hand"
+                  fill
+                  className="object-contain"
+                />
+              </div>
             </div>
 
             {/* Text */}
@@ -341,7 +362,7 @@ export default function HomePage() {
                 />
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-warmBrown-dark/90 via-warmBrown-dark/20 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-4">
-                  <p className="text-white font-semibold text-sm leading-tight">{saint.name}</p>
+                  <p className="saint-card-title font-semibold text-sm leading-tight">{saint.name}</p>
                   <span className="text-warmGold text-xs mt-1 inline-flex items-center gap-1 group-hover:gap-2 transition-all">
                     Learn more <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                   </span>
@@ -405,20 +426,23 @@ export default function HomePage() {
       </section>
 
       {/* ── LITURGICAL CALENDAR ────────────────────────────────────────── */}
-      <section className="py-16 md:py-24 bg-parchment border-b border-burgundy/15">
-        <div className="max-w-7xl mx-auto px-6 lg:px-16">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <section className="relative overflow-hidden py-16 md:py-24 bg-parchment border-b border-burgundy/15">
+        <div className="pointer-events-none absolute -top-10 -left-16 w-64 h-64 rounded-full bg-burgundy/10 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-16 -right-10 w-72 h-72 rounded-full bg-warmGold/20 blur-3xl" />
+        <div className="max-w-7xl mx-auto px-6 lg:px-16 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-12 items-stretch">
             {/* Calendar image */}
-            <div className="relative h-72 md:h-96 rounded-2xl overflow-hidden transition-all duration-300 group">
+            <div className="relative w-[85%] mx-auto h-72 md:h-96 lg:h-full rounded-2xl overflow-hidden transition-all duration-300 group">
               <Image
                 src="/images/logos/Liturgical-Calendar-Image.jpg"
                 alt="Malankara Orthodox Syrian Church liturgical calendar showing feast days and holy seasons"
-                fill
-                className="object-contain object-center group-hover:scale-105 transition-transform duration-500" />
+                width={1200}
+                height={900}
+                className="w-[80%] h-auto mx-auto rounded-2xl object-center shadow-xl shadow-burgundy/25 group-hover:scale-[1.04] transition-transform duration-500" />
             </div>
 
             {/* Calendar content */}
-            <div className="bg-parchment-light rounded-2xl p-8 border border-burgundy/20 shadow-sm">
+            <div className="bg-parchment-light/95 backdrop-blur-[2px] rounded-2xl p-8 border border-burgundy/25 shadow-xl shadow-burgundy/15">
               <span className="inline-block text-burgundy text-lg font-bold tracking-widest uppercase mb-3 border border-burgundy/30 px-3 py-1 rounded-full bg-burgundy/10">
                 Liturgical Calendar
               </span>
@@ -443,7 +467,7 @@ export default function HomePage() {
               </div>
 
               <div
-                className={`bg-parchment-deep rounded-xl p-5 border border-burgundy/20 ${
+                className={`bg-gradient-to-b from-parchment-deep to-parchment rounded-xl p-5 border border-burgundy/25 shadow-inner ${
                   readingLang === "malayalam" ? anekMalayalam.className : "font-dm-sans"
                 }`}
                 lang={readingLang === "malayalam" ? "ml" : "en"}
@@ -556,8 +580,8 @@ export default function HomePage() {
         </div>
       </section>
 
+      </main>
       <MoscRedesignFooter />
-      </div>
     </div>);
 
 }

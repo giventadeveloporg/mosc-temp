@@ -269,8 +269,8 @@ export default function MoscRedesignFooter() {
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-16 mt-10 pt-8 border-t border-warmBrown/20">
-          <div className="flex flex-col items-center gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-16 mt-6 pt-5 border-t border-warmBrown/20">
+          <div className="flex flex-col items-center gap-2">
             <p className="text-warmGray-dark/80 text-xs text-center">
               © {new Date().getFullYear()} Malankara Orthodox Syrian Church. All rights reserved.
             </p>
@@ -285,7 +285,7 @@ export default function MoscRedesignFooter() {
                 Giventa Inc., USA
               </a>
             </p>
-            <div className="flex flex-wrap justify-center gap-4 text-xs">
+            <div className="flex flex-wrap justify-center gap-3 text-xs pt-1">
               <Link href="/mosc-redesign/privacy-policy" className="text-warmGray-dark/85 hover:text-burgundy-dark transition-colors">
                 Privacy Policy
               </Link>

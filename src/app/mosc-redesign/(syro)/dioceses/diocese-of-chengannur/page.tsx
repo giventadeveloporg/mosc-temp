@@ -25,7 +25,7 @@ const dioceseofchengannurPage = () => {
                 {/* Featured Image - centered, contained (administration style) */}
                 <div className="mb-8 flex justify-center">
                   <Image
-                    src="/images/dioceses/chengannur_diocese.jpg"
+                    src="/images/dioceses/chengannur_diocese.png"
                     alt="Diocese of Chengannur"
                     width={175} height={175}
                     className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }}

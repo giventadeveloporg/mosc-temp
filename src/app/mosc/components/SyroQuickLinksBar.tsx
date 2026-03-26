@@ -24,8 +24,6 @@ export default function SyroQuickLinksBar() {
     <div className="syro-quicklinks-bar" role="navigation" aria-label="Quick links">
       <div className="container">
         <div className="syro-quicklinks-inner d-flex flex-nowrap align-items-center justify-content-center py-2">
-          <span className="syro-quicklinks-label text-uppercase fw-semibold me-2 flex-shrink-0">Quick Links</span>
-          <span className="syro-quicklinks-sep me-2 flex-shrink-0" aria-hidden="true" />
           <ul className="list-unstyled d-flex flex-nowrap align-items-center mb-0 flex-shrink-0">
             {QUICK_LINKS.map((link, index) => (
               <li key={link.href} className="d-flex align-items-center">

@@ -152,7 +152,9 @@ DROP TABLE IF EXISTS public.event_attendee CASCADE;
 DROP TABLE IF EXISTS public.event_admin_audit_log CASCADE;
 DROP TABLE IF EXISTS public.event_calendar_entry CASCADE;
 DROP TABLE IF EXISTS public.gallery_album CASCADE;
+DROP TABLE IF EXISTS public.official_document_year_bundle CASCADE;
 DROP TABLE IF EXISTS public.event_media CASCADE;
+DROP TABLE IF EXISTS public.official_document_category CASCADE;
 DROP TABLE IF EXISTS public.event_poll_response CASCADE;
 DROP TABLE IF EXISTS public.event_poll_option CASCADE;
 DROP TABLE IF EXISTS public.event_poll CASCADE;
@@ -1624,6 +1626,49 @@ COMMENT ON COLUMN public.gallery_album.is_public IS 'Whether album is visible to
 
 
 --
+-- Official document categories (tenant-scoped lookup for Church Resources / downloads).
+-- S3 path when is_event_management_official_document = true:
+--   media/{tenant_id}/official_document/{category.slug}/{official_document_year}/filename
+--
+
+CREATE TABLE public.official_document_category (
+    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    tenant_id character varying(255) NOT NULL,
+    slug character varying(128) NOT NULL,
+    display_name character varying(255) NOT NULL,
+    description character varying(1024) NULL,
+    sort_order integer DEFAULT 0 NOT NULL,
+    is_active boolean DEFAULT true NOT NULL,
+    created_at timestamp DEFAULT now() NOT NULL,
+    updated_at timestamp DEFAULT now() NOT NULL,
+    CONSTRAINT official_document_category_pkey PRIMARY KEY (id),
+    CONSTRAINT ux_official_document_category_tenant_slug UNIQUE (tenant_id, slug),
+    CONSTRAINT check_official_document_category_slug_format CHECK (
+        slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$'
+    ),
+    CONSTRAINT check_official_document_category_sort_non_negative CHECK (sort_order >= 0)
+);
+
+COMMENT ON TABLE public.official_document_category IS 'Lookup for official document types (Church Resources). Admin CRUD per tenant; slug is used as the S3 path segment under official_document/.';
+
+COMMENT ON COLUMN public.official_document_category.slug IS 'URL-safe segment for S3: .../official_document/{slug}/{year}/. Lowercase letters, digits, single hyphens between tokens.';
+
+CREATE INDEX idx_official_document_category_tenant_active ON public.official_document_category (tenant_id, is_active, sort_order);
+
+-- Optional seed for tenant_demo_002. Maps legacy Church Resources titles to stable slugs for S3.
+-- INSERT INTO public.official_document_category (tenant_id, slug, display_name, description, sort_order, is_active) VALUES
+-- ('tenant_demo_002', 'photos', 'Photos', 'Election photos, merit evening, general downloads', 10, true),
+-- ('tenant_demo_002', 'brochures', 'Brochures', 'Catholicate day book cover, brochures', 20, true),
+-- ('tenant_demo_002', 'calendars', 'Calendars', 'Panjangom and yearly calendars', 30, true),
+-- ('tenant_demo_002', 'insurance-benefits', 'Insurance & benefits', 'Medical insurance TPA and similar', 40, true),
+-- ('tenant_demo_002', 'official-circulars', 'Official circulars', 'Kalpana and official notices', 50, true),
+-- ('tenant_demo_002', 'financial-statements', 'Financial statements', 'Covering notes, MOSC financial statement formats', 60, true),
+-- ('tenant_demo_002', 'magazines', 'Magazines', 'Malankara Sabha magazine and periodicals', 70, true),
+-- ('tenant_demo_002', 'scholarships', 'Scholarships', 'Educational scholarship materials', 80, true),
+-- ('tenant_demo_002', 'awards-events', 'Awards & merit events', 'Merit awards, merit evening', 90, true);
+
+
+--
 -- TOC entry 246 (class 1259 OID 83070)
 -- Name: event_media; Type: TABLE; Schema: public; Owner: giventa_event_management
 --
@@ -1643,6 +1688,11 @@ CREATE TABLE public.event_media (
                                     event_flyer bool DEFAULT false NULL,
                                     is_email_header_image bool DEFAULT false NULL,
                                     is_event_management_official_document bool DEFAULT false NULL,
+                                    official_document_category_id bigint NULL,
+                                    official_document_year integer NULL,
+                                    hierarchy_path text NULL,
+                                    hierarchy_category_label text NULL,
+                                    display_priority int4 NULL,
                                     pre_signed_url varchar(2048) NULL,
                                     pre_signed_url_expires_at timestamp NULL,
                                     alt_text varchar(500) NULL,
@@ -1668,6 +1718,7 @@ CREATE TABLE public.event_media (
                                     is_live_event_image bool DEFAULT false NOT NULL,
                                     album_id int8 NULL,
                                     event_focus_group_id bigint NULL,
+                                    CONSTRAINT event_media_pkey PRIMARY KEY (id),
                                     CONSTRAINT check_download_count_non_negative CHECK ((download_count >= 0)),
                                     CONSTRAINT check_file_size_positive CHECK (((file_size IS NULL) OR (file_size >= 0))),
                                     CONSTRAINT check_priority_ranking_non_negative CHECK (priority_ranking >= 0),
@@ -1678,7 +1729,8 @@ CREATE TABLE public.event_media (
                                     CONSTRAINT fk_event_media_sponsor_id FOREIGN KEY (sponsor_id) REFERENCES public.event_sponsors(id) ON DELETE CASCADE,
                                     CONSTRAINT fk_event_media_event_sponsors_join_id FOREIGN KEY (event_sponsors_join_id) REFERENCES public.event_sponsors_join(id) ON DELETE CASCADE,
                                     CONSTRAINT fk_event_media_album_id FOREIGN KEY (album_id) REFERENCES public.gallery_album(id) ON DELETE SET NULL,
-                                    CONSTRAINT fk_event_media__event_focus_group_id FOREIGN KEY (event_focus_group_id) REFERENCES public.event_focus_groups(id) ON DELETE SET NULL
+                                    CONSTRAINT fk_event_media__event_focus_group_id FOREIGN KEY (event_focus_group_id) REFERENCES public.event_focus_groups(id) ON DELETE SET NULL,
+                                    CONSTRAINT fk_event_media_official_document_category_id FOREIGN KEY (official_document_category_id) REFERENCES public.official_document_category(id) ON DELETE SET NULL
 );
 
 
@@ -1700,7 +1752,48 @@ COMMENT ON COLUMN public.event_media.album_id IS 'Reference to gallery album. Mu
 
 COMMENT ON COLUMN public.event_media.event_focus_group_id IS 'Optional link to event_focus_groups. When set, this media is associated with that event focus group (e.g. for uploads tagged by focus group).';
 
+COMMENT ON COLUMN public.event_media.official_document_category_id IS 'When is_event_management_official_document is true, links to official_document_category; category.slug is used in S3 path media/{tenant_id}/official_document/{slug}/{year}/.';
+
+COMMENT ON COLUMN public.event_media.official_document_year IS 'Calendar year segment for official-document S3 path (e.g. 2025, 2026). Required for new uploads when official document + category are set; may be NULL for legacy rows.';
+
+COMMENT ON COLUMN public.event_media.hierarchy_path IS 'Canonical hierarchy path used for official-document tree rendering (example: Kalpana 2023\Kalpana 110 Commission\Kalpana-Commission-1.pdf).';
+
+COMMENT ON COLUMN public.event_media.hierarchy_category_label IS 'Top-level human-readable category label inferred from mirrored legacy folders.';
+
+COMMENT ON COLUMN public.event_media.display_priority IS 'Dedicated display priority for official documents. Lower values appear first in paginated downloads listing.';
+
 COMMENT ON COLUMN public.event_media.home_page_hero_display_duration_seconds IS 'Duration in seconds to display this image in the homepage hero slider when is_home_page_hero_image is true. Stored as total seconds (e.g. 50, 80 for 1m20s). NULL = use app default (8 seconds). Valid range: 1–600.';
+
+
+--
+-- Official document year bundle (option B): one row per (tenant, category, calendar year) with optional cover image.
+-- cover_event_media_id references an image (or representative) event_media row for downloads / category tiles.
+--
+
+CREATE TABLE public.official_document_year_bundle (
+    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    tenant_id character varying(255) NOT NULL,
+    official_document_category_id bigint NOT NULL,
+    document_year integer NOT NULL,
+    cover_event_media_id bigint NULL,
+    created_at timestamp DEFAULT now() NOT NULL,
+    updated_at timestamp DEFAULT now() NOT NULL,
+    CONSTRAINT official_document_year_bundle_pkey PRIMARY KEY (id),
+    CONSTRAINT ux_official_document_year_bundle_tenant_category_year UNIQUE (tenant_id, official_document_category_id, document_year),
+    CONSTRAINT fk_official_document_year_bundle_category FOREIGN KEY (official_document_category_id) REFERENCES public.official_document_category(id) ON DELETE CASCADE,
+    CONSTRAINT fk_official_document_year_bundle_cover_media FOREIGN KEY (cover_event_media_id) REFERENCES public.event_media(id) ON DELETE SET NULL,
+    CONSTRAINT check_official_document_year_bundle_year CHECK (document_year >= 1900 AND document_year <= 2100)
+);
+
+COMMENT ON TABLE public.official_document_year_bundle IS 'Per-tenant, per-category, per-calendar-year grouping for Church Resources / official documents; optional cover points to event_media for UI thumbnails.';
+
+COMMENT ON COLUMN public.official_document_year_bundle.document_year IS 'Calendar year segment matching event_media.official_document_year and S3 path .../official_document/{slug}/{year}/.';
+
+COMMENT ON COLUMN public.official_document_year_bundle.cover_event_media_id IS 'Optional FK to event_media used as cover/thumbnail for this category+year (typically image; should match tenant and official-document flags).';
+
+CREATE INDEX idx_official_document_year_bundle_tenant_category_year ON public.official_document_year_bundle (tenant_id, official_document_category_id, document_year);
+
+CREATE TRIGGER update_official_document_year_bundle_updated_at BEFORE UPDATE ON public.official_document_year_bundle FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
 
 
@@ -3418,6 +3511,10 @@ CREATE INDEX IF NOT EXISTS idx_event_media_event_sponsor_join_priority ON public
 -- Indexes for event_media album references
 CREATE INDEX IF NOT EXISTS idx_event_media_album_id ON public.event_media(album_id) WHERE album_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_event_media_album_public ON public.event_media(album_id, is_public) WHERE album_id IS NOT NULL AND is_public = true;
+
+-- Official document library: filter by tenant, category slug (FK), and year for S3 path media/{tenant}/official_document/{slug}/{year}/
+CREATE INDEX IF NOT EXISTS idx_event_media_official_doc_tenant_category_year ON public.event_media(tenant_id, official_document_category_id, official_document_year) WHERE is_event_management_official_document = true AND official_document_category_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_event_media_official_doc_tree_listing ON public.event_media(tenant_id, official_document_category_id, official_document_year, display_priority, priority_ranking, created_at) WHERE is_event_management_official_document = true AND is_public = true;
 
 -- Index for event_sponsors_join custom_poster_url
 CREATE INDEX IF NOT EXISTS idx_event_sponsors_join_custom_poster ON public.event_sponsors_join(custom_poster_url) WHERE custom_poster_url IS NOT NULL;
@@ -5207,6 +5304,8 @@ SELECT pg_catalog.setval(
                    COALESCE((SELECT MAX(id) FROM public.event_sponsors), 0),
                    COALESCE((SELECT MAX(id) FROM public.event_sponsors_join), 0),
                    COALESCE((SELECT MAX(id) FROM public.gallery_album), 0),
+                   COALESCE((SELECT MAX(id) FROM public.official_document_category), 0),
+                   COALESCE((SELECT MAX(id) FROM public.official_document_year_bundle), 0),
                    COALESCE((SELECT MAX(id) FROM public.event_media), 0),
                    COALESCE((SELECT MAX(id) FROM public.event_organizer), 0),
                    COALESCE((SELECT MAX(id) FROM public.event_poll), 0),

@@ -227,6 +227,16 @@ const nextConfig = {
     // Liturgical Calendar data source (strapi | external)
     LITURGY_DATA_SOURCE: process.env.LITURGY_DATA_SOURCE || process.env.AMPLIFY_LITURGY_DATA_SOURCE || 'external',
     AMPLIFY_LITURGY_DATA_SOURCE: process.env.AMPLIFY_LITURGY_DATA_SOURCE,
+
+    // Downloads page: merge public official documents from API (see PRD_FRONTEND.md)
+    NEXT_PUBLIC_MOSC_DOWNLOADS_DATA_DRIVEN: process.env.NEXT_PUBLIC_MOSC_DOWNLOADS_DATA_DRIVEN,
+    AMPLIFY_NEXT_PUBLIC_MOSC_DOWNLOADS_DATA_DRIVEN: process.env.AMPLIFY_NEXT_PUBLIC_MOSC_DOWNLOADS_DATA_DRIVEN,
+
+    // Admin official docs: when backend GET /api/official-document-categories returns 404, use built-in slug list (set false to disable)
+    NEXT_PUBLIC_OFFICIAL_DOCUMENT_CATEGORY_FALLBACK:
+      process.env.NEXT_PUBLIC_OFFICIAL_DOCUMENT_CATEGORY_FALLBACK,
+    AMPLIFY_NEXT_PUBLIC_OFFICIAL_DOCUMENT_CATEGORY_FALLBACK:
+      process.env.AMPLIFY_NEXT_PUBLIC_OFFICIAL_DOCUMENT_CATEGORY_FALLBACK,
   },
 };
 

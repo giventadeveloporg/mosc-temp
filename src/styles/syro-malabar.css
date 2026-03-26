@@ -25,6 +25,7 @@ body:has(.syro-layout) {
   min-height: 100% !important;
   overflow-x: hidden !important;
   overflow-y: auto !important;
+  scrollbar-gutter: stable;
   margin: 0 !important;
   display: flex !important;
   flex-direction: column !important;
@@ -111,6 +112,11 @@ body:has(.syro-layout) {
 #mainContent h3,
 #mainContent p {
   color: #000 !important;
+}
+
+/* Saints & Blesseds cards (home): keep title white over dark image overlay */
+#mainContent .saint-card-title {
+  color: #ffffff !important;
 }
 
 /* Subpage banner (SyroPageBanner): three distinct colors on burgundy/pink gradient */

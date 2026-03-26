@@ -126,7 +126,6 @@ export default function QuickLinks({ variant = 'default' }: QuickLinksProps) {
   if (variant === 'sidebar') {
     return (
       <div className="bg-parchment-light rounded-xl border border-burgundy/20 shadow-[0_2px_8px_rgba(61,13,13,0.08)] p-6">
-        <h3 className="font-dm-sans font-semibold text-lg text-burgundy-dark mb-4">Quick Links</h3>
         <nav className="flex flex-wrap gap-2">
           {quickLinks.map((link) => {
             const linkContent = (
@@ -161,7 +160,6 @@ export default function QuickLinks({ variant = 'default' }: QuickLinksProps) {
   const strip = (
     <section className="py-12 md:py-16 bg-parchment-deep border-t-2 border-burgundy/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-16">
-        <h3 className="text-center text-warmBrown-dark font-bold text-sm uppercase tracking-widest mb-8">Quick links</h3>
         <nav className="flex flex-wrap items-center justify-center gap-3 md:gap-4">
           {quickLinks.map((link) => {
             const linkContent = (
