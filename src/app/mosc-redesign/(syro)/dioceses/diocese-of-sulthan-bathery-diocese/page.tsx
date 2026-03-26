@@ -25,7 +25,7 @@ const dioceseofsulthanbatherydiocesePage = () => {
                 {/* Featured Image - centered, contained (administration style) */}
                 <div className="mb-8 flex justify-center">
                   <Image
-                    src="/images/dioceses/sulthan_bathery_diocese.jpg"
+                    src="/images/dioceses/sulthan_bathery_diocese.png"
                     alt="Diocese of Sulthan Bathery"
                     width={175} height={175}
                     className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }}

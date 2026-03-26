@@ -25,7 +25,7 @@ const dioceseofbrahamavarPage = () => {
                 {/* Featured Image - centered, contained (administration style) */}
                 <div className="mb-8 flex justify-center">
                   <Image
-                    src="/images/dioceses/bhramavar_diocese.jpg"
+                    src="/images/dioceses/bhramavar_diocese.png"
                     alt="Diocese of Brahamavar"
                     width={175} height={175}
                     className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }}

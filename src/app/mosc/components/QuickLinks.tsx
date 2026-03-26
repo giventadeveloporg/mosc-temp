@@ -117,7 +117,6 @@ export default function QuickLinks({ variant = 'default' }: QuickLinksProps) {
   if (variant === 'sidebar') {
     return (
       <div className="bg-syro-bg-gray rounded-lg shadow-syro-card p-6">
-        <h3 className="font-syro-display font-semibold text-lg text-syro-blue mb-4">Quick Links</h3>
         <nav className="flex flex-wrap gap-2">
           {quickLinks.map((link) => {
             const linkContent = (

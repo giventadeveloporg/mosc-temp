@@ -25,7 +25,7 @@ const dioceseofthiruvananthapuramdiocesePage = () => {
                 {/* Featured Image - centered, contained (administration style) */}
                 <div className="mb-8 flex justify-center">
                   <Image
-                    src="/images/dioceses/diocese-of-thiruvananthapuram-diocese.jpg"
+                    src="/images/dioceses/diocese-of-thiruvananthapuram-diocese.png"
                     alt="Diocese of Thiruvananthapuram"
                     width={175} height={175}
                     className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }}

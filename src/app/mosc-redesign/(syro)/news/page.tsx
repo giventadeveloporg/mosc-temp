@@ -37,9 +37,13 @@ export default async function NewsPage() {
       {/* Section nav */}
       <section className="mt-8 py-syro-lg bg-syro-bg-gray border-b border-syro-table-border">
         <div className="max-w-[1200px] mx-auto px-[15px]">
-          <nav className="flex flex-wrap gap-syro-xl" aria-label="News sections">
+          <nav className="flex flex-wrap gap-syro-lg" aria-label="News sections">
             {SECTION_LINKS.map(({ label, href }) => (
-              <a key={href} href={href} className="primary-button">
+              <a
+                key={href}
+                href={href}
+                className="syro-primary-button inline-flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-syro-red focus-visible:ring-offset-2"
+              >
                 {label}
               </a>
             ))}
@@ -49,7 +53,7 @@ export default async function NewsPage() {
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="primary-button"
+                className="syro-primary-button inline-flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-syro-red focus-visible:ring-offset-2"
               >
                 {label}
               </a>
