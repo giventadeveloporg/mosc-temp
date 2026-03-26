@@ -238,6 +238,40 @@ export interface EventMediaDTO {
    * Reference to event_focus_groups association (event-focus-group link). Optional; when set, media is scoped to that focus group for this event.
    */
   eventFocusGroupId?: number | null;
+  /** FK to public.official_document_category when isEventManagementOfficialDocument is true (tenant library). */
+  officialDocumentCategoryId?: number | null;
+  /** Calendar year segment for official-document S3 path (e.g. 2025). */
+  officialDocumentYear?: number | null;
+}
+
+/**
+ * Tenant-scoped official document category lookup (Church Resources).
+ */
+export interface OfficialDocumentCategoryDTO {
+  id?: number;
+  tenantId?: string;
+  slug: string;
+  displayName: string;
+  description?: string | null;
+  sortOrder?: number;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/**
+ * Per-tenant, per-category, per-year bundle for official document library cover (see official_document_year_bundle).
+ */
+export interface OfficialDocumentYearBundleDTO {
+  id?: number;
+  tenantId?: string;
+  officialDocumentCategoryId: number;
+  documentYear: number;
+  coverEventMediaId?: number | null;
+  createdAt?: string;
+  updatedAt?: string;
+  /** When API embeds the cover media row */
+  coverEventMedia?: Partial<EventMediaDTO> | null;
 }
 
 /**

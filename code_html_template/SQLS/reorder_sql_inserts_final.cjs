@@ -21,6 +21,7 @@ const TABLE_ORDER = [
   'event_sponsors',      // parent of event_media.sponsor_id (fk_event_media_sponsor_id)
   'event_sponsors_join',
   'gallery_album',   // parent of event_media.album_id (fk_event_media_album_id)
+  'official_document_category', // parent of event_media.official_document_category_id (fk_event_media_official_document_category_id); see Latest_Schema_Post__Blob_Claude_12.sql
   'event_media',
   'event_organizer',
   'event_poll',
