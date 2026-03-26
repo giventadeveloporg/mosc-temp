@@ -395,3 +395,160 @@ export async function patchOfficialDocumentYearBundleServer(
     return { ok: false, message: e instanceof Error ? e.message : String(e) };
   }
 }
+
+// --- Official document categories (admin CRUD + pagination) ---
+
+export type OfficialDocumentCategoriesPageResult = {
+  content: OfficialDocumentCategoryDTO[];
+  totalElements: number;
+  totalPages: number;
+  page: number;
+  size: number;
+};
+
+/**
+ * Paginated categories for admin. Returns `ok: false` when GET /api/official-document-categories is missing (404).
+ */
+export async function fetchOfficialDocumentCategoriesPagedServer(filters: {
+  page?: number;
+  size?: number;
+  /** If true, only active categories. If false, omit filter (tenant-wide list for admin). */
+  activeOnly?: boolean;
+}): Promise<
+  | { ok: true; data: OfficialDocumentCategoriesPageResult }
+  | { ok: false; reason: 'not_found' | 'error'; message?: string }
+> {
+  const page = filters.page ?? 0;
+  const size = filters.size ?? 20;
+  try {
+    const params = new URLSearchParams();
+    params.append('tenantId.equals', getTenantId());
+    params.append('sort', 'sortOrder,asc');
+    params.append('page', String(page));
+    params.append('size', String(size));
+    if (filters.activeOnly === true) {
+      params.append('isActive.equals', 'true');
+    }
+    const url = `${getApiBaseUrl()}/api/official-document-categories?${params.toString()}`;
+    const res = await fetchWithJwtRetry(url, { cache: 'no-store' });
+
+    if (res.status === 404) {
+      return { ok: false, reason: 'not_found' };
+    }
+    if (!res.ok) {
+      const t = await res.text().catch(() => '');
+      return { ok: false, reason: 'error', message: t || `HTTP ${res.status}` };
+    }
+
+    const json = await res.json();
+    const meta = parseSpringPageMeta(json);
+    const content = (meta.content as Record<string, unknown>[])
+      .map(normalizeOfficialDocumentCategory)
+      .filter((c) => c.slug);
+
+    return {
+      ok: true,
+      data: {
+        content,
+        totalElements: meta.totalElements,
+        totalPages: meta.totalPages,
+        page: meta.number,
+        size: meta.size,
+      },
+    };
+  } catch (e) {
+    return {
+      ok: false,
+      reason: 'error',
+      message: e instanceof Error ? e.message : String(e),
+    };
+  }
+}
+
+export async function createOfficialDocumentCategoryServer(payload: {
+  slug: string;
+  displayName: string;
+  description?: string;
+  sortOrder?: number;
+  isActive?: boolean;
+}): Promise<{ ok: true; category: OfficialDocumentCategoryDTO } | { ok: false; message: string }> {
+  try {
+    const now = new Date().toISOString();
+    const body = withTenantId({
+      slug: payload.slug.trim().toLowerCase().replace(/\s+/g, '-'),
+      displayName: payload.displayName.trim(),
+      description: payload.description?.trim() ?? '',
+      sortOrder: payload.sortOrder ?? 0,
+      isActive: payload.isActive !== false,
+      createdAt: now,
+      updatedAt: now,
+    });
+    const url = `${getApiBaseUrl()}/api/official-document-categories`;
+    const res = await fetchWithJwtRetry(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      const t = await res.text().catch(() => '');
+      return { ok: false, message: t || `HTTP ${res.status}` };
+    }
+    const row = (await res.json()) as Record<string, unknown>;
+    return { ok: true, category: normalizeOfficialDocumentCategory(row) };
+  } catch (e) {
+    return { ok: false, message: e instanceof Error ? e.message : String(e) };
+  }
+}
+
+export async function patchOfficialDocumentCategoryServer(
+  categoryId: number,
+  updates: {
+    slug: string;
+    displayName: string;
+    description?: string;
+    sortOrder?: number;
+    isActive?: boolean;
+  }
+): Promise<{ ok: true; category: OfficialDocumentCategoryDTO } | { ok: false; message: string }> {
+  try {
+    const url = `${getApiBaseUrl()}/api/official-document-categories/${categoryId}`;
+    const finalPayload = withTenantId({
+      id: categoryId,
+      slug: updates.slug.trim().toLowerCase().replace(/\s+/g, '-'),
+      displayName: updates.displayName.trim(),
+      description: updates.description?.trim() ?? '',
+      sortOrder: updates.sortOrder ?? 0,
+      isActive: updates.isActive !== false,
+      updatedAt: new Date().toISOString(),
+    });
+    const res = await fetchWithJwtRetry(url, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/merge-patch+json' },
+      body: JSON.stringify(finalPayload),
+    });
+    if (!res.ok) {
+      const t = await res.text().catch(() => '');
+      return { ok: false, message: t || `HTTP ${res.status}` };
+    }
+    const row = (await res.json()) as Record<string, unknown>;
+    return { ok: true, category: normalizeOfficialDocumentCategory(row) };
+  } catch (e) {
+    return { ok: false, message: e instanceof Error ? e.message : String(e) };
+  }
+}
+
+export async function deleteOfficialDocumentCategoryServer(
+  categoryId: number
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  try {
+    const url = `${getApiBaseUrl()}/api/official-document-categories/${categoryId}?tenantId.equals=${encodeURIComponent(getTenantId())}`;
+    const res = await fetchWithJwtRetry(url, { method: 'DELETE', cache: 'no-store' });
+    if (!res.ok) {
+      const t = await res.text().catch(() => '');
+      return { ok: false, message: t || `HTTP ${res.status}` };
+    }
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, message: e instanceof Error ? e.message : String(e) };
+  }
+}

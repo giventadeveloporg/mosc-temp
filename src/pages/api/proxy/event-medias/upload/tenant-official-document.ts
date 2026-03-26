@@ -65,15 +65,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
       apiRes.body.pipe(res);
     } else {
+      // Read backend body so clients see JHipster/Spring detail (proxy used to drop it).
+      let backendPayload: unknown = null;
       try {
-        if (apiRes.body && typeof (apiRes.body as any).destroy === 'function') {
-          (apiRes.body as any).destroy();
-        } else if (apiRes.body && typeof (apiRes.body as any).cancel === 'function') {
-          (apiRes.body as any).cancel();
+        const raw = await apiRes.text();
+        if (raw) {
+          try {
+            backendPayload = JSON.parse(raw) as unknown;
+          } catch {
+            backendPayload = raw.length > 4000 ? `${raw.slice(0, 4000)}…` : raw;
+          }
         }
       } catch {
-        /* ignore */
+        backendPayload = null;
       }
+
       res.status(apiRes.status >= 400 ? apiRes.status : 500);
       res.setHeader('Content-Type', 'application/json');
       res.json({
@@ -81,6 +87,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         status: apiRes.status,
         message: `Upload operation failed with HTTP status ${apiRes.status}`,
         success: false,
+        backend: backendPayload,
       });
     }
   } catch (err) {

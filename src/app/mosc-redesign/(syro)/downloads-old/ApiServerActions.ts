@@ -20,7 +20,7 @@ export async function fetchPublicOfficialDocumentsForDownloadsServer(): Promise<
     const data = await res.json();
     return Array.isArray(data) ? data : [];
   } catch (e) {
-    globalThis.console.error('[downloads] fetchPublicOfficialDocumentsForDownloadsServer:', e);
+    globalThis.console.error('[downloads-old] fetchPublicOfficialDocumentsForDownloadsServer:', e);
     return [];
   }
 }
@@ -135,7 +135,7 @@ export async function fetchPublicOfficialDocumentsTreeServer(input?: {
       categoryOptions,
     };
   } catch (e) {
-    globalThis.console.error('[downloads] fetchPublicOfficialDocumentsTreeServer:', e);
+    globalThis.console.error('[downloads-old] fetchPublicOfficialDocumentsTreeServer:', e);
     return { content: [], totalElements: 0, totalPages: 0, page, size, categoryOptions: [] };
   }
 }

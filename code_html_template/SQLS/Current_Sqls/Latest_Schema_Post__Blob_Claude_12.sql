@@ -1690,6 +1690,9 @@ CREATE TABLE public.event_media (
                                     is_event_management_official_document bool DEFAULT false NULL,
                                     official_document_category_id bigint NULL,
                                     official_document_year integer NULL,
+                                    hierarchy_path text NULL,
+                                    hierarchy_category_label text NULL,
+                                    display_priority int4 NULL,
                                     pre_signed_url varchar(2048) NULL,
                                     pre_signed_url_expires_at timestamp NULL,
                                     alt_text varchar(500) NULL,
@@ -1752,6 +1755,12 @@ COMMENT ON COLUMN public.event_media.event_focus_group_id IS 'Optional link to e
 COMMENT ON COLUMN public.event_media.official_document_category_id IS 'When is_event_management_official_document is true, links to official_document_category; category.slug is used in S3 path media/{tenant_id}/official_document/{slug}/{year}/.';
 
 COMMENT ON COLUMN public.event_media.official_document_year IS 'Calendar year segment for official-document S3 path (e.g. 2025, 2026). Required for new uploads when official document + category are set; may be NULL for legacy rows.';
+
+COMMENT ON COLUMN public.event_media.hierarchy_path IS 'Canonical hierarchy path used for official-document tree rendering (example: Kalpana 2023\Kalpana 110 Commission\Kalpana-Commission-1.pdf).';
+
+COMMENT ON COLUMN public.event_media.hierarchy_category_label IS 'Top-level human-readable category label inferred from mirrored legacy folders.';
+
+COMMENT ON COLUMN public.event_media.display_priority IS 'Dedicated display priority for official documents. Lower values appear first in paginated downloads listing.';
 
 COMMENT ON COLUMN public.event_media.home_page_hero_display_duration_seconds IS 'Duration in seconds to display this image in the homepage hero slider when is_home_page_hero_image is true. Stored as total seconds (e.g. 50, 80 for 1m20s). NULL = use app default (8 seconds). Valid range: 1–600.';
 
@@ -3505,6 +3514,7 @@ CREATE INDEX IF NOT EXISTS idx_event_media_album_public ON public.event_media(al
 
 -- Official document library: filter by tenant, category slug (FK), and year for S3 path media/{tenant}/official_document/{slug}/{year}/
 CREATE INDEX IF NOT EXISTS idx_event_media_official_doc_tenant_category_year ON public.event_media(tenant_id, official_document_category_id, official_document_year) WHERE is_event_management_official_document = true AND official_document_category_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_event_media_official_doc_tree_listing ON public.event_media(tenant_id, official_document_category_id, official_document_year, display_priority, priority_ranking, created_at) WHERE is_event_management_official_document = true AND is_public = true;
 
 -- Index for event_sponsors_join custom_poster_url
 CREATE INDEX IF NOT EXISTS idx_event_sponsors_join_custom_poster ON public.event_sponsors_join(custom_poster_url) WHERE custom_poster_url IS NOT NULL;

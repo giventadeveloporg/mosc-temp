@@ -231,6 +231,20 @@ export interface EventMediaDTO {
    */
   priorityRanking?: number;
   /**
+   * Canonical hierarchy path for official document tree rendering.
+   * Example: "Kalpana 2023\\Kalpana 110 Commission\\Kalpana-Commission-1.pdf"
+   */
+  hierarchyPath?: string | null;
+  /**
+   * Human-friendly top-level category label derived from the legacy folder hierarchy.
+   */
+  hierarchyCategoryLabel?: string | null;
+  /**
+   * Dedicated display priority for official documents.
+   * Lower values indicate higher priority (shown first in paginated list).
+   */
+  displayPriority?: number | null;
+  /**
    * Reference to gallery album. Mutually exclusive with eventId (media belongs to either an event OR an album, not both).
    */
   albumId?: number;
