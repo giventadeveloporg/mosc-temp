@@ -21,7 +21,7 @@ export const MOSC_REDESIGN_NAV_LINKS = [
   { label: "Holy Synod", href: "/mosc-redesign/holy-synod" },
   { label: "Ecumenical", href: "/mosc-redesign/ecumenical" },
   { label: "Dioceses", href: "/mosc-redesign/dioceses" },
-  { label: "News", href: "/mosc-redesign/news" },
+  // { label: "News", href: "/mosc-redesign/news" }, // temporarily hidden — 7th direct <a> under nav (Administration is in a wrapper div)
   { label: "Directory", href: "/mosc-redesign/directory" },
   { label: "Saints", href: "/mosc-redesign/saints" },
 ] as const;
