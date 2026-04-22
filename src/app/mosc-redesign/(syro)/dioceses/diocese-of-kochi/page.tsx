@@ -54,15 +54,38 @@ const dioceseofkochiPage = () => {
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       In 1958,when the Supreme Court verdict came,H.G.Paulose mar Severios was appointed as the Metropolitan of Kochi Diocese. The Present head quarters of the Kochi Diocese, The Zion Seminary was buit by H.G.Paulose mar Severios Metropolitan.
                     </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Address: Â zion Seminary, Koratty East P.O, Chirangara, Chalakudy- 680308.
-                    </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Ph: Â 0480-2732023, 2734818
-                    </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Email: sionseminary@gmail.com
-                    </p>
+                  <div className="mt-8 flex max-w-xl overflow-hidden rounded-lg border border-syro-table-border bg-syro-bg-gray shadow-syro-card">
+                    <div className="w-[7px] flex-shrink-0 bg-syro-red" aria-hidden="true" />
+                    <div className="flex-1 p-5 font-syro-primary text-syro-dark-gray leading-relaxed space-y-2 text-sm">
+                      <p className="mb-1">
+                        <span className="font-semibold">Office:</span>
+                        <br />
+                        Zion Seminary, Koratty East P.O.,
+                        <br />
+                        Chirangara, Chalakkudy - 680 308.
+                      </p>
+                      <p>
+                        <span className="font-semibold">Phone:</span> 0480 2732023, 2734818
+                      </p>
+                      <p>
+                        <span className="font-semibold">E-mail:</span>{' '}
+                        <a href="mailto:sionseminary@gmail.com" className="text-syro-red hover:underline font-medium">sionseminary@gmail.com</a>
+                      </p>
+                      <p>
+                        <a
+                          href="https://share.google/GnDQBIcWk9bFEKJ0p"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="syro-primary-button inline-flex items-center gap-2 w-fit"
+                        >
+                          <span>View on Map</span>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                          </svg>
+                        </a>
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
               {/* Quick Links - below content (desktop, same as administration) */}

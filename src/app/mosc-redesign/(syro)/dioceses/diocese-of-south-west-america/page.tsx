@@ -63,15 +63,38 @@ const dioceseofsouthwestamericaPage = () => {
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       In accordance with Section 3(c) Article 65 of the Constitution, matters concerning faith, order and discipline shall, subject to the decisions of the Holy Episcopal Synod, be under the control of the Diocesan Metropolitan.
                     </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Mailing Address:
-3101 Hopkins Rd Beasley, TX 77417, USA
-E-mail:Â dswadiocesanoffice@gmail.com
-Phone: 281.403.0670 Fax: 281.459.0814
-                    </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Website:Â www.ds-wa.org
-                    </p>
+                  <div className="mt-8 flex max-w-xl overflow-hidden rounded-lg border border-syro-table-border bg-syro-bg-gray shadow-syro-card">
+                    <div className="w-[7px] flex-shrink-0 bg-syro-red" aria-hidden="true" />
+                    <div className="flex-1 p-5 font-syro-primary text-syro-dark-gray leading-relaxed space-y-2 text-sm">
+                      <p className="mb-1">
+                        <span className="font-semibold">Office:</span>
+                        <br />
+                        3101 Hopkins Road,
+                        <br />
+                        Beasley, Texas 77417, USA.
+                      </p>
+                      <p>
+                        <span className="font-semibold">Ph:</span> 281 403 0670
+                      </p>
+                      <p>
+                        <span className="font-semibold">E-mail:</span>{' '}
+                        <a href="mailto:dswadiocesanoffice@gmail.com" className="text-syro-red hover:underline font-medium">dswadiocesanoffice@gmail.com</a>
+                      </p>
+                      <p>
+                        <a
+                          href="https://maps.app.goo.gl/c6aZTNHg5kXHX3dm9"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="syro-primary-button inline-flex items-center gap-2 w-fit"
+                        >
+                          <span>View on Map</span>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                          </svg>
+                        </a>
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
               {/* Quick Links - below content (desktop, same as administration) */}

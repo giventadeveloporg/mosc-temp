@@ -65,17 +65,40 @@ After 1970, the Malankara Orthodox Church gradually began to take root in many o
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       Today, the Northeast American Diocese can boast of more than fifty parishes, with more than forty priests, 14 deacons and seminarians. The hard work and prayers of all our Hierarchs, Priests, and laity have led to the Diocese's strong foundation, and have provided for us a secure future and outlook for the next generation of Indian Orthodox Christians in the Northeast American Diocese.
                     </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Mailing Address:
-Indian Orthodox Church Centre,Â 2158 route 106, mutton Town, New York-11791
-                    </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Ph: Â 2153421500
-                    </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Email: Â neamdio@neamericandiocese.org , northeastamericandiocese@gmail.com
-Web: www.neamericandiocese.org
-                    </p>
+                  <div className="mt-8 flex max-w-xl overflow-hidden rounded-lg border border-syro-table-border bg-syro-bg-gray shadow-syro-card">
+                    <div className="w-[7px] flex-shrink-0 bg-syro-red" aria-hidden="true" />
+                    <div className="flex-1 p-5 font-syro-primary text-syro-dark-gray leading-relaxed space-y-2 text-sm">
+                      <p className="mb-1">
+                        <span className="font-semibold">Office:</span>
+                        <br />
+                        Indian Orthodox Church Centre,
+                        <br />
+                        2158 Route 106, Mutton Town,
+                        <br />
+                        N.Y. 11791.
+                      </p>
+                      <p>
+                        <span className="font-semibold">Ph:</span> 00911-215 3421500
+                      </p>
+                      <p>
+                        <span className="font-semibold">E-mail:</span>{' '}
+                        <a href="mailto:northeastamericandiocese@gmail.com" className="text-syro-red hover:underline font-medium">northeastamericandiocese@gmail.com</a>
+                      </p>
+                      <p>
+                        <a
+                          href="https://maps.app.goo.gl/wPqgNc6t9rxR4snz6"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="syro-primary-button inline-flex items-center gap-2 w-fit"
+                        >
+                          <span>View on Map</span>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                          </svg>
+                        </a>
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
               {/* Quick Links - below content (desktop, same as administration) */}

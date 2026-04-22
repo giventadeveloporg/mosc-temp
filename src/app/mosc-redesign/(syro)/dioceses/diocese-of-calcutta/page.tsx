@@ -51,18 +51,40 @@ As a result of the re-organisation of the outside Kerala dioceses, when the Calc
 Re-Organisation in 2009
 In2009 it was decided to further reorganize the outside Kerala Dioceses into Nine. The newly formed dioceses were Bangalore , Ahmedabad, Brahmavar and North East America and South west America, UK- Europe & Africa . The parishes and Institutions in the Malwa region of Madhya Pradesh and the Parishes in Muscat , Sohar and Salala in the Gulf Region were taken away from Calcutta Diocese and added to the newly formed Ahmedabad Diocese.
                     </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      St.Thomas Asram, Kailash Nagar, Near Industrial Estate, Bhilai, Durg Dist.Chattisgarh-490001
-                    </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Phone No: 0788-2285309
-                    </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      E-mail : calcuttadiocese@gmail.com
-                    </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Website : www.calcuttadiocese.org
-                    </p>
+                  <div className="mt-8 flex max-w-xl overflow-hidden rounded-lg border border-syro-table-border bg-syro-bg-gray shadow-syro-card">
+                    <div className="w-[7px] flex-shrink-0 bg-syro-red" aria-hidden="true" />
+                    <div className="flex-1 p-5 font-syro-primary text-syro-dark-gray leading-relaxed space-y-2 text-sm">
+                      <p className="mb-1">
+                        <span className="font-semibold">Office:</span>
+                        <br />
+                        St. Thomas Asram, Kailash Nagar,
+                        <br />
+                        Bhilai, Durg Dist.,
+                        <br />
+                        Chattisgarh - 490 001.
+                      </p>
+                      <p>
+                        <span className="font-semibold">Phone:</span> 0788 2285309
+                      </p>
+                      <p>
+                        <span className="font-semibold">E-mail:</span>{' '}
+                        <a href="mailto:calcuttadiocese@gmail.com" className="text-syro-red hover:underline font-medium">calcuttadiocese@gmail.com</a>
+                      </p>
+                      <p>
+                        <a
+                          href="https://maps.app.goo.gl/pLLWnGkMGxzwXpey9"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="syro-primary-button inline-flex items-center gap-2 w-fit"
+                        >
+                          <span>View on Map</span>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                          </svg>
+                        </a>
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
               {/* Quick Links - below content (desktop, same as administration) */}
