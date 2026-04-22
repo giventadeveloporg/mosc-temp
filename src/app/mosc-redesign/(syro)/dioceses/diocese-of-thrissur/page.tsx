@@ -42,12 +42,34 @@ const dioceseofthrissurPage = () => {
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       The diocese was formed in 1982 with parishes in Thrissur and Palakkad districts. At the time of the formation of the diocese there were 32 parishes and 26 priests.The first metropolitan with independent charge of the diocese assumed the office on 26 December 1990. The present diocesan headquarters was completed in 1995. The consecration of the headquarters was done on July 20, 1995.The headquarters of the diocese is at Mannuthy.The Diocese leads to new vision under the spiritualÂ  leadership of H.G. Yuhanon Mar Meletius Metropolitan
                     </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Address: Gedseemon Orthodox Bishop's House, Mannuthy, Thrissur, Kerala, INDIA. 680651.
-                    </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Ph: Â 0487-2371039, 2371748
-                    </p>
+                  <div className="mt-8 flex max-w-xl overflow-hidden rounded-lg border border-syro-table-border bg-syro-bg-gray shadow-syro-card">
+                    <div className="w-[7px] flex-shrink-0 bg-syro-red" aria-hidden="true" />
+                    <div className="flex-1 p-5 font-syro-primary text-syro-dark-gray leading-relaxed space-y-2 text-sm">
+                      <p className="mb-1">
+                        <span className="font-semibold">Office:</span>
+                        <br />
+                        Gedseemon Seminary, Mannuthy,
+                        <br />
+                        Trissur 680 651.
+                      </p>
+                      <p>
+                        <span className="font-semibold">Phone:</span> 0487 2371039, 2371748
+                      </p>
+                      <p>
+                        <a
+                          href="https://maps.app.goo.gl/6iG8eUaocYz7Da2W8"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="syro-primary-button inline-flex items-center gap-2 w-fit"
+                        >
+                          <span>View on Map</span>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                          </svg>
+                        </a>
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
               {/* Quick Links - below content (desktop, same as administration) */}

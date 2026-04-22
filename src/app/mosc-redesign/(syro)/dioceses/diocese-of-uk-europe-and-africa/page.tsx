@@ -46,22 +46,44 @@ const dioceseofukeuropeandafricaPage = () => {
                       Diocese of UK Europe and Africa
 To cater the spiritual needs of the community, the Holy Episcopal Synod and Managing Committee of the church had recommended forming a Diocese for the geographical region of UK, Rest of Europe and African Continent. In May 2009, Cathlolicos and Malankara Metropoltan- Supreme head of the Church declared the new diocese â€“ Diocese of UK Europe and Africa and appointed Dr.Mathews Mar Thimothios as the Diocesan Metropolitan.
 Though vast majority of the members of the diocese is residing in the UK, by considering the geographical span of the diocese, for better functioning the Diocese has been divided into three regions, UK, Rest of Europe and Africa.
-The UK region of the diocese has got its Diocesan centre and office at St.Gregorios Indian Orthodox Church, Canfields Road , Brockley, London SE4 1UF. Now there are 957 families' comprise of approximately 3775 individuals lives in the UK, registered as members of the Diocese. Now we have twenty one (21) registered parishes/ congregations in various places of the UK where regular worships are being taken place. Most of the parishes and congregations are registered with UK charity Commission. For details been shown Table 1 below
+The UK region of the diocese has got its Diocesan centre and office at St.Gregorios Indian Orthodox Church, Cranfield Road, Brockley, London SE4 1UF. Now there are 957 families' comprise of approximately 3775 individuals lives in the UK, registered as members of the Diocese. Now we have twenty one (21) registered parishes/ congregations in various places of the UK where regular worships are being taken place. Most of the parishes and congregations are registered with UK charity Commission. For details been shown Table 1 below
 Diocesan Metropolitan (Bishop) is the head of the organisation. A high level Diocesan Council elected by the Diocesan general body is the policy making body. Diocesan General Body members are representatives of each parish elected by the Parish General Body.
 There are number of social organisations working under the Diocese as shown on the organisation chart below.
                     </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Address :
-                    </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      St.Gregorios Indian Orthodox Church, Canfields Road , Brockley, London SE4 1UF
-                    </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Mob: (India) 9447718511, (UK) 00447541814466
-                    </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Email: abrahamstephanos@mosc.in
-                    </p>
+                  <div className="mt-8 flex max-w-xl overflow-hidden rounded-lg border border-syro-table-border bg-syro-bg-gray shadow-syro-card">
+                    <div className="w-[7px] flex-shrink-0 bg-syro-red" aria-hidden="true" />
+                    <div className="flex-1 p-5 font-syro-primary text-syro-dark-gray leading-relaxed space-y-2 text-sm">
+                      <p className="mb-1">
+                        <span className="font-semibold">Office (U.K.):</span>
+                        <br />
+                        St. Gregorios Indian Orthodox Church,
+                        <br />
+                        Cranfield Road, Brockley,
+                        <br />
+                        London, SE4 1UF.
+                      </p>
+                      <p>
+                        <span className="font-semibold">Ph:</span> (44) 020-86919456
+                      </p>
+                      <p>
+                        <span className="font-semibold">E-mail:</span>{' '}
+                        <a href="mailto:office@indianorthodoxuk.org" className="text-syro-red hover:underline font-medium">office@indianorthodoxuk.org</a>
+                      </p>
+                      <p>
+                        <a
+                          href="https://maps.app.goo.gl/GNTRTuXaHQ2xU6bU6"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="syro-primary-button inline-flex items-center gap-2 w-fit"
+                        >
+                          <span>View on Map</span>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                          </svg>
+                        </a>
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
               {/* Quick Links - below content (desktop, same as administration) */}

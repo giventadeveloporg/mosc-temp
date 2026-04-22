@@ -90,16 +90,38 @@ const dioceseofbrahamavarPage = () => {
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       The Priests, faithful People, Diocesan General Assembly, Brahmavar Diocese Development Commitees, including one in Abu Dhabi, Malankara Association Managing Committee members, Diocesan Council Members and Many well wishers and friends are praying and helping for the development of this Diocese. We remember with prayer and thanks all of them. The Diocese is ever thankful to God ,and grateful to all the members of the Holy Church, to His Holiness Bava Thirumeni and to all the members of the Holy Episcopal Synod. We prayerfully remember all Our departed Metropolitans and priests who had served all the parishes in this Diocese. We beseech the prayers and intercessions of Holy and Blessed Virgin Mary, The Theotokos, St. Thomas, St. Gregorios of Parumala, St. Dionysius, St. Yeldho Mar Baselios and all other saints and the late Blessed Arch Bishop St. Alvares Mar Julius I.
                     </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Contact Address:Â Office : Mount Horeb Bishop's House,
-Balikashram Road,Â Kankanady,
-Mangalore - 575 002
-Karnataka, India
-Ph: 0824 2210018 & 09483530018
-                    </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Website:http://www.moscdob.com/index.php
-                    </p>
+                  <div className="mt-8 flex max-w-xl overflow-hidden rounded-lg border border-syro-table-border bg-syro-bg-gray shadow-syro-card">
+                    <div className="w-[7px] flex-shrink-0 bg-syro-red" aria-hidden="true" />
+                    <div className="flex-1 p-5 font-syro-primary text-syro-dark-gray leading-relaxed space-y-2 text-sm">
+                      <p className="mb-1">
+                        <span className="font-semibold">Office:</span>
+                        <br />
+                        Mount Horeb, Bishop&apos;s House,
+                        <br />
+                        Balikashrama Road,
+                        <br />
+                        Kankanady Mangalore-575002,
+                        <br />
+                        Karnataka.
+                      </p>
+                      <p>
+                        <span className="font-semibold">Ph:</span> 08242210018
+                      </p>
+                      <p>
+                        <a
+                          href="https://maps.app.goo.gl/XEWmiu6UjQABTXGi6"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="syro-primary-button inline-flex items-center gap-2 w-fit"
+                        >
+                          <span>View on Map</span>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                          </svg>
+                        </a>
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
               {/* Quick Links - below content (desktop, same as administration) */}

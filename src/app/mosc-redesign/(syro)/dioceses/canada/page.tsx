@@ -36,27 +36,30 @@ const CanadaPage = () => {
                     CANADA
                   </h2>
 
-                  <div className="font-syro-primary text-syro-dark-gray leading-relaxed space-y-4">
-                    <p className="mb-2">
-                      <span className="font-semibold">Office:</span>
-                      <br />
-                      Unit -33 900 Limeridge Rd E Hamilton,
-                      <br />
-                      ON L8W 1N9, Canada
-                    </p>
-                    <p className="mb-6">
-                      <a
-                        href="https://maps.app.goo.gl/dck3gHtDJXAjJ1Mz9"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="syro-primary-button inline-flex items-center gap-2"
-                      >
-                        <span>View on Map</span>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                        </svg>
-                      </a>
-                    </p>
+                  <div className="mt-8 flex max-w-xl overflow-hidden rounded-lg border border-syro-table-border bg-syro-bg-gray shadow-syro-card">
+                    <div className="w-[7px] flex-shrink-0 bg-syro-red" aria-hidden="true" />
+                    <div className="flex-1 p-5 font-syro-primary text-syro-dark-gray leading-relaxed space-y-2 text-sm">
+                      <p className="mb-1">
+                        <span className="font-semibold">Office:</span>
+                        <br />
+                        Unit -33 900 Limeridge Rd E Hamilton,
+                        <br />
+                        ON L8W 1N9, Canada
+                      </p>
+                      <p>
+                        <a
+                          href="https://maps.app.goo.gl/dck3gHtDJXAjJ1Mz9"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="syro-primary-button inline-flex items-center gap-2 w-fit"
+                        >
+                          <span>View on Map</span>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                          </svg>
+                        </a>
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>

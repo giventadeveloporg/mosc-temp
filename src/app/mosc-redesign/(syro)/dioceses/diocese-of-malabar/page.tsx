@@ -42,6 +42,40 @@ const dioceseofmalabarPage = () => {
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       The Malabar Diocese, which has extended in the western districts of Kerala, was formed in 1953. H.G. Paulose Mar Severios and H.G. Pathrose Mar Osthathios (1953â€“68) have executed its administration at different times. Since 11 November 1966, H.G.Thomas Mar Timotheos became the diocesan Metropolitan (H.H.Baselius Didymus I, Catholicose of the East.) Mount Hermon Aramana in Kozhikode is the diocesan headquarters. The Aramana is situated 100 meters away from the Kattamgal junction on the Kozhikode- Mukkam route near the NIT, Kozhikode.
                     </p>
+                  <div className="mt-8 flex max-w-xl overflow-hidden rounded-lg border border-syro-table-border bg-syro-bg-gray shadow-syro-card">
+                    <div className="w-[7px] flex-shrink-0 bg-syro-red" aria-hidden="true" />
+                    <div className="flex-1 p-5 font-syro-primary text-syro-dark-gray leading-relaxed space-y-2 text-sm">
+                      <p className="mb-1">
+                        <span className="font-semibold">Office:</span>
+                        <br />
+                        Mount Hermon Aramana,
+                        <br />
+                        Chathamangalam, N.I.T. Campus P.O.,
+                        <br />
+                        Kozhikode - 673 601.
+                      </p>
+                      <p>
+                        <span className="font-semibold">Phone:</span> 0495 2287278, 2288278
+                      </p>
+                      <p>
+                        <span className="font-semibold">E-mail:</span>{' '}
+                        <a href="mailto:mounthermonaramana@gmail.com" className="text-syro-red hover:underline font-medium">mounthermonaramana@gmail.com</a>
+                      </p>
+                      <p>
+                        <a
+                          href="https://maps.app.goo.gl/R5J8HtiuaMAch42A8"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="syro-primary-button inline-flex items-center gap-2 w-fit"
+                        >
+                          <span>View on Map</span>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                          </svg>
+                        </a>
+                      </p>
+                    </div>
+                  </div>
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       Key Projects and Institutions
                     </p>

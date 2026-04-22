@@ -25,12 +25,6 @@ interface Region {
 // ─── Data ────────────────────────────────────────────────────────────────────
 const saints: Saint[] = [
 {
-  name: "St. Mary Mother of God",
-  href: "/mosc-redesign/saints/st-mary-mother-of-god",
-  image: "https://www.mosc-temp.com/mosc/assets/images/mosc_images/St_Mother_Mary.jpg",
-  alt: "Icon of St. Mary, Mother of God, in traditional Orthodox style"
-},
-{
   name: "St. Basilios Yeldho",
   href: "/mosc-redesign/saints/st-baselios-yeldho-kothamangalam-bava",
   image: "/images/saints/st-baselios-yeldho-kothamangalam-bava.jpg",
@@ -48,6 +42,12 @@ const saints: Saint[] = [
   href: "/mosc-redesign/saints/st-gregorios-of-parumala-metropolitan-geevarghese-mar-gregorios",
   image: "https://www.mosc-temp.com/mosc/assets/images/mosc_images/St_Gregorios_Parumala.jpg",
   alt: "Portrait of St. Gregorios of Parumala Metropolitan in episcopal robes"
+},
+{
+  name: "St. Mary Mother of God",
+  href: "/mosc-redesign/saints/st-mary-mother-of-god",
+  image: "https://www.mosc-temp.com/mosc/assets/images/mosc_images/St_Mother_Mary.jpg",
+  alt: "Icon of St. Mary, Mother of God, in traditional Orthodox style"
 }];
 
 
@@ -76,8 +76,8 @@ const slides = [
   alt: "His Holiness Baselios Marthoma Mathews III meeting with Pope Francis at the Vatican"
 },
 {
-  image: "https://www.mosc-temp.com/mosc/assets/images/mosc_images/Malankara_Orthodox_Palace_Slider_New.jpeg",
-  alt: "Malankara Orthodox Palace, the headquarters of the Malankara Orthodox Syrian Church in Devalokam, Kottayam"
+  image: "/mosc/assets/images/mosc_images/Banner-image-of-Aramana-Slider.jpg",
+  alt: "Banner image of Aramana, Malankara Orthodox Syrian Church"
 }];
 
 
@@ -169,15 +169,20 @@ export default function HomePage() {
         </div>
         )}
 
-        {/* Pagination dots */}
-        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-10 flex gap-2">
-          {slides.map((_, i) =>
-          <button
-            key={i}
-            onClick={() => setCurrentSlide(i)}
-            className={`rounded-full transition-all duration-300 ${i === currentSlide ? "w-8 h-2.5 bg-warmGold" : "w-2.5 h-2.5 bg-white/40 hover:bg-white/70"}`}
-            aria-label={`Go to slide ${i + 1}`} />
-          )}
+        {/* Slider controls: bottom-center previous/next + themed pagination dots */}
+        <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 z-10 flex flex-col-reverse">
+          <div className="flex items-center rounded-full px-3 py-2">
+            <div className="flex items-center gap-2">
+              {slides.map((_, i) =>
+              <button
+                key={i}
+                type="button"
+                onClick={() => setCurrentSlide(i)}
+                className={`rounded-full transition-all duration-300 ${i === currentSlide ? "w-8 h-2.5 bg-burgundy" : "w-2.5 h-2.5 bg-burgundy/35 hover:bg-burgundy/65"}`}
+                aria-label={`Go to slide ${i + 1}`} />
+              )}
+            </div>
+          </div>
         </div>
       </section>
 

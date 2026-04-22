@@ -48,13 +48,37 @@ const dioceseofdelhiPage = () => {
                   <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
                       In 1975, the Delhi Diocese was constituted by the Holy Synod, along with the four other new dioceses of Madras, Bombay, Calcutta and America. The next year, Paulose Mar Gregorios took charge as the Metropolitan of Delhi. By 1985, the Diocesan headquarters moved to its own building, the Delhi Orthodox Centre in Tughlaqabad in South Delhi. An architecturally distinctive three-storey building, the centre was dedicated by Catholicos Baselios Mar Thoma Mathews I and inaugurated by the Vice-President of India, R Venkataraman, in November 1984. With the St. Thomas Chapel in the middle, the centre is the residence of the Metropolitan and houses, besides the secretariat of the Diocesan Council, a library, a publication unit, the People's Education Society, Sophia Society, Sarva Dharma Nilaya, Dhyan Mandir and Niti Santi Kendra, engaged in a variety of complementary activities. In 1991, the Diocese was strengthened by the arrival of Job Mar Philoxenos as the Assistant Metropolitan.1996 Paulose Mar Gregorios Metropolitan enters the heavenly Abode.2002 Job Mar Philoxenos is consecrated as the Metropoliton of Delhi Diocese on 26 December 2002.2011 Job Mar Philoxenos Metropolitan enters the heavenly Abode on 20 November 2011.2012 Youhanon Mar Demetrios is consecrated as new Metropolitan of the Delhi Diocese on 7 October 2012.
                     </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      Address:Â  Delhi Orthodox Centre 2, Institutional Area Tughlakabad, New Delhi 110062
-Phone : 011-29956417 / 29962799
-                    </p>
-                  <p className="font-syro-primary text-syro-dark-gray leading-relaxed mb-6">
-                      E mail: delhiorthodoxdiocese@gmail.com
-                    </p>
+                  <div className="mt-8 flex max-w-xl overflow-hidden rounded-lg border border-syro-table-border bg-syro-bg-gray shadow-syro-card">
+                    <div className="w-[7px] flex-shrink-0 bg-syro-red" aria-hidden="true" />
+                    <div className="flex-1 p-5 font-syro-primary text-syro-dark-gray leading-relaxed space-y-2 text-sm">
+                      <p className="mb-1">
+                        <span className="font-semibold">Office:</span>
+                        <br />
+                        Delhi Orthodox Church Centre,
+                        <br />
+                        2, Industrial Area,
+                        <br />
+                        Thughlakabad, New Delhi 110062.
+                      </p>
+                      <p>
+                        <span className="font-semibold">E-mail:</span>{' '}
+                        <a href="mailto:delhiorthodoxdiocese@gmail.com" className="text-syro-red hover:underline font-medium">delhiorthodoxdiocese@gmail.com</a>
+                      </p>
+                      <p>
+                        <a
+                          href="https://maps.app.goo.gl/ALM823MeZEns8yXN8"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="syro-primary-button inline-flex items-center gap-2 w-fit"
+                        >
+                          <span>View on Map</span>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                          </svg>
+                        </a>
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
               {/* Quick Links - below content (desktop, same as administration) */}
