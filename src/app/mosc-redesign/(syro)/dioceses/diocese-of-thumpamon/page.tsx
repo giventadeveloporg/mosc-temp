@@ -73,7 +73,7 @@ const dioceseofthumpamonPage = () => {
                       </p>
                       <p>
                         <a
-                          href="https://share.google/w4OqeqADOtP5RRwdL"
+                          href="https://maps.app.goo.gl/EDmq7ECerDfbRngh9"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="syro-primary-button inline-flex items-center gap-2 w-fit"

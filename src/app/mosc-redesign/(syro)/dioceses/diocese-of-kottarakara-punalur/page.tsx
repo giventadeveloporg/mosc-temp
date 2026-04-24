@@ -62,7 +62,7 @@ const dioceseofkottarakarapunalurPage = () => {
                       </p>
                       <p>
                         <a
-                          href="https://share.google/xVfBYcCfzWpngjd6k"
+                          href="https://maps.app.goo.gl/HRBRymSqbc6RDUgb8"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="syro-primary-button inline-flex items-center gap-2 w-fit"

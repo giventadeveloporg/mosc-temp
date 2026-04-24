@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { createPortal } from 'react-dom';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { MOSC_REDESIGN_NAV_LINKS, MOSC_REDESIGN_QUICK_LINKS } from './navConfig';
 import { ADMINISTRATION_PAGE_CARDS } from './administrationCards';
 
@@ -31,10 +31,13 @@ type AdminMenuPos = { top: number; left: number };
 export default function MoscRedesignHeader() {
   const pathname = normalizePath(usePathname());
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  /** Top edge (px) of fixed mobile menu panel — bottom of logo row; measured so menu scroll is independent of body. */
+  const [mobileMenuTopPx, setMobileMenuTopPx] = useState(0);
 
   const adminNavActive = isTopNavActive(pathname, ADMINISTRATION_BASE_HREF);
 
   const adminTriggerRef = useRef<HTMLDivElement>(null);
+  const mobileHeaderChromeRef = useRef<HTMLDivElement>(null);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [mounted, setMounted] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
@@ -104,6 +107,47 @@ export default function MoscRedesignHeader() {
     setAdminMenu(null);
   }, [pathname]);
 
+  useLayoutEffect(() => {
+    if (!mobileMenuOpen) return undefined;
+    const measure = () => {
+      const el = mobileHeaderChromeRef.current;
+      setMobileMenuTopPx(el ? Math.ceil(el.getBoundingClientRect().bottom) : 64);
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    const vv = window.visualViewport;
+    vv?.addEventListener('resize', measure);
+    vv?.addEventListener('scroll', measure);
+    return () => {
+      window.removeEventListener('resize', measure);
+      vv?.removeEventListener('resize', measure);
+      vv?.removeEventListener('scroll', measure);
+    };
+  }, [mobileMenuOpen]);
+
+  /** Lock document scroll while mobile nav is open so the menu panel can scroll independently. */
+  useEffect(() => {
+    if (!mobileMenuOpen || isDesktop) return undefined;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [mobileMenuOpen, isDesktop]);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return undefined;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileMenuOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [mobileMenuOpen]);
+
+  useEffect(() => {
+    if (isDesktop && mobileMenuOpen) setMobileMenuOpen(false);
+  }, [isDesktop, mobileMenuOpen]);
+
   const adminMenuOpen = !!adminMenu?.open;
   const adminHoverOrOpen = adminNavActive || adminMenuOpen;
 
@@ -134,7 +178,7 @@ export default function MoscRedesignHeader() {
   return (
     <header className="sticky top-0 z-[1000] w-full shrink-0 overflow-visible shadow-md border-b-2 border-burgundy/40">
       {/* Row 1: Logo + hamburger (mobile); part of one sticky block with nav + quick links (desktop) */}
-      <div className="bg-parchment-deep border-b border-burgundy/20">
+      <div ref={mobileHeaderChromeRef} className="bg-parchment-deep border-b border-burgundy/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2">
           <div className="flex min-w-0 items-center justify-between gap-2 sm:gap-4">
             <Link
@@ -189,7 +233,7 @@ export default function MoscRedesignHeader() {
                     href={link.href}
                     aria-current={adminNavActive ? 'page' : undefined}
                     aria-expanded={adminMenuOpen}
-                    className={`relative font-medium text-[11px] px-3 py-2 transition-all duration-200 whitespace-nowrap flex items-center gap-0.5 overflow-visible no-underline visited:no-underline ${
+                    className={`relative font-medium text-[13px] px-3 py-[7px] transition-all duration-200 whitespace-nowrap flex items-center gap-0.5 overflow-visible no-underline visited:no-underline ${
                       adminHoverOrOpen
                         ? 'text-warmGold visited:text-warmGold'
                         : 'text-white/95 visited:text-white/95 hover:text-warmGold'
@@ -220,7 +264,7 @@ export default function MoscRedesignHeader() {
                       key={link.label}
                       href={link.href}
                       aria-current={navActive ? 'page' : undefined}
-                      className={`relative font-medium text-[11px] px-3 py-2 transition-all duration-200 whitespace-nowrap group overflow-hidden no-underline visited:no-underline ${
+                      className={`relative font-medium text-[13px] px-3 py-[7px] transition-all duration-200 whitespace-nowrap group overflow-hidden no-underline visited:no-underline ${
                         navActive
                           ? 'text-warmGold visited:text-warmGold'
                           : 'text-white/95 visited:text-white/95 hover:text-warmGold'
@@ -259,8 +303,15 @@ export default function MoscRedesignHeader() {
         )}
 
       {mobileMenuOpen && (
-        <div className="relative z-30 lg:hidden bg-parchment-deep border-t border-burgundy/20 py-2">
-          <div className="max-w-7xl mx-auto px-4">
+        <div
+          className="fixed inset-x-0 bottom-0 z-[1001] flex min-h-0 flex-col border-t border-burgundy/20 bg-parchment-deep shadow-[0_8px_32px_rgba(61,13,13,0.12)] lg:hidden"
+          style={{ top: mobileMenuTopPx || 64 }}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Site navigation"
+        >
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain touch-pan-y py-2">
+            <div className="max-w-7xl mx-auto px-4">
             {MOSC_REDESIGN_NAV_LINKS.map((link) =>
               link.label === ADMINISTRATION_NAV_LABEL ? (
                 <div key={link.label} className="py-1 border-b border-burgundy/10 last:border-b-0">
@@ -343,6 +394,7 @@ export default function MoscRedesignHeader() {
                 })}
               </div>
             </div>
+            </div>
           </div>
         </div>
       )}
@@ -355,7 +407,7 @@ export default function MoscRedesignHeader() {
               <Link
                 key={ql.label}
                 href={ql.href}
-                className="relative text-parchment-light visited:text-parchment-light font-semibold text-[10px] px-3 py-2 whitespace-nowrap border-r border-white/10 last:border-r-0 group overflow-hidden transition-colors duration-200 hover:text-warmGold no-underline visited:no-underline"
+                className="relative text-parchment-light visited:text-parchment-light font-semibold text-[12px] px-3 py-2 whitespace-nowrap border-r border-white/10 last:border-r-0 group overflow-hidden transition-colors duration-200 hover:text-warmGold no-underline visited:no-underline"
               >
                 <span className="absolute inset-0 bg-warmBrown scale-y-0 group-hover:scale-y-100 transition-transform duration-200 origin-bottom" />
                 <span className="relative z-10">{ql.label}</span>

@@ -64,7 +64,7 @@ const dioceseofadoorkadampanaduPage = () => {
                       </p>
                       <p>
                         <a
-                          href="https://share.google/znjgX8wo7d6N676rM"
+                          href="https://maps.app.goo.gl/cwHaQoKF4vZDRHY76"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="syro-primary-button inline-flex items-center gap-2 w-fit"

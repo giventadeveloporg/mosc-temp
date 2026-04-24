@@ -60,7 +60,7 @@ const dioceseofkottayamcentralPage = () => {
                       </p>
                       <p>
                         <a
-                          href="https://share.google/muZlDUA4LCSge7pHa"
+                          href="https://maps.app.goo.gl/MjSjuPVKje12vDvHA"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="syro-primary-button inline-flex items-center gap-2 w-fit"

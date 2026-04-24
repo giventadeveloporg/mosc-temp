@@ -86,7 +86,7 @@ const dioceseofkandanadeastPage = () => {
                       </p>
                       <p>
                         <a
-                          href="https://share.google/9yo3ZUyn5mSV6GqP4"
+                          href="https://maps.app.goo.gl/8Dxy6Z2GEB1FdvNWA"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="syro-primary-button inline-flex items-center gap-2 w-fit"

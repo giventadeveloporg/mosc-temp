@@ -261,7 +261,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-16">
           <div className="grid lg:grid-cols-2 gap-12 items-stretch">
             {/* Images collage */}
-            <div className="relative h-[350px] md:h-[450px] lg:h-[480px] lg:w-[100%]">
+            <div className="order-2 relative lg:order-2 h-[350px] md:h-[450px] lg:h-[480px] lg:w-[100%]">
               {/* Top-right square: Bishops */}
               <div className="absolute right-2 top-0 w-[48%] aspect-square overflow-hidden border-4 border-white shadow-2xl shadow-burgundy/40">
                 <Image
@@ -300,7 +300,7 @@ export default function HomePage() {
             </div>
 
             {/* Text */}
-            <div>
+            <div className="order-1 lg:order-1">
               <span className="inline-block text-burgundy text-xs font-bold tracking-widest uppercase mb-3 border border-burgundy/40 px-3 py-1 rounded-full bg-burgundy/10">
                 About Us
               </span>

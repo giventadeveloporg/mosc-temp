@@ -90,7 +90,7 @@ const dioceseofkollamPage = () => {
                         </p>
                         <p>
                           <a
-                            href="https://share.google/ar5uMWIKfej8gyrO3"
+                            href="https://maps.app.goo.gl/ghXMMtu1diDkqCpm9"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="syro-primary-button inline-flex items-center gap-2 w-fit"
