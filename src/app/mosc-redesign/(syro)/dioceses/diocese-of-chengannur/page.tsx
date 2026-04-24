@@ -62,7 +62,7 @@ const dioceseofchengannurPage = () => {
                       </p>
                       <p>
                         <a
-                          href="https://share.google/Bv305x6or8xj9KbkR"
+                          href="https://maps.app.goo.gl/qrPsU77qYCLoZuJe7"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="syro-primary-button inline-flex items-center gap-2 w-fit"

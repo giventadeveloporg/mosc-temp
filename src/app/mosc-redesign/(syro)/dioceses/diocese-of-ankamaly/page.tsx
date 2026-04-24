@@ -64,7 +64,7 @@ const dioceseofankamalyPage = () => {
                       </p>
                       <p>
                         <a
-                          href="https://share.google/e2TONlXtbYyaY62nN"
+                          href="https://maps.app.goo.gl/gufnRkTQxsoHthBu6"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="syro-primary-button inline-flex items-center gap-2 w-fit"

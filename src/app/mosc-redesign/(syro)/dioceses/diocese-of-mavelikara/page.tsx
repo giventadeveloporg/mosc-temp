@@ -118,7 +118,7 @@ const dioceseofmavelikaraPage = () => {
                       </p>
                       <p>
                         <a
-                          href="https://share.google/KFuhxKZGb9NPAskrr"
+                          href="https://maps.app.goo.gl/zYFHLF61YLoEoYzZ8"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="syro-primary-button inline-flex items-center gap-2 w-fit"

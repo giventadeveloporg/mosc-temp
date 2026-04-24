@@ -71,7 +71,7 @@ const dioceseofkandanadwestPage = () => {
                       </p>
                       <p>
                         <a
-                          href="https://share.google/C6b2bl94j7RtqGbAT"
+                          href="https://maps.app.goo.gl/3s3YGFRf2Ra965316"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="syro-primary-button inline-flex items-center gap-2 w-fit"

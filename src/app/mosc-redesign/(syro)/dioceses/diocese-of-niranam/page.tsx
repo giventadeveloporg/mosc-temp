@@ -75,7 +75,7 @@ const dioceseofniranamPage = () => {
                       </p>
                       <p>
                         <a
-                          href="https://share.google/2uJQjqU6Bc6QPtjMJ"
+                          href="https://maps.app.goo.gl/SQYDSNo6SKfTXmb37"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="syro-primary-button inline-flex items-center gap-2 w-fit"

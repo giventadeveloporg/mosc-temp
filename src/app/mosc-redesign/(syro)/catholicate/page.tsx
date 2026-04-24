@@ -161,7 +161,7 @@ const CatholicatePage = () => {
             </h3>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-12">
+          <div className="catholicate-card-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-12">
             {catholicosCards.map((card) => (
               <article
                 key={card.title}
@@ -179,7 +179,7 @@ const CatholicatePage = () => {
                     />
                   </div>
                 </div>
-                <h3 className="text-lg font-semibold text-burgundy-dark mb-3 leading-snug group-hover:text-burgundy transition-colors">
+                <h3 className="text-lg font-semibold mb-3 leading-snug transition-colors">
                   {card.title}
                 </h3>
                 <p className="text-sm md:text-base text-warmGray-dark flex-1 mb-5 leading-relaxed">{card.excerpt}</p>

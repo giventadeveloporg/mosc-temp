@@ -73,7 +73,7 @@ const dioceseofkochiPage = () => {
                       </p>
                       <p>
                         <a
-                          href="https://share.google/GnDQBIcWk9bFEKJ0p"
+                          href="https://maps.app.goo.gl/3nE5uZRRKHmd82ej7"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="syro-primary-button inline-flex items-center gap-2 w-fit"

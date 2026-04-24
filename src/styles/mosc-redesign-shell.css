@@ -29,6 +29,19 @@
   color: rgb(92 61 61 / var(--tw-text-opacity, 1)) !important;
 }
 
+/* Saints carousel cards (homepage): white title on dark gradient — must beat shell #mainContent.syro-main p */
+.mosc-redesign-subpage-shell.syro-layout #mainContent.syro-main p.saint-card-title {
+  color: #ffffff !important;
+}
+
+/* Catholicate listing: card titles — beat syro-malabar #mainContent h3 #000 */
+.mosc-redesign-subpage-shell.syro-layout #mainContent.syro-main .catholicate-card-grid article h3 {
+  color: #8b1030 !important;
+}
+.mosc-redesign-subpage-shell.syro-layout #mainContent.syro-main .catholicate-card-grid article.group:hover h3 {
+  color: #c0284a !important;
+}
+
 /* Banner description: pink-200 — must beat #mainContent.syro-main p body rule; distinct from amber title + cyan breadcrumb */
 .mosc-redesign-subpage-shell.syro-layout #mainContent.syro-main section:first-of-type .syro-banner-content p.syro-banner-description {
   color: #fbcfe8 !important;

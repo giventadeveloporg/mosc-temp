@@ -61,7 +61,7 @@ const dioceseofidukkiPage = () => {
                       </p>
                       <p>
                         <a
-                          href="https://share.google/jju7UwFuFozLjRV1v"
+                          href="https://maps.app.goo.gl/SG9e8jXoNGbNgUjJ6"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="syro-primary-button inline-flex items-center gap-2 w-fit"
