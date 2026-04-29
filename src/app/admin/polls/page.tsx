@@ -1,5 +1,5 @@
-import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
+import { safeAuth } from '@/lib/safe-auth';
 import { PollManagementClient } from './PollManagementClient';
 import { fetchEventPollsServer } from './ApiServerActions';
 
