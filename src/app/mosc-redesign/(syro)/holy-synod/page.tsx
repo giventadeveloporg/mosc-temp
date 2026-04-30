@@ -225,7 +225,7 @@ const synodMembers: Array<{
     title: 'H.G. Zachariah Mar Severios Metropolitan',
     excerpt:
       'Born in Chirathilatt House as the son of Very Rev. C. John Cor- Episcopa and Mrs. Lissy on 19 th August, 1978, His Grace belongs to the parish of St....',
-    image: `${IMAGE_BASE}/Zakeriah_Mar_severios.jpg`,
+    image: '/images/holy-synod/Synod-30.jpg',
     internalHref: '/mosc-redesign/holy-synod/h-g-zacharia-mar-severios-metropolitan',
   },
 ];

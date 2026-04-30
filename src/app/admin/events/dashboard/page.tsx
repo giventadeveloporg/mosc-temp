@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import { auth } from '@clerk/nextjs/server';
 import { getAppUrl } from '@/lib/env';
+import { safeAuth } from '@/lib/safe-auth';
 import type { EventDetailsDTO, EventAttendeeDTO, EventAttendeeGuestDTO } from '@/types';
 import EventDashboardClient from './EventDashboardClient';
 import { fetchEventDashboardData } from './ApiServerActions';

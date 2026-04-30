@@ -708,8 +708,7 @@ nav[role="navigation"] .group {
   height: 100%;
 }
 
-/* Hero slideshow image: object-contain on all breakpoints so full image visible without cutoff (per image_containment_prevention_hero_images_cards.mdc).
-   Padding is on the wrapper so images have breathing room on all 4 sides. */
+/* Hero slideshow image: preserve full image visibility without cutoff. */
 .hero-slideshow-wrapper img {
   object-fit: contain !important;
   object-position: center center !important;
@@ -718,11 +717,17 @@ nav[role="navigation"] .group {
   border-radius: 0.5rem;
 }
 
-/* Desktop: switch to object-cover so slideshow images fill the panel edge-to-edge.
-   Section 2 images are 5:2 landscape; the center 60% is the safe zone per spec. */
+/* Desktop: match wrapper ratio to the hero sample image so contain fills cleanly. */
 @media (min-width: 768px) {
+  .hero-slideshow-wrapper {
+    width: 100%;
+    height: auto;
+    max-height: 100%;
+    aspect-ratio: 916 / 387;
+  }
+
   .hero-slideshow-wrapper img {
-    object-fit: cover !important;
+    object-fit: contain !important;
     border-radius: 0.75rem;
   }
 }
