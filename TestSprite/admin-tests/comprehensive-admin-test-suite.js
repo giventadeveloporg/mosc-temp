@@ -156,8 +156,18 @@ const adminTestPages = [
     url: '/admin/focus-groups',
     category: 'focus-groups',
     priority: 'medium',
-    expectedElements: ['h1', 'table', 'button', 'a[href*="/focus-groups"]'],
-    validation: ['Focus groups page loads', 'Focus groups list visible']
+    expectedElements: [
+      'h1',
+      '#focus-groups-search',
+      'a[href*="/admin/focus-groups/new"]',
+      'table'
+    ],
+    validation: [
+      'Focus groups page loads',
+      'Search and New Group visible',
+      'Table columns and search filter behave correctly',
+      'Row actions when groups exist'
+    ]
   },
 
   // ==========================================
@@ -169,8 +179,19 @@ const adminTestPages = [
     url: '/admin/membership/plans',
     category: 'membership',
     priority: 'high',
-    expectedElements: ['h1', 'table', 'button', 'form'],
-    validation: ['Membership plans page loads', 'Plans list visible']
+    expectedElements: [
+      'h1',
+      'a[aria-label="Back to Admin"]',
+      'button[aria-label="Create Plan"]',
+      'button[aria-label="Previous Page"]',
+      'button[aria-label="Next Page"]'
+    ],
+    validation: [
+      'Membership plans page loads',
+      'Navigation, create, and pagination controls visible',
+      'Create modal opens with plan form and closes on Cancel',
+      'Table or empty state matches data; row actions when plans exist'
+    ]
   },
   {
     id: 'admin-009',
@@ -231,9 +252,14 @@ const adminTestPages = [
     url: '/admin/executive-committee',
     category: 'content',
     priority: 'medium',
-    expectedElements: ['h1', 'table', 'button', 'form'],
+    expectedElements: ['h1', 'h2', 'button[aria-label="Add Member"]'],
     timeout: 45000, // Increased timeout for this page (makes API calls)
-    validation: ['Executive committee page loads', 'Committee members list visible']
+    validation: [
+      'Executive committee page loads',
+      'Guidelines and team section visible',
+      'Search/table/pagination when members exist; empty state otherwise',
+      'Add member modal opens with form and closes'
+    ]
   },
   {
     id: 'admin-015',
@@ -766,6 +792,271 @@ async function getAvailableEventIds_DEPRECATED(page, baseUrl) {
 }
 
 /**
+ * Extended checks for /admin/focus-groups (admin-007): list UI, search filter, table columns,
+ * row action links when data exists, and pagination when multiple pages of results exist.
+ */
+async function runFocusGroupsExtendedChecks(page, test, elementsFound) {
+  const expected = test.expectedElements || [];
+  const foundSelectors = new Set(elementsFound.map((e) => e.selector));
+  const missing = expected.filter((sel) => !foundSelectors.has(sel));
+  if (missing.length > 0) {
+    throw new Error(`Focus groups page missing expected elements: ${missing.join(', ')}`);
+  }
+
+  await page.waitForSelector('#focus-groups-search', { state: 'visible', timeout: 15000 });
+  const newLink = await page.$('a[href="/admin/focus-groups/new"], a[href*="/admin/focus-groups/new"]');
+  if (!newLink || !(await newLink.isVisible().catch(() => false))) {
+    throw new Error('Focus groups: "New Group" link not visible');
+  }
+
+  const hasColumns = await page.evaluate(() => {
+    const ths = [...document.querySelectorAll('table thead th')].map((t) => (t.textContent || '').trim());
+    return ths.includes('Name') && ths.includes('Slug') && ths.includes('Active') && ths.includes('Actions');
+  });
+  if (!hasColumns) {
+    throw new Error('Focus groups: table missing expected columns (Name, Slug, Active, Actions)');
+  }
+
+  await page.fill('#focus-groups-search', '__testsprite_no_results_xyz__');
+  await page.waitForTimeout(500);
+  const noMatchVisible = await page.evaluate(() => document.body.innerText.includes('No focus groups match your search'));
+  if (!noMatchVisible) {
+    throw new Error('Focus groups: search with no matches did not show expected empty message');
+  }
+
+  await page.fill('#focus-groups-search', '');
+  await page.waitForTimeout(400);
+
+  const editCount = await page.$$eval('a[href*="/admin/focus-groups/"][href*="/edit"]', (as) => as.length);
+  if (editCount > 0) {
+    const actionHrefs = await page.$$eval('tbody a[href*="/admin/focus-groups/"]', (anchors) =>
+      anchors.map((a) => a.getAttribute('href') || '')
+    );
+    const hasEvents = actionHrefs.some((h) => h.includes('/events'));
+    const hasMembers = actionHrefs.some((h) => h.includes('/members'));
+    const hasMedia = actionHrefs.some((h) => h.includes('/media'));
+    if (!hasEvents || !hasMembers || !hasMedia) {
+      throw new Error(
+        `Focus groups: expected row action links for events, members, and media. Found events=${hasEvents}, members=${hasMembers}, media=${hasMedia}`
+      );
+    }
+
+    const nextBtn = await page.$('button[aria-label="Next Page"]');
+    if (nextBtn) {
+      const isDisabled = await nextBtn.evaluate((el) => {
+        return el.disabled || el.getAttribute('aria-disabled') === 'true' || el.classList.contains('pointer-events-none');
+      });
+      if (!isDisabled) {
+        await nextBtn.click();
+        await page.waitForTimeout(400);
+        const prevBtn = await page.$('button[aria-label="Previous Page"]');
+        if (prevBtn) {
+          await prevBtn.click();
+          await page.waitForTimeout(300);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Extended checks for /admin/membership/plans (admin-008): header, back link, create flow modal,
+ * table columns when plans exist or empty state, pagination when multiple pages, optional test-plans strip.
+ */
+async function runMembershipPlansExtendedChecks(page, test, elementsFound) {
+  const expected = test.expectedElements || [];
+  const foundSelectors = new Set(elementsFound.map((e) => e.selector));
+  const missing = expected.filter((sel) => !foundSelectors.has(sel));
+  if (missing.length > 0) {
+    throw new Error(`Membership plans page missing expected elements: ${missing.join(', ')}`);
+  }
+
+  const h1 = await page.$('h1');
+  const h1Text = (await h1?.textContent()) || '';
+  if (!h1Text.includes('Membership Plans')) {
+    throw new Error('Membership plans: expected main heading to contain "Membership Plans"');
+  }
+
+  const back = await page.$('a[aria-label="Back to Admin"]');
+  if (!back || !(await back.isVisible().catch(() => false))) {
+    throw new Error('Membership plans: Back to Admin link not visible');
+  }
+
+  const bodyText = await page.evaluate(() => document.body.innerText);
+  if (!bodyText.includes('Create Test Plans')) {
+    throw new Error('Membership plans: expected "Create Test Plans" helper section');
+  }
+
+  const theadThCount = await page.$$eval('table thead th', (ths) => ths.length);
+  const hasPlansTable = theadThCount > 0;
+
+  if (hasPlansTable) {
+    const colsOk = await page.evaluate(() => {
+      const ths = [...document.querySelectorAll('table thead th')].map((t) => (t.textContent || '').trim());
+      return ths.some((t) => t.includes('Plan Name')) && ths.some((t) => t.includes('Actions'));
+    });
+    if (!colsOk) {
+      throw new Error('Membership plans: table missing Plan Name or Actions column headers');
+    }
+  } else {
+    if (!bodyText.includes('No membership plans found')) {
+      throw new Error('Membership plans: expected empty state copy when no table is shown');
+    }
+  }
+
+  const createPlanBtn = await page.$('button[aria-label="Create Plan"]');
+  if (!createPlanBtn || !(await createPlanBtn.isVisible().catch(() => false))) {
+    throw new Error('Membership plans: Create Plan button not visible');
+  }
+  await createPlanBtn.click();
+  await page.waitForSelector('div.fixed.inset-0.z-50 h2', { state: 'visible', timeout: 15000 });
+  const modalHeading = await page.textContent('div.fixed.inset-0.z-50 h2');
+  if (!modalHeading || !modalHeading.includes('Create Plan')) {
+    throw new Error('Membership plans: create modal did not show "Create Plan" heading');
+  }
+  await page.waitForSelector('div.fixed.inset-0.z-50 input[name="planName"]', { state: 'visible', timeout: 10000 });
+
+  const cancelInModal = page.locator('div.fixed.inset-0.z-50').getByRole('button', { name: 'Cancel' });
+  await cancelInModal.click({ timeout: 8000 });
+  await page.waitForFunction(
+    () => !document.querySelector('div.fixed.inset-0.z-50.flex.items-center'),
+    { timeout: 8000 }
+  ).catch(() => {
+    throw new Error('Membership plans: create modal did not close after Cancel');
+  });
+
+  const nextBtn = await page.$('button[aria-label="Next Page"]');
+  if (nextBtn) {
+    const isDisabled = await nextBtn.evaluate((el) => {
+      return el.disabled || el.getAttribute('aria-disabled') === 'true' || el.classList.contains('pointer-events-none');
+    });
+    if (!isDisabled) {
+      await nextBtn.click();
+      await page.waitForTimeout(800);
+      const prevBtn = await page.$('button[aria-label="Previous Page"]');
+      if (prevBtn) {
+        const prevDisabled = await prevBtn.evaluate((el) => el.disabled || el.classList.contains('pointer-events-none'));
+        if (!prevDisabled) {
+          await prevBtn.click();
+          await page.waitForTimeout(400);
+        }
+      }
+    }
+  }
+
+  if (hasPlansTable) {
+    const editCount = await page.$$('button[title="Edit"]');
+    if (editCount.length === 0) {
+      throw new Error('Membership plans: expected at least one Edit action when plans table is shown');
+    }
+  }
+}
+
+/**
+ * Extended checks for /admin/executive-committee (admin-014): page header, guidelines, Add Member,
+ * list/search/pagination when members exist, empty state otherwise, add-member modal open/close.
+ */
+async function runExecutiveCommitteeExtendedChecks(page, test, elementsFound) {
+  const expected = test.expectedElements || [];
+  const foundSelectors = new Set(elementsFound.map((e) => e.selector));
+  const missing = expected.filter((sel) => !foundSelectors.has(sel));
+  if (missing.length > 0) {
+    throw new Error(`Executive committee page missing expected elements: ${missing.join(', ')}`);
+  }
+
+  const h1Text = (await page.textContent('h1')) || '';
+  if (!h1Text.includes('Executive Committee Management')) {
+    throw new Error('Executive committee: expected h1 to contain "Executive Committee Management"');
+  }
+
+  const bodyText = await page.evaluate(() => document.body.innerText);
+  if (!bodyText.includes('Profile Image Guidelines')) {
+    throw new Error('Executive committee: expected profile image guidelines section');
+  }
+
+  const teamHeading =
+    (await page
+      .$eval('.flex.justify-between.items-center h2', (el) => el.textContent || '')
+      .catch(() => '')) || '';
+  if (!teamHeading.includes('Team Members')) {
+    throw new Error('Executive committee: expected subheading with "Team Members"');
+  }
+
+  const hasListUi = (await page.$('#exec-committee-search')) !== null;
+  if (hasListUi) {
+    await page.waitForSelector('#exec-committee-search', { state: 'visible', timeout: 15000 });
+    const colsOk = await page.evaluate(() => {
+      const ths = [...document.querySelectorAll('table thead th')].map((t) => (t.textContent || '').trim());
+      return ths.some((t) => t.includes('Priority')) && ths.some((t) => t.includes('Member')) && ths.some((t) => t.includes('Actions'));
+    });
+    if (!colsOk) {
+      throw new Error('Executive committee: table missing Priority, Member, or Actions column headers');
+    }
+
+    await page.fill('#exec-committee-search', '__no_exec_member_match_xyz__');
+    await page.waitForTimeout(500);
+    const noMatch = await page.evaluate(() => document.body.innerText.includes('No members match your search'));
+    if (!noMatch) {
+      throw new Error('Executive committee: search with no matches did not show expected message');
+    }
+    await page.fill('#exec-committee-search', '');
+    await page.waitForTimeout(400);
+
+    const viewBtns = await page.$$('button[aria-label="View details"]');
+    const editBtns = await page.$$('button[aria-label="Edit member"]');
+    if (viewBtns.length === 0 || editBtns.length === 0) {
+      throw new Error('Executive committee: expected View details and Edit member actions when list has data');
+    }
+
+    const nextBtn = await page.$('button[aria-label="Next Page"]');
+    if (nextBtn) {
+      const isDisabled = await nextBtn.evaluate((el) => {
+        return el.disabled || el.getAttribute('aria-disabled') === 'true' || el.classList.contains('pointer-events-none');
+      });
+      if (!isDisabled) {
+        await nextBtn.click();
+        await page.waitForTimeout(500);
+        const prevBtn = await page.$('button[aria-label="Previous Page"]');
+        if (prevBtn) {
+          const prevDisabled = await prevBtn.evaluate((el) => {
+            return el.disabled || el.getAttribute('aria-disabled') === 'true' || el.classList.contains('pointer-events-none');
+          });
+          if (!prevDisabled) {
+            await prevBtn.click();
+            await page.waitForTimeout(400);
+          }
+        }
+      }
+    }
+  } else if (!bodyText.includes('No team members yet')) {
+    throw new Error('Executive committee: expected empty state copy when no member list is shown');
+  }
+
+  const addBtn = await page.$('button[aria-label="Add Member"]');
+  if (!addBtn || !(await addBtn.isVisible().catch(() => false))) {
+    throw new Error('Executive committee: Add Member button not visible');
+  }
+  await addBtn.click();
+  await page.waitForFunction(
+    () => [...document.querySelectorAll('h2')].some((h) => (h.textContent || '').includes('Add New Team Member')),
+    { timeout: 15000 }
+  );
+  await page.waitForSelector('input[name="firstName"]', { state: 'visible', timeout: 10000 });
+
+  const closeBtn = await page.$('button[aria-label="Close"]');
+  if (!closeBtn) {
+    throw new Error('Executive committee: modal Close button not found');
+  }
+  await closeBtn.click();
+  await page.waitForFunction(
+    () => ![...document.querySelectorAll('h2')].some((h) => (h.textContent || '').includes('Add New Team Member')),
+    { timeout: 8000 }
+  ).catch(() => {
+    throw new Error('Executive committee: add-member modal did not close');
+  });
+}
+
+/**
  * Run a single test
  */
 async function runTest(page, test, config) {
@@ -1086,6 +1377,16 @@ async function runTest(page, test, config) {
     const hasMainContent = await page.$('h1, h2, main, [class*="admin"]').then(el => el !== null);
     if (!hasMainContent) {
       throw new Error('Page loaded but no main content found');
+    }
+
+    if (test.id === 'admin-007') {
+      await runFocusGroupsExtendedChecks(page, test, elementsFound);
+    }
+    if (test.id === 'admin-008') {
+      await runMembershipPlansExtendedChecks(page, test, elementsFound);
+    }
+    if (test.id === 'admin-014') {
+      await runExecutiveCommitteeExtendedChecks(page, test, elementsFound);
     }
 
     // Run validations

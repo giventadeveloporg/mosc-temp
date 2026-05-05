@@ -682,18 +682,23 @@ const testScenarios = [
     requiresAuth: true,
     expectedElements: [
       'h1',
-      'table, [class*="table"], [class*="grid"]',
-      'button, a[href*="/new"]',
-      'form, input[type="text"], input[type="number"]',
-      'button[type="submit"]'
+      'a[aria-label="Back to Admin"]',
+      'button[aria-label="Create Plan"]',
+      'button[aria-label="Previous Page"]',
+      'button[aria-label="Next Page"]',
+      'table thead th, p.text-lg.text-muted-foreground'
     ],
     validation: [
       'Membership plans page loads',
-      'Plans list visible',
-      'Create plan button accessible',
-      'Form elements present',
-      'Plan details displayed',
-      'CRUD operations work'
+      'Back and create controls visible',
+      'Pagination footer present',
+      'Plans table or empty-state message visible',
+      'Matches admin membership plans UI'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'button[aria-label="Create Plan"]', timeout: 10000 },
+      { type: 'check', selector: 'button[aria-label="Create Plan"]', visible: true },
+      { type: 'check', selector: 'a[aria-label="Back to Admin"]', visible: true }
     ]
   },
   {
@@ -751,18 +756,22 @@ const testScenarios = [
     requiresAuth: true,
     expectedElements: [
       'h1',
-      'table, [class*="table"], [class*="grid"]',
-      'button, form',
-      'input[type="text"], img',
-      'button[type="submit"]'
+      'h2',
+      'button[aria-label="Add Member"]',
+      '#exec-committee-search, h3',
+      'table thead th, p.text-gray-500',
+      'button[aria-label="Previous Page"], button[aria-label="Next Page"], div.text-center.py-12'
     ],
     validation: [
       'Executive committee page loads',
-      'Committee members list visible',
-      'Add/edit buttons accessible',
-      'Form elements present',
-      'Member images load',
-      'Management functions work'
+      'Page header and Add Member control visible',
+      'Search + table + pagination when data exists, or empty-state messaging',
+      'Matches admin executive-committee UI'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'button[aria-label="Add Member"]', timeout: 15000 },
+      { type: 'check', selector: 'button[aria-label="Add Member"]', visible: true },
+      { type: 'check', selector: 'h1', visible: true }
     ]
   },
   {
@@ -774,18 +783,24 @@ const testScenarios = [
     requiresAuth: true,
     expectedElements: [
       'h1',
+      '#focus-groups-search',
+      'input[type="search"]',
       'table, [class*="table"], [class*="grid"]',
-      'a[href*="/new"], button',
-      'form, input[type="text"]',
-      'button[type="submit"]'
+      'a[href*="/admin/focus-groups/new"], a[href*="/focus-groups/new"]',
+      'table thead th'
     ],
     validation: [
       'Focus groups page loads',
-      'Groups list visible',
-      'Create group button accessible',
-      'Action buttons present',
-      'Group management works',
-      'Form validation functional'
+      'Search by name/slug input visible',
+      'Groups table visible',
+      'New group link accessible',
+      'Table headers present',
+      'List UI matches admin focus-groups page'
+    ],
+    interactions: [
+      { type: 'wait', selector: '#focus-groups-search', timeout: 10000 },
+      { type: 'check', selector: '#focus-groups-search', visible: true },
+      { type: 'check', selector: 'a[href*="/admin/focus-groups/new"], a[href*="/focus-groups/new"]', visible: true }
     ]
   },
   {
