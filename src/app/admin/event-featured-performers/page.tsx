@@ -5,8 +5,7 @@ import { FaPlus, FaSearch, FaFilter, FaChevronLeft, FaChevronRight } from 'react
 import { useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import DataTable, { Column } from '@/components/ui/DataTable';
-import Modal from '@/components/ui/Modal';
-import ConfirmModal from '@/components/ui/Modal';
+import Modal, { ConfirmModal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/Toast';
 import AdminNavigation from '@/components/AdminNavigation';
 import type { EventFeaturedPerformersDTO, EventDetailsDTO } from '@/types';

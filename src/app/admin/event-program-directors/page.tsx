@@ -5,8 +5,7 @@ import { FaPlus, FaSearch, FaFilter } from 'react-icons/fa';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import DataTable, { Column } from '@/components/ui/DataTable';
-import Modal from '@/components/ui/Modal';
-import ConfirmModal from '@/components/ui/Modal';
+import Modal, { ConfirmModal } from '@/components/ui/Modal';
 import AdminNavigation from '@/components/AdminNavigation';
 import type { EventProgramDirectorsDTO, EventDetailsDTO } from '@/types';
 import {
@@ -427,6 +426,10 @@ export default function GlobalEventProgramDirectorsPage() {
           formData={formData}
           setFormData={setFormData}
           onSubmit={handleCreate}
+          onCancel={() => {
+            setIsCreateModalOpen(false);
+            resetForm();
+          }}
           loading={loading}
           submitText="Create Director"
           events={events}
@@ -448,6 +451,11 @@ export default function GlobalEventProgramDirectorsPage() {
           formData={formData}
           setFormData={setFormData}
           onSubmit={handleEdit}
+          onCancel={() => {
+            setIsEditModalOpen(false);
+            setSelectedDirector(null);
+            resetForm();
+          }}
           loading={loading}
           submitText="Update Director"
           events={events}
@@ -476,12 +484,13 @@ interface DirectorFormProps {
   formData: Partial<EventProgramDirectorsDTO>;
   setFormData: React.Dispatch<React.SetStateAction<Partial<EventProgramDirectorsDTO>>>;
   onSubmit: () => void;
+  onCancel: () => void;
   loading: boolean;
   submitText: string;
   events: EventDetailsDTO[];
 }
 
-function DirectorForm({ formData, setFormData, onSubmit, loading, submitText, events }: DirectorFormProps) {
+function DirectorForm({ formData, setFormData, onSubmit, onCancel, loading, submitText, events }: DirectorFormProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -564,7 +573,7 @@ function DirectorForm({ formData, setFormData, onSubmit, loading, submitText, ev
       <div className="flex justify-end space-x-3 pt-4">
         <button
           type="button"
-          onClick={() => {/* Close modal logic handled by parent */ }}
+          onClick={onCancel}
           className="flex-shrink-0 h-14 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-gray-100 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:hover:scale-100"
           disabled={loading}
           title="Cancel"

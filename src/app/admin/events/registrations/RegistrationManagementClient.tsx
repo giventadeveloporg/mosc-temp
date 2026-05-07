@@ -581,7 +581,7 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
               <span className="font-semibold text-center leading-tight px-1 break-words hyphens-auto">Manage Usage<br />[Users]</span>
             </Link>
             <Link
-              href="/admin/event-analytics"
+              href="/admin/events/dashboard"
               className="flex flex-col items-center justify-center bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-lg shadow-md p-1.5 sm:p-2 md:p-2.5 lg:p-3 xl:p-4 text-[9px] sm:text-[10px] md:text-xs lg:text-sm xl:text-base transition-all group overflow-hidden"
               title="Event Analytics Dashboard"
               aria-label="Event Analytics Dashboard"
@@ -1292,7 +1292,7 @@ export default function RegistrationManagementClient({ data }: RegistrationManag
             <span className="font-semibold text-green-700 dark:text-green-300 text-xs sm:text-sm lg:text-base whitespace-nowrap">Back to Manage Events</span>
           </Link>
           <Link
-            href="/admin/event-analytics"
+            href="/admin/events/dashboard"
             className="flex items-center justify-center gap-2 sm:gap-3 px-3 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-teal-100 hover:bg-teal-200 dark:bg-teal-900 dark:hover:bg-teal-800 transition-all duration-300 hover:scale-105"
             title="Event Analytics"
             aria-label="Event Analytics"

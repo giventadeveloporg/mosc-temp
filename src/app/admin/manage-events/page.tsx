@@ -520,7 +520,7 @@ export default function ManageEventsPage() {
             <span className="font-semibold text-center leading-tight">Create New<br />Event</span>
           </Link>
           <Link
-            href="/admin/event-analytics"
+            href="/admin/events/dashboard"
             className="flex flex-col items-center justify-center bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-lg shadow-md p-3 text-xs transition-all group"
             title="Event Analytics Dashboard"
             aria-label="Event Analytics Dashboard"

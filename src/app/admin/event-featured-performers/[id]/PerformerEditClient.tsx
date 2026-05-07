@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { FaArrowLeft, FaSpinner } from 'react-icons/fa';
+import { FaSpinner } from 'react-icons/fa';
 import AdminNavigation from '@/components/AdminNavigation';
 import PerformerImageUploadArea from '@/components/performers/PerformerImageUploadArea';
 import type { EventFeaturedPerformersDTO, EventMediaDTO } from '@/types';
@@ -85,10 +85,17 @@ export default function PerformerEditClient({
         <div className="flex items-center space-x-4">
           <button
             onClick={() => router.push('/admin/event-featured-performers')}
-            className="flex items-center space-x-2 text-foreground hover:text-primary reverent-transition"
+            className="flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+            title="Back to Performers"
+            aria-label="Back to Performers"
+            type="button"
           >
-            <FaArrowLeft className="h-4 w-4" />
-            <span>Back to Performers</span>
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
+              <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+            </div>
+            <span className="font-semibold text-indigo-700">Back to Performers</span>
           </button>
         </div>
       </div>
