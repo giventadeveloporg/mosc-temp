@@ -36,6 +36,7 @@ export default function TenantSettingsList({
 
   // Selection state for bulk operations
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [organizationNameByTenantId, setOrganizationNameByTenantId] = useState<Record<string, string>>({});
 
   // Track if initial load has completed
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
@@ -71,10 +72,42 @@ export default function TenantSettingsList({
     }
   };
 
+  const loadOrganizations = async () => {
+    try {
+      const response = await fetch('/api/proxy/tenant-organizations?' + new URLSearchParams({
+        page: '0',
+        size: '1000',
+      }));
+
+      if (!response.ok) {
+        return;
+      }
+
+      const data = await response.json();
+      if (!Array.isArray(data)) {
+        return;
+      }
+
+      const map: Record<string, string> = {};
+      for (const org of data) {
+        if (org?.tenantId && org?.organizationName) {
+          map[String(org.tenantId)] = String(org.organizationName);
+        }
+      }
+      setOrganizationNameByTenantId(map);
+    } catch (err) {
+      console.error('Failed to load tenant organizations for settings list:', err);
+    }
+  };
+
   // Load data on mount and when filters/pagination change
   useEffect(() => {
     loadData();
   }, [currentPage, pageSize, filters]);
+
+  useEffect(() => {
+    loadOrganizations();
+  }, []);
 
   // Handle search
   const handleSearch = (searchTerm: string) => {
@@ -194,10 +227,10 @@ export default function TenantSettingsList({
       {/* Table */}
       <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
         <div className="user-table-scroll-container">
-          <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-600 border border-gray-300 dark:border-gray-600" style={{ minWidth: '800px', width: '100%' }}>
+          <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-600 border border-gray-300 dark:border-gray-600" style={{ minWidth: '1040px', width: '100%' }}>
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th className="px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-left border-b border-r border-gray-300 dark:border-gray-600">
+                <th className="w-12 px-2 sm:px-3 py-2 sm:py-3 text-left border-b border-r border-gray-300 dark:border-gray-600">
                   <input
                     type="checkbox"
                     checked={selectedIds.length === settings.length && settings.length > 0}
@@ -207,7 +240,7 @@ export default function TenantSettingsList({
                   />
                 </th>
                 <th
-                  className="px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 border-b border-r border-gray-300 dark:border-gray-600"
+                  className="w-44 px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 border-b border-r border-gray-300 dark:border-gray-600"
                   onClick={() => handleSort('tenantId')}
                 >
                   <div className="flex items-center gap-2">
@@ -215,19 +248,22 @@ export default function TenantSettingsList({
                     <FaSort className="text-xs" />
                   </div>
                 </th>
-                <th className="px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">
+                <th className="w-44 px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">
+                  Organization
+                </th>
+                <th className="w-36 px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">
                   User Registration
                 </th>
-                <th className="px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">
+                <th className="w-36 px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">
                   WhatsApp Integration
                 </th>
-                <th className="px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">
+                <th className="w-36 px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">
                   Email Marketing
                 </th>
-                <th className="px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">
+                <th className="w-36 px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-r border-gray-300 dark:border-gray-600">
                   Max Events/Month
                 </th>
-                <th className="px-2 sm:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-300 dark:border-gray-600">
+                <th className="w-48 px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-300 dark:border-gray-600">
                   Actions
                 </th>
               </tr>
@@ -235,7 +271,7 @@ export default function TenantSettingsList({
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-300 dark:divide-gray-600">
             {settings.map((setting, index) => (
               <tr key={setting.id} className={`${index % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-blue-50 dark:bg-gray-700'} hover:bg-yellow-100 dark:hover:bg-gray-700/50 transition-colors border-b border-gray-300 dark:border-gray-600`}>
-                <td className="px-2 sm:px-4 lg:px-6 py-2 sm:py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600">
+                <td className="w-12 px-2 sm:px-3 py-2 sm:py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600">
                   <input
                     type="checkbox"
                     checked={selectedIds.includes(setting.id!)}
@@ -244,10 +280,15 @@ export default function TenantSettingsList({
                     onClick={(e) => e.stopPropagation()}
                   />
                 </td>
-                <td className="px-2 sm:px-4 lg:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600">
+                <td className="w-44 px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-600">
                   {setting.tenantId}
                 </td>
-                <td className="px-2 sm:px-4 lg:px-6 py-2 sm:py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600">
+                <td className="w-44 px-2 sm:px-4 py-2 sm:py-4 text-xs sm:text-sm text-gray-700 dark:text-gray-300 border-r border-gray-200 dark:border-gray-600">
+                  {setting.tenantOrganization?.organizationName ||
+                    organizationNameByTenantId[setting.tenantId] ||
+                    '—'}
+                </td>
+                <td className="w-36 px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600">
                   <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${setting.allowUserRegistration
                     ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                     : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
@@ -255,7 +296,7 @@ export default function TenantSettingsList({
                     {setting.allowUserRegistration ? 'Enabled' : 'Disabled'}
                   </span>
                 </td>
-                <td className="px-2 sm:px-4 lg:px-6 py-2 sm:py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600">
+                <td className="w-36 px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600">
                   <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${setting.enableWhatsappIntegration
                     ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                     : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
@@ -263,7 +304,7 @@ export default function TenantSettingsList({
                     {setting.enableWhatsappIntegration ? 'Enabled' : 'Disabled'}
                   </span>
                 </td>
-                <td className="px-2 sm:px-4 lg:px-6 py-2 sm:py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600">
+                <td className="w-36 px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap border-r border-gray-200 dark:border-gray-600">
                   <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${setting.enableEmailMarketing
                     ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                     : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
@@ -271,10 +312,10 @@ export default function TenantSettingsList({
                     {setting.enableEmailMarketing ? 'Enabled' : 'Disabled'}
                   </span>
                 </td>
-                <td className="px-2 sm:px-4 lg:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 dark:text-gray-400 border-r border-gray-200 dark:border-gray-600">
+                <td className="w-36 px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 dark:text-gray-400 border-r border-gray-200 dark:border-gray-600">
                   {setting.maxEventsPerMonth || 'Unlimited'}
                 </td>
-                <td className="px-2 sm:px-4 lg:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium">
+                <td className="w-48 px-2 sm:px-4 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium">
                   <div className="flex items-center justify-end gap-1 sm:gap-2" onClick={(e) => e.stopPropagation()}>
                     <Link
                       href={`/admin/tenant-management/settings/${setting.id}`}
@@ -314,7 +355,7 @@ export default function TenantSettingsList({
             ))}
             {settings.length === 0 && !loading && (
               <tr>
-                <td className="px-2 sm:px-4 lg:px-6 py-4 text-xs sm:text-sm text-gray-500 dark:text-gray-400 text-center" colSpan={7}>
+                <td className="px-2 sm:px-4 py-4 text-xs sm:text-sm text-gray-500 dark:text-gray-400 text-center" colSpan={8}>
                   <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 border-2 border-orange-300 rounded-lg shadow-sm">
                     <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
