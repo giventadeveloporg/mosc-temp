@@ -395,18 +395,67 @@ const testScenarios = [
     requiresAuth: true,
     expectedElements: [
       'h1',
-      '[class*="grid"], [class*="card"]',
-      'a[href*="/admin/events/new"], button',
-      'input[type="search"], input[type="text"]',
-      'table, [class*="table"]'
+      'div.text-lg.font-semibold.text-blue-800',
+      'a[aria-label="Create New Event"]',
+      'a[aria-label="Event Analytics Dashboard"]',
+      'a[aria-label="Manage Usage"]',
+      'select',
+      'input[type="text"], input[type="number"]',
+      'input[type="date"]',
+      'button[aria-label="Show Past Events"], button[aria-label="Show Future Events"]',
+      'button[aria-label="Refresh events from database"]',
+      'table, [class*="table"], [class*="grid"]',
+      'button[aria-label="Previous Page"], button[aria-label="Next Page"]'
     ],
     validation: [
-      'Events management hub loads',
-      'Event cards or list displayed',
-      'Create new event button visible',
-      'Search/filter controls present',
-      'Event list table functional',
-      'Pagination controls work'
+      'Manage Events (/admin/manage-events) loads',
+      'Primary action cards visible',
+      'Search Events panel visible',
+      'Text/number/date/select filters present',
+      'Future/Past toggle and refresh controls present',
+      'Event list region and pagination controls visible'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'a[aria-label="Create New Event"]', timeout: 15000 },
+      { type: 'check', selector: 'a[aria-label="Create New Event"]', visible: true },
+      { type: 'check', selector: 'button[aria-label="Refresh events from database"]', visible: true },
+      { type: 'check', selector: 'h1', visible: true }
+    ]
+  },
+  {
+    id: 'sanity-046',
+    name: 'Admin Event Analytics Dashboard Test',
+    url: '/admin/events/dashboard',
+    category: 'admin-pages',
+    priority: 'high',
+    requiresAuth: true,
+    expectedElements: [
+      'h1',
+      'div.bg-white.rounded-lg.shadow',
+      'h3:has-text("Registration Trends")',
+      'h3:has-text("Guest Age Groups")',
+      'h3:has-text("Guest Relationships")',
+      'h3:has-text("Special Requirements")',
+      'h3:has-text("Top Events by Attendance")',
+      'h3:has-text("Recent Registrations")',
+      'select',
+      'button[aria-label="Previous Page"], button[aria-label="Next Page"], span.text-sm.font-medium.text-orange-700',
+      'a[aria-label="Event Analytics"]',
+      'a[aria-label="View All Registrations"]'
+    ],
+    validation: [
+      'Event analytics dashboard loads',
+      'Metrics and analytics cards visible',
+      'Registration trends and time range selector visible',
+      'Recent registrations section visible',
+      'Pagination controls or empty-state visible',
+      'Action links are accessible'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'h3:has-text("Registration Trends")', timeout: 15000 },
+      { type: 'check', selector: 'h3:has-text("Recent Registrations")', visible: true },
+      { type: 'check', selector: 'a[aria-label="View All Registrations"]', visible: true },
+      { type: 'check', selector: 'h1', visible: true }
     ]
   },
   {
@@ -589,19 +638,26 @@ const testScenarios = [
     priority: 'high',
     requiresAuth: true,
     expectedElements: [
-      'h1',
-      'table, [class*="table"]',
-      'button, form',
-      'input[type="text"], input[type="email"], input[type="tel"]',
-      'button[type="submit"]'
+      'h1:has-text("Global Contacts")',
+      'input[placeholder*="Search contacts"], select:has(option:has-text("All Events"))',
+      'button[aria-label="Add Contact"]',
+      'table thead th, span:has-text("No contacts found")',
+      'button[aria-label="Edit"], button[aria-label="Delete"], span:has-text("No contacts found")',
+      'button[aria-label="Previous Page"], button[aria-label="Next Page"]',
+      'span:has-text("Showing"), span:has-text("No contacts found")'
     ],
     validation: [
       'Contacts management page loads',
-      'Contacts table visible',
-      'Add/edit buttons accessible',
-      'Form elements present',
-      'Contact information displayed',
-      'CRUD operations functional'
+      'Header, search input, event filter, and Add Contact action are visible',
+      'Contacts table headers appear when data exists, otherwise no-contacts state appears',
+      'Row edit/delete actions are visible when rows exist',
+      'Pagination controls and item-count footer are visible'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'button[aria-label="Add Contact"]', timeout: 12000 },
+      { type: 'check', selector: 'input[placeholder*="Search contacts"]', visible: true },
+      { type: 'check', selector: 'select:has(option:has-text("All Events"))', visible: true },
+      { type: 'check', selector: 'h1:has-text("Global Contacts")', visible: true }
     ]
   },
   {
@@ -612,19 +668,26 @@ const testScenarios = [
     priority: 'high',
     requiresAuth: true,
     expectedElements: [
-      'h1',
-      'table, [class*="table"]',
-      'button, form',
-      'input[type="email"], input[type="text"]',
-      'button[type="submit"]'
+      'h1:has-text("Global Emails")',
+      'button[aria-label="Add Email"]',
+      'input[placeholder*="Search emails"]',
+      'table thead th, span:has-text("No emails found")',
+      'button[aria-label="Edit"], button[aria-label="Delete"], span:has-text("No emails found")',
+      'button[aria-label="Previous Page"], button[aria-label="Next Page"]',
+      'span:has-text("Showing"), span:has-text("No emails found")'
     ],
     validation: [
       'Emails management page loads',
-      'Emails table visible',
-      'Create email button accessible',
-      'Form elements present',
-      'Email validation works',
-      'List functionality works'
+      'Header, search control, and Add Email action are visible',
+      'Emails table headers appear when data exists, otherwise no-emails state appears',
+      'Row edit/delete actions are visible when rows exist',
+      'Pagination controls and item-count footer are visible'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'button[aria-label="Add Email"]', timeout: 12000 },
+      { type: 'check', selector: 'input[placeholder*="Search emails"]', visible: true },
+      { type: 'check', selector: 'h1:has-text("Global Emails")', visible: true },
+      { type: 'check', selector: 'button[aria-label="Previous Page"]', visible: true }
     ]
   },
   {
@@ -635,19 +698,26 @@ const testScenarios = [
     priority: 'high',
     requiresAuth: true,
     expectedElements: [
-      'h1',
-      'table, [class*="table"], [class*="grid"]',
-      'button, a[href*="/new"]',
-      'form, input[type="text"]',
-      'img, [class*="image"]'
+      'h1:has-text("Global Program Directors")',
+      'input[placeholder*="Search directors"], select:has(option:has-text("All Events"))',
+      'button[aria-label="Add Director"]',
+      'table thead th, span:has-text("No directors found")',
+      'button[aria-label="Edit"], button[aria-label="Delete"], span:has-text("No directors found")',
+      'button[aria-label="Previous Page"], button[aria-label="Next Page"]',
+      'span:has-text("Showing"), span:has-text("No directors found")'
     ],
     validation: [
       'Program directors page loads',
-      'Directors list visible',
-      'Add director button accessible',
-      'Form elements present',
-      'Director images load',
-      'Management functions work'
+      'Header, search control, event filter, and Add Director action are visible',
+      'Directors table headers appear when data exists, otherwise no-directors state appears',
+      'Row edit/delete actions are visible when rows exist',
+      'Pagination controls and item-count footer are visible'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'button[aria-label="Add Director"]', timeout: 12000 },
+      { type: 'check', selector: 'input[placeholder*="Search directors"]', visible: true },
+      { type: 'check', selector: 'select:has(option:has-text("All Events"))', visible: true },
+      { type: 'check', selector: 'h1:has-text("Global Program Directors")', visible: true }
     ]
   },
   {
@@ -659,18 +729,34 @@ const testScenarios = [
     requiresAuth: true,
     expectedElements: [
       'h1',
+      'a[aria-label="Back to Admin"]',
+      'a[aria-label="Manage Events"]',
+      'a[aria-label="Manage Usage"]',
+      'a[aria-label="Event Analytics Dashboard"]',
+      'a[aria-label="Communication Center"]',
+      'button[aria-label="Search Events"]',
+      'input[type="number"], input[type="date"], input[type="text"]',
+      'button[aria-label="Search Registrations"]',
+      'button[aria-label="Export CSV"]',
       'table, [class*="table"]',
-      'select, input[type="text"]',
-      'button',
-      '[class*="pagination"], [class*="filter"]'
+      'button[aria-label="Previous Page"], button[aria-label="Next Page"], p:has-text("Search by event to view registrations")',
+      'a[aria-label="Back to Manage Events"]',
+      'a[aria-label="Event Analytics"]'
     ],
     validation: [
-      'Registrations page loads',
-      'Registrations table visible',
-      'Filter/search controls present',
-      'Export or action buttons accessible',
-      'Pagination works',
-      'Registration details accessible'
+      'Event registrations page loads',
+      'Header and quick action navigation links visible',
+      'Event search controls present (ID/name/date range)',
+      'Registration search and CSV export controls present',
+      'Registrations table area visible when event selected',
+      'Pagination controls appear for selected event or no-event prompt appears',
+      'Bottom action links visible'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'button[aria-label="Search Events"]', timeout: 15000 },
+      { type: 'check', selector: 'button[aria-label="Search Registrations"]', visible: true },
+      { type: 'check', selector: 'button[aria-label="Export CSV"]', visible: true },
+      { type: 'check', selector: 'a[aria-label="Back to Manage Events"]', visible: true }
     ]
   },
   {
@@ -682,18 +768,32 @@ const testScenarios = [
     requiresAuth: true,
     expectedElements: [
       'h1',
-      'table, [class*="table"], [class*="grid"]',
-      'button, a[href*="/new"]',
-      'form, input[type="text"], input[type="number"]',
-      'button[type="submit"]'
+      'a[aria-label="Back to Admin"]',
+      'button[aria-label="Create Plan"]',
+      'a[href="/admin/membership/subscriptions"]',
+      'a[href="/admin/membership/plans"]',
+      'h2, [role="dialog"]',
+      'button[aria-label="Create Your First Plan"], p:has-text("No membership plans found.")',
+      'table thead th, p:has-text("No membership plans found.")',
+      'button[title="Edit"], button[title="Delete"], button[title="Activate"], button[title="Deactivate"]',
+      'button[aria-label="Previous Page"]',
+      'button[aria-label="Next Page"]',
+      'span:has-text("Showing"), span:has-text("No plans found")'
     ],
     validation: [
       'Membership plans page loads',
-      'Plans list visible',
-      'Create plan button accessible',
-      'Form elements present',
-      'Plan details displayed',
-      'CRUD operations work'
+      'Back and membership navigation controls visible',
+      'Create plan modal structure is available',
+      'Plans table headers or empty-state content visible',
+      'Plan row actions (edit/status toggle/delete) visible when data exists',
+      'Pagination footer and item-count footer present'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'button[aria-label="Create Plan"]', timeout: 10000 },
+      { type: 'check', selector: 'button[aria-label="Create Plan"]', visible: true },
+      { type: 'check', selector: 'a[aria-label="Back to Admin"]', visible: true },
+      { type: 'check', selector: 'a[href="/admin/membership/subscriptions"]', visible: true },
+      { type: 'check', selector: 'button[aria-label="Previous Page"]', visible: true }
     ]
   },
   {
@@ -705,18 +805,28 @@ const testScenarios = [
     requiresAuth: true,
     expectedElements: [
       'h1',
-      'table, [class*="table"]',
-      'button, a[href*="/subscriptions"]',
-      'select, input[type="text"]',
-      '[class*="status"], [class*="filter"]'
+      'a[aria-label="Back to Admin"]',
+      'a[href="/admin/membership/plans"]',
+      'a[href="/admin/membership/subscriptions"]',
+      'label:has-text("Filter by Status"), select',
+      'table thead th, p:has-text("No subscriptions found.")',
+      'button[aria-label="View subscription details"], button[aria-label="Cancel subscription"], p:has-text("No subscriptions found.")',
+      'button[aria-label="Previous page"], button[aria-label="Next page"], p:has-text("No subscriptions found.")',
+      'div:has-text("Showing"), p:has-text("No subscriptions found.")'
     ],
     validation: [
       'Subscriptions page loads',
-      'Subscriptions table visible',
-      'View details buttons accessible',
-      'Filter controls present',
-      'Subscription status displayed',
-      'Cancel functionality works'
+      'Back and membership navigation links are visible',
+      'Status filter control is present',
+      'Subscriptions table headers appear when data exists, otherwise empty-state message appears',
+      'View-details and cancel row actions are visible when rows exist',
+      'Pagination controls and item-count footer appear when multiple pages exist'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'select', timeout: 10000 },
+      { type: 'check', selector: 'a[aria-label="Back to Admin"]', visible: true },
+      { type: 'check', selector: 'a[href="/admin/membership/plans"]', visible: true },
+      { type: 'check', selector: 'label:has-text("Filter by Status")', visible: true }
     ]
   },
   {
@@ -729,18 +839,31 @@ const testScenarios = [
     expectedElements: [
       'h1',
       'table, [class*="table"]',
-      'input[type="search"], select',
-      'button, form',
-      '[class*="user"], [class*="profile"]'
+      'table thead th',
+      'input[type="text"]',
+      'select',
+      'button[aria-label="Bulk Upload User List"]',
+      'a[aria-label="Download Bulk Upload Template File"]',
+      'button[aria-label="Previous Page"]',
+      'button[aria-label="Next Page"]',
+      'button[aria-label="Edit User"], button[aria-label="Approve User"], span.text-sm.font-medium.text-orange-700',
     ],
     validation: [
-      'Manage usage page loads',
-      'Users table visible',
-      'Search functionality works',
-      'User profile editing accessible',
-      'Status filters work',
-      'User management functions work'
-    ]
+      'Manage Users (/admin/manage-usage) loads',
+      'Users table and column headers visible',
+      'Search text input + search-field select + status + role filters',
+      'Bulk upload and download template controls visible',
+      'Pagination (Previous / Next) visible',
+      'Edit / Approve actions when rows exist, or empty-state messaging when no users',
+    ],
+    interactions: [
+      { type: 'wait', selector: 'button[aria-label="Bulk Upload User List"]', timeout: 15000 },
+      { type: 'check', selector: 'button[aria-label="Bulk Upload User List"]', visible: true },
+      { type: 'check', selector: 'a[aria-label="Download Bulk Upload Template File"]', visible: true },
+      { type: 'check', selector: 'button[aria-label="Previous Page"]', visible: true },
+      { type: 'check', selector: 'button[aria-label="Next Page"]', visible: true },
+      { type: 'check', selector: 'h1', visible: true },
+    ],
   },
   {
     id: 'sanity-031',
@@ -750,19 +873,29 @@ const testScenarios = [
     priority: 'medium',
     requiresAuth: true,
     expectedElements: [
-      'h1',
-      'table, [class*="table"], [class*="grid"]',
-      'button, form',
-      'input[type="text"], img',
-      'button[type="submit"]'
+      'h1:has-text("Executive Committee Management")',
+      'h2:has-text("Team Members Management")',
+      'button[aria-label="Add Member"]',
+      '#exec-committee-search',
+      'table thead th, h3:has-text("No team members yet")',
+      'button[aria-label="View Member"], button[aria-label="Edit Team Member"], button[aria-label="Delete Team Member"], p:has-text("No members found."), p:has-text("No members match your search.")',
+      'button[aria-label="Previous Page"], button[aria-label="Next Page"]',
+      'span:has-text("Showing")'
     ],
     validation: [
       'Executive committee page loads',
-      'Committee members list visible',
-      'Add/edit buttons accessible',
-      'Form elements present',
-      'Member images load',
-      'Management functions work'
+      'Page header, management section, and Add Member control are visible',
+      'Search input is visible',
+      'Members table headers appear when data exists, otherwise empty-state messaging appears',
+      'Row actions (view/edit/delete) appear when members exist',
+      'Pagination and item-count footer are visible',
+      'Matches admin executive-committee UI'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'button[aria-label="Add Member"]', timeout: 15000 },
+      { type: 'check', selector: 'button[aria-label="Add Member"]', visible: true },
+      { type: 'check', selector: '#exec-committee-search', visible: true },
+      { type: 'check', selector: 'h1:has-text("Executive Committee Management")', visible: true }
     ]
   },
   {
@@ -774,18 +907,29 @@ const testScenarios = [
     requiresAuth: true,
     expectedElements: [
       'h1',
+      '#focus-groups-search',
+      'input[type="search"]',
       'table, [class*="table"], [class*="grid"]',
-      'a[href*="/new"], button',
-      'form, input[type="text"]',
-      'button[type="submit"]'
+      'a[href*="/admin/focus-groups/new"], a[href*="/focus-groups/new"]',
+      'table thead th',
+      'a[aria-label="Edit Focus Group"], a[aria-label="Manage Events"], a[aria-label="Manage Members"], a[aria-label="View Media"], span.text-sm.font-medium.text-orange-700',
+      'button[aria-label="Previous Page"], button[aria-label="Next Page"], span:has-text("Showing")'
     ],
     validation: [
       'Focus groups page loads',
-      'Groups list visible',
-      'Create group button accessible',
-      'Action buttons present',
-      'Group management works',
-      'Form validation functional'
+      'Search by name/slug input visible',
+      'Groups table visible',
+      'New group link accessible',
+      'Table headers present',
+      'Row action links visible when groups exist',
+      'Pagination and item count visible when groups exist',
+      'List UI matches admin focus-groups page'
+    ],
+    interactions: [
+      { type: 'wait', selector: '#focus-groups-search', timeout: 10000 },
+      { type: 'check', selector: '#focus-groups-search', visible: true },
+      { type: 'check', selector: 'a[href*="/admin/focus-groups/new"], a[href*="/focus-groups/new"]', visible: true },
+      { type: 'check', selector: 'h1', visible: true }
     ]
   },
   {
@@ -797,18 +941,24 @@ const testScenarios = [
     requiresAuth: true,
     expectedElements: [
       'h1',
-      'table, [class*="table"], [class*="grid"]',
-      'button, a[href*="/new"]',
-      'form, input[type="text"]',
-      'button[type="submit"]'
+      'h2',
+      'button[aria-label="Create Poll"], button[aria-label="Create Your First Poll"]',
+      'input[type="text"]',
+      '[class*="card"], [class*="grid"]',
+      'button[aria-label="View Poll"], button[aria-label="Edit Poll"], button[aria-label="Delete Poll"], p:has-text("No polls created yet.")'
     ],
     validation: [
       'Polls management page loads',
-      'Polls list visible',
-      'Create poll button accessible',
-      'Action buttons present',
-      'Poll options management works',
-      'Vote tracking functional'
+      'Poll Management title and subtitle visible',
+      'Create Poll control accessible',
+      'Search polls input visible',
+      'Poll cards visible when polls exist',
+      'View/Edit/Delete actions visible when cards exist, or empty-state create prompt visible'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'button[aria-label="Create Poll"], button[aria-label="Create Your First Poll"]', timeout: 15000 },
+      { type: 'check', selector: 'input[type="text"]', visible: true },
+      { type: 'check', selector: 'h1', visible: true }
     ]
   },
   {
@@ -819,19 +969,28 @@ const testScenarios = [
     priority: 'medium',
     requiresAuth: true,
     expectedElements: [
-      'h1',
-      'nav, [class*="tab"]',
-      'button, form',
-      'table, [class*="table"]',
-      'a[href*="/organizations/"]'
+      'h1:has-text("Tenant Organizations")',
+      'h2:has-text("Tenant Organizations")',
+      'a[aria-label="Create New Organization"]',
+      'input[placeholder*="Search by organization name"], select:has(option:has-text("All Statuses")), select:has(option:has-text("All Organizations"))',
+      'table thead th, span:has-text("No organizations found")',
+      'a[aria-label="View Organization"], a[aria-label="Edit Organization"], button[aria-label="Delete Organization"], span:has-text("No organizations found")',
+      'button[aria-label="Previous Page"], button[aria-label="Next Page"]',
+      'span:has-text("Showing"), span:has-text("No organizations found")'
     ],
     validation: [
-      'Tenant management page loads',
-      'Tabs or navigation visible',
-      'Organizations list displayed',
-      'Settings forms accessible',
-      'Save buttons present',
-      'Organization management works'
+      'Tenant organizations page loads',
+      'Page header and create organization action are visible',
+      'Search and filter controls are visible',
+      'Organization table headers appear when data exists, otherwise no-organizations state appears',
+      'Row actions (view/edit/delete) are visible when rows exist',
+      'Pagination controls and item-count footer are visible'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'a[aria-label="Create New Organization"]', timeout: 12000 },
+      { type: 'check', selector: 'input[placeholder*="Search by organization name"]', visible: true },
+      { type: 'check', selector: 'select:has(option:has-text("All Statuses"))', visible: true },
+      { type: 'check', selector: 'h1:has-text("Tenant Organizations")', visible: true }
     ]
   },
   {
@@ -842,19 +1001,28 @@ const testScenarios = [
     priority: 'medium',
     requiresAuth: true,
     expectedElements: [
-      'h1',
-      'form',
-      'input[type="text"], input[type="email"]',
-      'button[type="submit"]',
-      'table, [class*="table"]'
+      'h1:has-text("Tenant Settings")',
+      'h2:has-text("Tenant Settings")',
+      'a[aria-label="Create New Settings"]',
+      'input[placeholder*="Search by tenant ID"], input[placeholder*="Filter by specific tenant ID"]',
+      'table thead th, span:has-text("No settings found")',
+      'a[aria-label="View details"], a[aria-label="Edit settings"], button[aria-label="Delete settings"], span:has-text("No settings found")',
+      'button[aria-label="Previous Page"], button[aria-label="Next Page"]',
+      'span:has-text("Showing"), span:has-text("No settings found")'
     ],
     validation: [
       'Tenant settings page loads',
-      'Settings form visible',
-      'Input fields accessible',
-      'Save button present',
-      'Settings list displayed',
-      'Edit functionality works'
+      'Page header and create settings action are visible',
+      'Search and tenant filter inputs are visible',
+      'Settings table headers appear when data exists, otherwise no-settings state appears',
+      'Row actions (view/edit/delete) are visible when rows exist',
+      'Pagination controls and item-count footer are visible'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'a[aria-label="Create New Settings"]', timeout: 12000 },
+      { type: 'check', selector: 'input[placeholder*="Search by tenant ID"]', visible: true },
+      { type: 'check', selector: 'input[placeholder*="Filter by specific tenant ID"]', visible: true },
+      { type: 'check', selector: 'h1:has-text("Tenant Settings")', visible: true }
     ]
   },
   {
@@ -866,18 +1034,25 @@ const testScenarios = [
     requiresAuth: true,
     expectedElements: [
       'h1',
-      'form',
-      'input[type="email"], textarea',
-      'button[type="submit"]',
-      'select, input[type="checkbox"]'
+      'p:has-text("Send bulk emails to your members and subscribers")',
+      'a[href="/admin/promotion-emails"]',
+      'a[href="/admin/newsletter-emails"]',
+      'h2:has-text("Promotional Emails for Events")',
+      'h2:has-text("Newsletter Emails")',
+      'li:has-text("Create event-specific email templates"), li:has-text("Create newsletter email templates")'
     ],
     validation: [
-      'Bulk email page loads',
-      'Email form visible',
-      'Recipient selection works',
-      'Message editor accessible',
-      'Send button present',
-      'Email templates functional'
+      'Bulk email management page loads',
+      'Page title and intro description are visible',
+      'Promotional emails and newsletter cards are visible',
+      'Navigation links to promotion-emails and newsletter-emails are present',
+      'Feature bullet lists are displayed in both cards'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'a[href="/admin/promotion-emails"]', timeout: 10000 },
+      { type: 'check', selector: 'a[href="/admin/promotion-emails"]', visible: true },
+      { type: 'check', selector: 'a[href="/admin/newsletter-emails"]', visible: true },
+      { type: 'check', selector: 'h2:has-text("Newsletter Emails")', visible: true }
     ]
   },
   {
@@ -889,18 +1064,26 @@ const testScenarios = [
     requiresAuth: true,
     expectedElements: [
       'h1',
-      'table, [class*="table"]',
-      'button, form',
-      'input[type="email"]',
-      'button[type="submit"]'
+      'button[aria-label="Add Email Address"]',
+      'label:has-text("Search"), input[placeholder*="Search by email"]',
+      'table thead th, p:has-text("No tenant email addresses configured yet.")',
+      'button[aria-label="Previous Page"], button[aria-label="Next Page"]',
+      'span:has-text("Showing"), span:has-text("No email addresses found")',
+      'button[aria-label="Edit"], button[aria-label="Delete"], p:has-text("No tenant email addresses configured yet.")'
     ],
     validation: [
-      'Email addresses page loads',
-      'Email addresses table visible',
-      'Add email button accessible',
-      'Form elements present',
-      'Email validation works',
-      'CRUD operations functional'
+      'Tenant email addresses page loads',
+      'Header and add-email action are visible',
+      'Search input is visible',
+      'Email table headers appear when data exists, otherwise empty-state message appears',
+      'Row action controls (edit/delete) are present when rows exist',
+      'Pagination controls and item-count footer are visible'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'button[aria-label="Add Email Address"]', timeout: 10000 },
+      { type: 'check', selector: 'button[aria-label="Add Email Address"]', visible: true },
+      { type: 'check', selector: 'label:has-text("Search")', visible: true },
+      { type: 'check', selector: 'button[aria-label="Previous Page"]', visible: true }
     ]
   },
   {
@@ -1104,6 +1287,416 @@ const testScenarios = [
       'Text is readable',
       'Navigation works',
       'Page structure correct'
+    ]
+  },
+  {
+    id: 'sanity-047',
+    name: 'Admin Test Stripe Page Test',
+    url: '/admin/test-stripe',
+    category: 'admin-pages',
+    priority: 'medium',
+    requiresAuth: true,
+    expectedElements: [
+      'h1:has-text("Test Stripe Transaction")',
+      'h2:has-text("Test Stripe Integration")',
+      'label[for="amount"], input#amount',
+      'button[aria-label="Test Stripe Payment"]',
+      'h3:has-text("Test Card Numbers")',
+      'p:has-text("Success:"), p:has-text("Decline:"), p:has-text("Insufficient Funds:")'
+    ],
+    validation: [
+      'Admin test stripe page loads',
+      'Stripe integration info panel is visible',
+      'Amount input and test payment action are visible',
+      'Test card reference section is displayed'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'input#amount', timeout: 10000 },
+      { type: 'check', selector: 'button[aria-label="Test Stripe Payment"]', visible: true },
+      { type: 'check', selector: 'h3:has-text("Test Card Numbers")', visible: true }
+    ]
+  },
+  {
+    id: 'sanity-048',
+    name: 'Admin Media Management Test',
+    url: '/admin/media',
+    category: 'admin-pages',
+    priority: 'high',
+    requiresAuth: true,
+    expectedElements: [
+      'h1:has-text("Manage Media Files")',
+      'button[aria-label="Upload New Media"]',
+      'h2:has-text("Search Media"), input#search-input, input#serial-input',
+      'button[aria-label="Go to Image"]',
+      'input[type="checkbox"][aria-label="Select all on this page"], button[aria-label="Delete selected"]',
+      'button[title="View details"], button[aria-label="Edit Media"], button[aria-label="Delete Media"], div:has-text("No media found.")',
+      'button[aria-label="Previous Page"], button[aria-label="Next Page"]',
+      'span:has-text("Showing"), span:has-text("No media found")'
+    ],
+    validation: [
+      'Admin media page loads',
+      'Header and upload action are visible',
+      'Search controls (title and serial number) are visible',
+      'Bulk selection and delete-selected controls are present',
+      'Media card action buttons appear when results exist, otherwise no-media state appears',
+      'Pagination controls and item-count footer are visible'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'button[aria-label="Upload New Media"]', timeout: 12000 },
+      { type: 'check', selector: 'input#search-input', visible: true },
+      { type: 'check', selector: 'button[aria-label="Go to Image"]', visible: true },
+      { type: 'check', selector: 'button[aria-label="Delete selected"]', visible: true }
+    ]
+  },
+  {
+    id: 'sanity-049',
+    name: 'Admin Gallery Albums Test',
+    url: '/admin/gallery/albums',
+    category: 'admin-pages',
+    priority: 'high',
+    requiresAuth: true,
+    expectedElements: [
+      'h1:has-text("Gallery Albums")',
+      'a[aria-label="Admin Dashboard"]',
+      'button[aria-label="Create New Album"]',
+      'form:has(input[placeholder*="Search albums by title"]), button:has-text("Search")',
+      'a[aria-label="Manage Media"], a[aria-label="Edit Album"], button[aria-label="Delete Album"], h3:has-text("No albums found")',
+      'button[aria-label="Previous Page"], button[aria-label="Next Page"], span:has-text("Showing")',
+      'button[aria-label="Cancel"], button[aria-label="Create Album"]'
+    ],
+    validation: [
+      'Gallery albums page loads',
+      'Header, breadcrumb action, and create album control are visible',
+      'Search bar and search submit action are present',
+      'Album card actions (manage media/edit/delete) appear when albums exist, otherwise no-albums state appears',
+      'Pagination controls and item-count footer appear when there are results',
+      'Create album modal actions are present'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'button[aria-label="Create New Album"]', timeout: 12000 },
+      { type: 'check', selector: 'a[aria-label="Admin Dashboard"]', visible: true },
+      { type: 'check', selector: 'button:has-text("Search")', visible: true },
+      { type: 'check', selector: 'h1:has-text("Gallery Albums")', visible: true }
+    ]
+  },
+  {
+    id: 'sanity-050',
+    name: 'Admin Global Event Sponsors Test',
+    url: '/admin/event-sponsors',
+    category: 'admin-pages',
+    priority: 'high',
+    requiresAuth: true,
+    expectedElements: [
+      'h1:has-text("Global Sponsors")',
+      'button[aria-label="Add Sponsor"]',
+      'input[placeholder*="Search sponsors"]',
+      'select:has(option:has-text("All Types")), select:has(option:has-text("All Status"))',
+      'table thead th, span:has-text("No sponsors found")',
+      'a[href^="/admin/event-sponsors/"], button[aria-label="Delete"], span:has-text("No sponsors found")',
+      'button[aria-label="Previous Page"], button[aria-label="Next Page"]',
+      'span:has-text("Showing"), span:has-text("No sponsors found")'
+    ],
+    validation: [
+      'Global event sponsors page loads',
+      'Header, search controls, and Add Sponsor action are visible',
+      'Type and status filter controls are visible',
+      'Sponsors table headers appear when data exists, otherwise no-sponsors state appears',
+      'Sponsor row actions are visible when rows exist',
+      'Pagination controls and item-count footer are visible'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'button[aria-label="Add Sponsor"]', timeout: 12000 },
+      { type: 'check', selector: 'input[placeholder*="Search sponsors"]', visible: true },
+      { type: 'check', selector: 'select:has(option:has-text("All Status"))', visible: true },
+      { type: 'check', selector: 'h1:has-text("Global Sponsors")', visible: true }
+    ]
+  },
+  {
+    id: 'sanity-051',
+    name: 'Admin Homepage Cache Test',
+    url: '/admin/homepage-cache',
+    category: 'admin-pages',
+    priority: 'high',
+    requiresAuth: true,
+    expectedElements: [
+      'h1:has-text("Cache records")',
+      'button[aria-label="Reload data from database"]',
+      'table thead th, td:has-text("No tenant settings found. Create tenant settings first.")',
+      'button[aria-label="Refresh cache records for this tenant"], td:has-text("No tenant settings found. Create tenant settings first.")',
+      'div:has-text("Cache refreshed for"), div:has-text("Failed to refresh cache")'
+    ],
+    validation: [
+      'Homepage cache page loads',
+      'Header and reload data action are visible',
+      'Cache table headers appear when settings exist, otherwise empty-state message appears',
+      'Per-row refresh cache action is visible when settings exist',
+      'Success or failure status messaging area is present after refresh attempts'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'h1:has-text("Cache records")', timeout: 12000 },
+      { type: 'check', selector: 'button[aria-label="Reload data from database"]', visible: true },
+      { type: 'check', selector: 'table thead th, td:has-text("No tenant settings found. Create tenant settings first.")', visible: true }
+    ]
+  },
+  {
+    id: 'sanity-052',
+    name: 'Admin Tenant Management CRUD Test Page',
+    url: '/admin/tenant-management/test',
+    category: 'admin-pages',
+    priority: 'medium',
+    requiresAuth: true,
+    expectedElements: [
+      'h1:has-text("Test CRUD Operations")',
+      'a:has-text("Admin Dashboard"), a:has-text("Tenant Management"), span:has-text("Test CRUD Operations")',
+      'h2:has-text("Test Controls"), h2:has-text("Test Results"), h2:has-text("Test Logs")',
+      'button[aria-label="Run All Tests"], button[aria-label="Test Organizations Only"], button[aria-label="Test Settings Only"], button[aria-label="Clear Results"]',
+      'div:has-text("All Tests"), div:has-text("Organizations"), div:has-text("Settings")',
+      'p:has-text("No logs yet. Run a test to see the output.")'
+    ],
+    validation: [
+      'Tenant management CRUD test page loads',
+      'Breadcrumb navigation and page header are visible',
+      'Test controls and all action buttons are visible',
+      'Result tiles for all tests, organizations, and settings are visible',
+      'Logs section shows initial no-logs message before running tests'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'h1:has-text("Test CRUD Operations")', timeout: 12000 },
+      { type: 'check', selector: 'button[aria-label="Run All Tests"]', visible: true },
+      { type: 'check', selector: 'button[aria-label="Test Organizations Only"]', visible: true },
+      { type: 'check', selector: 'button[aria-label="Test Settings Only"]', visible: true },
+      { type: 'check', selector: 'h2:has-text("Test Results")', visible: true },
+      { type: 'check', selector: 'h2:has-text("Test Logs")', visible: true }
+    ]
+  },
+  {
+    id: 'sanity-053',
+    name: 'Admin Global Performers Test',
+    url: '/admin/event-featured-performers',
+    category: 'admin-pages',
+    priority: 'medium',
+    requiresAuth: true,
+    expectedElements: [
+      'h1:has-text("Global Performers")',
+      'input[placeholder*="Search performers"], select:has(option:has-text("All Events"))',
+      'button[aria-label="Add Performer"]',
+      'table thead th, span:has-text("No performers found")',
+      'button[aria-label="Edit"], button[aria-label="Delete"], span:has-text("No performers found")',
+      'button[aria-label="Previous Page"], button[aria-label="Next Page"]',
+      'span:has-text("Showing"), span:has-text("No performers found")'
+    ],
+    validation: [
+      'Global performers page loads',
+      'Page header, search input, event filter, and Add Performer action are visible',
+      'Performers table headers appear when data exists, otherwise empty-state appears',
+      'Row edit/delete actions are visible when rows exist',
+      'Pagination controls and item-count footer are visible'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'button[aria-label="Add Performer"]', timeout: 12000 },
+      { type: 'check', selector: 'input[placeholder*="Search performers"]', visible: true },
+      { type: 'check', selector: 'select:has(option:has-text("All Events"))', visible: true },
+      { type: 'check', selector: 'h1:has-text("Global Performers")', visible: true }
+    ]
+  },
+  {
+    id: 'sanity-054',
+    name: 'Admin QR Scanner Page Test',
+    url: '/admin/qr-scanner',
+    category: 'admin-pages',
+    priority: 'high',
+    requiresAuth: true,
+    expectedElements: [
+      'h1:has-text("QR Code Scanner")',
+      'p:has-text("Scan QR codes to verify and check in tickets")',
+      'video, canvas, [class*="scanner"], [id*="scanner"]',
+      'h3:has-text("Instructions:"), li:has-text("Point your camera at the QR code on the ticket")',
+      'li:has-text("Use the \\"Switch Camera\\" button to toggle between front and back cameras")',
+      'button:has-text("Scan Another QR Code"), h3:has-text("Valid Ticket"), h3:has-text("Invalid Ticket"), h3:has-text("Error")'
+    ],
+    validation: [
+      'QR scanner page loads',
+      'Scanner title and helper subtitle are visible',
+      'Scanner viewport (video/canvas/scanner element) is visible',
+      'Instructions panel with primary usage guidance is visible',
+      'Post-scan result states or rescan action are available when applicable'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'h1:has-text("QR Code Scanner")', timeout: 12000 },
+      { type: 'check', selector: 'p:has-text("Scan QR codes to verify and check in tickets")', visible: true },
+      { type: 'check', selector: 'video, canvas, [class*="scanner"], [id*="scanner"]', visible: true },
+      { type: 'check', selector: 'h3:has-text("Instructions:")', visible: true }
+    ]
+  },
+  {
+    id: 'sanity-055',
+    name: 'Admin Check-In Analytics Test',
+    url: '/admin/check-in-analytics',
+    category: 'admin-pages',
+    priority: 'high',
+    requiresAuth: true,
+    expectedElements: [
+      'h1:has-text("Check-In Analytics")',
+      'input[placeholder*="Search events by title"], button[aria-label="Search events"]',
+      'button[aria-label="Quick Select Date Range"], button[aria-label="Apply Date Range"], button[aria-label="Clear Date Range"]',
+      'h3:has-text("Getting Started"), p:has-text("Enter an Event ID above to view check-in analytics and history.")',
+      'h3:has-text("Check-In History"), input[placeholder*="Search by name, email, or ID..."], button[aria-label="Export to CSV"]',
+      'table thead th:has-text("Transaction ID"), table thead th:has-text("Check-In Time"), div:has-text("No check-ins found for this event.")'
+    ],
+    validation: [
+      'Check-in analytics page loads',
+      'Header and event search selector controls are visible',
+      'Date range controls are visible for analytics filtering',
+      'Getting-started guidance is visible before event selection',
+      'Check-in history search/export controls appear when event data is loaded',
+      'History table headers appear when data exists, otherwise empty-state message appears'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'h1:has-text("Check-In Analytics")', timeout: 12000 },
+      { type: 'check', selector: 'input[placeholder*="Search events by title"]', visible: true },
+      { type: 'check', selector: 'button[aria-label="Search events"]', visible: true },
+      { type: 'check', selector: 'button[aria-label="Quick Select Date Range"]', visible: true },
+      { type: 'check', selector: 'h3:has-text("Getting Started")', visible: true }
+    ]
+  },
+  {
+    id: 'sanity-056',
+    name: 'Admin Sales Analytics Test',
+    url: '/admin/sales-analytics',
+    category: 'admin-pages',
+    priority: 'high',
+    requiresAuth: true,
+    expectedElements: [
+      'h1:has-text("Sales Analytics")',
+      'p:has-text("View and analyze sales data for your events")',
+      'input[placeholder*="Search events by title"], button[aria-label="Search events"]',
+      'button[aria-label="Quick Select Date Range"], button[aria-label="Apply Date Range"], button[aria-label="Clear Date Range"]',
+      'h3:has-text("Getting Started"), p:has-text("Enter an Event ID above to view sales analytics and reports.")',
+      'h3:has-text("Sales Transactions"), input[placeholder*="Search by name, email, or ID..."], button[aria-label="Export to CSV"], button[aria-label="Export to Excel"]',
+      'p:has-text("Total Revenue"), p:has-text("Gross Revenue"), p:has-text("Net Revenue"), p:has-text("Avg Ticket Price")',
+      'table thead th:has-text("Transaction ID"), table thead th:has-text("Final Amount"), div:has-text("No sales data found for this event.")'
+    ],
+    validation: [
+      'Sales analytics page loads',
+      'Header and event search selector controls are visible',
+      'Date range controls are visible for analytics filtering',
+      'Getting-started guidance is visible before event selection',
+      'Sales metric cards are visible when analytics are available',
+      'Sales transaction search and export controls appear when event data is loaded',
+      'Sales table headers appear when data exists, otherwise empty-state message appears'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'h1:has-text("Sales Analytics")', timeout: 12000 },
+      { type: 'check', selector: 'input[placeholder*="Search events by title"]', visible: true },
+      { type: 'check', selector: 'button[aria-label="Search events"]', visible: true },
+      { type: 'check', selector: 'button[aria-label="Quick Select Date Range"]', visible: true },
+      { type: 'check', selector: 'h3:has-text("Getting Started")', visible: true }
+    ]
+  },
+  {
+    id: 'sanity-057',
+    name: 'Admin Manual Payments Test',
+    url: '/admin/manual-payments',
+    category: 'admin-pages',
+    priority: 'high',
+    requiresAuth: true,
+    expectedElements: [
+      'h1:has-text("Manual Payments")',
+      'input[placeholder*="Search events by title"], button[aria-label="Search events"]',
+      'button[aria-label="Quick Select Date Range"], button[aria-label="Apply Date Range"], button[aria-label="Clear Date Range"]',
+      'h3:has-text("Manual Payment Summary Batch Job"), button:has-text("Batch Job Options"), button[aria-label="Trigger Manual Payment Summary Batch Job"]',
+      'h3:has-text("Getting Started"), p:has-text("Enter an Event ID above to view manual payment requests and summaries.")',
+      'h3:has-text("Manual Payment Requests"), input[placeholder*="Search by ID, handle, or instructions..."], select:has(option:has-text("All Statuses")), select:has(option:has-text("All Methods"))',
+      'table thead th:has-text("Method"), table thead th:has-text("Status"), a:has-text("View"), button:has-text("Mark Received"), button:has-text("Cancel")',
+      'button[aria-label="Previous Page"], button[aria-label="Next Page"], span:has-text("Showing"), div:has-text("No manual payments found for this event.")'
+    ],
+    validation: [
+      'Manual payments page loads',
+      'Header and event search selector controls are visible',
+      'Date range controls are visible for manual payment filtering',
+      'Batch job section controls are visible for manual payment summary aggregation',
+      'Getting-started guidance is visible before event selection',
+      'Manual payment request search and status/method filters are visible',
+      'Request table actions appear when data exists, otherwise empty-state message appears',
+      'Pagination and item-count footer controls are visible'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'h1:has-text("Manual Payments")', timeout: 12000 },
+      { type: 'check', selector: 'input[placeholder*="Search events by title"]', visible: true },
+      { type: 'check', selector: 'button[aria-label="Search events"]', visible: true },
+      { type: 'check', selector: 'button[aria-label="Quick Select Date Range"]', visible: true },
+      { type: 'check', selector: 'h3:has-text("Getting Started")', visible: true }
+    ]
+  },
+  {
+    id: 'sanity-058',
+    name: 'Admin Official Documents Test',
+    url: '/admin/official-documents',
+    category: 'admin-pages',
+    priority: 'high',
+    requiresAuth: true,
+    expectedElements: [
+      'h1:has-text("Official documents")',
+      'a:has-text("Admin Dashboard"), a:has-text("Browse categories (list)")',
+      'h2:has-text("Bulk upload"), button:has-text("Upload batch"), label:has-text("Upload folder"), label:has-text("Choose files")',
+      'h2:has-text("Filters"), button:has-text("Apply"), button:has-text("Refresh categories"), button:has-text("Add one file")',
+      'h2:has-text("Year bundle cover"), button:has-text("Create year bundle"), button:has-text("Save cover")',
+      'h2:has-text("Tenant official documents"), table thead th:has-text("Title"), table thead th:has-text("Link"), td:has-text("No documents found. Upload above or adjust filters.")',
+      'button[aria-label="Edit document"], button[aria-label="Delete document"], button[aria-label="Previous Page"], button[aria-label="Next Page"]',
+      'span:has-text("Showing"), span:has-text("No documents match the current filters"), div[role="dialog"]:has-text("Edit official document"), div:has-text("Delete document?")'
+    ],
+    validation: [
+      'Official documents page loads',
+      'Top navigation links to admin dashboard and categories list are visible',
+      'Bulk upload section controls for files and folder upload are visible',
+      'Filter section actions (apply/refresh/add-one-file) are visible',
+      'Year bundle cover controls are visible',
+      'Documents table headers appear when data exists, otherwise no-documents state appears',
+      'Row actions (edit/delete) and pagination controls are visible',
+      'Edit/delete dialog states are available from document actions'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'h1:has-text("Official documents")', timeout: 12000 },
+      { type: 'check', selector: 'h2:has-text("Bulk upload")', visible: true },
+      { type: 'check', selector: 'button:has-text("Upload batch")', visible: true },
+      { type: 'check', selector: 'h2:has-text("Filters")', visible: true },
+      { type: 'check', selector: 'h2:has-text("Tenant official documents")', visible: true }
+    ]
+  },
+  {
+    id: 'sanity-059',
+    name: 'Admin Official Document Categories Test',
+    url: '/admin/official-document-categories',
+    category: 'admin-pages',
+    priority: 'high',
+    requiresAuth: true,
+    expectedElements: [
+      'h1:has-text("Official document categories")',
+      'a:has-text("Admin Dashboard"), a:has-text("Official documents (upload)")',
+      'p:has-text("Manage category slugs used for bulk upload and year bundles. Tenant-scoped via the API.")',
+      'button[aria-label="Add category"], span:has-text("Add category")',
+      'code:has-text("official_document_category"), p:has-text("Rows in"), p:has-text("CRUD is disabled until GET /api/official-document-categories returns data from your backend.")',
+      'table thead th:has-text("Sort"), table thead th:has-text("Active"), table thead th:has-text("Slug"), table thead th:has-text("Display name"), table thead th:has-text("Description"), td:has-text("No categories on this page."), td:has-text("No categories.")',
+      'button[aria-label="Edit category"], button[aria-label="Delete category"], button[aria-label="Previous Page"], button[aria-label="Next Page"]',
+      'span:has-text("Showing"), div:has-text("No categories"), div[role="alert"]:has-text("Slug and display name are required.")',
+      'div[role="dialog"]:has-text("Add category"), div[role="dialog"]:has-text("Edit category"), div[role="alertdialog"]:has-text("Delete category?"), span:has-text("Create"), span:has-text("Save"), span:has-text("Delete")'
+    ],
+    validation: [
+      'Official document categories page loads',
+      'Top navigation links to admin dashboard and official documents upload page are visible',
+      'Page description and tenant/category guidance text are visible',
+      'Add category action is available in API mode',
+      'Categories table headers appear when data exists, otherwise no-categories empty state appears',
+      'Row actions (edit/delete) and pagination controls are visible in API mode',
+      'Pagination footer item count/empty state is visible',
+      'Add/edit/delete dialog states are available from category actions'
+    ],
+    interactions: [
+      { type: 'wait', selector: 'h1:has-text("Official document categories")', timeout: 12000 },
+      { type: 'check', selector: 'a:has-text("Admin Dashboard")', visible: true },
+      { type: 'check', selector: 'a:has-text("Official documents (upload)")', visible: true },
+      { type: 'check', selector: 'p:has-text("Manage category slugs used for bulk upload and year bundles. Tenant-scoped via the API.")', visible: true },
+      { type: 'check', selector: 'table thead th:has-text("Slug")', visible: true }
     ]
   }
 ];

@@ -124,13 +124,24 @@ export default function EventSearchSelect({
             setSearchTerm('');
             setIsOpen(true);
           }}
-          className={`px-3 py-1 text-xs rounded ${
+          title="Search by Title"
+          aria-label="Search by Title"
+          className={`flex-shrink-0 h-14 rounded-xl flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-4 ${
             searchType === 'title'
-              ? 'bg-blue-500 text-white'
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              ? 'bg-blue-100 hover:bg-blue-200'
+              : 'bg-gray-100 hover:bg-gray-200'
           }`}
         >
-          Search by Title
+          <div
+            className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
+              searchType === 'title' ? 'bg-blue-200' : 'bg-gray-200'
+            }`}
+          >
+            <FaSearch className={`${searchType === 'title' ? 'w-6 h-6 text-blue-600' : 'w-6 h-6 text-gray-600'}`} />
+          </div>
+          <span className={`${searchType === 'title' ? 'font-semibold text-blue-700' : 'font-semibold text-gray-700'}`}>
+            Search by Title
+          </span>
         </button>
         <button
           type="button"
@@ -139,13 +150,24 @@ export default function EventSearchSelect({
             setSearchTerm('');
             setIsOpen(true);
           }}
-          className={`px-3 py-1 text-xs rounded ${
+          title="Search by ID"
+          aria-label="Search by ID"
+          className={`flex-shrink-0 h-14 rounded-xl flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-4 ${
             searchType === 'id'
-              ? 'bg-blue-500 text-white'
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              ? 'bg-blue-100 hover:bg-blue-200'
+              : 'bg-indigo-100 hover:bg-indigo-200'
           }`}
         >
-          Search by ID
+          <div
+            className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
+              searchType === 'id' ? 'bg-blue-200' : 'bg-indigo-200'
+            }`}
+          >
+            <FaSearch className={`${searchType === 'id' ? 'w-6 h-6 text-blue-600' : 'w-6 h-6 text-indigo-600'}`} />
+          </div>
+          <span className={`${searchType === 'id' ? 'font-semibold text-blue-700' : 'font-semibold text-indigo-700'}`}>
+            Search by ID
+          </span>
         </button>
       </div>
 

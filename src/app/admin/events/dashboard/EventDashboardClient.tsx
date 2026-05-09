@@ -472,7 +472,7 @@ export default function EventDashboardClient({ data }: EventDashboardClientProps
       {/* Action Buttons */}
       <div className="mt-8 flex justify-center space-x-4">
         <Link
-          href="/admin/event-analytics"
+          href="/admin/events/dashboard"
           className="flex-shrink-0 h-14 rounded-xl bg-teal-100 hover:bg-teal-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
           title="Event Analytics"
           aria-label="Event Analytics"

@@ -5,8 +5,7 @@ import { FaPlus, FaSearch } from 'react-icons/fa';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import DataTable, { Column } from '@/components/ui/DataTable';
-import Modal from '@/components/ui/Modal';
-import ConfirmModal from '@/components/ui/Modal';
+import Modal, { ConfirmModal } from '@/components/ui/Modal';
 import AdminNavigation from '@/components/AdminNavigation';
 import type { EventEmailsDTO } from '@/types';
 import {
@@ -352,6 +351,10 @@ export default function GlobalEventEmailsPage() {
           formData={formData}
           setFormData={setFormData}
           onSubmit={handleCreate}
+          onCancel={() => {
+            setIsCreateModalOpen(false);
+            resetForm();
+          }}
           loading={loading}
           submitText="Create Email"
         />
@@ -372,6 +375,11 @@ export default function GlobalEventEmailsPage() {
           formData={formData}
           setFormData={setFormData}
           onSubmit={handleEdit}
+          onCancel={() => {
+            setIsEditModalOpen(false);
+            setSelectedEmail(null);
+            resetForm();
+          }}
           loading={loading}
           submitText="Update Email"
         />
@@ -399,11 +407,12 @@ interface EmailFormProps {
   formData: Partial<EventEmailsDTO>;
   setFormData: React.Dispatch<React.SetStateAction<Partial<EventEmailsDTO>>>;
   onSubmit: () => void;
+  onCancel: () => void;
   loading: boolean;
   submitText: string;
 }
 
-function EmailForm({ formData, setFormData, onSubmit, loading, submitText }: EmailFormProps) {
+function EmailForm({ formData, setFormData, onSubmit, onCancel, loading, submitText }: EmailFormProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -433,7 +442,7 @@ function EmailForm({ formData, setFormData, onSubmit, loading, submitText }: Ema
       <div className="flex justify-end space-x-3 pt-4">
         <button
           type="button"
-          onClick={() => {/* Close modal logic handled by parent */ }}
+          onClick={onCancel}
           className="flex-shrink-0 h-14 rounded-xl bg-red-100 hover:bg-red-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6 disabled:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           disabled={loading}
           title="Cancel"

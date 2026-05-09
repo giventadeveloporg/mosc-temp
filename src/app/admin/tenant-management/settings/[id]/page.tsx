@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { fetchTenantSetting } from '@/app/admin/tenant-management/settings/ApiServerActions';
+import { fetchTenantOrganization, fetchTenantOrganizations } from '@/app/admin/tenant-management/organizations/ApiServerActions';
 import Link from 'next/link';
 import { FaArrowLeft } from 'react-icons/fa';
 import { TenantSettingsDTO, TenantOrganizationDTO } from '@/app/admin/tenant-management/types';
@@ -31,9 +32,34 @@ export default async function TenantSettingsViewPage({ params }: PageProps) {
       notFound();
     }
 
-    // Use organization data from settings response (already included)
-    if (settings.tenantOrganization && settings.tenantOrganization.id) {
+    // Prefer organization data from settings response; hydrate if incomplete.
+    if (settings.tenantOrganization?.id) {
       organization = settings.tenantOrganization;
+
+      // Some API payloads include only tenantOrganization.id; fetch full org for display fields.
+      if (!organization.organizationName?.trim()) {
+        try {
+          const fullOrganization = await fetchTenantOrganization(settings.tenantOrganization.id);
+          if (fullOrganization) {
+            organization = fullOrganization;
+          }
+        } catch (orgErr) {
+          console.error('Error fetching organization by id:', orgErr);
+        }
+      }
+    } else if (settings.tenantId) {
+      // Fallback: resolve organization by tenantId when relationship is absent on tenant-settings payload.
+      try {
+        const orgResult = await fetchTenantOrganizations(
+          { page: 0, pageSize: 1 },
+          { tenantId: settings.tenantId }
+        );
+        if (orgResult.data.length > 0) {
+          organization = orgResult.data[0];
+        }
+      } catch (orgErr) {
+        console.error('Error fetching organization by tenantId:', orgErr);
+      }
     }
   } catch (err) {
     console.error('Error fetching settings:', err);

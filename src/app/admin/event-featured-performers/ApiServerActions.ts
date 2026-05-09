@@ -56,7 +56,12 @@ export async function fetchEventFeaturedPerformerServer(id: number) {
 }
 
 export async function createEventFeaturedPerformerServer(performer: Omit<EventFeaturedPerformersDTO, 'id' | 'createdAt' | 'updatedAt'>) {
-  const payload = withTenantId(performer);
+  const now = new Date().toISOString();
+  const payload = withTenantId({
+    ...performer,
+    createdAt: now,
+    updatedAt: now,
+  });
 
   const response = await fetchWithJwtRetry(`${getApiBase()}/api/event-featured-performers`, {
     method: 'POST',

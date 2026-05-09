@@ -49,7 +49,7 @@ export default function AdminNavigation({ currentPage, showHome = true }: AdminN
       key: 'manage-events'
     },
     {
-      href: '/admin/event-analytics',
+      href: '/admin/events/dashboard',
       icon: 'chart',
       label: 'Event Analytics',
       color: 'teal',
