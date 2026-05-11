@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Plain English summary of the site redesign guide for mosc-temp, including optional wget mirror/scrape steps for local reference.">
+    <meta name="description" content="Plain English summary of the site redesign guide for mosc-temp: Framer Motion vs 21st.dev (npm vs browser vs API keys), optional wget mirror/scrape for local reference.">
     <title>Site Redesign Guide — Simple Overview</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -114,7 +114,18 @@
         <li><strong>YouTube links</strong> — Optional videos about modern UI, AI design workflows, and related tools.</li>
         <li><strong>A sample prompt</strong> — Text you can paste into Cursor or Claude Code to ask for a careful homepage pass that includes the diaspora theme and lists what still needs human review.</li>
         <li><strong>Optional: mirror a site locally</strong> — See <a href="#wget-mirror">Clone / scrape with wget</a> if you want an offline copy of a page or site for layout reference (use responsibly).</li>
+        <li><strong>Framer Motion and 21st.dev (accounts vs copy-paste)</strong> — See <a href="#motion-and-21st">Framer Motion &amp; 21st.dev — do you need an account?</a>.</li>
     </ul>
+
+    <h2 id="motion-and-21st">Framer Motion and 21st.dev — do you need an account?</h2>
+
+    <h3>Framer Motion (in your Next.js app)</h3>
+    <p><strong>Framer Motion</strong> is an <strong>open-source React animation library</strong> published on npm (see <a href="https://www.framer.com/motion/" rel="noopener noreferrer">framer.com/motion</a>). You <strong>do not</strong> register on a website or create an API key to use it in code. You install it in the repo (for example <code>npm install framer-motion</code>), read the official docs, and <strong>copy or adapt examples</strong> into your own components—typically inside files marked <code>'use client'</code> because animation hooks run in the browser. Licensing follows the library’s open-source terms; there is no separate “Framer Motion login” for the package itself.</p>
+
+    <h3>21st.dev — two different ways to use it</h3>
+    <p><strong>Browsing the site (inspiration / copy snippets)</strong> — You can usually open <a href="https://21st.dev/" rel="noopener noreferrer">21st.dev</a> in the browser, browse components, and <strong>copy code by hand</strong> without setting up an API key. Anything that is clearly “log in to see this” or “Pro” follows their product rules on the site.</p>
+    <p><strong>Magic MCP, CLI, or other integrated flows</strong> — If you wire 21st.dev into Cursor via MCP or use their official CLI installers, you typically need a <strong>21st.dev account and an API key</strong> (often created in their Magic Console). Treat that key like any secret: local MCP config only, not committed to git.</p>
+    <div class="note"><strong>Same detail in the long guide:</strong> <a href="SITE_REDESIGN_MODERN_TOOLS_AND_HOMEPAGE_GUIDE.html#motion-21st-accounts">SITE_REDESIGN_MODERN_TOOLS_AND_HOMEPAGE_GUIDE.html § 3b</a>.</div>
 
     <h2 id="wget-mirror">Optional: clone or scrape a website manually (wget)</h2>
     <p>Sometimes you like a site’s <strong>layout or structure</strong> and want a <strong>local copy</strong> to study in the browser or folder, without using a paid “clone” service. A common free tool is <strong>GNU wget</strong>. This is <strong>not</strong> a substitute for rebuilding your real site in React/Next.js—it is mainly for <strong>reference</strong> (HTML, CSS, assets) while you redesign.</p>

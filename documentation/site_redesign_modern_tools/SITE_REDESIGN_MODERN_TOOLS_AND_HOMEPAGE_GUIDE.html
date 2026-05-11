@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Modern tools for homepage redesign: hero design guidelines, template galleries, hero-named inspiration sites, Claude Code, Framer Motion, UI/UX Pro Max, 21st.dev, Huashu Design, Cursor skills, learning videos, and mosc-temp repo availability.">
+    <meta name="description" content="Modern tools for homepage redesign: hero guidelines, Claude Code, Framer Motion (npm, no API key), 21st.dev (browser copy vs MCP API key), UI/UX Pro Max, Huashu Design, Cursor skills, videos, repo audit.">
     <title>Site Redesign — Modern Tools &amp; Homepage Facelift Guide</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -407,7 +407,7 @@
         <ul>
             <li><a href="#repo-status">1. Availability in this repository (quick audit)</a></li>
             <li><a href="#workflow">2. Recommended four-step workflow</a></li>
-            <li><a href="#tools">3. Tool reference: use, location, install, value</a></li>
+            <li><a href="#tools">3. Tool reference: use, location, install, value</a> — <a href="#motion-21st-accounts">3b. Framer Motion &amp; 21st.dev: accounts and API keys</a></li>
             <li><a href="#homepage">4. Homepage improvements for mosc-temp</a> — <a href="#diaspora-theme">4b. Malayalee / Keralite diaspora theme (research)</a></li>
             <li><a href="#hero-guidelines">5. Hero design: top guidelines &amp; templates</a></li>
             <li><a href="#hero-sites">6. Hero-named sites &amp; hero-focused libraries</a></li>
@@ -508,7 +508,7 @@
                     <td><strong>Framer Motion</strong></td>
                     <td>React animation library: <code>motion</code> components, variants, layout animations.</td>
                     <td><a href="https://www.framer.com/motion/" rel="noopener noreferrer">framer.com/motion</a></td>
-                    <td><code>npm install framer-motion</code> in repo root; import in client components only (<code>'use client'</code>).</td>
+                    <td><code>npm install framer-motion</code> in repo root; import in client components only (<code>'use client'</code>). <strong>No vendor account or API key</strong> for the library—install from npm and follow docs/snippets.</td>
                     <td>Polished section reveals, hero emphasis, and micro-interactions; use sparingly for performance.</td>
                 </tr>
                 <tr>
@@ -527,9 +527,9 @@
                 </tr>
                 <tr>
                     <td><strong>21st.dev</strong></td>
-                    <td>Discover React components; copy/adapt into your tree; respect licensing and attribution.</td>
+                    <td>Discover React components; copy/adapt into your tree; respect licensing and attribution. See <a href="#motion-21st-accounts">3b — accounts and API keys</a>.</td>
                     <td><a href="https://21st.dev/" rel="noopener noreferrer">21st.dev</a> — example community hero: <a href="https://21st.dev/r/erikvalencia1/hero-odyssey" rel="noopener noreferrer">Hero Odyssey</a>.</td>
-                    <td>No install; use browser. Optionally pair with AI to translate code into this repo’s patterns.</td>
+                    <td><strong>Browser only:</strong> no npm install; copy snippets by hand—usually <strong>no API key</strong>. <strong>Magic MCP / CLI:</strong> account + API key per 21st.dev (Magic Console). Optional: pair browser snippets with AI to translate into this repo’s patterns.</td>
                     <td>Accelerates exploration of premium landing layouts; still requires manual integration with MOSC styles.</td>
                 </tr>
                 <tr>
@@ -548,6 +548,16 @@
                 </tr>
             </tbody>
         </table>
+
+        <div class="info" id="motion-21st-accounts">
+            <p><strong>Framer Motion and 21st.dev — registration and API keys</strong></p>
+            <ul>
+                <li><strong>Framer Motion</strong> — This is an <strong>open-source npm package</strong> for React. You <strong>do not</strong> register on a site or obtain an API token to use it in your app. Install with <code class="code-highlight">npm install framer-motion</code>, read <a href="https://www.framer.com/motion/" rel="noopener noreferrer">framer.com/motion</a>, and <strong>copy or adapt examples</strong> from the docs into your components (typically under <code class="code-highlight">'use client'</code>). Licensing is the library’s open-source license, not a separate “Framer login” for the motion package. (Framer’s <em>hosted site builder</em> product is separate; this guide refers to the <strong>motion library</strong> in code.)</li>
+                <li><strong>21st.dev — browsing the site (inspiration / copy snippets)</strong> — You can usually open <a href="https://21st.dev/" rel="noopener noreferrer">21st.dev</a> in the browser, browse components, and <strong>copy code by hand</strong> without setting up an API key. Anything that is clearly “log in to see this” or “Pro” follows their product rules on the site.</li>
+                <li><strong>21st.dev — Magic MCP, CLI, or integrated IDE flows</strong> — If you use their <strong>Cursor MCP</strong>, official <strong>CLI</strong> (<code class="code-highlight">npx @21st-dev/cli</code>), or similar, you typically need a <strong>21st.dev account and an API key</strong> (often from their Magic Console). Store keys only in local MCP or environment configuration—never commit secrets. See current 21st.dev documentation for exact env var names and setup.</li>
+            </ul>
+            <p><strong>Short overview of the same points:</strong> <a href="SITE_REDESIGN_MODERN_TOOLS_OVERVIEW.html#motion-and-21st">SITE_REDESIGN_MODERN_TOOLS_OVERVIEW.html</a>.</p>
+        </div>
 
         <div class="warning">
             <strong>About <code class="code-highlight">npx adcn@latest add</code>:</strong> Some community workflows mention an <code>adcn</code> package for pulling high-end components. <strong>Always verify the package on npm and the upstream author</strong> before running it in your project. If the intent is <strong>shadcn/ui</strong>, the widely documented command is <code class="code-highlight">npx shadcn@latest add &lt;component&gt;</code>. Do not run unverified CLIs against production branches.
