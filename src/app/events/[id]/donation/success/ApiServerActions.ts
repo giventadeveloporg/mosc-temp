@@ -1,6 +1,6 @@
 'use server';
 
-import { getAppUrl } from '@/lib/env';
+import { getAppUrlFromRequestHeaders } from '@/lib/env';
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import { getTenantId } from '@/lib/env';
 import type { DonationTransactionDTO } from '@/types';
@@ -13,7 +13,7 @@ export async function findDonationTransactionByTransactionId(
   eventId: string
 ): Promise<DonationTransactionDTO | null> {
   try {
-    const baseUrl = getAppUrl();
+    const baseUrl = await getAppUrlFromRequestHeaders();
     const response = await fetchWithJwtRetry(
       `${baseUrl}/api/proxy/donation-transactions/${transactionId}?eventId=${eventId}`,
       {
@@ -48,7 +48,7 @@ export async function findDonationTransactionByDonationId(
 ): Promise<DonationTransactionDTO | null> {
   try {
     const tenantId = getTenantId();
-    const baseUrl = getAppUrl();
+    const baseUrl = await getAppUrlFromRequestHeaders();
     
     // Query by givebutterDonationId
     const params = new URLSearchParams({

@@ -7,7 +7,7 @@ import {
   EventAttendeeDTO,
   EventAttendeeGuestDTO,
 } from '@/types';
-import { getTenantId, getPaymentMethodDomainId, getAppUrl, getEmailHostUrlPrefix } from '@/lib/env';
+import { getTenantId, getPaymentMethodDomainId, getAppUrl, getAppUrlFromRequestHeaders, getEmailHostUrlPrefix } from '@/lib/env';
 import { withTenantId } from '@/lib/withTenantId';
 import Stripe from 'stripe';
 import { getTenantSettings } from '@/lib/tenantSettingsCache';
@@ -36,7 +36,7 @@ export interface ShoppingCartItem {
 async function fetchTicketTypeByIdServer(
   id: number,
 ): Promise<EventTicketTypeDTO | null> {
-  const url = `${getAppUrl()}/api/proxy/event-ticket-types/${id}`;
+  const url = `${await getAppUrlFromRequestHeaders()}/api/proxy/event-ticket-types/${id}`;
   const response = await fetchWithJwtRetry(url, { cache: 'no-store' });
 
   if (!response.ok) {
@@ -57,7 +57,7 @@ export async function findTransactionBySessionId(
   });
 
   const response = await fetchWithJwtRetry(
-    `${getAppUrl()}/api/proxy/event-ticket-transactions?${params.toString()}`,
+    `${await getAppUrlFromRequestHeaders()}/api/proxy/event-ticket-transactions?${params.toString()}`,
   );
 
   if (!response.ok) {
@@ -91,7 +91,7 @@ export async function findTransactionByPaymentIntentId(
     'tenantId.equals': tenantId,
     'paymentMethodDomainId.equals': paymentMethodDomainId, // CRITICAL: Backend requires this for lookup
   });
-  const tenantUrl = `${getAppUrl()}/api/proxy/event-ticket-transactions?${tenantParams.toString()}`;
+  const tenantUrl = `${await getAppUrlFromRequestHeaders()}/api/proxy/event-ticket-transactions?${tenantParams.toString()}`;
   console.log('[findTransactionByPaymentIntentId] Querying with tenant and paymentMethodDomainId filter:', {
     url: tenantUrl,
     paymentIntentId,
@@ -136,7 +136,7 @@ export async function findTransactionByPaymentIntentId(
     'stripePaymentIntentId.equals': paymentIntentId,
     'paymentMethodDomainId.equals': paymentMethodDomainId, // Include paymentMethodDomainId even for global check
   });
-  const globalUrl = `${getAppUrl()}/api/proxy/event-ticket-transactions?${globalParams.toString()}`;
+  const globalUrl = `${await getAppUrlFromRequestHeaders()}/api/proxy/event-ticket-transactions?${globalParams.toString()}`;
   console.log('[findTransactionByPaymentIntentId] Querying without tenant filter but with paymentMethodDomainId (global check):', {
     url: globalUrl,
     paymentIntentId,
@@ -336,7 +336,7 @@ async function createTransaction(transactionData: Omit<EventTicketTransactionDTO
     // Include all other fields but truncate long values
   }, null, 2));
 
-  const backendUrl = `${getAppUrl()}/api/proxy/event-ticket-transactions`;
+  const backendUrl = `${await getAppUrlFromRequestHeaders()}/api/proxy/event-ticket-transactions`;
   console.log('[MOBILE-WORKFLOW] [createTransaction] Backend URL:', backendUrl);
   console.log('[MOBILE-WORKFLOW] [createTransaction] About to call fetchWithJwtRetry...');
 
@@ -381,7 +381,7 @@ async function createTransaction(transactionData: Omit<EventTicketTransactionDTO
 
 // Helper to bulk create transaction items
 async function createTransactionItemsBulk(items: any[]): Promise<any[]> {
-  const baseUrl = getAppUrl();
+  const baseUrl = await getAppUrlFromRequestHeaders();
 
   // Import environment variable helpers
   const { getTenantId, getPaymentMethodDomainId } = await import('@/lib/env');
@@ -659,7 +659,7 @@ export async function processStripeSessionServer(
     // CRITICAL: Enhanced idempotency check - verify items don't exist for this transaction
     // Check each cart item individually to prevent duplicates even if partial items exist
     // IMPORTANT: This check is NOT atomic - backend should enforce uniqueness at DB level
-    const baseUrl = getAppUrl();
+    const baseUrl = await getAppUrlFromRequestHeaders();
     const itemsCheckUrl = `${baseUrl}/api/proxy/event-ticket-transaction-items?transactionId.equals=${newTransaction.id}&tenantId.equals=${getTenantId()}`;
 
     // Retry logic to handle race conditions: check multiple times with small delay
@@ -746,7 +746,7 @@ export async function processStripeSessionServer(
       'tenantId.equals': getTenantId(),
     });
     const attendeeLookupRes = await fetchWithJwtRetry(
-      `${getAppUrl()}/api/proxy/event-attendees?${attendeeLookupParams.toString()}`,
+      `${await getAppUrlFromRequestHeaders()}/api/proxy/event-attendees?${attendeeLookupParams.toString()}`,
       { method: 'GET', headers: { 'Content-Type': 'application/json' } }
     );
     let attendee = null;
@@ -770,7 +770,7 @@ export async function processStripeSessionServer(
         updatedAt: now,
       });
       const attendeeInsertRes = await fetchWithJwtRetry(
-        `${getAppUrl()}/api/proxy/event-attendees`,
+        `${await getAppUrlFromRequestHeaders()}/api/proxy/event-attendees`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -807,7 +807,7 @@ export async function processStripeSessionServer(
           'tenantId.equals': tenantId,
         });
         const userProfileRes = await fetchWithJwtRetry(
-          `${getAppUrl()}/api/proxy/user-profiles?${userProfileParams.toString()}`,
+          `${await getAppUrlFromRequestHeaders()}/api/proxy/user-profiles?${userProfileParams.toString()}`,
           { method: 'GET', headers: { 'Content-Type': 'application/json' } }
         );
 
@@ -826,7 +826,7 @@ export async function processStripeSessionServer(
           'tenantId.equals': tenantId,
         });
         const emailRes = await fetchWithJwtRetry(
-          `${getAppUrl()}/api/proxy/user-profiles?${emailParams.toString()}`,
+          `${await getAppUrlFromRequestHeaders()}/api/proxy/user-profiles?${emailParams.toString()}`,
           { method: 'GET', headers: { 'Content-Type': 'application/json' } }
         );
 
@@ -864,7 +864,7 @@ export async function processStripeSessionServer(
         };
 
         const updateRes = await fetchWithJwtRetry(
-          `${getAppUrl()}/api/proxy/user-profiles/${existingProfile.id}`,
+          `${await getAppUrlFromRequestHeaders()}/api/proxy/user-profiles/${existingProfile.id}`,
           {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -880,7 +880,7 @@ export async function processStripeSessionServer(
       } else {
         // Create new profile
         const createRes = await fetchWithJwtRetry(
-          `${getAppUrl()}/api/proxy/user-profiles`,
+          `${await getAppUrlFromRequestHeaders()}/api/proxy/user-profiles`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -911,7 +911,7 @@ export async function processStripeSessionServer(
         if (i < 1) await new Promise(res => setTimeout(res, 4000));
       }
       if (stripeFeeAmount > 0) {
-        const patchUrl = `${getAppUrl()}/api/proxy/event-ticket-transactions/${newTransaction.id}`;
+        const patchUrl = `${await getAppUrlFromRequestHeaders()}/api/proxy/event-ticket-transactions/${newTransaction.id}`;
         const patchRes = await fetchWithJwtRetry(patchUrl, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/merge-patch+json' },
@@ -936,7 +936,7 @@ export async function processStripeSessionServer(
 }
 
 export async function fetchTransactionQrCode(eventId: number, transactionId: number): Promise<{ qrCodeImageUrl: string }> {
-  const baseUrl = getAppUrl();
+  const baseUrl = await getAppUrlFromRequestHeaders();
 
   // Get the current domain/host URL prefix for email context
   const emailHostUrlPrefix = getEmailHostUrlPrefix();
@@ -1032,7 +1032,7 @@ export async function fetchTransactionQrCode(eventId: number, transactionId: num
  */
 export async function getEventAttendee(attendeeId: number): Promise<EventAttendeeDTO | null> {
   try {
-    const baseUrl = getAppUrl();
+    const baseUrl = await getAppUrlFromRequestHeaders();
     const response = await fetchWithJwtRetry(`${baseUrl}/api/proxy/event-attendees/${attendeeId}`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
@@ -1058,7 +1058,7 @@ export async function getEventAttendee(attendeeId: number): Promise<EventAttende
  */
 export async function getEventAttendeeGuests(attendeeId: number): Promise<EventAttendeeGuestDTO[]> {
   try {
-    const baseUrl = getAppUrl();
+    const baseUrl = await getAppUrlFromRequestHeaders();
     const params = new URLSearchParams({ 'eventAttendeeId.equals': attendeeId.toString() });
     const response = await fetchWithJwtRetry(`${baseUrl}/api/proxy/event-attendee-guests?${params.toString()}`, {
       method: 'GET',
@@ -1410,7 +1410,7 @@ export async function createTransactionFromPaymentIntent(
       // CRITICAL: Enhanced idempotency check - verify items don't exist for this transaction
       // Check each item individually to prevent duplicates even if partial items exist
       // IMPORTANT: This check is NOT atomic - backend should enforce uniqueness at DB level
-      const baseUrl = getAppUrl();
+      const baseUrl = await getAppUrlFromRequestHeaders();
       const itemsCheckUrl = `${baseUrl}/api/proxy/event-ticket-transaction-items?transactionId.equals=${transaction.id}&tenantId.equals=${getTenantId()}`;
 
       // Retry logic to handle race conditions: check multiple times with small delay

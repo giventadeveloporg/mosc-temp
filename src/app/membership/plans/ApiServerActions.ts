@@ -1,6 +1,6 @@
 "use server";
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
-import { getAppUrl, getTenantId, getApiBaseUrl } from '@/lib/env';
+import { getTenantId, getApiBaseUrl, getAppUrlFromRequestHeaders } from '@/lib/env';
 import type { MembershipPlanDTO } from '@/types';
 
 // Lazy getter — evaluated at call time, not module load time (critical for Lambda cold starts)
@@ -41,7 +41,7 @@ export async function fetchMembershipPlansServer(
     params.append('sort', filters.sort);
   }
 
-  const url = `${getAppUrl()}/api/proxy/membership-plans?${params.toString()}`;
+  const url = `${await getAppUrlFromRequestHeaders()}/api/proxy/membership-plans?${params.toString()}`;
   const res = await fetchWithJwtRetry(url, {
     method: 'GET',
     cache: 'no-store',

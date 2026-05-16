@@ -3,7 +3,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { getAppUrl } from '@/lib/env';
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import type { DonationTransactionDTO, EventTicketTransactionDTO } from '@/types';
 import {
@@ -128,7 +127,6 @@ export default function DonationSuccessClient({
   // Fetch donation transaction data (used by desktop flow)
   async function fetchDonationTransactionData() {
     try {
-      const baseUrl = getAppUrl();
       const queryParams = new URLSearchParams();
       
       if (transactionId) {
@@ -197,9 +195,8 @@ export default function DonationSuccessClient({
   // Fetch ticket transaction (for ticketed fundraisers going through donation-checkout)
   async function fetchTicketTransaction(ticketTransactionId: number) {
     try {
-      const baseUrl = getAppUrl();
       const response = await fetchWithJwtRetry(
-        `${baseUrl}/api/proxy/event-ticket-transactions/${ticketTransactionId}`,
+        `/api/proxy/event-ticket-transactions/${ticketTransactionId}`,
         {
           method: 'GET',
           cache: 'no-store',
@@ -289,7 +286,6 @@ export default function DonationSuccessClient({
     
     // Mobile flow: Try POST endpoint as fallback (similar to Stripe mobile flow)
     try {
-      const baseUrl = getAppUrl();
       const postBody: any = {
         eventId,
         skip_qr: true, // Skip QR for mobile to prevent duplicate emails

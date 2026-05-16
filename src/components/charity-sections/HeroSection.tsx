@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { EventDetailsDTO } from '@/types';
-import { getAppUrl } from '@/lib/env';
+import { proxyApiPath } from '@/lib/proxyApiPath';
 import { isTicketedFundraiserEvent } from '@/lib/donation/utils';
 import { isTicketedEventCube } from '@/lib/eventcube/utils';
 
@@ -28,14 +28,13 @@ const DynamicHeroImage: React.FC = () => {
 
   // Fetch events with media function
   const fetchEventsWithMedia = async (): Promise<EventWithMedia[]> => {
-    const baseUrl = getAppUrl();
-    console.log('Fetching events from:', `${baseUrl}/api/proxy/event-details`);
+    console.log('Fetching events from:', proxyApiPath('/api/proxy/event-details'));
 
     let eventsData: EventDetailsDTO[] = [];
 
     try {
       let eventsResponse = await fetch(
-        `${baseUrl}/api/proxy/event-details?sort=startDate,asc`,
+        proxyApiPath('/api/proxy/event-details?sort=startDate,asc'),
         { cache: 'no-store' }
       );
 
@@ -54,7 +53,7 @@ const DynamicHeroImage: React.FC = () => {
         // Try fallback
         try {
           eventsResponse = await fetch(
-            `${baseUrl}/api/proxy/event-details?sort=startDate,desc`,
+            proxyApiPath('/api/proxy/event-details?sort=startDate,desc'),
             { cache: 'no-store' }
           );
           if (eventsResponse.ok) {
@@ -89,7 +88,7 @@ const DynamicHeroImage: React.FC = () => {
 
           try {
             const flyerRes = await fetch(
-              `${baseUrl}/api/proxy/event-medias?eventId.equals=${event.id}&eventFlyer.equals=true`,
+              proxyApiPath(`/api/proxy/event-medias?eventId.equals=${event.id}&eventFlyer.equals=true`),
               {
                 cache: 'no-store',
                 signal: controller.signal
@@ -118,7 +117,7 @@ const DynamicHeroImage: React.FC = () => {
 
               try {
                 const featuredRes = await fetch(
-                  `${baseUrl}/api/proxy/event-medias?eventId.equals=${event.id}&isFeaturedImage.equals=true`,
+                  proxyApiPath(`/api/proxy/event-medias?eventId.equals=${event.id}&isFeaturedImage.equals=true`),
                   {
                     cache: 'no-store',
                     signal: featuredController.signal
@@ -190,10 +189,9 @@ const DynamicHeroImage: React.FC = () => {
 
   // Fetch hero image for specific event function
   const fetchHeroImageForEvent = async (eventId: number): Promise<string | null> => {
-    const baseUrl = getAppUrl();
     try {
       const mediaRes = await fetch(
-        `${baseUrl}/api/proxy/event-medias?eventId.equals=${eventId}&isFeaturedImage.equals=true`,
+        proxyApiPath(`/api/proxy/event-medias?eventId.equals=${eventId}&isFeaturedImage.equals=true`),
         { cache: 'no-store' }
       );
       if (mediaRes.ok) {

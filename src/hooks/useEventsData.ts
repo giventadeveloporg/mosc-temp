@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { EventDetailsDTO, EventMediaDTO } from '@/types';
-import { getAppUrl, getTenantId } from '@/lib/env';
+import { getTenantId } from '@/lib/env';
+import { proxyApiPath } from '@/lib/proxyApiPath';
 
 export interface EventWithMedia {
   event: EventDetailsDTO;
@@ -51,12 +52,13 @@ export const useEventsData = (enabled: boolean = true) => {
       try {
         setData(prev => ({ ...prev, isLoading: true, error: null }));
 
-        const baseUrl = getAppUrl();
         const tenantId = getTenantId();
 
         // Fetch events (tenant-scoped for homepage)
         let eventsResponse = await fetch(
-          `${baseUrl}/api/proxy/event-details?tenantId.equals=${encodeURIComponent(tenantId)}&sort=startDate,asc`,
+          proxyApiPath(
+            `/api/proxy/event-details?tenantId.equals=${encodeURIComponent(tenantId)}&sort=startDate,asc`
+          ),
           { cache: 'no-store' }
         );
 
@@ -65,7 +67,9 @@ export const useEventsData = (enabled: boolean = true) => {
           // Try fallback
           try {
             eventsResponse = await fetch(
-              `${baseUrl}/api/proxy/event-details?tenantId.equals=${encodeURIComponent(tenantId)}&sort=startDate,desc`,
+              proxyApiPath(
+                `/api/proxy/event-details?tenantId.equals=${encodeURIComponent(tenantId)}&sort=startDate,desc`
+              ),
               { cache: 'no-store' }
             );
             if (!eventsResponse.ok) {
@@ -119,7 +123,9 @@ export const useEventsData = (enabled: boolean = true) => {
           console.log(`Fetching media for event ${event.id}: ${event.title}`);
           try {
             const mediaResponse = await fetch(
-              `${baseUrl}/api/proxy/event-medias?tenantId.equals=${encodeURIComponent(tenantId)}&eventId.equals=${event.id}`,
+              proxyApiPath(
+                `/api/proxy/event-medias?tenantId.equals=${encodeURIComponent(tenantId)}&eventId.equals=${event.id}`
+              ),
               { cache: 'no-store' }
             );
 

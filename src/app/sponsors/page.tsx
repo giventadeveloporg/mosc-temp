@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import type { EventSponsorsDTO } from "@/types";
-import { getAppUrl } from '@/lib/env';
+import { proxyApiPath } from '@/lib/proxyApiPath';
 import { SponsorCard } from '@/components/sponsors/SponsorCard';
 
 export default function SponsorsPage() {
@@ -58,8 +58,7 @@ export default function SponsorsPage() {
         params.append('name.contains', searchTerm.trim());
       }
 
-      const baseUrl = getAppUrl();
-      const response = await fetch(`${baseUrl}/api/proxy/event-sponsors?${params.toString()}`, {
+      const response = await fetch(proxyApiPath(`/api/proxy/event-sponsors?${params.toString()}`), {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         cache: 'no-store',

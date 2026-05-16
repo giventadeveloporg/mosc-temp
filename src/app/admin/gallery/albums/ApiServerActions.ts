@@ -1,7 +1,7 @@
 'use server';
 
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
-import { getTenantId, getAppUrl, getApiBaseUrl } from '@/lib/env';
+import { getTenantId, getApiBaseUrl } from '@/lib/env';
 import { withTenantId } from '@/lib/withTenantId';
 import type { GalleryAlbumDTO, EventMediaDTO } from '@/types';
 
@@ -9,8 +9,6 @@ import type { GalleryAlbumDTO, EventMediaDTO } from '@/types';
 function getApiBase() {
   return getApiBaseUrl();
 }
-const baseUrl = getAppUrl();
-
 /**
  * Create new album
  */

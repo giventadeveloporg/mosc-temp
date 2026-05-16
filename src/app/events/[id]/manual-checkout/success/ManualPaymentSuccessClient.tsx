@@ -9,7 +9,6 @@ import {
   FaMoneyBillWave, FaInfoCircle, FaReceipt, FaMapPin, FaTags
 } from 'react-icons/fa';
 import LocationDisplay from '@/components/LocationDisplay';
-import { getAppUrl } from '@/lib/env';
 import type {
   ManualPaymentRequestDTO,
   EventTicketTransactionDTO,
@@ -117,7 +116,6 @@ export default function ManualPaymentSuccessClient({
       }
 
       try {
-        const baseUrl = getAppUrl();
         // CRITICAL: Use the exact transaction ID from payment request (not from ticketTransaction state)
         // Use transactionId.equals (not eventTicketTransactionId.equals) - matches admin modals
         // Add size limit to prevent fetching all items
@@ -132,11 +130,11 @@ export default function ManualPaymentSuccessClient({
           eventId: eventId,
           paymentRequestId: requestId,
           paymentRequestTransactionId: paymentRequest.ticketTransactionId,
-          url: `${baseUrl}/api/proxy/event-ticket-transaction-items?${params.toString()}`
+          url: `/api/proxy/event-ticket-transaction-items?${params.toString()}`
         });
 
         const itemsRes = await fetch(
-          `${baseUrl}/api/proxy/event-ticket-transaction-items?${params.toString()}`,
+          `/api/proxy/event-ticket-transaction-items?${params.toString()}`,
           { cache: 'no-store' }
         );
         
@@ -211,9 +209,8 @@ export default function ManualPaymentSuccessClient({
               uniqueTicketTypeIds.map(async (ticketTypeId) => {
                 if (!ticketTypeId) return;
                 try {
-                  const baseUrl = getAppUrl();
                   const ticketTypeRes = await fetch(
-                    `${baseUrl}/api/proxy/event-ticket-types/${ticketTypeId}`,
+                    `/api/proxy/event-ticket-types/${ticketTypeId}`,
                     { cache: 'no-store' }
                   );
                   if (ticketTypeRes.ok) {
@@ -250,10 +247,9 @@ export default function ManualPaymentSuccessClient({
       if (!eventId) return;
 
       try {
-        const baseUrl = getAppUrl();
         // Try homepage hero image first
         let mediaRes = await fetch(
-          `${baseUrl}/api/proxy/event-medias?eventId.equals=${eventId}&isHomePageHeroImage.equals=true`,
+          `/api/proxy/event-medias?eventId.equals=${eventId}&isHomePageHeroImage.equals=true`,
           { cache: 'no-store' }
         );
         if (mediaRes.ok) {
@@ -267,7 +263,7 @@ export default function ManualPaymentSuccessClient({
 
         // Try regular hero image
         mediaRes = await fetch(
-          `${baseUrl}/api/proxy/event-medias?eventId.equals=${eventId}&isHeroImage.equals=true`,
+          `/api/proxy/event-medias?eventId.equals=${eventId}&isHeroImage.equals=true`,
           { cache: 'no-store' }
         );
         if (mediaRes.ok) {

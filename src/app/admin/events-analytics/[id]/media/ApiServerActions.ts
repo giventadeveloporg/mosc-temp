@@ -1,6 +1,6 @@
 "use server";
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
-import { getTenantId, getAppUrl, getApiBaseUrl } from '@/lib/env';
+import { getTenantId, getAppUrl, getAppUrlFromRequestHeaders, getApiBaseUrl } from '@/lib/env';
 import type { EventMediaDTO } from '@/types';
 import { withTenantId } from '@/lib/withTenantId';
 
@@ -169,7 +169,7 @@ export async function uploadMedia(eventId: number, {
   formData.append('startDisplayingFromDate', startDisplayingFromDate);
 
   // Use the proxy endpoint (not direct backend call)
-  const url = `${getAppUrl()}/api/proxy/event-medias/upload-multiple`;
+  const url = `${await getAppUrlFromRequestHeaders()}/api/proxy/event-medias/upload-multiple`;
 
   const res = await fetch(url, {
     method: 'POST',

@@ -1,4 +1,4 @@
-import { getAppUrl, getTenantId } from '@/lib/env';
+import { getAppUrlFromRequestHeaders, getTenantId } from '@/lib/env';
 import type { EventDetailsDTO } from '@/types';
 import {
   computeFeaturedEventsFromMedia,
@@ -23,7 +23,7 @@ function isEventInNextYear(eventDate: string, today: Date): boolean {
  */
 export async function fetchFeaturedEventsForHomepageServer(): Promise<FeaturedEventWithMedia[]> {
   try {
-    const baseUrl = getAppUrl();
+    const baseUrl = await getAppUrlFromRequestHeaders();
     const tenantId = getTenantId();
 
     let eventsResponse = await fetch(

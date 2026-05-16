@@ -10,7 +10,6 @@ import {
 } from 'react-icons/fa';
 import { formatInTimeZone } from 'date-fns-tz';
 import LocationDisplay from '@/components/LocationDisplay';
-import { getAppUrl } from '@/lib/env';
 import type { PaymentTransactionDTO, EventTicketTransactionDTO, EventDetailsDTO } from '@/types';
 import { sendTicketEmailAsync } from '@/lib/emailUtils';
 import MobileDebugConsole from '@/components/MobileDebugConsole';
@@ -192,13 +191,11 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
 
   // Fetch payment status function
   async function fetchPaymentStatus(): Promise<PaymentTransactionDTO | null> {
-    const baseUrl = getAppUrl();
     console.log('[PaymentSuccessClient] ===== FETCHING PAYMENT STATUS =====');
-    console.log('[PaymentSuccessClient] Base URL:', baseUrl);
     console.log('[PaymentSuccessClient] Transaction ID:', transactionId);
-    console.log('[PaymentSuccessClient] Full URL:', `${baseUrl}/api/proxy/payments/${transactionId}`);
+    console.log('[PaymentSuccessClient] Full URL:', `/api/proxy/payments/${transactionId}`);
 
-    const paymentRes = await fetch(`${baseUrl}/api/proxy/payments/${transactionId}`, {
+    const paymentRes = await fetch(`/api/proxy/payments/${transactionId}`, {
       cache: 'no-store',
     });
 
@@ -383,8 +380,6 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
   // Fetch full data after payment succeeds
   async function fetchFullData(paymentData: PaymentTransactionDTO) {
     try {
-      const baseUrl = getAppUrl();
-
       // Get eventId from payment transaction or parameter
       const eventId = paymentData?.eventId || (eventIdParam ? parseInt(eventIdParam) : null);
       if (!eventId) {
@@ -393,7 +388,7 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
 
       // Fetch event details if not already fetched
       if (!eventDetails) {
-        const eventRes = await fetch(`${baseUrl}/api/proxy/event-details/${eventId}`, {
+        const eventRes = await fetch(`/api/proxy/event-details/${eventId}`, {
           cache: 'no-store',
         });
         if (eventRes.ok) {
@@ -417,7 +412,7 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
       if (ticketTransactionId) {
         console.log('[PaymentSuccessClient] Using ticket transaction ID from payment status response:', ticketTransactionId);
         // Fetch ticket transaction details
-        const ticketRes = await fetch(`${baseUrl}/api/proxy/event-ticket-transactions/${ticketTransactionId}`, {
+        const ticketRes = await fetch(`/api/proxy/event-ticket-transactions/${ticketTransactionId}`, {
           cache: 'no-store',
         });
         if (ticketRes.ok) {
@@ -440,7 +435,7 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
           searchParams.append('eventId.equals', eventId.toString());
         }
 
-        const ticketRes = await fetch(`${baseUrl}/api/proxy/event-ticket-transactions?${searchParams.toString()}`, {
+        const ticketRes = await fetch(`/api/proxy/event-ticket-transactions?${searchParams.toString()}`, {
           cache: 'no-store',
         });
         if (ticketRes.ok) {
@@ -481,7 +476,7 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
           searchParams.append('eventId.equals', eventId.toString());
         }
 
-        const ticketRes = await fetch(`${baseUrl}/api/proxy/event-ticket-transactions?${searchParams.toString()}`, {
+        const ticketRes = await fetch(`/api/proxy/event-ticket-transactions?${searchParams.toString()}`, {
           cache: 'no-store',
         });
         if (ticketRes.ok) {
@@ -507,7 +502,7 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
 
       // Fetch transaction items
       if (ticketTransactionId) {
-        const itemsRes = await fetch(`${baseUrl}/api/proxy/event-ticket-transaction-items?eventTicketTransactionId.equals=${ticketTransactionId}`, {
+        const itemsRes = await fetch(`/api/proxy/event-ticket-transaction-items?eventTicketTransactionId.equals=${ticketTransactionId}`, {
           cache: 'no-store',
         });
         if (itemsRes.ok) {
@@ -531,8 +526,7 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
         // First, fetch event details to show hero image during loading
         const eventId = eventIdParam ? parseInt(eventIdParam) : null;
         if (eventId) {
-          const baseUrl = getAppUrl();
-          const eventRes = await fetch(`${baseUrl}/api/proxy/event-details/${eventId}`, {
+          const eventRes = await fetch(`/api/proxy/event-details/${eventId}`, {
             cache: 'no-store',
           });
           if (eventRes.ok) {
@@ -542,7 +536,7 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
             // Fetch hero image from event-medias API
             try {
               // Try homepage hero image first
-              let mediaRes = await fetch(`${baseUrl}/api/proxy/event-medias?eventId.equals=${eventId}&isHomePageHeroImage.equals=true`, {
+              let mediaRes = await fetch(`/api/proxy/event-medias?eventId.equals=${eventId}&isHomePageHeroImage.equals=true`, {
                 cache: 'no-store',
               });
               if (mediaRes.ok) {
@@ -552,7 +546,7 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
                   setHeroImageUrl(mediaArray[0].fileUrl);
                 } else {
                   // Try regular hero image
-                  mediaRes = await fetch(`${baseUrl}/api/proxy/event-medias?eventId.equals=${eventId}&isHeroImage.equals=true`, {
+                  mediaRes = await fetch(`/api/proxy/event-medias?eventId.equals=${eventId}&isHeroImage.equals=true`, {
                     cache: 'no-store',
                   });
                   if (mediaRes.ok) {
@@ -713,7 +707,6 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
         try {
           if (!paymentTransaction) return; // Guard against null
 
-          const baseUrl = getAppUrl();
           const eventId = paymentTransaction.eventId || (eventIdParam ? parseInt(eventIdParam) : null);
           const searchParams = new URLSearchParams();
           searchParams.append('stripePaymentIntentId.equals', stripePaymentIntentId);
@@ -721,7 +714,7 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
             searchParams.append('eventId.equals', eventId.toString());
           }
 
-          const ticketUrl = `${baseUrl}/api/proxy/event-ticket-transactions?${searchParams.toString()}`;
+          const ticketUrl = `/api/proxy/event-ticket-transactions?${searchParams.toString()}`;
           console.log(`[PaymentSuccessClient] Fetching ticket from: ${ticketUrl}`);
 
           const ticketRes = await fetch(ticketUrl, {
@@ -877,7 +870,6 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
         eventId: eventId
       });
 
-      const baseUrl = getAppUrl();
       const emailHostUrlPrefix = window.location.origin;
       const encodedEmailHostUrlPrefix = btoa(emailHostUrlPrefix);
 
@@ -885,7 +877,7 @@ export default function PaymentSuccessClient({ transactionId, eventId: eventIdPa
       setQrCodeError(null);
 
       try {
-        const qrUrl = `${baseUrl}/api/proxy/events/${eventId}/transactions/${ticketId}/emailHostUrlPrefix/${encodedEmailHostUrlPrefix}/qrcode`;
+        const qrUrl = `/api/proxy/events/${eventId}/transactions/${ticketId}/emailHostUrlPrefix/${encodedEmailHostUrlPrefix}/qrcode`;
         console.log('[PaymentSuccessClient] Fetching QR code from:', qrUrl);
 
         const qrRes = await fetch(qrUrl, { cache: 'no-store' });

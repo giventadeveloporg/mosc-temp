@@ -21,6 +21,8 @@ export default function DonationCheckoutClient({
   eventId,
 }: DonationCheckoutClientProps) {
   const router = useRouter();
+  const appOrigin =
+    typeof window !== 'undefined' ? window.location.origin : getAppUrl();
   const [donationAmount, setDonationAmount] = useState<number | null>(null);
   const [customAmount, setCustomAmount] = useState<string>('');
   const [email, setEmail] = useState<string>('');
@@ -90,8 +92,6 @@ export default function DonationCheckoutClient({
     setIsProcessing(true);
 
     try {
-      const baseUrl = getAppUrl();
-      
       // Call payment initialization endpoint via server action
       const response = await initializeDonationPayment({
         eventId: parseInt(eventId),
@@ -104,8 +104,8 @@ export default function DonationCheckoutClient({
         isFundraiser: initialData.isFundraiserEvent,
         isCharity: initialData.isCharityEvent,
         prayerIntention: prayerIntention.trim() || undefined,
-        returnUrl: `${baseUrl}/events/${eventId}/donation/success`,
-        cancelUrl: `${baseUrl}/events/${eventId}`,
+        returnUrl: `${appOrigin}/events/${eventId}/donation/success`,
+        cancelUrl: `${appOrigin}/events/${eventId}`,
       });
 
       // Redirect to GiveButter checkout URL (handle both checkoutUrl and sessionUrl)

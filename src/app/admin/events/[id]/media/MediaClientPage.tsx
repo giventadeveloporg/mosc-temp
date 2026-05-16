@@ -258,9 +258,6 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
         throw new Error('NEXT_PUBLIC_TENANT_ID is not set in environment variables');
       }
 
-      // Get app URL from environment variable (available on client)
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-
       // Append other parameters as form data
       formData.append('eventId', eventId);
       formData.append('eventFlyer', String(eventFlyer));
@@ -311,10 +308,8 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
         }
       }
 
-      // Use the proxy endpoint directly from client
-      const url = `${appUrl}/api/proxy/event-medias/upload-multiple`;
-
-      const res = await fetch(url, {
+      // Same-origin relative URL — avoids wrong port when NEXT_PUBLIC_APP_URL is unset (e.g. dev on :3001)
+      const res = await fetch('/api/proxy/event-medias/upload-multiple', {
         method: 'POST',
         body: formData,
       });
