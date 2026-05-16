@@ -23,6 +23,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 import { authenticatePage, createAuthenticatedContext, loadAuthState } from '../sanity-tests/authenticate-playwright.js';
+import { resolveAdminTestBaseUrl } from './resolve-admin-test-base-url.js';
 
 const AUTH_CONFIG_PATH = path.join(__dirname, 'auth.json');
 const AUTH_STATE_PATH = path.join(__dirname, '.auth-state.json');
@@ -37,7 +38,7 @@ function loadAuthConfig() {
   return {
     email: config.email,
     password: config.password,
-    baseUrl: config.baseUrl || 'http://localhost:3000',
+    baseUrl: resolveAdminTestBaseUrl(config.baseUrl) || 'http://localhost:3000',
   };
 }
 

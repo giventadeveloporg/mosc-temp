@@ -226,6 +226,7 @@ export function AdminMembershipPlansClient({
   if (error) {
     return (
       <div className="max-w-5xl mx-auto px-8 py-8" style={{ paddingTop: '180px' }}>
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">Membership Plans</h1>
         <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded-md">
           {error}
         </div>

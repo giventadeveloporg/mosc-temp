@@ -782,17 +782,17 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
     <>
       <header className="fixed top-0 left-0 right-0 z-50 header-glass">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-[4.5rem]">
+          <div className="flex items-center justify-between h-[6.75rem]">
             {/* Left side - Unite India Text Logo with Editorial Typography */}
             <div className="flex items-center h-full">
               <Link href="/" className="group flex items-center gap-3 h-full">
-                {/* Unite India logo icon - full header height, 102px wide */}
-                <div className="flex items-center justify-center h-full w-[102px] min-w-[102px] rounded-xl flex-shrink-0 overflow-hidden transition-all duration-300 group-hover:scale-105">
+                {/* Unite India logo icon - full header height, 148px wide */}
+                <div className="flex items-center justify-center h-full w-[148px] min-w-[148px] rounded-xl flex-shrink-0 overflow-hidden transition-all duration-300 group-hover:scale-105">
                   <Image
                     src="/images/logos/Malayalees_US/Malayalees_US_Header_Branding.png"
                     alt="Unite India"
-                    width={102}
-                    height={72}
+                    width={148}
+                    height={108}
                     className="w-full h-full object-contain"
                   />
                 </div>
@@ -1070,12 +1070,12 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
           {/* Mobile Menu Header */}
           <div className="flex items-center justify-between p-5 border-b border-[var(--header-border)]">
             <Link href="/" className="group flex items-center gap-2.5" onClick={closeMobileMenu}>
-              <div className="flex items-center justify-center w-[86px] min-w-[86px] h-14 rounded-lg flex-shrink-0 overflow-hidden">
+              <div className="flex items-center justify-center w-[124px] min-w-[124px] h-[4.75rem] rounded-lg flex-shrink-0 overflow-hidden">
                 <Image
                   src="/images/logos/Malayalees_US/Malayalees_US_Header_Branding.png"
                   alt="Unite India"
-                  width={86}
-                  height={56}
+                  width={124}
+                  height={90}
                   className="w-full h-full object-contain"
                 />
               </div>

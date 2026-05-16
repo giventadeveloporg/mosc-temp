@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { FaImage } from 'react-icons/fa';
 import { useAuth } from '@clerk/nextjs';
 import type { ExecutiveCommitteeTeamMemberDTO } from '@/types/executiveCommitteeTeamMember';
-import { uploadTeamMemberProfileImage } from './ApiServerActions';
+import { uploadTeamMemberProfileImage } from './ExecutiveCommitteeUploadActions';
 import SuccessDialog from '@/components/SuccessDialog';
 import ErrorDialog from '@/components/ErrorDialog';
 

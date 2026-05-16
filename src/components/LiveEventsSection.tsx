@@ -49,7 +49,7 @@ const LiveEventsSection: React.FC = () => {
   }
 
   return (
-    <section className="pt-0 md:pt-0 pb-0 md:pb-0.5 bg-gradient-to-r from-red-50 to-orange-50">
+    <section className="pt-0 md:pt-0 pb-0 md:pb-0.5 bg-gradient-to-r from-green-50 to-emerald-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Live Events Strip */}
         <div className="space-y-4 md:space-y-6">

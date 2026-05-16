@@ -33,15 +33,19 @@
   --header-dropdown-bg: #ffffff;
   --header-dropdown-border: rgba(99, 67, 138, 0.1);
   --header-dropdown-shadow: 0 10px 40px rgba(99, 67, 138, 0.12), 0 2px 10px rgba(99, 67, 138, 0.08);
+
+  /* Homepage sections (header, hero, live events, etc.) */
+  --homepage-section-bg: #f0fdf4;
+  --homepage-section-bg-glass: rgba(240, 253, 244, 0.94);
 }
 
 /* Header Glass Effect */
 .header-glass {
-  background: var(--header-bg-glass);
+  background: var(--homepage-section-bg-glass);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-bottom: 1px solid var(--header-border);
-  box-shadow: var(--header-shadow);
+  border-bottom: none;
+  box-shadow: none;
 }
 
 /* Header Logo Typography */
@@ -364,20 +368,54 @@ nav[role="navigation"] .group {
 
 /* Hero-specific CSS Custom Properties */
 :root {
-  /* Hero Background - Deep Purple Gradient */
-  --hero-bg-primary: #1a0a2e;
-  --hero-bg-secondary: #2d1b4e;
-  --hero-bg-gradient: linear-gradient(180deg, #1a0a2e 0%, #2d1b4e 100%);
+  /* Hero background — aligned with homepage section green-50 */
+  --hero-bg-primary: var(--homepage-section-bg);
+  --hero-bg-secondary: var(--homepage-section-bg);
+  --hero-bg-gradient: var(--homepage-section-bg);
 
-  /* Hero Text Colors */
-  --hero-text-primary: #ffffff;
-  --hero-text-secondary: rgba(255, 255, 255, 0.85);
-  --hero-text-muted: rgba(255, 255, 255, 0.6);
+  /* Hero text on section background (browse link, labels outside dark frames) */
+  --hero-text-primary: #14532d;
+  --hero-text-secondary: #166534;
+  --hero-text-muted: #4b5563;
 
   /* Hero Accent Colors */
   --hero-accent-gold: #f59e0b;
   --hero-accent-amber: #fbbf24;
   --hero-accent-red: #ef4444;
+
+  --hero-neon-cyan: #22d3ee;
+  --hero-neon-magenta: #e879f9;
+  --hero-neon-yellow: #fde047;
+  --hero-glass-bg: rgba(15, 23, 42, 0.45);
+
+  /* Neon gradient ring (matches .hero-slideshow-neon-frame) — reused on brand + mission bars */
+  --hero-neon-frame-gradient: linear-gradient(
+    135deg,
+    rgba(34, 211, 238, 0.55),
+    rgba(129, 140, 248, 0.45),
+    rgba(232, 121, 249, 0.5)
+  );
+  --hero-neon-frame-shadow:
+    0 0 28px rgba(34, 211, 238, 0.25),
+    0 0 56px rgba(99, 102, 241, 0.12),
+    inset 0 0 40px rgba(15, 23, 42, 0.35);
+  --hero-neon-frame-inner-fill: linear-gradient(
+    rgba(15, 23, 42, 0.55),
+    rgba(15, 23, 42, 0.55)
+  );
+}
+
+/* Homepage hero block — height follows content (no forced viewport gap below) */
+.home-hero-viewport-filler {
+  display: block;
+  width: 100%;
+  background: var(--homepage-section-bg);
+}
+
+.home-hero-viewport-filler > section.hero-container-split {
+  width: 100%;
+  height: auto !important;
+  max-height: none !important;
 }
 
 /* ========================================
@@ -385,61 +423,356 @@ nav[role="navigation"] .group {
    Image Containment: Full visibility, no cropping
    ======================================== */
 
-/* Split Hero Container - FIXED standard size; height allows taller bottom cards + padding */
+/* Split hero container — neon/circuit layer optional */
 .hero-container-split {
   position: relative;
-  background: var(--hero-bg-gradient);
-  padding-top: 5rem;
+  background: var(--homepage-section-bg);
+  padding-top: 6.75rem;
   width: 100%;
-  /* Height accommodates bottom row cards + ~20px so image/content stay fully visible */
-  height: 31.25rem; /* 500px - mobile */
-  max-height: 31.25rem;
+  height: auto;
+  max-height: none;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
+}
+
+.hero-container-neon::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.35;
+  background-image:
+    radial-gradient(circle at 15% 25%, rgba(34, 197, 94, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 85% 70%, rgba(109, 40, 217, 0.06) 0%, transparent 40%),
+    linear-gradient(90deg, rgba(22, 163, 74, 0.04) 1px, transparent 1px),
+    linear-gradient(rgba(22, 163, 74, 0.04) 1px, transparent 1px);
+  background-size:
+    100% 100%,
+    100% 100%,
+    32px 32px,
+    32px 32px;
+}
+
+.hero-container-neon > * {
+  position: relative;
+  z-index: 1;
 }
 
 @media (min-width: 768px) {
   .hero-container-split {
-    padding-top: 5.5rem;
-    height: 35.25rem; /* 564px - tablet */
-    max-height: 35.25rem;
+    padding-top: 7.25rem;
+    height: auto;
+    max-height: none;
+    min-height: 0;
   }
 }
 
-@media (min-width: 1024px) {
-  .hero-container-split {
-    height: 37.25rem; /* 596px - desktop */
-    max-height: 37.25rem;
-  }
-}
-
-@media (min-width: 1440px) {
-  .hero-container-split {
-    height: 39.25rem; /* 628px - large desktop */
-    max-height: 39.25rem;
-  }
-}
-
-/* Top Row (div[1]): ~82% of hero - left and right image panels */
+/* Top area: mobile = brand → slideshow+browse → CTA; desktop = 30% | 70% grid */
 .hero-split-row {
   position: relative;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-auto-rows: auto;
   width: 100%;
-  flex: 1 1 0%;
-  min-height: 0;
   margin: 0;
-  padding: 0;
-  gap: 0;
-  overflow: hidden;
+  padding: 0 0.5rem;
+  gap: 0.35rem;
+  overflow: visible;
+  align-content: start;
+}
+
+/* Mobile: top row stacks brand then slideshow */
+.hero-top-row {
+  display: contents;
 }
 
 @media (min-width: 768px) {
   .hero-split-row {
-    flex-direction: row;
-    align-items: stretch;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 0 0.75rem 0.25rem;
+    flex: 0 0 auto;
   }
+
+  /* Grid row: both columns share row height; right column sets intrinsic height */
+  .hero-top-row {
+    display: grid;
+    grid-template-columns: minmax(0, 30%) minmax(0, 1fr);
+    column-gap: 0.75rem;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .hero-brand-card {
+    grid-column: 1;
+    grid-row: 1;
+    min-height: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hero-right-wrap {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .hero-left-cta-card {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+    padding: calc(0.28rem + 2px) calc(0.65rem + 2px);
+    gap: 0.5rem;
+  }
+
+  .hero-left-cta-mission-row {
+    gap: 0.5rem;
+  }
+
+  .hero-left-cta-mission-label {
+    font-size: clamp(0.95rem, 1.8vw, 1.2rem);
+  }
+
+  .hero-donate-button {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* --- Brand card: Kerala image — same neon gradient ring as slideshow frame --- */
+.hero-brand-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: stretch;
+  gap: 0;
+  padding: 2px;
+  border-radius: 1rem;
+  border: 2px solid transparent;
+  background:
+    var(--hero-neon-frame-inner-fill) padding-box,
+    var(--hero-neon-frame-gradient) border-box;
+  background-clip: padding-box, border-box;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--hero-neon-frame-shadow);
+  overflow: hidden;
+  min-height: 0;
+  height: auto;
+}
+
+.hero-brand-image-wrap {
+  position: relative;
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 10rem;
+  max-height: none;
+  border-radius: 0.5rem;
+  background: var(--homepage-section-bg);
+}
+
+@media (min-width: 768px) {
+  .hero-brand-image-wrap {
+    position: relative;
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: 12rem;
+    height: 100%;
+    max-height: none;
+    aspect-ratio: unset;
+    margin: 0;
+  }
+
+  .hero-brand-kerala-image {
+    object-fit: cover !important;
+  }
+}
+
+.hero-brand-kerala-image {
+  border-radius: 0.45rem;
+  transition: transform 0.8s ease-out, filter 0.8s ease-out;
+}
+
+.hero-brand-card:hover .hero-brand-kerala-image {
+  transform: scale(1.04);
+  filter: brightness(1.08);
+}
+
+/* --- Right column: slideshow + browse --- */
+.hero-right-wrap {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  gap: 0;
+}
+
+.hero-browse-under-slideshow {
+  justify-content: flex-end;
+  padding: 0;
+  margin: 0;
+  min-height: auto;
+}
+
+@media (min-width: 768px) {
+  .hero-browse-under-slideshow {
+    padding: 0;
+    margin: 0;
+    justify-content: flex-end;
+    flex: 0 0 auto;
+  }
+
+  .hero-browse-link-neon {
+    padding-top: 0.2rem !important;
+    padding-bottom: 0 !important;
+    line-height: 1.25;
+  }
+}
+
+/* --- Branding + Our Mission + donate — same neon gradient ring as slideshow --- */
+.hero-left-cta-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: calc(0.45rem + 2px) calc(0.85rem + 2px);
+  border-radius: 1rem;
+  border: 2px solid transparent;
+  background:
+    var(--hero-neon-frame-inner-fill) padding-box,
+    var(--hero-neon-frame-gradient) border-box;
+  background-clip: padding-box, border-box;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--hero-neon-frame-shadow);
+  width: 100%;
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.hero-left-cta-mission-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: #fff;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.hero-left-cta-mission-label {
+  font-family: 'Crimson Text', 'Times New Roman', serif;
+  font-size: clamp(1rem, 2.5vw, 1.35rem);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.35);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.hero-left-cta-mission-row .hero-left-cta-thumb {
+  flex-shrink: 0;
+}
+
+.hero-left-cta-mission-row .hero-left-cta-thumb img {
+  transition: transform 0.8s ease-out, filter 0.8s ease-out;
+}
+
+.hero-left-cta-mission-row:hover .hero-left-cta-thumb img {
+  transform: scale(1.08);
+  filter: brightness(1.1);
+}
+
+/* Neon slideshow frame + corner accents */
+.hero-slideshow-neon-frame {
+  position: relative;
+  flex: 1 1 0%;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-start;
+  border-radius: 1rem;
+  padding: 2px;
+  background: var(--hero-neon-frame-gradient);
+  box-shadow: var(--hero-neon-frame-shadow);
+}
+
+@media (min-width: 768px) {
+  .hero-slideshow-neon-frame {
+    flex: 0 0 auto;
+    align-items: stretch;
+    justify-content: flex-start;
+  }
+}
+
+.hero-slideshow-neon-frame > .hero-slideshow-wrapper {
+  position: relative;
+  z-index: 2;
+  border-radius: calc(1rem - 2px);
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+}
+
+.hero-slideshow-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  border-radius: 1rem;
+  background:
+    radial-gradient(circle at 8% 92%, rgba(34, 211, 238, 0.2) 0%, transparent 35%),
+    radial-gradient(circle at 94% 88%, rgba(232, 121, 249, 0.18) 0%, transparent 32%);
+  opacity: 0.85;
+}
+
+.hero-carousel-control {
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(8px);
+  border: 2px solid rgba(34, 211, 238, 0.75) !important;
+  box-shadow:
+    0 0 16px rgba(34, 211, 238, 0.45),
+    inset 0 0 12px rgba(34, 211, 238, 0.08);
+}
+
+.hero-carousel-control:hover {
+  border-color: rgba(103, 232, 249, 0.95) !important;
+  box-shadow:
+    0 0 22px rgba(34, 211, 238, 0.65),
+    inset 0 0 14px rgba(34, 211, 238, 0.12);
+}
+
+.hero-browse-link-neon {
+  color: var(--header-accent-primary) !important;
+  font-weight: 600;
+  text-shadow: none;
+  padding-top: 0.35rem !important;
+  padding-bottom: 0 !important;
+}
+
+.hero-browse-link-neon:hover {
+  color: #5b21b6 !important;
+  text-shadow: none;
+}
+
+.hero-donate-button-neon {
+  box-shadow:
+    0 0 18px rgba(249, 115, 22, 0.45),
+    0 4px 16px rgba(245, 158, 11, 0.35) !important;
 }
 
 /* ===========================================
@@ -584,29 +917,27 @@ nav[role="navigation"] .group {
 .hero-right-panel {
   position: relative;
   width: 100%;
-  /* Mobile: take 55% of the stacked column so slideshow is always visible */
-  flex: 0 0 55%;
+  flex: 1 1 0%;
   min-height: 0;
   overflow: hidden;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  /* Padding on all 4 sides so images don't bleed to edges or get cut off */
-  padding: 0.5rem;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  padding: 0;
   background: transparent;
 }
 
 @media (min-width: 768px) {
   .hero-right-panel {
-    width: 65%;
-    flex: 1;
+    flex: 0 0 auto;
     padding: 0;
+    justify-content: flex-start;
   }
 }
 
 @media (min-width: 1024px) {
   .hero-right-panel {
-    width: 68%;
     padding: 0;
   }
 }
@@ -626,6 +957,34 @@ nav[role="navigation"] .group {
   filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
 }
 
+.hero-ticket-overlay img {
+  transition: transform 0.8s ease-out;
+}
+
+.hero-ticket-overlay a:hover img,
+.hero-ticket-overlay:hover img {
+  transform: scale(1.06);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-brand-kerala-image,
+  .hero-slideshow-wrapper img.hero-slide-image,
+  .hero-left-cta-mission-row .hero-left-cta-thumb img,
+  .hero-ticket-overlay img {
+    transition: none;
+  }
+
+  .hero-brand-card:hover .hero-brand-kerala-image,
+  .hero-slideshow-wrapper:hover .hero-crossfade-layer.is-visible img.hero-slide-image,
+  .hero-slideshow-wrapper:hover .hero-slideshow-ken-burns--solo img.hero-slide-image,
+  .hero-left-cta-mission-row:hover .hero-left-cta-thumb img,
+  .hero-ticket-overlay a:hover img,
+  .hero-ticket-overlay:hover img {
+    transform: none;
+    filter: none;
+  }
+}
+
 @media (min-width: 768px) {
   .hero-ticket-overlay {
     bottom: 2rem;
@@ -640,8 +999,7 @@ nav[role="navigation"] .group {
   }
 }
 
-/* Slideshow wrapper - padding on all 4 sides so images don't bleed; image contained (no cutoff).
-   Mobile and desktop: consistent padding; object-contain so full image visible on all screen sizes. */
+/* Slideshow wrapper — mobile keeps light padding; desktop is flush inside neon frame */
 .hero-slideshow-wrapper {
   position: relative;
   width: 100%;
@@ -649,9 +1007,8 @@ nav[role="navigation"] .group {
   max-height: 100%;
   min-height: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  /* Padding on all 4 sides so Section 2 images don't bleed to edges */
+  align-items: stretch;
+  justify-content: stretch;
   padding: 0.5rem;
   border-radius: 0.75rem;
   overflow: hidden;
@@ -660,24 +1017,13 @@ nav[role="navigation"] .group {
   background: transparent;
 }
 
-/* Desktop: elegant frame with moderate padding all around (reduced to avoid excessive whitespace) */
+/* Desktop: inner wrapper stays flat — outer .hero-slideshow-neon-frame supplies the neon ring */
 @media (min-width: 768px) {
-  .hero-slideshow-wrapper {
+  .hero-slideshow-neon-frame .hero-slideshow-wrapper {
     padding: 0;
-    border-radius: 1.25rem;
-    box-shadow:
-      0 0 60px rgba(245, 158, 11, 0.06),
-      0 0 30px rgba(255, 255, 255, 0.02),
-      0 12px 40px rgba(0, 0, 0, 0.35),
-      inset 0 0 30px rgba(0, 0, 0, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    background: linear-gradient(145deg, rgba(45, 27, 78, 0.5), rgba(26, 10, 46, 0.7));
-  }
-}
-
-@media (min-width: 1024px) {
-  .hero-slideshow-wrapper {
-    padding: 0;
+    box-shadow: none;
+    border: none;
+    background: rgba(15, 23, 42, 0.35);
   }
 }
 
@@ -699,6 +1045,68 @@ nav[role="navigation"] .group {
   );
 }
 
+/* Two-layer crossfade stack (no gap between slides — opacity overlaps). */
+.hero-crossfade-stack {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.hero-crossfade-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  opacity: 0;
+  z-index: 1;
+  pointer-events: none;
+  transition: opacity 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hero-crossfade-layer.is-visible {
+  opacity: 1;
+  z-index: 2;
+  pointer-events: auto;
+}
+
+.hero-crossfade-layer > .hero-slideshow-ken-burns,
+.hero-slideshow-ken-burns--solo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Ken Burns slow zoom — hero slideshow only (rAF on img in HeroKenBurnsSlide). */
+.hero-slideshow-ken-burns {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  isolation: isolate;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  background: var(--homepage-section-bg);
+}
+
+.hero-slideshow-ken-burns img.hero-slide-image,
+.hero-slideshow-ken-burns .hero-slide-image {
+  object-fit: contain !important;
+  object-position: center center !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  transform-origin: center center;
+  will-change: transform;
+}
+
 /* Slideshow inner container - centers the image */
 .hero-slideshow-wrapper > div {
   display: flex;
@@ -708,26 +1116,49 @@ nav[role="navigation"] .group {
   height: 100%;
 }
 
-/* Hero slideshow image: preserve full image visibility without cutoff. */
-.hero-slideshow-wrapper img {
+/* Hero slideshow: full image visible (object-contain); Ken Burns on .hero-slide-image--ken-burns. */
+.hero-slideshow-wrapper img.hero-slide-image {
+  border-radius: 0.5rem;
   object-fit: contain !important;
   object-position: center center !important;
-  width: 100% !important;
-  height: 100% !important;
-  border-radius: 0.5rem;
 }
 
-/* Desktop: match wrapper ratio to the hero sample image so contain fills cleanly. */
+.hero-slideshow-wrapper:hover .hero-crossfade-layer.is-visible img.hero-slide-image,
+.hero-slideshow-wrapper:hover .hero-slideshow-ken-burns--solo img.hero-slide-image {
+  filter: brightness(1.07);
+}
+
+/* Desktop: wrapper height from aspect ratio (no vertical centering in a taller flex cell) */
 @media (min-width: 768px) {
   .hero-slideshow-wrapper {
     width: 100%;
     height: auto;
-    max-height: 100%;
+    max-height: none;
     aspect-ratio: 916 / 387;
+    align-items: stretch;
+    justify-content: stretch;
+    padding: 0;
   }
 
-  .hero-slideshow-wrapper img {
-    object-fit: contain !important;
+  .hero-slideshow-wrapper > div {
+    align-items: stretch;
+    justify-content: stretch;
+  }
+
+  .hero-slideshow-ken-burns {
+    border-radius: 0.75rem;
+    align-items: stretch;
+    justify-content: stretch;
+  }
+
+  .hero-slideshow-ken-burns img.hero-slide-image,
+  .hero-slideshow-ken-burns .hero-slide-image {
+    object-fit: cover !important;
+    border-radius: 0.75rem;
+  }
+
+  .hero-slideshow-wrapper img.hero-slide-image {
+    object-fit: cover !important;
     border-radius: 0.75rem;
   }
 }
@@ -962,13 +1393,13 @@ nav[role="navigation"] .group {
 /* Browse Container - compact strip at hero bottom */
 .hero-browse-container {
   flex: 0 0 auto;
-  min-height: 2rem;
+  min-height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0.125rem 1rem;
+  padding: 0 1rem;
   width: 100%;
 }
 
@@ -980,7 +1411,7 @@ nav[role="navigation"] .group {
   .hero-container-split {
     padding-left: 0;
     padding-right: 0;
-    padding-top: 5rem;
+    padding-top: 6.75rem;
     height: auto;
     min-height: 0;
     max-height: none;
@@ -988,60 +1419,58 @@ nav[role="navigation"] .group {
   }
 
   .hero-split-row {
-    flex-direction: column;
-    gap: 0;
-    padding: 0;
+    padding: 0 0.5rem;
+    gap: 0.35rem;
     margin: 0;
     min-height: 0;
   }
 
-  /* Section 1: Left panel (Kerala image) – short on mobile; image drives height (no min-height gap) */
-  .hero-left-panel {
-    width: 100%;
-    flex: 0 0 auto;
+  .hero-brand-card {
+    border-radius: 0.75rem;
+    margin: 0 0.5rem;
+    padding: 2px;
     min-height: 0;
-    padding: 0;
-    margin: 0;
-  }
-
-  .hero-left-image {
-    width: 100%;
-    max-width: 100%;
     height: auto;
+  }
+
+  .hero-brand-image-wrap {
+    max-height: min(38vh, 240px);
     min-height: 0;
-    aspect-ratio: auto;
-    padding: 0;
-    border-radius: 0;
-    box-shadow: none;
-    border: none;
-    /* Match hero dark purple so contain side-bars blend seamlessly */
-    background: #1a0a2e;
+    aspect-ratio: 5 / 6;
+    width: 100%;
+    margin: 0 auto;
   }
 
-  .hero-left-image::before,
-  .hero-left-image::after {
-    display: none;
+  .hero-right-wrap {
+    width: 100%;
+    min-height: 0;
   }
 
-  .hero-left-image img {
-    border-radius: 0 !important;
-    object-fit: contain !important;
-    object-position: center center !important;
-    width: 100% !important;
-    height: auto !important;
-    max-height: 22vh !important;
-    display: block !important;
-  }
-
-  /* Section 2: Right panel (slideshow) – full-bleed, content-driven height, tight against Section 1 */
   .hero-right-panel {
     width: 100%;
     flex: 0 0 auto;
     min-height: 0;
     padding: 0;
-    margin-top: 0.125rem;
+    margin: 0;
     align-items: stretch;
     justify-content: stretch;
+  }
+
+  .hero-slideshow-neon-frame {
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
+    background: transparent;
+    flex: 0 0 auto;
+  }
+
+  .hero-slideshow-particles {
+    border-radius: 0;
+    opacity: 0.65;
+  }
+
+  .hero-slideshow-neon-frame > .hero-slideshow-wrapper {
+    border-radius: 0;
   }
 
   .hero-slideshow-wrapper {
@@ -1049,8 +1478,7 @@ nav[role="navigation"] .group {
     border-radius: 0;
     box-shadow: none;
     border: none;
-    background: #1a0a2e;
-    /* Match image 5:2 aspect ratio so contain fills with zero gaps */
+    background: var(--homepage-section-bg);
     aspect-ratio: 5 / 2;
     width: 100%;
     height: auto;
@@ -1060,91 +1488,37 @@ nav[role="navigation"] .group {
     display: none;
   }
 
-  .hero-slideshow-wrapper img {
+  .hero-slideshow-ken-burns img.hero-slide-image {
     border-radius: 0 !important;
-    object-fit: contain !important;
-    width: 100% !important;
-    height: 100% !important;
   }
 
-  /* Ticket/Register overlay: pinned to bottom-right corner ON TOP of the slideshow image */
+  .hero-slideshow-ken-burns {
+    border-radius: 0;
+  }
+
   .hero-ticket-overlay {
     bottom: 0.75rem;
     right: 0.75rem;
     z-index: 30;
   }
 
-  /* Section 3 & 4: Bottom row – taller cards, tight against Section 2, minimal top padding */
-  .hero-bottom-row {
-    flex-direction: column;
-    gap: 0.75rem;
-    padding: 0.125rem 1rem 0.75rem;
-    margin: 0;
-    width: 100%;
-    align-items: flex-start;
-    justify-content: flex-start;
-  }
-
-  .hero-bottom-card {
-    width: 100%;
-    max-width: none;
-    min-height: 100px;
-    max-height: none;
-    border-radius: 0.625rem;
-  }
-
-  .hero-bottom-card-mission {
-    min-height: 0;
-    overflow: hidden;
-    position: relative;
+  .hero-left-cta-card {
+    margin: 0 0.5rem;
     border-radius: 0.75rem;
-    aspect-ratio: 5 / 1;
-    width: 100%;
-    height: auto;
-    background: #1a0a2e;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    max-width: none;
+    width: calc(100% - 1rem);
   }
 
-  /* Stronger bottom gradient on mobile so text is readable over the image */
-  .hero-bottom-card-mission .hero-mission-overlay {
-    background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.3) 50%, transparent 100%);
+  .hero-browse-under-slideshow {
+    padding: 0;
+    justify-content: center;
   }
 
-  /* Mission card: text overlays the image — positioned inside the card, above the bottom edge */
-  .hero-bottom-card-mission .hero-mission-content {
-    margin-top: 0;
-    position: absolute;
-    bottom: 0.75rem;
-    left: 0;
-    right: 0;
-    padding: 0.25rem 0.75rem;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.7);
-  }
-
-  /* Tighter text sizing so "About" + "Our Mission" fits within the card on small screens */
-  .hero-bottom-card-mission .hero-card-label {
-    font-size: 0.625rem;
-    margin-bottom: 0.125rem;
-  }
-
-  .hero-bottom-card-mission .hero-card-title {
-    font-size: 0.8125rem;
-  }
-
-  /* Mission card bg image: contain inside 5:1 aspect-ratio card — same technique as Section 2 */
-  .hero-bottom-card-mission .hero-mission-bg {
-    position: absolute;
-    inset: 0;
-  }
-  .hero-bottom-card-mission .hero-mission-bg img {
-    object-fit: contain !important;
-    object-position: center center !important;
-    width: 100% !important;
-    height: 100% !important;
-  }
-
-  .hero-browse-container {
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
+  .hero-browse-link-neon {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 }
 
@@ -1192,14 +1566,211 @@ nav[role="navigation"] .group {
   }
 }
 
-/* Hero Image Transition */
-.hero-image-transition {
-  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+/* Hero slideshow — hover brightness only on img (layer opacity handles crossfade). HERO_SLIDESHOW_CROSSFADE_MS in HeroSection.tsx must match .hero-crossfade-layer transition. */
+.hero-slide-image {
+  transition: filter 0.8s ease-out;
 }
 
-.hero-image-transition.transitioning {
+/* Featured Events + sponsor type pills — blue gradient fill + lift shadow */
+.featured-event-pill-badge {
+  background: linear-gradient(90deg, #0061ff 0%, #2f7df4 50%, #60a5fa 100%);
+  box-shadow:
+    0 4px 16px rgba(0, 97, 255, 0.38),
+    0 2px 6px rgba(0, 0, 0, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .featured-event-pill-badge {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  }
+}
+
+/* Cultural services grid — frosted glass + scroll reveal + 3D tilt (ServicesSection.tsx) */
+.services-glass-card-wrap {
   opacity: 0;
-  transform: scale(1.02);
+  transform: translate3d(0, 36px, 0) scale(0.96);
+  transition:
+    opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--services-reveal-delay, 0ms);
+  perspective: 1200px;
+}
+
+.services-glass-card-wrap--visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+.services-glass-card-face {
+  border-radius: 1rem;
+  padding: 2rem;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.78) 0%,
+    rgba(255, 255, 255, 0.42) 45%,
+    rgba(255, 255, 255, 0.62) 100%
+  );
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.06),
+    0 14px 36px -12px rgba(5, 150, 105, 0.18),
+    0 1px 0 0 rgba(255, 255, 255, 0.95) inset,
+    0 -1px 0 0 rgba(0, 0, 0, 0.04) inset;
+  transform-style: preserve-3d;
+  transition:
+    box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.35s ease;
+  will-change: transform;
+}
+
+.services-glass-card-face:hover {
+  border-color: rgba(255, 255, 255, 1);
+  box-shadow:
+    0 10px 22px -6px rgba(0, 0, 0, 0.1),
+    0 24px 52px -16px rgba(5, 120, 90, 0.22),
+    0 1px 0 0 rgba(255, 255, 255, 1) inset,
+    0 -1px 0 0 rgba(0, 0, 0, 0.06) inset;
+}
+
+.services-glass-card-shine {
+  border-radius: inherit;
+  background: linear-gradient(
+    118deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 38%,
+    rgba(255, 255, 255, 0.55) 50%,
+    rgba(255, 255, 255, 0.12) 62%,
+    transparent 100%
+  );
+  background-size: 220% 220%;
+  background-position: 0% 50%;
+  opacity: 0;
+  transition: opacity 0.45s ease, background-position 0.6s ease;
+}
+
+.services-glass-card-face:hover .services-glass-card-shine {
+  opacity: 1;
+  background-position: 100% 50%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .services-glass-card-wrap {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .services-glass-card-wrap--visible {
+    transform: none;
+  }
+
+  .services-glass-card-face {
+    transition: none;
+    will-change: auto;
+  }
+
+  .services-glass-card-shine {
+    display: none;
+  }
+}
+
+/* Upcoming events homepage cards — frosted glass + scroll reveal + 3D tilt (UpcomingEventsSection.tsx) */
+.upcoming-events-glass-card-wrap {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0) scale(0.97);
+  transition:
+    opacity 0.72s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.72s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--upcoming-events-reveal-delay, 0ms);
+  perspective: 1200px;
+}
+
+.upcoming-events-glass-card-wrap--visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+.upcoming-events-glass-card-face {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  padding: 0;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.74) 0%,
+    rgba(255, 255, 255, 0.4) 45%,
+    rgba(255, 255, 255, 0.6) 100%
+  );
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.06),
+    0 18px 42px -14px rgba(22, 101, 52, 0.22),
+    0 1px 0 0 rgba(255, 255, 255, 0.92) inset,
+    0 -1px 0 0 rgba(0, 0, 0, 0.05) inset;
+  transform-style: preserve-3d;
+  transition:
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.35s ease;
+  will-change: transform;
+}
+
+.upcoming-events-glass-card-face:hover {
+  border-color: rgba(255, 255, 255, 1);
+  box-shadow:
+    0 10px 24px -8px rgba(0, 0, 0, 0.12),
+    0 26px 56px -18px rgba(21, 128, 61, 0.28),
+    0 1px 0 0 rgba(255, 255, 255, 1) inset,
+    0 -1px 0 0 rgba(0, 0, 0, 0.06) inset;
+}
+
+.upcoming-events-glass-card-shine {
+  border-radius: inherit;
+  background: linear-gradient(
+    118deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.12) 38%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0.14) 62%,
+    transparent 100%
+  );
+  background-size: 220% 220%;
+  background-position: 0% 50%;
+  opacity: 0;
+  transition:
+    opacity 0.45s ease,
+    background-position 0.6s ease;
+}
+
+.upcoming-events-glass-card-face:hover .upcoming-events-glass-card-shine {
+  opacity: 1;
+  background-position: 100% 50%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .upcoming-events-glass-card-wrap {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .upcoming-events-glass-card-wrap--visible {
+    transform: none;
+  }
+
+  .upcoming-events-glass-card-face {
+    transition: none;
+    will-change: auto;
+  }
+
+  .upcoming-events-glass-card-shine {
+    display: none;
+  }
 }
 
 /* Get Tickets Badge */

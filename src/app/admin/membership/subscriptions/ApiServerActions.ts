@@ -1,6 +1,6 @@
 "use server";
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
-import { getAppUrl, getTenantId, getApiBaseUrl } from '@/lib/env';
+import { getAppUrlFromRequestHeaders, getTenantId, getApiBaseUrl } from '@/lib/env';
 import { withTenantId } from '@/lib/withTenantId';
 import type { MembershipSubscriptionDTO } from '@/types';
 
@@ -52,7 +52,7 @@ export async function fetchAllSubscriptionsServer(
     params.append('size', String(filters.pageSize));
   }
 
-  const url = `${getAppUrl()}/api/proxy/membership-subscriptions?${params.toString()}`;
+  const url = `${await getAppUrlFromRequestHeaders()}/api/proxy/membership-subscriptions?${params.toString()}`;
   const res = await fetchWithJwtRetry(url, {
     method: 'GET',
     cache: 'no-store',
@@ -86,7 +86,7 @@ export async function getSubscriptionDetailsServer(
     return null;
   }
 
-  const url = `${getAppUrl()}/api/proxy/membership-subscriptions/${subscriptionId}`;
+  const url = `${await getAppUrlFromRequestHeaders()}/api/proxy/membership-subscriptions/${subscriptionId}`;
   const res = await fetchWithJwtRetry(url, {
     method: 'GET',
     cache: 'no-store',

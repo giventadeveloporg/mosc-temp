@@ -4,8 +4,8 @@ import React, { useState, useEffect, useLayoutEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { ExecutiveCommitteeTeamMemberDTO } from '@/types';
-import { getAppUrl } from '@/lib/env';
 import { useDeferredFetch } from '@/hooks/usePageReady';
+import { parseExecutiveCommitteeTeamMembersResponse } from '@/lib/parseExecutiveCommitteeTeamMembersResponse';
 import { getHomepageCacheKey } from '@/lib/homepageCacheKeys';
 import Modal from '@/components/ui/Modal';
 import styles from './TeamSection.module.css';
@@ -37,7 +37,7 @@ const TeamSection: React.FC = () => {
       if (cachedData) {
         const { data, timestamp } = JSON.parse(cachedData);
         if (Date.now() - timestamp < CACHE_DURATION) {
-          setTeamMembers(data);
+          setTeamMembers(parseExecutiveCommitteeTeamMembersResponse(data));
           setLoading(false);
           setShowImages(true);
         }
@@ -54,7 +54,7 @@ const TeamSection: React.FC = () => {
           const { data, timestamp } = JSON.parse(cachedData);
           if (Date.now() - timestamp < CACHE_DURATION) {
             console.log('✅ Using cached team data');
-            setTeamMembers(data);
+            setTeamMembers(parseExecutiveCommitteeTeamMembersResponse(data));
             setLoading(false);
             setShowImages(true); // Show images immediately for cached data
             return;
@@ -68,10 +68,9 @@ const TeamSection: React.FC = () => {
       if (!shouldFetch) return;
 
       try {
-        const baseUrl = getAppUrl();
-        // Proxy injects tenantId.equals per nextjs_api_routes.mdc; only pass filter/sort here
+        // Same-origin relative URL (avoids localhost vs 127.0.0.1 / port mismatch)
         const response = await fetch(
-          `${baseUrl}/api/proxy/executive-committee-team-members?isActive.equals=true&sort=priorityOrder,asc`,
+          '/api/proxy/executive-committee-team-members?isActive.equals=true&sort=priorityOrder,asc',
           {
             method: 'GET',
             headers: {
@@ -89,7 +88,7 @@ const TeamSection: React.FC = () => {
         }
 
         const data = await response.json();
-        const teamMembersList = Array.isArray(data) ? data : [];
+        const teamMembersList = parseExecutiveCommitteeTeamMembersResponse(data);
 
         // Cache the data
         try {
@@ -146,10 +145,8 @@ const TeamSection: React.FC = () => {
   };
 
   /**
-   * Chunk team members by priority for layout:
-   * - Row 1: only the first (priority 0 / rank 1) - single card, one item
-   * - Row 2+: 3 per row (2nd, 3rd, 4th then 5th, 6th, 7th, etc.)
-   * Homepage shows first 6 members in this layout.
+   * Chunk team members by priority: 3 cards per row on the homepage grid.
+   * Homepage shows first 6 members (two full rows when there are 6+).
    */
   const displayedRows = ((): ExecutiveCommitteeTeamMemberDTO[][] => {
     const sorted = [...teamMembers].sort((a, b) => (a.priorityOrder ?? 0) - (b.priorityOrder ?? 0));
@@ -157,10 +154,9 @@ const TeamSection: React.FC = () => {
     if (take === 0) return [];
     const list = sorted.slice(0, take);
     const rows: ExecutiveCommitteeTeamMemberDTO[][] = [];
-    rows.push(list.slice(0, 1));   // Row 1: only rank 1 (single card)
-    let i = 1;
+    let i = 0;
     while (i < list.length) {
-      rows.push(list.slice(i, i + 3)); // Row 2+: 3 per row
+      rows.push(list.slice(i, i + 3));
       i += 3;
     }
     return rows;
@@ -172,7 +168,7 @@ const TeamSection: React.FC = () => {
   }
 
   return (
-    <div id="team-section" className="py-24 bg-gradient-to-br from-gray-50 to-white">
+    <div id="team-section" className="py-24 bg-green-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Profile "Read more" popup */}
         <Modal
@@ -288,7 +284,7 @@ const TeamSection: React.FC = () => {
           </div>
         </div>
 
-        {/* Dynamic Team Grid by priority: row 1 = rank 1 only (1 card), row 2+ = 3 cards per row */}
+        {/* Dynamic Team Grid by priority: 3 cards per row */}
         {teamMembers.length > 0 ? (
           <>
             {displayedRows.map((row, rowIndex) => {

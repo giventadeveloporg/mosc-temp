@@ -2,7 +2,6 @@
 
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { TenantSettingsDTO } from '@/types';
-import { getAppUrl } from '@/lib/env';
 import { usePageReady } from '@/hooks/usePageReady';
 import {
   getHomepageCacheKey,
@@ -114,17 +113,14 @@ export const TenantSettingsProvider: React.FC<TenantSettingsProviderProps> = ({ 
       if (!pageReady && retryCount === 0) return;
 
       try {
-        const baseUrl = getAppUrl();
-        const response = await fetch(
-          `${baseUrl}/api/proxy/tenant-settings`,
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            cache: 'no-store',
-          }
-        );
+        // Same-origin relative URL — matches browser tab (localhost vs 127.0.0.1, port, etc.)
+        const response = await fetch('/api/proxy/tenant-settings', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          cache: 'no-store',
+        });
 
         if (response.ok) {
           const data = await response.json();

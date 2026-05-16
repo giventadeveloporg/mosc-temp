@@ -503,29 +503,24 @@ alwaysApply: true
   - See `src/pages/api/proxy/event-ticket-transactions/[...slug].ts` for a working example.
   - See `src/pages/api/proxy/discount-codes/[...slug].ts` for the required fix.
 
-- **Port-Agnostic App URL Configuration**
-  - Use `getAppUrl()` from `@/lib/env` instead of hardcoded URLs for server-side API calls.
-  - This ensures the application works on any port (3000, 3001, etc.) without hardcoding.
-  - **DO:**
-    ```typescript
-    import { getAppUrl } from '@/lib/env';
-    const baseUrl = getAppUrl();
-    const response = await fetch(`${baseUrl}/api/proxy/event-details`);
-    ```
-  - **DON'T:**
-    ```typescript
-    // ❌ DON'T: Hardcode port numbers
-    const baseUrl = 'http://localhost:3000';
-    // ❌ DON'T: Use environment variable with hardcoded fallback
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    ```
-  - **Rationale:**
-    - Makes the application truly port-agnostic
-    - Supports development on any port (3000, 3001, 3002, etc.)
-    - Maintains compatibility with production environment variables
+- **App URL and fetch targets (client vs server) — use the right base**
+  - **Browser / `'use client'` calling `/api/proxy/*` (public data): use same-origin relative URLs**
+    - **DO:** `fetch('/api/proxy/executive-committee-team-members?isActive.equals=true&sort=priorityOrder,asc', { ... })`
+    - **DON'T:** `const baseUrl = getAppUrl(); fetch(\`${baseUrl}/api/proxy/...\`)` from the browser.
+    - **Why:** `getAppUrl()` often resolves to `http://localhost:3000` while the tab may be `http://127.0.0.1:3001` (or another host/port). Browsers treat those as **different origins** → CORS / `TypeError: Failed to fetch` even though the proxy works. Relative paths always hit the current tab’s origin.
+    - **Do NOT add `tenantId.equals` in the query** when calling the proxy; `createProxyHandler` injects it for list GETs (see rule above).
+    - **References:** `src/components/TeamSection.tsx`, `src/components/OurSponsorsSection.tsx`, `src/components/TenantSettingsProvider.tsx`
+  - **Server code calling the backend API directly (server components, server actions, `ApiServerActions.ts`): use `getApiBaseUrl()` + `fetchWithJwtRetry`**
+    - **DO:** `await fetchWithJwtRetry(\`${getApiBaseUrl()}/api/resource?tenantId.equals=${getTenantId()}&...\`, { cache: 'no-store' })` (add `tenantId.equals` when the backend criteria require it; `fetchWithJwtRetry` adds `Authorization` and `X-Tenant-ID`).
+    - **DON'T:** Loop through the Next app with `getAppUrl() + '/api/proxy/...'` from server code unless you have a specific reason (extra hop, wrong port if env is stale).
+    - **References:** `src/app/admin/executive-committee/ApiServerActions.ts`, `src/app/admin/event-sponsors/ApiServerActions.ts`, `src/lib/proxyHandler.ts`
+  - **Server code that must call this Next app (e.g. multipart upload to a Pages API route): prefer request host, then env**
+    - **DO:** `import { headers } from 'next/headers'` → build `proto://host` from `x-forwarded-host` / `host` and `x-forwarded-proto` when possible (matches actual dev port and deployment host).
+    - **Fallback:** `getAppUrl()` from `@/lib/env` when not in a request context — never hardcode `http://localhost:3000` in application code.
+  - **Legacy `getAppUrl()` note**
+    - `getAppUrl()` remains correct for **absolute links**, emails, QR bases, and **server→Next** when `headers()` is unavailable — not for **browser→proxy** fetches.
   - **References:**
-    - See `src/app/page.tsx` for correct usage
-    - See `src/lib/env.ts` for the `getAppUrl()` implementation
+    - See `src/lib/env.ts` for `getAppUrl()` and `getApiBaseUrl()`
 
 - **Graceful API Failure Handling**
   - Always handle API fetch failures gracefully in server components to prevent page crashes.
@@ -570,14 +565,13 @@ alwaysApply: true
   - **Rationale:** Server actions called from client components can trigger `headers()` without awaiting, causing runtime errors in Next.js 15+.
   - **DO:**
     ```typescript
-    // ✅ DO: Use direct fetch to proxy endpoints from client components on public pages
+    // ✅ DO: Same-origin relative URL to /api/proxy/* from client on public pages (no getAppUrl in browser)
     'use client';
     export function TeamSection() {
       useEffect(() => {
         const loadData = async () => {
-          const baseUrl = getAppUrl();
           const response = await fetch(
-            `${baseUrl}/api/proxy/executive-committee-team-members?isActive.equals=true&sort=priorityOrder,asc`,
+            '/api/proxy/executive-committee-team-members?isActive.equals=true&sort=priorityOrder,asc',
             {
               method: 'GET',
               headers: { 'Content-Type': 'application/json' },
@@ -593,7 +587,9 @@ alwaysApply: true
       }, []);
     }
     ```
+  - **Also normalize API shape:** backends may return HAL `_embedded` or Spring `content` instead of a bare array — parse before `setData` (see `src/lib/parseExecutiveCommitteeTeamMembersResponse.ts`).
   - **Executive committee priority order:** The list is sorted by `priorityOrder` ascending (`sort=priorityOrder,asc`). **Lower number = higher rank** (0 appears first, 10 later). Show this tip in the admin form (tooltip or info above the Priority Order field).
+  - **DON'T (client):** `getAppUrl()` / `NEXT_PUBLIC_APP_URL` + absolute `/api/proxy/...` from the browser — use relative URLs (see **App URL and fetch targets** above).
   - **DON'T:**
     ```typescript
     // ❌ DON'T: Call server actions from client components on public pages
@@ -628,11 +624,12 @@ alwaysApply: true
   - **Rationale**: This ensures consistent authentication, error handling, and prevents `headers()` async context errors in Next.js 15+.
   - **DO:**
     ```typescript
-    // ✅ DO: Use fetchWithJwtRetry for all backend API calls
+    // ✅ DO: Use fetchWithJwtRetry for all backend API calls (prefer getApiBaseUrl() from @/lib/env)
     import { fetchWithJwtRetry } from '@/lib/proxyHandler';
+    import { getApiBaseUrl } from '@/lib/env';
 
     export async function fetchDataServer() {
-      const res = await fetchWithJwtRetry(`${API_BASE_URL}/api/some-endpoint`, {
+      const res = await fetchWithJwtRetry(`${getApiBaseUrl()}/api/some-endpoint`, {
         cache: 'no-store',
       });
       if (!res.ok) return null;

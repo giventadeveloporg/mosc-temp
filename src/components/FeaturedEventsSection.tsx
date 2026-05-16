@@ -91,7 +91,7 @@ const FeaturedEventsSection: React.FC<FeaturedEventsSectionProps> = ({
   }
 
   return (
-    <section className="py-0 md:py-0.5 bg-gradient-to-r from-blue-50 to-indigo-50">
+    <section className="py-0 md:py-0.5 bg-gradient-to-r from-green-50 to-emerald-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header - Yellow bar and label only (h2 removed per request) */}
         <div className="mt-4 mb-4">
@@ -133,12 +133,23 @@ const FeaturedEventsSection: React.FC<FeaturedEventsSectionProps> = ({
                     </div>
                   )}
 
-                  {/* Featured Event Badge Overlay */}
-                  <div className="absolute top-2 left-2 md:top-3 md:left-3">
-                    <div className="flex items-center space-x-1.5 bg-blue-600 text-white px-2 py-0.5 rounded-full">
-                      <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
-                      <span className="text-[10px] md:text-xs font-semibold uppercase tracking-wide">
-                        Featured Event
+                  {/* Featured Event pill — blue gradient, star + label (matches homepage featured strip spec) */}
+                  <div className="absolute top-2 left-2 z-[5] md:top-3 md:left-3">
+                    <div
+                      className="featured-event-pill-badge inline-flex items-center gap-1.5 rounded-full border border-white/25 px-2.5 py-1 pl-2.5 pr-3 md:gap-2 md:px-3.5 md:py-1.5 md:pl-3 md:pr-4"
+                      role="status"
+                      aria-label="Featured event"
+                    >
+                      <svg
+                        className="h-2.5 w-2.5 shrink-0 text-white drop-shadow-sm md:h-3 md:w-3"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        aria-hidden
+                      >
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                      </svg>
+                      <span className="text-[10px] font-bold uppercase leading-none tracking-[0.12em] text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.22)] md:text-[11px] md:tracking-[0.14em]">
+                        Featured event
                       </span>
                     </div>
                   </div>

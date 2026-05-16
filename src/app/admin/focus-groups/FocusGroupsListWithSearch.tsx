@@ -235,9 +235,8 @@ export default function FocusGroupsListWithSearch({ groups, total }: FocusGroups
         </div>
       </div>
 
-      {/* Pagination - only show when there are results (client-side buttons) */}
-      {filteredCount > 0 && (
-        <div className="mt-8">
+      {/* Pagination: always render so admin tests and users see consistent controls (disabled when empty) */}
+      <div className="mt-8">
           <div className="flex justify-between items-center">
             <button
               type="button"
@@ -290,7 +289,6 @@ export default function FocusGroupsListWithSearch({ groups, total }: FocusGroups
             </div>
           </div>
         </div>
-      )}
     </div>
   );
 }
