@@ -932,14 +932,14 @@ const HeroSection: React.FC = () => {
               src="/images/hero_section/wooden-boat-under-coconut-tree-riverside_ver_2.jpg"
               alt="Malayalees.US - Kerala Backwaters"
               fill
-              className="object-cover object-center hero-brand-kerala-image"
+              className="hero-brand-kerala-image object-contain object-top md:object-cover md:object-center"
               sizes="(max-width: 767px) 100vw, 30vw"
               priority
             />
           </div>
         </div>
 
-        {/* Slideshow + browse — right column desktop; second on mobile */}
+        {/* Slideshow — right column desktop; second on mobile */}
         <div className="hero-right-wrap">
           <div className="hero-right-panel">
             <div className="hero-slideshow-neon-frame">
@@ -968,12 +968,6 @@ const HeroSection: React.FC = () => {
             )}
           </div>
 
-          <div className="hero-browse-container hero-browse-under-slideshow">
-            <Link href="/events" className="hero-browse-link hero-browse-link-neon">
-              <span>Browse all upcoming events</span>
-              <ArrowRight size={16} className="shrink-0" />
-            </Link>
-          </div>
         </div>
         </div>
 
@@ -981,7 +975,7 @@ const HeroSection: React.FC = () => {
         <div className="hero-left-cta-card">
           <Link
             href="/#about-us"
-            className="hero-left-cta-mission-row min-w-0 flex-1"
+            className="hero-left-cta-mission-row min-w-0 shrink-0"
             title="About our mission"
             aria-label="Our mission — about us"
           >
@@ -1000,6 +994,13 @@ const HeroSection: React.FC = () => {
             <Heart size={16} className="fill-white" />
             <span>Donate Now</span>
           </GivebutterDonateButton>
+        </div>
+
+        <div className="hero-browse-container hero-browse-at-hero-bottom">
+          <Link href="/events" className="hero-browse-link hero-browse-link-neon">
+            <span>Browse all upcoming events</span>
+            <ArrowRight size={16} className="shrink-0" />
+          </Link>
         </div>
       </div>
     </section>

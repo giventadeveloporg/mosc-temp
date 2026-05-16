@@ -235,6 +235,118 @@ The homepage hero section uses a 4-section split layout with images of **varying
 
 ---
 
+## **Featured Event Card Strip (Homepage) — Fill + Rounded Corners**
+
+**Use when:** Featured Events horizontal strip (`FeaturedEventsSection`) — wide promo banners must **fill** the image column with **no left/right letterboxing** and **rounded top/left corners** matching the card (`rounded-2xl`).
+
+**Reference implementation:** Align with **Upcoming Events** banner pattern (`UpcomingEventsSection` → `Link.block` → `event-card-banner-media--upcoming`).
+
+### **Problem**
+- Fixed `md:h-[200px]` on a **70%**-wide column + `object-contain` → very wide, short box (~4:1) → **side gaps** for landscape banners (e.g. Givebutter).
+- Rounded radius on inner media only — contained image did not reach edges → **square yellow corners** visible inside rounded card.
+
+### **Solution**
+
+**1. Parent wrapper clips corners (not inner image box alone)**
+
+```css
+.featured-event-card-media {
+  overflow: hidden;
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+  line-height: 0;
+}
+@media (min-width: 768px) {
+  .featured-event-card-media {
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 1rem;
+    border-bottom-right-radius: 0;
+  }
+}
+```
+
+Inner `.event-card-banner-media--featured-strip` uses `border-radius: 0` — parent clips.
+
+**2. Mobile: compact aspect-ratio frame; Desktop: fill entire media column**
+
+```css
+/* Mobile — shorter strip (~25% less than 5/3) */
+.event-card-banner-media--featured-strip {
+  aspect-ratio: 20 / 9;
+  width: 100%;
+  max-height: 11.25rem;
+  border-radius: 0;
+}
+
+@media (min-width: 768px) {
+  .featured-event-card-media {
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+    min-height: 0;
+  }
+  .featured-event-card-media > a {
+    flex: 1 1 auto;
+    height: 100%;
+    min-height: 0;
+  }
+  .event-card-banner-media--featured-strip {
+    aspect-ratio: auto;
+    max-height: none;
+    min-height: 100%;
+    height: 100%;
+    width: 100%;
+  }
+}
+
+.event-card-banner-media--featured-strip .event-card-banner-image,
+.event-card-banner-media--featured-strip img {
+  object-fit: cover !important;
+  object-position: top center !important;
+}
+```
+
+- **Mobile:** `aspect-ratio: 20/9` + `max-height` keeps cards compact.
+- **Desktop:** Row uses `md:items-stretch`; media column + link + strip use **`height: 100%`** (no fixed `aspect-ratio` / `max-height` on desktop) so the image **spans the full left panel**.
+- **`object-cover`** + **`top center`** fills edge-to-edge (no side letterboxing); crops bottom if needed — same intent as live event strip.
+- Override global `object-fit: contain` with `!important` for featured strip only.
+- **`EventStripBannerImage`**: `variant="featured"` must include `h-full w-full` on the media wrapper.
+
+**3. Remove fixed row height** — no `md:h-[200px]` on card; mobile aspect-ratio drives height; desktop height follows details column stretch.
+
+**4. Component structure**
+
+```tsx
+<div className="featured-event-card group overflow-hidden rounded-2xl ...">
+  <div className="flex flex-col md:flex-row md:items-stretch">
+    <div className="featured-event-card-media relative w-full shrink-0 md:w-[70%]">
+      <Link href={`/events/${id}`} className="block w-full">
+        <EventStripBannerImage src={...} variant="featured" />
+      </Link>
+      {/* absolute: featured pill, buy-ticket overlay */}
+    </div>
+    <div className="featured-event-card-details ...">...</div>
+  </div>
+</div>
+```
+
+**5. `EventStripBannerImage`** — `variant="featured"` → `event-card-banner-media--featured-strip`; Next/Image `fill` + `event-card-banner-image`; `group-hover:scale-105` on featured.
+
+### **Files**
+- [`src/app/globals.css`](mdc:src/app/globals.css) — `.event-card-banner-media--featured-strip`, `.featured-event-card-media`
+- [`src/components/FeaturedEventsSection.tsx`](mdc:src/components/FeaturedEventsSection.tsx)
+- [`src/components/EventStripBannerImage.tsx`](mdc:src/components/EventStripBannerImage.tsx)
+
+### **When to use contain vs cover**
+
+| Context | Fit | Why |
+|--------|-----|-----|
+| Event thumbnails, sponsors, heroes (must show full art) | `object-contain` | Zero crop |
+| Featured homepage **promo strip** (fill column, no side gaps) | `object-cover` in 5/3 clipped parent | Full bleed + rounded corners |
+
+---
+
 ## **Related Patterns**
 
 - See [Hero Mobile Image Containment](mdc:.cursor/rules/hero_mobile_image_containment_aspect_ratio.mdc) for the complete mobile technique

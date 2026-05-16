@@ -28,24 +28,24 @@ function EventImageWithErrorHandling({
   // Don't render if image fails to load or src is empty
   if (imageError || !src) {
     return isPastEvent ? (
-      <div className="relative flex aspect-[5/3] w-full items-start justify-end rounded-t-2xl bg-gradient-to-br from-gray-100 to-gray-200/90 pt-3 pr-3">
+      <div className="event-card-banner-media event-card-banner-media--upcoming relative flex items-start justify-end pt-3 pr-3">
         <span className="px-3 py-1 bg-gray-500 text-white text-xs font-medium rounded-full">
           Past Event
         </span>
       </div>
     ) : (
-      <div className="relative aspect-[5/3] w-full rounded-t-2xl bg-gradient-to-br from-gray-100 to-gray-200/60" aria-hidden />
+      <div className="event-card-banner-media event-card-banner-media--upcoming" aria-hidden />
     );
   }
 
   return (
-    <div className="relative aspect-[5/3] w-full overflow-hidden rounded-t-2xl bg-gradient-to-br from-gray-50 to-gray-100/90">
+    <div className="event-card-banner-media event-card-banner-media--upcoming">
       <Image
         src={src}
         alt={alt}
         fill
         sizes="(min-width: 1024px) 42vw, 100vw"
-        className="object-contain object-center transition-transform duration-300 group-hover:scale-105"
+        className="event-card-banner-image transition-transform duration-300 group-hover:scale-105"
         onError={() => {
           setImageError(true);
         }}
