@@ -407,7 +407,7 @@
         <ul>
             <li><a href="#repo-status">1. Availability in this repository (quick audit)</a></li>
             <li><a href="#workflow">2. Recommended four-step workflow</a></li>
-            <li><a href="#tools">3. Tool reference: use, location, install, value</a> — <a href="#motion-21st-accounts">3b. Framer Motion &amp; 21st.dev: accounts and API keys</a></li>
+            <li><a href="#tools">3. Tool reference: use, location, install, value</a> — <a href="#motion-21st-accounts">3b. Framer Motion &amp; 21st.dev: accounts and API keys</a> — <a href="#preferred-reference-urls">3c. Preferred reference URLs</a></li>
             <li><a href="#homepage">4. Homepage improvements for mosc-temp</a> — <a href="#diaspora-theme">4b. Malayalee / Keralite diaspora theme (research)</a></li>
             <li><a href="#hero-guidelines">5. Hero design: top guidelines &amp; templates</a></li>
             <li><a href="#hero-sites">6. Hero-named sites &amp; hero-focused libraries</a></li>
@@ -545,6 +545,51 @@
                     <td><a href="https://ui.shadcn.com/" rel="noopener noreferrer">ui.shadcn.com</a></td>
                     <td>Requires alignment with Next.js + Tailwind setup; not a one-line drop-in if the repo was not scaffolded for shadcn.</td>
                     <td>Consistent component primitives if you adopt the stack; evaluate bundle and design-system overlap with existing Radix usage.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3 id="preferred-reference-urls">3c. Preferred reference URLs</h3>
+        <p>Bookmark these when researching homepage facelift ideas, AI-assisted layout workflows, hero treatments, and visual polish. Use as <strong>reference only</strong>—port patterns into this repo with MOSC tokens (<code class="code-highlight">mosc_styling_standards.mdc</code>) and existing hero containment rules.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Heading / topic</th>
+                    <th>Link</th>
+                    <th>Why look here</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td><strong>Neuform</strong> — AI design workflow (try with Google <code class="code-highlight">design.md</code> + Gemini 3.1 Pro)</td>
+                    <td><a href="https://neuform.ai" rel="noopener noreferrer">neuform.ai</a></td>
+                    <td>Explore agentic UI generation and design-system-style workflows; pair with a <code class="code-highlight">design.md</code> file in the repo for consistent agent context (see also row 3).</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td><strong>Aura</strong> — clone or copy a site (layout reference)</td>
+                    <td><a href="https://aura.build" rel="noopener noreferrer">aura.build</a></td>
+                    <td>Rapid visual exploration: recreate or adapt an existing site’s structure and styling ideas before re-implementing in React + Tailwind for mosc-temp.</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td><strong>Google’s design.md Just Changed AI Design</strong> (My Full AI Workflow Using Gemini 3.1 Pro)</td>
+                    <td><a href="https://www.youtube.com/watch?v=g-1K7MPpMyc" rel="noopener noreferrer">youtube.com/watch?v=g-1K7MPpMyc</a></td>
+                    <td>End-to-end narrative for keeping design rules in a project file and using Gemini-class models for UI work; complements section 9 row on Design.md.</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td><strong>I made this AMAZING Hero Section Completely using AI</strong> — Claude Design Tutorial</td>
+                    <td><a href="https://www.youtube.com/watch?v=R4RvqfIvSdk" rel="noopener noreferrer">youtube.com/watch?v=R4RvqfIvSdk</a></td>
+                    <td>Hero-section-focused AI design walkthrough; useful before changing <code class="code-highlight">HeroSection.tsx</code>.</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td><strong>Make Your Website Look 10X Better With This!</strong> [Shaders]</td>
+                    <td><a href="https://www.youtube.com/watch?v=_B0fVMb6Eko" rel="noopener noreferrer">youtube.com/watch?v=_B0fVMb6Eko</a></td>
+                    <td>Shader / visual-effect techniques for premium feel—evaluate performance and <code class="code-highlight">prefers-reduced-motion</code> before adding heavy effects to the public homepage.</td>
                 </tr>
             </tbody>
         </table>
@@ -838,7 +883,7 @@
         </div>
 
         <h2 id="videos">9. Curated learning videos (YouTube)</h2>
-        <p>Use these to build intuition for modern marketing sites, agentic design workflows, and motion-heavy experiences. Titles reflect the source labels you provided; channels may update thumbnails or descriptions over time.</p>
+        <p>Use these to build intuition for modern marketing sites, agentic design workflows, and motion-heavy experiences. Titles reflect the source labels you provided; channels may update thumbnails or descriptions over time. For site tools (Neuform, Aura) and the latest preferred links in one table, see <a href="#preferred-reference-urls">section 3c — Preferred reference URLs</a>.</p>
         <table>
             <thead>
                 <tr>
@@ -897,6 +942,21 @@
                     <td>10</td>
                     <td>Google Design.md — design team in a file</td>
                     <td><a href="https://www.youtube.com/watch?v=oLu32YpiIJw" rel="noopener noreferrer">youtube.com/watch?v=oLu32YpiIJw</a></td>
+                </tr>
+                <tr>
+                    <td>11</td>
+                    <td>Google’s design.md Just Changed AI Design (Gemini 3.1 Pro workflow; try <a href="https://neuform.ai" rel="noopener noreferrer">neuform.ai</a>)</td>
+                    <td><a href="https://www.youtube.com/watch?v=g-1K7MPpMyc" rel="noopener noreferrer">youtube.com/watch?v=g-1K7MPpMyc</a></td>
+                </tr>
+                <tr>
+                    <td>12</td>
+                    <td>I made this AMAZING Hero Section Completely using AI — Claude Design Tutorial</td>
+                    <td><a href="https://www.youtube.com/watch?v=R4RvqfIvSdk" rel="noopener noreferrer">youtube.com/watch?v=R4RvqfIvSdk</a></td>
+                </tr>
+                <tr>
+                    <td>13</td>
+                    <td>Make Your Website Look 10X Better With This! [Shaders]</td>
+                    <td><a href="https://www.youtube.com/watch?v=_B0fVMb6Eko" rel="noopener noreferrer">youtube.com/watch?v=_B0fVMb6Eko</a></td>
                 </tr>
             </tbody>
         </table>

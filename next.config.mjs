@@ -1,4 +1,20 @@
 /** @type {import('next').NextConfig} */
+
+// Amplify/CI: default Next.js uses several parallel workers for "Collecting page data".
+// On memory-limited build images, spawn ENOMEM fails when heap is large and workers > 1.
+const isCiBuild =
+  process.env.CI === 'true' ||
+  process.env.CI === '1' ||
+  Boolean(process.env.AWS_APP_ID);
+const parsedBuildWorkers = process.env.NEXT_BUILD_WORKERS
+  ? Number.parseInt(process.env.NEXT_BUILD_WORKERS, 10)
+  : NaN;
+const buildWorkerCount = Number.isFinite(parsedBuildWorkers)
+  ? Math.max(1, parsedBuildWorkers)
+  : isCiBuild
+    ? 1
+    : undefined;
+
 const nextConfig = {
   // Do NOT use output: 'standalone' for AWS Amplify Hosting SSR.
   // Standalone adds .next/standalone/ (traced node_modules + server) while .next/server still
@@ -142,6 +158,7 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: '50mb', // Increase from default 1mb to 50mb for file uploads
     },
+    ...(buildWorkerCount !== undefined ? { cpus: buildWorkerCount } : {}),
   },
 
   // Keep large / native deps out of the webpack server bundle; load from node_modules at runtime.
