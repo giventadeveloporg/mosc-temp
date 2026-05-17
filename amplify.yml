@@ -7,9 +7,9 @@ frontend:
         - npm ci
     build:
       commands:
-        # Prevent OOM during Next.js build: heap for webpack + single page-data worker (see next.config experimental.cpus).
-        # spawn ENOMEM at "Collecting page data" = OS cannot fork workers when heap + multiple workers exhaust the build VM.
-        - export NODE_OPTIONS="--max-old-space-size=3584"
+        # Large build compute (16GiB): give webpack headroom; keep 1 page-data worker (next.config experimental.cpus).
+        # 3584MB heap caused "JavaScript heap out of memory" during webpack; 3 workers caused spawn ENOMEM earlier.
+        - export NODE_OPTIONS="--max-old-space-size=10240"
         - export NEXT_BUILD_WORKERS=1
         # Required for Next.js Lambda React bundling on Amplify
         - echo "__NEXT_PRIVATE_PREBUNDLED_REACT=next" >> .env.production
