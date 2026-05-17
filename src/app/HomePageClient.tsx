@@ -23,7 +23,7 @@ import type { FeaturedEventWithMedia } from '@/lib/homepage/featuredEvents';
 
 // Fallback components for when data is not available
 const EventsFallback = () => (
-  <section className="py-24 bg-gray-50">
+  <section className="py-24 bg-green-50">
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="text-center mb-12">
         <div className="flex items-center justify-center space-x-2 mb-4">
@@ -50,7 +50,7 @@ const EventsFallback = () => (
 );
 
 const TeamFallback = () => (
-  <section id="team-section" className="py-24 bg-gray-50">
+  <section id="team-section" className="py-24 bg-green-50">
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="text-center mb-12">
         <div className="flex items-center justify-center space-x-2 mb-4">
@@ -260,8 +260,11 @@ function HomePageContent({ initialFeaturedEvents }: { initialFeaturedEvents: Fea
   }, []);
 
   return (
-    <main>
-      <HeroSection />
+    <main className="w-full min-h-screen bg-green-50">
+      {/* Fills first screen so header + hero occupy full viewport (no green gap below hero) */}
+      <div className="home-hero-viewport-filler">
+        <HeroSection />
+      </div>
       <div>
         <ErrorBoundary fallback={<EventsFallback />}>
           <LiveEventsSection />
@@ -275,7 +278,7 @@ function HomePageContent({ initialFeaturedEvents }: { initialFeaturedEvents: Fea
       <AboutSection />
       {/* Loading state for Upcoming Events and Team sections only */}
       {loading ? (
-        <div className="py-16 bg-gray-50">
+        <div className="py-16 bg-green-50">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-center items-center min-h-[400px]">
               <div className="relative">
@@ -318,7 +321,7 @@ function HomePageContent({ initialFeaturedEvents }: { initialFeaturedEvents: Fea
         </ErrorBoundary>
       )}
       {/* Contact Section - Updated to match "What We Do" styling */}
-      <div id="contact" className="py-24 bg-gray-50">
+      <div id="contact" className="py-24 bg-green-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section Header - Matching "What We Do" style */}
           <div className="mb-16">

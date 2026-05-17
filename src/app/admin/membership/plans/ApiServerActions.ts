@@ -1,5 +1,5 @@
 "use server";
-import { getAppUrl, getTenantId, getApiBaseUrl } from '@/lib/env';
+import { getAppUrlFromRequestHeaders, getTenantId, getApiBaseUrl } from '@/lib/env';
 import type { MembershipPlanDTO } from '@/types';
 import { stripe } from '@/lib/stripe';
 
@@ -35,7 +35,7 @@ export async function fetchAllMembershipPlansServer(
   }
 
   // Use regular fetch for proxy endpoints (proxy handler handles JWT)
-  const url = `${getAppUrl()}/api/proxy/membership-plans?${params.toString()}`;
+  const url = `${await getAppUrlFromRequestHeaders()}/api/proxy/membership-plans?${params.toString()}`;
   const res = await fetch(url, {
     method: 'GET',
     cache: 'no-store',
@@ -95,7 +95,7 @@ export async function createMembershipPlanServer(
 
   // Use regular fetch for proxy endpoints (proxy handler handles JWT and tenantId)
   // fetchWithJwtRetry is only for direct backend API calls
-  const url = `${getAppUrl()}/api/proxy/membership-plans`;
+  const url = `${await getAppUrlFromRequestHeaders()}/api/proxy/membership-plans`;
   const res = await fetch(url, {
     method: 'POST',
     headers: {
@@ -241,7 +241,7 @@ export async function updateMembershipPlanServer(
   };
 
   // Use regular fetch for proxy endpoints (proxy handler handles JWT and tenantId)
-  const url = `${getAppUrl()}/api/proxy/membership-plans/${planId}`;
+  const url = `${await getAppUrlFromRequestHeaders()}/api/proxy/membership-plans/${planId}`;
   const res = await fetch(url, {
     method: 'PATCH',
     headers: {
@@ -277,7 +277,7 @@ export async function deleteMembershipPlanServer(planId: number): Promise<void> 
   }
 
   // Use regular fetch for proxy endpoints (proxy handler handles JWT)
-  const url = `${getAppUrl()}/api/proxy/membership-plans/${planId}`;
+  const url = `${await getAppUrlFromRequestHeaders()}/api/proxy/membership-plans/${planId}`;
   const res = await fetch(url, {
     method: 'DELETE',
     cache: 'no-store',

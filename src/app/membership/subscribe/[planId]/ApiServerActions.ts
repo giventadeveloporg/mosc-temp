@@ -1,6 +1,6 @@
 "use server";
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
-import { getAppUrl, getTenantId, getPaymentMethodDomainId, getApiBaseUrl } from '@/lib/env';
+import { getAppUrl, getAppUrlFromRequestHeaders, getTenantId, getPaymentMethodDomainId, getApiBaseUrl } from '@/lib/env';
 import { auth } from '@clerk/nextjs/server';
 import { stripe } from '@/lib/stripe';
 import { withTenantId } from '@/lib/withTenantId';
@@ -23,7 +23,7 @@ export async function fetchMembershipPlanServer(planId: number): Promise<Members
     return null;
   }
 
-  const url = `${getAppUrl()}/api/proxy/membership-plans/${planId}`;
+  const url = `${await getAppUrlFromRequestHeaders()}/api/proxy/membership-plans/${planId}`;
   const res = await fetchWithJwtRetry(url, {
     method: 'GET',
     cache: 'no-store',
@@ -58,7 +58,7 @@ export async function createSubscriptionCheckoutSessionServer(
     throw new Error('Unauthorized - Please sign in');
   }
 
-  const baseUrl = getAppUrl();
+  const baseUrl = await getAppUrlFromRequestHeaders();
 
   // Fetch membership plan details from backend
   const planRes = await fetchWithJwtRetry(
@@ -260,7 +260,7 @@ export async function createUserProfileFromClerkUser({
     throw error;
   }
 
-  const baseUrl = getAppUrl();
+  const baseUrl = await getAppUrlFromRequestHeaders();
   if (!baseUrl) {
     const error = new Error('NEXT_PUBLIC_APP_URL is not configured. Cannot create user profile.');
     console.error('[MEMBERSHIP-SUBSCRIBE] createUserProfileFromClerkUser configuration error:', {

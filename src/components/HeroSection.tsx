@@ -69,51 +69,103 @@ function getHeroMediaDurationMs(media: MediaWithSnake): number {
   return sec != null && sec > 0 ? Math.max(1000, Math.min(600000, sec * 1000)) : 8000;
 }
 
+/** Crossfade duration — must match `.hero-crossfade-layer` opacity transition in globals.css. */
+const HERO_SLIDESHOW_CROSSFADE_MS = 420;
+
+type HeroSlideCrossfade = { a: number; b: number; showA: boolean };
+
 // Extended event type
 interface EventWithMediaExtended extends EventWithMedia {
   placeholderText?: string;
 }
 
-// Hands/Heart Icon SVG for About Card
-const HandsHeartIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path
-      d="M40 20C40 20 32 12 24 12C16 12 10 18 10 26C10 40 40 56 40 56C40 56 70 40 70 26C70 18 64 12 56 12C48 12 40 20 40 20Z"
-      stroke="white"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      fill="none"
-    />
-    <path
-      d="M20 44V64C20 66 22 68 24 68H32C34 68 36 66 36 64V52"
-      stroke="white"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M60 44V64C60 66 58 68 56 68H48C46 68 44 66 44 64V52"
-      stroke="white"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M28 52H52"
-      stroke="white"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-    />
-  </svg>
-);
+/** Ken Burns slow-zoom — hero slideshow slides only (animates the img element directly). */
+function HeroKenBurnsSlide({
+  src,
+  alt,
+  priority,
+  durationMs,
+  slideKey,
+  isActive,
+  solo,
+}: {
+  src: string;
+  alt: string;
+  priority?: boolean;
+  durationMs: number;
+  slideKey: string;
+  isActive: boolean;
+  solo?: boolean;
+}) {
+  const imgRef = React.useRef<HTMLImageElement>(null);
+  const kenBurnsMs = Math.max(durationMs, 5000);
+  const KEN_BURNS_MAX_SCALE = 1.12;
+
+  React.useEffect(() => {
+    const img = imgRef.current;
+    let rafId = 0;
+
+    const stop = () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = 0;
+    };
+
+    if (!img || !isActive) {
+      if (img) {
+        img.style.transform = '';
+        img.style.transformOrigin = '';
+      }
+      stop();
+      return stop;
+    }
+
+    const start = performance.now();
+
+    const tick = (now: number) => {
+      if (!imgRef.current || imgRef.current !== img) return;
+      const progress = Math.min(1, (now - start) / kenBurnsMs);
+      const scale = 1 + (KEN_BURNS_MAX_SCALE - 1) * progress;
+      img.style.transformOrigin = 'center center';
+      img.style.transform = `scale(${scale})`;
+      if (progress < 1) {
+        rafId = requestAnimationFrame(tick);
+      }
+    };
+
+    img.style.transformOrigin = 'center center';
+    img.style.transform = 'scale(1)';
+    rafId = requestAnimationFrame(tick);
+
+    return stop;
+  }, [isActive, slideKey, kenBurnsMs]);
+
+  return (
+    <div
+      key={slideKey}
+      data-ken-burns-active={isActive ? 'true' : 'false'}
+      className={solo ? 'hero-slideshow-ken-burns hero-slideshow-ken-burns--solo' : 'hero-slideshow-ken-burns'}
+      style={{ ['--hero-ken-burns-ms' as string]: `${kenBurnsMs}ms` }}
+    >
+      <Image
+        ref={imgRef}
+        src={src}
+        alt={alt}
+        fill
+        className="hero-slide-image"
+        sizes="(max-width: 768px) 100vw, 65vw"
+        priority={priority}
+      />
+    </div>
+  );
+}
 
 // Dynamic Hero Image Component
 const DynamicHeroImage: React.FC<{
   onEventChange?: (event: EventWithMediaExtended | null) => void;
 }> = ({ onEventChange }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  /** Two stacked slide indices for crossfade (only used when length ≥ 2). */
+  const [slide, setSlide] = useState<HeroSlideCrossfade>({ a: 0, b: 1, showA: true });
   const [dynamicImages, setDynamicImages] = useState<string[]>([]);
   const [upcomingEvents, setUpcomingEvents] = useState<EventWithMediaExtended[]>([]);
   const [imageDurations, setImageDurations] = useState<number[]>([]); // Duration in milliseconds for each image
@@ -132,6 +184,14 @@ const DynamicHeroImage: React.FC<{
   const isPausedRef = React.useRef<boolean>(false);
   // Ref to track the last scheduled image index to prevent duplicate scheduling
   const lastScheduledIndexRef = React.useRef<number | null>(null);
+  const slideRef = React.useRef<HeroSlideCrossfade>({ a: 0, b: 1, showA: true });
+  const pendingCrossfadeTargetRef = React.useRef<number | null>(null);
+  const crossfadeTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isCrossfadingRef = React.useRef(false);
+
+  useEffect(() => {
+    slideRef.current = slide;
+  }, [slide]);
 
   // Defer hero event data fetching until after initial paint + 500ms
   const heroFetchEnabled = useDeferredFetch(500);
@@ -442,8 +502,110 @@ const DynamicHeroImage: React.FC<{
     isPausedRef.current = isPaused;
   }, [isPaused]);
 
+  /** When hero data is ready, reset dual-layer indices (avoids stale b index when length was 1). */
+  useEffect(() => {
+    if (!isInitialized || dynamicImages.length === 0) return;
+    const n = dynamicImages.length;
+    if (n === 1) {
+      setSlide({ a: 0, b: 0, showA: true });
+      setCurrentImageIndex(0);
+      return;
+    }
+    setSlide({ a: 0, b: 1, showA: true });
+    setCurrentImageIndex(0);
+  }, [isInitialized, dynamicImages.length]);
+
   // Store scheduleNextRotation in a ref to avoid dependency issues
   const scheduleNextRotationRef = React.useRef<((imageIndex: number) => void) | null>(null);
+
+  /** True crossfade: two stacked layers; no sequential fade-out gap before swapping `src`. */
+  const beginCrossfadeTo = React.useCallback((toIdx: number) => {
+    const n = dynamicImagesRef.current.length;
+    if (n < 2) {
+      setCurrentImageIndex(toIdx);
+      const ev = toIdx < upcomingEventsRef.current.length ? upcomingEventsRef.current[toIdx] : null;
+      const cb = onEventChangeRef.current;
+      if (cb) setTimeout(() => cb(ev), 0);
+      return;
+    }
+
+    if (isCrossfadingRef.current) return;
+
+    const s = slideRef.current;
+    const fromIdx = s.showA ? s.a : s.b;
+    if (toIdx === fromIdx) return;
+
+    isCrossfadingRef.current = true;
+    pendingCrossfadeTargetRef.current = toIdx;
+
+    setSlide((prev) => (prev.showA ? { ...prev, b: toIdx } : { ...prev, a: toIdx }));
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setSlide((prev) => ({ ...prev, showA: !prev.showA }));
+      });
+    });
+
+    if (crossfadeTimeoutRef.current) {
+      clearTimeout(crossfadeTimeoutRef.current);
+    }
+    crossfadeTimeoutRef.current = setTimeout(() => {
+      crossfadeTimeoutRef.current = null;
+      const targetIdx = pendingCrossfadeTargetRef.current ?? toIdx;
+      const n2 = dynamicImagesRef.current.length;
+
+      setSlide((prev) => {
+        const vIdx = prev.showA ? prev.a : prev.b;
+        const preload = (vIdx + 1) % n2;
+        return prev.showA
+          ? { a: vIdx, b: preload, showA: true }
+          : { a: preload, b: vIdx, showA: false };
+      });
+
+      setCurrentImageIndex(targetIdx);
+      const latestEvents = upcomingEventsRef.current;
+      const nextEvent = targetIdx < latestEvents.length ? latestEvents[targetIdx] : null;
+      const cb = onEventChangeRef.current;
+      if (cb) setTimeout(() => cb(nextEvent), 0);
+
+      isCrossfadingRef.current = false;
+      pendingCrossfadeTargetRef.current = null;
+
+      setTimeout(() => {
+        if (!isPausedRef.current && scheduleNextRotationRef.current) {
+          scheduleNextRotationRef.current(targetIdx);
+        }
+      }, 10);
+    }, HERO_SLIDESHOW_CROSSFADE_MS);
+  }, []);
+
+  /** If crossfade timeout is cleared mid-flight (pause / effect cleanup), snap indices so rotation state stays consistent. */
+  const finalizeInterruptedCrossfade = React.useCallback(() => {
+    if (crossfadeTimeoutRef.current) {
+      clearTimeout(crossfadeTimeoutRef.current);
+      crossfadeTimeoutRef.current = null;
+    }
+    const target = pendingCrossfadeTargetRef.current;
+    if (isCrossfadingRef.current && target != null) {
+      const n2 = dynamicImagesRef.current.length;
+      if (n2 >= 2) {
+        setSlide((prev) => {
+          const vIdx = prev.showA ? prev.a : prev.b;
+          const preload = (vIdx + 1) % n2;
+          return prev.showA
+            ? { a: vIdx, b: preload, showA: true }
+            : { a: preload, b: vIdx, showA: false };
+        });
+        setCurrentImageIndex(target);
+        const latestEvents = upcomingEventsRef.current;
+        const nextEvent = target < latestEvents.length ? latestEvents[target] : null;
+        const cb = onEventChangeRef.current;
+        if (cb) setTimeout(() => cb(nextEvent), 0);
+      }
+    }
+    isCrossfadingRef.current = false;
+    pendingCrossfadeTargetRef.current = null;
+  }, []);
 
   // Shared recursive function to rotate to next image with dynamic duration
   // Use refs to access the latest arrays to avoid stale closures
@@ -473,7 +635,6 @@ const DynamicHeroImage: React.FC<{
     // CRITICAL: Access all arrays from refs to get the latest values, not from closure
     const currentDurations = imageDurationsRef.current;
     const currentImages = dynamicImagesRef.current;
-    const currentEvents = upcomingEventsRef.current;
 
     // Safety check
     if (!currentImages || currentImages.length < 2) {
@@ -494,57 +655,26 @@ const DynamicHeroImage: React.FC<{
     });
 
     rotationTimeoutRef.current = setTimeout(() => {
-      // Clear the scheduled index ref when timeout executes
       lastScheduledIndexRef.current = null;
 
-      setIsTransitioning(true);
+      if (isPausedRef.current) return;
 
-      setTimeout(() => {
-        setCurrentImageIndex((prevIndex) => {
-          // CRITICAL: Get latest arrays from refs, not closure
-          const latestDurations = imageDurationsRef.current;
-          const latestImages = dynamicImagesRef.current;
-          const latestEvents = upcomingEventsRef.current;
+      const latestImages = dynamicImagesRef.current;
+      if (!latestImages || latestImages.length < 2) return;
 
-          const nextIndex = (prevIndex + 1) % latestImages.length;
-          const nextDuration = (latestDurations && latestDurations[nextIndex]) ? latestDurations[nextIndex] : 8000;
+      const s = slideRef.current;
+      const fromIdx = s.showA ? s.a : s.b;
+      const toIdx = (fromIdx + 1) % latestImages.length;
 
-          console.log('[HeroSection] Rotating to image', nextIndex + 1, 'of', latestImages.length, {
-            previousIndex: prevIndex,
-            nextIndex,
-            nextDurationMs: nextDuration,
-            nextDurationSec: nextDuration / 1000,
-            nextImageUrl: latestImages[nextIndex] || 'default',
-            durationsArray: latestDurations,
-            durationsArrayLength: latestDurations?.length
-          });
+      console.log('[HeroSection] Rotating to image', toIdx + 1, 'of', latestImages.length, {
+        previousIndex: fromIdx,
+        nextIndex: toIdx,
+        nextImageUrl: latestImages[toIdx] || 'default',
+      });
 
-          // Defer parent update to avoid "Cannot update component while rendering another"
-          const nextEvent = nextIndex < latestEvents.length ? latestEvents[nextIndex] : null;
-          const cb = onEventChangeRef.current;
-          if (cb) {
-            setTimeout(() => cb(nextEvent), 0);
-          }
-
-          // Schedule next rotation with the new image's duration (use nextIndex)
-          // Access latest arrays from refs in the next schedule call
-          // Use ref to check pause state to avoid stale closure
-          // Use the ref to call the function to avoid closure issues
-          // Schedule after a small delay to ensure state update completes
-          setTimeout(() => {
-            if (!isPausedRef.current && scheduleNextRotationRef.current) {
-              scheduleNextRotationRef.current(nextIndex);
-            }
-          }, 10);
-
-          return nextIndex;
-        });
-
-        // Remove transition class after image changes
-        setTimeout(() => setIsTransitioning(false), 50);
-      }, 400);
+      beginCrossfadeTo(toIdx);
     }, imageDuration);
-  }, [isInitialized]);
+  }, [isInitialized, beginCrossfadeTo]);
 
   // Update the ref whenever the function changes
   useEffect(() => {
@@ -561,6 +691,7 @@ const DynamicHeroImage: React.FC<{
         clearTimeout(rotationTimeoutRef.current);
         rotationTimeoutRef.current = null;
       }
+      finalizeInterruptedCrossfade();
       return;
     }
 
@@ -591,79 +722,42 @@ const DynamicHeroImage: React.FC<{
         clearTimeout(rotationTimeoutRef.current);
         rotationTimeoutRef.current = null;
       }
+      finalizeInterruptedCrossfade();
       lastScheduledIndexRef.current = null;
     };
-  }, [isInitialized, dynamicImages.length, upcomingEvents.length, isPaused]);
+  }, [isInitialized, dynamicImages.length, upcomingEvents.length, isPaused, finalizeInterruptedCrossfade]);
 
   // Navigation functions
   const goToPrevious = () => {
-    // Clear existing rotation timeout when manually navigating
+    if (isCrossfadingRef.current) return;
     if (rotationTimeoutRef.current) {
       clearTimeout(rotationTimeoutRef.current);
       rotationTimeoutRef.current = null;
     }
     lastScheduledIndexRef.current = null;
 
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setCurrentImageIndex((prevIndex) => {
-        // Use refs to get latest arrays
-        const latestImages = dynamicImagesRef.current;
-        const latestEvents = upcomingEventsRef.current;
-
-        const newIndex = (prevIndex - 1 + latestImages.length) % latestImages.length;
-
-        const newEvent = newIndex < latestEvents.length ? latestEvents[newIndex] : null;
-        const cb = onEventChangeRef.current;
-        if (cb) setTimeout(() => cb(newEvent), 0);
-
-        // Restart rotation from new index after navigation completes
-        // Use ref to call the function to avoid closure issues
-        setTimeout(() => {
-          if (scheduleNextRotationRef.current) {
-            scheduleNextRotationRef.current(newIndex);
-          }
-        }, 100);
-
-        return newIndex;
-      });
-      setTimeout(() => setIsTransitioning(false), 50);
-    }, 400);
+    const latestImages = dynamicImagesRef.current;
+    if (!latestImages || latestImages.length < 2) return;
+    const n = latestImages.length;
+    const s = slideRef.current;
+    const fromIdx = s.showA ? s.a : s.b;
+    beginCrossfadeTo((fromIdx - 1 + n) % n);
   };
 
   const goToNext = () => {
-    // Clear existing rotation timeout when manually navigating
+    if (isCrossfadingRef.current) return;
     if (rotationTimeoutRef.current) {
       clearTimeout(rotationTimeoutRef.current);
       rotationTimeoutRef.current = null;
     }
     lastScheduledIndexRef.current = null;
 
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setCurrentImageIndex((prevIndex) => {
-        // Use refs to get latest arrays
-        const latestImages = dynamicImagesRef.current;
-        const latestEvents = upcomingEventsRef.current;
-
-        const nextIndex = (prevIndex + 1) % latestImages.length;
-
-        const nextEvent = nextIndex < latestEvents.length ? latestEvents[nextIndex] : null;
-        const cb = onEventChangeRef.current;
-        if (cb) setTimeout(() => cb(nextEvent), 0);
-
-        // Restart rotation from new index after navigation completes
-        // Use ref to call the function to avoid closure issues
-        setTimeout(() => {
-          if (scheduleNextRotationRef.current) {
-            scheduleNextRotationRef.current(nextIndex);
-          }
-        }, 100);
-
-        return nextIndex;
-      });
-      setTimeout(() => setIsTransitioning(false), 50);
-    }, 400);
+    const latestImages = dynamicImagesRef.current;
+    if (!latestImages || latestImages.length < 2) return;
+    const n = latestImages.length;
+    const s = slideRef.current;
+    const fromIdx = s.showA ? s.a : s.b;
+    beginCrossfadeTo((fromIdx + 1) % n);
   };
 
   const togglePlayPause = () => {
@@ -698,18 +792,22 @@ const DynamicHeroImage: React.FC<{
     }, 3000);
   };
 
-  // Cleanup timeout on unmount
+  // Cleanup timeouts on unmount
   useEffect(() => {
     return () => {
       if (touchTimeoutRef.current) {
         clearTimeout(touchTimeoutRef.current);
       }
+      finalizeInterruptedCrossfade();
     };
-  }, []);
+  }, [finalizeInterruptedCrossfade]);
 
   const currentImage = dynamicImages[currentImageIndex] || defaultImage;
   const showControls = isHovered || isTouched;
   const hasMultipleImages = dynamicImages.length > 1;
+
+  const kenBurnsDurationMs = (index: number) =>
+    imageDurations[index] ?? imageDurations[0] ?? 8000;
 
   return (
     <div
@@ -718,19 +816,40 @@ const DynamicHeroImage: React.FC<{
       onMouseLeave={() => setIsHovered(false)}
       onTouchStart={handleTouchStart}
     >
-      <Image
-        src={currentImage}
-        alt="Featured Event"
-        width={1200}
-        height={800}
-        className={`w-full h-full object-contain hero-image-transition ${isTransitioning ? 'transitioning' : ''}`}
-        sizes="(max-width: 768px) 100vw, 65vw"
-        priority
-        style={{
-          backgroundColor: 'transparent',
-          borderRadius: '1rem'
-        }}
-      />
+      {hasMultipleImages ? (
+        <div className="hero-crossfade-stack">
+          <div className={`hero-crossfade-layer${slide.showA ? ' is-visible' : ''}`}>
+            <HeroKenBurnsSlide
+              src={dynamicImages[slide.a] || defaultImage}
+              alt="Featured Event"
+              priority={slide.showA}
+              durationMs={kenBurnsDurationMs(slide.a)}
+              slideKey={`hero-ken-a-${slide.a}`}
+              isActive={slide.showA}
+            />
+          </div>
+          <div className={`hero-crossfade-layer${!slide.showA ? ' is-visible' : ''}`}>
+            <HeroKenBurnsSlide
+              src={dynamicImages[slide.b] || defaultImage}
+              alt="Featured Event"
+              priority={!slide.showA}
+              durationMs={kenBurnsDurationMs(slide.b)}
+              slideKey={`hero-ken-b-${slide.b}`}
+              isActive={!slide.showA}
+            />
+          </div>
+        </div>
+      ) : (
+        <HeroKenBurnsSlide
+          src={currentImage}
+          alt="Featured Event"
+          priority
+          durationMs={kenBurnsDurationMs(currentImageIndex)}
+          slideKey={`hero-ken-solo-${currentImageIndex}`}
+          isActive
+          solo
+        />
+      )}
 
       {/* Slider Controls - Show on hover or touch */}
       {/* Controls positioned above image and Buy Tickets overlay (z-20) */}
@@ -747,12 +866,12 @@ const DynamicHeroImage: React.FC<{
               goToPrevious();
             }}
             onTouchStart={handleTouchInteraction}
-            className="pointer-events-auto flex-shrink-0 w-12 h-12 rounded-full bg-white/90 hover:bg-white active:bg-white backdrop-blur-sm shadow-lg border-2 border-gray-300 hover:border-blue-500 active:border-blue-600 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
+            className="hero-carousel-control pointer-events-auto flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
             title="Previous Image"
             aria-label="Previous Image"
             type="button"
           >
-            <ChevronLeft className="w-6 h-6 text-gray-700" />
+            <ChevronLeft className="w-6 h-6 text-cyan-200" />
           </button>
 
           {/* Play/Pause Button - Center */}
@@ -763,15 +882,15 @@ const DynamicHeroImage: React.FC<{
               togglePlayPause();
             }}
             onTouchStart={handleTouchInteraction}
-            className="pointer-events-auto flex-shrink-0 w-12 h-12 rounded-full bg-white/90 hover:bg-white active:bg-white backdrop-blur-sm shadow-lg border-2 border-gray-300 hover:border-blue-500 active:border-blue-600 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
+            className="hero-carousel-control pointer-events-auto flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
             title={isPaused ? 'Play' : 'Pause'}
             aria-label={isPaused ? 'Play' : 'Pause'}
             type="button"
           >
             {isPaused ? (
-              <Play className="w-6 h-6 text-gray-700 ml-0.5" />
+              <Play className="w-6 h-6 text-cyan-200 ml-0.5" />
             ) : (
-              <Pause className="w-6 h-6 text-gray-700" />
+              <Pause className="w-6 h-6 text-cyan-200" />
             )}
           </button>
 
@@ -783,12 +902,12 @@ const DynamicHeroImage: React.FC<{
               goToNext();
             }}
             onTouchStart={handleTouchInteraction}
-            className="pointer-events-auto flex-shrink-0 w-12 h-12 rounded-full bg-white/90 hover:bg-white active:bg-white backdrop-blur-sm shadow-lg border-2 border-gray-300 hover:border-blue-500 active:border-blue-600 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
+            className="hero-carousel-control pointer-events-auto flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
             title="Next Image"
             aria-label="Next Image"
             type="button"
           >
-            <ChevronRight className="w-6 h-6 text-gray-700" />
+            <ChevronRight className="w-6 h-6 text-cyan-200" />
           </button>
         </div>
       )}
@@ -803,103 +922,86 @@ const HeroSection: React.FC = () => {
   const overlayInfo = getOverlayInfo(currentEvent);
 
   return (
-    <section className="hero-container-split">
-      {/* === TOP ROW: Two-Column Hero Layout === */}
+    <section className="hero-container-split hero-container-neon" aria-label="Homepage hero">
       <div className="hero-split-row">
-        {/* LEFT PANEL (Section 1): Static Kerala Image - Full visibility, elegant frame */}
-        <div className="hero-left-panel">
-          {/* Image container - object-contain for full image visibility, centered */}
-          <div className="hero-left-image flex items-center justify-center">
+        <div className="hero-top-row">
+        {/* Brand card — left column desktop; first on mobile */}
+        <div className="hero-brand-card">
+          <div className="hero-brand-image-wrap">
             <Image
               src="/images/hero_section/wooden-boat-under-coconut-tree-riverside_ver_2.jpg"
               alt="Malayalees.US - Kerala Backwaters"
-              width={600}
-              height={800}
-              className="w-full h-full object-contain object-center"
-              sizes="(max-width: 768px) 100vw, 35vw"
-              priority
-              style={{
-                backgroundColor: 'transparent',
-                borderRadius: '1rem'
-              }}
-            />
-          </div>
-        </div>
-
-        {/* RIGHT PANEL (Section 2): Dynamic Slideshow - Full image visibility */}
-        <div className="hero-right-panel">
-          <div className="hero-slideshow-wrapper">
-            <DynamicHeroImage onEventChange={setCurrentEvent} />
-          </div>
-
-          {/* Buy Tickets Overlay Image - Bottom Right Corner of Section 2 */}
-          {overlayInfo && (
-            <div className="hero-ticket-overlay">
-              <Link
-                href={overlayInfo.href}
-                className="block cursor-pointer hover:scale-110 transition-transform duration-300 drop-shadow-lg"
-                onClick={(e) => e.stopPropagation()}
-                title={overlayInfo.alt}
-                aria-label={overlayInfo.alt}
-              >
-                <img
-                  src={overlayInfo.image}
-                  alt={overlayInfo.alt}
-                  className="object-contain w-[140px] h-[48px] sm:w-[180px] sm:h-[62px] md:w-[200px] md:h-[70px]"
-                />
-              </Link>
-            </div>
-          )}
-        </div>
-
-        {/* Elegant vertical divider between sections */}
-        <div className="hero-split-divider" />
-      </div>
-
-      {/* === BOTTOM ROW: Two Cards (Section 3 & 4) === */}
-      <div className="hero-bottom-row">
-        {/* Section 3: Unite India Logo + Mission */}
-        <Link href="/#about-us" className="hero-bottom-card hero-bottom-card-mission group">
-          <div className="hero-mission-bg">
-            <Image
-              src="/images/logos/Malayalees_US/image.png"
-              alt="Unite India - A Nonprofit Corporation"
               fill
-              className="object-cover object-left transition-transform duration-500 group-hover:scale-[1.02]"
+              className="hero-brand-kerala-image object-contain object-top md:object-cover md:object-center"
+              sizes="(max-width: 767px) 100vw, 30vw"
+              priority
             />
           </div>
-          <div className="hero-mission-overlay" />
-          <div className="hero-mission-content">
-            <p className="hero-card-label">About</p>
-            <p className="hero-card-title">Our Mission</p>
-          </div>
-        </Link>
-
-        {/* Section 4: Donate Button - Compact horizontal layout */}
-        <div className="hero-bottom-card hero-bottom-card-donate">
-          <div className="hero-donate-bg" />
-          <div className="hero-donate-glow" />
-          <div className="hero-donate-content">
-            <div className="hero-donate-text-group">
-              <p className="hero-donate-heading">Support Our Community</p>
-              <p className="hero-donate-subtext">Help us make a difference</p>
-            </div>
-            <GivebutterDonateButton
-              className="hero-donate-button"
-            >
-              <Heart size={16} className="fill-white" />
-              <span>Donate Now</span>
-            </GivebutterDonateButton>
-          </div>
         </div>
-      </div>
 
-      {/* Browse All Events Link */}
-      <div className="hero-browse-container">
-        <Link href="/events" className="hero-browse-link">
-          <span>Browse all upcoming events</span>
-          <ArrowRight size={16} />
-        </Link>
+        {/* Slideshow — right column desktop; second on mobile */}
+        <div className="hero-right-wrap">
+          <div className="hero-right-panel">
+            <div className="hero-slideshow-neon-frame">
+              <div className="hero-slideshow-wrapper">
+                <DynamicHeroImage onEventChange={setCurrentEvent} />
+              </div>
+              <div className="hero-slideshow-particles" aria-hidden />
+            </div>
+
+            {overlayInfo && (
+              <div className="hero-ticket-overlay">
+                <Link
+                  href={overlayInfo.href}
+                  className="block cursor-pointer hover:scale-110 transition-transform duration-300 drop-shadow-lg"
+                  onClick={(e) => e.stopPropagation()}
+                  title={overlayInfo.alt}
+                  aria-label={overlayInfo.alt}
+                >
+                  <img
+                    src={overlayInfo.image}
+                    alt={overlayInfo.alt}
+                    className="object-contain w-[140px] h-[48px] sm:w-[180px] sm:h-[62px] md:w-[200px] md:h-[70px]"
+                  />
+                </Link>
+              </div>
+            )}
+          </div>
+
+        </div>
+        </div>
+
+        {/* Branding image + Our Mission + donate — full width row below images (desktop) */}
+        <div className="hero-left-cta-card">
+          <Link
+            href="/#about-us"
+            className="hero-left-cta-mission-row min-w-0 shrink-0"
+            title="About our mission"
+            aria-label="Our mission — about us"
+          >
+            <span className="hero-left-cta-thumb relative block w-14 h-14 sm:w-16 sm:h-16 shrink-0 rounded-lg overflow-hidden ring-1 ring-cyan-500/40">
+              <Image
+                src="/images/logos/Malayalees_US/Branding-image.jpg"
+                alt=""
+                fill
+                className="object-cover object-center"
+                sizes="64px"
+              />
+            </span>
+            <span className="hero-left-cta-mission-label">Our Mission</span>
+          </Link>
+          <GivebutterDonateButton className="hero-donate-button hero-donate-button-neon shrink-0">
+            <Heart size={16} className="fill-white" />
+            <span>Donate Now</span>
+          </GivebutterDonateButton>
+        </div>
+
+        <div className="hero-browse-container hero-browse-at-hero-bottom">
+          <Link href="/events" className="hero-browse-link hero-browse-link-neon">
+            <span>Browse all upcoming events</span>
+            <ArrowRight size={16} className="shrink-0" />
+          </Link>
+        </div>
       </div>
     </section>
   );

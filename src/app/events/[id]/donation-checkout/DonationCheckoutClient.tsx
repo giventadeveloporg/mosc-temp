@@ -239,11 +239,13 @@ function TicketedFundraiserCheckout({ initialData, eventId }: { initialData: Don
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [giveButterNotConfigured, setGiveButterNotConfigured] = useState(false);
 
+  const appOrigin =
+    typeof window !== 'undefined' ? window.location.origin : getAppUrl();
+
   // Success URL - use donation-checkout success route for tracking
   // For donation-checkout flow, redirect to donation success page (not standard ticket success)
-  const baseUrl = getAppUrl();
-  const returnUrl = `${baseUrl}/events/${eventId}/donation/success`;
-  const cancelUrl = `${baseUrl}/events/${eventId}/donation-checkout`;
+  const returnUrl = `${appOrigin}/events/${eventId}/donation/success`;
+  const cancelUrl = `${appOrigin}/events/${eventId}/donation-checkout`;
 
   // Handle payment initialization for ticketed fundraisers with GiveButter
   const handleCheckout = async () => {
@@ -513,6 +515,8 @@ function DonationFormCheckout({
   const [isRecurring, setIsRecurring] = useState<boolean>(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const appOrigin =
+    typeof window !== 'undefined' ? window.location.origin : getAppUrl();
 
   const handlePresetAmount = (amount: number) => {
     setDonationAmount(amount);
@@ -570,12 +574,10 @@ function DonationFormCheckout({
     setIsProcessing(true);
 
     try {
-      const baseUrl = getAppUrl();
-      
       // Use donation success route for tracking
       const successRoute = isOffering 
-        ? `${baseUrl}/events/${eventId}/offering/success`
-        : `${baseUrl}/events/${eventId}/donation/success`;
+        ? `${appOrigin}/events/${eventId}/offering/success`
+        : `${appOrigin}/events/${eventId}/donation/success`;
       
       const response = await initializeDonationPayment({
         eventId: parseInt(eventId),
@@ -589,7 +591,7 @@ function DonationFormCheckout({
         isCharity: initialData.isCharityEvent,
         prayerIntention: prayerIntention.trim() || undefined,
         returnUrl: successRoute,
-        cancelUrl: `${baseUrl}/events/${eventId}`,
+        cancelUrl: `${appOrigin}/events/${eventId}`,
       });
 
       const checkoutUrl = response.checkoutUrl || response.sessionUrl;

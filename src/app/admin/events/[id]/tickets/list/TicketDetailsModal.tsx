@@ -39,8 +39,7 @@ export default function TicketDetailsModal({ open, onClose, transaction }: Ticke
     setError(null);
 
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-      const response = await fetch(`${baseUrl}/api/proxy/event-ticket-transaction-items?transactionId.equals=${transaction.id}`, {
+      const response = await fetch(`/api/proxy/event-ticket-transaction-items?transactionId.equals=${transaction.id}`, {
         cache: 'no-store'
       });
 

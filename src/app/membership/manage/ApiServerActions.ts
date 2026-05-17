@@ -1,6 +1,6 @@
 "use server";
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
-import { getAppUrl, getTenantId, getApiBaseUrl } from '@/lib/env';
+import { getAppUrl, getAppUrlFromRequestHeaders, getTenantId, getApiBaseUrl } from '@/lib/env';
 import { withTenantId } from '@/lib/withTenantId';
 import type { MembershipSubscriptionDTO } from '@/types';
 
@@ -31,7 +31,7 @@ export async function fetchUserSubscriptionServer(
   params.append('sort', 'createdAt,desc');
   params.append('size', '1');
 
-  const url = `${getAppUrl()}/api/proxy/membership-subscriptions?${params.toString()}`;
+  const url = `${await getAppUrlFromRequestHeaders()}/api/proxy/membership-subscriptions?${params.toString()}`;
   const res = await fetchWithJwtRetry(url, {
     method: 'GET',
     cache: 'no-store',
@@ -69,7 +69,7 @@ export async function updateSubscriptionServer(
   });
 
   // Use proxy API route instead of direct backend call
-  const url = `${getAppUrl()}/api/proxy/membership-subscriptions/${subscriptionId}`;
+  const url = `${await getAppUrlFromRequestHeaders()}/api/proxy/membership-subscriptions/${subscriptionId}`;
   const res = await fetchWithJwtRetry(url, {
     method: 'PATCH',
     headers: {

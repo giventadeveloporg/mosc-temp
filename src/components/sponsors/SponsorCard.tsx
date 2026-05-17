@@ -3,6 +3,21 @@ import Link from "next/link";
 import type { EventSponsorsDTO } from "@/types";
 import { useState } from "react";
 
+/** Pill tag on sponsor banner — matches featured-event pill (blue gradient, lift shadow). */
+function SponsorTypePillBadge({ label }: { label: string }) {
+  return (
+    <div
+      className="featured-event-pill-badge inline-flex items-center rounded-full border border-white/25 px-3 py-1 pl-3 pr-3.5 md:px-3.5 md:py-1.5"
+      role="status"
+      aria-label={`Sponsor type: ${label}`}
+    >
+      <span className="text-xs font-bold leading-none text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.22)] md:text-sm">
+        {label}
+      </span>
+    </div>
+  );
+}
+
 // Component to handle image loading errors and hide container when image fails
 function ImageWithErrorHandling({
   src,
@@ -20,10 +35,8 @@ function ImageWithErrorHandling({
   if (imageError || !src) {
     return sponsorType ? (
       <div className="relative w-full pt-3 pr-3">
-        <div className="flex justify-end">
-          <span className="px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full">
-            {sponsorType}
-          </span>
+        <div className="absolute top-2 right-2 z-[5] md:top-3 md:right-3">
+          <SponsorTypePillBadge label={sponsorType} />
         </div>
       </div>
     ) : null;
@@ -49,15 +62,15 @@ function ImageWithErrorHandling({
         }}
       />
       {sponsorType && imageLoaded && !imageError && (
-        <div className="absolute top-3 right-3">
-          <span className="px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full">
-            {sponsorType}
-          </span>
+        <div className="absolute top-2 right-2 z-[5] md:top-3 md:right-3">
+          <SponsorTypePillBadge label={sponsorType} />
         </div>
       )}
     </div>
   );
 }
+
+export type SponsorCardBodyLayout = "default" | "split";
 
 interface SponsorCardProps {
   sponsor: EventSponsorsDTO;
@@ -65,6 +78,8 @@ interface SponsorCardProps {
   onCardClick?: () => void;
   className?: string;
   shadowStyle?: string;
+  /** Homepage: banner on top, title/company left, contact icon rows right. */
+  bodyLayout?: SponsorCardBodyLayout;
 }
 
 const defaultShadow =
@@ -76,6 +91,7 @@ export function SponsorCard({
   onCardClick,
   className = "",
   shadowStyle = defaultShadow,
+  bodyLayout = "default",
 }: SponsorCardProps) {
   const combinedClasses = [
     backgroundClass,
@@ -117,146 +133,182 @@ export function SponsorCard({
           )}
           {!sponsor.bannerImageUrl && sponsor.type && (
             <div className="relative w-full pt-3 pr-3">
-              <div className="flex justify-end">
-                <span className="px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full">
-                  {sponsor.type}
-                </span>
+              <div className="absolute top-2 right-2 z-[5] md:top-3 md:right-3">
+                <SponsorTypePillBadge label={sponsor.type} />
               </div>
             </div>
           )}
 
-          <div className={`flex-1 flex flex-col ${sponsor.bannerImageUrl ? 'border-t border-white/20' : ''}`}>
-            <div className="p-5">
-              <h2 className="text-xl font-bold text-gray-800 mb-2">
-                {sponsor.name}
-              </h2>
-
-              {sponsor.companyName && (
-                <p className="text-gray-600 text-base mb-2">
-                  {sponsor.companyName}
-                </p>
-              )}
-            </div>
-
-            <div className="px-5 pb-5 pt-3 border-t border-white/20 flex-1 flex flex-col">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4 lg:justify-items-center">
-                {sponsor.companyName && (
-                  <div className="flex items-center gap-3 text-gray-700 justify-center lg:justify-start">
-                    <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                      <svg
-                        className="w-8 h-8 text-blue-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                        />
-                      </svg>
+          <div className={`flex-1 flex flex-col min-h-0 ${sponsor.bannerImageUrl ? "border-t border-white/20" : ""}`}>
+            {bodyLayout === "split" ? (
+              <div className="flex flex-col gap-6 p-5 lg:flex-row lg:items-start lg:justify-between lg:gap-8">
+                <div className="min-w-0 flex-1 text-left">
+                  <h2 className="mb-2 text-xl font-bold text-gray-800">{sponsor.name}</h2>
+                  {sponsor.companyName && (
+                    <p className="text-base text-gray-600">{sponsor.companyName}</p>
+                  )}
+                </div>
+                <div className="flex w-full flex-col gap-3 lg:w-auto lg:min-w-[10.5rem] lg:max-w-[50%] lg:shrink-0">
+                  {sponsor.type && (
+                    <div className="flex w-full items-center justify-end gap-3 text-gray-700">
+                      <span className="min-w-0 flex-1 text-right text-sm font-semibold leading-snug sm:text-base">
+                        {sponsor.type}
+                      </span>
+                      <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-green-100 transition-transform duration-300 group-hover:scale-110">
+                        <svg className="h-8 w-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+                          />
+                        </svg>
+                      </div>
                     </div>
-                    <span className="text-lg font-semibold">
-                      {sponsor.companyName}
-                    </span>
-                  </div>
-                )}
-
-                {sponsor.type && (
-                  <div className="flex items-center gap-3 text-gray-700 justify-center lg:justify-start">
-                    <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                      <svg
-                        className="w-8 h-8 text-green-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-                        />
-                      </svg>
+                  )}
+                  {sponsor.contactEmail && (
+                    <div className="flex w-full items-center justify-end gap-3 text-gray-700">
+                      <span className="min-w-0 flex-1 break-all text-right text-sm font-semibold leading-snug sm:text-base">
+                        {sponsor.contactEmail}
+                      </span>
+                      <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-orange-100 transition-transform duration-300 group-hover:scale-110">
+                        <svg className="h-8 w-8 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                          />
+                        </svg>
+                      </div>
                     </div>
-                    <span className="text-lg font-semibold">{sponsor.type}</span>
-                  </div>
-                )}
-
-                {sponsor.contactEmail && (
-                  <div className="flex items-center gap-3 text-gray-700 justify-center lg:justify-start">
-                    <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                      <svg
-                        className="w-8 h-8 text-orange-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                        />
-                      </svg>
+                  )}
+                  {sponsor.contactPhone && (
+                    <div className="flex w-full items-center justify-end gap-3 text-gray-700">
+                      <span className="min-w-0 flex-1 text-right text-sm font-semibold leading-snug sm:text-base">
+                        {sponsor.contactPhone}
+                      </span>
+                      <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-purple-100 transition-transform duration-300 group-hover:scale-110">
+                        <svg className="h-8 w-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                          />
+                        </svg>
+                      </div>
                     </div>
-                    <span className="text-lg font-semibold">
-                      {sponsor.contactEmail}
-                    </span>
-                  </div>
-                )}
-
-                {sponsor.contactPhone && (
-                  <div className="flex items-center gap-3 text-gray-700 justify-center lg:justify-start">
-                    <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                      <svg
-                        className="w-8 h-8 text-purple-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                        />
-                      </svg>
+                  )}
+                  {sponsor.websiteUrl?.trim() && (
+                    <div className="flex w-full items-center justify-end gap-3 text-gray-700">
+                      <span className="min-w-0 flex-1 break-all text-right text-sm font-semibold leading-snug sm:text-base">
+                        {sponsor.websiteUrl.replace(/^https?:\/\//, "")}
+                      </span>
+                      <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-teal-100 transition-transform duration-300 group-hover:scale-110">
+                        <svg className="h-8 w-8 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9-9a9 9 0 00-9-9m0 18a9 9 0 009-9M12 3a9 9 0 00-9 9"
+                          />
+                        </svg>
+                      </div>
                     </div>
-                    <span className="text-lg font-semibold">
-                      {sponsor.contactPhone}
-                    </span>
-                  </div>
-                )}
-
-                {sponsor.websiteUrl?.trim() && (
-                  <div className="flex items-center gap-3 text-gray-700 justify-center lg:justify-start">
-                    <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-teal-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                      <svg
-                        className="w-8 h-8 text-teal-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9-9a9 9 0 00-9-9m0 18a9 9 0 009-9M12 3a9 9 0 00-9 9"
-                        />
-                      </svg>
-                    </div>
-                    <span className="text-lg font-semibold">
-                      {sponsor.websiteUrl.replace(/^https?:\/\//, "")}
-                    </span>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
+            ) : (
+              <>
+                <div className="p-5">
+                  <h2 className="mb-2 text-xl font-bold text-gray-800">{sponsor.name}</h2>
+                  {sponsor.companyName && <p className="mb-2 text-base text-gray-600">{sponsor.companyName}</p>}
+                </div>
+                <div className="mb-4 grid grid-cols-1 gap-3 px-5 pt-3 sm:grid-cols-2 lg:grid-cols-3 lg:justify-items-center">
+                  {sponsor.companyName && (
+                    <div className="flex items-center justify-center gap-3 text-gray-700 lg:justify-start">
+                      <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-blue-100 transition-transform duration-300 group-hover:scale-110">
+                        <svg className="h-8 w-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                          />
+                        </svg>
+                      </div>
+                      <span className="text-lg font-semibold">{sponsor.companyName}</span>
+                    </div>
+                  )}
+                  {sponsor.type && (
+                    <div className="flex items-center justify-center gap-3 text-gray-700 lg:justify-start">
+                      <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-green-100 transition-transform duration-300 group-hover:scale-110">
+                        <svg className="h-8 w-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+                          />
+                        </svg>
+                      </div>
+                      <span className="text-lg font-semibold">{sponsor.type}</span>
+                    </div>
+                  )}
+                  {sponsor.contactEmail && (
+                    <div className="flex items-center justify-center gap-3 text-gray-700 lg:justify-start">
+                      <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-orange-100 transition-transform duration-300 group-hover:scale-110">
+                        <svg className="h-8 w-8 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                          />
+                        </svg>
+                      </div>
+                      <span className="text-lg font-semibold">{sponsor.contactEmail}</span>
+                    </div>
+                  )}
+                  {sponsor.contactPhone && (
+                    <div className="flex items-center justify-center gap-3 text-gray-700 lg:justify-start">
+                      <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-purple-100 transition-transform duration-300 group-hover:scale-110">
+                        <svg className="h-8 w-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                          />
+                        </svg>
+                      </div>
+                      <span className="text-lg font-semibold">{sponsor.contactPhone}</span>
+                    </div>
+                  )}
+                  {sponsor.websiteUrl?.trim() && (
+                    <div className="flex items-center justify-center gap-3 text-gray-700 lg:justify-start">
+                      <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-teal-100 transition-transform duration-300 group-hover:scale-110">
+                        <svg className="h-8 w-8 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9-9a9 9 0 00-9-9m0 18a9 9 0 009-9M12 3a9 9 0 00-9 9"
+                          />
+                        </svg>
+                      </div>
+                      <span className="text-lg font-semibold">{sponsor.websiteUrl.replace(/^https?:\/\//, "")}</span>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
 
+            <div className="flex flex-1 flex-col border-t border-white/20 px-5 pb-5 pt-3">
               {/* Social media links - only show icons when URL is non-null and non-empty */}
               {(sponsor.facebookUrl?.trim() || sponsor.instagramUrl?.trim() || sponsor.twitterUrl?.trim() || sponsor.linkedinUrl?.trim() || sponsor.youtubeUrl?.trim() || sponsor.tiktokUrl?.trim()) && (
-                <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-white/20">
+                <div className="mt-3 flex flex-nowrap items-center gap-2 overflow-x-auto border-t border-white/20 pt-3">
                   {sponsor.facebookUrl?.trim() && (
                     <a href={sponsor.facebookUrl.trim()} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 w-9 h-9 rounded-lg bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-all duration-200" title="Facebook" aria-label="Facebook">
                       <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
@@ -293,7 +345,9 @@ export function SponsorCard({
               {(sponsor.tagline || sponsor.id) && (
                 <div className="mt-auto space-y-4 pt-4">
                   {sponsor.tagline && (
-                    <div className="relative overflow-hidden rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 via-white to-amber-100 shadow-[0_12px_30px_-15px_rgba(146,118,65,0.4)] px-4 py-3 text-center">
+                    <div
+                      className={`relative overflow-hidden rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 via-white to-amber-100 shadow-[0_12px_30px_-15px_rgba(146,118,65,0.4)] px-4 py-3 ${bodyLayout === "split" ? "text-left" : "text-center"}`}
+                    >
                       <p className="relative z-10 text-sm font-medium text-amber-800 italic leading-relaxed line-clamp-2">
                         {sponsor.tagline}
                       </p>

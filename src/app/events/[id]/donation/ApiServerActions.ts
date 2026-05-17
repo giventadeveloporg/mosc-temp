@@ -1,6 +1,6 @@
 'use server';
 
-import { getAppUrl } from '@/lib/env';
+import { getAppUrlFromRequestHeaders } from '@/lib/env';
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 
 export interface InitializeDonationPaymentRequest {
@@ -32,7 +32,7 @@ export interface InitializeDonationPaymentResponse {
 export async function initializeDonationPayment(
   data: InitializeDonationPaymentRequest
 ): Promise<InitializeDonationPaymentResponse> {
-  const baseUrl = getAppUrl();
+  const baseUrl = await getAppUrlFromRequestHeaders();
   
   const response = await fetchWithJwtRetry(
     `${baseUrl}/api/proxy/payments/initialize`,
@@ -77,7 +77,7 @@ export async function getDonationTransaction(
   transactionId: string,
   eventId: string
 ): Promise<any> {
-  const baseUrl = getAppUrl();
+  const baseUrl = await getAppUrlFromRequestHeaders();
   
   const response = await fetchWithJwtRetry(
     `${baseUrl}/api/proxy/donation-transactions/${transactionId}?eventId=${eventId}`,
@@ -104,7 +104,7 @@ export async function getDonationTransaction(
 export async function getPaymentTransactionStatus(
   transactionId: string
 ): Promise<any> {
-  const baseUrl = getAppUrl();
+  const baseUrl = await getAppUrlFromRequestHeaders();
   
   const response = await fetchWithJwtRetry(
     `${baseUrl}/api/proxy/payments/${transactionId}`,
@@ -132,7 +132,7 @@ export async function generateDonationQRCode(
   eventId: string,
   transactionId: number
 ): Promise<{ qrCodeUrl: string }> {
-  const baseUrl = getAppUrl();
+  const baseUrl = await getAppUrlFromRequestHeaders();
   
   const response = await fetchWithJwtRetry(
     `${baseUrl}/api/proxy/events/${eventId}/donations/${transactionId}/qrcode`,
@@ -158,7 +158,7 @@ export async function sendDonationConfirmationEmail(
   transactionId: number,
   email: string
 ): Promise<void> {
-  const baseUrl = getAppUrl();
+  const baseUrl = await getAppUrlFromRequestHeaders();
   
   const response = await fetchWithJwtRetry(
     `${baseUrl}/api/proxy/events/${eventId}/donations/${transactionId}/send-email?to=${encodeURIComponent(email)}`,

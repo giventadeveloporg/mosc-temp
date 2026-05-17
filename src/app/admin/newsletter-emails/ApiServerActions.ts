@@ -1,6 +1,6 @@
 "use server";
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
-import { getTenantId, getAppUrl, getApiBaseUrl } from '@/lib/env';
+import { getAppUrlFromRequestHeaders, getTenantId, getApiBaseUrl } from '@/lib/env';
 import { withTenantId } from '@/lib/withTenantId';
 import type {
   PromotionEmailTemplateDTO,
@@ -24,7 +24,7 @@ export async function fetchNewsletterEmailTemplatesServer(params?: {
   page?: number;
   size?: number;
 }): Promise<{ templates: PromotionEmailTemplateDTO[]; totalCount: number }> {
-  const baseUrl = getAppUrl();
+  const baseUrl = await getAppUrlFromRequestHeaders();
   const queryParams = new URLSearchParams();
 
   // Always scope newsletter templates to NEWS_LETTER template type
@@ -78,7 +78,7 @@ export async function fetchNewsletterEmailTemplatesServer(params?: {
  * Fetch a single newsletter email template by ID
  */
 export async function fetchNewsletterEmailTemplateServer(id: number): Promise<PromotionEmailTemplateDTO | null> {
-  const baseUrl = getAppUrl();
+  const baseUrl = await getAppUrlFromRequestHeaders();
   // Use the same backend resource as promotional emails
   const url = `${baseUrl}/api/proxy/promotion-email-templates/${id}`;
 
@@ -106,7 +106,7 @@ export async function fetchNewsletterEmailTemplateServer(id: number): Promise<Pr
 export async function createNewsletterEmailTemplateServer(
   formData: PromotionEmailTemplateFormDTO
 ): Promise<PromotionEmailTemplateDTO> {
-  const baseUrl = getAppUrl();
+  const baseUrl = await getAppUrlFromRequestHeaders();
   // Use the same backend resource as promotional emails
   const url = `${baseUrl}/api/proxy/promotion-email-templates`;
 
@@ -159,7 +159,7 @@ export async function updateNewsletterEmailTemplateServer(
   id: number,
   formData: Partial<PromotionEmailTemplateFormDTO>
 ): Promise<PromotionEmailTemplateDTO> {
-  const baseUrl = getAppUrl();
+  const baseUrl = await getAppUrlFromRequestHeaders();
   // Use the same backend resource as promotional emails
   const url = `${baseUrl}/api/proxy/promotion-email-templates/${id}`;
 
@@ -197,7 +197,7 @@ export async function updateNewsletterEmailTemplateServer(
  * Delete a newsletter email template
  */
 export async function deleteNewsletterEmailTemplateServer(id: number): Promise<void> {
-  const baseUrl = getAppUrl();
+  const baseUrl = await getAppUrlFromRequestHeaders();
   // Use the same backend resource as promotional emails
   const url = `${baseUrl}/api/proxy/promotion-email-templates/${id}`;
 
@@ -224,7 +224,7 @@ export async function sendTestNewsletterEmailServer(
   templateId: number,
   recipientEmail: string
 ): Promise<{ success: boolean; messageId?: string }> {
-  const baseUrl = getAppUrl();
+  const baseUrl = await getAppUrlFromRequestHeaders();
   // Use the same backend resource as promotional emails
   const url = `${baseUrl}/api/proxy/promotion-email-templates/${templateId}/send-test`;
 
@@ -254,7 +254,7 @@ export async function sendBulkNewsletterEmailServer(
   templateId: number,
   recipientEmails?: string[]
 ): Promise<{ success: boolean; sentCount: number; failedCount: number }> {
-  const baseUrl = getAppUrl();
+  const baseUrl = await getAppUrlFromRequestHeaders();
   // Use the same backend resource as promotional emails
   const url = `${baseUrl}/api/proxy/promotion-email-templates/${templateId}/send-bulk`;
 
@@ -284,7 +284,7 @@ export async function sendBulkNewsletterEmailServer(
 export async function sendBulkNewsletterEmailToSubscribedMembersServer(
   templateId: number
 ): Promise<{ success: boolean; sentCount?: number; failedCount?: number }> {
-  const baseUrl = getAppUrl();
+  const baseUrl = await getAppUrlFromRequestHeaders();
   // Use the same backend resource as promotional emails
   const url = `${baseUrl}/api/proxy/promotion-email-templates/${templateId}/send-to-subscribed`;
 
@@ -313,7 +313,7 @@ export async function uploadNewsletterEmailHeaderImageClient(
   title?: string,
   description?: string
 ): Promise<{ url: string; mediaId: number }> {
-  const baseUrl = getAppUrl();
+  const baseUrl = await getAppUrlFromRequestHeaders();
   const formData = new FormData();
 
   formData.append('file', file);
@@ -358,7 +358,7 @@ export async function uploadNewsletterEmailFooterImageClient(
   title?: string,
   description?: string
 ): Promise<{ url: string; mediaId: number }> {
-  const baseUrl = getAppUrl();
+  const baseUrl = await getAppUrlFromRequestHeaders();
   const formData = new FormData();
 
   formData.append('file', file);

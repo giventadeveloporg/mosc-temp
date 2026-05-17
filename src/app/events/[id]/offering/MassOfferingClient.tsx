@@ -68,8 +68,9 @@ export default function MassOfferingClient({
     setIsProcessing(true);
 
     try {
-      const baseUrl = getAppUrl();
-      
+      const origin =
+        typeof window !== 'undefined' ? window.location.origin : getAppUrl();
+
       const response = await initializeDonationPayment({
         eventId: parseInt(eventId),
         amount: donationAmount!,
@@ -81,8 +82,8 @@ export default function MassOfferingClient({
         isFundraiser: initialData.isFundraiserEvent,
         isCharity: initialData.isCharityEvent,
         prayerIntention: prayerIntention.trim() || undefined,
-        returnUrl: `${baseUrl}/events/${eventId}/offering/success`,
-        cancelUrl: `${baseUrl}/events/${eventId}`,
+        returnUrl: `${origin}/events/${eventId}/offering/success`,
+        cancelUrl: `${origin}/events/${eventId}`,
       });
 
       // Redirect to GiveButter checkout URL (handle both checkoutUrl and sessionUrl)

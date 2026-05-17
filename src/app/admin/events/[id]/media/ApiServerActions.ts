@@ -1,6 +1,6 @@
 "use server";
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
-import { getTenantId, getAppUrl, getApiBaseUrl } from '@/lib/env';
+import { getTenantId, getAppUrl, getAppUrlFromRequestHeaders, getApiBaseUrl } from '@/lib/env';
 import type { EventMediaDTO, EventFocusGroupDTO, FocusGroupDTO } from '@/types';
 import { withTenantId } from '@/lib/withTenantId';
 
@@ -208,7 +208,7 @@ export async function uploadMedia(eventId: number, {
   }
 
   // Use the proxy endpoint (not direct backend call)
-  const url = `${getAppUrl()}/api/proxy/event-medias/upload-multiple`;
+  const url = `${await getAppUrlFromRequestHeaders()}/api/proxy/event-medias/upload-multiple`;
 
   const res = await fetch(url, {
     method: 'POST',
@@ -343,7 +343,7 @@ export async function fetchEventDetailsByIdServer(eventId: number) {
  */
 export async function fetchEventFocusGroupsForEventServer(eventId: number): Promise<EventFocusGroupDTO[]> {
   if (!eventId) return [];
-  const baseUrl = getAppUrl();
+  const baseUrl = await getAppUrlFromRequestHeaders();
   const url = `${baseUrl}/api/proxy/event-focus-groups?eventId.equals=${eventId}`;
   const res = await fetchWithJwtRetry(url, { cache: 'no-store' });
   if (!res.ok) {
@@ -358,7 +358,7 @@ export async function fetchEventFocusGroupsForEventServer(eventId: number): Prom
  * Fetch focus groups (for resolving names by id). Uses proxy with size limit.
  */
 async function fetchFocusGroupsServer(size: number = 500): Promise<FocusGroupDTO[]> {
-  const baseUrl = getAppUrl();
+  const baseUrl = await getAppUrlFromRequestHeaders();
   const url = `${baseUrl}/api/proxy/focus-groups?size=${size}&sort=name,asc`;
   const res = await fetchWithJwtRetry(url, { cache: 'no-store' });
   if (!res.ok) return [];

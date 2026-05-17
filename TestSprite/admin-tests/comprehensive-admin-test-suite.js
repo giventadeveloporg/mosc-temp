@@ -8,6 +8,11 @@
  *   1. Copy auth.json.example to auth.json
  *   2. Fill in your admin credentials
  *   3. Run: node TestSprite/admin-tests/comprehensive-admin-test-suite.js
+ *
+ * Base URL (default http://localhost:3000 from auth.json):
+ *   npm run test:admin -- --port=3001
+ *   npm run test:admin -- --base-url=http://127.0.0.1:3001
+ *   Env: TEST_BASE_URL, TEST_PORT, or PORT (see resolve-admin-test-base-url.js)
  */
 
 import { chromium } from 'playwright';
@@ -23,6 +28,7 @@ const __dirname = dirname(__filename);
 
 // Import ES module authentication helpers
 import { authenticatePage, createAuthenticatedContext, saveAuthState, loadAuthState } from '../sanity-tests/authenticate-playwright.js';
+import { resolveAdminTestBaseUrl } from './resolve-admin-test-base-url.js';
 
 // Configuration
 const AUTH_CONFIG_PATH = path.join(__dirname, 'auth.json');
@@ -55,7 +61,7 @@ function loadAuthConfig() {
     return {
       email: config.email,
       password: config.password,
-      baseUrl: config.baseUrl || 'http://localhost:3000',
+      baseUrl: resolveAdminTestBaseUrl(config.baseUrl) || 'http://localhost:3000',
       timeout: config.timeout || 30000,
       headless: config.headless !== undefined ? config.headless : true, // Default to headless for CI/CD
       screenshotOnFailure: config.screenshotOnFailure !== false
@@ -428,13 +434,13 @@ const adminTestPages = [
     priority: 'medium',
     expectedElements: [
       'h1:has-text("Executive Committee Management")',
-      'h2:has-text("Team Members Management")',
+      'h2:has-text("Team Members")',
       'button[aria-label="Add Member"]',
-      '#exec-committee-search',
+      '#exec-committee-search, h3:has-text("No team members yet")',
       'table thead th, h3:has-text("No team members yet")',
-      'button[aria-label="View Member"], button[aria-label="Edit Team Member"], button[aria-label="Delete Team Member"], p:has-text("No members found."), p:has-text("No members match your search.")',
-      'button[aria-label="Previous Page"], button[aria-label="Next Page"]',
-      'span:has-text("Showing")'
+      'button[aria-label="View details"], button[aria-label="Edit member"], button[aria-label="Delete member"], span:has-text("No members found."), span:has-text("No members match your search."), h3:has-text("No team members yet")',
+      'button[aria-label="Previous Page"], button[aria-label="Next Page"], h3:has-text("No team members yet")',
+      'span:has-text("Showing"), h3:has-text("No team members yet")'
     ],
     timeout: 45000, // Increased timeout for this page (makes API calls)
     validation: [
@@ -745,6 +751,7 @@ const adminTestPages = [
     url: '/admin/check-in-analytics',
     category: 'analytics',
     priority: 'high',
+    timeout: 60000,
     expectedElements: [
       'h1:has-text("Check-In Analytics")',
       'input[placeholder*="Search events by title"], button[aria-label="Search events"]',

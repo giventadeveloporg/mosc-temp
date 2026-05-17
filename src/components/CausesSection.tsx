@@ -25,7 +25,7 @@ const causes = [
 
 const CausesSection: React.FC = () => {
   return (
-    <div className="py-24 bg-gray-50">
+    <div className="py-24 bg-green-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="mb-16 flex flex-col md:flex-row justify-between items-start md:items-end space-y-4 md:space-y-0">

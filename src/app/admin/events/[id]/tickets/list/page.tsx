@@ -3,6 +3,7 @@ import Link from 'next/link';
 import TicketTableClient from './TicketTableClient';
 import BatchRefundSection from './BatchRefundSection';
 import { fetchEventDetailsServer } from '@/app/admin/ApiServerActions';
+import { getAppUrlFromRequestHeaders } from '@/lib/env';
 import { formatInTimeZone } from 'date-fns-tz';
 
 interface SearchParams {
@@ -29,7 +30,7 @@ function buildQueryString(query: Record<string, any>) {
 }
 
 async function fetchTickets(eventId: string, searchParams: SearchParams) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const baseUrl = await getAppUrlFromRequestHeaders();
   // Use 0-based page for API
   const page = Math.max(0, parseInt(searchParams.page || '0', 10));
   const pageSize = parseInt(searchParams.pageSize || PAGE_SIZE.toString(), 10);
@@ -101,7 +102,7 @@ async function fetchTickets(eventId: string, searchParams: SearchParams) {
 }
 
 async function fetchStatistics(eventId: string): Promise<EventTicketTransactionStatisticsDTO | null> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const baseUrl = await getAppUrlFromRequestHeaders();
   const res = await fetch(`${baseUrl}/api/proxy/event-ticket-transactions/statistics/${eventId}`, { cache: 'no-store' });
   if (!res.ok) {
     console.error('Statistics fetch failed:', res.status, res.statusText);
@@ -113,7 +114,7 @@ async function fetchStatistics(eventId: string): Promise<EventTicketTransactionS
 }
 
 async function fetchTicketTypes(eventId: string): Promise<EventTicketTypeDTO[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const baseUrl = await getAppUrlFromRequestHeaders();
   const res = await fetch(`${baseUrl}/api/proxy/event-ticket-types?eventId.equals=${eventId}`, { cache: 'no-store' });
   if (!res.ok) return [];
   return res.json();

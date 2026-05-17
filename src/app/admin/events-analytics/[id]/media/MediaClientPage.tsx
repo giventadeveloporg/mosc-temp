@@ -228,8 +228,6 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
       }
 
       // Get app URL from environment variable (available on client)
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-
       // Append other parameters as form data
       formData.append('eventId', eventId);
       formData.append('eventFlyer', String(eventFlyer));
@@ -277,9 +275,7 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
       }
 
       // Use the proxy endpoint directly from client
-      const url = `${appUrl}/api/proxy/event-medias/upload-multiple`;
-
-      const res = await fetch(url, {
+      const res = await fetch('/api/proxy/event-medias/upload-multiple', {
         method: 'POST',
         body: formData,
       });

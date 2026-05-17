@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { formatInTimeZone } from 'date-fns-tz';
 import { useFilteredEvents } from '@/hooks/useFilteredEvents';
@@ -12,6 +11,7 @@ import {
   MAX_FEATURED_EVENTS_HOMEPAGE,
   type FeaturedEventWithMedia,
 } from '@/lib/homepage/featuredEvents';
+import { EventStripBannerImage } from '@/components/EventStripBannerImage';
 
 const MAX_FEATURED_EVENTS = MAX_FEATURED_EVENTS_HOMEPAGE;
 const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes (same as UpcomingEventsSection)
@@ -91,39 +91,42 @@ const FeaturedEventsSection: React.FC<FeaturedEventsSectionProps> = ({
   }
 
   return (
-    <section className="py-0 md:py-0.5 bg-gradient-to-r from-blue-50 to-indigo-50">
+    <section className="featured-events-section py-0 md:py-1 bg-gradient-to-b from-emerald-50/80 via-white to-emerald-50/40">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header - Yellow bar and label only (h2 removed per request) */}
-        <div className="mt-4 mb-4">
-          <div className="flex items-center space-x-2 mb-0">
-            <div className="w-5 h-2 bg-yellow-400 rounded"></div>
-            <p className="text-gray-600">Featured</p>
+        {/* Section header — matches What We Do (ServicesSection) */}
+        <div className="mb-5 mt-4 text-center md:mb-6">
+          <div className="mb-3 flex items-center justify-center gap-2">
+            <div className="h-2 w-5 rounded bg-yellow-400" aria-hidden />
+            <p className="text-sm font-medium tracking-wide text-gray-600">Featured</p>
           </div>
+          <h2 className="font-heading text-2xl font-bold text-gray-900 md:text-3xl">Featured Events</h2>
         </div>
 
         {/* Featured Events Strip - max 3 */}
-        <div className="space-y-4 md:space-y-6">
+        <div className="featured-events-list">
           {displayedEvents.map((featuredEvent, index) => (
             <div
               key={featuredEvent.event.id}
-              className="bg-white rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300 overflow-hidden h-auto md:h-[200px]"
+              className="featured-event-card group overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-sm transition-all duration-300 hover:border-emerald-200/60 hover:shadow-lg"
             >
-              <div className="flex flex-col md:flex-row h-full">
-                {/* Left Column - Image only; 70% width on desktop; height = card (200px) */}
-                <div className="w-full md:w-[70%] h-48 md:h-full relative overflow-hidden rounded-t-2xl md:rounded-t-none md:rounded-l-2xl">
+              <div className="featured-event-card-inner flex flex-col md:flex-row md:items-stretch">
+                <div className="featured-event-card-media relative w-full shrink-0 md:w-[70%]">
                   {featuredEvent.media.fileUrl ? (
-                    <Image
-                      src={featuredEvent.media.fileUrl}
-                      alt={featuredEvent.media.altText || featuredEvent.event.title}
-                      fill
-                      className="object-cover"
-                      style={{
-                        backgroundColor: 'transparent'
-                      }}
-                      priority={index === 0}
-                    />
+                    <Link
+                      href={`/events/${featuredEvent.event.id}`}
+                      className="block h-full w-full min-h-0"
+                      title={`View ${featuredEvent.event.title}`}
+                      aria-label={`View ${featuredEvent.event.title}`}
+                    >
+                      <EventStripBannerImage
+                        src={featuredEvent.media.fileUrl}
+                        alt={featuredEvent.media.altText || featuredEvent.event.title}
+                        priority={index === 0}
+                        variant="featured"
+                      />
+                    </Link>
                   ) : (
-                    <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                    <div className="event-card-banner-media event-card-banner-media--featured-strip flex items-center justify-center">
                       <div className="text-center text-gray-500">
                         <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -133,12 +136,25 @@ const FeaturedEventsSection: React.FC<FeaturedEventsSectionProps> = ({
                     </div>
                   )}
 
-                  {/* Featured Event Badge Overlay */}
-                  <div className="absolute top-2 left-2 md:top-3 md:left-3">
-                    <div className="flex items-center space-x-1.5 bg-blue-600 text-white px-2 py-0.5 rounded-full">
-                      <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
-                      <span className="text-[10px] md:text-xs font-semibold uppercase tracking-wide">
-                        Featured Event
+                  {/* Featured event pill — glass indigo + gold accent */}
+                  <div className="absolute top-2.5 left-2.5 z-[5] md:top-3 md:left-3">
+                    <div
+                      className="featured-event-pill-badge featured-event-pill-badge--featured"
+                      role="status"
+                      aria-label="Featured event"
+                    >
+                      <span className="featured-event-pill-badge-icon" aria-hidden>
+                        <svg
+                          className="featured-event-pill-badge-star"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                          aria-hidden
+                        >
+                          <path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7L12 16.9 5.7 21.1 8 14 2 9.4h7.6L12 2z" />
+                        </svg>
+                      </span>
+                      <span className="featured-event-pill-badge-text">
+                        <span className="featured-event-pill-badge-label">Featured event</span>
                       </span>
                     </div>
                   </div>
@@ -159,7 +175,7 @@ const FeaturedEventsSection: React.FC<FeaturedEventsSectionProps> = ({
                           <img
                             src={overlay.image}
                             alt={overlay.alt}
-                            className="object-contain w-[100px] h-[34px] sm:w-[120px] sm:h-[42px] md:w-[130px] md:h-[44px]"
+                            className="object-contain w-[88px] h-[30px] sm:w-[100px] sm:h-[34px] md:w-[110px] md:h-[36px]"
                           />
                         </Link>
                       </div>
@@ -167,28 +183,28 @@ const FeaturedEventsSection: React.FC<FeaturedEventsSectionProps> = ({
                   })()}
                 </div>
 
-                {/* Right Column - Same height as image (200px); compact content, no scrollbar */}
-                <div className="w-full md:w-[30%] md:h-full min-h-0 flex flex-col bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 rounded-b-2xl md:rounded-b-none md:rounded-r-2xl relative">
-                  {/* Subtle decorative accent */}
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-indigo-100/40 to-transparent rounded-bl-full pointer-events-none" />
+                <div className="featured-event-card-details relative flex w-full min-h-0 flex-col md:w-[30%]">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 hidden w-px bg-gradient-to-b from-transparent via-slate-200 to-transparent md:block" aria-hidden />
 
-                  <div className="relative z-10 flex-1 min-h-0 flex flex-col justify-between p-3 md:p-4 overflow-hidden">
-                    <div className="space-y-1.5 min-w-0">
-                    {/* Event Title - compact, single line on desktop */}
-                    <h3 className="text-sm md:text-base font-bold text-slate-800 line-clamp-1 leading-tight tracking-tight">
-                      {featuredEvent.event.title}
-                    </h3>
+                  <div className="featured-event-card-details-body">
+                    <div className="featured-event-card-details-main">
+                    <div>
+                      <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-600/90">
+                        Event details
+                      </p>
+                      <h3 className="font-heading line-clamp-2 text-sm font-semibold leading-snug text-slate-900 md:line-clamp-1 md:text-base">
+                        {featuredEvent.event.title}
+                      </h3>
+                    </div>
 
-                    {/* Event Meta - compact icons and text */}
-                    <div className="space-y-1">
-                      {/* Date */}
-                      <div className="flex items-center gap-2 text-slate-600">
-                        <div className="flex-shrink-0 w-7 h-7 rounded-lg bg-blue-100 flex items-center justify-center">
+                    <div className="featured-event-meta-list">
+                      <div className="featured-event-meta-row text-slate-700">
+                        <div className="featured-event-meta-row-icon bg-blue-100">
                           <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
                         </div>
-                        <span className="text-xs font-medium truncate">
+                        <span className="text-xs font-medium truncate sm:text-sm">
                           {featuredEvent.event.timezone
                             ? formatInTimeZone(featuredEvent.event.startDate, featuredEvent.event.timezone, 'EEE, MMM d, yyyy')
                             : new Date(featuredEvent.event.startDate).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
@@ -196,38 +212,35 @@ const FeaturedEventsSection: React.FC<FeaturedEventsSectionProps> = ({
                         </span>
                       </div>
 
-                      {/* Time */}
                       {featuredEvent.event.startTime && (
-                        <div className="flex items-center gap-2 text-slate-600">
-                          <div className="flex-shrink-0 w-7 h-7 rounded-lg bg-green-100 flex items-center justify-center">
+                        <div className="featured-event-meta-row text-slate-700">
+                          <div className="featured-event-meta-row-icon bg-green-100">
                             <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                           </div>
-                          <span className="text-xs font-medium">{featuredEvent.event.startTime}</span>
+                          <span className="text-xs font-medium sm:text-sm">{featuredEvent.event.startTime}</span>
                         </div>
                       )}
 
-                      {/* Location */}
                       {featuredEvent.event.location && (
-                        <div className="flex items-center gap-2 text-slate-600">
-                          <div className="flex-shrink-0 w-7 h-7 rounded-lg bg-purple-100 flex items-center justify-center">
+                        <div className="featured-event-meta-row text-slate-700">
+                          <div className="featured-event-meta-row-icon bg-purple-100">
                             <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
                           </div>
-                          <span className="text-xs font-medium truncate">{featuredEvent.event.location}</span>
+                          <span className="text-xs font-medium truncate sm:text-sm">{featuredEvent.event.location}</span>
                         </div>
                       )}
                     </div>
                     </div>
 
-                    {/* Action Buttons - compact */}
-                    <div className="relative z-10 pt-2 flex flex-wrap gap-2 flex-shrink-0">
+                    <div className="featured-event-card-actions">
                       <Link
                         href={`/events/${featuredEvent.event.id}`}
-                        className="flex-1 min-w-0 flex-shrink-0 h-9 rounded-lg bg-green-100 hover:bg-green-200 flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105"
+                        className="flex h-9 min-w-0 flex-1 flex-shrink-0 items-center justify-center gap-1.5 rounded-lg border border-emerald-200/90 bg-emerald-50 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:bg-emerald-100 hover:shadow-md"
                         title="View Event Details"
                         aria-label="View Event Details"
                       >
@@ -260,7 +273,7 @@ const FeaturedEventsSection: React.FC<FeaturedEventsSectionProps> = ({
                             href={calendarLink}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex-shrink-0 h-9 rounded-lg bg-orange-100 hover:bg-orange-200 flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 px-3"
+                            className="flex h-9 flex-shrink-0 items-center justify-center gap-1.5 rounded-lg border border-amber-200/90 bg-amber-50 px-3 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:bg-amber-100 hover:shadow-md"
                             title="Add to Calendar"
                             aria-label="Add to Calendar"
                           >

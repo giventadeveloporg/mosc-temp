@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useLayoutEffect } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { EventWithMedia, EventDetailsDTO } from "@/types";
@@ -28,28 +28,24 @@ function EventImageWithErrorHandling({
   // Don't render if image fails to load or src is empty
   if (imageError || !src) {
     return isPastEvent ? (
-      <div className="relative w-full pt-3 pr-3">
-        <div className="flex justify-end">
-          <span className="px-3 py-1 bg-gray-500 text-white text-xs font-medium rounded-full">
-            Past Event
-          </span>
-        </div>
+      <div className="event-card-banner-media event-card-banner-media--upcoming relative flex items-start justify-end pt-3 pr-3">
+        <span className="px-3 py-1 bg-gray-500 text-white text-xs font-medium rounded-full">
+          Past Event
+        </span>
       </div>
-    ) : null;
+    ) : (
+      <div className="event-card-banner-media event-card-banner-media--upcoming" aria-hidden />
+    );
   }
 
   return (
-    <div className="relative w-full h-auto rounded-t-2xl overflow-hidden">
+    <div className="event-card-banner-media event-card-banner-media--upcoming">
       <Image
         src={src}
         alt={alt}
-        width={800}
-        height={600}
-        className="w-full h-auto object-contain group-hover:scale-105 transition-transform duration-300"
-        style={{
-          backgroundColor: 'transparent',
-          borderRadius: '1rem 1rem 0 0',
-        }}
+        fill
+        sizes="(min-width: 1024px) 42vw, 100vw"
+        className="event-card-banner-image transition-transform duration-300 group-hover:scale-105"
         onError={() => {
           setImageError(true);
         }}
@@ -59,12 +55,288 @@ function EventImageWithErrorHandling({
       />
       {/* Past Event Badge */}
       {isPastEvent && imageLoaded && !imageError && (
-        <div className="absolute top-3 right-3">
+        <div className="absolute top-3 right-3 z-10">
           <span className="px-3 py-1 bg-gray-500 text-white text-xs font-medium rounded-full">
             Past Event
           </span>
         </div>
       )}
+    </div>
+  );
+}
+
+const UPCOMING_TILT_MAX_RX = 6;
+const UPCOMING_TILT_MAX_RY = 8;
+
+function UpcomingEventGlassCard({
+  event,
+  index,
+  isUpcomingEvents,
+  cardTintClass,
+  formatDate,
+  formatTime,
+}: {
+  event: EventWithMedia;
+  index: number;
+  isUpcomingEvents: boolean;
+  cardTintClass: string;
+  formatDate: (dateString: string, timezone?: string) => string;
+  formatTime: (time: string) => string;
+}) {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [tilt, setTilt] = useState({ rx: 0, ry: 0, z: 0 });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (mq.matches) {
+      setReducedMotion(true);
+      setInView(true);
+      return;
+    }
+    const el = wrapRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -8% 0px' }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  const onMouseMove = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (reducedMotion) return;
+      const el = e.currentTarget;
+      const r = el.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      const ry = Math.max(-UPCOMING_TILT_MAX_RY, Math.min(UPCOMING_TILT_MAX_RY, x * 2 * UPCOMING_TILT_MAX_RY));
+      const rx = Math.max(-UPCOMING_TILT_MAX_RX, Math.min(UPCOMING_TILT_MAX_RX, -y * 2 * UPCOMING_TILT_MAX_RX));
+      const z = 10 + (Math.abs(x) + Math.abs(y)) * 14;
+      setTilt({ rx, ry, z: Math.min(26, z) });
+    },
+    [reducedMotion]
+  );
+
+  const onMouseLeave = useCallback(() => {
+    setTilt({ rx: 0, ry: 0, z: 0 });
+  }, []);
+
+  const faceStyle: React.CSSProperties | undefined = reducedMotion
+    ? undefined
+    : {
+        transform: `perspective(1100px) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) translateZ(${tilt.z}px)`,
+      };
+
+  return (
+    <div
+      ref={wrapRef}
+      className={`upcoming-events-glass-card-wrap h-full min-w-0${inView ? ' upcoming-events-glass-card-wrap--visible' : ''}`}
+      style={{ ['--upcoming-events-reveal-delay' as string]: `${index * 80}ms` }}
+    >
+      <div
+        className="upcoming-events-glass-card-face group relative flex h-full min-h-0 flex-col rounded-2xl"
+        onMouseMove={onMouseMove}
+        onMouseLeave={onMouseLeave}
+        style={faceStyle}
+      >
+        <div
+          className={`pointer-events-none absolute inset-0 z-0 rounded-2xl opacity-[0.14] ${cardTintClass}`}
+          aria-hidden
+        />
+        <div
+          className="upcoming-events-glass-card-shine pointer-events-none absolute inset-0 z-[1] overflow-hidden rounded-2xl"
+          aria-hidden
+        />
+        <div className="relative z-[2] flex min-h-0 flex-1 flex-col">
+          {event.thumbnailUrl && (
+            <Link
+              href={`/events/${event.id}/checkout`}
+              className="block shrink-0 cursor-pointer"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <EventImageWithErrorHandling
+                src={event.thumbnailUrl}
+                alt={event.title}
+                isPastEvent={!isUpcomingEvents}
+              />
+            </Link>
+          )}
+          {!event.thumbnailUrl && !isUpcomingEvents && (
+            <div className="relative w-full pt-3 pr-3">
+              <div className="flex justify-end">
+                <span className="rounded-full bg-gray-500 px-3 py-1 text-xs font-medium text-white">Past Event</span>
+              </div>
+            </div>
+          )}
+
+          <div className={`flex min-h-0 flex-1 flex-col p-5 ${event.thumbnailUrl ? 'border-t border-white/25' : ''}`}>
+            <h2 className="mb-2 text-xl font-bold text-gray-800">{event.title}</h2>
+
+            {event.caption && <p className="mb-3 text-base text-gray-600">{event.caption}</p>}
+
+            <div className="mb-2 flex flex-wrap justify-center gap-3 lg:mx-auto lg:max-w-4xl">
+              <div className="flex w-full items-center gap-3 text-gray-700 sm:w-auto sm:min-w-[280px]">
+                <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-blue-100 transition-transform duration-300 group-hover:scale-110">
+                  <svg className="h-10 w-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <span className="text-lg font-semibold">{formatDate(event.startDate, event.timezone)}</span>
+              </div>
+              <div className="flex w-full items-center gap-3 text-gray-700 sm:w-auto sm:min-w-[280px]">
+                <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-green-100 transition-transform duration-300 group-hover:scale-110">
+                  <svg className="h-10 w-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <span className="text-lg font-semibold">
+                  {formatTime(event.startTime)} - {formatTime(event.endTime)}
+                </span>
+              </div>
+              {event.location && (
+                <div className="flex w-full items-center gap-3 text-gray-700 sm:w-auto sm:min-w-[280px]">
+                  <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-purple-100 transition-transform duration-300 group-hover:scale-110">
+                    <svg className="h-10 w-10 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <span className="text-lg font-semibold">{event.location}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-auto flex flex-col gap-3 pt-4 sm:flex-row sm:items-center sm:justify-between">
+              <Link
+                href={`/events/${event.id}`}
+                onClick={(e) => e.stopPropagation()}
+                className="flex h-14 flex-shrink-0 items-center justify-center gap-3 self-start rounded-xl bg-green-100 px-6 transition-all duration-300 hover:scale-105 hover:bg-green-200"
+                title="See Event Details"
+                aria-label="See Event Details"
+              >
+                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-green-200">
+                  <svg className="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-green-700">See Event Details</span>
+              </Link>
+
+              <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+                {isUpcomingEvents && event.isRegistrationRequired === true && (
+                  <Link
+                    href={`/events/${event.id}/register`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="inline-block transition-transform hover:scale-105"
+                  >
+                    <img
+                      src="/images/register_here_button.jpg"
+                      alt="Register Here"
+                      className="h-[70px] w-[200px] max-w-full object-contain"
+                      width={200}
+                      height={70}
+                    />
+                  </Link>
+                )}
+
+                {isUpcomingEvents && isTicketedFundraiserEvent(event) && (
+                  <Link
+                    href={`/events/${event.id}/givebutter-checkout`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="inline-block transition-transform hover:scale-105"
+                    title="Buy Tickets"
+                    aria-label="Buy Tickets"
+                  >
+                    <img
+                      src="/images/buy_tickets_click_here_fundraiser.png"
+                      alt="Buy Tickets"
+                      className="h-[70px] w-[200px] max-w-full object-contain"
+                      width={200}
+                      height={70}
+                    />
+                  </Link>
+                )}
+
+                {isUpcomingEvents && isTicketedEventCube(event) && (
+                  <Link
+                    href={`/events/${event.id}/eventcube-checkout`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="inline-block transition-transform hover:scale-105"
+                    title="Buy Tickets"
+                    aria-label="Buy Tickets"
+                  >
+                    <img
+                      src="/images/buy_tickets_click_here_red.webp"
+                      alt="Buy Tickets"
+                      className="h-[70px] w-[200px] max-w-full object-contain"
+                      width={200}
+                      height={70}
+                    />
+                  </Link>
+                )}
+
+                {isUpcomingEvents &&
+                  event.admissionType?.toUpperCase() === 'TICKETED' &&
+                  !isTicketedFundraiserEvent(event) &&
+                  !isTicketedEventCube(event) && (
+                    <Link
+                      href={
+                        event.manualPaymentEnabled === true &&
+                        (event.paymentFlowMode === 'MANUAL_ONLY' || event.paymentFlowMode === 'HYBRID')
+                          ? `/events/${event.id}/manual-checkout`
+                          : `/events/${event.id}/checkout`
+                      }
+                      onClick={(e) => e.stopPropagation()}
+                      className="inline-block transition-transform hover:scale-105"
+                      title="Buy Tickets"
+                      aria-label="Buy Tickets"
+                    >
+                      <img
+                        src="/images/buy_tickets_click_here_red.webp"
+                        alt="Buy Tickets"
+                        className="h-[70px] w-[200px] max-w-full object-contain"
+                        width={200}
+                        height={70}
+                      />
+                    </Link>
+                  )}
+
+                {isUpcomingEvents && isDonationBasedEvent(event) && !isTicketedFundraiserEvent(event) && (
+                  <Link
+                    href={`/events/${event.id}/donation`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex h-14 flex-shrink-0 items-center justify-center gap-3 rounded-xl bg-teal-100 px-6 transition-all duration-300 hover:scale-105 hover:bg-teal-200"
+                    title="Make a Donation"
+                    aria-label="Make a Donation"
+                  >
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-teal-200">
+                      <svg className="h-6 w-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    </div>
+                    <span className="font-semibold text-teal-700">Make a Donation</span>
+                  </Link>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -446,7 +718,7 @@ const UpcomingEventsSection: React.FC = () => {
   // Handle fetch error state - return complete section with header
   if (fetchError) {
     return (
-      <section className="py-24 bg-gray-50">
+      <section className="py-24 bg-green-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <div className="flex items-center justify-center space-x-2 mb-4">
@@ -476,7 +748,7 @@ const UpcomingEventsSection: React.FC = () => {
   // Handle no events state - return complete section with header
   if (events.length === 0) {
     return (
-      <section className="py-24 bg-gray-50">
+      <section className="py-24 bg-green-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <div className="flex items-center justify-center space-x-2 mb-4">
@@ -505,7 +777,7 @@ const UpcomingEventsSection: React.FC = () => {
 
   // Normal render with events
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-16 bg-green-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-12">
@@ -524,222 +796,19 @@ const UpcomingEventsSection: React.FC = () => {
           </p>
         </div>
 
-        {/* Events List - Single column layout exactly like sponsors section */}
-        <div className="space-y-8 mb-8">
-              {events.map((event, index) => (
-                <div
-                  key={event.id}
-                  className={`${getRandomBackground(index)} rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 overflow-hidden group`}
-                  style={{
-                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05)'
-                  }}
-                >
-                  <div className="flex flex-col h-full">
-                    {/* Image Section - Top on all screen sizes, exactly like events page */}
-                    {event.thumbnailUrl && (
-                      <Link
-                        href={`/events/${event.id}/checkout`}
-                        className="block cursor-pointer"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <EventImageWithErrorHandling
-                          src={event.thumbnailUrl}
-                          alt={event.title}
-                          isPastEvent={!isUpcomingEvents}
-                        />
-                      </Link>
-                    )}
-                    {/* Past Event Badge - Show at top of content if no image */}
-                    {!event.thumbnailUrl && !isUpcomingEvents && (
-                      <div className="relative w-full pt-3 pr-3">
-                        <div className="flex justify-end">
-                          <span className="px-3 py-1 bg-gray-500 text-white text-xs font-medium rounded-full">
-                            Past Event
-                          </span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Content Section - Bottom on all screen sizes, exactly like events page */}
-                    <div className={`p-5 ${event.thumbnailUrl ? 'border-t border-white/20' : ''}`}>
-                      {/* Title */}
-                      <h2 className="text-xl font-bold text-gray-800 mb-2">
-                        {event.title}
-                      </h2>
-
-                      {/* Caption */}
-                      {event.caption && (
-                        <p className="text-gray-600 text-base mb-3">
-                          {event.caption}
-                        </p>
-                      )}
-
-                      {/* Event Details - Centered flexbox layout */}
-                      <div className="flex flex-wrap justify-center gap-3 mb-2 lg:max-w-4xl lg:mx-auto">
-                        <div className="flex items-center gap-3 text-gray-700 w-full sm:w-auto sm:min-w-[280px]">
-                          <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                            <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                          </div>
-                          <span className="text-lg font-semibold">
-                            {formatDate(event.startDate, event.timezone)}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-3 text-gray-700 w-full sm:w-auto sm:min-w-[280px]">
-                          <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-green-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                            <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                          </div>
-                          <span className="text-lg font-semibold">
-                            {formatTime(event.startTime)} - {formatTime(event.endTime)}
-                          </span>
-                        </div>
-                        {event.location && (
-                          <div className="flex items-center gap-3 text-gray-700 w-full sm:w-auto sm:min-w-[280px]">
-                            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                              <svg className="w-10 h-10 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                              </svg>
-                            </div>
-                            <span className="text-lg font-semibold">
-                              {event.location}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Action Buttons */}
-                      <div className="flex flex-col sm:flex-row gap-2 mt-4">
-                        {/* See Event Details Button */}
-                        <Link
-                          href={`/events/${event.id}`}
-                          onClick={(e) => e.stopPropagation()}
-                          className="flex-shrink-0 h-14 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
-                          title="See Event Details"
-                          aria-label="See Event Details"
-                        >
-                          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-200 flex items-center justify-center">
-                            <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                            </svg>
-                          </div>
-                          <span className="font-semibold text-green-700">See Event Details</span>
-                        </Link>
-
-                        {/* Register Here Button - Show if registration is required and event is upcoming */}
-                        {isUpcomingEvents && event.isRegistrationRequired === true && (
-                          <Link
-                            href={`/events/${event.id}/register`}
-                            onClick={(e) => e.stopPropagation()}
-                            className="transition-transform hover:scale-105 inline-block"
-                          >
-                            <img
-                              src="/images/register_here_button.jpg"
-                              alt="Register Here"
-                              className="object-contain"
-                              style={{
-                                width: '200px',
-                                height: '70px'
-                              }}
-                            />
-                          </Link>
-                        )}
-
-                        {/* Fundraiser Image - Show for ticketed fundraiser/charity events (replaces Buy Tickets button) */}
-                        {isUpcomingEvents && isTicketedFundraiserEvent(event) && (
-                          <Link
-                            href={`/events/${event.id}/givebutter-checkout`}
-                            onClick={(e) => e.stopPropagation()}
-                            className="transition-transform hover:scale-105 inline-block"
-                            title="Buy Tickets"
-                            aria-label="Buy Tickets"
-                          >
-                            <img
-                              src="/images/buy_tickets_click_here_fundraiser.png"
-                              alt="Buy Tickets"
-                              className="object-contain"
-                              style={{
-                                width: '200px',
-                                height: '70px'
-                              }}
-                            />
-                          </Link>
-                        )}
-
-                        {/* Event Cube: Buy Tickets → eventcube-checkout (red image) */}
-                        {isUpcomingEvents && isTicketedEventCube(event) && (
-                          <Link
-                            href={`/events/${event.id}/eventcube-checkout`}
-                            onClick={(e) => e.stopPropagation()}
-                            className="transition-transform hover:scale-105 inline-block"
-                            title="Buy Tickets"
-                            aria-label="Buy Tickets"
-                          >
-                            <img
-                              src="/images/buy_tickets_click_here_red.webp"
-                              alt="Buy Tickets"
-                              className="object-contain"
-                              style={{
-                                width: '200px',
-                                height: '70px'
-                              }}
-                            />
-                          </Link>
-                        )}
-
-                        {/* Buy Tickets Button - Only for TICKETED events and upcoming events (case-insensitive) */}
-                        {/* BUT NOT if Event Cube or ticketed fundraiser (use their dedicated links instead) */}
-                        {isUpcomingEvents && event.admissionType?.toUpperCase() === 'TICKETED' && !isTicketedFundraiserEvent(event) && !isTicketedEventCube(event) && (
-                          <Link
-                            href={
-                              event.manualPaymentEnabled === true &&
-                              (event.paymentFlowMode === 'MANUAL_ONLY' || event.paymentFlowMode === 'HYBRID')
-                                ? `/events/${event.id}/manual-checkout`
-                                : `/events/${event.id}/checkout`
-                            }
-                            onClick={(e) => e.stopPropagation()}
-                            className="transition-transform hover:scale-105 inline-block"
-                            title="Buy Tickets"
-                            aria-label="Buy Tickets"
-                          >
-                            <img
-                              src="/images/buy_tickets_click_here_red.webp"
-                              alt="Buy Tickets"
-                              className="object-contain"
-                              style={{
-                                width: '200px',
-                                height: '70px'
-                              }}
-                            />
-                          </Link>
-                        )}
-
-                        {/* Make a Donation Button - Show for donation-based events (not ticketed fundraiser) */}
-                        {isUpcomingEvents && isDonationBasedEvent(event) && !isTicketedFundraiserEvent(event) && (
-                          <Link
-                            href={`/events/${event.id}/donation`}
-                            onClick={(e) => e.stopPropagation()}
-                            className="flex-shrink-0 h-14 rounded-xl bg-teal-100 hover:bg-teal-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
-                            title="Make a Donation"
-                            aria-label="Make a Donation"
-                          >
-                            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-teal-200 flex items-center justify-center">
-                              <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                              </svg>
-                            </div>
-                            <span className="font-semibold text-teal-700">Make a Donation</span>
-                          </Link>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
+        {/* Events grid — two cards per row on large screens; equal-height rows */}
+        <div className="mb-8 grid grid-cols-1 items-stretch gap-8 lg:grid-cols-2">
+          {events.map((event, index) => (
+            <UpcomingEventGlassCard
+              key={event.id}
+              event={event}
+              index={index}
+              isUpcomingEvents={isUpcomingEvents}
+              cardTintClass={getRandomBackground(index)}
+              formatDate={formatDate}
+              formatTime={formatTime}
+            />
+          ))}
         </div>
 
         {/* View All Events Button */}

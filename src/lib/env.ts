@@ -90,6 +90,29 @@ export function getAppUrl(): string {
 }
 
 /**
+ * Base URL of this Next.js app for server-side fetches to same-origin routes (e.g. `/api/proxy/*`).
+ * Uses the incoming request host/port when available so dev servers on non-default ports work.
+ * Falls back to {@link getAppUrl} when `headers()` is not available.
+ */
+export async function getAppUrlFromRequestHeaders(): Promise<string> {
+  try {
+    const { headers } = await import('next/headers');
+    const headersList = await headers();
+    const host = headersList.get('x-forwarded-host') ?? headersList.get('host');
+    if (host) {
+      const forwardedProto = headersList.get('x-forwarded-proto')?.split(',')[0]?.trim();
+      const proto =
+        forwardedProto ||
+        (host.includes('localhost') || host.startsWith('127.') ? 'http' : 'https');
+      return `${proto}://${host}`;
+    }
+  } catch {
+    // headers() unavailable outside a request (e.g. static generation)
+  }
+  return getAppUrl();
+}
+
+/**
  * Get the email host URL prefix for QR code generation
  * This is used to ensure QR codes work properly in email contexts
  * Returns the full URL including protocol (e.g., "http://localhost:3000" or "https://mcefee.org")

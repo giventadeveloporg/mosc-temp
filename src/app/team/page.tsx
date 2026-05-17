@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { ExecutiveCommitteeTeamMemberDTO } from '@/types';
-import { getAppUrl } from '@/lib/env';
+import { parseExecutiveCommitteeTeamMembersResponse } from '@/lib/parseExecutiveCommitteeTeamMembersResponse';
 import Modal from '@/components/ui/Modal';
 import styles from '@/components/TeamSection.module.css';
 import { getHomepageCacheKey } from '@/lib/homepageCacheKeys';
@@ -36,7 +36,7 @@ export default function TeamPage() {
           const { data, timestamp } = JSON.parse(cachedData);
           if (Date.now() - timestamp < CACHE_DURATION) {
             console.log('✅ Using cached team data');
-            setTeamMembers(data);
+            setTeamMembers(parseExecutiveCommitteeTeamMembersResponse(data));
             setLoading(false);
             setShowImages(true);
             return;
@@ -47,9 +47,8 @@ export default function TeamPage() {
       }
 
       try {
-        const baseUrl = getAppUrl();
         const response = await fetch(
-          `${baseUrl}/api/proxy/executive-committee-team-members?isActive.equals=true&sort=priorityOrder,asc`,
+          '/api/proxy/executive-committee-team-members?isActive.equals=true&sort=priorityOrder,asc',
           {
             method: 'GET',
             headers: {
@@ -67,7 +66,7 @@ export default function TeamPage() {
         }
 
         const data = await response.json();
-        const teamMembersList = Array.isArray(data) ? data : [];
+        const teamMembersList = parseExecutiveCommitteeTeamMembersResponse(data);
 
         // Cache the data
         try {

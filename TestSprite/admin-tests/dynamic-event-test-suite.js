@@ -15,6 +15,9 @@
  *   npm run test:admin:dynamic
  *   or
  *   node TestSprite/admin-tests/dynamic-event-test-suite.js
+ *
+ * Base URL override: npm run test:admin:dynamic -- --port=3001
+ *   (also TEST_BASE_URL, TEST_PORT, PORT — see resolve-admin-test-base-url.js)
  */
 
 import { chromium } from 'playwright';
@@ -29,6 +32,7 @@ const __dirname = dirname(__filename);
 
 // Import ES module authentication helpers
 import { authenticatePage, createAuthenticatedContext, saveAuthState, loadAuthState } from '../sanity-tests/authenticate-playwright.js';
+import { resolveAdminTestBaseUrl } from './resolve-admin-test-base-url.js';
 
 // Configuration
 const AUTH_CONFIG_PATH = path.join(__dirname, 'auth.json');
@@ -61,7 +65,7 @@ function loadAuthConfig() {
     return {
       email: config.email,
       password: config.password,
-      baseUrl: config.baseUrl || 'http://localhost:3000',
+      baseUrl: resolveAdminTestBaseUrl(config.baseUrl) || 'http://localhost:3000',
       timeout: config.timeout || 30000,
       headless: config.headless !== undefined ? config.headless : true,
       screenshotOnFailure: config.screenshotOnFailure !== false

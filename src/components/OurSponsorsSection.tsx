@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useLayoutEffect } from 'react';
 import Link from 'next/link';
 import type { EventSponsorsDTO } from "@/types";
-import { getAppUrl, getTenantId } from '@/lib/env';
+import { getTenantId } from '@/lib/env';
 import { useDeferredFetch } from '@/hooks/usePageReady';
 import { SponsorCard } from '@/components/sponsors/SponsorCard';
 import { getHomepageCacheKey } from '@/lib/homepageCacheKeys';
@@ -55,7 +55,6 @@ const OurSponsorsSection: React.FC = () => {
 
   // Resolve banner URL from event_medias (SPONSOR_BANNER, lowest priority first). Runs on every load so new/updated media shows.
   async function resolveBannersForSponsors(
-    baseUrl: string,
     limitedSponsors: EventSponsorsDTO[]
   ): Promise<EventSponsorsDTO[]> {
     return Promise.all(
@@ -68,7 +67,8 @@ const OurSponsorsSection: React.FC = () => {
             sort: 'priorityRanking,asc',
             size: '1',
           });
-          const bannerRes = await fetch(`${baseUrl}/api/proxy/event-medias?${bannerParams.toString()}`, { cache: 'no-store' });
+          // Same-origin relative URL — avoids CORS when tab is 127.0.0.1 vs localhost or non-3000 port
+          const bannerRes = await fetch(`/api/proxy/event-medias?${bannerParams.toString()}`, { cache: 'no-store' });
           if (!bannerRes.ok) return { ...s };
           const bannerData = await bannerRes.json();
           let bannerMedia: { fileUrl?: string }[] = [];
@@ -89,8 +89,6 @@ const OurSponsorsSection: React.FC = () => {
 
   useEffect(() => {
     async function fetchSponsors() {
-      const baseUrl = getAppUrl();
-
       // Defer network request until page is ready + delay
       if (!shouldFetch) return;
 
@@ -122,7 +120,7 @@ const OurSponsorsSection: React.FC = () => {
             size: '15',
             'isActive.equals': 'true'
           });
-          const response = await fetch(`${baseUrl}/api/proxy/event-sponsors?${params.toString()}`, {
+          const response = await fetch(`/api/proxy/event-sponsors?${params.toString()}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
             cache: 'no-store',
@@ -144,7 +142,7 @@ const OurSponsorsSection: React.FC = () => {
         }
 
         // Always resolve banners from event_medias so new/updated images (e.g. priority 1) show without waiting for cache expiry
-        const sponsorsWithBanners = await resolveBannersForSponsors(baseUrl, rawSponsors);
+        const sponsorsWithBanners = await resolveBannersForSponsors(rawSponsors);
         setSponsors(sponsorsWithBanners);
       } catch (error) {
         console.error('Error fetching sponsors:', error);
@@ -164,7 +162,7 @@ const OurSponsorsSection: React.FC = () => {
 
   if (fetchError) {
     return (
-      <section className="py-24 bg-gray-50">
+      <section className="py-24 bg-green-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <div className="flex items-center justify-center space-x-2 mb-4">
@@ -193,7 +191,7 @@ const OurSponsorsSection: React.FC = () => {
 
   if (sponsors.length === 0) {
     return (
-      <section className="py-24 bg-gray-50">
+      <section className="py-24 bg-green-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <div className="flex items-center justify-center space-x-2 mb-4">
@@ -221,7 +219,7 @@ const OurSponsorsSection: React.FC = () => {
   }
 
   return (
-    <section className="py-24 bg-gray-50">
+    <section className="py-24 bg-green-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-12">
@@ -237,13 +235,15 @@ const OurSponsorsSection: React.FC = () => {
           </p>
         </div>
 
-        {/* Sponsors List - Single column layout with equal height cards */}
-        <div className="space-y-8 mb-8">
+        {/* Sponsors grid — two per row on large screens; cards stretch to equal height */}
+        <div className="mb-8 grid grid-cols-1 items-stretch gap-8 lg:grid-cols-2">
           {sponsors.map((sponsor, index) => (
             <SponsorCard
               key={sponsor.id ?? index}
               sponsor={sponsor}
               backgroundClass={getRandomBackground(index)}
+              bodyLayout="split"
+              className="h-full min-w-0"
               onCardClick={() => sponsor.websiteUrl && window.open(sponsor.websiteUrl, '_blank')}
             />
           ))}
