@@ -159,6 +159,8 @@ const nextConfig = {
       bodySizeLimit: '50mb', // Increase from default 1mb to 50mb for file uploads
     },
     ...(buildWorkerCount !== undefined ? { cpus: buildWorkerCount } : {}),
+    // CI/Amplify: lower peak webpack RAM (slightly longer compile). See Next.js memory-usage guide.
+    ...(isCiBuild ? { webpackMemoryOptimizations: true } : {}),
   },
 
   // Keep large / native deps out of the webpack server bundle; load from node_modules at runtime.
