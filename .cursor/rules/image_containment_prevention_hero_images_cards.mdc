@@ -319,9 +319,9 @@ Inner `.event-card-banner-media--featured-strip` uses `border-radius: 0` — par
 
 ```tsx
 <div className="featured-event-card group overflow-hidden rounded-2xl ...">
-  <div className="flex flex-col md:flex-row md:items-stretch">
+  <div className="featured-event-card-inner flex flex-col md:flex-row md:items-stretch">
     <div className="featured-event-card-media relative w-full shrink-0 md:w-[70%]">
-      <Link href={`/events/${id}`} className="block w-full">
+      <Link href={`/events/${id}`} className="block h-full w-full min-h-0">
         <EventStripBannerImage src={...} variant="featured" />
       </Link>
       {/* absolute: featured pill, buy-ticket overlay */}
@@ -331,7 +331,7 @@ Inner `.event-card-banner-media--featured-strip` uses `border-radius: 0` — par
 </div>
 ```
 
-**5. `EventStripBannerImage`** — `variant="featured"` → `event-card-banner-media--featured-strip`; Next/Image `fill` + `event-card-banner-image`; `group-hover:scale-105` on featured.
+**5. `EventStripBannerImage`** — `variant="featured"` → `event-card-banner-media--featured-strip h-full w-full`; Next/Image `fill` + `event-card-banner-image`; `group-hover:scale-105` on featured.
 
 ### **Files**
 - [`src/app/globals.css`](mdc:src/app/globals.css) — `.event-card-banner-media--featured-strip`, `.featured-event-card-media`
@@ -343,7 +343,22 @@ Inner `.event-card-banner-media--featured-strip` uses `border-radius: 0` — par
 | Context | Fit | Why |
 |--------|-----|-----|
 | Event thumbnails, sponsors, heroes (must show full art) | `object-contain` | Zero crop |
-| Featured homepage **promo strip** (fill column, no side gaps) | `object-cover` in 5/3 clipped parent | Full bleed + rounded corners |
+| Featured homepage **promo strip** (fill column, no side gaps) | `object-cover` in clipped parent | Full bleed + rounded corners |
+
+### **Troubleshooting: Image cut off in middle / doesn't fill left column (desktop)**
+
+**Symptom:** Featured banner shows only a horizontal band or empty space above/below; image does not span full height of the left media column.
+
+**Root cause:** Desktop `.event-card-banner-media--featured-strip` used fixed `aspect-ratio` + `max-height` while `.featured-event-card-inner` uses `md:items-stretch` — details column sets row height but the banner box stayed a short fixed box.
+
+**Fix checklist:**
+- [ ] Desktop: `aspect-ratio: auto`, `max-height: none`, `height: 100%`, `min-height: 100%` on `--featured-strip`
+- [ ] Desktop: `.featured-event-card-media` is `display: flex`, link is `height: 100%`, `min-height: 0`
+- [ ] `EventStripBannerImage` featured variant includes `h-full w-full`
+- [ ] Link: `block h-full w-full min-h-0`
+- [ ] `object-fit: cover !important` + `object-position: top center !important`
+- [ ] Parent `.featured-event-card-media` has `overflow: hidden` + border-radius (inner strip `border-radius: 0`)
+- [ ] Do **not** re-add desktop `max-height` or fixed `aspect-ratio` on featured strip when row uses `items-stretch`
 
 ---
 
