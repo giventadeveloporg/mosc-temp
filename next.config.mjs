@@ -161,6 +161,17 @@ const nextConfig = {
     ...(buildWorkerCount !== undefined ? { cpus: buildWorkerCount } : {}),
     // CI/Amplify: lower peak webpack RAM (slightly longer compile). See Next.js memory-usage guide.
     ...(isCiBuild ? { webpackMemoryOptimizations: true } : {}),
+    // Smaller per-route server bundles (922+ pages — helps Amplify ~220MB .next cap)
+    optimizePackageImports: [
+      'lucide-react',
+      'react-icons',
+      'react-icons/fa',
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-dropdown-menu',
+      '@radix-ui/react-select',
+      '@radix-ui/react-tabs',
+      '@radix-ui/react-tooltip',
+    ],
   },
 
   // Keep large / native deps out of the webpack server bundle; load from node_modules at runtime.
@@ -176,6 +187,28 @@ const nextConfig = {
     'svix',
     'jsonwebtoken',
   ],
+
+  // Shrink per-route file traces (Amplify SSR ~220MB deploy cap). See scripts/prune-amplify-next-artifact.mjs
+  outputFileTracingExcludes: {
+    '*': [
+      'node_modules/@swc/core-linux-x64-gnu/**',
+      'node_modules/@swc/core-linux-x64-musl/**',
+      'node_modules/@esbuild/linux-x64/**',
+      'node_modules/@esbuild/linux-arm64/**',
+      'node_modules/@swc/core-darwin-*/**',
+      'node_modules/@swc/core-win32-*/**',
+      'node_modules/esbuild-darwin-*/**',
+      'node_modules/esbuild-windows-*/**',
+      'node_modules/webpack/**',
+      'node_modules/typescript/**',
+      'node_modules/@anthropic-ai/**',
+      'node_modules/@img/**',
+      'node_modules/playwright/**',
+      'node_modules/playwright-core/**',
+      'node_modules/prettier/**',
+      'node_modules/eslint/**',
+    ],
+  },
 
   env: {
     // Clerk environment variables
