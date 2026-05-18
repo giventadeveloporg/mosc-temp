@@ -113,6 +113,18 @@ for (const pattern of pathPatterns) {
   runFindDelete(`-path '${pattern}'`);
 }
 
+// Amplify Hosting SSR bundles from the default .next/server traced layout, NOT .next/standalone
+// (standalone is only for `node .next/standalone/server.js` self-hosting). When a deployed branch
+// still sets output: 'standalone', this tree is pure deploy bloat (often 150MB+) — strip it.
+const standaloneDir = join(NEXT_DIR, 'standalone');
+if (existsSync(standaloneDir)) {
+  const stBytes = dirSizeBytes(standaloneDir);
+  console.log(
+    `[prune-amplify] Removing .next/standalone (${(stBytes / 1024 / 1024).toFixed(1)} MB) — not used by Amplify Hosting SSR (default .next/server layout)`,
+  );
+  rmrf(standaloneDir);
+}
+
 // Next 16 may leave hashed symlinks under .next/node_modules (Turbopack / external packages).
 // Amplify bundles from traced server files; drop this tree if present (webpack SSR uses root node_modules at runtime).
 const nextNodeModules = join(NEXT_DIR, 'node_modules');
