@@ -1,0 +1,165 @@
+/* Richer purple glass — shared by all homepage cards */
+body.home-page-background {
+  --homepage-purple-glass-gradient: linear-gradient(
+    145deg,
+    rgba(196, 181, 253, 0.96) 0%,
+    rgba(167, 139, 250, 0.94) 48%,
+    rgba(183, 148, 252, 0.95) 100%
+  );
+  --homepage-purple-glass-border: rgba(237, 233, 254, 0.82);
+  --homepage-purple-glass-shadow:
+    0 4px 14px rgba(76, 29, 149, 0.16),
+    0 1px 0 rgba(255, 255, 255, 0.75) inset;
+  --homepage-purple-glass-shadow-hover:
+    0 10px 28px rgba(76, 29, 149, 0.22),
+    0 1px 0 rgba(255, 255, 255, 0.9) inset;
+}
+
+/* Fixed viewport particle background — homepage only (via HomeParticleBackground) */
+.home-particle-background {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/*
+ * Full-page visibility: fixed canvas stays in place while content scrolls over it.
+ * Only section shells are cleared — cards/panels keep their own backgrounds.
+ */
+body.home-page-background .home-page-layout .home-hero-viewport-filler,
+body.home-page-background .home-page-layout .home-hero-viewport-filler .hero-container-split,
+body.home-page-background .home-page-layout .hero-slideshow-ken-burns {
+  background: transparent !important;
+}
+
+/* Green section wrappers */
+body.home-page-background .home-page-layout section.bg-green-50,
+body.home-page-background .home-page-layout div.bg-green-50.py-12,
+body.home-page-background .home-page-layout div.bg-green-50.py-16,
+body.home-page-background .home-page-layout div.bg-green-50.py-24,
+body.home-page-background .home-page-layout #contact.bg-green-50,
+body.home-page-background .home-page-layout div#about-us,
+body.home-page-background .home-page-layout div#team-section {
+  background-color: transparent !important;
+}
+
+/* Gradient section wrappers (live events, featured, services) */
+body.home-page-background .home-page-layout section[class*='bg-gradient-to'],
+body.home-page-background .home-page-layout section.featured-events-section,
+body.home-page-background .home-page-layout > div.relative.overflow-hidden.py-24[class*='bg-gradient'] {
+  background: transparent !important;
+  background-image: none !important;
+}
+
+/* Services decorative overlay — would block particles */
+body.home-page-background .home-page-layout > div.relative.overflow-hidden.py-24 > .pointer-events-none.absolute {
+  display: none;
+}
+
+/* Projects band — glass so particles show through */
+body.home-page-background .home-page-layout div.bg-gray-800.py-24.text-white {
+  background-color: rgba(31, 41, 55, 0.42) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Footer (sibling of main in layout) — particles visible when scrolled to bottom */
+body.home-page-background footer.footer-edge-to-edge,
+body.home-page-background footer.footer-edge-to-edge .bg-gray-900 {
+  background-color: rgba(17, 24, 39, 0.72) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ── Homepage light purple glass panels (matches Cultural Workshops cards) ── */
+body.home-page-background .home-page-layout .bg-white {
+  position: relative;
+  overflow: hidden;
+  background: var(--homepage-purple-glass-gradient) !important;
+  background-color: transparent !important;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--homepage-purple-glass-border) !important;
+  box-shadow: var(--homepage-purple-glass-shadow);
+  transition:
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.45s ease,
+    border-color 0.45s ease;
+}
+
+body.home-page-background .home-page-layout .bg-white:hover {
+  transform: translateY(-2px) scale(1.004);
+  border-color: rgba(255, 255, 255, 0.95) !important;
+  box-shadow: var(--homepage-purple-glass-shadow-hover);
+}
+
+body.home-page-background .home-page-layout .homepage-glass-card.services-glass-card-face:hover {
+  transform: translateY(-2px) scale(1.004);
+}
+
+body.home-page-background .home-page-layout .teamCard .cardContent {
+  background: var(--homepage-purple-glass-gradient) !important;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--homepage-purple-glass-border);
+  box-shadow: var(--homepage-purple-glass-shadow);
+}
+
+body.home-page-background .featured-event-card-details {
+  background: var(--homepage-purple-glass-gradient) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+body.home-page-background .featured-event-meta-row {
+  background: rgba(167, 139, 250, 0.35) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+body.home-page-background .live-event-details-panel {
+  background: var(--homepage-purple-glass-gradient) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--homepage-purple-glass-border);
+}
+
+/* Readable text on purple glass panels */
+body.home-page-background .home-page-layout .bg-white .text-gray-900,
+body.home-page-background .home-page-layout .bg-white .text-gray-800,
+body.home-page-background .featured-event-card-details .text-slate-900,
+body.home-page-background .featured-event-card-details .text-slate-800,
+body.home-page-background .live-event-details-panel .text-slate-800 {
+  color: #1e1b4b !important;
+}
+
+body.home-page-background .home-page-layout .bg-white .text-gray-600,
+body.home-page-background .home-page-layout .bg-white .text-gray-500,
+body.home-page-background .featured-event-card-details .text-slate-700,
+body.home-page-background .featured-event-card-details .text-slate-600,
+body.home-page-background .live-event-details-panel .text-slate-600 {
+  color: #312e81 !important;
+}
+
+body.home-page-background .home-page-layout .teamCard .cardContent .text-gray-900,
+body.home-page-background .home-page-layout .teamCard .cardContent .text-gray-800 {
+  color: #1e1b4b !important;
+}
+
+body.home-page-background .home-page-layout .teamCard .cardContent .text-gray-600,
+body.home-page-background .home-page-layout .teamCard .cardContent .text-gray-500 {
+  color: #312e81 !important;
+}
+
+body.home-page-background .home-page-layout .homepage-glass-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+body.home-page-background .home-page-layout .homepage-glass-card .text-gray-700 {
+  color: #312e81 !important;
+}

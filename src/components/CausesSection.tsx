@@ -1,6 +1,8 @@
 'use client';
 
 import React from 'react';
+import { HomeSectionRail } from '@/components/HomeSectionRail';
+import { HomeSectionTitle } from '@/components/HomeSectionTitle';
 
 const causes = [
   {
@@ -26,18 +28,13 @@ const causes = [
 const CausesSection: React.FC = () => {
   return (
     <div className="py-24 bg-green-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <HomeSectionRail eyebrow="Our causes" containerClassName="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="mb-16 flex flex-col md:flex-row justify-between items-start md:items-end space-y-4 md:space-y-0">
           <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-5 h-2 bg-yellow-400 rounded"></div>
-              <p className="text-gray-600">Our causes</p>
-            </div>
-
-            <h2 className="text-4xl md:text-6xl font-normal leading-tight tracking-tight max-w-2xl">
+<HomeSectionTitle className="text-4xl md:text-6xl font-normal leading-tight tracking-tight max-w-2xl">
               Various things we help in whole world
-            </h2>
+            </HomeSectionTitle>
           </div>
 
         </div>
@@ -68,7 +65,7 @@ const CausesSection: React.FC = () => {
             </div>
           ))}
         </div>
-      </div>
+      </HomeSectionRail>
     </div>
   );
 };

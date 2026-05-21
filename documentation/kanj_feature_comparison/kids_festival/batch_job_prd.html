@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kids Festival — Batch Job PRD</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 1100px; margin: 0 auto; padding: 20px 20px 48px; }
+        h1 { font-size: 2.1em; border-bottom: 3px solid #0066cc; padding-bottom: 12px; margin-bottom: 8px; }
+        .doc-meta { color: #555; font-size: 0.95em; margin-bottom: 20px; }
+        .doc-meta a { color: #0066cc; font-weight: 600; }
+        h2 { font-size: 1.55em; border-left: 4px solid #0066cc; padding-left: 14px; margin-top: 32px; margin-bottom: 14px; }
+        h3 { font-size: 1.2em; margin-top: 18px; margin-bottom: 10px; }
+        p, li { margin-bottom: 10px; }
+        ul, ol { margin: 10px 0 14px 24px; }
+        .lead { background: linear-gradient(135deg, #e8f4f8 0%, #d1e7f0 100%); border-left: 4px solid #0066cc; border-radius: 8px; padding: 18px 20px; margin: 20px 0; }
+        .section-container { background: linear-gradient(135deg, #fff5e6 0%, #ffe6cc 100%); border-left: 4px solid #ff9800; border-radius: 8px; padding: 20px; margin: 22px 0; }
+        .section-header { background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); color: white; padding: 12px 20px; margin: -20px -20px 18px -20px; border-radius: 8px 8px 0 0; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.92em; background: #fff; }
+        thead th { background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%); color: #fff; text-align: left; padding: 12px 14px; }
+        tbody td { padding: 11px 14px; border-bottom: 1px solid #e0e8f0; vertical-align: top; }
+        code { background: #e8f4f8; color: #0d3b66; padding: 2px 7px; border-radius: 3px; border: 1px solid #b8d4e3; font-family: Consolas, monospace; font-size: 0.88em; }
+        pre { background: #e8f4f8; color: #0d3b66; border: 1px solid #b8d4e3; padding: 14px; border-radius: 6px; overflow-x: auto; font-family: Consolas, monospace; font-size: 0.82em; line-height: 1.45; white-space: pre-wrap; margin: 12px 0; }
+        .info-box { background: #d1ecf1; border-left: 4px solid #0c5460; padding: 14px; border-radius: 6px; margin: 16px 0; }
+        .warning-box { background: #fff3cd; border-left: 4px solid #ffc107; padding: 14px; border-radius: 6px; margin: 16px 0; }
+    </style>
+</head>
+<body>
+
+    <h1>Kids Festival — Batch Job PRD</h1>
+    <p class="doc-meta">
+        <strong>Project:</strong> <code>C:\project_workspace\event-site-manager-batch-jobs</code> (Spring Batch, port 8081)<br>
+        <strong>Date:</strong> May 21, 2026 &nbsp;|&nbsp; <strong>Phase:</strong> P4 (optional)<br>
+        <strong>Index:</strong> <a href="generic_prd.html">generic_prd.html</a>
+    </p>
+
+    <div class="warning-box">
+        <p><strong>v1 position:</strong> Batch is <strong>not required</strong> for core Kids Festival registration. Registration is synchronous via backend REST + Next.js Stripe webhook (<a href="frontend_prd.html">frontend_prd.html</a>). Do not block P0–P3 on batch work.</p>
+    </div>
+
+    <div class="lead">
+        <p>When email or bulk notification is needed, follow existing donation / manual-payment batch patterns. Next.js or Spring Boot triggers batch HTTP endpoints; batch project does <strong>not</strong> host Stripe webhooks.</p>
+    </div>
+
+    <h2>1. Reference implementation (reuse patterns)</h2>
+    <table>
+        <thead><tr><th>Existing component</th><th>Path (batch repo)</th><th>Reuse for</th></tr></thead>
+        <tbody>
+            <tr><td><code>BatchJobController</code></td><td><code>com.eventmanager.batch.controller.BatchJobController</code></td><td>New REST trigger endpoints</td></tr>
+            <tr><td><code>BatchJobOrchestrationService</code></td><td><code>...service.BatchJobOrchestrationService</code></td><td>Job launch + status</td></tr>
+            <tr><td><code>EmailService</code></td><td><code>...service.EmailService</code></td><td>Template send</td></tr>
+            <tr><td><code>DonationEmailJobService</code></td><td>donation email jobs</td><td>Confirmation email pattern</td></tr>
+            <tr><td><code>ManualPaymentConfirmationEmailJobService</code></td><td>manual payment emails</td><td>Post-payment notify pattern</td></tr>
+            <tr><td><code>EmailBatchJobConfig</code></td><td>bulk email config</td><td>Results-published blast</td></tr>
+            <tr><td><code>ManualPaymentSummaryJobService</code></td><td>summary reports</td><td>Optional nightly registration summary</td></tr>
+        </tbody>
+    </table>
+
+    <h2>2. Proposed jobs (P4 / optional)</h2>
+    <table>
+        <thead><tr><th>Job</th><th>Trigger</th><th>Payload</th></tr></thead>
+        <tbody>
+            <tr>
+                <td><strong>Registration confirmation email</strong></td>
+                <td>After Stripe webhook confirms registrations (Next.js or boot calls batch)</td>
+                <td><code>eventId</code>, <code>registrationIds[]</code>, <code>parentEmail</code>, <code>templateId</code></td>
+            </tr>
+            <tr>
+                <td><strong>Results published notification</strong></td>
+                <td>Admin publishes results (<code>is_published=true</code>)</td>
+                <td><code>eventId</code>, recipient list or “all confirmed parents”</td>
+            </tr>
+            <tr>
+                <td><strong>Registration summary report</strong></td>
+                <td>Optional cron (nightly)</td>
+                <td><code>eventId</code>, CSV/email to organizers</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>3. API surface (new endpoints — illustrative)</h2>
+    <div class="section-container">
+        <div class="section-header">Follow existing /batch-jobs/api/... conventions</div>
+<pre>POST /batch-jobs/api/batch-jobs/kids-festival-registration-email
+Body: { eventId, registrationIds, tenantId, templateId? }
+
+POST /batch-jobs/api/batch-jobs/kids-festival-results-published-email
+Body: { eventId, tenantId, templateId? }
+
+POST /batch-jobs/api/batch-jobs/kids-festival-registration-summary
+Body: { eventId, tenantId, recipientEmail }</pre>
+    </div>
+
+    <h2>4. Integration flow</h2>
+    <pre>Parent pays (Stripe) → Next.js webhook confirms registrations (sync)
+    → [optional] POST batch kids-festival-registration-email
+    → EmailService sends template
+
+Admin publishes results → Admin UI or boot
+    → [optional] POST batch kids-festival-results-published-email</pre>
+
+    <h2>5. Out of scope (batch v1)</h2>
+    <ul>
+        <li>Capacity waitlist processor</li>
+        <li>Schedule PDF generation</li>
+        <li>Soundtrack upload / judging workflow</li>
+        <li>Stripe webhook handling in batch project</li>
+        <li>Replacing sync registration API</li>
+    </ul>
+
+    <h2>6. Environment &amp; operations</h2>
+    <ul>
+        <li>Batch service base URL configured in Next.js / boot (same as existing donation batch calls)</li>
+        <li>Email templates stored per tenant (align with existing template ID conventions)</li>
+        <li>Idempotent job triggers: safe to retry confirmation email with same <code>registrationIds</code></li>
+    </ul>
+
+    <h2>7. Batch checklist (when P4 starts)</h2>
+    <table>
+        <thead><tr><th>#</th><th>Task</th></tr></thead>
+        <tbody>
+            <tr><td>1</td><td>Clone email job structure from <code>DonationEmailJobService</code></td></tr>
+            <tr><td>2</td><td>Add controller routes in <code>BatchJobController</code></td></tr>
+            <tr><td>3</td><td>Define email templates (registration confirmed, results live)</td></tr>
+            <tr><td>4</td><td>Wire optional call from Stripe webhook or admin publish action</td></tr>
+            <tr><td>5</td><td>Document env vars in batch README</td></tr>
+        </tbody>
+    </table>
+
+</body>
+</html>

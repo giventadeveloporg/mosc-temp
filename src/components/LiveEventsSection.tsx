@@ -57,7 +57,7 @@ const LiveEventsSection: React.FC = () => {
           {filteredEvents.map((liveEvent, index) => (
             <div
               key={liveEvent.event.id}
-              className="bg-white rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300 overflow-hidden h-auto md:h-[200px]"
+              className="homepage-glass-card services-glass-card-face group rounded-2xl shadow-md border border-gray-200/80 hover:shadow-lg transition-all duration-300 overflow-hidden h-auto md:h-[200px]"
             >
               <div className="flex flex-col md:flex-row h-full md:items-stretch">
                 <div className="relative h-48 w-full shrink-0 md:h-full md:w-[70%]">
@@ -80,7 +80,7 @@ const LiveEventsSection: React.FC = () => {
                 </div>
 
                 {/* Right Column - Same height as image (200px); compact content, no scrollbar */}
-                <div className="w-full md:w-[30%] md:h-full min-h-0 flex flex-col bg-gradient-to-br from-slate-50 via-white to-amber-50/30 rounded-b-2xl md:rounded-b-none md:rounded-r-2xl relative">
+                <div className="live-event-details-panel w-full md:w-[30%] md:h-full min-h-0 flex flex-col rounded-b-2xl md:rounded-b-none md:rounded-r-2xl relative">
                   {/* Subtle decorative accent */}
                   <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-amber-100/40 to-transparent rounded-bl-full pointer-events-none" />
 

@@ -12,6 +12,8 @@ import {
   type FeaturedEventWithMedia,
 } from '@/lib/homepage/featuredEvents';
 import { EventStripBannerImage } from '@/components/EventStripBannerImage';
+import { HomeSectionRail } from '@/components/HomeSectionRail';
+import { HomeSectionTitle } from '@/components/HomeSectionTitle';
 
 const MAX_FEATURED_EVENTS = MAX_FEATURED_EVENTS_HOMEPAGE;
 const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes (same as UpcomingEventsSection)
@@ -92,14 +94,11 @@ const FeaturedEventsSection: React.FC<FeaturedEventsSectionProps> = ({
 
   return (
     <section className="featured-events-section py-0 md:py-1 bg-gradient-to-b from-emerald-50/80 via-white to-emerald-50/40">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section header — matches What We Do (ServicesSection) */}
-        <div className="mb-5 mt-4 text-center md:mb-6">
-          <div className="mb-3 flex items-center justify-center gap-2">
-            <div className="h-2 w-5 rounded bg-yellow-400" aria-hidden />
-            <p className="text-sm font-medium tracking-wide text-gray-600">Featured</p>
-          </div>
-          <h2 className="font-heading text-2xl font-bold text-gray-900 md:text-3xl">Featured Events</h2>
+      <HomeSectionRail eyebrow="Featured" containerClassName="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="featured-events-section-header mb-5 mt-4 text-center md:mb-6">
+          <HomeSectionTitle className="featured-events-title font-heading text-2xl font-bold md:text-3xl">
+            Featured Events
+          </HomeSectionTitle>
         </div>
 
         {/* Featured Events Strip - max 3 */}
@@ -107,7 +106,7 @@ const FeaturedEventsSection: React.FC<FeaturedEventsSectionProps> = ({
           {displayedEvents.map((featuredEvent, index) => (
             <div
               key={featuredEvent.event.id}
-              className="featured-event-card group overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-sm transition-all duration-300 hover:border-emerald-200/60 hover:shadow-lg"
+              className="featured-event-card homepage-glass-card services-glass-card-face group overflow-hidden rounded-2xl border border-slate-200/90 shadow-sm transition-all duration-300 hover:border-emerald-200/60 hover:shadow-lg"
             >
               <div className="featured-event-card-inner flex flex-col md:flex-row md:items-stretch">
                 <div className="featured-event-card-media relative w-full shrink-0 md:w-[70%]">
@@ -294,7 +293,7 @@ const FeaturedEventsSection: React.FC<FeaturedEventsSectionProps> = ({
           ))}
         </div>
 
-      </div>
+      </HomeSectionRail>
     </section>
   );
 };

@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { HomeSectionRail } from '@/components/HomeSectionRail';
+import { HomeSectionTitle } from '@/components/HomeSectionTitle';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { EventWithMedia, EventDetailsDTO } from "@/types";
@@ -721,16 +723,12 @@ const UpcomingEventsSection: React.FC = () => {
       <section className="py-24 bg-green-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <div className="flex items-center justify-center space-x-2 mb-4">
-              <div className="w-5 h-2 bg-yellow-400 rounded"></div>
-              <p className="text-gray-600 font-medium">Upcoming Events</p>
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <HomeSectionTitle className="text-3xl md:text-4xl font-bold mb-4">
               Our Upcoming Events
-            </h2>
+            </HomeSectionTitle>
           </div>
           <div className="text-center text-gray-500 py-8">
-            <div className="bg-white rounded-lg shadow-sm p-8 max-w-md mx-auto">
+            <div className="homepage-glass-card services-glass-card-face bg-white rounded-lg p-8 max-w-md mx-auto">
               <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full">
                 <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -751,16 +749,12 @@ const UpcomingEventsSection: React.FC = () => {
       <section className="py-24 bg-green-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <div className="flex items-center justify-center space-x-2 mb-4">
-              <div className="w-5 h-2 bg-yellow-400 rounded"></div>
-              <p className="text-gray-600 font-medium">Upcoming Events</p>
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <HomeSectionTitle className="text-3xl md:text-4xl font-bold mb-4">
               Our Upcoming Events
-            </h2>
+            </HomeSectionTitle>
           </div>
           <div className="text-center text-gray-500 py-8">
-            <div className="bg-white rounded-lg shadow-sm p-8 max-w-md mx-auto">
+            <div className="homepage-glass-card services-glass-card-face bg-white rounded-lg p-8 max-w-md mx-auto">
               <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full">
                 <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -778,17 +772,14 @@ const UpcomingEventsSection: React.FC = () => {
   // Normal render with events
   return (
     <section className="py-16 bg-green-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <HomeSectionRail eyebrow="Events" containerClassName="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <div className="flex items-center justify-center space-x-2 mb-4">
-            <div className="w-5 h-2 bg-yellow-400 rounded"></div>
-            <p className="text-gray-600 font-medium">Events</p>
-          </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            {isUpcomingEvents ? 'Upcoming Events' : 'Recent Events'}
-          </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <HomeSectionTitle
+            className="text-3xl md:text-4xl font-bold mb-4"
+            text={isUpcomingEvents ? 'Upcoming Events' : 'Recent Events'}
+          />
+          <p className="home-section-body-text text-lg text-gray-600 max-w-2xl mx-auto">
             {isUpcomingEvents
               ? 'Join us for our upcoming cultural celebrations and community events (showing up to 6 events)'
               : 'Take a look at our recent events and community gatherings (showing up to 6 events)'
@@ -827,7 +818,7 @@ const UpcomingEventsSection: React.FC = () => {
             <span className="font-semibold text-indigo-700">View All Events</span>
           </Link>
         </div>
-      </div>
+      </HomeSectionRail>
 
       <style jsx>{`
         .line-clamp-1 {

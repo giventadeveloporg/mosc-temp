@@ -4,7 +4,29 @@ This folder contains comparative analysis between KANJ.org (Kerala Association o
 
 ## 📁 Documents in This Folder
 
-### 1. KANJ_vs_OurSite_Analysis.md
+### 1. KGT_Youth_Festival_Kids_Events_PRD.html
+**Product Requirements Document — Kids Festival / Youth Festival (KGT-style)**
+
+- Modeled on [KANJ KGT'26](https://www.kanj.org/kgt-26): parent registration, child profiles, competition catalog, multi-day schedule, published results
+- Additive design: `is_kids_festival` on `event_details` without breaking ticket checkout
+- Database tables, API/proxy routes, Next.js pages, components, phases, and open questions
+
+**Open in browser:** [`KGT_Youth_Festival_Kids_Events_PRD.html`](KGT_Youth_Festival_Kids_Events_PRD.html)
+
+### 2. kids_festival/ — Layer-specific PRDs (split by application)
+**Implementation guides** for database, backend, frontend, and batch jobs (May 2026).
+
+| Document | Layer |
+|----------|-------|
+| [`kids_festival/generic_prd.html`](kids_festival/generic_prd.html) | Index — phases P0–P4, KANJ reference, open questions |
+| [`kids_festival/database_schema_prd.html`](kids_festival/database_schema_prd.html) | PostgreSQL — DDL, DROP order, `sequence_generator` |
+| [`kids_festival/backend_prd.html`](kids_festival/backend_prd.html) | `malayalees-us-site-boot` — JHipster REST, Liquibase |
+| [`kids_festival/frontend_prd.html`](kids_festival/frontend_prd.html) | `mosc-temp-poc-1` — Next.js proxy, routes, Stripe |
+| [`kids_festival/batch_job_prd.html`](kids_festival/batch_job_prd.html) | `event-site-manager-batch-jobs` — optional P4 emails |
+
+**Start here for coding:** [`kids_festival/generic_prd.html`](kids_festival/generic_prd.html) → database → backend → frontend (batch parallel in P4).
+
+### 3. KANJ_vs_OurSite_Analysis.md
 **Comprehensive feature comparison and gap analysis**
 
 - Full KANJ website scraping results
@@ -133,6 +155,8 @@ After implementing recommendations, measure:
 | Date | Version | Author | Changes |
 |------|---------|--------|---------|
 | Oct 22, 2025 | 1.0 | Development Team | Initial analysis and comparison |
+| May 21, 2026 | 1.1 | Development Team | Added KGT Youth Festival Kids Events PRD (HTML) |
+| May 21, 2026 | 1.2 | Development Team | Added `kids_festival/` layer PRDs (database, backend, frontend, batch) |
 
 ## 💬 Feedback
 

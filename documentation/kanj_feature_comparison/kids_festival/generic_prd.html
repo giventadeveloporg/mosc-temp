@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kids Festival — Generic PRD (Index)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 1100px; margin: 0 auto; padding: 20px 20px 48px; background: #fff; }
+        h1 { font-size: 2.1em; border-bottom: 3px solid #0066cc; padding-bottom: 12px; margin-bottom: 8px; }
+        .doc-meta { color: #555; font-size: 0.95em; margin-bottom: 20px; }
+        .doc-meta a { color: #0066cc; font-weight: 600; }
+        h2 { font-size: 1.55em; border-left: 4px solid #0066cc; padding-left: 14px; margin-top: 32px; margin-bottom: 14px; }
+        h3 { font-size: 1.2em; margin-top: 18px; margin-bottom: 10px; }
+        p, li { margin-bottom: 10px; }
+        ul, ol { margin: 10px 0 14px 24px; }
+        a { color: #0066cc; }
+        .lead { background: linear-gradient(135deg, #e8f4f8 0%, #d1e7f0 100%); border-left: 4px solid #0066cc; border-radius: 8px; padding: 18px 20px; margin: 20px 0; }
+        .toc { background: linear-gradient(135deg, #f0f7ff 0%, #e6f2ff 100%); border-left: 4px solid #0066cc; border-radius: 8px; padding: 20px; margin: 24px 0; }
+        .toc h2 { margin-top: 0; border: none; padding: 0; font-size: 1.25em; }
+        .layer-cards { display: grid; grid-template-columns: 1fr; gap: 12px; margin: 20px 0; }
+        @media (min-width: 640px) { .layer-cards { grid-template-columns: 1fr 1fr; } }
+        .layer-card { background: #fff; border: 2px solid #b8d4e3; border-radius: 8px; padding: 16px; }
+        .layer-card h3 { margin-top: 0; color: #0052a3; }
+        .section-container { background: linear-gradient(135deg, #f0f7ff 0%, #e6f2ff 100%); border-left: 4px solid #0066cc; border-radius: 8px; padding: 20px; margin: 22px 0; }
+        .section-header { background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%); color: white; padding: 12px 20px; margin: -20px -20px 18px -20px; border-radius: 8px 8px 0 0; font-weight: bold; }
+        .section-container.usage { background: linear-gradient(135deg, #f0e6ff 0%, #e6ccff 100%); border-left-color: #7b1fa2; }
+        .section-container.usage .section-header { background: linear-gradient(135deg, #7b1fa2 0%, #6a1b9a 100%); }
+        .section-container.parameters { background: linear-gradient(135deg, #fff5e6 0%, #ffe6cc 100%); border-left-color: #ff9800; }
+        .section-container.parameters .section-header { background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); }
+        table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.92em; background: #fff; border-radius: 6px; overflow: hidden; }
+        thead th { background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%); color: #fff; text-align: left; padding: 12px 14px; }
+        tbody td { padding: 11px 14px; border-bottom: 1px solid #e0e8f0; vertical-align: top; }
+        tbody tr:hover { background: #f5faff; }
+        code { background: #e8f4f8; color: #0d3b66; padding: 2px 7px; border-radius: 3px; border: 1px solid #b8d4e3; font-family: Consolas, monospace; font-size: 0.9em; }
+        .info-box { background: #d1ecf1; border-left: 4px solid #0c5460; padding: 14px 16px; border-radius: 6px; margin: 16px 0; }
+        .warning-box { background: #fff3cd; border-left: 4px solid #ffc107; padding: 14px 16px; border-radius: 6px; margin: 16px 0; }
+        .companion { background: #d4edda; border-left: 4px solid #28a745; padding: 14px 18px; border-radius: 8px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+
+    <h1>Kids Festival / Youth Festival — Generic PRD (Index)</h1>
+    <p class="doc-meta">
+        <strong>Version:</strong> 1.0 &nbsp;|&nbsp; <strong>Date:</strong> May 21, 2026 &nbsp;|&nbsp; <strong>Status:</strong> Draft<br>
+        <strong>Master PRD:</strong> <a href="../KGT_Youth_Festival_Kids_Events_PRD.html">KGT_Youth_Festival_Kids_Events_PRD.html</a> (full single-file reference)<br>
+        <strong>Reference:</strong> <a href="https://www.kanj.org/kgt-26" target="_blank" rel="noopener">KANJ KGT'26</a>
+    </p>
+
+    <div class="lead">
+        <p>This index splits the Kids Festival feature into <strong>layer-specific PRDs</strong> for three codebases plus the canonical database schema. Use this page for scope, phases, and stakeholder sign-off; use each layer PRD for implementation.</p>
+        <p><strong>Non-breaking rule:</strong> <code>is_kids_festival = false</code> by default — existing ticket checkout, QR, and admin event flows are unchanged.</p>
+    </div>
+
+    <div class="companion">
+        <p><strong>Layer PRDs (implement in this order):</strong></p>
+        <div class="layer-cards">
+            <div class="layer-card">
+                <h3><a href="database_schema_prd.html">Database schema PRD</a></h3>
+                <p>DDL for <code>Latest_Schema_Post__Blob_Claude_12.sql</code> + migration notes. <strong>P0 first.</strong></p>
+            </div>
+            <div class="layer-card">
+                <h3><a href="backend_prd.html">Backend PRD</a></h3>
+                <p><code>C:\project_workspace\malayalees-us-site-boot</code> — JHipster REST, Liquibase, OpenAPI.</p>
+            </div>
+            <div class="layer-card">
+                <h3><a href="frontend_prd.html">Frontend PRD</a></h3>
+                <p><code>mosc-temp-poc-1</code> — Next.js proxy, pages, Stripe webhook, UI standards.</p>
+            </div>
+            <div class="layer-card">
+                <h3><a href="batch_job_prd.html">Batch job PRD</a></h3>
+                <p><code>event-site-manager-batch-jobs</code> — optional P4 emails (not required for v1 registration).</p>
+            </div>
+        </div>
+    </div>
+
+    <nav class="toc" aria-label="Table of contents">
+        <h2>Contents</h2>
+        <ul>
+            <li><a href="#executive-summary">Executive summary</a></li>
+            <li><a href="#repos">Repositories</a></li>
+            <li><a href="#kanj-reference">KANJ reference (summary)</a></li>
+            <li><a href="#user-roles">User roles</a></li>
+            <li><a href="#functional-overview">Functional overview</a></li>
+            <li><a href="#phases">Implementation phases</a></li>
+            <li><a href="#open-questions">Open questions</a></li>
+            <li><a href="#feature-matrix">KANJ vs our platform</a></li>
+        </ul>
+    </nav>
+
+    <h2 id="executive-summary">Executive summary</h2>
+    <div class="section-container usage">
+        <div class="section-header">Problem and solution</div>
+        <p>Parents need to register <strong>children</strong> for multiple <strong>competitions</strong> under one festival event (KGT-style), pay optional per-event fees, and view <strong>published results</strong>. Today the platform supports adult <strong>ticket</strong> checkout only.</p>
+        <p><strong>Solution:</strong> Optional <code>is_kids_festival</code> on <code>event_details</code> plus parallel <code>kids_*</code> tables, REST APIs, Next.js routes under <code>/events/[id]/kids-festival/</code>, and admin tools — without overloading <code>event_ticket_type</code>.</p>
+    </div>
+
+    <h2 id="repos">Repositories</h2>
+    <table>
+        <thead><tr><th>Layer</th><th>Path</th><th>PRD</th></tr></thead>
+        <tbody>
+            <tr><td>Database (canonical SQL)</td><td><code>code_html_template/SQLS/Current_Sqls/Latest_Schema_Post__Blob_Claude_12.sql</code></td><td><a href="database_schema_prd.html">database_schema_prd.html</a></td></tr>
+            <tr><td>Backend API</td><td><code>C:\project_workspace\malayalees-us-site-boot</code></td><td><a href="backend_prd.html">backend_prd.html</a></td></tr>
+            <tr><td>Frontend (Next.js)</td><td><code>c:\project_workspace\mosc-temp-poc-1</code></td><td><a href="frontend_prd.html">frontend_prd.html</a></td></tr>
+            <tr><td>Batch jobs</td><td><code>C:\project_workspace\event-site-manager-batch-jobs</code></td><td><a href="batch_job_prd.html">batch_job_prd.html</a></td></tr>
+            <tr><td>API contract (frontend copy)</td><td><code>documentation/Swagger_API_Docs/api-docs.json</code></td><td>Regenerate after backend P0</td></tr>
+        </tbody>
+    </table>
+
+    <h2 id="kanj-reference">KANJ reference (summary)</h2>
+    <table>
+        <thead><tr><th>Area</th><th>KANJ pattern</th></tr></thead>
+        <tbody>
+            <tr><td>Festival</td><td>Named festival; multiple days/venues (e.g. KGT'26: Mar 14 + Mar 22)</td></tr>
+            <tr><td>Registration</td><td>Parent Portal; deadline; no walk-ins</td></tr>
+            <tr><td>Categories</td><td>Grades 1–3, 4–6, 7–10, 11+ (Cat 1–4)</td></tr>
+            <tr><td>Fees</td><td>$15 individual; $15/group participant; groups 3–10</td></tr>
+            <tr><td>Results</td><td>Points 5/3/1; champion (group points excluded)</td></tr>
+        </tbody>
+    </table>
+    <p>Detail: <a href="../KGT_Youth_Festival_Kids_Events_PRD.html#kanj-reference">master PRD §2</a></p>
+
+    <h2 id="user-roles">User roles</h2>
+    <table>
+        <thead><tr><th>Role</th><th>Capabilities</th></tr></thead>
+        <tbody>
+            <tr><td><strong>Parent</strong></td><td>Child profiles; register for competitions; pay; view own registrations and published results</td></tr>
+            <tr><td><strong>Admin</strong></td><td>Enable festival; days; competition catalog; registrations; results publish</td></tr>
+            <tr><td><strong>Public</strong></td><td>Hub, schedule, rules, published results (no PII)</td></tr>
+        </tbody>
+    </table>
+
+    <h2 id="functional-overview">Functional overview</h2>
+    <div class="section-container parameters">
+        <div class="section-header">Where to find detail</div>
+        <table>
+            <thead><tr><th>FR area</th><th>Layer PRD</th></tr></thead>
+            <tbody>
+                <tr><td>Event flag, settings, days, competitions</td><td><a href="database_schema_prd.html">Database</a>, <a href="backend_prd.html">Backend</a>, <a href="frontend_prd.html">Frontend</a> admin</td></tr>
+                <tr><td>Child profiles, registration cart, payment</td><td><a href="backend_prd.html">Backend</a> validation, <a href="frontend_prd.html">Frontend</a> wizard + Stripe</td></tr>
+                <tr><td>Results publish, champion</td><td><a href="backend_prd.html">Backend</a>, <a href="frontend_prd.html">Frontend</a> results board</td></tr>
+                <tr><td>Confirmation / bulk emails</td><td><a href="batch_job_prd.html">Batch</a> (P4 optional)</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2 id="phases">Implementation phases</h2>
+    <table>
+        <thead><tr><th>Phase</th><th>Depends on</th><th>Deliverable</th><th>PRDs</th></tr></thead>
+        <tbody>
+            <tr><td><strong>P0</strong></td><td>—</td><td>DDL + Liquibase; entities + REST; sync <code>api-docs.json</code></td><td>Database, Backend</td></tr>
+            <tr><td><strong>P1</strong></td><td>P0</td><td>Admin catalog UI (flag, days, competitions, content)</td><td>Backend, Frontend</td></tr>
+            <tr><td><strong>P2</strong></td><td>P1</td><td>Parent registration + Stripe webhook</td><td>Backend, Frontend</td></tr>
+            <tr><td><strong>P3</strong></td><td>P2</td><td>Results entry + public publish</td><td>Backend, Frontend</td></tr>
+            <tr><td><strong>P4</strong></td><td>P3</td><td>Emails, CSV export, waitlist</td><td>Batch (optional)</td></tr>
+        </tbody>
+    </table>
+
+    <h2 id="open-questions">Open questions (stakeholder sign-off)</h2>
+    <div class="warning-box">
+        <ol>
+            <li>Per-competition fee only vs single festival pass?</li>
+            <li>Stripe required at launch vs admin confirm / $0 only?</li>
+            <li>Fixed four grade categories vs tenant-configurable?</li>
+            <li>Group billing: one leader pays vs split fees?</li>
+            <li>Public results: full name vs initials vs codes?</li>
+            <li>Enforce eligibility in software vs display-only?</li>
+            <li>Allow ticket sales when <code>is_kids_festival=true</code> (<code>allow_ticket_sales</code>)?</li>
+        </ol>
+    </div>
+
+    <h2 id="feature-matrix">KANJ vs our platform</h2>
+    <table>
+        <thead><tr><th>KANJ</th><th>Our implementation</th><th>Status</th></tr></thead>
+        <tbody>
+            <tr><td>Parent Portal</td><td>Clerk + child profiles</td><td>Exists (auth); new (kids)</td></tr>
+            <tr><td>Multi-day / venue</td><td><code>kids_festival_day</code></td><td>New</td></tr>
+            <tr><td>Competition catalog</td><td><code>kids_competition</code></td><td>New</td></tr>
+            <tr><td>Published results</td><td><code>kids_competition_result</code></td><td>New</td></tr>
+            <tr><td>Adult tickets</td><td>Unchanged when flag off</td><td>Exists</td></tr>
+        </tbody>
+    </table>
+
+    <div class="info-box">
+        <strong>Related:</strong> <a href="../KANJ_vs_OurSite_Comparison.html">KANJ vs Our Site</a> ·
+        <a href="../../event_sports_arts_competition/Event_Sports_Arts_Competition_Results_Feature_Requirements.html">Sports/Arts Results</a> (orthogonal)
+    </div>
+
+</body>
+</html>
