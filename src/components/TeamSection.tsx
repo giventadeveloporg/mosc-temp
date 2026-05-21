@@ -267,15 +267,13 @@ const TeamSection: React.FC = () => {
         </Modal>
 
         {/* Section Header */}
-        <div className="mb-20 flex flex-col lg:flex-row justify-between items-start lg:items-end space-y-6 lg:space-y-0">
-          <div className="max-w-2xl">
-<HomeSectionTitle className="text-4xl md:text-5xl lg:text-6xl font-light leading-tight tracking-tight">
-              Meet our amazing team
-            </HomeSectionTitle>
-            <p className="home-section-body-text text-lg text-gray-600 mt-4 leading-relaxed">
-              Dedicated professionals working together to make a positive impact in our communities.
-            </p>
-          </div>
+        <div className="mb-20 text-center">
+          <HomeSectionTitle className="text-4xl md:text-5xl lg:text-6xl font-light leading-tight tracking-tight">
+            Meet our amazing team
+          </HomeSectionTitle>
+          <p className="home-section-body-text text-lg text-gray-600 mt-4 leading-relaxed max-w-2xl mx-auto">
+            Dedicated professionals working together to make a positive impact in our communities.
+          </p>
         </div>
 
         {/* Dynamic Team Grid by priority: 3 cards per row */}

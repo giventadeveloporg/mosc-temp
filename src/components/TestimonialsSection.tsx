@@ -8,14 +8,14 @@ const TestimonialsSection: React.FC = () => {
   return (
     <div className="py-24 bg-green-50">
       <HomeSectionRail eyebrow="Testimonials" containerClassName="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-16 text-center">
+          <HomeSectionTitle className="text-4xl md:text-6xl font-normal leading-tight tracking-tight max-w-2xl mx-auto">
+            What people say about our charity company
+          </HomeSectionTitle>
+        </div>
+
         <div className="flex flex-col lg:flex-row space-y-8 lg:space-y-0 lg:space-x-16 items-center">
           <div className="flex-1">
-            <div className="mb-16">
-<HomeSectionTitle className="text-4xl md:text-6xl font-normal leading-tight tracking-tight max-w-2xl">
-                What people say about our charity company
-              </HomeSectionTitle>
-            </div>
-
             <div className="testimonials-glass-card services-glass-card-face group relative rounded-3xl p-8 md:p-12">
               <div
                 className="services-glass-card-shine pointer-events-none absolute inset-0 overflow-hidden rounded-3xl"

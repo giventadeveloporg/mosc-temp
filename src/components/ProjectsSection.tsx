@@ -41,8 +41,8 @@ const ProjectsSection: React.FC = () => {
 
       <HomeSectionRail eyebrow="Projects" containerClassName="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
-        <div className="mb-16">
-<HomeSectionTitle className="text-4xl md:text-6xl font-normal leading-tight tracking-tight max-w-4xl">
+        <div className="mb-16 text-center">
+          <HomeSectionTitle className="text-4xl md:text-6xl font-normal leading-tight tracking-tight max-w-4xl mx-auto">
             Our latest projects around the world
           </HomeSectionTitle>
         </div>
