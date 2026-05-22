@@ -266,6 +266,11 @@
             <strong>⚠️ Important:</strong> This document contains requirements only. <strong>Do NOT implement</strong> until explicitly requested. Focus on understanding the requirements and creating a comprehensive implementation plan.
         </div>
 
+        <div class="info">
+            <strong>Related — Event Competitions (multi-competition festivals):</strong> For events with a <strong>catalog of many competitions</strong> (youth parent/child, adult self-register, mixed), registrations, and published winners with photos, use the unified <strong>Event Competitions</strong> model (<code>is_competition_event</code>, <code>event_competition_*</code> tables). See <a href="../kanj_feature_comparison/Event_Competitions_PRD.html">Event_Competitions_PRD.html</a> and <a href="../kanj_feature_comparison/event_competitions/generic_prd.html">event_competitions/generic_prd.html</a>.<br><br>
+            <strong>When to use which:</strong> <code>is_sports_event</code> + this doc → team scorecards / single-event sports or arts result rows. <code>is_competition_event</code> → festival-style multi-competition programs (e.g. KANJ KGT as YOUTH preset). Do not duplicate both for the same event without an explicit product decision.
+        </div>
+
         <h2>1. Current State Analysis</h2>
 
         <div class="analysis">
