@@ -108,6 +108,8 @@ export interface EventDetailsDTO {
   isRegistrationRequired?: boolean;
   /** Is sports event */
   isSportsEvent?: boolean;
+  /** Is competition event (Kanj-style competitions) */
+  isCompetitionEvent?: boolean;
   /** Is event live */
   isLive?: boolean;
   /** Is featured event */
@@ -680,6 +682,8 @@ export interface TenantSettingsDTO {
   customJs?: string;
   showEventsSectionInHomePage?: boolean;
   showTeamMembersSectionInHomePage?: boolean;
+  /** When true, homepage shows executive committee TeamSection (migrated from legacy team flag). */
+  showExecutiveCommitteeSectionInHomePage?: boolean;
   showSponsorsSectionInHomePage?: boolean;
   isMembershipSubscriptionEnabled?: boolean;
   homepageCacheVersion?: number;
@@ -1651,4 +1655,144 @@ export interface ManualPaymentSummaryReportDTO {
   requestCount: number;
   createdAt?: string;
   updatedAt?: string;
+}
+
+// --- Event Competitions ---
+
+export type CompetitionAudienceMode = 'YOUTH' | 'ADULT' | 'MIXED';
+export type CompetitionRegistrationMode = 'PARENT_CHILD' | 'SELF' | 'TEAM_CAPTAIN' | 'MIXED';
+export type CompetitionResultsDisplayMode = 'FULL_NAME' | 'INITIALS' | 'ANONYMOUS';
+export type CompetitionType = 'INDIVIDUAL' | 'GROUP';
+export type CompetitionEligibleAudience = 'YOUTH_ONLY' | 'ADULT_ONLY' | 'ALL';
+export type CompetitionParticipantType = 'CHILD' | 'ADULT' | 'TEAM_MEMBER';
+export type CompetitionRegistrationStatus = 'PENDING_PAYMENT' | 'CONFIRMED' | 'CANCELLED' | 'REFUNDED';
+
+export interface EventCompetitionSettingsDTO {
+  id?: number | null;
+  tenantId?: string;
+  audienceMode: CompetitionAudienceMode;
+  registrationMode: CompetitionRegistrationMode;
+  registrationDeadline?: string | null;
+  registrationOpen: boolean;
+  allowTicketSales: boolean;
+  pointsFirst: number;
+  pointsSecond: number;
+  pointsThird: number;
+  championEnabled: boolean;
+  championExcludeGroupPoints: boolean;
+  championMaxCategory?: number | null;
+  resultsDisplayMode?: CompetitionResultsDisplayMode | null;
+  eligibilityText?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  event?: EventDetailsDTO;
+}
+
+export interface EventCompetitionDayDTO {
+  id?: number | null;
+  tenantId?: string;
+  dayLabel: string;
+  eventDate: string;
+  venueName: string;
+  venueAddress?: string | null;
+  sortOrder: number;
+  notes?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  event?: EventDetailsDTO;
+}
+
+export interface EventCompetitionDTO {
+  id?: number | null;
+  tenantId?: string;
+  name: string;
+  description?: string | null;
+  competitionType: CompetitionType;
+  eligibleAudience: CompetitionEligibleAudience;
+  categoryCode?: string | null;
+  divisionLabel?: string | null;
+  track?: string | null;
+  feeAmount: number;
+  maxParticipants?: number | null;
+  minGroupSize?: number | null;
+  maxGroupSize?: number | null;
+  timeLimitMinutes?: number | null;
+  requiresSoundtrack: boolean;
+  judgmentCriteriaJson?: string | null;
+  displayOrder: number;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  event?: EventDetailsDTO;
+  competitionDay?: EventCompetitionDayDTO;
+}
+
+export interface EventCompetitionParticipantDTO {
+  id?: number | null;
+  tenantId?: string;
+  participantType: CompetitionParticipantType;
+  clerkUserId: string;
+  firstName: string;
+  lastName: string;
+  displayName?: string | null;
+  dateOfBirth?: string | null;
+  currentGrade?: number | null;
+  schoolName?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  userProfile?: UserProfileDTO;
+  guardianUserProfile?: UserProfileDTO;
+}
+
+export interface EventCompetitionRegistrationDTO {
+  id?: number | null;
+  tenantId?: string;
+  registrationStatus: CompetitionRegistrationStatus;
+  feeAmount: number;
+  effectiveCategory?: string | null;
+  stripePaymentIntentId?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  event?: EventDetailsDTO;
+  competition?: EventCompetitionDTO;
+  participantProfile?: EventCompetitionParticipantDTO;
+  groupLeaderRegistration?: EventCompetitionRegistrationDTO | null;
+  registeredByUserProfile?: UserProfileDTO;
+}
+
+export interface EventCompetitionResultDTO {
+  id?: number | null;
+  tenantId?: string;
+  displayName: string;
+  placement?: number | null;
+  placementLabel?: string | null;
+  prizeTitle?: string | null;
+  prizeDetails?: string | null;
+  pointsAwarded: number;
+  winnerPhotoUrl?: string | null;
+  notes?: string | null;
+  isPublished: boolean;
+  publishedAt?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  event?: EventDetailsDTO;
+  competition?: EventCompetitionDTO;
+  participantProfile?: EventCompetitionParticipantDTO;
+  registration?: EventCompetitionRegistrationDTO;
+  winnerMedia?: EventMediaDTO;
+}
+
+export interface EventCompetitionContentBlockDTO {
+  id?: number | null;
+  tenantId?: string;
+  blockType: string;
+  title?: string | null;
+  bodyMarkdown: string;
+  sortOrder: number;
+  createdAt?: string;
+  updatedAt?: string;
+  event?: EventDetailsDTO;
 }

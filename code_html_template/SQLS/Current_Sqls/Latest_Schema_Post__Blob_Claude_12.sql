@@ -211,6 +211,9 @@ DROP TABLE IF EXISTS public.discount_code CASCADE;
 DROP TABLE IF EXISTS public.communication_campaign CASCADE;
 DROP TABLE IF EXISTS public.email_log CASCADE;
 DROP TABLE IF EXISTS public.whatsapp_log CASCADE;
+-- Squad roster (drop child before parent; references user_profile and tenant_organization)
+DROP TABLE IF EXISTS public.team_members CASCADE;
+DROP TABLE IF EXISTS public.team_groups CASCADE;
 DROP TABLE IF EXISTS public.executive_committee_team_members CASCADE;
 DROP TABLE IF EXISTS public.event_focus_groups CASCADE;
 DROP TABLE IF EXISTS public.focus_group_members CASCADE;
@@ -2317,6 +2320,7 @@ CREATE TABLE public.tenant_settings (
                                         tenant_organization_id bigint,
                                         allow_user_registration boolean DEFAULT true,
                                         show_events_section_in_home_page boolean DEFAULT false,
+                                        show_executive_committee_section_in_home_page boolean DEFAULT false,
                                         show_team_members_section_in_home_page boolean DEFAULT false,
                                         show_sponsors_section_in_home_page boolean DEFAULT false,
                                         is_membership_subscription_enabled boolean DEFAULT false,
@@ -2387,6 +2391,8 @@ COMMENT ON COLUMN public.tenant_settings.twitter_url IS 'Organization X (Twitter
 COMMENT ON COLUMN public.tenant_settings.linkedin_url IS 'Organization LinkedIn profile or company page URL for Follow our journey section';
 COMMENT ON COLUMN public.tenant_settings.youtube_url IS 'Organization YouTube channel URL for Follow our journey section';
 COMMENT ON COLUMN public.tenant_settings.tiktok_url IS 'Organization TikTok profile URL for Follow our journey section';
+COMMENT ON COLUMN public.tenant_settings.show_executive_committee_section_in_home_page IS 'When true, homepage shows executive committee TeamSection';
+COMMENT ON COLUMN public.tenant_settings.show_team_members_section_in_home_page IS 'When true, homepage shows squad roster SquadRosterSection';
 
 --
 -- TOC entry (class 1259 OID)
@@ -2583,6 +2589,89 @@ COMMENT ON COLUMN public.executive_committee_team_members.tenant_id IS 'Foreign 
 COMMENT ON COLUMN public.executive_committee_team_members.expertise IS 'JSON array of skills and expertise areas';
 COMMENT ON COLUMN public.executive_committee_team_members.is_active IS 'Whether the team member is currently active';
 
+
+-- Create team_groups table (sports squad / music band roster metadata)
+CREATE TABLE public.team_groups (
+    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    tenant_id character varying(255) NOT NULL,
+    team_type character varying(32) NOT NULL,
+    name character varying(255) NOT NULL,
+    slug character varying(100),
+    section_label character varying(64),
+    headline character varying(255),
+    description character varying(2048),
+    cta_label character varying(128),
+    cta_href character varying(500),
+    display_order integer,
+    is_active boolean DEFAULT true,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT team_groups_pkey PRIMARY KEY (id),
+    CONSTRAINT chk_team_groups__team_type CHECK (team_type IN ('SPORTS', 'MUSIC', 'OTHER')),
+    CONSTRAINT fk_team_groups__tenant_id FOREIGN KEY (tenant_id) REFERENCES public.tenant_organization(tenant_id) ON DELETE CASCADE
+);
+
+CREATE UNIQUE INDEX ux_team_groups__tenant_slug ON public.team_groups (tenant_id, slug) WHERE slug IS NOT NULL;
+CREATE INDEX idx_team_groups_tenant_id ON public.team_groups(tenant_id);
+CREATE INDEX idx_team_groups_tenant_active ON public.team_groups(tenant_id, is_active);
+
+COMMENT ON TABLE public.team_groups IS 'Tenant-scoped squad or band roster groups for public carousel display';
+
+-- Create team_members table (roster members; optional user_profile link)
+CREATE TABLE public.team_members (
+    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    tenant_id character varying(255) NOT NULL,
+    team_group_id bigint NOT NULL,
+    user_profile_id bigint,
+    first_name character varying(255) NOT NULL,
+    last_name character varying(255) NOT NULL,
+    title character varying(255) NOT NULL,
+    designation character varying(255),
+    bio character varying(2048),
+    email character varying(255),
+    priority_order integer,
+    profile_image_url character varying(500),
+    expertise character varying(500),
+    image_background character varying(255),
+    image_style character varying(100),
+    department character varying(100),
+    join_date date,
+    is_active boolean DEFAULT true,
+    linkedin_url character varying(500),
+    twitter_url character varying(500),
+    website_url character varying(500),
+    jersey_number integer,
+    position character varying(128),
+    lineup_subtitle character varying(128),
+    instrument character varying(128),
+    vocal_role character varying(128),
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT team_members_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_team_members__tenant_id FOREIGN KEY (tenant_id) REFERENCES public.tenant_organization(tenant_id) ON DELETE CASCADE,
+    CONSTRAINT fk_team_members__team_group_id FOREIGN KEY (team_group_id) REFERENCES public.team_groups(id) ON DELETE CASCADE,
+    CONSTRAINT fk_team_members__user_profile_id FOREIGN KEY (user_profile_id) REFERENCES public.user_profile(id) ON DELETE SET NULL
+);
+
+CREATE INDEX idx_team_members_team_group_id ON public.team_members(team_group_id);
+CREATE INDEX idx_team_members_tenant_id ON public.team_members(tenant_id);
+CREATE INDEX idx_team_members_user_profile_id ON public.team_members(user_profile_id);
+CREATE INDEX idx_team_members_is_active ON public.team_members(is_active);
+CREATE INDEX idx_team_members_priority_order ON public.team_members(priority_order);
+
+COMMENT ON TABLE public.team_members IS 'Sports squad or music band members belonging to a team_group';
+COMMENT ON COLUMN public.team_members.expertise IS 'JSON array of skills and expertise areas';
+COMMENT ON COLUMN public.team_members.user_profile_id IS 'Optional link to platform user_profile for prefilled identity';
+
+CREATE TRIGGER trg_team_groups_updated_at
+    BEFORE UPDATE ON public.team_groups
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER trg_team_members_updated_at
+    BEFORE UPDATE ON public.team_members
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
 
 -- TOC entry 3363 (class 2604 OID 82769)
 -- Name: discount_code id; Type: DEFAULT; Schema: public; Owner: giventa_event_management
@@ -5647,6 +5736,8 @@ SELECT pg_catalog.setval(
                    COALESCE((SELECT MAX(id) FROM public.user_subscription), 0),
                    COALESCE((SELECT MAX(id) FROM public.user_task), 0),
                    COALESCE((SELECT MAX(id) FROM public.executive_committee_team_members), 0),
+                   COALESCE((SELECT MAX(id) FROM public.team_groups), 0),
+                   COALESCE((SELECT MAX(id) FROM public.team_members), 0),
                    COALESCE((SELECT MAX(id) FROM public.communication_campaign), 0),
                    COALESCE((SELECT MAX(id) FROM public.email_log), 0),
                    COALESCE((SELECT MAX(id) FROM public.whatsapp_log), 0),

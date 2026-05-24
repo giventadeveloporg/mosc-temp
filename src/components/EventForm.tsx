@@ -43,6 +43,7 @@ export const defaultEvent: EventDetailsDTO = {
   enableGuestPricing: false,
   isRegistrationRequired: false,
   isSportsEvent: false,
+  isCompetitionEvent: false,
   isLive: false,
   isFeaturedEvent: false,
   featuredEventPriorityRanking: 0,
@@ -1011,6 +1012,7 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
       enableGuestPricing: !!form.enableGuestPricing,
       isRegistrationRequired: !!form.isRegistrationRequired,
       isSportsEvent: !!form.isSportsEvent,
+      isCompetitionEvent: !!form.isCompetitionEvent,
       isLive: !!form.isLive,
       isFeaturedEvent: !!form.isFeaturedEvent,
       featuredEventPriorityRanking: Number(form.featuredEventPriorityRanking) || 0,
@@ -1407,6 +1409,7 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
           { name: 'enableGuestPricing', label: 'Enable Guest Pricing', checked: form.enableGuestPricing ?? false },
           { name: 'isRegistrationRequired', label: 'Registration Required', checked: form.isRegistrationRequired ?? false },
           { name: 'isSportsEvent', label: 'Sports Event', checked: form.isSportsEvent ?? false },
+          { name: 'isCompetitionEvent', label: 'Competition Event', checked: form.isCompetitionEvent ?? false },
           { name: 'isLive', label: 'Live Event', checked: form.isLive ?? false },
           { name: 'isFeaturedEvent', label: 'Featured Event', checked: form.isFeaturedEvent ?? false },
         ].map(({ name, label, checked }) => (
@@ -1433,6 +1436,21 @@ export function EventForm({ event, eventTypes, onSubmit, loading, onCancel }: Ev
           </div>
         ))}
       </div>
+
+      {form.isCompetitionEvent && form.id && (
+        <div className="p-4 bg-rose-50 border border-rose-200 rounded-lg">
+          <p className="text-sm text-rose-800 mb-2">
+            Competition mode is enabled. Configure settings, schedule, and catalog in the admin competitions section.
+          </p>
+          <button
+            type="button"
+            onClick={() => router.push(`/admin/events/${form.id}/competitions/settings`)}
+            className="text-sm font-semibold text-rose-700 hover:text-rose-900 underline"
+          >
+            Open competition admin →
+          </button>
+        </div>
+      )}
 
       {/* Payment Configuration Section */}
       <div className="border-t border-gray-200 pt-6 mt-6 bg-gradient-to-br from-green-50 via-teal-50 to-blue-50 rounded-lg p-6">

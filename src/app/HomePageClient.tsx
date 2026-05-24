@@ -12,6 +12,7 @@ import AboutSection from '../components/AboutSection';
 import UpcomingEventsSection from '../components/UpcomingEventsSection';
 import CausesSection from '../components/CausesSection';
 import TeamSection from '../components/TeamSection';
+import SquadRosterSection from '../components/squad/SquadRosterSection';
 import OurSponsorsSection from '../components/OurSponsorsSection';
 import ProjectsSection from '../components/ProjectsSection';
 import TestimonialsSection from '../components/TestimonialsSection';
@@ -73,7 +74,15 @@ const TeamFallback = () => (
 
 // Main content component that uses tenant settings
 function HomePageContent({ initialFeaturedEvents }: { initialFeaturedEvents: FeaturedEventWithMedia[] }) {
-  const { showEventsSection, showTeamSection, showSponsorsSection, loading, settings } = useTenantSettings();
+  const {
+    showEventsSection,
+    showSquadSection,
+    showExecutiveCommitteeSection,
+    showTeamSection,
+    showSponsorsSection,
+    loading,
+    settings,
+  } = useTenantSettings();
   const hasAnySocial = settings?.facebookUrl?.trim() || settings?.instagramUrl?.trim() || settings?.twitterUrl?.trim() || settings?.linkedinUrl?.trim() || settings?.youtubeUrl?.trim() || settings?.tiktokUrl?.trim();
 
   // Handle hash navigation on page load and hash changes
@@ -301,7 +310,14 @@ function HomePageContent({ initialFeaturedEvents }: { initialFeaturedEvents: Fea
               <UpcomingEventsSection />
             </ErrorBoundary>
           )}
-          {showTeamSection && (
+          {showSquadSection && (
+            <ErrorBoundary fallback={<div className="py-8 text-center text-gray-500">Squad roster unavailable</div>}>
+              <div id="squad-section">
+                <SquadRosterSection />
+              </div>
+            </ErrorBoundary>
+          )}
+          {showExecutiveCommitteeSection && (
             <ErrorBoundary fallback={<TeamFallback />}>
               <TeamSection />
             </ErrorBoundary>

@@ -77,6 +77,13 @@ const isPublicRouteClerk = createRouteMatcher([
 export default clerkMiddleware(
   async (auth, req: NextRequest) => {
     const pathname = req.nextUrl.pathname;
+    const needsCompetitionAuth = /^\/events\/[^/]+\/competitions\/(register|my-registrations)(\/|$)/.test(
+      pathname
+    );
+    if (needsCompetitionAuth) {
+      await auth.protect();
+    }
+
     const isApiRoute = pathname.startsWith('/api/');
     const isApiProxy = pathname.startsWith('/api/proxy');
     const isDiagnostic = pathname.startsWith('/api/diagnostic');
