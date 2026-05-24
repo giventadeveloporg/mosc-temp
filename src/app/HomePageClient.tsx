@@ -12,6 +12,7 @@ import AboutSection from '../components/AboutSection';
 import UpcomingEventsSection from '../components/UpcomingEventsSection';
 import CausesSection from '../components/CausesSection';
 import TeamSection from '../components/TeamSection';
+import SquadRosterSection from '../components/squad/SquadRosterSection';
 import OurSponsorsSection from '../components/OurSponsorsSection';
 import ProjectsSection from '../components/ProjectsSection';
 import TestimonialsSection from '../components/TestimonialsSection';
@@ -20,22 +21,21 @@ import { useTenantSettings } from '@/components/TenantSettingsProvider';
 import { bootstrapUserProfile } from '@/components/ProfileBootstrapperApiServerActions';
 import Link from 'next/link';
 import type { FeaturedEventWithMedia } from '@/lib/homepage/featuredEvents';
+import HomeParticleBackground from '../components/HomeParticleBackground';
+import { HomeSectionRail } from '@/components/HomeSectionRail';
+import { HomeSectionTitle } from '@/components/HomeSectionTitle';
 
 // Fallback components for when data is not available
 const EventsFallback = () => (
   <section className="py-24 bg-green-50">
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <HomeSectionRail eyebrow="Events" containerClassName="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="text-center mb-12">
-        <div className="flex items-center justify-center space-x-2 mb-4">
-          <div className="w-5 h-2 bg-yellow-400 rounded"></div>
-          <p className="text-gray-600 font-medium">Upcoming Events</p>
-        </div>
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        <HomeSectionTitle className="text-3xl md:text-4xl font-bold mb-4">
           Our Upcoming Events
-        </h2>
+        </HomeSectionTitle>
       </div>
       <div className="text-center text-gray-500 py-8">
-        <div className="bg-white rounded-lg shadow-sm p-8 max-w-md mx-auto">
+        <div className="homepage-glass-card services-glass-card-face bg-white rounded-lg p-8 max-w-md mx-auto">
           <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full">
             <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -45,24 +45,20 @@ const EventsFallback = () => (
           <p className="text-gray-500">We're currently updating our upcoming events information. Please check back later.</p>
         </div>
       </div>
-    </div>
+    </HomeSectionRail>
   </section>
 );
 
 const TeamFallback = () => (
   <section id="team-section" className="py-24 bg-green-50">
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <HomeSectionRail eyebrow="Our team" containerClassName="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="text-center mb-12">
-        <div className="flex items-center justify-center space-x-2 mb-4">
-          <div className="w-5 h-2 bg-yellow-400 rounded"></div>
-          <p className="text-gray-600 font-medium">Our Team</p>
-        </div>
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        <HomeSectionTitle className="text-3xl md:text-4xl font-bold mb-4">
           Meet Our Team
-        </h2>
+        </HomeSectionTitle>
       </div>
       <div className="text-center text-gray-500 py-8">
-        <div className="bg-white rounded-lg shadow-sm p-8 max-w-md mx-auto">
+        <div className="homepage-glass-card services-glass-card-face bg-white rounded-lg p-8 max-w-md mx-auto">
           <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full">
             <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -72,13 +68,21 @@ const TeamFallback = () => (
           <p className="text-gray-500">We're currently updating our team members information. Please check back later.</p>
         </div>
       </div>
-    </div>
+    </HomeSectionRail>
   </section>
 );
 
 // Main content component that uses tenant settings
 function HomePageContent({ initialFeaturedEvents }: { initialFeaturedEvents: FeaturedEventWithMedia[] }) {
-  const { showEventsSection, showTeamSection, showSponsorsSection, loading, settings } = useTenantSettings();
+  const {
+    showEventsSection,
+    showSquadSection,
+    showExecutiveCommitteeSection,
+    showTeamSection,
+    showSponsorsSection,
+    loading,
+    settings,
+  } = useTenantSettings();
   const hasAnySocial = settings?.facebookUrl?.trim() || settings?.instagramUrl?.trim() || settings?.twitterUrl?.trim() || settings?.linkedinUrl?.trim() || settings?.youtubeUrl?.trim() || settings?.tiktokUrl?.trim();
 
   // Handle hash navigation on page load and hash changes
@@ -98,7 +102,7 @@ function HomePageContent({ initialFeaturedEvents }: { initialFeaturedEvents: Fea
         const maxWaitTime = 15000; // 15 seconds max wait (increased for team section)
         const pollInterval = 100; // Check every 100ms
         const startTime = Date.now();
-        const headerHeight = 80;
+        const headerHeight = 128;
 
         const waitForElementAndScroll = () => {
           const element = document.getElementById(targetId);
@@ -260,7 +264,9 @@ function HomePageContent({ initialFeaturedEvents }: { initialFeaturedEvents: Fea
   }, []);
 
   return (
-    <main className="w-full min-h-screen bg-green-50">
+    <>
+      <HomeParticleBackground />
+      <main className="home-page-layout relative z-[1] w-full min-h-screen">
       {/* Fills first screen so header + hero occupy full viewport (no green gap below hero) */}
       <div className="home-hero-viewport-filler">
         <HeroSection />
@@ -304,7 +310,14 @@ function HomePageContent({ initialFeaturedEvents }: { initialFeaturedEvents: Fea
               <UpcomingEventsSection />
             </ErrorBoundary>
           )}
-          {showTeamSection && (
+          {showSquadSection && (
+            <ErrorBoundary fallback={<div className="py-8 text-center text-gray-500">Squad roster unavailable</div>}>
+              <div id="squad-section">
+                <SquadRosterSection />
+              </div>
+            </ErrorBoundary>
+          )}
+          {showExecutiveCommitteeSection && (
             <ErrorBoundary fallback={<TeamFallback />}>
               <TeamSection />
             </ErrorBoundary>
@@ -322,27 +335,22 @@ function HomePageContent({ initialFeaturedEvents }: { initialFeaturedEvents: Fea
       )}
       {/* Contact Section - Updated to match "What We Do" styling */}
       <div id="contact" className="py-24 bg-green-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Section Header - Matching "What We Do" style */}
+        <HomeSectionRail eyebrow="Contact" containerClassName="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-16">
-            <div className="flex items-center space-x-2 mb-6">
-              <div className="w-5 h-2 bg-yellow-400 rounded"></div>
-              <p className="text-gray-600">Contact</p>
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 text-center">
+            <HomeSectionTitle className="text-3xl md:text-4xl font-bold mb-4 text-center">
               Get in Touch
-            </h2>
+            </HomeSectionTitle>
           </div>
 
           {/* Contact Description */}
-          <p className="contact-description text-center max-w-2xl mx-auto mb-16 text-gray-600 text-lg">
+          <p className="contact-description home-section-body-text text-center max-w-2xl mx-auto mb-16 text-gray-600 text-lg">
             Connect with us to learn more about our community initiatives and how you can get involved in preserving and promoting Malayali culture across the United States. Join us in fostering cultural exchange and building stronger connections within our diverse communities.
           </p>
 
           {/* Contact Cards Grid - Matching "What We Do" card style */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
             {/* Location Card */}
-            <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-lg transition-all duration-300 ease-in-out group">
+            <div className="homepage-glass-card services-glass-card-face bg-white rounded-2xl p-8 group">
               <div className="flex items-start space-x-6">
                 <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                   <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -363,7 +371,7 @@ function HomePageContent({ initialFeaturedEvents }: { initialFeaturedEvents: Fea
             </div>
 
             {/* Phone Card */}
-            <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-lg transition-all duration-300 ease-in-out group">
+            <div className="homepage-glass-card services-glass-card-face bg-white rounded-2xl p-8 group">
               <div className="flex items-start space-x-6">
                 <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                   <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -384,7 +392,7 @@ function HomePageContent({ initialFeaturedEvents }: { initialFeaturedEvents: Fea
             </div>
 
             {/* Email Card */}
-            <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-lg transition-all duration-300 ease-in-out group">
+            <div className="homepage-glass-card services-glass-card-face bg-white rounded-2xl p-8 group">
               <div className="flex items-start space-x-6">
                 <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                   <svg className="w-8 h-8 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -406,7 +414,7 @@ function HomePageContent({ initialFeaturedEvents }: { initialFeaturedEvents: Fea
 
             {/* Social Media Card - icons only when tenant settings URLs are set */}
             {hasAnySocial && (
-              <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-lg transition-all duration-300 ease-in-out group">
+              <div className="homepage-glass-card services-glass-card-face bg-white rounded-2xl p-8 group">
                 <div className="flex items-start space-x-6">
                   <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                     <svg className="w-8 h-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -464,9 +472,10 @@ function HomePageContent({ initialFeaturedEvents }: { initialFeaturedEvents: Fea
               <span>Ready to connect? Reach out and join our vibrant community</span>
             </div>
           </div>
-        </div>
+        </HomeSectionRail>
       </div>
     </main>
+    </>
   );
 }
 
@@ -481,6 +490,14 @@ export default function HomePageClient({
   const { isSignedIn, userId, isLoaded } = useAuth();
   const { user } = useUser();
   const [hasCheckedRedirect, setHasCheckedRedirect] = useState(false);
+
+  // Homepage-only typography (eyebrows, section titles) — not a background image
+  useEffect(() => {
+    document.body.classList.add('home-page-background');
+    return () => {
+      document.body.classList.remove('home-page-background');
+    };
+  }, []);
 
   // CRITICAL: Redirect new sign-ups from home page to /profile
   // This catches cases where Clerk redirects to home page after signup

@@ -943,7 +943,7 @@ const HeroSection: React.FC = () => {
         <div className="hero-right-wrap">
           <div className="hero-right-panel">
             <div className="hero-slideshow-neon-frame">
-              <div className="hero-slideshow-wrapper">
+              <div className="hero-slideshow-wrapper hero-image-tilt-panel">
                 <DynamicHeroImage onEventChange={setCurrentEvent} />
               </div>
               <div className="hero-slideshow-particles" aria-hidden />
@@ -979,13 +979,13 @@ const HeroSection: React.FC = () => {
             title="About our mission"
             aria-label="Our mission — about us"
           >
-            <span className="hero-left-cta-thumb relative block w-14 h-14 sm:w-16 sm:h-16 shrink-0 rounded-lg overflow-hidden ring-1 ring-cyan-500/40">
+            <span className="hero-left-cta-thumb relative block h-12 w-[15rem] sm:h-14 sm:w-[17.5rem] shrink-0 rounded-lg overflow-hidden bg-white ring-1 ring-cyan-500/40">
               <Image
-                src="/images/logos/Malayalees_US/Branding-image.jpg"
-                alt=""
+                src="/images/logos/Malayalees_US/image.png"
+                alt="Unite India"
                 fill
-                className="object-cover object-center"
-                sizes="64px"
+                className="object-contain object-center"
+                sizes="(max-width: 640px) 240px, 280px"
               />
             </span>
             <span className="hero-left-cta-mission-label">Our Mission</span>

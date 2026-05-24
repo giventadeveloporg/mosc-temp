@@ -181,6 +181,16 @@ DROP TABLE IF EXISTS public.event_contacts CASCADE;
 DROP TABLE IF EXISTS public.event_featured_performers CASCADE;
 
 
+-- Event competitions (drop children before event_details)
+DROP TABLE IF EXISTS public.event_competition_group_member CASCADE;
+DROP TABLE IF EXISTS public.event_competition_result CASCADE;
+DROP TABLE IF EXISTS public.event_competition_registration CASCADE;
+DROP TABLE IF EXISTS public.event_competition_participant CASCADE;
+DROP TABLE IF EXISTS public.event_competition CASCADE;
+DROP TABLE IF EXISTS public.event_competition_content_block CASCADE;
+DROP TABLE IF EXISTS public.event_competition_day CASCADE;
+DROP TABLE IF EXISTS public.event_competition_settings CASCADE;
+
 DROP TABLE IF EXISTS public.event_recurrence_series CASCADE;
 DROP TABLE IF EXISTS public.event_details CASCADE;
 DROP TABLE IF EXISTS public.event_admin CASCADE;
@@ -201,6 +211,9 @@ DROP TABLE IF EXISTS public.discount_code CASCADE;
 DROP TABLE IF EXISTS public.communication_campaign CASCADE;
 DROP TABLE IF EXISTS public.email_log CASCADE;
 DROP TABLE IF EXISTS public.whatsapp_log CASCADE;
+-- Squad roster (drop child before parent; references user_profile and tenant_organization)
+DROP TABLE IF EXISTS public.team_members CASCADE;
+DROP TABLE IF EXISTS public.team_groups CASCADE;
 DROP TABLE IF EXISTS public.executive_committee_team_members CASCADE;
 DROP TABLE IF EXISTS public.event_focus_groups CASCADE;
 DROP TABLE IF EXISTS public.focus_group_members CASCADE;
@@ -789,6 +802,7 @@ CREATE TABLE public.event_details (
                                       updated_at timestamp DEFAULT now() NOT NULL,
                                       is_registration_required bool DEFAULT false NULL,
                                       is_sports_event bool DEFAULT false NULL,
+                                      is_competition_event bool DEFAULT false NOT NULL,
                                       is_live bool DEFAULT false NULL,
                                       is_featured_event BOOLEAN NOT NULL DEFAULT false,
                                       featured_event_priority_ranking INT4 NOT NULL DEFAULT 0,
@@ -882,6 +896,16 @@ COMMENT ON COLUMN public.event_details.is_registration_required IS 'Whether form
 --
 
 COMMENT ON COLUMN public.event_details.is_sports_event IS 'Whether this event is a sports event';
+
+
+--
+-- TOC entry 3950b (class 0 OID 0)
+-- Dependencies: 234
+-- Name: COLUMN event_details.is_competition_event; Type: COMMENT; Schema: public; Owner: giventa_event_management
+--
+
+COMMENT ON COLUMN public.event_details.is_competition_event IS
+    'When true, event uses Event Competitions flow (catalog + registrations + results), not default ticket-only checkout.';
 
 
 --
@@ -2296,6 +2320,7 @@ CREATE TABLE public.tenant_settings (
                                         tenant_organization_id bigint,
                                         allow_user_registration boolean DEFAULT true,
                                         show_events_section_in_home_page boolean DEFAULT false,
+                                        show_executive_committee_section_in_home_page boolean DEFAULT false,
                                         show_team_members_section_in_home_page boolean DEFAULT false,
                                         show_sponsors_section_in_home_page boolean DEFAULT false,
                                         is_membership_subscription_enabled boolean DEFAULT false,
@@ -2366,6 +2391,8 @@ COMMENT ON COLUMN public.tenant_settings.twitter_url IS 'Organization X (Twitter
 COMMENT ON COLUMN public.tenant_settings.linkedin_url IS 'Organization LinkedIn profile or company page URL for Follow our journey section';
 COMMENT ON COLUMN public.tenant_settings.youtube_url IS 'Organization YouTube channel URL for Follow our journey section';
 COMMENT ON COLUMN public.tenant_settings.tiktok_url IS 'Organization TikTok profile URL for Follow our journey section';
+COMMENT ON COLUMN public.tenant_settings.show_executive_committee_section_in_home_page IS 'When true, homepage shows executive committee TeamSection';
+COMMENT ON COLUMN public.tenant_settings.show_team_members_section_in_home_page IS 'When true, homepage shows squad roster SquadRosterSection';
 
 --
 -- TOC entry (class 1259 OID)
@@ -2562,6 +2589,89 @@ COMMENT ON COLUMN public.executive_committee_team_members.tenant_id IS 'Foreign 
 COMMENT ON COLUMN public.executive_committee_team_members.expertise IS 'JSON array of skills and expertise areas';
 COMMENT ON COLUMN public.executive_committee_team_members.is_active IS 'Whether the team member is currently active';
 
+
+-- Create team_groups table (sports squad / music band roster metadata)
+CREATE TABLE public.team_groups (
+    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    tenant_id character varying(255) NOT NULL,
+    team_type character varying(32) NOT NULL,
+    name character varying(255) NOT NULL,
+    slug character varying(100),
+    section_label character varying(64),
+    headline character varying(255),
+    description character varying(2048),
+    cta_label character varying(128),
+    cta_href character varying(500),
+    display_order integer,
+    is_active boolean DEFAULT true,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT team_groups_pkey PRIMARY KEY (id),
+    CONSTRAINT chk_team_groups__team_type CHECK (team_type IN ('SPORTS', 'MUSIC', 'OTHER')),
+    CONSTRAINT fk_team_groups__tenant_id FOREIGN KEY (tenant_id) REFERENCES public.tenant_organization(tenant_id) ON DELETE CASCADE
+);
+
+CREATE UNIQUE INDEX ux_team_groups__tenant_slug ON public.team_groups (tenant_id, slug) WHERE slug IS NOT NULL;
+CREATE INDEX idx_team_groups_tenant_id ON public.team_groups(tenant_id);
+CREATE INDEX idx_team_groups_tenant_active ON public.team_groups(tenant_id, is_active);
+
+COMMENT ON TABLE public.team_groups IS 'Tenant-scoped squad or band roster groups for public carousel display';
+
+-- Create team_members table (roster members; optional user_profile link)
+CREATE TABLE public.team_members (
+    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    tenant_id character varying(255) NOT NULL,
+    team_group_id bigint NOT NULL,
+    user_profile_id bigint,
+    first_name character varying(255) NOT NULL,
+    last_name character varying(255) NOT NULL,
+    title character varying(255) NOT NULL,
+    designation character varying(255),
+    bio character varying(2048),
+    email character varying(255),
+    priority_order integer,
+    profile_image_url character varying(500),
+    expertise character varying(500),
+    image_background character varying(255),
+    image_style character varying(100),
+    department character varying(100),
+    join_date date,
+    is_active boolean DEFAULT true,
+    linkedin_url character varying(500),
+    twitter_url character varying(500),
+    website_url character varying(500),
+    jersey_number integer,
+    position character varying(128),
+    lineup_subtitle character varying(128),
+    instrument character varying(128),
+    vocal_role character varying(128),
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT team_members_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_team_members__tenant_id FOREIGN KEY (tenant_id) REFERENCES public.tenant_organization(tenant_id) ON DELETE CASCADE,
+    CONSTRAINT fk_team_members__team_group_id FOREIGN KEY (team_group_id) REFERENCES public.team_groups(id) ON DELETE CASCADE,
+    CONSTRAINT fk_team_members__user_profile_id FOREIGN KEY (user_profile_id) REFERENCES public.user_profile(id) ON DELETE SET NULL
+);
+
+CREATE INDEX idx_team_members_team_group_id ON public.team_members(team_group_id);
+CREATE INDEX idx_team_members_tenant_id ON public.team_members(tenant_id);
+CREATE INDEX idx_team_members_user_profile_id ON public.team_members(user_profile_id);
+CREATE INDEX idx_team_members_is_active ON public.team_members(is_active);
+CREATE INDEX idx_team_members_priority_order ON public.team_members(priority_order);
+
+COMMENT ON TABLE public.team_members IS 'Sports squad or music band members belonging to a team_group';
+COMMENT ON COLUMN public.team_members.expertise IS 'JSON array of skills and expertise areas';
+COMMENT ON COLUMN public.team_members.user_profile_id IS 'Optional link to platform user_profile for prefilled identity';
+
+CREATE TRIGGER trg_team_groups_updated_at
+    BEFORE UPDATE ON public.team_groups
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER trg_team_members_updated_at
+    BEFORE UPDATE ON public.team_members
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
 
 -- TOC entry 3363 (class 2604 OID 82769)
 -- Name: discount_code id; Type: DEFAULT; Schema: public; Owner: giventa_event_management
@@ -2853,6 +2963,15 @@ CREATE INDEX idx_recurrence_series_id ON public.event_details USING btree (recur
 --
 
 CREATE INDEX idx_parent_event_id ON public.event_details USING btree (parent_event_id) WHERE (parent_event_id IS NOT NULL);
+
+
+--
+-- Name: idx_event_details__is_competition_event; Type: INDEX; Schema: public; Owner: giventa_event_management
+--
+
+CREATE INDEX idx_event_details__is_competition_event
+    ON public.event_details(is_competition_event)
+    WHERE is_competition_event = true;
 
 
 --
@@ -5193,6 +5312,293 @@ CREATE TRIGGER trg_news_live_stream_config_updated_at
     EXECUTE FUNCTION public.update_updated_at_column();
 
 -- =====================================================
+-- EVENT COMPETITIONS TABLES
+-- =====================================================
+-- Generic Event Competitions domain (youth, adult, mixed).
+-- See documentation/kanj_feature_comparison/event_competitions/database_schema_prd.html
+-- and .cursor/rules/database_schema_guidelines.mdc
+
+-- event_competition_settings: Per-event competition configuration (1:1 with event_details).
+CREATE TABLE public.event_competition_settings (
+    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    tenant_id character varying(255) NOT NULL,
+    event_id bigint NOT NULL,
+    audience_mode character varying(20) DEFAULT 'YOUTH' NOT NULL,
+    registration_mode character varying(32) DEFAULT 'PARENT_CHILD' NOT NULL,
+    registration_deadline timestamp without time zone,
+    registration_open boolean DEFAULT true NOT NULL,
+    allow_ticket_sales boolean DEFAULT false NOT NULL,
+    points_first integer DEFAULT 5 NOT NULL,
+    points_second integer DEFAULT 3 NOT NULL,
+    points_third integer DEFAULT 1 NOT NULL,
+    champion_enabled boolean DEFAULT false NOT NULL,
+    champion_exclude_group_points boolean DEFAULT true NOT NULL,
+    champion_max_category integer,
+    results_display_mode character varying(32) DEFAULT 'FULL_NAME',
+    eligibility_text text,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    CONSTRAINT event_competition_settings_pkey PRIMARY KEY (id),
+    CONSTRAINT chk_event_competition_settings__audience
+        CHECK (audience_mode IN ('YOUTH', 'ADULT', 'MIXED')),
+    CONSTRAINT chk_event_competition_settings__reg_mode
+        CHECK (registration_mode IN ('PARENT_CHILD', 'SELF', 'TEAM_CAPTAIN', 'MIXED')),
+    CONSTRAINT ux_event_competition_settings__event UNIQUE (event_id),
+    CONSTRAINT fk_event_competition_settings__event
+        FOREIGN KEY (event_id) REFERENCES public.event_details(id) ON DELETE CASCADE
+);
+
+COMMENT ON TABLE public.event_competition_settings IS 'Per-event competition settings (audience, registration, scoring, results display).';
+
+-- event_competition_day: Multi-day festival schedule rows.
+CREATE TABLE public.event_competition_day (
+    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    tenant_id character varying(255) NOT NULL,
+    event_id bigint NOT NULL,
+    day_label character varying(100) NOT NULL,
+    event_date date NOT NULL,
+    venue_name character varying(255) NOT NULL,
+    venue_address character varying(500),
+    sort_order integer DEFAULT 0 NOT NULL,
+    notes text,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    CONSTRAINT event_competition_day_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_event_competition_day__event
+        FOREIGN KEY (event_id) REFERENCES public.event_details(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_event_competition_day__event_id ON public.event_competition_day(event_id);
+
+COMMENT ON TABLE public.event_competition_day IS 'Competition festival days (venue, date, sort order).';
+
+-- event_competition: Competition catalog entries for an event.
+CREATE TABLE public.event_competition (
+    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    tenant_id character varying(255) NOT NULL,
+    event_id bigint NOT NULL,
+    competition_day_id bigint,
+    name character varying(255) NOT NULL,
+    description text,
+    competition_type character varying(20) NOT NULL,
+    eligible_audience character varying(20) DEFAULT 'ALL' NOT NULL,
+    category_code character varying(20),
+    division_label character varying(100),
+    track character varying(50),
+    fee_amount numeric(10,2) DEFAULT 0 NOT NULL,
+    max_participants integer,
+    min_group_size integer DEFAULT 3,
+    max_group_size integer DEFAULT 10,
+    time_limit_minutes integer,
+    requires_soundtrack boolean DEFAULT false NOT NULL,
+    judgment_criteria_json text,
+    display_order integer DEFAULT 0 NOT NULL,
+    is_active boolean DEFAULT true NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    CONSTRAINT event_competition_pkey PRIMARY KEY (id),
+    CONSTRAINT chk_event_competition__type
+        CHECK (competition_type IN ('INDIVIDUAL', 'GROUP')),
+    CONSTRAINT chk_event_competition__eligible_audience
+        CHECK (eligible_audience IN ('YOUTH_ONLY', 'ADULT_ONLY', 'ALL')),
+    CONSTRAINT fk_event_competition__event
+        FOREIGN KEY (event_id) REFERENCES public.event_details(id) ON DELETE CASCADE,
+    CONSTRAINT fk_event_competition__day
+        FOREIGN KEY (competition_day_id) REFERENCES public.event_competition_day(id) ON DELETE SET NULL
+);
+
+CREATE INDEX idx_event_competition__event_id ON public.event_competition(event_id);
+
+COMMENT ON TABLE public.event_competition IS 'Competition catalog (individual/group, fees, categories, eligibility).';
+
+-- event_competition_participant: Child, adult, or team member profiles for registrations.
+CREATE TABLE public.event_competition_participant (
+    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    tenant_id character varying(255) NOT NULL,
+    participant_type character varying(20) NOT NULL,
+    user_profile_id bigint NOT NULL,
+    clerk_user_id character varying(255) NOT NULL,
+    guardian_user_profile_id bigint,
+    first_name character varying(100) NOT NULL,
+    last_name character varying(100) NOT NULL,
+    display_name character varying(200),
+    date_of_birth date,
+    current_grade integer,
+    school_name character varying(255),
+    phone character varying(50),
+    email character varying(255),
+    is_active boolean DEFAULT true NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    CONSTRAINT event_competition_participant_pkey PRIMARY KEY (id),
+    CONSTRAINT chk_event_competition_participant__type
+        CHECK (participant_type IN ('CHILD', 'ADULT', 'TEAM_MEMBER')),
+    CONSTRAINT fk_event_competition_participant__user_profile
+        FOREIGN KEY (user_profile_id) REFERENCES public.user_profile(id),
+    CONSTRAINT fk_event_competition_participant__guardian
+        FOREIGN KEY (guardian_user_profile_id) REFERENCES public.user_profile(id)
+);
+
+CREATE INDEX idx_event_competition_participant__tenant_clerk
+    ON public.event_competition_participant(tenant_id, clerk_user_id);
+CREATE INDEX idx_event_competition_participant__guardian
+    ON public.event_competition_participant(tenant_id, guardian_user_profile_id)
+    WHERE guardian_user_profile_id IS NOT NULL;
+
+COMMENT ON TABLE public.event_competition_participant IS 'Competition participants (child/adult/team member) linked to user_profile.';
+
+-- event_competition_registration: Participant enrolled in a competition.
+CREATE TABLE public.event_competition_registration (
+    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    tenant_id character varying(255) NOT NULL,
+    event_id bigint NOT NULL,
+    competition_id bigint NOT NULL,
+    participant_profile_id bigint NOT NULL,
+    registration_status character varying(32) DEFAULT 'PENDING_PAYMENT' NOT NULL,
+    fee_amount numeric(10,2) NOT NULL,
+    effective_category character varying(20),
+    stripe_payment_intent_id character varying(255),
+    group_leader_registration_id bigint,
+    registered_by_user_profile_id bigint NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    CONSTRAINT event_competition_registration_pkey PRIMARY KEY (id),
+    CONSTRAINT ux_event_comp_reg__participant_competition
+        UNIQUE (competition_id, participant_profile_id),
+    CONSTRAINT fk_event_comp_reg__competition
+        FOREIGN KEY (competition_id) REFERENCES public.event_competition(id),
+    CONSTRAINT fk_event_comp_reg__participant
+        FOREIGN KEY (participant_profile_id) REFERENCES public.event_competition_participant(id),
+    CONSTRAINT fk_event_comp_reg__event
+        FOREIGN KEY (event_id) REFERENCES public.event_details(id) ON DELETE CASCADE,
+    CONSTRAINT fk_event_comp_reg__registered_by
+        FOREIGN KEY (registered_by_user_profile_id) REFERENCES public.user_profile(id),
+    CONSTRAINT fk_event_comp_reg__group_leader
+        FOREIGN KEY (group_leader_registration_id) REFERENCES public.event_competition_registration(id) ON DELETE SET NULL
+);
+
+CREATE INDEX idx_event_comp_reg__event_id ON public.event_competition_registration(event_id);
+
+COMMENT ON TABLE public.event_competition_registration IS 'Competition registrations with payment and group leader linkage.';
+
+-- event_competition_result: Placements, prizes, and winner media.
+CREATE TABLE public.event_competition_result (
+    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    tenant_id character varying(255) NOT NULL,
+    event_id bigint NOT NULL,
+    competition_id bigint NOT NULL,
+    participant_profile_id bigint,
+    registration_id bigint,
+    display_name character varying(200) NOT NULL,
+    placement integer,
+    placement_label character varying(50),
+    prize_title character varying(255),
+    prize_details text,
+    points_awarded integer DEFAULT 0 NOT NULL,
+    winner_photo_url character varying(1024),
+    winner_media_id bigint,
+    notes text,
+    is_published boolean DEFAULT false NOT NULL,
+    published_at timestamp without time zone,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    CONSTRAINT event_competition_result_pkey PRIMARY KEY (id),
+    CONSTRAINT chk_event_comp_result__placement
+        CHECK (placement IS NULL OR placement >= 1),
+    CONSTRAINT fk_event_comp_result__competition
+        FOREIGN KEY (competition_id) REFERENCES public.event_competition(id) ON DELETE CASCADE,
+    CONSTRAINT fk_event_comp_result__participant
+        FOREIGN KEY (participant_profile_id) REFERENCES public.event_competition_participant(id),
+    CONSTRAINT fk_event_comp_result__registration
+        FOREIGN KEY (registration_id) REFERENCES public.event_competition_registration(id),
+    CONSTRAINT fk_event_comp_result__winner_media
+        FOREIGN KEY (winner_media_id) REFERENCES public.event_media(id) ON DELETE SET NULL
+);
+
+CREATE INDEX idx_event_comp_result__event_published
+    ON public.event_competition_result(event_id, is_published);
+CREATE INDEX idx_event_comp_result__competition_placement
+    ON public.event_competition_result(competition_id, placement)
+    WHERE is_published = true;
+
+COMMENT ON TABLE public.event_competition_result IS 'Competition results (placement, prizes, winner photo via event_media).';
+
+-- event_competition_content_block: Markdown content blocks per event (rules, FAQ, etc.).
+CREATE TABLE public.event_competition_content_block (
+    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    tenant_id character varying(255) NOT NULL,
+    event_id bigint NOT NULL,
+    block_type character varying(32) NOT NULL,
+    title character varying(255),
+    body_markdown text NOT NULL,
+    sort_order integer DEFAULT 0 NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    CONSTRAINT event_competition_content_block_pkey PRIMARY KEY (id),
+    CONSTRAINT ux_event_comp_content__event_type UNIQUE (event_id, block_type),
+    CONSTRAINT fk_event_comp_content__event
+        FOREIGN KEY (event_id) REFERENCES public.event_details(id) ON DELETE CASCADE
+);
+
+COMMENT ON TABLE public.event_competition_content_block IS 'Per-event competition content blocks (markdown).';
+
+-- event_competition_group_member: Optional normalized group roster members (v1.1).
+CREATE TABLE public.event_competition_group_member (
+    id bigint DEFAULT nextval('public.sequence_generator'::regclass) NOT NULL,
+    tenant_id character varying(255) NOT NULL,
+    registration_id bigint NOT NULL,
+    participant_profile_id bigint NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    CONSTRAINT event_competition_group_member_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_event_comp_group_member__registration
+        FOREIGN KEY (registration_id) REFERENCES public.event_competition_registration(id) ON DELETE CASCADE,
+    CONSTRAINT fk_event_comp_group_member__participant
+        FOREIGN KEY (participant_profile_id) REFERENCES public.event_competition_participant(id)
+);
+
+COMMENT ON TABLE public.event_competition_group_member IS 'Group competition roster members linked to leader registration.';
+
+-- Triggers for updated_at on tables that have updated_at
+CREATE TRIGGER trg_event_competition_settings_updated_at
+    BEFORE UPDATE ON public.event_competition_settings
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER trg_event_competition_day_updated_at
+    BEFORE UPDATE ON public.event_competition_day
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER trg_event_competition_updated_at
+    BEFORE UPDATE ON public.event_competition
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER trg_event_competition_participant_updated_at
+    BEFORE UPDATE ON public.event_competition_participant
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER trg_event_competition_registration_updated_at
+    BEFORE UPDATE ON public.event_competition_registration
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER trg_event_competition_result_updated_at
+    BEFORE UPDATE ON public.event_competition_result
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER trg_event_competition_content_block_updated_at
+    BEFORE UPDATE ON public.event_competition_content_block
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_updated_at_column();
+
+-- =====================================================
+-- END OF EVENT COMPETITIONS TABLES
+-- =====================================================
+
+-- =====================================================
 -- END OF PAYMENT ORCHESTRATION LAYER MIGRATION
 -- =====================================================
 
@@ -5290,6 +5696,14 @@ SELECT pg_catalog.setval(
                    COALESCE((SELECT MAX(id) FROM public.bulk_operation_log), 0),
                    COALESCE((SELECT MAX(id) FROM public.event_type_details), 0),
                    COALESCE((SELECT MAX(id) FROM public.event_details), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_competition), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_competition_content_block), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_competition_day), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_competition_group_member), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_competition_participant), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_competition_registration), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_competition_result), 0),
+                   COALESCE((SELECT MAX(id) FROM public.event_competition_settings), 0),
                    COALESCE((SELECT MAX(id) FROM public.event_recurrence_series), 0),
                    COALESCE((SELECT MAX(id) FROM public.focus_group), 0),
                    COALESCE((SELECT MAX(id) FROM public.focus_group_members), 0),
@@ -5322,6 +5736,8 @@ SELECT pg_catalog.setval(
                    COALESCE((SELECT MAX(id) FROM public.user_subscription), 0),
                    COALESCE((SELECT MAX(id) FROM public.user_task), 0),
                    COALESCE((SELECT MAX(id) FROM public.executive_committee_team_members), 0),
+                   COALESCE((SELECT MAX(id) FROM public.team_groups), 0),
+                   COALESCE((SELECT MAX(id) FROM public.team_members), 0),
                    COALESCE((SELECT MAX(id) FROM public.communication_campaign), 0),
                    COALESCE((SELECT MAX(id) FROM public.email_log), 0),
                    COALESCE((SELECT MAX(id) FROM public.whatsapp_log), 0),

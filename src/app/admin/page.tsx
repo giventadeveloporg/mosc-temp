@@ -114,9 +114,25 @@ export default function AdminPage() {
       href: '/admin/executive-committee',
       icon: 'userTie',
       label: 'Executive Committee',
-      sublabel: 'Team Members',
+      sublabel: 'Leadership',
       color: 'amber',
       key: 'executive-committee'
+    },
+    {
+      href: '/admin/team-groups',
+      icon: 'userFriends',
+      label: 'Squad groups',
+      sublabel: 'Sports / bands',
+      color: 'violet',
+      key: 'team-groups'
+    },
+    {
+      href: '/admin/team-members',
+      icon: 'addressCard',
+      label: 'Squad roster',
+      sublabel: 'Members',
+      color: 'rose',
+      key: 'team-members'
     },
     {
       href: '/admin/event-sponsors',

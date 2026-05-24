@@ -135,7 +135,7 @@ const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string
   window.history.pushState(null, '', hashPart);
 
   // Wait for element to exist before scrolling (especially important for dynamically loaded sections)
-  const headerHeight = 80;
+  const headerHeight = 128;
   const maxWaitTime = 10000; // 10 seconds max wait
   const pollInterval = 100; // Check every 100ms
   const startTime = Date.now();
@@ -419,7 +419,6 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [openMobileDropdowns, setOpenMobileDropdowns] = useState<Record<string, boolean>>({});
-
   // CRITICAL: Check for sign-out flag and call signOut() on satellite domain.
   // Just clearing localStorage is NOT enough — Clerk stores session in HTTP-only cookies
   // that can only be cleared via signOut(). Without this, the avatar/admin menu persist.
@@ -660,7 +659,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const headerHeight = 80;
+    const headerHeight = 128;
 
     const scrollToHashWithOffset = (behavior: ScrollBehavior = 'smooth') => {
       const hash = window.location.hash;
@@ -782,22 +781,22 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
     <>
       <header className="fixed top-0 left-0 right-0 z-50 header-glass">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-[6.75rem]">
+          <div className="flex items-center justify-between h-[8rem]">
             {/* Left side - Unite India Text Logo with Editorial Typography */}
             <div className="flex items-center h-full">
               <Link href="/" className="group flex items-center gap-3 h-full">
-                {/* Unite India logo icon - full header height, 148px wide */}
-                <div className="flex items-center justify-center h-full w-[148px] min-w-[148px] rounded-xl flex-shrink-0 overflow-hidden transition-all duration-300 group-hover:scale-105">
+                {/* Unite India logo icon - full header height, 168px wide */}
+                <div className="header-logo-image-wrap flex items-center justify-center h-full w-[168px] min-w-[168px] rounded-xl flex-shrink-0 overflow-hidden transition-all duration-300 group-hover:scale-105">
                   <Image
                     src="/images/logos/Malayalees_US/Malayalees_US_Header_Branding.png"
                     alt="Unite India"
-                    width={148}
-                    height={108}
-                    className="w-full h-full object-contain"
+                    width={168}
+                    height={128}
+                    className="w-full h-full object-contain object-center"
                   />
                 </div>
                 <div className="text-left">
-                  <div className="header-logo-brand text-[1.375rem] leading-tight inline-block">
+                  <div className="header-logo-brand text-[1.75rem] leading-tight inline-block">
                     MALAYALEES.US
                   </div>
                 </div>
@@ -841,7 +840,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                             >
                               <span>{item.name}</span>
                               <ChevronDown
-                                size={14}
+                                size={16}
                                 className="header-chevron text-[var(--header-text-muted)]"
                                 aria-hidden="true"
                               />
@@ -934,7 +933,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                         >
                           <span>Admin</span>
                           <ChevronDown
-                            size={14}
+                            size={16}
                             className="header-chevron text-[var(--header-text-muted)]"
                             aria-hidden="true"
                           />
@@ -1070,17 +1069,17 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
           {/* Mobile Menu Header */}
           <div className="flex items-center justify-between p-5 border-b border-[var(--header-border)]">
             <Link href="/" className="group flex items-center gap-2.5" onClick={closeMobileMenu}>
-              <div className="flex items-center justify-center w-[124px] min-w-[124px] h-[4.75rem] rounded-lg flex-shrink-0 overflow-hidden">
+              <div className="header-logo-image-wrap flex items-center justify-center w-[144px] min-w-[144px] h-[6rem] rounded-lg flex-shrink-0 overflow-hidden">
                 <Image
                   src="/images/logos/Malayalees_US/Malayalees_US_Header_Branding.png"
                   alt="Unite India"
-                  width={124}
-                  height={90}
+                  width={144}
+                  height={110}
                   className="w-full h-full object-contain"
                 />
               </div>
               <div className="text-left">
-                <div className="header-logo-brand text-lg leading-tight inline-block">
+                <div className="header-logo-brand text-2xl leading-tight inline-block">
                   MALAYALEES.US
                 </div>
               </div>

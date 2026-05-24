@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { HomeSectionRail } from '@/components/HomeSectionRail';
+import { HomeSectionTitle } from '@/components/HomeSectionTitle';
 
 type ServiceColor = 'green' | 'orange' | 'blue' | 'yellow';
 
@@ -126,7 +128,7 @@ function CulturalGlassCard({ service, index }: { service: CulturalServiceItem; i
       <div
         role="article"
         aria-labelledby={`services-card-title-${index}`}
-        className="services-glass-card-face group relative"
+        className="services-glass-card-face services-cultural-card group relative"
         onMouseMove={onMouseMove}
         onMouseLeave={onMouseLeave}
         style={faceStyle}
@@ -141,11 +143,11 @@ function CulturalGlassCard({ service, index }: { service: CulturalServiceItem; i
           <div className="min-w-0 flex-1">
             <h3
               id={`services-card-title-${index}`}
-              className="mb-3 text-xl font-bold text-gray-900 transition-colors duration-300 group-hover:text-emerald-700"
+              className="services-cultural-card-title mb-3 text-xl font-bold transition-colors duration-300 group-hover:text-emerald-800"
             >
               {service.title}
             </h3>
-            <p className="text-sm leading-relaxed text-gray-600/95 lg:text-base">{service.description}</p>
+            <p className="services-cultural-card-desc text-sm leading-relaxed lg:text-base">{service.description}</p>
           </div>
         </div>
       </div>
@@ -157,19 +159,17 @@ const ServicesSection: React.FC = () => {
   return (
     <div className="relative overflow-hidden bg-gradient-to-b from-emerald-50/90 via-green-50 to-emerald-50/80 py-24">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(16,185,129,0.12),transparent)]" aria-hidden />
-      <div className="relative z-[1] mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
+      <HomeSectionRail
+        eyebrow="What we do"
+        containerClassName="relative z-[1] mx-auto max-w-6xl px-4 sm:px-6 lg:px-8"
+      >
         <div className="mb-16">
-          <div className="mb-6 flex items-center space-x-2">
-            <div className="h-2 w-5 rounded bg-yellow-400"></div>
-            <p className="text-gray-600">What we do</p>
-          </div>
-          <h2 className="mb-4 text-center text-3xl font-bold text-gray-900 md:text-4xl">
+          <HomeSectionTitle className="mb-4 text-center text-3xl font-bold md:text-4xl">
             Cultural Workshops and Educational Events
-          </h2>
+          </HomeSectionTitle>
         </div>
 
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:gap-12">
+        <div className="services-cultural-cards grid grid-cols-1 gap-8 md:grid-cols-2 lg:gap-12">
           {culturalServices.map((service, index) => (
             <CulturalGlassCard key={service.title} service={service} index={index} />
           ))}
@@ -184,7 +184,7 @@ const ServicesSection: React.FC = () => {
             <span>Join our cultural community and preserve Kerala's rich heritage</span>
           </div>
         </div>
-      </div>
+      </HomeSectionRail>
     </div>
   );
 };

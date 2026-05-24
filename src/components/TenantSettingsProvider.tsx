@@ -13,6 +13,11 @@ interface TenantSettingsContextType {
   settings: TenantSettingsDTO | null;
   loading: boolean;
   showEventsSection: boolean;
+  /** Squad / band roster carousel on homepage */
+  showSquadSection: boolean;
+  /** Executive committee TeamSection on homepage */
+  showExecutiveCommitteeSection: boolean;
+  /** @deprecated Use showExecutiveCommitteeSection — kept for callers not yet migrated */
   showTeamSection: boolean;
   showSponsorsSection: boolean;
 }
@@ -21,6 +26,8 @@ const TenantSettingsContext = React.createContext<TenantSettingsContextType>({
   settings: null,
   loading: true,
   showEventsSection: true, // Default to true for backward compatibility
+  showSquadSection: false,
+  showExecutiveCommitteeSection: true,
   showTeamSection: true,
   showSponsorsSection: true,
 });
@@ -205,13 +212,20 @@ export const TenantSettingsProvider: React.FC<TenantSettingsProviderProps> = ({ 
   // Determine section visibility with fallback to true (show by default)
   // This ensures the app continues to work even if tenant settings fail
   const showEventsSection = settings?.showEventsSectionInHomePage ?? true;
-  const showTeamSection = settings?.showTeamMembersSectionInHomePage ?? true;
+  const showSquadSection = settings?.showTeamMembersSectionInHomePage ?? false;
+  const showExecutiveCommitteeSection =
+    settings?.showExecutiveCommitteeSectionInHomePage ??
+    settings?.showTeamMembersSectionInHomePage ??
+    true;
+  const showTeamSection = showExecutiveCommitteeSection;
   const showSponsorsSection = settings?.showSponsorsSectionInHomePage ?? true;
 
   const contextValue: TenantSettingsContextType = {
     settings,
     loading,
     showEventsSection,
+    showSquadSection,
+    showExecutiveCommitteeSection,
     showTeamSection,
     showSponsorsSection,
   };
