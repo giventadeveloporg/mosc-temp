@@ -5,12 +5,13 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { SignUp } from '@clerk/nextjs';
-import { useAuth, useUser } from '@clerk/nextjs';
+import { useAuth, useClerk, useUser } from '@clerk/nextjs';
 import { bootstrapUserProfile } from '@/components/ProfileBootstrapperApiServerActions';
 
 export default function SignUpPage() {
   const router = useRouter();
   const pathname = usePathname();
+  const clerk = useClerk();
   const [shouldRedirect, setShouldRedirect] = useState(false);
   const [isLocalhost, setIsLocalhost] = useState(false);
   const [isPrimaryDomain, setIsPrimaryDomain] = useState(false);
@@ -107,19 +108,18 @@ export default function SignUpPage() {
       const satelliteDomain = process.env.NEXT_PUBLIC_CLERK_DOMAIN || 'mosc-temp.com';
       if (hostname.includes('mosc-temp.com') || hostname.includes(satelliteDomain.replace('www.', ''))) {
         setShouldRedirect(true);
-        // Get the current URL to return to after authentication
-        const currentUrl = window.location.origin;
-
-        // Redirect to primary domain with redirect_url parameter
-        // Clerk will redirect back to this URL after successful authentication
-        const redirectUrl = `https://${primaryDomain}/sign-up?redirect_url=${encodeURIComponent(currentUrl)}`;
-        window.location.href = redirectUrl;
+        // Use Clerk's redirectToSignUp — it reads isSatellite/domain/signUpUrl from
+        // the ClerkProvider and adds __clerk_satellite_url so the primary returns
+        // here with a __clerk_handshake token that establishes the satellite session.
+        // A plain window.location.href to ?redirect_url=... skips that handshake and
+        // leaves the satellite with __client_uat=0 forever.
+        clerk.redirectToSignUp({ redirectUrl: window.location.origin });
       } else {
         // Default: assume primary domain if not satellite
         setIsPrimaryDomain(true);
       }
     }
-  }, []);
+  }, [clerk]);
 
   // Handle profile bootstrap after signup
   // Note: Clerk will handle redirect via afterSignUpUrl prop, so we only bootstrap here

@@ -6,11 +6,12 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { SignIn } from '@clerk/nextjs';
-import { useAuth, useUser } from '@clerk/nextjs';
+import { useAuth, useClerk, useUser } from '@clerk/nextjs';
 import { bootstrapUserProfile } from '@/components/ProfileBootstrapperApiServerActions';
 
 export default function SignInPage() {
   const searchParams = useSearchParams();
+  const clerk = useClerk();
   const [shouldRedirect, setShouldRedirect] = useState(false);
   const [isLocalhost, setIsLocalhost] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -66,12 +67,15 @@ export default function SignInPage() {
       const isSatellite = hostname.includes('mosc-temp.com');
       if (isSatellite) {
         setShouldRedirect(true);
-        const currentUrl = window.location.origin;
-        const signInUrl = `https://${primaryHost}/sign-in?redirect_url=${encodeURIComponent(currentUrl)}`;
-        window.location.href = signInUrl;
+        // Use Clerk's redirectToSignIn — it reads isSatellite/domain/signInUrl from
+        // the ClerkProvider and adds __clerk_satellite_url so the primary returns
+        // here with a __clerk_handshake token that establishes the satellite session.
+        // A plain window.location.href to ?redirect_url=... skips that handshake and
+        // leaves the satellite with __client_uat=0 forever.
+        clerk.redirectToSignIn({ redirectUrl: window.location.origin });
       }
     }
-  }, []);
+  }, [clerk]);
 
   // Show Clerk component for localhost development
   if (isLocalhost) {
