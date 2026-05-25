@@ -155,9 +155,14 @@ export default clerkMiddleware(
   },
   {
     ...satConfig,
-    // NOTE: frontendApiProxy REMOVED. The CNAME clerk.event-site-manager.com is verified
-    // and points to frontend-api.clerk.services, so Clerk reaches its FAPI directly.
-    // The proxy was causing auth failures (couldn't register in Clerk Dashboard).
+    // Satellite-only FAPI proxy. The primary domain (event-site-manager.com) reaches
+    // its FAPI directly via the verified CNAME clerk.event-site-manager.com. The
+    // satellite (mosc-temp.com) has no such CNAME, so without this proxy the Clerk
+    // session cookie lives on clerk.event-site-manager.com — third-party from the
+    // satellite, blocked by browsers, login appears to do nothing.
+    // PREREQUISITE: https://www.mosc-temp.com/__clerk must be registered as the
+    // proxy URL for the satellite domain in the Clerk Dashboard.
+    frontendApiProxy: { enabled: isSatEnv },
     signInUrl: process.env.NEXT_PUBLIC_APP_URL?.includes('amplifyapp.com') || process.env.NEXT_PUBLIC_APP_URL?.includes('mosc-temp.com')
       ? `https://${process.env.NEXT_PUBLIC_PRIMARY_DOMAIN || 'www.event-site-manager.com'}/sign-in`
       : '/sign-in',
@@ -166,10 +171,12 @@ export default clerkMiddleware(
 
 export const config = {
   matcher: [
-    // Skip Next.js internals, static files, AND /__clerk
-    // __clerk excluded — using CNAME (clerk.event-site-manager.com) directly, no proxy needed.
+    // Skip Next.js internals and static files.
+    // __clerk IS matched (not excluded) — clerkMiddleware's frontendApiProxy intercepts
+    // /__clerk/* on the satellite domain and proxies it to clerk.event-site-manager.com
+    // with the required headers (Clerk-Proxy-Url, Clerk-Secret-Key, X-Forwarded-For).
     // Include video/audio (mp4, webm, …) — otherwise Clerk runs on /images/.../*.mp4 and auth.protect() returns 404 HTML instead of the file.
-    '/((?!_next|__clerk|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest|mp4|webm|mov|m4v|ogg|mp3|wav|aac|opus|pdf|map)).*)',
-    '/(api|trpc)(.*)',
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest|mp4|webm|mov|m4v|ogg|mp3|wav|aac|opus|pdf|map)).*)',
+    '/(api|trpc|__clerk)(.*)',
   ],
 };
