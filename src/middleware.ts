@@ -155,14 +155,16 @@ export default clerkMiddleware(
   },
   {
     ...satConfig,
-    // Satellite-only FAPI proxy. The primary domain (event-site-manager.com) reaches
-    // its FAPI directly via the verified CNAME clerk.event-site-manager.com. The
-    // satellite (mosc-temp.com) has no such CNAME, so without this proxy the Clerk
-    // session cookie lives on clerk.event-site-manager.com — third-party from the
-    // satellite, blocked by browsers, login appears to do nothing.
-    // PREREQUISITE: https://www.mosc-temp.com/__clerk must be registered as the
-    // proxy URL for the satellite domain in the Clerk Dashboard.
-    frontendApiProxy: { enabled: isSatEnv },
+    // NOTE: frontendApiProxy intentionally NOT enabled. Enabling it routes Clerk's
+    // satellite handshake through /__clerk/* on this domain, which requires the
+    // proxy URL to be registered against the Clerk instance in the Dashboard.
+    // That registration validation fails (host_invalid) — the chicken-and-egg
+    // documented in the original comment — so the proxied handshake never works.
+    // Instead, rely on Clerk's URL-handshake flow: clerk.redirectToSignIn() in the
+    // satellite's sign-in page sends the browser to the primary, which signs the
+    // user in and redirects back with __clerk_handshake=<token> in the URL. The
+    // satellite SDK reads that token and establishes a first-party session cookie
+    // — no proxy or Dashboard registration required.
     signInUrl: process.env.NEXT_PUBLIC_APP_URL?.includes('amplifyapp.com') || process.env.NEXT_PUBLIC_APP_URL?.includes('mosc-temp.com')
       ? `https://${process.env.NEXT_PUBLIC_PRIMARY_DOMAIN || 'www.event-site-manager.com'}/sign-in`
       : '/sign-in',
@@ -171,12 +173,13 @@ export default clerkMiddleware(
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and static files.
-    // __clerk IS matched (not excluded) — clerkMiddleware's frontendApiProxy intercepts
-    // /__clerk/* on the satellite domain and proxies it to clerk.event-site-manager.com
-    // with the required headers (Clerk-Proxy-Url, Clerk-Secret-Key, X-Forwarded-For).
+    // Skip Next.js internals, static files, AND /__clerk.
+    // __clerk is excluded because frontendApiProxy is not enabled — we don't want
+    // Clerk middleware to intercept /__clerk/* on this domain. The satellite uses
+    // the URL-handshake flow (browser redirects with __clerk_handshake token),
+    // not the proxy flow.
     // Include video/audio (mp4, webm, …) — otherwise Clerk runs on /images/.../*.mp4 and auth.protect() returns 404 HTML instead of the file.
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest|mp4|webm|mov|m4v|ogg|mp3|wav|aac|opus|pdf|map)).*)',
-    '/(api|trpc|__clerk)(.*)',
+    '/((?!_next|__clerk|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest|mp4|webm|mov|m4v|ogg|mp3|wav|aac|opus|pdf|map)).*)',
+    '/(api|trpc)(.*)',
   ],
 };
