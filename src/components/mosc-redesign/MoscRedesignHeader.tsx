@@ -3,14 +3,20 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Search } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { MOSC_REDESIGN_NAV_LINKS, MOSC_REDESIGN_QUICK_LINKS } from './navConfig';
+import {
+  MOSC_REDESIGN_NAV_LINKS,
+  MOSC_REDESIGN_QUICK_LINKS,
+  MOSC_REDESIGN_SEARCH_DIRECTORY_NAV,
+} from './navConfig';
 import { ADMINISTRATION_PAGE_CARDS } from './administrationCards';
 
 const ADMINISTRATION_NAV_LABEL = 'Administration';
 const ADMINISTRATION_BASE_HREF = '/mosc-redesign/administration';
 const ADMIN_MENU_CLOSE_MS = 200;
+const SEARCH_DIRECTORY_ICON_SIZE = 24;
 
 function normalizePath(p: string | null): string {
   if (!p) return '';
@@ -150,6 +156,7 @@ export default function MoscRedesignHeader() {
 
   const adminMenuOpen = !!adminMenu?.open;
   const adminHoverOrOpen = adminNavActive || adminMenuOpen;
+  const searchDirectoryActive = isTopNavActive(pathname, MOSC_REDESIGN_SEARCH_DIRECTORY_NAV.href);
 
   const adminDropdownPanel = (
     <ul className="py-1.5">
@@ -219,7 +226,8 @@ export default function MoscRedesignHeader() {
       {/* Row 2: Main Nav */}
       <div className="relative z-20 overflow-visible bg-burgundy-dark hidden lg:block">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-16">
-          <nav className="flex items-center gap-0 justify-end">
+          <nav className="flex w-full items-center gap-0">
+            <div className="flex min-w-0 flex-1 items-center justify-end gap-0">
             {MOSC_REDESIGN_NAV_LINKS.map((link) =>
               link.label === ADMINISTRATION_NAV_LABEL ? (
                 <div
@@ -235,8 +243,8 @@ export default function MoscRedesignHeader() {
                     aria-expanded={adminMenuOpen}
                     className={`relative font-medium text-[13px] px-3 py-[7px] transition-all duration-200 whitespace-nowrap flex items-center gap-0.5 overflow-visible no-underline visited:no-underline ${
                       adminHoverOrOpen
-                        ? 'text-warmGold visited:text-warmGold'
-                        : 'text-white/95 visited:text-white/95 hover:text-warmGold'
+                        ? 'text-white visited:text-white'
+                        : 'text-white/95 visited:text-white/95 hover:text-white'
                     }`}
                   >
                     <span
@@ -266,8 +274,8 @@ export default function MoscRedesignHeader() {
                       aria-current={navActive ? 'page' : undefined}
                       className={`relative font-medium text-[13px] px-3 py-[7px] transition-all duration-200 whitespace-nowrap group overflow-hidden no-underline visited:no-underline ${
                         navActive
-                          ? 'text-warmGold visited:text-warmGold'
-                          : 'text-white/95 visited:text-white/95 hover:text-warmGold'
+                          ? 'text-white visited:text-white font-semibold'
+                          : 'text-white/95 visited:text-white/95 hover:text-white'
                       }`}
                     >
                       <span
@@ -281,6 +289,29 @@ export default function MoscRedesignHeader() {
                 })()
               )
             )}
+            </div>
+            <div className="ml-3 flex shrink-0 items-center border-l border-white/25 pl-3">
+              <Link
+                href={MOSC_REDESIGN_SEARCH_DIRECTORY_NAV.href}
+                aria-current={searchDirectoryActive ? 'page' : undefined}
+                className={`group relative flex items-center gap-2 whitespace-nowrap px-3 py-[7px] text-[13px] font-medium no-underline visited:no-underline text-white visited:text-white hover:text-white ${
+                  searchDirectoryActive ? 'font-semibold' : ''
+                }`}
+              >
+                <span
+                  className={`absolute inset-0 rounded-sm bg-white/10 transition-transform duration-200 origin-left ${
+                    searchDirectoryActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                  }`}
+                />
+                <Search
+                  size={SEARCH_DIRECTORY_ICON_SIZE}
+                  strokeWidth={2.25}
+                  className="relative z-10 shrink-0 text-white"
+                  aria-hidden
+                />
+                <span className="relative z-10">{MOSC_REDESIGN_SEARCH_DIRECTORY_NAV.label}</span>
+              </Link>
+            </div>
           </nav>
         </div>
       </div>
@@ -370,6 +401,22 @@ export default function MoscRedesignHeader() {
                 })()
               )
             )}
+
+            <div className="mt-2 border-t border-burgundy/15 pt-2">
+              <Link
+                href={MOSC_REDESIGN_SEARCH_DIRECTORY_NAV.href}
+                aria-current={searchDirectoryActive ? 'page' : undefined}
+                className={`flex items-center gap-2.5 rounded px-2 py-2.5 text-xs font-semibold no-underline visited:no-underline ${
+                  searchDirectoryActive
+                    ? 'bg-burgundy/15 text-burgundy visited:text-burgundy'
+                    : 'text-burgundy-dark visited:text-burgundy-dark hover:bg-burgundy/10 hover:text-burgundy'
+                }`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Search size={22} strokeWidth={2.25} className="shrink-0" aria-hidden />
+                <span>{MOSC_REDESIGN_SEARCH_DIRECTORY_NAV.label}</span>
+              </Link>
+            </div>
 
             <div className="mt-3 pt-3 border-t border-burgundy/20">
               <p className="text-[10px] font-bold uppercase tracking-wider text-burgundy/70 px-2 mb-2">Quick links</p>

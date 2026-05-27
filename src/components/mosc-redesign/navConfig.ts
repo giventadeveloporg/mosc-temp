@@ -13,6 +13,12 @@ export const MOSC_REDESIGN_QUICK_LINKS = [
   { label: "Gallery", href: "/mosc-redesign/gallery" },
 ] as const;
 
+/** Right-aligned main nav item with search icon (rendered separately in header). */
+export const MOSC_REDESIGN_SEARCH_DIRECTORY_NAV = {
+  label: "Search Directory",
+  href: "/mosc-redesign/directory",
+} as const;
+
 export const MOSC_REDESIGN_NAV_LINKS = [
   { label: "Home", href: "/mosc-redesign" },
   { label: "The Catholicate", href: "/mosc-redesign/catholicate" },
@@ -22,7 +28,6 @@ export const MOSC_REDESIGN_NAV_LINKS = [
   { label: "Ecumenical", href: "/mosc-redesign/ecumenical" },
   { label: "Dioceses", href: "/mosc-redesign/dioceses" },
   // { label: "News", href: "/mosc-redesign/news" }, // temporarily hidden — 7th direct <a> under nav (Administration is in a wrapper div)
-  { label: "Directory", href: "/mosc-redesign/directory" },
   { label: "Saints", href: "/mosc-redesign/saints" },
 ] as const;
 

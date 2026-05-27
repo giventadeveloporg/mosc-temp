@@ -266,6 +266,135 @@ const hideNavigationLoading = () => {
   }
 };
 
+type NavSubItem = {
+  name: string;
+  href: string;
+  requiresAuth?: boolean;
+};
+
+/**
+ * Desktop nav item with submenu (About, Features) — hover + click, click-outside close
+ */
+function HeaderNavDropdown({
+  item,
+  userId,
+  settings,
+  pathname,
+  handleSmoothScroll,
+}: {
+  item: { name: string; dropdown: NavSubItem[] };
+  userId: string | null | undefined;
+  settings: { isMembershipSubscriptionEnabled?: boolean } | null;
+  pathname: string | null;
+  handleSmoothScroll: (e: React.MouseEvent, href: string) => void;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen]);
+
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
+
+  const isAboutActive =
+    item.name === 'About' &&
+    item.dropdown.some(
+      (subItem) =>
+        subItem.href === pathname ||
+        (subItem.href === '/#about-us' && typeof window !== 'undefined' && window.location.hash === '#about-us') ||
+        (subItem.href === '/team' && pathname === '/team') ||
+        (subItem.href === '/sponsors' && pathname === '/sponsors')
+    );
+
+  const isFeaturesActive =
+    item.name === 'Features' &&
+    item.dropdown.some(
+      (subItem) =>
+        subItem.href === pathname ||
+        (subItem.href === '/profile' && pathname === '/profile') ||
+        (subItem.href === '/membership' && pathname?.startsWith('/membership')) ||
+        (subItem.href === '/mosc' && pathname?.startsWith('/mosc')) ||
+        (subItem.href === '/mosc-redesign' && pathname?.startsWith('/mosc-redesign'))
+    );
+
+  const isActive =
+    (item.name === 'About' && isAboutActive) || (item.name === 'Features' && isFeaturesActive);
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative group"
+      onMouseEnter={() => setIsOpen(true)}
+      onMouseLeave={() => setIsOpen(false)}
+    >
+      <button
+        type="button"
+        onClick={() => setIsOpen((prev) => !prev)}
+        className={`header-nav-link font-semibold flex items-center gap-1.5 cursor-pointer ${isActive ? 'active' : ''}`}
+        aria-haspopup="true"
+        aria-expanded={isOpen}
+      >
+        <span>{item.name}</span>
+        <ChevronDown
+          size={16}
+          className={`header-chevron text-[var(--header-text-muted)] transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+          aria-hidden="true"
+        />
+      </button>
+      <div
+        className={`header-dropdown absolute top-full left-0 mt-2 w-56 z-50 ${isOpen ? 'visible' : ''}`}
+        role="menu"
+        aria-label={`${item.name} submenu`}
+      >
+        <div className="py-2">
+          {item.dropdown.map((subItem) => {
+            if (subItem.requiresAuth && !userId) return null;
+            if (subItem.href === '/membership' && !settings?.isMembershipSubscriptionEnabled) return null;
+
+            const isSubItemActive =
+              subItem.href === pathname ||
+              (subItem.href === '/membership' && pathname?.startsWith('/membership')) ||
+              (subItem.href === '/mosc' && pathname?.startsWith('/mosc')) ||
+              (subItem.href === '/mosc-redesign' && pathname?.startsWith('/mosc-redesign')) ||
+              (subItem.href === '/#about-us' && typeof window !== 'undefined' && window.location.hash === '#about-us') ||
+              (subItem.href === '/team' && pathname === '/team');
+
+            return (
+              <Link
+                key={subItem.name}
+                href={subItem.href}
+                prefetch={subItem.href === '/mosc' || subItem.href === '/mosc-redesign' ? false : undefined}
+                onClick={(e) => {
+                  if (subItem.href.startsWith('/#')) {
+                    handleSmoothScroll(e, subItem.href);
+                  }
+                  setIsOpen(false);
+                }}
+                className={`header-dropdown-item font-semibold block ${isSubItemActive ? 'active' : ''}`}
+                role="menuitem"
+                aria-label={`Navigate to ${subItem.name}`}
+              >
+                {subItem.name}
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /**
  * User Avatar Dropdown Component
  * Shows user's profile image with dropdown menu for Profile and Sign Out
@@ -419,6 +548,7 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [openMobileDropdowns, setOpenMobileDropdowns] = useState<Record<string, boolean>>({});
+  const [headerScrolled, setHeaderScrolled] = useState(false);
   // CRITICAL: Check for sign-out flag and call signOut() on satellite domain.
   // Just clearing localStorage is NOT enough — Clerk stores session in HTTP-only cookies
   // that can only be cleared via signOut(). Without this, the avatar/admin menu persist.
@@ -468,6 +598,22 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
 
     performSignOut();
   }, [pendingSignOut, isLoaded, signOut]);
+
+  const isHomePage =
+    pathname === '/' || pathname === '/charity-theme';
+
+  // Frosted header when content scrolls under the sticky bar (homepage + all pages)
+  useEffect(() => {
+    const SCROLL_THRESHOLD = 24;
+
+    const updateScrollState = () => {
+      setHeaderScrolled(window.scrollY > SCROLL_THRESHOLD);
+    };
+
+    updateScrollState();
+    window.addEventListener('scroll', updateScrollState, { passive: true });
+    return () => window.removeEventListener('scroll', updateScrollState);
+  }, [pathname]);
 
   // Debug: Log auth state changes
   useEffect(() => {
@@ -601,6 +747,15 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isMobileMenuOpen]);
 
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
@@ -779,115 +934,52 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 header-glass">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-[8rem]">
-            {/* Left side - Unite India Text Logo with Editorial Typography */}
-            <div className="flex items-center h-full">
-              <Link href="/" className="group flex items-center gap-3 h-full">
-                {/* Unite India logo icon - full header height, 168px wide */}
-                <div className="header-logo-image-wrap flex items-center justify-center h-full w-[168px] min-w-[168px] rounded-xl flex-shrink-0 overflow-hidden transition-all duration-300 group-hover:scale-105">
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 header-glass${headerScrolled ? ' header-glass--scrolled' : ''}${isHomePage ? ' header-glass--home' : ''}`}
+      >
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:pl-5 lg:pr-8 xl:px-10">
+          <div className="flex h-[8rem] w-full min-w-0 items-center gap-3 sm:gap-4 lg:gap-6">
+            {/* Brand — logo + MALAYALEES.US on all breakpoints (incl. mobile) */}
+            <div className="flex min-w-0 flex-1 items-center h-full max-w-[calc(100%-5.75rem)] sm:max-w-[calc(100%-6.25rem)] lg:max-w-none lg:flex-none lg:mr-1 xl:mr-2">
+              <Link href="/" className="group flex min-w-0 items-center gap-2 sm:gap-2.5 lg:gap-3 h-full">
+                <div className="header-logo-image-wrap flex h-full w-[5.75rem] min-w-[5.75rem] sm:w-[6.75rem] sm:min-w-[6.75rem] lg:w-[7.5rem] lg:min-w-[7.5rem] xl:w-[10.5rem] xl:min-w-[10.5rem] flex-shrink-0 items-center justify-center overflow-hidden rounded-xl transition-all duration-300 group-hover:scale-105">
                   <Image
                     src="/images/logos/Malayalees_US/Malayalees_US_Header_Branding.png"
                     alt="Unite India"
                     width={168}
                     height={128}
-                    className="w-full h-full object-contain object-center"
+                    className="h-full w-full object-contain object-center"
                   />
                 </div>
-                <div className="text-left">
-                  <div className="header-logo-brand text-[1.75rem] leading-tight inline-block">
+                <div className="min-w-0 shrink text-left">
+                  <div className="header-logo-brand truncate whitespace-nowrap text-base leading-tight sm:text-lg md:text-xl lg:text-lg xl:text-[1.5rem] 2xl:text-[1.75rem]">
                     MALAYALEES.US
                   </div>
                 </div>
               </Link>
             </div>
 
-            {/* Center - Desktop Navigation */}
-            <div className="hidden lg:flex items-center gap-1 ml-6">
-              {/* Navigation Menu Items */}
+            {/* Main nav (desktop) — grows in remaining space; no wrap to prevent overlap */}
+            <div className="hidden min-w-0 flex-1 items-center overflow-visible lg:flex">
               {!hideMenuItems && (
-                <nav className="flex items-center gap-0.5" role="navigation" aria-label="Main navigation">
+                <nav
+                  className="header-main-nav flex min-w-0 flex-nowrap items-center gap-0.5 lg:gap-1 xl:gap-2"
+                  role="navigation"
+                  aria-label="Main navigation"
+                >
                   {updatedNavItems.map((item) => {
                     const hasDropdown = item.dropdown && Array.isArray(item.dropdown) && item.dropdown.length > 0;
-                    const isAboutActive = hasDropdown && item.name === 'About' && item.dropdown.some(
-                      (subItem: any) => subItem.href === pathname ||
-                        (subItem.href === '/#about-us' && typeof window !== 'undefined' && window.location.hash === '#about-us') ||
-                        (subItem.href === '/team' && pathname === '/team') ||
-                        (subItem.href === '/sponsors' && pathname === '/sponsors')
-                    );
-                    const isFeaturesActive = hasDropdown && item.name === 'Features' && item.dropdown.some(
-                      (subItem: any) => subItem.href === pathname ||
-                        (subItem.href === '/profile' && pathname === '/profile') ||
-                        (subItem.href === '/membership' && pathname?.startsWith('/membership')) ||
-                        (subItem.href === '/mosc' && pathname?.startsWith('/mosc')) ||
-                        (subItem.href === '/mosc-redesign' && pathname?.startsWith('/mosc-redesign'))
-                    );
 
                     return (
-                      <div key={item.name} className="relative group">
+                      <div key={item.name} className="relative">
                         {hasDropdown ? (
-                          <>
-                            <div
-                              className={`header-nav-link font-semibold flex items-center gap-1.5 cursor-pointer ${(item.name === 'About' && isAboutActive) || (item.name === 'Features' && isFeaturesActive)
-                                  ? 'active'
-                                  : ''
-                                }`}
-                              aria-haspopup="true"
-                              aria-expanded="false"
-                              role="button"
-                              tabIndex={0}
-                            >
-                              <span>{item.name}</span>
-                              <ChevronDown
-                                size={16}
-                                className="header-chevron text-[var(--header-text-muted)]"
-                                aria-hidden="true"
-                              />
-                            </div>
-                            {/* Dropdown Menu */}
-                            <div
-                              className="header-dropdown absolute top-full left-0 mt-2 w-56 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100 z-50"
-                              role="menu"
-                              aria-label={`${item.name} submenu`}
-                            >
-                              <div className="py-2">
-                                {item.dropdown.map((subItem: any) => {
-                                  // Skip Profile if user is not authenticated
-                                  if (subItem.requiresAuth && !userId) return null;
-
-                                  // Skip Membership if membership subscription is not enabled
-                                  if (subItem.href === '/membership' && !settings?.isMembershipSubscriptionEnabled) return null;
-
-                                  const isSubItemActive = subItem.href === pathname ||
-                                    (subItem.href === '/membership' && pathname?.startsWith('/membership')) ||
-                                    (subItem.href === '/mosc' && pathname?.startsWith('/mosc')) ||
-                                    (subItem.href === '/mosc-redesign' && pathname?.startsWith('/mosc-redesign')) ||
-                                    (subItem.href === '/#about-us' && typeof window !== 'undefined' && window.location.hash === '#about-us') ||
-                                    (subItem.href === '/team' && pathname === '/team');
-
-                                  return (
-                                    <Link
-                                      key={subItem.name}
-                                      href={subItem.href}
-                                      prefetch={subItem.href === '/mosc' || subItem.href === '/mosc-redesign' ? false : undefined}
-                                      onClick={(e) => {
-                                        // Handle smooth scroll for hash links
-                                        if (subItem.href.startsWith('/#')) {
-                                          handleSmoothScroll(e, subItem.href);
-                                        }
-                                      }}
-                                      className={`header-dropdown-item font-semibold block ${isSubItemActive ? 'active' : ''}`}
-                                      role="menuitem"
-                                      aria-label={`Navigate to ${subItem.name}`}
-                                    >
-                                      {subItem.name}
-                                    </Link>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          </>
+                          <HeaderNavDropdown
+                            item={{ name: item.name, dropdown: item.dropdown }}
+                            userId={userId}
+                            settings={settings}
+                            pathname={pathname}
+                            handleSmoothScroll={handleSmoothScroll}
+                          />
                         ) : (
                           <Link
                             href={item.href}
@@ -904,9 +996,11 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                   })}
                 </nav>
               )}
+            </div>
 
-              {/* Auth and Admin Menu Items */}
-              <div className="flex items-center gap-2 ml-2">
+            {/* Right — auth, search, mobile menu */}
+            <div className="ml-auto flex shrink-0 items-center justify-end gap-2 sm:gap-3">
+              <div className="hidden lg:flex items-center gap-2">
                 {!userId ? (
                   <>
                     <Link
@@ -924,7 +1018,6 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                   </>
                 ) : (
                   <>
-                    {/* Admin Menu with Submenu */}
                     {isAdmin && (
                       <div className="relative group">
                         <Link
@@ -939,7 +1032,6 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                           />
                         </Link>
 
-                        {/* Admin Submenu */}
                         <div className="header-dropdown absolute top-full right-0 mt-2 w-64 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100 z-50 max-h-[70vh] overflow-y-auto">
                           <div className="py-2">
                             {adminSubmenuItems.map(subItem => {
@@ -961,7 +1053,6 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                                         aria-hidden="true"
                                       />
                                     </div>
-                                    {/* Membership Submenu */}
                                     <div className="header-dropdown absolute top-0 left-full ml-2 w-48 group-hover/membership:visible group-hover/membership:opacity-100 group-hover/membership:translate-y-0 group-hover/membership:scale-100 z-50">
                                       <div className="py-2">
                                         {subItem.dropdown.map((subSubItem: any) => {
@@ -1001,7 +1092,6 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                       </div>
                     )}
 
-                    {/* User Profile Avatar Dropdown - Rightmost */}
                     <UserAvatarDropdown
                       user={user}
                       onSignOut={handleSignOut}
@@ -1010,10 +1100,6 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
                   </>
                 )}
               </div>
-            </div>
-
-            {/* Right side - Search and Mobile Menu */}
-            <div className="flex items-center gap-2">
               {/* Search Button */}
               <button
                 aria-label="Search"
@@ -1053,57 +1139,54 @@ export default function Header({ hideMenuItems = false, variant = 'charity', isT
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-[var(--header-text-primary)]/20 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 z-[55] bg-[var(--header-text-primary)]/30 backdrop-blur-sm lg:hidden"
           onClick={closeMobileMenu}
+          aria-hidden="true"
         />
       )}
 
-      {/* Mobile Menu Sidebar */}
+      {/* Mobile Menu — full viewport width so nothing is clipped off-screen */}
       <div
         id="mobile-menu"
-        className={`header-mobile-menu fixed top-0 right-0 h-full w-80 max-w-[85vw] z-50 transform transition-transform duration-300 ease-out lg:hidden ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+        className={`header-mobile-menu fixed inset-y-0 right-0 left-0 z-[60] flex h-[100dvh] max-h-[100dvh] w-full max-w-[100vw] transform transition-transform duration-300 ease-out lg:hidden ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
         aria-hidden={!isMobileMenuOpen}
       >
-        <div className="flex flex-col h-full">
-          {/* Mobile Menu Header */}
-          <div className="flex items-center justify-between p-5 border-b border-[var(--header-border)]">
-            <Link href="/" className="group flex items-center gap-2.5" onClick={closeMobileMenu}>
-              <div className="header-logo-image-wrap flex items-center justify-center w-[144px] min-w-[144px] h-[6rem] rounded-lg flex-shrink-0 overflow-hidden">
+        <div className="flex h-full min-h-0 w-full max-w-full flex-col overflow-hidden">
+          {/* Mobile Menu Header — compact row; close always visible */}
+          <div className="flex shrink-0 items-center gap-3 border-b border-[var(--header-border)] px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
+            <Link
+              href="/"
+              className="group flex min-w-0 flex-1 items-center gap-2 overflow-hidden"
+              onClick={closeMobileMenu}
+            >
+              <div className="header-logo-image-wrap flex h-12 w-12 min-w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg sm:h-14 sm:w-14 sm:min-w-14">
                 <Image
                   src="/images/logos/Malayalees_US/Malayalees_US_Header_Branding.png"
                   alt="Unite India"
-                  width={144}
-                  height={110}
-                  className="w-full h-full object-contain"
+                  width={56}
+                  height={56}
+                  className="h-full w-full object-contain"
                 />
               </div>
-              <div className="text-left">
-                <div className="header-logo-brand text-2xl leading-tight inline-block">
+              <div className="min-w-0 text-left">
+                <div className="header-logo-brand truncate text-base leading-tight sm:text-lg">
                   MALAYALEES.US
                 </div>
               </div>
             </Link>
             <button
               onClick={closeMobileMenu}
-              className="
-                flex items-center justify-center
-                w-10 h-10
-                text-[var(--header-text-muted)] hover:text-[var(--header-accent-primary)]
-                bg-transparent hover:bg-[var(--header-hover-bg)]
-                rounded-lg
-                focus:outline-none focus:ring-2 focus:ring-[var(--header-focus-ring)]
-                transition-all duration-200
-                touch-manipulation
-              "
+              className="header-mobile-menu-close flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[var(--header-border)] bg-[var(--header-hover-bg)] text-[var(--header-text-primary)] hover:bg-[var(--header-active-bg)] focus:outline-none focus:ring-2 focus:ring-[var(--header-focus-ring)] transition-all duration-200 touch-manipulation"
               aria-label="Close navigation menu"
+              type="button"
             >
-              <X size={20} strokeWidth={2} aria-hidden="true" />
+              <X size={22} strokeWidth={2.5} aria-hidden="true" />
             </button>
           </div>
 
           {/* Mobile Menu Navigation */}
-          <nav className="flex-1 overflow-y-auto py-4" role="navigation" aria-label="Mobile navigation">
+          <nav className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto py-4 pb-[max(1rem,env(safe-area-inset-bottom))]" role="navigation" aria-label="Mobile navigation">
             <ul className="space-y-0.5 px-3">
               {!hideMenuItems && updatedNavItems.map((item) => {
                 const hasDropdown = item.dropdown && Array.isArray(item.dropdown) && item.dropdown.length > 0;

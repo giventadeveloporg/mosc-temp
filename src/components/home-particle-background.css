@@ -1,4 +1,4 @@
-/* Richer purple glass — shared by all homepage cards */
+/* Richer purple glass — shared by all homepage cards + header/footer tokens on particle canvas */
 body.home-page-background {
   --homepage-purple-glass-gradient: linear-gradient(
     145deg,
@@ -13,6 +13,17 @@ body.home-page-background {
   --homepage-purple-glass-shadow-hover:
     0 10px 28px rgba(76, 29, 149, 0.22),
     0 1px 0 rgba(255, 255, 255, 0.9) inset;
+  --header-bg-glass: transparent;
+  --header-text-primary: #f8fafc;
+  --header-text-secondary: rgba(248, 250, 252, 0.94);
+  --header-text-muted: rgba(226, 232, 240, 0.88);
+  --header-hover-bg: rgba(255, 255, 255, 0.1);
+  --header-active-bg: rgba(167, 139, 250, 0.28);
+  --header-border: rgba(255, 255, 255, 0.14);
+  --header-dropdown-bg: rgba(30, 27, 75, 0.96);
+  --header-dropdown-border: rgba(196, 181, 253, 0.35);
+  --header-dropdown-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+  --header-focus-ring: rgba(196, 181, 253, 0.55);
 }
 
 /* Fixed viewport particle background — homepage only (via HomeParticleBackground) */
@@ -33,6 +44,21 @@ body.home-page-background .home-page-layout .home-hero-viewport-filler,
 body.home-page-background .home-page-layout .home-hero-viewport-filler .hero-container-split,
 body.home-page-background .home-page-layout .hero-slideshow-ken-burns {
   background: transparent !important;
+}
+
+/* Hero top row (Kerala + slideshow) — mobile uses light section bg in globals; show particles instead */
+@media (max-width: 767px) {
+  body.home-page-background .home-page-layout .hero-brand-card,
+  body.home-page-background .home-page-layout .hero-brand-image-wrap,
+  body.home-page-background .home-page-layout .hero-right-wrap,
+  body.home-page-background .home-page-layout .hero-right-panel,
+  body.home-page-background .home-page-layout .hero-slideshow-neon-frame,
+  body.home-page-background .home-page-layout .hero-slideshow-wrapper,
+  body.home-page-background .home-page-layout .hero-slideshow-ken-burns,
+  body.home-page-background .home-page-layout .hero-crossfade-stack,
+  body.home-page-background .home-page-layout .hero-crossfade-layer {
+    background: transparent !important;
+  }
 }
 
 /* Green section wrappers */
@@ -66,12 +92,163 @@ body.home-page-background .home-page-layout div.bg-gray-800.py-24.text-white {
   -webkit-backdrop-filter: blur(10px);
 }
 
-/* Footer (sibling of main in layout) — particles visible when scrolled to bottom */
+/* ── Header & footer: transparent over particle canvas (homepage only) ── */
+body.home-page-background .header-glass.header-glass--home {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  border-bottom: none !important;
+  transition:
+    background 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    backdrop-filter 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    -webkit-backdrop-filter 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Scrolled: frosted glass so body content under the sticky header stays readable */
+body.home-page-background .header-glass.header-glass--home.header-glass--scrolled {
+  background: linear-gradient(
+    180deg,
+    rgba(26, 10, 46, 0.92) 0%,
+    rgba(26, 10, 46, 0.78) 72%,
+    rgba(26, 10, 46, 0.55) 100%
+  ) !important;
+  backdrop-filter: blur(18px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(160%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.35),
+    0 1px 0 rgba(255, 255, 255, 0.06) inset !important;
+}
+
+/* Soft fade strip below header when scrolled (extra separation from content) */
+body.home-page-background .header-glass.header-glass--home.header-glass--scrolled::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1.25rem;
+  height: 1.25rem;
+  pointer-events: none;
+  z-index: -1;
+  background: linear-gradient(
+    180deg,
+    rgba(26, 10, 46, 0.45) 0%,
+    transparent 100%
+  );
+}
+
+body.home-page-background .header-logo-brand {
+  color: #ede9fe !important;
+  filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.45))
+    drop-shadow(0 0 12px rgba(167, 139, 250, 0.35));
+}
+
+body.home-page-background .header-nav-link {
+  color: rgba(248, 250, 252, 0.95) !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+body.home-page-background .header-nav-link:hover {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.home-page-background .header-nav-link.active {
+  color: #fbbf24 !important;
+}
+
+body.home-page-background .header-nav-link.active::after {
+  background: #fbbf24 !important;
+}
+
+body.home-page-background .header-cta {
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.75) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+body.home-page-background .header-cta:hover {
+  color: #1e1b4b !important;
+}
+
+body.home-page-background .header-hamburger-line {
+  background: rgba(248, 250, 252, 0.95) !important;
+}
+
+body.home-page-background .header-mobile-menu {
+  background: rgba(30, 27, 75, 0.96) !important;
+  backdrop-filter: blur(20px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
+  border-left: none !important;
+}
+
+body.home-page-background .header-mobile-menu-close {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #f8fafc !important;
+}
+
+body.home-page-background .header-mobile-menu .from-violet-50,
+body.home-page-background .header-mobile-menu [class*='from-violet-50'] {
+  background: rgba(255, 255, 255, 0.08) !important;
+  background-image: none !important;
+}
+
+/* Footer — no solid bar; particle background shows through */
 body.home-page-background footer.footer-edge-to-edge,
-body.home-page-background footer.footer-edge-to-edge .bg-gray-900 {
-  background-color: rgba(17, 24, 39, 0.72) !important;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+body.home-page-background footer.footer-edge-to-edge .bg-gray-900,
+body.home-page-background footer.footer-edge-to-edge [class*='bg-gray-900'] {
+  background-color: transparent !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+body.home-page-background footer.footer-edge-to-edge {
+  position: relative;
+  z-index: 1;
+  color: #e2e8f0;
+  border-top: none;
+}
+
+body.home-page-background footer.footer-edge-to-edge .text-gray-300 {
+  color: #e2e8f0 !important;
+}
+
+body.home-page-background footer.footer-edge-to-edge .text-gray-400 {
+  color: #cbd5e1 !important;
+}
+
+body.home-page-background footer.footer-edge-to-edge .text-white {
+  color: #f8fafc !important;
+}
+
+body.home-page-background footer.footer-edge-to-edge h3,
+body.home-page-background footer.footer-edge-to-edge .font-semibold.text-white {
+  color: #f8fafc !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+body.home-page-background footer.footer-edge-to-edge .border-gray-800 {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+body.home-page-background footer.footer-edge-to-edge a[class*='bg-gray-800'] {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #e2e8f0 !important;
+}
+
+body.home-page-background footer.footer-edge-to-edge a[class*='bg-gray-800']:hover {
+  color: #ffffff !important;
+}
+
+body.home-page-background footer.footer-edge-to-edge a.text-gray-300:hover,
+body.home-page-background footer.footer-edge-to-edge a.text-gray-400:hover {
+  color: #c4b5fd !important;
 }
 
 /* ── Homepage light purple glass panels (matches Cultural Workshops cards) ── */
