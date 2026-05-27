@@ -159,7 +159,7 @@ function UpcomingEventGlassCard({
           aria-hidden
         />
         <div className="relative z-[2] flex min-h-0 flex-1 flex-col">
-          {event.thumbnailUrl && (
+          {event.thumbnailUrl ? (
             <Link
               href={`/events/${event.id}/checkout`}
               className="block shrink-0 cursor-pointer"
@@ -171,22 +171,25 @@ function UpcomingEventGlassCard({
                 isPastEvent={!isUpcomingEvents}
               />
             </Link>
+          ) : (
+            <div
+              className="event-card-banner-media event-card-banner-media--upcoming w-full shrink-0"
+              aria-hidden
+            />
           )}
           {!event.thumbnailUrl && !isUpcomingEvents && (
-            <div className="relative w-full pt-3 pr-3">
-              <div className="flex justify-end">
-                <span className="rounded-full bg-gray-500 px-3 py-1 text-xs font-medium text-white">Past Event</span>
-              </div>
+            <div className="pointer-events-none absolute right-3 top-3 z-10">
+              <span className="rounded-full bg-gray-500 px-3 py-1 text-xs font-medium text-white">Past Event</span>
             </div>
           )}
 
-          <div className={`flex min-h-0 flex-1 flex-col p-5 ${event.thumbnailUrl ? 'border-t border-white/25' : ''}`}>
+          <div className="flex min-h-0 flex-1 flex-col border-t border-white/25 p-5">
             <h2 className="mb-2 text-xl font-bold text-gray-800">{event.title}</h2>
 
             {event.caption && <p className="mb-3 text-base text-gray-600">{event.caption}</p>}
 
-            <div className="mb-2 flex flex-wrap justify-center gap-3 lg:mx-auto lg:max-w-4xl">
-              <div className="flex w-full items-center gap-3 text-gray-700 sm:w-auto sm:min-w-[280px]">
+            <div className="mb-2 flex w-full flex-col items-start gap-3">
+              <div className="flex w-full items-start gap-3 text-gray-700">
                 <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-blue-100 transition-transform duration-300 group-hover:scale-110">
                   <svg className="h-10 w-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -194,7 +197,7 @@ function UpcomingEventGlassCard({
                 </div>
                 <span className="text-lg font-semibold">{formatDate(event.startDate, event.timezone)}</span>
               </div>
-              <div className="flex w-full items-center gap-3 text-gray-700 sm:w-auto sm:min-w-[280px]">
+              <div className="flex w-full items-start gap-3 text-gray-700">
                 <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-green-100 transition-transform duration-300 group-hover:scale-110">
                   <svg className="h-10 w-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -205,7 +208,7 @@ function UpcomingEventGlassCard({
                 </span>
               </div>
               {event.location && (
-                <div className="flex w-full items-center gap-3 text-gray-700 sm:w-auto sm:min-w-[280px]">
+                <div className="flex w-full items-start gap-3 text-gray-700">
                   <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-purple-100 transition-transform duration-300 group-hover:scale-110">
                     <svg className="h-10 w-10 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -806,16 +809,14 @@ const UpcomingEventsSection: React.FC = () => {
         <div className="text-center">
           <Link
             href="/events"
-            className="inline-flex flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+            className="hero-browse-link hero-browse-link-neon"
             title="View All Events"
             aria-label="View All Events"
           >
-            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
-              <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </div>
-            <span className="font-semibold text-indigo-700">View All Events</span>
+            <span>View All Events</span>
+            <svg className="shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+            </svg>
           </Link>
         </div>
       </HomeSectionRail>

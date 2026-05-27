@@ -63,6 +63,18 @@ body.home-page-background .home-section-eyebrow-mark {
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-bottom: none;
   box-shadow: none;
+  transition:
+    background 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    backdrop-filter 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    -webkit-backdrop-filter 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Non-home pages: slightly stronger glass after scroll */
+.header-glass.header-glass--scrolled:not(.header-glass--home) {
+  background: rgba(240, 253, 244, 0.98);
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
 }
 
 /* Header logo image — breathing room above bottom border */
@@ -130,12 +142,20 @@ body.home-page-background .home-section-eyebrow-mark {
 
 /* Responsive padding for navigation links */
 @media (min-width: 1024px) {
-  .header-nav-link {
-    padding: 0.5rem 0.875rem;
+  .header-main-nav .header-nav-link {
+    padding: 0.5rem 0.5rem;
+    font-size: 0.9375rem;
   }
 }
 
 @media (min-width: 1280px) {
+  .header-nav-link {
+    padding: 0.5rem 0.875rem;
+    font-size: 1.0625rem;
+  }
+}
+
+@media (min-width: 1536px) {
   .header-nav-link {
     padding: 0.5rem 1rem;
   }
@@ -185,10 +205,22 @@ body.home-page-background .home-section-eyebrow-mark {
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.header-dropdown.visible {
+.header-dropdown.visible,
+.group:hover > .header-dropdown,
+.group:focus-within > .header-dropdown {
   opacity: 1;
   visibility: visible;
   transform: translateY(0) scale(1);
+}
+
+/* Hover bridge between nav trigger and dropdown (avoids gap losing hover) */
+.header-dropdown::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -0.5rem;
+  height: 0.5rem;
 }
 
 .header-dropdown-item {
@@ -273,8 +305,14 @@ body.home-page-background .home-section-eyebrow-mark {
   background: var(--header-bg-glass);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-left: 1px solid var(--header-border);
+  border-left: none;
   box-shadow: -10px 0 40px rgba(99, 67, 138, 0.15);
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+.header-mobile-menu-close {
+  color: var(--header-text-primary);
 }
 
 .header-mobile-link {
@@ -2005,6 +2043,15 @@ nav[role="navigation"] .group {
   object-position: top center !important;
 }
 
+/* Homepage: upcoming event banner slot — purple glass (matches Services, Featured, Team cards) */
+body.home-page-background .home-page-layout .upcoming-events-glass-card-face .event-card-banner-media--upcoming {
+  background: var(--homepage-purple-glass-gradient) !important;
+  background-color: transparent !important;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--homepage-purple-glass-border);
+}
+
 /* Featured homepage strip — compact on mobile; desktop fills entire media column (object-cover) */
 .event-card-banner-media--featured-strip {
   aspect-ratio: 20 / 9;
@@ -2151,13 +2198,25 @@ body.home-page-background .home-section-eyebrow-stack {
 @media (max-width: 639px) {
   .home-section-rail {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: 0.75rem;
   }
 
   .home-section-rail__aside {
     width: auto;
     padding-top: 0;
+    align-self: center;
+  }
+
+  .home-section-rail__content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .home-section-rail__content > * {
+    width: 100%;
   }
 
   body.home-page-background .home-section-rail .home-section-eyebrow {
@@ -2246,9 +2305,31 @@ body.home-page-background .home-section-body-text {
   margin-right: auto;
 }
 
+@media (max-width: 767px) {
+  .featured-events-section .featured-events-list {
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .featured-events-section .featured-event-card {
+    width: 100%;
+    max-width: 36rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
 @media (min-width: 768px) {
   .featured-events-section .featured-events-list {
     gap: 1rem;
+    align-items: stretch;
+  }
+
+  .featured-events-section .featured-event-card {
+    max-width: none;
   }
 }
 
@@ -2573,6 +2654,30 @@ body.home-page-background .testimonials-glass-card .text-slate-600 {
 .upcoming-events-glass-card-face:hover .upcoming-events-glass-card-shine {
   opacity: 1;
   background-position: 100% 50%;
+}
+
+/* Homepage: full upcoming event card uses shared purple glass (not default white frost) */
+body.home-page-background .home-page-layout .upcoming-events-glass-card-face {
+  background: var(--homepage-purple-glass-gradient) !important;
+  background-color: transparent !important;
+  border: 1px solid var(--homepage-purple-glass-border) !important;
+  box-shadow: var(--homepage-purple-glass-shadow);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+body.home-page-background .home-page-layout .upcoming-events-glass-card-face:hover {
+  border-color: rgba(255, 255, 255, 0.9) !important;
+  box-shadow: var(--homepage-purple-glass-shadow-hover);
+}
+
+body.home-page-background .home-page-layout .upcoming-events-glass-card-face .text-gray-800,
+body.home-page-background .home-page-layout .upcoming-events-glass-card-face .text-gray-700 {
+  color: #1e1b4b !important;
+}
+
+body.home-page-background .home-page-layout .upcoming-events-glass-card-face .text-gray-600 {
+  color: #312e81 !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

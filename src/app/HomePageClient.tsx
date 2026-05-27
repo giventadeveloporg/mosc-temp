@@ -22,6 +22,7 @@ import { bootstrapUserProfile } from '@/components/ProfileBootstrapperApiServerA
 import Link from 'next/link';
 import type { FeaturedEventWithMedia } from '@/lib/homepage/featuredEvents';
 import HomeParticleBackground from '../components/HomeParticleBackground';
+import { InstagramIcon } from '@/components/icons/InstagramIcon';
 import { HomeSectionRail } from '@/components/HomeSectionRail';
 import { HomeSectionTitle } from '@/components/HomeSectionTitle';
 
@@ -433,7 +434,7 @@ function HomePageContent({ initialFeaturedEvents }: { initialFeaturedEvents: Fea
                       )}
                       {settings?.instagramUrl?.trim() && (
                         <a href={settings.instagramUrl.trim()} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 w-10 h-10 rounded-lg bg-pink-100 hover:bg-pink-200 flex items-center justify-center transition-all duration-300 hover:scale-110" title="Follow us on Instagram" aria-label="Follow us on Instagram">
-                          <svg className="w-6 h-6 text-pink-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069z"/></svg>
+                          <InstagramIcon className="w-6 h-6 text-pink-600" />
                         </a>
                       )}
                       {settings?.twitterUrl?.trim() && (

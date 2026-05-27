@@ -227,16 +227,14 @@ const OurSponsorsSection: React.FC = () => {
         <div className="text-center">
           <Link
             href="/sponsors"
-            className="inline-flex flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-6"
+            className="hero-browse-link hero-browse-link-neon"
             title="See All Sponsors"
             aria-label="See All Sponsors"
           >
-            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
-              <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </div>
-            <span className="font-semibold text-indigo-700">See All Sponsors</span>
+            <span>See All Sponsors</span>
+            <svg className="shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+            </svg>
           </Link>
         </div>
       </HomeSectionRail>
