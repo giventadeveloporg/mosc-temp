@@ -292,7 +292,7 @@ const TeamSection: React.FC = () => {
                     return (
               <div
                 key={member.id}
-                className={`${styles.teamCard} group relative rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 ease-out hover:-translate-y-3`}
+                className={`${styles.teamCard} team-card group relative rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 ease-out hover:-translate-y-3`}
                 style={{
                   animationDelay: `${globalIndex * 150}ms`,
                 }}
@@ -328,7 +328,7 @@ const TeamSection: React.FC = () => {
                 </div>
 
                 {/* Card Content - flex column with scrollable body so image never gets cut off */}
-                <div className={`${styles.cardContent} flex flex-col min-h-0`}>
+                <div className={`${styles.cardContent} team-card-content flex flex-col min-h-0`}>
                   {/* Name and Title - reduced spacing */}
                   <div className="flex-shrink-0 mb-2">
                     <h3 className="text-xl lg:text-2xl font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors duration-300">
@@ -442,16 +442,14 @@ const TeamSection: React.FC = () => {
               <div className="mt-12 flex justify-center">
                 <Link
                   href="/team"
-                  className="w-full max-w-xs flex-shrink-0 h-14 rounded-xl bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105"
+                  className="hero-browse-link hero-browse-link-neon"
                   title="View All Team Members"
                   aria-label="View All Team Members"
                 >
-                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-200 flex items-center justify-center">
-                    <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                  </div>
-                  <span className="font-semibold text-indigo-700">Show More</span>
+                  <span>Show More</span>
+                  <svg className="shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                  </svg>
                 </Link>
               </div>
             )}

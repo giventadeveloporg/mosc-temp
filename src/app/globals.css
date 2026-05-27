@@ -2005,6 +2005,15 @@ nav[role="navigation"] .group {
   object-position: top center !important;
 }
 
+/* Homepage: upcoming event banner slot — purple glass (matches Services, Featured, Team cards) */
+body.home-page-background .home-page-layout .upcoming-events-glass-card-face .event-card-banner-media--upcoming {
+  background: var(--homepage-purple-glass-gradient) !important;
+  background-color: transparent !important;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--homepage-purple-glass-border);
+}
+
 /* Featured homepage strip — compact on mobile; desktop fills entire media column (object-cover) */
 .event-card-banner-media--featured-strip {
   aspect-ratio: 20 / 9;
@@ -2573,6 +2582,30 @@ body.home-page-background .testimonials-glass-card .text-slate-600 {
 .upcoming-events-glass-card-face:hover .upcoming-events-glass-card-shine {
   opacity: 1;
   background-position: 100% 50%;
+}
+
+/* Homepage: full upcoming event card uses shared purple glass (not default white frost) */
+body.home-page-background .home-page-layout .upcoming-events-glass-card-face {
+  background: var(--homepage-purple-glass-gradient) !important;
+  background-color: transparent !important;
+  border: 1px solid var(--homepage-purple-glass-border) !important;
+  box-shadow: var(--homepage-purple-glass-shadow);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+body.home-page-background .home-page-layout .upcoming-events-glass-card-face:hover {
+  border-color: rgba(255, 255, 255, 0.9) !important;
+  box-shadow: var(--homepage-purple-glass-shadow-hover);
+}
+
+body.home-page-background .home-page-layout .upcoming-events-glass-card-face .text-gray-800,
+body.home-page-background .home-page-layout .upcoming-events-glass-card-face .text-gray-700 {
+  color: #1e1b4b !important;
+}
+
+body.home-page-background .home-page-layout .upcoming-events-glass-card-face .text-gray-600 {
+  color: #312e81 !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

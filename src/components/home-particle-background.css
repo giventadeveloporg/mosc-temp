@@ -100,11 +100,13 @@ body.home-page-background .home-page-layout .homepage-glass-card.services-glass-
   transform: translateY(-2px) scale(1.004);
 }
 
-body.home-page-background .home-page-layout .teamCard .cardContent {
+/* Team member cards — content panel (global class; CSS module hashes break .teamCard .cardContent) */
+body.home-page-background .home-page-layout .team-card-content {
   background: var(--homepage-purple-glass-gradient) !important;
+  background-color: transparent !important;
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
-  border: 1px solid var(--homepage-purple-glass-border);
+  border: 1px solid var(--homepage-purple-glass-border) !important;
   box-shadow: var(--homepage-purple-glass-shadow);
 }
 
@@ -145,14 +147,42 @@ body.home-page-background .live-event-details-panel .text-slate-600 {
   color: #312e81 !important;
 }
 
-body.home-page-background .home-page-layout .teamCard .cardContent .text-gray-900,
-body.home-page-background .home-page-layout .teamCard .cardContent .text-gray-800 {
+/* Readable text on team card purple glass */
+body.home-page-background .home-page-layout .team-card-content .text-gray-900,
+body.home-page-background .home-page-layout .team-card-content .text-gray-800,
+body.home-page-background .home-page-layout .team-card-content h3 {
   color: #1e1b4b !important;
 }
 
-body.home-page-background .home-page-layout .teamCard .cardContent .text-gray-600,
-body.home-page-background .home-page-layout .teamCard .cardContent .text-gray-500 {
+body.home-page-background .home-page-layout .team-card-content .group:hover h3 {
+  color: #4c1d95 !important;
+}
+
+body.home-page-background .home-page-layout .team-card-content .text-gray-700,
+body.home-page-background .home-page-layout .team-card-content .text-gray-600,
+body.home-page-background .home-page-layout .team-card-content .text-gray-500 {
   color: #312e81 !important;
+}
+
+body.home-page-background .home-page-layout .team-card-content .text-gray-400 {
+  color: #4338ca !important;
+}
+
+body.home-page-background .home-page-layout .team-card-content .text-blue-600 {
+  color: #4c1d95 !important;
+}
+
+body.home-page-background .home-page-layout .team-card-content .bg-blue-50 {
+  background: rgba(255, 255, 255, 0.38) !important;
+  border: 1px solid rgba(237, 233, 254, 0.65);
+}
+
+body.home-page-background .home-page-layout .team-card-content .border-gray-100 {
+  border-color: rgba(237, 233, 254, 0.55) !important;
+}
+
+body.home-page-background .home-page-layout .team-card-content a:hover {
+  color: #5b21b6 !important;
 }
 
 body.home-page-background .home-page-layout .homepage-glass-card > * {
