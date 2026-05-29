@@ -138,16 +138,21 @@ const nextConfig = {
           },
         ],
       },
-      // Allow Next.js static assets to be cached (they have unique hashes)
-      {
-        source: '/_next/static/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
+      // Production only: long-cache hashed webpack chunks. In dev, custom Cache-Control on
+      // /_next/static breaks HMR and can cause ChunkLoadError (timeout loading app/layout.js).
+      ...(process.env.NODE_ENV === 'production'
+        ? [
+            {
+              source: '/_next/static/:path*',
+              headers: [
+                {
+                  key: 'Cache-Control',
+                  value: 'public, max-age=31536000, immutable',
+                },
+              ],
+            },
+          ]
+        : []),
     ];
   },
 

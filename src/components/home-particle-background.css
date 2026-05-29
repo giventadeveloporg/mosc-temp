@@ -370,3 +370,55 @@ body.home-page-background .home-page-layout .homepage-glass-card > * {
 body.home-page-background .home-page-layout .homepage-glass-card .text-gray-700 {
   color: #312e81 !important;
 }
+
+/* Team + Sponsors pages: homepage-like header behavior
+ * - At top: transparent (no separate header background color)
+ * - On scroll: dark frosted backdrop appears
+ */
+body.team-page-background .header-glass,
+body.sponsors-page-background .header-glass {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  border-bottom: none !important;
+  transition:
+    background 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    backdrop-filter 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    -webkit-backdrop-filter 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.team-page-background .header-glass.header-glass--scrolled,
+body.sponsors-page-background .header-glass.header-glass--scrolled {
+  background: linear-gradient(
+    180deg,
+    rgba(26, 10, 46, 0.95) 0%,
+    rgba(26, 10, 46, 0.84) 72%,
+    rgba(26, 10, 46, 0.62) 100%
+  ) !important;
+  backdrop-filter: blur(18px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(160%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.35),
+    0 1px 0 rgba(255, 255, 255, 0.06) inset !important;
+}
+
+body.team-page-background .header-glass.header-glass--scrolled::after,
+body.sponsors-page-background .header-glass.header-glass--scrolled::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1.25rem;
+  height: 1.25rem;
+  pointer-events: none;
+  z-index: -1;
+  background: linear-gradient(
+    180deg,
+    rgba(26, 10, 46, 0.45) 0%,
+    transparent 100%
+  );
+}
