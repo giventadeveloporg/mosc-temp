@@ -13,7 +13,7 @@ interface EventListProps {
   events: EventDetailsDTO[];
   eventTypes: EventTypeDetailsDTO[];
   calendarEvents?: EventCalendarEntryDTO[];
-  onEdit: (event: EventDetailsDTO) => void;
+  onEdit?: (event: EventDetailsDTO) => void;
   onCancel: (event: EventDetailsDTO) => void;
   onHardDelete?: (event: EventDetailsDTO) => void;
   onActivate?: (event: EventDetailsDTO) => void;
@@ -431,9 +431,9 @@ export function EventList({
                   <a
                     href={`/admin/events/${event.id}/edit`}
                     className="flex flex-col items-center focus:outline-none inline-block w-full h-full"
-                    onClick={(e) => {
-                      // Allow default behavior (navigation) but also call onEdit for backward compatibility
-                      onEdit(event);
+                    onClick={() => {
+                      // Allow default navigation via href; optional callback for backward compatibility
+                      onEdit?.(event);
                     }}
                     title="Edit/View Event Details"
                     aria-label="Edit/View Event Details"

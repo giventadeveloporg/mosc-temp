@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect, useRef } from 'react';
 import { flushSync } from 'react-dom';
 import type { EventDetailsDTO, EventTypeDetailsDTO } from '@/types';
