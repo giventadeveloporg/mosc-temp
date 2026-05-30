@@ -371,12 +371,14 @@ body.home-page-background .home-page-layout .homepage-glass-card .text-gray-700 
   color: #312e81 !important;
 }
 
-/* Team + Sponsors pages: homepage-like header behavior
+/* Team + Sponsors + Events pages: homepage-like header behavior
  * - At top: transparent (no separate header background color)
  * - On scroll: dark frosted backdrop appears
  */
 body.team-page-background .header-glass,
-body.sponsors-page-background .header-glass {
+body.sponsors-page-background .header-glass,
+body.events-page-background .header-glass,
+body.polls-page-background .header-glass {
   background: transparent !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
@@ -391,7 +393,9 @@ body.sponsors-page-background .header-glass {
 }
 
 body.team-page-background .header-glass.header-glass--scrolled,
-body.sponsors-page-background .header-glass.header-glass--scrolled {
+body.sponsors-page-background .header-glass.header-glass--scrolled,
+body.events-page-background .header-glass.header-glass--scrolled,
+body.polls-page-background .header-glass.header-glass--scrolled {
   background: linear-gradient(
     180deg,
     rgba(26, 10, 46, 0.95) 0%,
@@ -407,7 +411,9 @@ body.sponsors-page-background .header-glass.header-glass--scrolled {
 }
 
 body.team-page-background .header-glass.header-glass--scrolled::after,
-body.sponsors-page-background .header-glass.header-glass--scrolled::after {
+body.sponsors-page-background .header-glass.header-glass--scrolled::after,
+body.events-page-background .header-glass.header-glass--scrolled::after,
+body.polls-page-background .header-glass.header-glass--scrolled::after {
   content: '';
   position: absolute;
   left: 0;

@@ -2560,6 +2560,41 @@ body.home-page-background .testimonials-glass-card .text-slate-600 {
   color: #475569 !important;
 }
 
+/* ── Events page: text readability on the homepage particle background ──
+ * Reuses the homepage purple-glass tokens. Card-internal grays become dark
+ * indigo (legible on the light-purple glass); standalone text sitting directly
+ * on the dark particle field becomes near-white. */
+body.events-page-background .home-page-layout .services-glass-card-face .text-gray-700,
+body.events-page-background .home-page-layout .services-glass-card-face .text-gray-400,
+body.events-page-background .home-page-layout .homepage-glass-card .text-gray-700,
+body.events-page-background .home-page-layout .homepage-glass-card .text-gray-400 {
+  color: #312e81 !important;
+}
+
+/* Filter description sits directly on the dark particle field — keep it light.
+ * Scoped to the centered header block so pagination chips (which have their own
+ * light backgrounds) are not affected. */
+body.events-page-background .home-page-layout .text-center > p.text-gray-600,
+body.events-page-background .home-page-layout > .max-w-6xl > .text-center.text-gray-500 {
+  color: rgba(248, 250, 252, 0.92) !important;
+}
+
+/* ── Polls page: text readability on the homepage particle background ──
+ * Active poll cards use `bg-white`, so `home-page-layout .bg-white` already
+ * converts them to purple glass (and recolors their inner grays). These rules
+ * cover the standalone copy that sits directly on the dark particle field. */
+body.polls-page-background .home-page-layout p.text-gray-600,
+body.polls-page-background .home-page-layout h2.text-gray-900,
+body.polls-page-background .home-page-layout .text-center.py-12.text-gray-500,
+body.polls-page-background .home-page-layout .text-center.py-12 p.text-gray-500 {
+  color: rgba(248, 250, 252, 0.92) !important;
+}
+
+/* Empty-state placeholder icon on the dark field — soften to a light tint. */
+body.polls-page-background .home-page-layout .text-center.py-12 svg.text-gray-400 {
+  color: rgba(226, 232, 240, 0.6) !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .services-glass-card-wrap {
     opacity: 1;

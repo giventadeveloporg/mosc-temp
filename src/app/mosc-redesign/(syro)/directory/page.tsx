@@ -6,6 +6,7 @@ import { getDirectoryHomeData } from './getDirectoryHomeData';
 import type { DirectorySectionCard } from './types';
 import QuickLinks from '../components/QuickLinks';
 import SyroPageBanner from '../components/SyroPageBanner';
+import DirectorySearch from './DirectorySearch';
 
 export const metadata: Metadata = {
   title: 'Directory | Malankara Orthodox Syrian Church',
@@ -165,6 +166,9 @@ export default async function DirectoryPage() {
         breadcrumbFrom="home"
         description={leadText}
       />
+
+      {/* Quick entity selector + global name search (routes to the chosen entity's list page) */}
+      <DirectorySearch />
 
       {/* Content - same layout and design as /mosc/administration */}
       <section className="py-16 bg-syro-bg-gray">

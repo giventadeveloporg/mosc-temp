@@ -78,7 +78,7 @@ function DownloadCard({ file }: { file: TreeItem }) {
         <p className="text-sm text-gray-500 mt-4 line-clamp-3">Official document file ready for download.</p>
       )}
 
-      <div className="mt-5 pt-4 border-t border-syro-gold/20 flex justify-end">
+      <div className="mt-auto pt-4 border-t border-syro-gold/20 flex justify-end">
         {file.downloadUrl ? (
           <a
             href={file.downloadUrl}

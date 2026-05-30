@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,6 +9,9 @@ import LocationDisplay from '@/components/LocationDisplay';
 import { isRecurringEvent, getNextOccurrenceDate } from '@/lib/eventUtils';
 import { isDonationBasedEvent, isTicketedFundraiserEvent } from '@/lib/donation/utils';
 import { isTicketedEventCube } from '@/lib/eventcube/utils';
+import HomeParticleBackground from '@/components/HomeParticleBackground';
+import { HomeSectionEyebrow } from '@/components/HomeSectionEyebrow';
+import { HomeSectionTitle } from '@/components/HomeSectionTitle';
 // import { formatInTimeZone } from 'date-fns-tz';
 
 const EVENTS_PAGE_SIZE = 20; // Minimum events to display per page
@@ -68,24 +71,21 @@ export default function EventsPage() {
   const [isAutoSwitching, setIsAutoSwitching] = useState(false);
   const [expandedDescriptions, setExpandedDescriptions] = useState<Record<number, boolean>>({});
 
-  // Array of modern background colors inspired by the Dribbble design
-  const cardBackgrounds = [
-    'bg-gradient-to-br from-blue-50 to-blue-100',
-    'bg-gradient-to-br from-green-50 to-green-100',
-    'bg-gradient-to-br from-purple-50 to-purple-100',
-    'bg-gradient-to-br from-pink-50 to-pink-100',
-    'bg-gradient-to-br from-yellow-50 to-yellow-100',
-    'bg-gradient-to-br from-indigo-50 to-indigo-100',
-    'bg-gradient-to-br from-teal-50 to-teal-100',
-    'bg-gradient-to-br from-orange-50 to-orange-100',
-    'bg-gradient-to-br from-cyan-50 to-cyan-100',
-    'bg-gradient-to-br from-rose-50 to-rose-100'
-  ];
-
-  // Function to get random background color for each event
-  const getRandomBackground = (index: number) => {
-    return cardBackgrounds[index % cardBackgrounds.length];
-  };
+  // Apply the homepage design system to this page:
+  // - `home-page-background`: enables the purple particle field, purple-glass cards
+  //   (.home-page-layout .bg-white / .services-glass-card-face), transparent footer,
+  //   and clears green/gradient section shells so the particles show through.
+  // - `events-page-background`: gives the header the homepage behavior on this subpage
+  //   (transparent at top, frosted-dark on scroll) since `header-glass--home` only
+  //   applies on `/`. See src/components/home-particle-background.css.
+  useLayoutEffect(() => {
+    document.body.classList.add('home-page-background');
+    document.body.classList.add('events-page-background');
+    return () => {
+      document.body.classList.remove('home-page-background');
+      document.body.classList.remove('events-page-background');
+    };
+  }, []);
 
   useEffect(() => {
     // Skip reload if we're currently auto-switching (prevents double-load)
@@ -383,7 +383,9 @@ export default function EventsPage() {
   };
 
   return (
-    <div className="w-full overflow-x-hidden">
+    <>
+      <HomeParticleBackground />
+      <div className="home-page-layout relative z-[1] w-full overflow-x-hidden">
       <style dangerouslySetInnerHTML={{
         __html: `
           /* Line clamp utilities */
@@ -406,7 +408,7 @@ export default function EventsPage() {
               min-height: 180px !important;
               height: 180px !important;
               padding-top: 80px !important;
-              background-color: #000 !important;
+              background-color: transparent !important;
               margin: 0 !important;
               padding: 80px 0 0 0 !important;
             }
@@ -444,17 +446,17 @@ export default function EventsPage() {
             .feature-boxes-container {
               margin-top: 180px !important;
             }
-            /* Ensure mobile hero has solid black background */
+            /* Mobile hero is transparent so the particle background shows through */
             .flex.md\\:hidden {
-              background-color: #000 !important;
+              background-color: transparent !important;
               padding: 0 !important;
               margin: 0 !important;
               border: none !important;
               outline: none !important;
             }
-            /* Force all mobile hero elements to have black background */
+            /* Force all mobile hero elements to be transparent */
             .flex.md\\:hidden * {
-              background-color: #000 !important;
+              background-color: transparent !important;
             }
             /* Ensure no white spaces in mobile hero */
             .flex.md\\:hidden img {
@@ -469,7 +471,7 @@ export default function EventsPage() {
             .flex.md\\:hidden h1 {
               margin: 0 !important;
               padding: 0 !important;
-              background-color: #000 !important;
+              background-color: transparent !important;
             }
           }
           /* Desktop-specific adjustments */
@@ -494,7 +496,7 @@ export default function EventsPage() {
         minHeight: '320px',
         position: 'relative',
         overflow: 'visible',
-        backgroundColor: '#000',
+        backgroundColor: 'transparent',
         marginBottom: 0,
         paddingBottom: 0,
         paddingTop: '100px',
@@ -542,7 +544,7 @@ export default function EventsPage() {
           justifyContent: 'center',
           padding: '20px 0px',
           minHeight: '160px',
-          backgroundColor: '#000',
+          backgroundColor: 'transparent',
           position: 'relative',
           zIndex: 3,
           width: '100%',
@@ -564,7 +566,7 @@ export default function EventsPage() {
 
           {/* Mobile Main Text - Single instance only */}
           <div style={{
-            backgroundColor: '#000',
+            backgroundColor: 'transparent',
             padding: '0px',
             margin: '0px',
             width: '100%',
@@ -587,7 +589,7 @@ export default function EventsPage() {
               margin: '0px auto',
               padding: '0px',
               fontWeight: '500',
-              backgroundColor: '#000',
+              backgroundColor: 'transparent',
               justifyContent: 'center',
               alignItems: 'center'
             }}>
@@ -716,9 +718,11 @@ export default function EventsPage() {
       <div className="block md:hidden" style={{ height: '150px', width: '100%', backgroundColor: 'transparent' }}></div>
 
       {/* Event List */}
-      <div className="max-w-6xl mx-auto px-8 py-12 md:px-16 lg:px-24" style={{ paddingTop: '60px' }}>
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-6">All Events</h1>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12" style={{ paddingTop: '60px' }}>
+        <div className="flex flex-col items-center text-center mb-8">
+          {/* Homepage section chrome: eyebrow pill + gradient-accent title */}
+          <HomeSectionEyebrow label="Events" className="mb-4" />
+          <HomeSectionTitle className="mb-6">All Events</HomeSectionTitle>
 
           {/* Event Filter Toggle */}
           <div className="flex justify-center items-center gap-4 mt-6 mb-6">
@@ -768,7 +772,7 @@ export default function EventsPage() {
 
         {/* Search Form */}
         <div className="max-w-5xl mx-auto mb-8">
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+          <div className="homepage-glass-card services-glass-card-face rounded-2xl p-6">
             <h3 className="text-xl font-semibold text-gray-800 mb-4 text-center">Search Events</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* Title Search */}
@@ -974,45 +978,17 @@ export default function EventsPage() {
           </div>
         ) : (
           <>
-            {/* Events List Container with Gradient Background and 3D Beveled Border */}
-            <div
-              className="relative overflow-hidden rounded-3xl mb-8"
-              style={{
-                background: 'linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 50%, #f3e8ff 100%)',
-                padding: '2rem',
-                boxShadow: `
-                  0 20px 60px -12px rgba(0, 0, 0, 0.25),
-                  0 0 0 1px rgba(255, 255, 255, 0.8) inset,
-                  0 2px 4px rgba(0, 0, 0, 0.1) inset,
-                  0 -2px 4px rgba(255, 255, 255, 0.9),
-                  0 4px 8px rgba(0, 0, 0, 0.15)
-                `,
-                border: '1px solid rgba(255, 255, 255, 0.6)',
-                borderTop: '2px solid rgba(255, 255, 255, 0.9)',
-                borderLeft: '2px solid rgba(255, 255, 255, 0.9)',
-                borderBottom: '2px solid rgba(0, 0, 0, 0.1)',
-                borderRight: '2px solid rgba(0, 0, 0, 0.1)',
-              }}
-            >
-              {/* Subtle Radial Gradient Overlay */}
-              <div
-                className="absolute inset-0 pointer-events-none opacity-30"
-                style={{
-                  backgroundImage: 'radial-gradient(circle at top left, rgba(255, 255, 255, 0.5), transparent 60%)'
-                }}
-              />
-
+            {/* Events list — cards sit directly on the particle background (homepage look) */}
+            <div className="mb-8">
               {/* Content Container */}
               <div className="relative space-y-8">
                 {events.map((event, index) => (
                 <div
                   key={event.id}
-                  className={`${getRandomBackground(index)} rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 overflow-hidden group`}
-                  style={{
-                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05)'
-                  }}
+                  className="homepage-glass-card services-glass-card-face relative rounded-2xl hover:-translate-y-1 transition-all duration-300 overflow-hidden group"
+                  style={{ padding: 0 }}
                 >
-                  <div className="flex flex-col h-full">
+                  <div className="relative flex flex-col h-full">
                     {/* Image Section - Top on all screen sizes */}
                     <div className="relative w-full h-auto rounded-t-2xl overflow-hidden">
                       {event.thumbnailUrl ? (
@@ -1173,7 +1149,7 @@ export default function EventsPage() {
                     </div>
 
                     {/* Content Section - Bottom on all screen sizes */}
-                    <div className="p-5 border-t border-white/20 relative">
+                    <div className="p-5 border-t border-emerald-100/70 relative">
                       {/* Title */}
                       <h2 className="text-xl font-bold text-gray-800 mb-2 sm:pr-48 lg:pr-56">
                         {event.title}
@@ -1187,7 +1163,7 @@ export default function EventsPage() {
                       )}
 
                       {/* Event Details - Matching sponsors page style with centered flexbox */}
-                      <div className="px-4 pb-4 border-t border-white/20">
+                      <div className="px-4 pb-4 border-t border-emerald-100/70">
                         <div className="flex flex-wrap justify-center gap-3 mb-2 pt-3 lg:max-w-4xl lg:mx-auto">
                           {/* Date */}
                           <div className="flex items-center gap-3 text-gray-700 w-full sm:w-auto sm:min-w-[280px]">
@@ -1584,6 +1560,7 @@ export default function EventsPage() {
           </>
         )}
       </div>
-    </div>
+      </div>
+    </>
   );
 }
