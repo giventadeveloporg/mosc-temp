@@ -40,13 +40,13 @@ const saints: Saint[] = [
 {
   name: "St. Gregorios Of Parumala",
   href: "/mosc-redesign/saints/st-gregorios-of-parumala-metropolitan-geevarghese-mar-gregorios",
-  image: "https://www.mosc-temp.com/mosc/assets/images/mosc_images/St_Gregorios_Parumala.jpg",
+  image: "/mosc/assets/images/mosc_images/St_Gregorios_Parumala.jpg",
   alt: "Portrait of St. Gregorios of Parumala Metropolitan in episcopal robes"
 },
 {
   name: "St. Mary Mother of God",
   href: "/mosc-redesign/saints/st-mary-mother-of-god",
-  image: "https://www.mosc-temp.com/mosc/assets/images/mosc_images/St_Mother_Mary.jpg",
+  image: "/mosc/assets/images/mosc_images/St_Mother_Mary.jpg",
   alt: "Icon of St. Mary, Mother of God, in traditional Orthodox style"
 }];
 
@@ -72,11 +72,11 @@ function formatLiturgyDisplayDate(liturgyDate: string | null): string {
 
 const slides = [
 {
-  image: "https://www.mosc-temp.com/mosc/assets/images/mosc_images/bava_thirumeni_pope_visit.jpeg",
+  image: "/mosc/assets/images/mosc_images/bava_thirumeni_pope_visit_8k.png",
   alt: "His Holiness Baselios Marthoma Mathews III meeting with Pope Francis at the Vatican"
 },
 {
-  image: "/mosc/assets/images/mosc_images/Banner-image-of-Aramana-Slider.jpg",
+  image: "/mosc/assets/images/mosc_images/Banner-image-of-Aramana-Slider_8k.png",
   alt: "Banner image of Aramana, Malankara Orthodox Syrian Church"
 }];
 
@@ -259,48 +259,66 @@ export default function HomePage() {
       {/* ── ABOUT US (always visible — IntersectionObserver + opacity-0 caused empty gaps) ─ */}
       <section className="py-16 md:py-24 bg-parchment border-b border-burgundy/15">
         <div className="max-w-7xl mx-auto px-6 lg:px-16">
-          <div className="grid lg:grid-cols-2 gap-12 items-stretch">
-            {/* Images collage */}
-            <div className="order-2 relative lg:order-2 h-[350px] md:h-[450px] lg:h-[480px] lg:w-[100%]">
-              {/* Top-right square: Bishops */}
-              <div className="absolute right-2 top-0 w-[48%] aspect-square overflow-hidden border-4 border-white shadow-2xl shadow-burgundy/40">
-                <Image
-                  src="/images/logos/About US/Bishops-image-AboutUs.jpg"
-                  alt="Bishops in church sanctuary"
-                  fill
-                  className="object-cover"
-                />
-              </div>
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-14 items-center">
+            {/* Heritage narrative bento — left column on desktop */}
+            <div className="order-2 lg:order-1 about-us-heritage-mosaic">
+              <div className="about-us-mosaic-frame">
+                <figure className="about-us-mosaic-tile about-us-mosaic-tile--hero">
+                  <span className="about-us-mosaic-tile__accent">
+                    <span className="about-us-mosaic-tile__accent-dot" aria-hidden />
+                    Since AD 52
+                  </span>
+                  <div className="about-us-mosaic-tile__media">
+                    <Image
+                      src="/images/logos/About US/Chirst-Thomas-AboutUs.jpg"
+                      alt="Christ commissioning St. Thomas the Apostle"
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 42vw"
+                      className="object-cover object-center"
+                    />
+                  </div>
+                  <figcaption className="about-us-mosaic-tile__caption">
+                    <span className="about-us-mosaic-tile__label">Apostolic foundation</span>
+                    <span className="about-us-mosaic-tile__title">St. Thomas in India</span>
+                  </figcaption>
+                </figure>
 
-              {/* Gradient back plate behind center-left square (img-1-container::before equivalent) */}
-              <div
-                className="absolute z-0 left-[-34px] top-[57%] w-[42%] h-[44%]"
-                style={{ background: "linear-gradient(#dc3545, #dc354588, #eaebef59)" }}
-              />
+                <figure className="about-us-mosaic-tile about-us-mosaic-tile--bishops">
+                  <div className="about-us-mosaic-tile__media">
+                    <Image
+                      src="/images/logos/About US/Bishops-image-AboutUs.jpg"
+                      alt="Bishops gathered in church sanctuary"
+                      fill
+                      sizes="(max-width: 1024px) 50vw, 22vw"
+                      className="object-cover object-top"
+                    />
+                  </div>
+                  <figcaption className="about-us-mosaic-tile__caption">
+                    <span className="about-us-mosaic-tile__label">Living ministry</span>
+                    <span className="about-us-mosaic-tile__title">Shepherds of the faithful</span>
+                  </figcaption>
+                </figure>
 
-              {/* Center-left square: Christ and St. Thomas */}
-              <div className="absolute z-10 left-0 top-[38%] w-[42%] aspect-square overflow-hidden border-4 border-white shadow-2xl shadow-burgundy/35">
-                <Image
-                  src="/images/logos/About US/Chirst-Thomas-AboutUs.jpg"
-                  alt="Christ with St. Thomas"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-
-              {/* Bottom-right square: Cross plate */}
-              <div className="absolute right-2 -bottom-14 w-[48%] aspect-square overflow-hidden border-4 border-white bg-burgundy/20 shadow-2xl shadow-burgundy/35">
-                <Image
-                  src="/images/logos/About US/Cross-PlateOnly-AboutUs.png"
-                  alt="Cross plate in hand"
-                  fill
-                  className="object-contain"
-                />
+                <figure className="about-us-mosaic-tile about-us-mosaic-tile--cross">
+                  <div className="about-us-mosaic-tile__media">
+                    <Image
+                      src="/images/logos/About US/Cross-PlateOnly-AboutUs.png"
+                      alt="Orthodox cross on a sacred plate"
+                      fill
+                      sizes="(max-width: 1024px) 50vw, 22vw"
+                      className="object-contain object-center"
+                    />
+                  </div>
+                  <figcaption className="about-us-mosaic-tile__caption">
+                    <span className="about-us-mosaic-tile__label">Sacred tradition</span>
+                    <span className="about-us-mosaic-tile__title">Faith handed down</span>
+                  </figcaption>
+                </figure>
               </div>
             </div>
 
-            {/* Text */}
-            <div className="order-1 lg:order-1">
+            {/* Text — right column on desktop */}
+            <div className="order-1 lg:order-2">
               <span className="inline-block text-burgundy text-xs font-bold tracking-widest uppercase mb-3 border border-burgundy/40 px-3 py-1 rounded-full bg-burgundy/10">
                 About Us
               </span>
@@ -397,7 +415,7 @@ export default function HomePage() {
             <div className="lg:col-span-2 flex justify-center lg:justify-start">
               <div className="w-full max-w-[320px] rounded-2xl overflow-hidden aspect-[3/4] relative shadow-xl border border-burgundy/30 hover:border-burgundy/60 transition-all duration-300 hover:shadow-burgundy/30">
                 <Image
-                  src="https://www.mosc-temp.com/mosc/assets/images/mosc_images/Baselios_Marthoma_Mathews_III.jpeg"
+                  src="/mosc/assets/images/mosc_images/Baselios_Marthoma_Mathews_III_Halo.jpg"
                   alt="His Holiness Baselios Marthoma Mathews III, Catholicos of the East and Malankara Metropolitan, in full episcopal vestments"
                   fill
                   className="object-cover" />

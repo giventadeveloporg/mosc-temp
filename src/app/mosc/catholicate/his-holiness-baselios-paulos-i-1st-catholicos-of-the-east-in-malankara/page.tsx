@@ -28,7 +28,7 @@ const BaseliosPaulosIPage = () => {
 
                 <div className="mb-8 flex justify-center">
                   <Image
-                    src="https://mosc.in/wp-content/uploads/2014/12/Untitled-11.jpg"
+                    src="/images/catholicate/Catholicos-1.jpg"
                     alt="His Holiness Baselios Paulos I, The First Catholicos of the East in Malankara"
                     width={175} height={175}
                     className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }}

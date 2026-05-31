@@ -1,8 +1,14 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import QuickLinks from '../components/QuickLinks';
 import SyroPageBanner from '../components/SyroPageBanner';
+import LiturgyCalendarClient from './LiturgyCalendarClient';
+import {
+  fetchLiturgyDaysForMonthServer,
+  getLiturgyCalendarConfiguredServer,
+} from './ApiServerActions';
+import type { LiturgyCalendarView, LiturgyLanguage } from './types';
 
 export const metadata: Metadata = {
   title: 'Calendar | Malankara Orthodox Syrian Church',
@@ -10,36 +16,71 @@ export const metadata: Metadata = {
   keywords: ['MOSC Calendar', 'Liturgical Calendar', 'Orthodox Feast Days', 'Church Calendar', 'Fasting Days'],
 };
 
-export default function CalendarPage() {
+type PageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function CalendarPage({ searchParams }: PageProps) {
+  const resolvedParams = await searchParams;
+
+  const today = new Date();
+  let year = today.getFullYear();
+  let month = today.getMonth() + 1;
+
+  const dateParam = typeof resolvedParams?.date === 'string' ? resolvedParams.date : undefined;
+  if (dateParam) {
+    const [y, m] = dateParam.split('-').map(Number);
+    if (y && m) {
+      year = y;
+      month = m;
+    }
+  }
+
+  const initialView = (typeof resolvedParams?.view === 'string' ? resolvedParams.view : 'month') as LiturgyCalendarView;
+  const initialLng = (typeof resolvedParams?.lng === 'string' && resolvedParams.lng === 'ml' ? 'ml' : 'en') as LiturgyLanguage;
+  const initialDate = dateParam ? new Date(dateParam + 'T12:00:00') : today;
+
+  const configured = await getLiturgyCalendarConfiguredServer();
+  const initialItems = configured
+    ? await fetchLiturgyDaysForMonthServer(year, month, initialLng)
+    : [];
+
   return (
     <div className="bg-syro-bg-gray">
       <SyroPageBanner
         title="Liturgical Calendar"
         breadcrumbFrom="home"
-        description="Access the liturgical calendar of the Malankara Orthodox Syrian Church with feast days, fasts, and important church dates."
+        description="Browse the liturgical calendar with feast days, fasting seasons, and daily readings from the Malankara Orthodox Syrian Church."
       />
 
-      {/* CTA + What's in the Calendar */}
+      {/* Interactive liturgy calendar */}
+      <section className="py-10 bg-syro-bg-gray">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-6 sm:p-8">
+            <Suspense
+              fallback={
+                <div className="flex items-center justify-center py-12">
+                  <span className="text-sm text-[#798daf] font-syro-primary">Loading calendar...</span>
+                </div>
+              }
+            >
+              <LiturgyCalendarClient
+                initialItems={initialItems}
+                initialYear={year}
+                initialMonth={month}
+                initialView={initialView}
+                initialDate={initialDate}
+                initialLng={initialLng}
+                configured={configured}
+              />
+            </Suspense>
+          </div>
+        </div>
+      </section>
+
+      {/* What's in the Calendar */}
       <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <a
-              href="/calendar"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center px-8 py-4 bg-syro-red text-white font-syro-primary font-semibold text-lg rounded-lg hover:bg-syro-red/90 transition-all duration-300 shadow-syro-card hover:shadow-syro-card-hover border-r-4 border-[#be1929]"
-            >
-              <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-              Access Church Calendar
-              <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </a>
-          </div>
-
-          {/* Section title - left red bar (matches administration .admin-section-title) */}
           <h3 className="text-2xl font-light text-[#798daf] mb-10 pl-8 border-l-[7px] border-syro-red">
             What&apos;s in the Calendar
           </h3>
@@ -53,9 +94,7 @@ export default function CalendarPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                 </svg>
               </div>
-              <h3 className="font-syro-display font-medium text-xl text-syro-blue mb-3">
-                Feast Days
-              </h3>
+              <h3 className="font-syro-display font-medium text-xl text-syro-blue mb-3">Feast Days</h3>
               <p className="font-syro-primary text-syro-dark-gray leading-relaxed">
                 Major and minor feasts throughout the liturgical year
               </p>
@@ -66,9 +105,7 @@ export default function CalendarPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                 </svg>
               </div>
-              <h3 className="font-syro-display font-medium text-xl text-syro-blue mb-3">
-                Fasting Periods
-              </h3>
+              <h3 className="font-syro-display font-medium text-xl text-syro-blue mb-3">Fasting Periods</h3>
               <p className="font-syro-primary text-syro-dark-gray leading-relaxed">
                 Great Lent, Three Days Lent, and other fasting seasons
               </p>
@@ -79,9 +116,7 @@ export default function CalendarPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="font-syro-display font-medium text-xl text-syro-blue mb-3">
-                Daily Prayers
-              </h3>
+              <h3 className="font-syro-display font-medium text-xl text-syro-blue mb-3">Daily Prayers</h3>
               <p className="font-syro-primary text-syro-dark-gray leading-relaxed">
                 Morning and evening prayer times and special services
               </p>
@@ -92,49 +127,11 @@ export default function CalendarPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
-              <h3 className="font-syro-display font-medium text-xl text-syro-blue mb-3">
-                Special Days
-              </h3>
+              <h3 className="font-syro-display font-medium text-xl text-syro-blue mb-3">Special Days</h3>
               <p className="font-syro-primary text-syro-dark-gray leading-relaxed">
                 Commemorations, parish feasts, and special observances
               </p>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* External Calendar CTA */}
-      <section className="py-16 bg-syro-bg-gray">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] p-12">
-            <div className="w-20 h-20 bg-syro-red rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg className="w-10 h-10 text-syro-red-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-4">
-              Official Church Calendar
-            </h2>
-            <p className="font-syro-primary text-lg text-syro-dark-gray leading-relaxed mb-8">
-              The official calendar is maintained on a dedicated platform for easy viewing and regular updates with all liturgical dates, feast days, and special observances. Click below to access the interactive church calendar.
-            </p>
-            <a
-              href="/calendar"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center px-8 py-4 bg-syro-red text-white font-syro-primary font-semibold text-lg rounded-lg hover:bg-syro-red/90 transition-all duration-300 shadow-syro-card hover:shadow-syro-card-hover"
-            >
-              <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-              Visit calendar.mosc.in
-              <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </a>
-            <p className="font-syro-primary text-sm text-syro-dark-gray mt-4">
-              (Opens in new window)
-            </p>
           </div>
         </div>
       </section>
@@ -147,49 +144,37 @@ export default function CalendarPage() {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="bg-white rounded-lg p-6 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] border-l-4 border-syro-red">
-              <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-3">
-                Koodosh Eetho (Sanctification)
-              </h3>
+              <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-3">Koodosh Eetho (Sanctification)</h3>
               <p className="font-syro-primary text-syro-dark-gray leading-relaxed">
                 Beginning of the church year, celebrated on or after October 30th
               </p>
             </div>
             <div className="bg-white rounded-lg p-6 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] border-l-4 border-syro-red">
-              <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-3">
-                Christmas Season
-              </h3>
+              <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-3">Christmas Season</h3>
               <p className="font-syro-primary text-syro-dark-gray leading-relaxed">
-                Yeldho (Incarnation) and related feasts celebrating Christ's birth
+                Yeldho (Incarnation) and related feasts celebrating Christ&apos;s birth
               </p>
             </div>
             <div className="bg-white rounded-lg p-6 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] border-l-4 border-syro-red">
-              <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-3">
-                Baptism of Our Lord (Danaha)
-              </h3>
+              <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-3">Baptism of Our Lord (Danaha)</h3>
               <p className="font-syro-primary text-syro-dark-gray leading-relaxed">
                 January 6th - Epiphany/Theophany, blessing of water
               </p>
             </div>
             <div className="bg-white rounded-lg p-6 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] border-l-4 border-syro-red">
-              <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-3">
-                Great Lent
-              </h3>
+              <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-3">Great Lent</h3>
               <p className="font-syro-primary text-syro-dark-gray leading-relaxed">
                 50 days of fasting and spiritual preparation for Easter
               </p>
             </div>
             <div className="bg-white rounded-lg p-6 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] border-l-4 border-syro-red">
-              <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-3">
-                Kyomtho (Easter)
-              </h3>
+              <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-3">Kyomtho (Easter)</h3>
               <p className="font-syro-primary text-syro-dark-gray leading-relaxed">
                 Resurrection Sunday and the 50-day Easter season
               </p>
             </div>
             <div className="bg-white rounded-lg p-6 shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] border-l-4 border-syro-red">
-              <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-3">
-                Pentecost
-              </h3>
+              <h3 className="font-syro-display font-semibold text-xl text-syro-blue mb-3">Pentecost</h3>
               <p className="font-syro-primary text-syro-dark-gray leading-relaxed">
                 Descent of the Holy Spirit, 50 days after Easter
               </p>
@@ -260,7 +245,3 @@ export default function CalendarPage() {
     </div>
   );
 }
-
-
-
-

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import QuickLinks from '../components/QuickLinks';
 import SyroPageBanner from '../components/SyroPageBanner';
+import { MoscHubCardMedia } from '../components/MoscHubCardMedia';
 import {
   MOSC_REDESIGN_CARD,
   MOSC_REDESIGN_CARD_HOVER,
@@ -167,18 +168,15 @@ const CatholicatePage = () => {
                 key={card.title}
                 className="group flex flex-col h-full rounded-xl border border-burgundy/20 bg-parchment-light p-6 shadow-[0_2px_8px_rgba(61,13,13,0.08)] transition-all duration-300 hover:border-burgundy/50 hover:shadow-[0_8px_24px_rgba(192,40,74,0.16)] hover:-translate-y-1"
               >
-                <div className="mb-5 flex justify-center -mx-1">
-                  <div className="relative w-full max-w-[280px] aspect-[280/168] rounded-xl overflow-hidden flex items-center justify-center">
-                    <Image
-                      src={card.image}
-                      alt={card.alt}
-                      fill
-                      className="object-contain rounded-xl"
-                      unoptimized
-                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 280px"
-                    />
-                  </div>
-                </div>
+                <MoscHubCardMedia
+                  src={card.image}
+                  alt={card.alt}
+                  objectPosition="top"
+                  unoptimized
+                  padded={false}
+                  outerClassName="-mx-1"
+                  frameClassName="bg-parchment-light ring-0"
+                />
                 <h3 className="text-lg font-semibold mb-3 leading-snug transition-colors">
                   {card.title}
                 </h3>

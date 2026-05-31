@@ -1,10 +1,10 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import QuickLinks from '../components/QuickLinks';
 import SyroPageBanner from '../components/SyroPageBanner';
+import { MoscHubCardMedia, MoscHubCardMediaPlaceholder } from '../components/MoscHubCardMedia';
 import type { PublicOfficialDocumentTreePage } from './ApiServerActions';
 
 export type DownloadCard = {
@@ -37,19 +37,11 @@ function DownloadCardGrid({ items, keyPrefix }: { items: DownloadCard[]; keyPref
           key={`${keyPrefix}-${item.title}-${index}`}
           className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 p-8 flex flex-col h-full"
         >
-          <div className="mb-5 flex justify-center pt-8">
-            {item.image ? (
-              <div className="relative w-full max-w-[280px] aspect-[280/168] rounded-lg overflow-hidden flex items-center justify-center">
-                <Image
-                  src={item.image}
-                  alt=""
-                  fill
-                  className="object-contain rounded-lg"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 280px"
-                />
-              </div>
-            ) : (
-              <div className="w-full max-w-[280px] aspect-[280/168] rounded-lg flex items-center justify-center">
+          {item.image ? (
+            <MoscHubCardMedia src={item.image} alt={item.title} />
+          ) : (
+            <MoscHubCardMediaPlaceholder
+              icon={
                 <svg
                   className="w-10 h-10 text-syro-red"
                   fill="none"
@@ -64,9 +56,9 @@ function DownloadCardGrid({ items, keyPrefix }: { items: DownloadCard[]; keyPref
                     d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                   />
                 </svg>
-              </div>
-            )}
-          </div>
+              }
+            />
+          )}
           <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-2 line-clamp-2">
             {item.title}
           </h3>

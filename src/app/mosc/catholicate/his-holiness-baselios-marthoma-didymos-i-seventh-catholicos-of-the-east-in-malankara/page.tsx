@@ -28,7 +28,7 @@ const BaseliosMarthomaDidymosIPage = () => {
 
                 <div className="mb-8 flex justify-center">
                   <Image
-                    src="https://mosc.in/wp-content/uploads/2015/01/didymus.jpg"
+                    src="/images/catholicate/didymus.jpg"
                     alt="His Holiness Baselios Marthoma Didymos I, The Seventh Catholicos of the East in Malankara"
                     width={175} height={175}
                     className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }}

@@ -41,10 +41,6 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'www.mosc-temp.com',
-      },
-      {
-        protocol: 'https',
         hostname: 'img.rocket.new',
       },
       // Strapi CMS (News Portal - article covers, ad slots)
