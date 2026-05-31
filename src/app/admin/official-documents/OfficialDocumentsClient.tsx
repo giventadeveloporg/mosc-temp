@@ -22,6 +22,12 @@ import {
 } from './ApiServerActions';
 import Modal from '@/components/ui/Modal';
 import {
+  getEventMediaDisplayThumbnailUrl,
+  getOfficialDocumentPlaceholderKind,
+  placeholderGradient,
+  placeholderLabel,
+} from '@/lib/officialDocumentThumbnail';
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -91,8 +97,10 @@ export default function OfficialDocumentsClient({
   const [description, setDescription] = useState('');
   const [isPublic, setIsPublic] = useState(false);
   const [files, setFiles] = useState<FileList | null>(null);
+  const [bulkThumbnailFile, setBulkThumbnailFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const folderInputRef = useRef<HTMLInputElement | null>(null);
+  const bulkThumbnailInputRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -111,6 +119,8 @@ export default function OfficialDocumentsClient({
   const [editCategoryId, setEditCategoryId] = useState<number | ''>('');
   const [editSaving, setEditSaving] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
+  const [editThumbnailFile, setEditThumbnailFile] = useState<File | null>(null);
+  const [editThumbnailBusy, setEditThumbnailBusy] = useState(false);
 
   const [deleting, setDeleting] = useState<EventMediaDTO | null>(null);
   const [deleteBusy, setDeleteBusy] = useState(false);
@@ -122,6 +132,7 @@ export default function OfficialDocumentsClient({
   const [qaDescription, setQaDescription] = useState('');
   const [qaIsPublic, setQaIsPublic] = useState(false);
   const [qaFile, setQaFile] = useState<File | null>(null);
+  const [qaThumbnailFile, setQaThumbnailFile] = useState<File | null>(null);
   const [qaBusy, setQaBusy] = useState(false);
   const [qaError, setQaError] = useState<string | null>(null);
 
@@ -258,6 +269,7 @@ export default function OfficialDocumentsClient({
 
   const openEdit = (row: EventMediaDTO) => {
     setEditError(null);
+    setEditThumbnailFile(null);
     setEditing(row);
     setEditTitle(row.title || '');
     setEditDescription(row.description || '');
@@ -299,6 +311,38 @@ export default function OfficialDocumentsClient({
       setEditError(e instanceof Error ? e.message : String(e));
     } finally {
       setEditSaving(false);
+    }
+  };
+
+  const handleUploadEditThumbnail = async () => {
+    if (!editing?.id || !editThumbnailFile || !tenantId) return;
+    setEditThumbnailBusy(true);
+    setEditError(null);
+    try {
+      const form = new FormData();
+      form.append('thumbnailFile', editThumbnailFile);
+      const res = await fetch(
+        `/api/proxy/event-medias/upload-official-document-thumbnail/${editing.id}`,
+        {
+          method: 'POST',
+          headers: { 'X-Tenant-ID': tenantId },
+          body: form,
+        }
+      );
+      if (!res.ok) {
+        const t = await res.text().catch(() => '');
+        setEditError(t || `Thumbnail upload failed (${res.status})`);
+        return;
+      }
+      const updated = (await res.json()) as EventMediaDTO;
+      setEditing(updated);
+      setEditThumbnailFile(null);
+      await reloadDocuments(currentPage);
+      router.refresh();
+    } catch (e) {
+      setEditError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setEditThumbnailBusy(false);
     }
   };
 
@@ -345,6 +389,7 @@ export default function OfficialDocumentsClient({
       if (qaDescription.trim()) form.append('description', qaDescription.trim());
       form.append('isPublic', qaIsPublic ? 'true' : 'false');
       form.append('files', qaFile);
+      if (qaThumbnailFile) form.append('thumbnailFile', qaThumbnailFile);
 
       const res = await fetch('/api/proxy/event-medias/upload/bulk-tenant-official', {
         method: 'POST',
@@ -367,6 +412,7 @@ export default function OfficialDocumentsClient({
 
       setQuickAddOpen(false);
       setQaFile(null);
+      setQaThumbnailFile(null);
       await reloadDocuments(0);
       await reloadBundles();
       if (selectedCategoryId != null) {
@@ -418,6 +464,7 @@ export default function OfficialDocumentsClient({
       for (let i = 0; i < files.length; i++) {
         form.append('files', files[i]);
       }
+      if (bulkThumbnailFile) form.append('thumbnailFile', bulkThumbnailFile);
 
       const res = await fetch('/api/proxy/event-medias/upload/bulk-tenant-official', {
         method: 'POST',
@@ -444,8 +491,10 @@ export default function OfficialDocumentsClient({
       const count = Array.isArray(data) ? data.length : 1;
       setMessage(`Uploaded ${count} file(s) successfully.`);
       setFiles(null);
+      setBulkThumbnailFile(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
       if (folderInputRef.current) folderInputRef.current.value = '';
+      if (bulkThumbnailInputRef.current) bulkThumbnailInputRef.current.value = '';
       await reloadDocuments(0);
       await reloadBundles();
     } catch (err) {
@@ -683,6 +732,27 @@ export default function OfficialDocumentsClient({
               />
               <span className="text-sm text-gray-700">Public (visible on downloads when data-driven mode is on)</span>
             </label>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Card thumbnail (optional, image only)
+              </label>
+              <p className="text-xs text-gray-500 mb-2">
+                Applied to every file in this batch (PDF/Office previews on the public downloads page).
+              </p>
+              <label className="inline-flex cursor-pointer items-center rounded-lg border border-violet-200 bg-violet-50 px-3 py-2 text-sm font-medium text-violet-800 hover:bg-violet-100">
+                <input
+                  ref={bulkThumbnailInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setBulkThumbnailFile(e.target.files?.[0] ?? null)}
+                  className="sr-only"
+                />
+                Choose thumbnail
+              </label>
+              {bulkThumbnailFile && (
+                <p className="text-sm text-gray-700 mt-2">{bulkThumbnailFile.name}</p>
+              )}
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Files</label>
               <p className="text-xs text-gray-500 mb-2">
@@ -1094,6 +1164,56 @@ export default function OfficialDocumentsClient({
             />
             <span className="text-sm text-gray-700">Public</span>
           </label>
+          {editing && (
+            <div className="rounded-lg border border-gray-200 p-4 space-y-3">
+              <p className="text-sm font-medium text-gray-800">Card thumbnail</p>
+              {(() => {
+                const previewUrl = getEventMediaDisplayThumbnailUrl({
+                  fileUrl: editing.fileUrl,
+                  thumbnailUrl: editing.thumbnailPreSignedUrl || editing.thumbnailUrl,
+                  fileDataContentType: editing.fileDataContentType || editing.contentType,
+                  title: editing.title,
+                });
+                const kind = getOfficialDocumentPlaceholderKind({
+                  fileUrl: editing.fileUrl,
+                  fileDataContentType: editing.fileDataContentType || editing.contentType,
+                  title: editing.title,
+                });
+                return previewUrl ? (
+                  <div className="relative h-28 w-full max-w-xs overflow-hidden rounded-lg border border-gray-200">
+                    <Image src={previewUrl} alt="" fill className="object-cover" unoptimized />
+                  </div>
+                ) : (
+                  <div
+                    className={`h-28 max-w-xs rounded-lg border border-gray-200 flex items-center justify-center bg-gradient-to-br ${placeholderGradient(kind)}`}
+                  >
+                    <span className="text-lg font-bold text-gray-600">{placeholderLabel(kind)}</span>
+                  </div>
+                );
+              })()}
+              <div className="flex flex-wrap gap-2 items-center">
+                <label className="inline-flex cursor-pointer items-center rounded-lg border border-violet-200 bg-violet-50 px-3 py-2 text-sm font-medium text-violet-800 hover:bg-violet-100">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setEditThumbnailFile(e.target.files?.[0] ?? null)}
+                    className="sr-only"
+                  />
+                  Replace thumbnail
+                </label>
+                {editThumbnailFile && (
+                  <button
+                    type="button"
+                    disabled={editThumbnailBusy}
+                    onClick={() => void handleUploadEditThumbnail()}
+                    className="px-3 py-2 rounded-lg bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium disabled:opacity-50"
+                  >
+                    {editThumbnailBusy ? 'Uploading…' : 'Upload thumbnail'}
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
           {editError && (
             <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">{editError}</div>
           )}
@@ -1195,6 +1315,15 @@ export default function OfficialDocumentsClient({
             />
             <span className="text-sm text-gray-700">Public</span>
           </label>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Card thumbnail (optional)</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setQaThumbnailFile(e.target.files?.[0] ?? null)}
+              className="w-full text-sm"
+            />
+          </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">File</label>
             <input

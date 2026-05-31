@@ -4,6 +4,7 @@ import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import { getTenantId, getApiBaseUrl } from '@/lib/env';
 import type { EventMediaDTO } from '@/types';
 import { parseHierarchyDescription } from '@/lib/officialDocumentHierarchy';
+import { resolveOfficialDocumentDownloadUrl } from '@/lib/officialDocumentDownload';
 
 /** Public tenant official documents for the downloads page (server-side JWT). */
 export async function fetchPublicOfficialDocumentsForDownloadsServer(): Promise<EventMediaDTO[]> {
@@ -37,6 +38,9 @@ export type PublicOfficialDocumentTreeItem = {
   priorityRanking: number;
   description: string | null;
   downloadUrl: string | null;
+  thumbnailUrl: string | null;
+  fileUrl: string | null;
+  fileDataContentType: string | null;
   createdAt: string;
 };
 
@@ -47,7 +51,35 @@ export type PublicOfficialDocumentTreePage = {
   page: number;
   size: number;
   categoryOptions: Array<{ id: number; slug: string; displayName: string }>;
+  /** Distinct years from public official documents (newest first) */
+  yearOptions: number[];
 };
+
+async function fetchPublicOfficialDocumentYearOptionsServer(): Promise<number[]> {
+  try {
+    const params = new globalThis.URLSearchParams();
+    params.append('tenantId.equals', getTenantId());
+    params.append('isEventManagementOfficialDocument.equals', 'true');
+    params.append('isPublic.equals', 'true');
+    params.append('size', '500');
+    params.append('sort', 'officialDocumentYear,desc');
+    const url = `${getApiBaseUrl()}/api/event-medias?${params.toString()}`;
+    const res = await fetchWithJwtRetry(url, { cache: 'no-store' });
+    if (!res.ok) return [];
+    const json = await res.json();
+    const raw = Array.isArray(json) ? json : Array.isArray(json?.content) ? json.content : [];
+    const years = new Set<number>();
+    for (const row of raw as EventMediaDTO[]) {
+      const y = row.officialDocumentYear;
+      if (typeof y === 'number' && Number.isFinite(y) && y >= 1900 && y <= 2100) {
+        years.add(y);
+      }
+    }
+    return [...years].sort((a, b) => b - a);
+  } catch {
+    return [];
+  }
+}
 
 export async function fetchPublicOfficialDocumentsTreeServer(input?: {
   page?: number;
@@ -71,9 +103,12 @@ export async function fetchPublicOfficialDocumentsTreeServer(input?: {
     baseParams.append('size', String(size));
 
     const docsUrl = `${getApiBaseUrl()}/api/event-medias?${baseParams.toString()}`;
-    const docsRes = await fetchWithJwtRetry(docsUrl, { cache: 'no-store' });
+    const [docsRes, yearOptions] = await Promise.all([
+      fetchWithJwtRetry(docsUrl, { cache: 'no-store' }),
+      fetchPublicOfficialDocumentYearOptionsServer(),
+    ]);
     if (!docsRes.ok) {
-      return { content: [], totalElements: 0, totalPages: 0, page, size, categoryOptions: [] };
+      return { content: [], totalElements: 0, totalPages: 0, page, size, categoryOptions: [], yearOptions };
     }
     const docsJson = await docsRes.json();
     const docsRaw = Array.isArray(docsJson) ? docsJson : Array.isArray(docsJson?.content) ? docsJson.content : [];
@@ -104,7 +139,10 @@ export async function fetchPublicOfficialDocumentsTreeServer(input?: {
         officialDocumentYear: doc.officialDocumentYear ?? null,
         priorityRanking: doc.displayPriority ?? parsed.priority ?? doc.priorityRanking ?? 999999,
         description: parsed.cleanDescription || null,
-        downloadUrl: doc.preSignedUrl || doc.fileUrl || null,
+        downloadUrl: resolveOfficialDocumentDownloadUrl(doc),
+        thumbnailUrl: doc.thumbnailPreSignedUrl || doc.thumbnailUrl || null,
+        fileUrl: doc.fileUrl || null,
+        fileDataContentType: doc.fileDataContentType || doc.contentType || null,
         createdAt: doc.createdAt,
       } satisfies PublicOfficialDocumentTreeItem;
     });
@@ -133,9 +171,10 @@ export async function fetchPublicOfficialDocumentsTreeServer(input?: {
       page: currentPage,
       size,
       categoryOptions,
+      yearOptions,
     };
   } catch (e) {
     globalThis.console.error('[downloads] fetchPublicOfficialDocumentsTreeServer:', e);
-    return { content: [], totalElements: 0, totalPages: 0, page, size, categoryOptions: [] };
+    return { content: [], totalElements: 0, totalPages: 0, page, size, categoryOptions: [], yearOptions: [] };
   }
 }

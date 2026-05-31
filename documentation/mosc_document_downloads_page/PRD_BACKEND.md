@@ -47,6 +47,7 @@
   - `eventId` omitted or null when using tenant library mode
 - **Bulk:** `POST /api/event-medias/upload/bulk-tenant-official` with multiple files + shared `categorySlug` + optional per-file names in JSON part **or** repeated `files[]` parts.
   - Bulk also requires shared `officialDocumentYear`.
+- **Thumbnails (v1):** Optional multipart `thumbnailFile` (image only) on single and bulk official-document uploads; optional `POST /api/event-medias/{id}/upload-official-document-thumbnail` to attach/replace after upload. See [thumbnail/README.md](./thumbnail/README.md).
 
 ### FR3 — Authorization
 

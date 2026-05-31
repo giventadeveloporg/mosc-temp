@@ -315,8 +315,18 @@ export function MediaClientPage({ eventId, mediaList: initialMediaList, eventDet
       });
 
       if (!res.ok) {
-        const err = await res.text();
-        throw new Error(err);
+        const text = await res.text();
+        let errMsg = text;
+        try {
+          const json = JSON.parse(text) as { details?: string; message?: string; error?: string };
+          errMsg = json.details?.trim() || json.message || json.error || text;
+        } catch {
+          /* not JSON */
+        }
+        if (res.status === 413) {
+          errMsg = 'File is too large. Use images under 10MB each, or upload one file at a time.';
+        }
+        throw new Error(errMsg || `Upload failed (HTTP ${res.status})`);
       }
 
       const result = await res.json();

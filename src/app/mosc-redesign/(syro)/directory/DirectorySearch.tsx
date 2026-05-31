@@ -75,10 +75,10 @@ export default function DirectorySearch() {
                     role="radio"
                     aria-checked={isActive}
                     onClick={() => setSelectedKey(opt.key)}
-                    className={`font-body font-medium px-4 py-2 rounded-lg reverent-transition focus:outline-none focus:ring-2 focus:ring-syro-red focus:ring-offset-2 ${
+                    className={`font-body font-medium px-4 py-2 rounded-lg reverent-transition focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                       isActive
-                        ? 'bg-syro-red text-white shadow-[rgba(50,50,93,0.25)_0px_4px_8px_-2px]'
-                        : 'bg-white text-syro-blue border border-syro-table-border hover:bg-syro-red/10 hover:text-syro-red'
+                        ? 'bg-syro-red text-white border-2 border-syro-red-darker shadow-[0_4px_12px_rgba(220,53,69,0.35)] focus:ring-syro-red'
+                        : 'bg-syro-blue/[0.08] text-syro-blue border border-syro-blue/25 hover:bg-syro-red/15 hover:text-syro-red hover:border-syro-red/40 focus:ring-syro-blue/40'
                     }`}
                   >
                     {opt.label}
@@ -129,7 +129,7 @@ export default function DirectorySearch() {
               <button
                 type="button"
                 onClick={() => goTo(false)}
-                className="font-body font-medium px-5 py-2.5 rounded-lg bg-syro-red/10 text-syro-blue hover:bg-syro-red/20 reverent-transition shrink-0"
+                className="font-body font-medium px-5 py-2.5 rounded-lg border border-syro-blue/25 bg-syro-blue/[0.08] text-syro-blue hover:bg-syro-red/15 hover:text-syro-red hover:border-syro-red/40 reverent-transition shrink-0 focus:outline-none focus:ring-2 focus:ring-syro-blue/40 focus:ring-offset-2"
               >
                 Browse all {selected.label}
               </button>

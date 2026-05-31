@@ -3,6 +3,7 @@ import type { EventMediaDTO } from '@/types';
 import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import { getApiBaseUrl, getTenantId } from '@/lib/env';
 import { parseHierarchyDescription } from '@/lib/officialDocumentHierarchy';
+import { resolveOfficialDocumentDownloadUrl } from '@/lib/officialDocumentDownload';
 
 function parsePositiveInt(value: string | string[] | undefined, fallback: number): number {
   const raw = Array.isArray(value) ? value[0] : value;
@@ -80,7 +81,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         officialDocumentYear: doc.officialDocumentYear ?? null,
         priorityRanking: doc.displayPriority ?? parsed.priority ?? doc.priorityRanking ?? 999999,
         description: parsed.cleanDescription || null,
-        downloadUrl: doc.preSignedUrl || doc.fileUrl || null,
+        downloadUrl: resolveOfficialDocumentDownloadUrl(doc),
         createdAt: doc.createdAt,
       };
     });

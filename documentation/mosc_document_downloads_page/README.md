@@ -12,6 +12,7 @@ This folder holds cross-project planning and PRD-style documents for:
 | [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) | Both teams | Phased plan, gaps, S3 layout, scraping vs manual |
 | [PRD_BACKEND.md](./PRD_BACKEND.md) | Spring Boot (`malayalees-us-site-boot`) | APIs, S3 paths, DTO fields, acceptance criteria |
 | [PRD_FRONTEND.md](./PRD_FRONTEND.md) | Next.js (`mosc-temp`) | Admin UI, public downloads, proxy patterns |
+| [thumbnail/README.md](./thumbnail/README.md) | Both teams | Per-file `event_media` thumbnails, migration, API contract |
 
 **Related backend doc (existing):**  
 `malayalees-us-site-boot/documentation/Enhanced_Upload_System_Documentation.md` — event-media uploads, entity-specific paths; lists **bulk upload** as a future enhancement.
