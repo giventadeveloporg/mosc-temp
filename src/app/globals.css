@@ -296,6 +296,24 @@ body.home-page-background .header-glass.header-glass--home.header-glass--scrolle
   transform: translateY(0) scale(1);
 }
 
+/* Fixed to viewport — escapes nav overflow-x scroll clipping (About, Features) */
+.header-dropdown.header-dropdown--fixed {
+  position: fixed;
+  z-index: 60;
+  margin-top: 0;
+}
+
+/* Invisible hit area below trigger so hover can reach the menu */
+.header-nav-dropdown-root::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 0.75rem;
+  pointer-events: auto;
+}
+
 /* Hover bridge between nav trigger and dropdown (avoids gap losing hover) */
 .header-dropdown::before {
   content: '';

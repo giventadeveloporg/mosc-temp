@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Search, ChevronDown, X, LogOut, User } from 'lucide-react';
@@ -339,15 +339,41 @@ function HeaderNavDropdown({
   handleSmoothScroll: (e: React.MouseEvent, href: string) => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [menuPosition, setMenuPosition] = useState<{ top: number; left: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const closeHoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mounted = useMounted();
   const locationHash = useLocationHash();
 
+  const updateMenuPosition = useCallback(() => {
+    if (!triggerRef.current) return;
+    const rect = triggerRef.current.getBoundingClientRect();
+    setMenuPosition({ top: rect.bottom + 8, left: rect.left });
+  }, []);
+
+  const clearCloseHoverTimeout = useCallback(() => {
+    if (closeHoverTimeoutRef.current) {
+      clearTimeout(closeHoverTimeoutRef.current);
+      closeHoverTimeoutRef.current = null;
+    }
+  }, []);
+
+  const scheduleCloseOnHoverLeave = useCallback(() => {
+    clearCloseHoverTimeout();
+    closeHoverTimeoutRef.current = setTimeout(() => setIsOpen(false), 200);
+  }, [clearCloseHoverTimeout]);
+
+  const openMenu = useCallback(() => {
+    clearCloseHoverTimeout();
+    setIsOpen(true);
+  }, [clearCloseHoverTimeout]);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
+      const target = event.target as Node;
+      if (containerRef.current?.contains(target)) return;
+      setIsOpen(false);
     };
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
@@ -356,8 +382,24 @@ function HeaderNavDropdown({
   }, [isOpen]);
 
   useEffect(() => {
+    if (!isOpen) {
+      setMenuPosition(null);
+      return;
+    }
+    updateMenuPosition();
+    window.addEventListener('scroll', updateMenuPosition, true);
+    window.addEventListener('resize', updateMenuPosition);
+    return () => {
+      window.removeEventListener('scroll', updateMenuPosition, true);
+      window.removeEventListener('resize', updateMenuPosition);
+    };
+  }, [isOpen, updateMenuPosition]);
+
+  useEffect(() => {
     setIsOpen(false);
   }, [pathname]);
+
+  useEffect(() => () => clearCloseHoverTimeout(), [clearCloseHoverTimeout]);
 
   const isAboutActive =
     item.name === 'About' &&
@@ -387,13 +429,23 @@ function HeaderNavDropdown({
   return (
     <div
       ref={containerRef}
-      className="relative group"
-      onMouseEnter={() => setIsOpen(true)}
-      onMouseLeave={() => setIsOpen(false)}
+      className="header-nav-dropdown-root relative group"
+      onMouseEnter={openMenu}
+      onMouseLeave={scheduleCloseOnHoverLeave}
     >
       <button
+        ref={triggerRef}
         type="button"
-        onClick={() => setIsOpen((prev) => !prev)}
+        onClick={() => {
+          clearCloseHoverTimeout();
+          setIsOpen((prev) => {
+            const next = !prev;
+            if (next) {
+              requestAnimationFrame(() => updateMenuPosition());
+            }
+            return next;
+          });
+        }}
         className={`header-nav-link font-semibold flex items-center gap-1.5 cursor-pointer ${isActive ? 'active' : ''}`}
         aria-haspopup="true"
         aria-expanded={isOpen}
@@ -405,10 +457,14 @@ function HeaderNavDropdown({
           aria-hidden="true"
         />
       </button>
+      {isOpen && menuPosition && (
       <div
-        className={`header-dropdown absolute top-full left-0 mt-2 w-56 z-50 ${isOpen ? 'visible' : ''}`}
+        className="header-dropdown header-dropdown--fixed visible w-56"
+        style={{ top: menuPosition.top, left: menuPosition.left }}
         role="menu"
         aria-label={`${item.name} submenu`}
+        onMouseEnter={openMenu}
+        onMouseLeave={scheduleCloseOnHoverLeave}
       >
         <div className="py-2">
           {item.dropdown.map((subItem) => {
@@ -444,6 +500,7 @@ function HeaderNavDropdown({
           })}
         </div>
       </div>
+      )}
     </div>
   );
 }
