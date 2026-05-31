@@ -1719,6 +1719,9 @@ CREATE TABLE public.event_media (
                                     display_priority int4 NULL,
                                     pre_signed_url varchar(2048) NULL,
                                     pre_signed_url_expires_at timestamp NULL,
+                                    thumbnail_url varchar(2048) NULL,
+                                    thumbnail_pre_signed_url varchar(2048) NULL,
+                                    thumbnail_pre_signed_url_expires_at timestamp NULL,
                                     alt_text varchar(500) NULL,
                                     display_order int4 DEFAULT 0 NULL,
                                     download_count int4 DEFAULT 0 NULL,
@@ -1765,6 +1768,12 @@ CREATE TABLE public.event_media (
 --
 
 COMMENT ON COLUMN public.event_media.pre_signed_url IS 'Pre-signed URL for temporary access (max length 2048 chars)';
+
+COMMENT ON COLUMN public.event_media.thumbnail_url IS 'Stable S3/object URL for optional card thumbnail (e.g. preview image for PDF official documents).';
+
+COMMENT ON COLUMN public.event_media.thumbnail_pre_signed_url IS 'Optional cached presigned URL for thumbnail access (mirrors pre_signed_url pattern).';
+
+COMMENT ON COLUMN public.event_media.thumbnail_pre_signed_url_expires_at IS 'Expiry timestamp for thumbnail_pre_signed_url.';
 
 COMMENT ON COLUMN public.event_media.sponsor_id IS 'Reference to sponsor for sponsor-specific media files. When set, this media file belongs to a specific sponsor.';
 

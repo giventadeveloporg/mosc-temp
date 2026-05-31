@@ -364,6 +364,7 @@ Inner `.event-card-banner-media--featured-strip` uses `border-radius: 0` — par
 
 ## **Related Patterns**
 
+- See [MOSC Redesign Hub Card Rounded Containment](mdc:.cursor/rules/image_mosc_redesign_hub_card_rounded_containment.mdc) for `/mosc-redesign/*` hub tiles (`MoscHubCardMedia` — intrinsic portrait vs landscape cover)
 - See [Hero Mobile Image Containment](mdc:.cursor/rules/hero_mobile_image_containment_aspect_ratio.mdc) for the complete mobile technique
 - See [MOSC Styling Standards](mdc:.cursor/rules/mosc_styling_standards.mdc) for overall design system
 - See [`src/app/events/page.tsx`](mdc:src/app/events/page.tsx) for reference implementation

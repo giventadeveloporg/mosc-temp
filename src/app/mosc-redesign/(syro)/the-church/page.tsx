@@ -1,8 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import QuickLinks from '../components/QuickLinks';
 import SyroPageBanner from '../components/SyroPageBanner';
+import { MoscHubCardMedia } from '../components/MoscHubCardMedia';
 
 export const metadata = {
   title: 'The Church',
@@ -118,17 +118,7 @@ const TheChurchPage = () => {
                   className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 p-8 flex flex-col h-full"
                   style={{ boxShadow: cardShadow }}
                 >
-                  <div className="mb-5 flex justify-center">
-                    <div className="relative w-full max-w-[280px] aspect-[280/168] rounded-lg overflow-hidden flex items-center justify-center">
-                      <Image
-                        src={item.image}
-                        alt={item.title}
-                        fill
-                        className="object-contain rounded-lg"
-                        sizes="280px"
-                      />
-                    </div>
-                  </div>
+                  <MoscHubCardMedia src={item.image} alt={item.title} padded={false} frameClassName="bg-white" />
                   <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug">
                     {item.title}
                   </h3>

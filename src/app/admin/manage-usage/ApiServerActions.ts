@@ -46,8 +46,20 @@ export async function fetchAdminProfileServer(userId: string): Promise<UserProfi
     if (!res.ok) return null;
     const data = await res.json();
     if (Array.isArray(data) && data.length > 0) return data[0] as UserProfileDTO;
-    // Some backends may return a single object
-    if (data && typeof data === 'object') return data as UserProfileDTO;
+    // Spring Data REST / paginated shape: { content: [...] }
+    if (
+      data &&
+      typeof data === 'object' &&
+      'content' in data &&
+      Array.isArray((data as { content: unknown }).content)
+    ) {
+      const content = (data as { content: UserProfileDTO[] }).content;
+      return content.length > 0 ? content[0] : null;
+    }
+    // Single profile object (must have userId — not a page wrapper)
+    if (data && typeof data === 'object' && 'userId' in data) {
+      return data as UserProfileDTO;
+    }
     return null;
   } catch (error) {
     console.error('Error fetching admin profile:', error);

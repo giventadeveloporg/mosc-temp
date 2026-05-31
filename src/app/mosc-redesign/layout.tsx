@@ -6,6 +6,7 @@ import { DM_Sans } from 'next/font/google';
  * and the home page (global html/body overflow-x alone can break sticky).
  */
 import '@/styles/syro-malabar.css';
+import '@/styles/mosc-redesign-shell.css';
 
 const dmSans = DM_Sans({
   subsets: ['latin'],

@@ -6,6 +6,9 @@ export type AdministrationCard = {
   title: string;
   excerpt: string;
   href: string;
+  /** Hub card thumbnail (280×168 frame); omit for logo-only cards */
+  image?: string;
+  imageAlt?: string;
 };
 
 export const ADMINISTRATION_PAGE_CARDS: AdministrationCard[] = [
@@ -22,6 +25,8 @@ export const ADMINISTRATION_PAGE_CARDS: AdministrationCard[] = [
     excerpt:
       'The Canon Law accepted and followed by the Orthodox church of Malankara was collected and codified by Mar Gregorios Bar Hebraeus, Catholicos of Edessa (AD. 1226-1286) in the thirteenth century....',
     href: '/mosc-redesign/administration/he-canon-law-of-the-malankara-orthodox-church',
+    image: '/images/administration/canon-law.jpg',
+    imageAlt: 'The Canon Law of the Malankara Orthodox Church',
   },
   {
     shortTitle: 'Holy Episcopal Synod',
@@ -29,6 +34,8 @@ export const ADMINISTRATION_PAGE_CARDS: AdministrationCard[] = [
     excerpt:
       'The Episcopal Synod with the Catholicos as its president is the apex body of all bishops. The authority of the synod is final and binding. It has exclusive rights and...',
     href: '/mosc-redesign/administration/the-holy-episcopal-synod',
+    image: '/images/administration/holy-episcopal-synod.jpg',
+    imageAlt: 'The Holy Episcopal Synod',
   },
   {
     shortTitle: 'Malankara Association',
@@ -36,6 +43,8 @@ export const ADMINISTRATION_PAGE_CARDS: AdministrationCard[] = [
     excerpt:
       'It was in the Mulamthuruthy synod summoned by the patriarch peter III in 1876 that resolved to have an elected body called the Malankara Syria Christian Association to manage and...',
     href: '/mosc-redesign/administration/malankara-association',
+    image: '/images/administration/malankara-association.jpg',
+    imageAlt: 'Malankara Association',
   },
   {
     shortTitle: 'Managing Committee',
@@ -43,6 +52,8 @@ export const ADMINISTRATION_PAGE_CARDS: AdministrationCard[] = [
     excerpt:
       'In the Mulamthuruthy synod which formulated the Malankara association had laid down the provision for the managing committee, a smaller body to look into the financial and other administrative matters....',
     href: '/mosc-redesign/administration/the-managing-committee',
+    image: '/images/administration/managing-committee.jpg',
+    imageAlt: 'The Managing Committee',
   },
   {
     shortTitle: 'Working Committee',
@@ -50,6 +61,8 @@ export const ADMINISTRATION_PAGE_CARDS: AdministrationCard[] = [
     excerpt:
       'It is a small body of members nominated by the Malankara Metropolitan. This body prepares the agenda for the Managing Committee and helps the Malankara Metropolitan in his administrative functions....',
     href: '/mosc-redesign/administration/the-working-committee',
+    image: '/images/administration/working-committee.jpg',
+    imageAlt: 'The Working Committee',
   },
   {
     shortTitle: 'Diocesan General Body',
@@ -57,6 +70,8 @@ export const ADMINISTRATION_PAGE_CARDS: AdministrationCard[] = [
     excerpt:
       'Every diocese will have a Diocesan Assembly. The Diocesan bishop presides over the meetings. All matters related to the Diocese is discussed and decided in the General body assembly including...',
     href: '/mosc-redesign/administration/the-diocesan-general-body',
+    image: '/images/administration/diocesan-general-body.jpg',
+    imageAlt: 'The Diocesan General Body',
   },
   {
     shortTitle: 'Parish Managing Committee',
@@ -64,6 +79,8 @@ export const ADMINISTRATION_PAGE_CARDS: AdministrationCard[] = [
     excerpt:
       'The members of the Parish Managing Committee excluding the priests will be elected by the Parish Assembly and their term of office will be one year. Every Parish Managing Committee...',
     href: '/mosc-redesign/administration/the-parish-managing-committee',
+    image: '/images/administration/parish-managing-committee.jpg',
+    imageAlt: 'The Parish Managing Committee',
   },
   {
     shortTitle: 'Parish General Body',
@@ -71,5 +88,7 @@ export const ADMINISTRATION_PAGE_CARDS: AdministrationCard[] = [
     excerpt:
       'Every parish is within the frame work of the church constitution. It is neither outside the umbrella of the constitution nor an independent entity. Each Parish has a general body....',
     href: '/mosc-redesign/administration/the-parish-general-body',
+    image: '/images/administration/parish-general-body.jpg',
+    imageAlt: 'The Parish General Body',
   },
 ];

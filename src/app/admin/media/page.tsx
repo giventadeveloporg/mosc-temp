@@ -22,6 +22,26 @@ function formatDateInTimezone(dateString: string, timezone: string = 'America/Ne
   }
 }
 
+const MAX_MEDIA_UPLOAD_BYTES = 10 * 1024 * 1024; // 10MB per file (matches other admin upload UIs)
+
+async function parseMediaUploadError(res: Response): Promise<string> {
+  const text = await res.text();
+  try {
+    const json = JSON.parse(text) as { details?: string; message?: string; error?: string };
+    if (json.details && typeof json.details === 'string' && json.details.trim()) {
+      return json.details;
+    }
+    if (json.message) return json.message;
+    if (json.error) return json.error;
+  } catch {
+    /* not JSON */
+  }
+  if (res.status === 413) {
+    return 'File is too large. Use images under 10MB each, or upload fewer files at once.';
+  }
+  return text.trim() || `Upload failed (HTTP ${res.status})`;
+}
+
 interface EditMediaModalProps {
   media: EventMediaDTO;
   onClose: () => void;
@@ -627,6 +647,12 @@ function UploadMediaModal({
       setExternalMessage("No valid files to upload. Dropped folders are expanded automatically; if you still see this, use the \"Upload Folder\" button.");
       return;
     }
+    const oversized = validFiles.filter((f) => f.size > MAX_MEDIA_UPLOAD_BYTES);
+    if (oversized.length > 0) {
+      const names = oversized.map((f) => f.name).join(', ');
+      setExternalMessage(`File(s) exceed 10MB limit: ${names}. Compress or resize before uploading.`);
+      return;
+    }
     const tenantId = process.env.NEXT_PUBLIC_TENANT_ID;
     if (!tenantId) {
       setExternalMessage("NEXT_PUBLIC_TENANT_ID is not set.");
@@ -665,7 +691,7 @@ function UploadMediaModal({
         const formData = buildOneFileFormData(validFiles[i]);
         const res = await fetch("/api/proxy/event-medias/upload-multiple", { method: "POST", body: formData });
         if (!res.ok) {
-          const err = await res.text();
+          const err = await parseMediaUploadError(res);
           throw new Error(err || `Upload failed for file ${i + 1} (${res.status})`);
         }
       }

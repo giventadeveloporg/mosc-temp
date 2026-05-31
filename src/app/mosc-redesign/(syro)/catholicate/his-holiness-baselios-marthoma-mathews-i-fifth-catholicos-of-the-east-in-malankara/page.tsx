@@ -28,7 +28,7 @@ const BaseliosMarthomaMathewsIPage = () => {
 
                 <div className="mb-8 flex justify-center">
                   <Image
-                    src="https://mosc.in/wp-content/uploads/2015/01/mathews-i.jpg"
+                    src="/images/catholicate/mathews-i.jpg"
                     alt="His Holiness Baselios Marthoma Mathews I, The Fifth Catholicos of the East in Malankara"
                     width={175} height={175}
                     className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }}

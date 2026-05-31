@@ -4,6 +4,7 @@ import { fetchWithJwtRetry } from '@/lib/proxyHandler';
 import { getTenantId, getApiBaseUrl } from '@/lib/env';
 import type { EventMediaDTO } from '@/types';
 import { parseHierarchyDescription } from '@/lib/officialDocumentHierarchy';
+import { resolveOfficialDocumentDownloadUrl } from '@/lib/officialDocumentDownload';
 
 /** Public tenant official documents for the downloads page (server-side JWT). */
 export async function fetchPublicOfficialDocumentsForDownloadsServer(): Promise<EventMediaDTO[]> {
@@ -104,7 +105,7 @@ export async function fetchPublicOfficialDocumentsTreeServer(input?: {
         officialDocumentYear: doc.officialDocumentYear ?? null,
         priorityRanking: doc.displayPriority ?? parsed.priority ?? doc.priorityRanking ?? 999999,
         description: parsed.cleanDescription || null,
-        downloadUrl: doc.preSignedUrl || doc.fileUrl || null,
+        downloadUrl: resolveOfficialDocumentDownloadUrl(doc),
         createdAt: doc.createdAt,
       } satisfies PublicOfficialDocumentTreeItem;
     });

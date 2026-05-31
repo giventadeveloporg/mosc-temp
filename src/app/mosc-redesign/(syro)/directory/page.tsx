@@ -5,7 +5,9 @@ import { Metadata } from 'next';
 import { getDirectoryHomeData } from './getDirectoryHomeData';
 import type { DirectorySectionCard } from './types';
 import QuickLinks from '../components/QuickLinks';
+import { MoscHubCardMedia } from '../components/MoscHubCardMedia';
 import SyroPageBanner from '../components/SyroPageBanner';
+import DirectorySearch from './DirectorySearch';
 
 export const metadata: Metadata = {
   title: 'Directory | Malankara Orthodox Syrian Church',
@@ -166,6 +168,9 @@ export default async function DirectoryPage() {
         description={leadText}
       />
 
+      {/* Quick entity selector + global name search (routes to the chosen entity's list page) */}
+      <DirectorySearch />
+
       {/* Content - same layout and design as /mosc/administration */}
       <section className="py-16 bg-syro-bg-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -184,17 +189,11 @@ export default async function DirectoryPage() {
                 className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 p-8 flex flex-col h-full overflow-hidden"
               >
                 {imageUrl ? (
-                  <div className="mb-5 flex justify-center pt-8">
-                    <div className="relative w-full max-w-[280px] aspect-[280/168] rounded-lg overflow-hidden flex items-center justify-center">
-                      <Image
-                        src={imageUrl}
-                        alt={card.imageAlt ?? card.title}
-                        fill
-                        className="object-contain rounded-lg"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 280px"
-                      />
-                    </div>
-                  </div>
+                  <MoscHubCardMedia
+                    src={imageUrl}
+                    alt={card.imageAlt ?? card.title}
+                    frame="landscape"
+                  />
                 ) : (
                   <DirectoryCardIcon title={card.title} />
                 )}

@@ -5,6 +5,8 @@ import Link from 'next/link';
 import type { EventSponsorsDTO } from "@/types";
 import { proxyApiPath } from '@/lib/proxyApiPath';
 import { SponsorCard } from '@/components/sponsors/SponsorCard';
+import HomeParticleBackground from '@/components/HomeParticleBackground';
+import pageStyles from './SponsorsPage.module.css';
 
 export default function SponsorsPage() {
   const [sponsors, setSponsors] = useState<EventSponsorsDTO[]>([]);
@@ -19,27 +21,18 @@ export default function SponsorsPage() {
   const [totalPages, setTotalPages] = useState(0);
   const pageSize = 10; // Standard page size
 
-  // Array of modern background colors - using MOSC warm earth tones
-  const cardBackgrounds = [
-    'bg-gradient-to-br from-primary/10 to-primary/20',
-    'bg-gradient-to-br from-secondary/10 to-secondary/20',
-    'bg-gradient-to-br from-accent/10 to-accent/20',
-    'bg-gradient-to-br from-muted to-muted/80',
-    'bg-gradient-to-br from-background to-muted',
-    'bg-gradient-to-br from-primary/5 to-secondary/10',
-    'bg-gradient-to-br from-accent/5 to-primary/10',
-    'bg-gradient-to-br from-muted/50 to-background',
-    'bg-gradient-to-br from-secondary/5 to-muted',
-    'bg-gradient-to-br from-primary/15 to-muted/50'
-  ];
-
-  const getRandomBackground = (index: number) => {
-    return cardBackgrounds[index % cardBackgrounds.length];
-  };
-
   useEffect(() => {
     fetchSponsors();
   }, [currentPage, searchTerm]); // Refetch when page or search changes
+
+  useEffect(() => {
+    document.body.classList.add('home-page-background');
+    document.body.classList.add('sponsors-page-background');
+    return () => {
+      document.body.classList.remove('home-page-background');
+      document.body.classList.remove('sponsors-page-background');
+    };
+  }, []);
 
   async function fetchSponsors() {
     setLoading(true);
@@ -121,32 +114,36 @@ export default function SponsorsPage() {
   const endItem = (currentPage - 1) * pageSize + filteredSponsors.length;
 
   return (
-    <div className="min-h-screen bg-background" style={{ paddingTop: '100px' }}>
+    <>
+      <HomeParticleBackground />
+      <div className={`${pageStyles.sponsorsPage} home-page-layout relative z-[1] min-h-screen`} style={{ paddingTop: '100px' }}>
       {/* Header Section - MOSC Styling */}
-      <section className="py-16 bg-card sacred-shadow-sm">
+      <section className={`${pageStyles.topSection} py-16`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
+          <div className={`${pageStyles.topbar} flex items-center mb-8 gap-4 px-16`}>
             <Link
               href="/"
-              className="inline-flex items-center space-x-2 text-primary hover:text-accent reverent-transition mb-6"
+              className={`${pageStyles.backButton} flex-shrink-0 h-14 rounded-xl flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 px-3 sm:px-6`}
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              <span className="font-body">Back to Home</span>
+              <div className={`${pageStyles.backButtonIcon} flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center`}>
+                <svg className={`${pageStyles.backButtonIconSvg} w-6 h-6`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+              </div>
+              <span className={`${pageStyles.backButtonText} font-semibold hidden sm:inline`}>Back to Home</span>
             </Link>
-            <h1 className="font-heading font-semibold text-4xl text-foreground mb-4">
-              Our Sponsors
-            </h1>
-            <p className="font-body text-lg text-muted-foreground max-w-3xl mx-auto">
-              Meet the organizations that support our community initiatives
-            </p>
+            <div className="flex-1 min-w-0">
+              <h1 className={`${pageStyles.pageTitle} text-2xl sm:text-3xl font-bold mb-2`}>Our Sponsors</h1>
+              <p className={`${pageStyles.pageDescription} text-sm sm:text-base`}>
+                Meet the organizations that support our community initiatives
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Main Content Section - MOSC Styling */}
-      <section className="py-16 bg-background">
+      <section className={`${pageStyles.mainSection} py-16`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Search Bar - MOSC Styling */}
           <div className="mb-12">
@@ -161,7 +158,7 @@ export default function SponsorsPage() {
                 value={searchTerm}
                 onChange={(e) => handleSearch(e.target.value)}
                 placeholder="Search sponsors..."
-                className="block w-full pl-10 pr-3 py-3 border border-border rounded-lg bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring reverent-transition font-body"
+                className={`${pageStyles.searchInput} block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 reverent-transition`}
               />
             </div>
           </div>
@@ -169,33 +166,33 @@ export default function SponsorsPage() {
           {loading ? (
             <div className="flex justify-center items-center min-h-[400px]">
               <div className="relative">
-                <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+                <div className={`${pageStyles.loader} w-16 h-16 border-4 rounded-full animate-spin`}></div>
               </div>
             </div>
           ) : fetchError ? (
             <div className="text-center py-12">
-              <div className="bg-card rounded-lg sacred-shadow p-8 max-w-md mx-auto">
-                <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-muted rounded-full">
+              <div className={`${pageStyles.statusCard} rounded-lg p-8 max-w-md mx-auto`}>
+                <div className={`${pageStyles.statusCardIcon} flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full`}>
                   <svg className="w-8 h-8 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
                 </div>
-                <h3 className="font-heading font-semibold text-xl text-foreground mb-2">Unable to Load Sponsors</h3>
-                <p className="font-body text-muted-foreground">Please try refreshing the page or contact us if the problem persists.</p>
+                <h3 className={`${pageStyles.statusCardTitle} font-heading font-semibold text-xl mb-2`}>Unable to Load Sponsors</h3>
+                <p className={pageStyles.statusCardText}>Please try refreshing the page or contact us if the problem persists.</p>
               </div>
             </div>
           ) : filteredSponsors.length === 0 ? (
             <div className="text-center py-12">
-              <div className="bg-card rounded-lg sacred-shadow p-8 max-w-md mx-auto">
-                <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-muted rounded-full">
+              <div className={`${pageStyles.statusCard} rounded-lg p-8 max-w-md mx-auto`}>
+                <div className={`${pageStyles.statusCardIcon} flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full`}>
                   <svg className="w-8 h-8 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
-                <h3 className="font-heading font-semibold text-xl text-foreground mb-2">
+                <h3 className={`${pageStyles.statusCardTitle} font-heading font-semibold text-xl mb-2`}>
                   {searchTerm ? 'No Sponsors Found' : 'No Sponsors Available'}
                 </h3>
-                <p className="font-body text-muted-foreground">
+                <p className={pageStyles.statusCardText}>
                   {searchTerm
                     ? `No sponsors match "${searchTerm}". Try a different search term.`
                     : 'We\'re currently seeking sponsors for our events. Contact us to learn about sponsorship opportunities!'
@@ -207,7 +204,7 @@ export default function SponsorsPage() {
             <>
               {/* Results Count - MOSC Styling */}
               <div className="text-center mb-12">
-                <p className="font-body text-muted-foreground">
+                <p className={pageStyles.resultsCount}>
                   {searchTerm
                     ? `Found ${totalCount} sponsor${totalCount !== 1 ? 's' : ''} matching "${searchTerm}"`
                     : `Showing ${totalCount} sponsor${totalCount !== 1 ? 's' : ''}`
@@ -215,13 +212,13 @@ export default function SponsorsPage() {
                 </p>
               </div>
 
-              {/* Sponsors List - Single column stacked layout */}
-              <div className="space-y-8 mb-12">
+              {/* Sponsors List - 2 cards per row on medium+ screens */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
                 {filteredSponsors.map((sponsor, index) => (
                   <SponsorCard
                     key={sponsor.id ?? `${sponsor.name}-${index}`}
                     sponsor={sponsor}
-                    backgroundClass={getRandomBackground(index)}
+                    backgroundClass={pageStyles.sponsorCardBg}
                   />
                 ))}
               </div>
@@ -232,7 +229,7 @@ export default function SponsorsPage() {
                   <button
                     onClick={handlePrevPage}
                     disabled={!hasPrevPage}
-                    className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+                    className={`${pageStyles.paginationButton} px-5 py-2.5 font-semibold rounded-lg border-2 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105`}
                     title="Previous Page"
                     aria-label="Previous Page"
                     type="button"
@@ -244,16 +241,16 @@ export default function SponsorsPage() {
                   </button>
 
                   {/* Page Info */}
-                  <div className="px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
-                    <span className="text-sm font-bold text-blue-700">
-                      Page <span className="text-blue-600">{currentPage}</span> of <span className="text-blue-600">{Math.max(totalPages, 1)}</span>
+                  <div className={`${pageStyles.pageInfo} px-4 py-2 border-2 rounded-lg`}>
+                    <span className={`${pageStyles.pageInfoText} text-sm font-bold`}>
+                      Page <span className={pageStyles.pageInfoValue}>{currentPage}</span> of <span className={pageStyles.pageInfoValue}>{Math.max(totalPages, 1)}</span>
                     </span>
                   </div>
 
                   <button
                     onClick={handleNextPage}
                     disabled={!hasNextPage}
-                    className="px-5 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-semibold rounded-lg shadow-sm border-2 border-blue-400 hover:border-blue-500 disabled:bg-blue-100 disabled:border-blue-300 disabled:text-blue-500 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-md"
+                    className={`${pageStyles.paginationButton} px-5 py-2.5 font-semibold rounded-lg border-2 disabled:cursor-not-allowed flex items-center gap-2 transition-all duration-300 hover:scale-105`}
                     title="Next Page"
                     aria-label="Next Page"
                     type="button"
@@ -268,13 +265,13 @@ export default function SponsorsPage() {
                 {/* Item Count Text */}
                 <div className="text-center mt-3">
                   {totalCount > 0 ? (
-                    <div className="inline-flex items-center px-4 py-2 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
-                      <span className="text-sm text-gray-700">
-                        Showing <span className="font-bold text-blue-600">{filteredSponsors.length > 0 ? startItem : 0}</span> to <span className="font-bold text-blue-600">{filteredSponsors.length > 0 ? endItem : 0}</span> of <span className="font-bold text-blue-600">{totalCount}</span> sponsors
+                    <div className={`${pageStyles.itemCountBox} inline-flex items-center px-4 py-2 border-2 rounded-lg`}>
+                      <span className={`${pageStyles.itemCountText} text-sm`}>
+                        Showing <span className={`${pageStyles.itemCountValue} font-bold`}>{filteredSponsors.length > 0 ? startItem : 0}</span> to <span className={`${pageStyles.itemCountValue} font-bold`}>{filteredSponsors.length > 0 ? endItem : 0}</span> of <span className={`${pageStyles.itemCountValue} font-bold`}>{totalCount}</span> sponsors
                       </span>
                     </div>
                   ) : (
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 border-2 border-orange-300 rounded-lg shadow-sm">
+                    <div className={`${pageStyles.noResultsBox} inline-flex items-center gap-2 px-4 py-2 border-2 rounded-lg`}>
                       <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
@@ -288,6 +285,7 @@ export default function SponsorsPage() {
           )}
         </div>
       </section>
-    </div>
+      </div>
+    </>
   );
 }

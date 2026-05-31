@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import QuickLinks from '../components/QuickLinks';
 import SyroPageBanner from '../components/SyroPageBanner';
+import { MoscHubCardMedia } from '../components/MoscHubCardMedia';
 import { ADMINISTRATION_PAGE_CARDS } from '@/components/mosc-redesign/administrationCards';
 
 export const metadata = {
@@ -40,7 +41,7 @@ const AdministrationPage = () => {
                 key={card.title}
                 className="bg-white rounded-lg shadow-[rgba(50,50,93,0.25)_0px_6px_12px_-2px,rgba(0,0,0,0.3)_0px_3px_7px_-3px] hover:shadow-[rgba(0,0,0,0.35)_0px_5px_15px] transition-shadow duration-300 p-8 flex flex-col h-full"
               >
-                {index === 0 && (
+                {index === 0 ? (
                   <div className="mb-5 flex justify-center">
                     <Image
                       src="/images/logos/Current_Edits/MOSC-Logo-only.png"
@@ -50,103 +51,13 @@ const AdministrationPage = () => {
                       className="object-contain"
                     />
                   </div>
-                )}
-                {index === 1 && (
-                  <div className="mb-5 flex justify-center pt-8">
-                    <div className="relative w-full max-w-[280px] aspect-[280/168] rounded-lg overflow-hidden flex items-center justify-center">
-                      <Image
-                        src="/images/administration/canon-law.jpg"
-                        alt="The Canon Law of the Malankara Orthodox Church"
-                        fill
-                        className="object-contain rounded-lg"
-                      />
-                    </div>
-                  </div>
-                )}
-                {index === 2 && (
-                  <div className="mb-5 flex justify-center pt-8">
-                    <div className="relative w-full max-w-[280px] aspect-[280/168] rounded-lg overflow-hidden flex items-center justify-center">
-                      <Image
-                        src="/images/administration/holy-episcopal-synod.jpg"
-                        alt="The Holy Episcopal Synod"
-                        fill
-                        className="object-contain rounded-lg"
-                      />
-                    </div>
-                  </div>
-                )}
-                {index === 3 && (
-                  <div className="mb-5 flex justify-center pt-8">
-                    <div className="relative w-full max-w-[280px] aspect-[280/168] rounded-lg overflow-hidden flex items-center justify-center">
-                      <Image
-                        src="/images/administration/malankara-association.jpg"
-                        alt="Malankara Association"
-                        fill
-                        className="object-contain rounded-lg"
-                      />
-                    </div>
-                  </div>
-                )}
-                {index === 4 && (
-                  <div className="mb-5 flex justify-center pt-8">
-                    <div className="relative w-full max-w-[280px] aspect-[280/168] rounded-lg overflow-hidden flex items-center justify-center">
-                      <Image
-                        src="/images/administration/managing-committee.jpg"
-                        alt="The Managing Committee"
-                        fill
-                        className="object-contain rounded-lg"
-                      />
-                    </div>
-                  </div>
-                )}
-                {index === 5 && (
-                  <div className="mb-5 flex justify-center pt-8">
-                    <div className="relative w-full max-w-[280px] aspect-[280/168] rounded-lg overflow-hidden flex items-center justify-center">
-                      <Image
-                        src="/images/administration/working-committee.jpg"
-                        alt="The Working Committee"
-                        fill
-                        className="object-contain rounded-lg"
-                      />
-                    </div>
-                  </div>
-                )}
-                {index === 6 && (
-                  <div className="mb-5 flex justify-center pt-8">
-                    <div className="relative w-full max-w-[280px] aspect-[280/168] rounded-lg overflow-hidden flex items-center justify-center">
-                      <Image
-                        src="/images/administration/diocesan-general-body.jpg"
-                        alt="The Diocesan General Body"
-                        fill
-                        className="object-contain rounded-lg"
-                      />
-                    </div>
-                  </div>
-                )}
-                {index === 7 && (
-                  <div className="mb-5 flex justify-center pt-8">
-                    <div className="relative w-full max-w-[280px] aspect-[280/168] rounded-lg overflow-hidden flex items-center justify-center">
-                      <Image
-                        src="/images/administration/parish-managing-committee.jpg"
-                        alt="The Parish Managing Committee"
-                        fill
-                        className="object-contain rounded-lg"
-                      />
-                    </div>
-                  </div>
-                )}
-                {index === 8 && (
-                  <div className="mb-5 flex justify-center pt-8">
-                    <div className="relative w-full max-w-[280px] aspect-[280/168] rounded-lg overflow-hidden flex items-center justify-center">
-                      <Image
-                        src="/images/administration/parish-general-body.jpg"
-                        alt="The Parish General Body"
-                        fill
-                        className="object-contain rounded-lg"
-                      />
-                    </div>
-                  </div>
-                )}
+                ) : card.image ? (
+                  <MoscHubCardMedia
+                    src={card.image}
+                    alt={card.imageAlt ?? card.title}
+                    objectPosition="top"
+                  />
+                ) : null}
                 <h3 className="font-syro-display text-xl font-semibold text-syro-blue mb-4 leading-snug">
                   {card.title}
                 </h3>

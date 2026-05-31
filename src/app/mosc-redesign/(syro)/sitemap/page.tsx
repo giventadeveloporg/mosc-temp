@@ -1,169 +1,125 @@
 import React from 'react';
 import Link from 'next/link';
+import QuickLinks from '../components/QuickLinks';
+import SyroPageBanner from '../components/SyroPageBanner';
+import { MOSC_REDESIGN_SITEMAP, type SitemapLink } from './sitemapData';
 
 export const metadata = {
   title: 'Sitemap',
   description: 'Complete sitemap of the Malankara Orthodox Syrian Church website.',
 };
 
-const SitemapPage = () => {
-  const sitemapStructure = [
-    {
-      title: 'Main Sections',
-      links: [
-        { name: 'Home', href: '/mosc-old' },
-        { name: 'The Catholicate', href: '/mosc-redesign/catholicate' },
-        { name: 'Administration', href: '/mosc-redesign/administration' },
-        { name: 'The Church', href: '/mosc-redesign/the-church' },
-        { name: 'Holy Synod', href: '/mosc-redesign/holy-synod' },
-        { name: 'Ecumenical', href: '/mosc-redesign/ecumenical' },
-        { name: 'Dioceses', href: '/mosc-redesign/dioceses' },
-        { name: 'Saints', href: '/mosc-redesign/saints' }
-      ]
-    },
-    {
-      title: 'Spiritual Resources',
-      links: [
-        { name: 'Liturgical Resources', href: '/mosc-redesign/liturgical-resources' },
-        { name: 'Theological Writings', href: '/mosc-redesign/theological-writings' },
-        { name: 'Patristic Fathers', href: '/mosc-redesign/patristic-fathers' },
-        { name: 'Holy Bible', href: '/mosc-redesign/holy-bible' },
-        { name: 'Sermons', href: '/mosc-redesign/sermons' },
-        { name: 'Hymns', href: '/mosc-redesign/hymns' },
-        { name: 'Prayers', href: '/mosc-redesign/prayers' },
-        { name: 'Calendar', href: '/mosc-redesign/calendar' }
-      ]
-    },
-    {
-      title: 'Community Services',
-      links: [
-        { name: 'Spiritual Organisations', href: '/mosc-redesign/spiritual' },
-        { name: 'Publications', href: '/mosc-redesign/publications' },
-        { name: 'Institutions', href: '/mosc-redesign/institutions' },
-        { name: 'Training', href: '/mosc-redesign/training' },
-        { name: 'Theological Seminaries', href: '/mosc-redesign/theological' },
-        { name: 'Lectionary', href: '/mosc-redesign/lectionary' },
-        { name: 'Downloads', href: '/mosc-redesign/downloads' },
-        { name: 'Gallery', href: '/mosc-redesign/gallery' }
-      ]
-    },
-    {
-      title: 'External Links',
-      links: [
-        { name: 'Directory', href: '/mosc-redesign/directory' },
-        { name: 'Calendar', href: 'http://calendar.mosc.in/', external: true },
-        { name: 'E-mail', href: 'https://accounts.google.com/ServiceLogin', external: true }
-      ]
-    }
-  ];
+function ExternalLinkIcon() {
+  return (
+    <svg
+      className="inline-block w-3.5 h-3.5 ml-1 opacity-70"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      aria-hidden
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+      />
+    </svg>
+  );
+}
+
+function SitemapLinkItem({ link }: { link: SitemapLink }) {
+  const className =
+    'group flex items-start gap-2 text-sm text-warmGray-dark hover:text-burgundy transition-colors duration-200 leading-snug';
+
+  if (link.external) {
+    return (
+      <a href={link.href} target="_blank" rel="noopener noreferrer" className={className}>
+        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-burgundy/35 group-hover:bg-burgundy transition-colors" />
+        <span>
+          {link.name}
+          <ExternalLinkIcon />
+        </span>
+      </a>
+    );
+  }
 
   return (
-    <div className="bg-syro-bg-gray">
-      {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-br from-syro-bg-gray to-syro-bg-gray">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-syro-red rounded-lg flex items-center justify-center mx-auto mb-6 shadow-syro-card-hover">
-              <span className="text-syro-red-foreground text-4xl font-bold" role="img" aria-label="Sitemap">🗺️</span>
-            </div>
-            <h1 className="font-syro-display font-semibold text-4xl text-syro-blue mb-4">
-              Website Sitemap
-            </h1>
-            <p className="font-syro-primary text-lg text-syro-dark-gray max-w-3xl mx-auto leading-relaxed">
-              Navigate through all sections and pages of the Malankara Orthodox Syrian Church website.
-              Find information about our faith, history, administration, and spiritual resources.
-            </p>
-          </div>
-        </div>
-      </section>
+    <Link href={link.href} className={className}>
+      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-burgundy/35 group-hover:bg-burgundy transition-colors" />
+      <span>{link.name}</span>
+    </Link>
+  );
+}
 
-      {/* Sitemap Structure */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {sitemapStructure.map((section) => (
-              <div key={section.title} className="bg-syro-bg-gray rounded-lg shadow-syro-card p-6">
-                <h2 className="font-syro-display font-semibold text-xl text-syro-blue mb-6">
-                  {section.title}
-                </h2>
-                <nav className="space-y-3" role="navigation" aria-label={`${section.title} navigation`}>
-                  {section.links.map((link) => (
-                    <div key={link.name}>
-                      {link.external ? (
-                        <a
-                          href={link.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="block text-syro-dark-gray hover:text-syro-red transition-all duration-300 text-sm"
-                        >
-                          {link.name}
-                          <span className="ml-1" role="img" aria-label="External link">🔗</span>
-                        </a>
-                      ) : (
-                        <Link
-                          href={link.href}
-                          className="block text-syro-dark-gray hover:text-syro-red transition-all duration-300 text-sm"
-                        >
-                          {link.name}
-                        </Link>
-                      )}
-                    </div>
-                  ))}
-                </nav>
-              </div>
+const SitemapPage = () => {
+  return (
+    <div className="min-h-screen bg-parchment">
+      <SyroPageBanner
+        title="Website Sitemap"
+        breadcrumbFrom="home"
+        description="Navigate all sections and pages of the Malankara Orthodox Syrian Church website — faith, history, administration, directory, and spiritual resources."
+      />
+
+      <section className="py-14 md:py-20 bg-parchment border-b border-burgundy/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
+            {MOSC_REDESIGN_SITEMAP.map((section) => (
+              <article
+                key={section.title}
+                className="rounded-2xl border border-burgundy/15 bg-white/80 shadow-sm hover:shadow-md hover:border-burgundy/30 transition-all duration-300 overflow-hidden"
+              >
+                <div className="h-1 bg-gradient-to-r from-burgundy via-burgundy-light to-warmGold" />
+                <div className="p-6">
+                  <h2 className="text-lg font-semibold text-warmBrown-dark mb-2">{section.title}</h2>
+                  <p className="text-xs text-warmGray-dark/90 mb-5 leading-relaxed">{section.description}</p>
+                  <nav className="space-y-2.5" aria-label={`${section.title} links`}>
+                    {section.links.map((link) => (
+                      <div key={`${section.title}-${link.href}`}>
+                        <SitemapLinkItem link={link} />
+                      </div>
+                    ))}
+                  </nav>
+                </div>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Quick Search */}
-      <section className="py-16 bg-syro-bg-gray">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="font-syro-display font-semibold text-3xl text-syro-blue mb-4">
-              Can't Find What You're Looking For?
-            </h2>
-            <p className="font-syro-primary text-lg text-syro-dark-gray mb-8 max-w-2xl mx-auto">
-              Use our search functionality or contact us for assistance in finding specific information.
-            </p>
-
-            <div className="max-w-md mx-auto">
-              <div className="flex space-x-4">
-                <Link
-                  href="/mosc-redesign/contact-info"
-                  className="flex-1 inline-flex items-center justify-center px-6 py-3 bg-syro-red text-syro-red-foreground rounded-lg hover:bg-syro-red/90 transition-all duration-300"
-                >
-                  <span className="mr-2" role="img" aria-label="Contact">📞</span>
-                  Contact Us
-                </Link>
-                <Link
-                  href="/mosc-old"
-                  className="flex-1 inline-flex items-center justify-center px-6 py-3 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/90 transition-all duration-300"
-                >
-                  <span className="mr-2" role="img" aria-label="Home">🏠</span>
-                  Go Home
-                </Link>
-              </div>
-            </div>
+      <section className="py-14 bg-parchment-deep border-b border-burgundy/10">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-2xl font-semibold text-warmBrown-dark mb-3">Can&apos;t find what you need?</h2>
+          <p className="text-warmGray-dark mb-8 leading-relaxed">
+            Use the church directory to search parishes and priests, or contact us for help locating specific
+            information.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link
+              href="/mosc-redesign/directory"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-burgundy text-white font-semibold text-sm hover:bg-burgundy-light transition-all duration-300 hover:shadow-lg hover:shadow-burgundy/30"
+            >
+              Search Directory
+            </Link>
+            <Link
+              href="/mosc-redesign/contact-info"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg border-2 border-burgundy text-burgundy font-semibold text-sm hover:bg-burgundy hover:text-white transition-all duration-300"
+            >
+              Contact Us
+            </Link>
+            <Link
+              href="/mosc-redesign"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg border border-burgundy/30 text-warmBrown-dark font-semibold text-sm hover:border-burgundy/50 hover:bg-white transition-all duration-300"
+            >
+              Back to Home
+            </Link>
           </div>
         </div>
       </section>
+
+      <QuickLinks />
     </div>
   );
 };
 
 export default SitemapPage;
-
-
-
-
-
-
-
-
-
-
-
-
-
-

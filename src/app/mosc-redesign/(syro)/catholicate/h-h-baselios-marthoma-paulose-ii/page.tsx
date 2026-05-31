@@ -28,7 +28,7 @@ const BaseliosMarthomaPauloseIIPage = () => {
 
                 <div className="mb-8 flex justify-center">
                   <Image
-                    src="https://mosc.in/wp-content/uploads/2015/01/bava.jpg"
+                    src="/images/catholicate/bava.jpg"
                     alt="H.H. Baselios Marthoma Paulose II, The Eighth Catholicos of the East in Malankara"
                     width={175} height={175}
                     className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }}

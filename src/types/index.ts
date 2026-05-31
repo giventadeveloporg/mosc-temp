@@ -189,6 +189,10 @@ export interface EventMediaDTO {
   isEventManagementOfficialDocument?: boolean;
   preSignedUrl?: string;
   preSignedUrlExpiresAt?: string;
+  /** Optional card thumbnail for non-image files (e.g. PDF official documents). */
+  thumbnailUrl?: string;
+  thumbnailPreSignedUrl?: string;
+  thumbnailPreSignedUrlExpiresAt?: string;
   altText?: string;
   displayOrder?: number;
   downloadCount?: number;

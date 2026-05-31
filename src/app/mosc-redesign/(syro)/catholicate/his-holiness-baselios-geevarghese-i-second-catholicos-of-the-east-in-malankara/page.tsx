@@ -28,7 +28,7 @@ const BaseliosGeevargheseIPage = () => {
 
                 <div className="mb-8 flex justify-center">
                   <Image
-                    src="https://mosc.in/wp-content/uploads/2014/12/Untitled-12.jpg"
+                    src="/images/catholicate/Catholicos-2.jpg"
                     alt="His Holiness Baselios Geevarghese I, The Second Catholicos of the East in Malankara"
                     width={175} height={175}
                     className="rounded-lg object-contain" style={{ width: '175px', height: '175px' }}

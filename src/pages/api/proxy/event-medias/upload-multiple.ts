@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getCachedApiJwt, generateApiJwt } from '@/lib/api/jwt';
-import { getApiBaseUrl } from '@/lib/env';
+import { getApiBaseUrl, getTenantId } from '@/lib/env';
+import { getRawBody } from '@/lib/getRawBody';
 
 const API_BASE_URL = getApiBaseUrl();
 
@@ -9,30 +10,6 @@ export const config = {
     bodyParser: false,
   },
 };
-
-async function fetchWithJwtRetry(apiUrl: string, options: any = {}, debugLabel = '') {
-  let token = await getCachedApiJwt();
-  let response = await fetch(apiUrl, {
-    ...options,
-    headers: {
-      ...options.headers,
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  if (response.status === 401) {
-    token = await generateApiJwt();
-    response = await fetch(apiUrl, {
-      ...options,
-      headers: {
-        ...options.headers,
-        Authorization: `Bearer ${token}`,
-      },
-    });
-  }
-
-  return response;
-}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -59,25 +36,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Use node-fetch for proper multipart form handling
     const fetch = (await import("node-fetch")).default;
 
-    // Copy headers from request, but sanitize them
+    const tenantId = getTenantId();
+
+    // Buffer multipart body (more reliable on Amplify/Lambda than streaming IncomingMessage)
+    const rawBody = await getRawBody(req);
+
     const headers: Record<string, string> = {
       Authorization: `Bearer ${token}`,
+      'X-Tenant-ID': tenantId,
+      'content-length': String(rawBody.length),
     };
 
-    // Only copy content-type and content-length if they exist
     if (req.headers['content-type']) {
-      headers['content-type'] = req.headers['content-type'];
-    }
-    if (req.headers['content-length']) {
-      headers['content-length'] = req.headers['content-length'];
+      headers['content-type'] = Array.isArray(req.headers['content-type'])
+        ? req.headers['content-type'][0]
+        : req.headers['content-type'];
     }
 
-    // Forward the request to the backend
     const apiRes = await fetch(apiUrl, {
       method: 'POST',
-      headers: headers,
-      body: req, // Forward the raw request stream
-      duplex: 'half', // Required for streaming body in Node.js fetch
+      headers,
+      body: rawBody,
     });
 
     // Check response status and handle accordingly
@@ -95,19 +74,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       apiRes.body.pipe(res);
     } else {
-      // Error - return structured error response
       console.error('❌ Proxy: Backend upload failed - HTTP status:', apiRes.status);
 
-      // Drain the error response to prevent processing
+      let backendDetail = '';
       try {
-        // For node-fetch, we need to consume the body differently
-        if (apiRes.body && typeof apiRes.body.destroy === 'function') {
-          apiRes.body.destroy();
-        } else if (apiRes.body && typeof apiRes.body.cancel === 'function') {
-          apiRes.body.cancel();
-        }
-      } catch (drainError) {
-        console.warn('Warning: Could not drain error response body:', drainError);
+        backendDetail = await apiRes.text();
+      } catch {
+        /* ignore */
       }
 
       res.status(apiRes.status >= 400 ? apiRes.status : 500);
@@ -116,7 +89,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         error: 'Upload failed',
         status: apiRes.status,
         message: `Upload operation failed with HTTP status ${apiRes.status}`,
-        success: false
+        details: backendDetail || undefined,
+        success: false,
       });
     }
   } catch (err) {
