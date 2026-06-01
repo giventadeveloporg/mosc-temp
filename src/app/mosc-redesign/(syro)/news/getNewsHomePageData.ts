@@ -5,7 +5,7 @@
  * API reference: documentation/news_portal/strapi/api_reference.md
  */
 
-import { fetchStrapi, getStrapiUrl, getStrapiTenantId } from '@/lib/strapi';
+import { fetchStrapi, getStrapiTenantDocumentId, getStrapiUrl, getStrapiTenantId } from '@/lib/strapi';
 import type { BlocksContent } from '@strapi/blocks-react-renderer';
 import type { NewsHomePageData, NewsArticle, FlashNews, FlashNewsItemUI, SidebarPromoBlock, AdSlot } from './types';
 
@@ -77,8 +77,7 @@ function getMediaAlt(media: unknown): string | undefined {
  * Strapi 5 list endpoints: use pagination[page] and pagination[pageSize] (not pagination[limit]).
  * See .cursor/rules/strapi_5_api_patterns.mdc and bishops getBishopsData.ts.
  */
-function buildArticleQuery(filters: string, sort: string, pageSize: number, withTenant: boolean): string {
-  const tenantId = getStrapiTenantId();
+function buildArticleQuery(filters: string, sort: string, pageSize: number, tenantFilter: string): string {
   const parts = [
     'filters[publishedAt][$notNull]=true',
     POPULATE,
@@ -86,11 +85,25 @@ function buildArticleQuery(filters: string, sort: string, pageSize: number, with
     'pagination[page]=1',
     `pagination[pageSize]=${pageSize}`,
   ];
-  if (withTenant) {
-    parts.unshift(`filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}`);
-  }
+  parts.unshift(tenantFilter);
   if (filters) parts.unshift(filters);
   return `/articles?${parts.join('&')}`;
+}
+
+/**
+ * Builds a tenant filter that works across Strapi relation shapes:
+ * - local: filters[tenant][tenantId][$eq]=tenant_demo_002
+ * - some prod datasets: filters[tenant][documentId][$eq]=<tenant_document_id>
+ */
+async function buildTenantFilterQuery(tenantId: string): Promise<string> {
+  const tenantDocumentId = await getStrapiTenantDocumentId();
+  if (tenantDocumentId) {
+    return [
+      `filters[$or][0][tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}`,
+      `filters[$or][1][tenant][documentId][$eq]=${encodeURIComponent(tenantDocumentId)}`,
+    ].join('&');
+  }
+  return `filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}`;
 }
 
 function normalizeArticle(raw: { id?: number; documentId?: string; attributes?: Record<string, unknown> }): NewsArticle {
@@ -271,8 +284,9 @@ export async function getNewsHomePageData(): Promise<NewsHomePageData> {
     return empty;
   }
 
-  const flashNewsPath = `/flash-news-items?filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}&filters[publishedAt][$notNull]=true&sort=order:asc,publishedAt:desc&populate[0]=article&pagination[limit]=20`;
-  const adsPath = `/advertisement-slots?filters[$or][0][position][$eq]=sidebar&filters[$or][1][position][$eq]=top&filters[$or][2][position][$eq]=between_sections&filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}&populate=media`;
+  const tenantFilterQuery = await buildTenantFilterQuery(tenantId);
+  const flashNewsPath = `/flash-news-items?${tenantFilterQuery}&filters[publishedAt][$notNull]=true&sort=order:asc,publishedAt:desc&populate[0]=article&pagination[limit]=20`;
+  const adsPath = `/advertisement-slots?filters[$or][0][position][$eq]=sidebar&filters[$or][1][position][$eq]=top&filters[$or][2][position][$eq]=between_sections&${tenantFilterQuery}&populate=media`;
 
   let lastResult: NewsHomePageData = empty;
   let lastError: unknown;
@@ -294,10 +308,10 @@ export async function getNewsHomePageData(): Promise<NewsHomePageData> {
       ] = await Promise.all([
         fetchStrapi<{ id?: number; attributes?: Record<string, unknown> }>('/homepage?populate=*'),
         fetchStrapi<unknown[]>(flashNewsPath),
-        fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=featured-news', 'publishedAt:desc', 6, true)),
-        fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=main-news', 'publishedAt:desc', 10, true)),
-        fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=press-release', 'publishedAt:desc', 10, true)),
-        fetchStrapi<unknown[]>(buildArticleQuery('', 'views:desc', 5, true)),
+        fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=featured-news', 'publishedAt:desc', 6, tenantFilterQuery)),
+        fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=main-news', 'publishedAt:desc', 10, tenantFilterQuery)),
+        fetchStrapi<unknown[]>(buildArticleQuery('filters[category][slug][$eqi]=press-release', 'publishedAt:desc', 10, tenantFilterQuery)),
+        fetchStrapi<unknown[]>(buildArticleQuery('', 'views:desc', 5, tenantFilterQuery)),
         fetchStrapi<{ id?: number; attributes?: Record<string, unknown> }>('/sidebar-promotional-block?populate=*'),
         fetchStrapi<unknown[]>(adsPath),
       ]);
@@ -395,7 +409,8 @@ export async function getFlashNewsForNewsPages(): Promise<FlashNewsForPage> {
   }
   if (!getStrapiUrl()) return empty;
   try {
-    const flashNewsPath = `/flash-news-items?filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}&filters[publishedAt][$notNull]=true&sort=order:asc,publishedAt:desc&populate[0]=article&pagination[limit]=20`;
+    const tenantFilterQuery = await buildTenantFilterQuery(tenantId);
+    const flashNewsPath = `/flash-news-items?${tenantFilterQuery}&filters[publishedAt][$notNull]=true&sort=order:asc,publishedAt:desc&populate[0]=article&pagination[limit]=20`;
     const [homepageRes, flashRes] = await Promise.all([
       fetchStrapi<{ id?: number; attributes?: Record<string, unknown> }>('/homepage?populate=*'),
       fetchStrapi<unknown[]>(flashNewsPath),
@@ -432,7 +447,8 @@ export async function getArticleBySlug(slugOrId: string): Promise<NewsArticle | 
   } catch {
     return null;
   }
-  const base = `filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}&filters[publishedAt][$notNull]=true&${POPULATE}&pagination[page]=1&pagination[pageSize]=1`;
+  const tenantFilterQuery = await buildTenantFilterQuery(tenantId);
+  const base = `${tenantFilterQuery}&filters[publishedAt][$notNull]=true&${POPULATE}&pagination[page]=1&pagination[pageSize]=1`;
   const param = slugOrId.trim();
   try {
     let path: string;
@@ -481,7 +497,8 @@ export async function getRecentArticles(limit: number = 5): Promise<NewsArticle[
   if (!getStrapiUrl()) return [];
   try {
     const tenantId = getStrapiTenantId();
-    const path = `/articles?filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}&filters[publishedAt][$notNull]=true&${POPULATE}&sort=publishedAt:desc&pagination[page]=1&pagination[pageSize]=${limit}`;
+    const tenantFilterQuery = await buildTenantFilterQuery(tenantId);
+    const path = `/articles?${tenantFilterQuery}&filters[publishedAt][$notNull]=true&${POPULATE}&sort=publishedAt:desc&pagination[page]=1&pagination[pageSize]=${limit}`;
     const res = await fetchStrapi<unknown[]>(path);
     const list = Array.isArray(res?.data) ? res.data : [];
     return list.map((raw) => normalizeArticle(raw as { id?: number; documentId?: string; attributes?: Record<string, unknown> }));
@@ -497,7 +514,8 @@ export async function getPreviousArticle(beforePublishedAt: string): Promise<New
   if (!getStrapiUrl() || !beforePublishedAt) return null;
   try {
     const tenantId = getStrapiTenantId();
-    const path = `/articles?filters[tenant][tenantId][$eq]=${encodeURIComponent(tenantId)}&filters[publishedAt][$notNull]=true&filters[publishedAt][$lt]=${encodeURIComponent(beforePublishedAt)}&${POPULATE}&sort=publishedAt:desc&pagination[page]=1&pagination[pageSize]=1`;
+    const tenantFilterQuery = await buildTenantFilterQuery(tenantId);
+    const path = `/articles?${tenantFilterQuery}&filters[publishedAt][$notNull]=true&filters[publishedAt][$lt]=${encodeURIComponent(beforePublishedAt)}&${POPULATE}&sort=publishedAt:desc&pagination[page]=1&pagination[pageSize]=1`;
     const res = await fetchStrapi<unknown[]>(path);
     const list = Array.isArray(res?.data) ? res.data : [];
     const first = list[0] as { id?: number; documentId?: string; attributes?: Record<string, unknown> } | undefined;
