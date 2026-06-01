@@ -44,24 +44,28 @@ export function ArticleList({ title, articles, baseHref, compact, id }: ArticleL
                 href={`${baseHref}/${article.documentId || article.slug || String(article.id)}`}
                 className="flex flex-col h-full group rounded-[5px] overflow-hidden border border-syro-table-border hover:shadow-syro-card-hover transition-shadow duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-syro-red focus-visible:ring-offset-2 bg-white"
               >
-                {/* Image on top - fixed 4:3 aspect; object-contain shows full image centered, no cropping */}
-                <div className="relative w-full aspect-[4/3] shrink-0 overflow-hidden bg-syro-bg-gray flex items-center justify-center">
-                  {article.coverUrl ? (
-                    <Image
-                      src={article.coverUrl}
-                      alt={article.coverAlt || article.title}
-                      fill
-                      className="object-contain object-center group-hover:scale-105 transition-transform duration-300"
-                      sizes={compact ? '(max-width: 768px) 100vw, 672px' : '(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 400px'}
-                      unoptimized
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-syro-dark-gray/50" aria-hidden>
-                      <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14" />
-                      </svg>
-                    </div>
-                  )}
+                {/* Image on top — rounded-xl frame hugs the image (matches holy-synod hub card media): full image, no crop, rounded on all sides */}
+                <div className="px-4 pt-4">
+                  <div className="relative w-full overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-black/5 flex items-center justify-center">
+                    {article.coverUrl ? (
+                      <Image
+                        src={article.coverUrl}
+                        alt={article.coverAlt || article.title}
+                        width={400}
+                        height={300}
+                        className="w-full h-auto !rounded-xl group-hover:scale-105 transition-transform duration-300"
+                        sizes={compact ? '(max-width: 768px) 100vw, 672px' : '(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 400px'}
+                        unoptimized
+                        style={{ backgroundColor: 'transparent', width: '100%', height: 'auto' }}
+                      />
+                    ) : (
+                      <div className="w-full aspect-[4/3] flex items-center justify-center text-syro-dark-gray/50" aria-hidden>
+                        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 {/* Title, date, description - minimal top padding so less white space below image */}
                 <div className="flex flex-col flex-1 min-h-0 pt-1.5 px-syro-lg pb-syro-lg">
