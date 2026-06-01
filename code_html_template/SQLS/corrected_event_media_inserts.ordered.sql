@@ -1,3 +1,4 @@
+
 INSERT INTO public.event_type_details (id, tenant_id, name, description, color, icon, is_active, display_order, created_at, updated_at) VALUES (1, 'tenant_demo_001', 'Gala', 'Formal gala event', '#3B82F6', NULL, true, 0, '2025-06-22 11:31:26.181502', '2025-06-22 11:31:26.181502');
 
 INSERT INTO public.event_type_details (id, tenant_id, name, description, color, icon, is_active, display_order, created_at, updated_at) VALUES (2, 'tenant_demo_001', 'Conference', 'Tech conference', '#3B82F6', NULL, true, 0, '2025-06-22 11:31:26.181502', '2025-06-22 11:31:26.181502');
