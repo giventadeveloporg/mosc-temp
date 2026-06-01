@@ -1,5 +1,6 @@
 /**
  * Shared nav for /mosc-redesign — aligned with design_systems/design_samples/mosc_site_re_design.json
+ * Calendar submenu: see calendarNav.ts (Liturgical + MOSC calendars).
  */
 export const MOSC_REDESIGN_QUICK_LINKS = [
   { label: "Spiritual Organisations", href: "/mosc-redesign/spiritual-organizations" },
@@ -9,7 +10,6 @@ export const MOSC_REDESIGN_QUICK_LINKS = [
   { label: "Theological Seminaries", href: "/mosc-redesign/theological-seminaries" },
   { label: "Lectionary", href: "/mosc-redesign/lectionary" },
   { label: "Downloads", href: "/mosc-redesign/downloads" },
-  { label: "Calendar", href: "/mosc-redesign/calendar" },
   { label: "Gallery", href: "/mosc-redesign/gallery" },
 ] as const;
 

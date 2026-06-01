@@ -12,7 +12,7 @@ const QUICK_LINKS = [
   { name: 'Theological Seminaries', href: '/mosc-redesign/theological-seminaries' },
   { name: 'Lectionary', href: '/mosc-redesign/lectionary' },
   { name: 'Downloads', href: '/mosc-redesign/downloads' },
-  { name: 'Calendar', href: '/mosc-redesign/calendar' },
+  { name: 'Calendar', href: '/mosc-redesign/liturgical-calendar' },
   { name: 'Gallery', href: '/mosc-redesign/gallery' },
 ];
 

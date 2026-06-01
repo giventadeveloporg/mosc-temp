@@ -25,7 +25,7 @@ const AboutOurChurchSection = () => {
     { label: 'Institutions', href: '/mosc-redesign/institutions', icon: 'Building', isInternal: true },
     { label: 'Downloads', href: '/mosc-redesign/downloads', icon: 'Download', isInternal: true },
     { label: 'Directory', href: '/mosc-redesign/directory', icon: 'Users', isInternal: true },
-    { label: 'Calendar', href: '/mosc-redesign/calendar', icon: 'Calendar', isInternal: true },
+    { label: 'Calendar', href: '/mosc-redesign/liturgical-calendar', icon: 'Calendar', isInternal: true },
     { label: 'Training', href: '/mosc-redesign/training', icon: 'GraduationCap', isInternal: true },
     { label: 'Gallery', href: '/mosc-redesign/gallery', icon: 'Image', isInternal: true }
   ];

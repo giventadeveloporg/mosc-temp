@@ -4,7 +4,7 @@ import Icon from './ui/Icon';
 
 const ResourcesServicesSection = () => {
   const resourceCards = [
-    { name: 'Liturgical Calendar', icon: 'calendar', href: '/mosc-redesign/calendar' },
+    { name: 'Liturgical Calendar', icon: 'calendar', href: '/mosc-redesign/liturgical-calendar' },
     { name: 'Lectionary', icon: 'book', href: '/mosc-redesign/lectionary' },
     { name: 'Parish Directory', icon: 'map', href: '/mosc-redesign/directory' },
     { name: 'Prayer Requests', icon: 'prayer', href: '/mosc-redesign/contact-form-email' },
